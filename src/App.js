@@ -1,11 +1,14 @@
-import logo from './logo.svg';
+//import logo from './logo.png';
+
 import './App.css';
+import Header from './components/Header'
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+      <Header/>
+      {/* <header className="App-header">
+      <img src={logo} className="App-logo" alt="logo" />
         <p>
           Site em Manutenção.
         </p>
@@ -18,6 +21,7 @@ function App() {
           Menvo - Mentores Voluntários
         </a>
       </header>
+      */}
     </div>
   );
 }
