@@ -1,5 +1,7 @@
+import {BrowserRouter as Router, Link} from 'react-router-dom';
 import logo from "../../logo.png";
 import React, { useState } from "react";
+import Routers from "../../Routes"
 //import { FiLogOut } from "react-icons/fi"; 
 import "./styles.css";
 
@@ -7,12 +9,13 @@ const Header = () => {
   const [classOn, setClassOn] = useState(false);
 
   return (
+      <Router>
     <header>
       <div className="container">
 
-      <a href="/">
+      <Link to="/">
         <img src={logo} className="logo-cyan" alt="Logo Menvo" />
-      </a>
+      </Link>
 
         <div
           className={classOn ? "menu-section on" : "menu-section"}
@@ -23,38 +26,30 @@ const Header = () => {
             <div className="two"></div>
             <div className="three"></div>
           </div>
-
           <nav>
             <ul>
               <li>
-                <a href="/">About</a>
+                <Link to="/About">About</Link>
               </li>
               <li>
-                <a href="/">Mentors</a>
+                <Link to="/Mentors">Mentors</Link>
               </li>
               <li>
-                <a href="/">Courses</a>
-              </li>
-              <li>
-                <a href="/">Store</a>
-              </li>
-              <li>
-                <a href="/">Panel</a>
-              </li>
-              <li>
-                <a href="/oi"><button>Register</button> </a>
+                <Link to="/Register"><button>Register</button> </Link>
             </li>
             {/* <li>
                 <a className={classOn ? "show" : "hide"} href="/login">
-                  Sair <FiLogOut className="FiLogOut" />{" "}
+                Sair <FiLogOut className="FiLogOut" />{" "}
                 </a>
-              </li>
-              */}
+                </li>
+            */}
             </ul>
           </nav>
         </div>
       </div>
     </header>
+    <Routers/>
+            </Router>
   );
 };
 
