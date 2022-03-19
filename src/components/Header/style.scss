@@ -1,7 +1,6 @@
 header{
   width: 100%;
   background-color: #fff;
-  border-bottom: 1px solid #c0c0c0;
   img {
     width: 160px;
     margin-right: 0;
@@ -42,7 +41,7 @@ header nav ul li a button {
   animation-name: menu;
   animation-duration: 1s;
   transition: 100ms;
-  border-radius: 50px;
+  border-radius: 10px;
   margin-top: -10px;
   padding: 8px 22px;
   background-color: $color1;

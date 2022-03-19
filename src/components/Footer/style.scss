@@ -1,21 +1,23 @@
-
 .footer{
-    background-color: green;
     width: 100%;
-}
-
-.social-list {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    li {
-        margin: 0 1em;
-    }
-    svg {
-        font-size: 2rem;
-        color: $color1;
-        &:hover {
-            color: $color2;
+    .social_list {
+        display: flex;
+        margin: 10px;
+        justify-content: center;
+        list-style-type: none;
+        li {
+            margin: 0 0.8em;
+        }
+        svg {
+            font-size: 1.8rem;
+            color: $color1;
+            &:hover {
+                color: $color2;
+            }
         }
     }
+    p {
+        text-align: center;
+    }
 }
+
