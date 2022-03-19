@@ -8,7 +8,7 @@
   text-decoration: none;
 }
 
-.About, .Home, .Mentors, .Register {
+.About, .Home, .Register {
   height: 75vh;
   background-color: #f0f0f0;
   text-align: center;
@@ -19,10 +19,122 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100px;
   max-width: 1200px;
   width: 90%;
   margin: auto;
+}
+
+.buttonStandard {
+  max-width: 100%;
+  margin-bottom: 10px;
+  padding: 10px 22px;
+  position: relative;
+  animation-name: menu;
+  animation-duration: 1.3s;
+  transition: 80ms;
+  border-radius: 25px;
+  font-size: 16px;
+  background-color: #006276;
+  border: 1px solid #006276;
+  color: #fff;
+  font-weight: 500;
+}
+.buttonStandard:hover {
+  background-color: #0f7185;
+  cursor: pointer;
+}
+
+.linkStandard {
+  color: #006276;
+}
+.linkStandard:hover {
+  color: #0f7185;
+}
+
+.Mentors {
+  display: flex;
+  margin: 0px auto;
+  background-color: #f0f0f0;
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+.Mentors .container {
+  align-items: start;
+}
+
+.sideBar {
+  margin: 10px;
+  width: 25%;
+}
+
+.feedMentor {
+  width: 75%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: space-around;
+}
+
+.filterButonIcon {
+  border-radius: 50px;
+  position: fixed;
+  background-color: #006276;
+  bottom: 20px;
+  left: 20px;
+  padding: 14px;
+}
+.filterButonIcon:hover {
+  background-color: #0f7185;
+  cursor: pointer;
+}
+.filterButonIcon svg {
+  color: #fff;
+  z-index: 10;
+  font-size: 24px;
+}
+
+.Mentors {
+  display: flex;
+  margin: 0px auto;
+  background-color: #f0f0f0;
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+.Mentors .container {
+  align-items: start;
+}
+
+.sideBar {
+  margin: 10px;
+  width: 25%;
+}
+
+.feedMentor {
+  width: 75%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: space-around;
+}
+
+.filterButonIcon {
+  border-radius: 50px;
+  position: fixed;
+  background-color: #006276;
+  bottom: 20px;
+  left: 20px;
+  padding: 14px;
+}
+.filterButonIcon:hover {
+  background-color: #0f7185;
+  cursor: pointer;
+}
+.filterButonIcon svg {
+  color: #fff;
+  z-index: 10;
+  font-size: 24px;
 }
 
 header {
@@ -242,6 +354,150 @@ header nav ul li a .FiLogOut {
   text-align: center;
 }
 
+.cardMentor {
+  min-width: 150px;
+  width: 100%;
+  margin: 10px auto;
+  border-radius: 6px;
+  transition: 0.1s;
+  box-shadow: 0.1px 0.1px 4px #c0c0c0;
+  background-color: #fff;
+}
+.cardMentor:hover {
+  transition: 0.3s;
+  box-shadow: 0.1px 0.1px 8px #959595;
+}
+.cardMentor .cardMentorPhoto {
+  overflow: hidden;
+  position: relative;
+  border-radius: 6px 6px 0px 0px;
+}
+.cardMentor .cardMentorPhoto img {
+  padding: -5px;
+  top: 0;
+  border-radius: 6px 6px 0px 0px;
+  background-size: cover;
+  width: 100%;
+  -webkit-transition: 0.4s ease;
+  transition: 0.4s ease;
+  transform: scale(1.06);
+}
+.cardMentor .cardMentorPhoto img:hover {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+.mainSubject h3 {
+  top: 10px;
+  right: 10px;
+  text-align: right;
+  position: absolute;
+  background-color: #006276;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+}
+.mainSubject h3:hover {
+  background-color: #0f7185;
+}
+
+.infoMentor {
+  padding: 25px;
+}
+.infoMentor p {
+  margin: 20px auto;
+  font-size: 16px;
+  color: #3b3b3b;
+  text-align: justify;
+}
+.infoMentor button {
+  width: 100%;
+}
+
+@media screen and (min-width: 1201px) and (max-width: 4000px) {
+  .cardMentor {
+    max-width: 30%;
+  }
+
+  .filterButonIcon {
+    display: none;
+  }
+}
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .cardMentor {
+    max-width: 45%;
+  }
+
+  .filterButonIcon {
+    display: none;
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 800px) {
+  .cardMentor {
+    max-width: 40%;
+  }
+
+  .sideBar {
+    display: none;
+  }
+
+  .feedMentor {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 600px) {
+  .sideBar {
+    display: none;
+  }
+
+  .feedMentor {
+    width: 100%;
+  }
+
+  .cardMentor {
+    max-width: 90%;
+  }
+}
+.sidebarMentor {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0.1px 0.1px 4px #c0c0c0;
+}
+.sidebarMentor h4 {
+  color: #006276;
+  margin: 12px 0px;
+}
+.sidebarMentor ul {
+  display: flex;
+  flex-direction: column;
+}
+.sidebarMentor ul li {
+  text-align: left;
+}
+.sidebarMentor ul li input {
+  margin-bottom: 10px;
+}
+.sidebarMentor ul li label {
+  margin-left: 10px;
+}
+.sidebarMentor ul button {
+  float: right;
+  margin-top: 20px;
+}
+
+.searchInput {
+  max-width: 100%;
+  border: 1px solid #f0f0f0;
+  margin-bottom: 10px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 16px;
+  background-color: #f0f0f0;
+}
+
 .formLogin {
   margin: 50px auto;
 }
@@ -260,7 +516,7 @@ header nav ul li a .FiLogOut {
   justify-content: center;
   margin: 0px auto;
 }
-.formLogin form input, .formLogin form button {
+.formLogin form input {
   max-width: 100%;
   border: none;
   margin-bottom: 10px;
@@ -272,19 +528,6 @@ header nav ul li a .FiLogOut {
   border-radius: 10px;
   font-size: 16px;
 }
-.formLogin form button {
-  animation-duration: 1s;
-  transition: 100ms;
-  border-radius: 10px;
-  background-color: #006276;
-  border: 1px solid #006276;
-  color: #fff;
-  font-weight: 500;
-}
-.formLogin form button:hover {
-  background-color: #0f7185;
-  cursor: pointer;
-}
 .formLogin form ul {
   position: relative;
   animation-name: menu;
@@ -293,12 +536,6 @@ header nav ul li a .FiLogOut {
   display: flex;
   justify-content: space-between;
   padding: 0px 20px;
-}
-.formLogin form ul a {
-  color: #585858;
-}
-.formLogin form ul a:hover {
-  color: #006276;
 }
 
 .formSchedule {
@@ -319,7 +556,7 @@ header nav ul li a .FiLogOut {
   justify-content: center;
   margin: 0px auto;
 }
-.formSchedule form input, .formSchedule form button {
+.formSchedule form input {
   max-width: 100%;
   border: none;
   margin-bottom: 10px;
@@ -331,19 +568,6 @@ header nav ul li a .FiLogOut {
   border-radius: 10px;
   font-size: 16px;
 }
-.formSchedule form button {
-  animation-duration: 1s;
-  transition: 100ms;
-  border-radius: 10px;
-  background-color: #006276;
-  border: 1px solid #006276;
-  color: #fff;
-  font-weight: 500;
-}
-.formSchedule form button:hover {
-  background-color: #0f7185;
-  cursor: pointer;
-}
 .formSchedule form ul {
   position: relative;
   animation-name: menu;
@@ -352,12 +576,6 @@ header nav ul li a .FiLogOut {
   display: flex;
   justify-content: space-between;
   padding: 0px 20px;
-}
-.formSchedule form ul a {
-  color: #585858;
-}
-.formSchedule form ul a:hover {
-  color: #006276;
 }
 
 /*# sourceMappingURL=App.css.map */

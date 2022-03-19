@@ -1,12 +1,14 @@
 // Base
 @import "../src/Sass/helpers.scss";
 @import "../src/Sass/variables.scss";
+@import "../src/Sass/components.scss";
 
 // Pages
 
 @import "../src/pages/About/style.scss";
 @import "../src/pages/Home/style.scss";
 @import "../src/pages/Mentors/style.scss";
+@import "../src/pages/SingleMentor/style.scss";
 @import "../src/pages/Register/style.scss";
 
     // Header and Footer
@@ -15,6 +17,7 @@
     // Components
     @import "../src/components/CardMentor/style.scss";
     @import "../src/components/CardMentorship/style.scss";
+    @import "../src/components/SidebarMentor/style.scss";
     @import "../src/components/Guider/style.scss";
     // Forms
     @import "../src/components/Forms/FormLogin/style.scss";
