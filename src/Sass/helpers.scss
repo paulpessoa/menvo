@@ -7,7 +7,7 @@
     text-decoration: none;
 }
 
-.About, .Home, .Mentors, .Register{
+.About, .Home, .Register{
     height: 75vh;
     background-color: #f0f0f0;
     text-align: center;
@@ -17,7 +17,6 @@
     display: flex; 
     align-items: center;
     justify-content: space-between;
-    height: 100px;
     max-width: 1200px;
     width: 90%; 
     margin: auto;

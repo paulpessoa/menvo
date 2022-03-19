@@ -1,2 +1,22 @@
+.Mentors{
+    display: flex;
+    margin: 0px auto;
+    background-color: #f0f0f0;
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.sideBar {
+    background-color: red;
+    width: 30%;
+}
 
 
+
+.feedMentor {
+    width: 70%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}

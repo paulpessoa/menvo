@@ -7,10 +7,10 @@ function FormLogin () {
         <form onSubmit={submitLogin}>
             <input type="mail" placeholder="e-mail"/>
             <input type="password" placeholder="password"/>
-            <button type = 'submit'>Login</button>
+            <button className="buttonStandard" type = 'submit'>Login</button>
             <ul>
-                <li><a href="/About">Register</a></li>
-                <li><a href="/Mentors">Reset Password</a></li>
+                <li><a className="linkStandard" href="/About">Register</a></li>
+                <li><a className="linkStandard" href="/Mentors">Reset Password</a></li>
             </ul>
         </form>
         </div>

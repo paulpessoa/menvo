@@ -14,7 +14,7 @@
         flex-direction: column;
         justify-content: center;
         margin: 0px auto;
-        input, button {
+        input {
             max-width: 100%;
             border: none;
             margin-bottom: 10px;
@@ -25,20 +25,7 @@
             transition: 80ms;
             border-radius: 10px;
             font-size: 16px;
-        }
-        button {
-            animation-duration: 1s;
-            transition: 100ms;
-            border-radius: 10px;
-            background-color: $color1;
-            border: 1px solid $color1;
-            color: #fff;
-            font-weight: 500;
-            &:hover {
-             background-color: $color2;
-             cursor: pointer;   
-            }
-        }
+        }       
         ul {
             position: relative;
             animation-name: menu;
@@ -47,12 +34,6 @@
             display: flex;
             justify-content: space-between;
             padding: 0px 20px;
-            a {
-                color: #585858;
-                &:hover{
-                    color: $color1;
-                }
-            }
         }
     }
 }
