@@ -5,10 +5,12 @@
     padding: 0px;
 }
 
-body {
-    background-color: red!important;
+.About, .Home, .Mentors, .Register{
+    height: 75vh;
+    background-color: #f0f0f0;
+    text-align: center;
+    padding-top: 50px;
 }
-
 .container {
     display: flex; 
     align-items: center;
