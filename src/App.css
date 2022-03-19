@@ -1,39 +1,240 @@
-.App {
-  text-align: center;
+/*Reset CSS*/
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+* {
+  font-family: "Rubik", sans-serif;
+  margin: 0px;
+  padding: 0px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  background-color: red !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.container {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between;
+  height: 100px;
+  max-width: 1200px;
+  width: 90%;
+  margin: auto;
 }
 
-.App-link {
-  color: #61dafb;
+header {
+  width: 100%;
+  background-color: #fff;
+  border-bottom: 1px solid #c0c0c0;
+}
+header img {
+  width: 160px;
+  margin-right: 0;
+  padding: 15px 0;
+  margin: 0px;
+}
+header nav {
+  display: flex;
+}
+header nav ul {
+  display: flex;
+}
+header nav ul li {
+  list-style: none;
+}
+header nav ul li a {
   text-decoration: none;
+  font-weight: 500;
+  color: #006276;
+  font-size: 16px;
+  padding: 1rem;
+  transition: all 250ms linear 0s;
+  position: relative;
+  animation-name: menu;
+  animation-duration: 1s;
+  transition: 100ms;
+}
+header nav ul li a:hover {
+  color: #0f7185;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+header nav ul li a button {
+  position: relative;
+  animation-name: menu;
+  animation-duration: 1s;
+  transition: 100ms;
+  border-radius: 50px;
+  margin-top: -10px;
+  padding: 8px 22px;
+  background-color: #006276;
+  border: 2px solid #006276;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: -20px;
+}
+header nav ul li a button:hover {
+  background-color: #0f7185;
+  border: 2px solid #0f7185;
+}
+
+header nav ul li a .FiLogOut {
+  position: relative;
+  top: 2px;
+  left: 2px;
+}
+
+@keyframes menu {
+  0% {
+    left: 0px;
+    top: -100px;
   }
-  to {
-    transform: rotate(360deg);
+  100% {
+    left: 0px;
+    top: 0px;
   }
 }
+@media (max-width: 630px) {
+  .hero .container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .form-group {
+    display: block;
+  }
+}
+@media (max-width: 1020px) {
+  .menu-section nav {
+    display: none;
+  }
+
+  .one,
+.two,
+.three {
+    background-color: #006276;
+    height: 5px;
+    max-width: 1020px;
+    width: 90%;
+    margin: 6px auto;
+    transition-duration: 0.3s;
+  }
+
+  .menu-toggle {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+  }
+
+  /*Fullscreen*/
+  .menu-section.on {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #006276;
+    z-index: 10;
+    /*camada acima, evitar o scrool dos itens a baixo*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .menu-section.on nav {
+    display: block;
+  }
+
+  .menu-section.on .menu-toggle {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+  }
+
+  .menu-section.on .menu-toggle .one {
+    transform: rotate(45deg) translate(7px, 7px);
+    background-color: #fff;
+  }
+
+  .menu-section.on .menu-toggle .two {
+    opacity: 0;
+  }
+
+  .menu-section.on .menu-toggle .three {
+    transform: rotate(-45deg) translate(8px, -9px);
+    background-color: #fff;
+  }
+
+  .menu-section.on nav ul {
+    text-align: center;
+    display: block;
+  }
+
+  .menu-section.on nav ul a {
+    transition-duration: 0.5s;
+    font-size: 1rem;
+    display: block;
+    color: #fff;
+    padding: 1rem;
+  }
+
+  .menu-section.on nav ul a button {
+    transition-duration: 0.5s;
+    font-size: 1rem;
+    display: block;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 50px;
+    padding: 8px 22px;
+    background-color: #fff;
+    border: 2px solid #fff;
+    color: #006276;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .menu-section.on nav ul a button:hover {
+    background-color: #bedce2;
+    border: 2px solid #bedce2;
+    color: #004350;
+  }
+
+  header nav ul li a .FiLogOut {
+    width: 40px;
+  }
+
+  .menu-section.on nav ul .hide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0rem;
+    font-size: 1rem;
+  }
+}
+@media (max-width: 320px) {
+  #form h3 {
+    font-size: 1rem;
+  }
+}
+.footer {
+  background-color: green;
+  width: 100%;
+}
+
+.social-list {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+}
+.social-list li {
+  margin: 0 1em;
+}
+.social-list svg {
+  font-size: 2rem;
+  color: #006276;
+}
+.social-list svg:hover {
+  color: #0f7185;
+}
+
+/*# sourceMappingURL=App.css.map */
