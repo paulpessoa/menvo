@@ -1,2 +1,104 @@
+.cardMentor {
+  min-width: 150px;
+  width: 100%;
+  margin: 10px auto;
+  border-radius: 6px;
+  transition: 0.1s;
+  box-shadow: 0.1px 0.1px 4px #c0c0c0;
+  background-color: #fff;
+  &:hover {
+    transition: 0.3s;
+    box-shadow: 0.1px 0.1px 8px #959595;
+  }
+  .cardMentorPhoto {
+    overflow: hidden;
+    position: relative;
+    border-radius: 6px 6px 0px 0px;
 
+    img {
+      padding: -5px;
+      top: 0;
+      border-radius: 6px 6px 0px 0px;
+      background-size: cover;
+      width: 100%;
+      -webkit-transition: 0.4s ease;
+      transition: 0.4s ease;
+      transform: scale(1.06);
+      &:hover {
+        -webkit-transform: scale(1.1);
+        transform: scale(1.1);
+      }
+    }
+  }
+}
 
+.mainSubject h3 {
+  top: 10px;
+  right: 10px;
+  text-align: right;
+  position: absolute;
+  background-color: $color1;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+  &:hover {
+    background-color: $color2;
+  }
+}
+
+.infoMentor {
+  padding: 25px;
+  p {
+    margin: 20px auto;
+    font-size: 16px;
+    color: #3b3b3b;
+    text-align: justify;
+  }
+  button {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 1201px) and (max-width: 4000px) {
+  .cardMentor {
+    max-width: 30%;
+  }
+  .filterButonIcon {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .cardMentor {
+    max-width: 45%;
+  }
+  .filterButonIcon {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 601px) and (max-width: 800px) {
+  .cardMentor {
+    max-width: 40%;
+  }
+  .sideBar {
+    display: none;
+  }
+  .feedMentor {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .sideBar {
+    display: none;
+  }
+  .feedMentor {
+    width: 100%;
+  }
+  .cardMentor {
+    max-width: 90%;
+  }
+}

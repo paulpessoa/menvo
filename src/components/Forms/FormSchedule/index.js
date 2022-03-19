@@ -9,12 +9,11 @@ function FormSchedule () {
             <input type="text" name="data[name]" placeholder="name"/>
             <input type="text" name="data[subject]" placeholder="subject" rows='5'/>
             <input type="url" name="data[linkedin]" placeholder="linkedin"/>
-            <input type="date" name="data[date]"/>
             <input type="file" name="data[file]"/>
-            <button type = 'submit'>Schedule</button>
+            <button className="buttonStandard" type='submit'>Schedule</button>
             <ul>
-                <li><a href="/About">Terms Accept</a></li>
-                <li><a href="/Mentors">Mentorship Guide</a></li>
+                <li><a className="linkStandard" href="/About">Terms Accept</a></li>
+                <li><a className="linkStandard" href="/Mentors">Mentorship Guide</a></li>
             </ul>
         </form>
         </div>
