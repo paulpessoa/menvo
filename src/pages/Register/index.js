@@ -1,7 +1,8 @@
+import FormLogin from "../../components/Forms/FormLogin";
 function Register () {
     return (  
-      <div className="App">
-        <h1>Register </h1>
+      <div className="Register">
+        <FormLogin/>
       </div>
     );
   };

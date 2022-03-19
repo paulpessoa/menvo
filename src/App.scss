@@ -1,0 +1,23 @@
+// Base
+@import "../src/Sass/helpers.scss";
+@import "../src/Sass/variables.scss";
+
+// Pages
+
+@import "../src/pages/About/style.scss";
+@import "../src/pages/Home/style.scss";
+@import "../src/pages/Mentors/style.scss";
+@import "../src/pages/Register/style.scss";
+
+    // Header and Footer
+    @import "../src/components/Header/style.scss";
+    @import "../src/components/Footer/style.scss";
+    // Components
+    @import "../src/components/CardMentor/style.scss";
+    @import "../src/components/CardMentorship/style.scss";
+    @import "../src/components/Guider/style.scss";
+    // Forms
+    @import "../src/components/Forms/FormLogin/style.scss";
+    @import "../src/components/Forms/FormSchedule/style.scss";
+
+

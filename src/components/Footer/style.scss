@@ -1,0 +1,22 @@
+.footer{
+    width: 100%;
+    .social_list {
+        display: flex;
+        margin: 10px;
+        justify-content: center;
+        li {
+            margin: 0 0.8em;
+        }
+        svg {
+            font-size: 1.8rem;
+            color: $color1;
+            &:hover {
+                color: $color2;
+            }
+        }
+    }
+    p {
+        text-align: center;
+    }
+}
+

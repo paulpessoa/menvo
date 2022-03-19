@@ -1,87 +1,61 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-*{
-  font-family: 'Rubik', sans-serif;
-}
-
 header{
   width: 100%;
   background-color: #fff;
-  border-bottom: 1px solid #c0c0c0;
+  img {
+    width: 160px;
+    margin-right: 0;
+    padding: 15px 0;
+    margin: 0px;
+  }
+  nav {
+    display: flex;
+    ul {
+      display: flex;
+      li {
+        list-style: none;
+        a {
+          text-decoration: none;
+          font-weight: 500;
+          color: $color1;
+          font-size: 16px;
+          padding: 1rem;
+          transition: all 250ms linear 0s;
+          position: relative;
+          animation-name: menu;
+          animation-duration: 1s;
+          transition: 100ms;
+          &:hover {
+            color: $color2;
+          }
+        }
+      }
+    }
+  }
 }
 
-header .container {
-  display: flex; 
-  align-items: center;
-  justify-content: space-between;
-  height: 100px;
-  max-width: 1200px;
-  width: 90%; 
-  margin: auto;
-}
 
-header img {
-  width: 160px;
-  margin-right: 0;
-  padding: 15px 0;
-  margin: 0px;
-}
 
-header nav {
-  display: flex;
-}
-
-header nav ul {
-  display: flex;
-}
-
-header nav ul li {
-  list-style: none;
-}
-
-header nav ul li a {
-  text-decoration: none;
-  font-weight: 500;
-  color: #006276;
-  font-size: 16px;
-  padding: 1rem;
-  transition: all 250ms linear 0s;
-}
-
-header nav ul li a:hover {
-  color: #005464;
- 
-}
-header nav ul li a{
-  position: relative;
-  animation-name: menu;
-  animation-duration: 1s;
-  transition: 100ms;
-}
 
 header nav ul li a button {
   position: relative;
   animation-name: menu;
   animation-duration: 1s;
   transition: 100ms;
-  border-radius: 50px;
+  border-radius: 10px;
   margin-top: -10px;
   padding: 8px 22px;
-  background-color: #006276;
-  border: 2px solid #006276;
+  background-color: $color1;
+  border: 2px solid $color1;
   color: #fff;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
   margin-bottom: -20px;
+  &:hover{
+    background-color: $color2;
+    border: 2px solid $color2;
+  }
 }
-
-header nav ul li a button:hover{
-  background-color: #005464;
-  border: 2px solid #005464;
-}
-
 
 
 header nav ul li a .FiLogOut{
@@ -116,7 +90,7 @@ header nav ul li a .FiLogOut{
   .one,
   .two,
   .three{
-    background-color:#006276;
+    background-color:$color1;
     height: 5px;
     max-width: 1020px;
     width: 90%; 
@@ -136,7 +110,7 @@ header nav ul li a .FiLogOut{
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #006276;
+    background: $color1;
     z-index: 10; /*camada acima, evitar o scrool dos itens a baixo*/
     display: flex;
     justify-content: center;
@@ -194,7 +168,7 @@ header nav ul li a .FiLogOut{
     padding: 8px 22px;
     background-color: #fff;
     border: 2px solid #fff;
-    color: #006276;
+    color: $color1;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
