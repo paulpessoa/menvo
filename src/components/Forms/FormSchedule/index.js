@@ -4,12 +4,13 @@ function FormSchedule () {
       <div className="form">
       <div className="formSchedule">
         <h3>It's your time</h3>
-        <form onSubmit={submitLogin}>
-            <input type="text" placeholder="name"/>
-            <input type="text" placeholder="subject" rows='5'/>
-            <input type="url" placeholder="linkedin"/>
-            <input type="date"/>
-            <input type="file"/>
+        <form onSubmit={submitSchedule} method="post" id="sheetdb-form" action="https://sheetdb.io/api/v1/m9wh0c99r9ojz">
+            <input type="hidden" name="data[id]"/>
+            <input type="text" name="data[name]" placeholder="name"/>
+            <input type="text" name="data[subject]" placeholder="subject" rows='5'/>
+            <input type="url" name="data[linkedin]" placeholder="linkedin"/>
+            <input type="date" name="data[date]"/>
+            <input type="file" name="data[file]"/>
             <button type = 'submit'>Schedule</button>
             <ul>
                 <li><a href="/About">Terms Accept</a></li>
@@ -21,9 +22,33 @@ function FormSchedule () {
       
     );
 
-    function submitLogin (event) {
-        event.preventDefault();
-        alert('Hey dude!!!!')
+
+
+
+
+
+
+
+
+
+
+
+    function submitSchedule (event) {
+       
+    var form = document.getElementById('sheetdb-form');
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      fetch(form.action, {
+          method : "POST",
+          body: new FormData(document.getElementById("sheetdb-form")),
+      }).then(
+          response => response.json()
+      ).then((html) => {
+        // you can put any JS code here
+        alert('success')
+        console.log(form)
+      });
+    });
     }
   };
   
