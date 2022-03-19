@@ -39,5 +39,20 @@
              cursor: pointer;   
             }
         }
+        ul {
+            position: relative;
+            animation-name: menu;
+            animation-duration: 0.8s;
+            transition: 80ms;
+            display: flex;
+            justify-content: space-between;
+            padding: 0px 20px;
+            a {
+                color: #585858;
+                &:hover{
+                    color: $color1;
+                }
+            }
+        }
     }
 }

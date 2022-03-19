@@ -4,6 +4,8 @@
   font-family: "Rubik", sans-serif;
   margin: 0px;
   padding: 0px;
+  list-style-type: none;
+  text-decoration: none;
 }
 
 .About, .Home, .Mentors, .Register {
@@ -225,7 +227,6 @@ header nav ul li a .FiLogOut {
   display: flex;
   margin: 10px;
   justify-content: center;
-  list-style-type: none;
 }
 .footer .social_list li {
   margin: 0 0.8em;
@@ -283,6 +284,21 @@ header nav ul li a .FiLogOut {
 .formLogin form button:hover {
   background-color: #0f7185;
   cursor: pointer;
+}
+.formLogin form ul {
+  position: relative;
+  animation-name: menu;
+  animation-duration: 0.8s;
+  transition: 80ms;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 20px;
+}
+.formLogin form ul a {
+  color: #585858;
+}
+.formLogin form ul a:hover {
+  color: #006276;
 }
 
 /*# sourceMappingURL=App.css.map */
