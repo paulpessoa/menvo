@@ -26,10 +26,9 @@ function CardMentor() {
       </a>
       
         <p> lorem  adyusio sdouiduajs dbiobnxaisdj djoia bnxaisdj ioajs dioajsdioasjd oijxdjas djhlaaaaa assdn asldiqwuyuie iwqe (...)</p>
-        <a href="https://#" target="_blank" rel="noreferrer">
+        <a href="/SingleMentor">
         <button className="buttonStandard">View Profile</button>      
       </a>
-        
      </div>
     </div>
   );
