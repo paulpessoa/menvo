@@ -24,9 +24,9 @@
         width: 100%;
         -webkit-transition: 0.4s ease;
         transition: 0.4s ease;
-        -webkit-transform: scale(1.05);
+        transform: scale(1.06);
         &:hover {
-          -webkit-transform: scale(1.10);
+          -webkit-transform:scale(1.10) ;
           transform: scale(1.10);
         }
       }
