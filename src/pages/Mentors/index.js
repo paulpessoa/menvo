@@ -1,7 +1,9 @@
+import FormSchedule from "../../components/Forms/FormSchedule";
 function Mentors () {
   return (  
     <div className="Mentors">
-      <h1>Mentor </h1>
+      <div></div>
+      <div><FormSchedule/></div>
 
     </div>
   );

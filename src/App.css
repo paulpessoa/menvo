@@ -301,4 +301,63 @@ header nav ul li a .FiLogOut {
   color: #006276;
 }
 
+.formSchedule {
+  margin: 50px auto;
+}
+.formSchedule h3 {
+  margin-bottom: 20px;
+  position: relative;
+  animation-name: menu;
+  animation-duration: 1.4s;
+  transition: 110ms;
+}
+.formSchedule form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0px auto;
+}
+.formSchedule form input, .formSchedule form button {
+  max-width: 100%;
+  border: none;
+  margin-bottom: 10px;
+  padding: 12px 22px;
+  position: relative;
+  animation-name: menu;
+  animation-duration: 1.3s;
+  transition: 80ms;
+  border-radius: 10px;
+  font-size: 16px;
+}
+.formSchedule form button {
+  animation-duration: 1s;
+  transition: 100ms;
+  border-radius: 10px;
+  background-color: #006276;
+  border: 1px solid #006276;
+  color: #fff;
+  font-weight: 500;
+}
+.formSchedule form button:hover {
+  background-color: #0f7185;
+  cursor: pointer;
+}
+.formSchedule form ul {
+  position: relative;
+  animation-name: menu;
+  animation-duration: 0.8s;
+  transition: 80ms;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 20px;
+}
+.formSchedule form ul a {
+  color: #585858;
+}
+.formSchedule form ul a:hover {
+  color: #006276;
+}
+
 /*# sourceMappingURL=App.css.map */
