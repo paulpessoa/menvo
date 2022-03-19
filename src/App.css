@@ -53,22 +53,27 @@
 
 .Mentors {
   display: flex;
+  align-items: start;
   margin: 0px auto;
   background-color: #f0f0f0;
   text-align: center;
   padding-top: 50px;
   padding-bottom: 50px;
 }
+.Mentors .container {
+  align-items: start;
+}
 
 .sideBar {
-  background-color: red;
-  width: 30%;
+  margin: 10px;
+  width: 25%;
 }
 
 .feedMentor {
-  width: 70%;
+  width: 75%;
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   justify-content: space-around;
 }
 
@@ -292,7 +297,7 @@ header nav ul li a .FiLogOut {
 .cardMentor {
   min-width: 150px;
   width: 100%;
-  max-width: 250px;
+  max-width: 30%;
   margin: 10px auto;
   border-radius: 6px;
   transition: 0.1s;
@@ -350,6 +355,43 @@ header nav ul li a .FiLogOut {
 }
 .infoMentor button {
   width: 100%;
+}
+
+.sidebarMentor {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0.1px 0.1px 4px #c0c0c0;
+}
+.sidebarMentor h4 {
+  color: #006276;
+  margin: 12px 0px;
+}
+.sidebarMentor ul {
+  display: flex;
+  flex-direction: column;
+}
+.sidebarMentor ul li {
+  text-align: left;
+}
+.sidebarMentor ul li input {
+  margin-bottom: 10px;
+}
+.sidebarMentor ul li label {
+  margin-left: 10px;
+}
+.sidebarMentor ul button {
+  float: right;
+  margin-top: 20px;
+}
+
+.searchInput {
+  max-width: 100%;
+  border: 1px solid #c0c0c0;
+  margin-bottom: 10px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 16px;
 }
 
 .formLogin {
