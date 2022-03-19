@@ -3,7 +3,7 @@ function SidebarMentor() {
     <div className="sidebarMentor">
       <ul>
         <li>
-          <h4>Search</h4>
+          <h4>Find a Mentor</h4>
           <input className="searchInput" type="search" placeholder="search" />
         </li>
         <li>
@@ -43,7 +43,7 @@ function SidebarMentor() {
           <br />
         </li>
         <li>
-          <h4>your way</h4>
+          <h4>Your Way</h4>
           <input type="checkbox" />
           <label for="huey">Woman</label>
           <br />
@@ -55,11 +55,13 @@ function SidebarMentor() {
           <br />
         </li>
         <li>
-          <button className="buttonStandard">Apply filters</button>
+          <button  className="buttonStandard">Apply filters</button>
         </li>
       </ul>
     </div>
   );
 }
+
+
 
 export default SidebarMentor;

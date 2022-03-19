@@ -25,7 +25,7 @@ function CardMentor() {
       <h3>Mentor Name</h3>      
       </a>
       
-        <p> lorem  adyusio sdouiduajs dbioowqidbnxaisdj djoia djoia ioajs dioajsdioasjd oijxdjasdjasdn</p>
+        <p> lorem  adyusio sdouiduajs dbiobnxaisdj djoia bnxaisdj ioajs dioajsdioasjd oijxdjas djhlaaaaa assdn asldiqwuyuie iwqe (...)</p>
         <a href="https://#" target="_blank" rel="noreferrer">
         <button className="buttonStandard">View Profile</button>      
       </a>

@@ -77,6 +77,24 @@
   justify-content: space-around;
 }
 
+.filterButonIcon {
+  border-radius: 50px;
+  position: fixed;
+  background-color: #006276;
+  bottom: 20px;
+  left: 20px;
+  padding: 14px;
+}
+.filterButonIcon:hover {
+  background-color: #0f7185;
+  cursor: pointer;
+}
+.filterButonIcon svg {
+  color: #fff;
+  z-index: 10;
+  font-size: 24px;
+}
+
 header {
   width: 100%;
   background-color: #fff;
@@ -297,7 +315,6 @@ header nav ul li a .FiLogOut {
 .cardMentor {
   min-width: 150px;
   width: 100%;
-  max-width: 30%;
   margin: 10px auto;
   border-radius: 6px;
   transition: 0.1s;
@@ -357,6 +374,42 @@ header nav ul li a .FiLogOut {
   width: 100%;
 }
 
+@media screen and (min-width: 1201px) and (max-width: 4000px) {
+  .cardMentor {
+    max-width: 30%;
+  }
+}
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .cardMentor {
+    max-width: 45%;
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 800px) {
+  .cardMentor {
+    max-width: 40%;
+  }
+
+  .sideBar {
+    display: none;
+  }
+
+  .feedMentor {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 600px) {
+  .sideBar {
+    display: none;
+  }
+
+  .feedMentor {
+    width: 100%;
+  }
+
+  .cardMentor {
+    max-width: 90%;
+  }
+}
 .sidebarMentor {
   background-color: #fff;
   padding: 20px;
@@ -387,11 +440,12 @@ header nav ul li a .FiLogOut {
 
 .searchInput {
   max-width: 100%;
-  border: 1px solid #c0c0c0;
+  border: 1px solid #f0f0f0;
   margin-bottom: 10px;
   padding: 12px 22px;
   border-radius: 10px;
   font-size: 16px;
+  background-color: #f0f0f0;
 }
 
 .formLogin {
