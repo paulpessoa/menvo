@@ -1,0 +1,24 @@
+/*Reset CSS*/
+*{
+    font-family: 'Rubik', sans-serif;
+    margin: 0px;
+    padding: 0px;
+    list-style-type: none;
+    text-decoration: none;
+}
+
+.About, .Home, .Mentors, .Register{
+    height: 75vh;
+    background-color: #f0f0f0;
+    text-align: center;
+    padding-top: 50px;
+}
+.container {
+    display: flex; 
+    align-items: center;
+    justify-content: space-between;
+    height: 100px;
+    max-width: 1200px;
+    width: 90%; 
+    margin: auto;
+  }

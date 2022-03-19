@@ -1,9 +1,9 @@
 import {BrowserRouter as Router, Link} from 'react-router-dom';
 import logo from "../../logo.png";
 import React, { useState } from "react";
-import Routers from "../../Routes"
+import Routers from "../../Routes";
 //import { FiLogOut } from "react-icons/fi"; 
-import "./styles.css";
+
 
 const Header = () => {
   const [classOn, setClassOn] = useState(false);
