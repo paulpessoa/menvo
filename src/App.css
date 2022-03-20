@@ -9,7 +9,7 @@
 }
 
 .About, .Home, .Register {
-  min-height: 75vh;
+  min-height: 80vh;
   background-color: #f0f0f0;
   text-align: center;
   padding-top: 50px;
@@ -49,6 +49,27 @@
 }
 .linkStandard:hover {
   color: #0f7185;
+}
+
+.Home {
+  background-image: url(https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.Home .bannerHome {
+  background-color: rgba(255, 255, 255, 0.644);
+  width: 200px;
+  height: 200px;
+  margin: 0px auto;
+  padding: 60px;
+  border-radius: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .Mentors {
@@ -177,7 +198,7 @@ header nav ul li a button {
   animation-name: menu;
   animation-duration: 1s;
   transition: 100ms;
-  border-radius: 10px;
+  border-radius: 25px;
   margin-top: -10px;
   padding: 8px 22px;
   background-color: #006276;
@@ -504,7 +525,7 @@ header nav ul li a .FiLogOut {
   border: 1px solid #f0f0f0;
   margin-bottom: 10px;
   padding: 12px 22px;
-  border-radius: 10px;
+  border-radius: 25px;
   font-size: 16px;
   background-color: #f0f0f0;
 }
@@ -536,7 +557,7 @@ header nav ul li a .FiLogOut {
   animation-name: menu;
   animation-duration: 1.3s;
   transition: 80ms;
-  border-radius: 10px;
+  border-radius: 25px;
   font-size: 16px;
 }
 .formLogin form ul {
@@ -576,7 +597,7 @@ header nav ul li a .FiLogOut {
   animation-name: menu;
   animation-duration: 1.3s;
   transition: 80ms;
-  border-radius: 10px;
+  border-radius: 25px;
   font-size: 16px;
 }
 .formSchedule form ul {
