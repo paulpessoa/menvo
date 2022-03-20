@@ -1,2 +1,20 @@
-
-
+.Home {
+    background-image: url(https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .bannerHome {
+        background-color: rgba(255, 255, 255, 0.644);
+        width: 200px;
+        height: 200px;
+        margin: 0px auto;
+        padding: 60px;
+        border-radius: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
