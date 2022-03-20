@@ -21,7 +21,7 @@ function Footer (){
             <FaGithub/></a>
             </li>
         </ul>           
-            <p>Todos os direitos reservados  &copy; Menvo 2022 </p>  
+            <p>Menvo &copy; 2022 </p>  
       
         </section> 
       </footer>
