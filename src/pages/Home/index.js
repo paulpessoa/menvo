@@ -1,9 +1,10 @@
-function Home () {
-  return (  
+function Home() {
+  return (
     <div className="Home">
-      <h1>Home </h1>
+      <a href="/Mentors"><button className="buttonStandard">Find a Mentor</button></a>
+      <h1> First Page</h1>
     </div>
   );
-};
+}
 
 export default Home;

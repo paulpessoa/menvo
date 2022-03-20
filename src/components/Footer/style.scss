@@ -1,5 +1,6 @@
 .footer{
     width: 100%;
+    padding: 10px;
     .social_list {
         display: flex;
         margin: 10px;
@@ -8,7 +9,7 @@
             margin: 0 0.8em;
         }
         svg {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             color: $color1;
             &:hover {
                 color: $color2;

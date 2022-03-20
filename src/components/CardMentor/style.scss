@@ -20,7 +20,7 @@
       top: 0;
       border-radius: 6px 6px 0px 0px;
       background-size: cover;
-      width: 100%;
+      height: 220px;
       -webkit-transition: 0.4s ease;
       transition: 0.4s ease;
       transform: scale(1.06);
@@ -55,6 +55,15 @@
     font-size: 16px;
     color: #3b3b3b;
     text-align: justify;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-height: 16px;     /* fallback */
+    max-height: 80px;      /* fallback */
+    -webkit-line-clamp: 5; /* number of lines to show */
+    -webkit-box-orient: vertical;
+
   }
   button {
     width: 100%;

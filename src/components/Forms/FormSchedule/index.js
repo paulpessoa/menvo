@@ -21,17 +21,6 @@ function FormSchedule () {
       
     );
 
-
-
-
-
-
-
-
-
-
-
-
     function submitSchedule (event) {
       event.preventDefault(); 
     var form = document.getElementById('sheetdb-form');
