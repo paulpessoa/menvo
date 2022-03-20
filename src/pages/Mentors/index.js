@@ -12,7 +12,7 @@ function Mentors() {
     axios
       .get("https://sheetdb.io/api/v1/m9wh0c99r9ojz")
       .then((response) => {
-        alert("tudo certo");
+        console.log("tudo certo");
         setMentor(response.data);
         console.log(response.data);
       })
