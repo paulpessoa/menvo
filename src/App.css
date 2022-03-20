@@ -9,7 +9,7 @@
 }
 
 .About, .Home, .Register {
-  height: 75vh;
+  min-height: 75vh;
   background-color: #f0f0f0;
   text-align: center;
   padding-top: 50px;
@@ -334,6 +334,7 @@ header nav ul li a .FiLogOut {
 }
 .footer {
   width: 100%;
+  padding: 10px;
 }
 .footer .social_list {
   display: flex;
@@ -344,7 +345,7 @@ header nav ul li a .FiLogOut {
   margin: 0 0.8em;
 }
 .footer .social_list svg {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   color: #006276;
 }
 .footer .social_list svg:hover {
@@ -377,7 +378,7 @@ header nav ul li a .FiLogOut {
   top: 0;
   border-radius: 6px 6px 0px 0px;
   background-size: cover;
-  width: 100%;
+  height: 220px;
   -webkit-transition: 0.4s ease;
   transition: 0.4s ease;
   transform: scale(1.06);
@@ -411,6 +412,16 @@ header nav ul li a .FiLogOut {
   font-size: 16px;
   color: #3b3b3b;
   text-align: justify;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-height: 16px;
+  /* fallback */
+  max-height: 80px;
+  /* fallback */
+  -webkit-line-clamp: 5;
+  /* number of lines to show */
+  -webkit-box-orient: vertical;
 }
 .infoMentor button {
   width: 100%;
