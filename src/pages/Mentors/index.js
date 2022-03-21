@@ -17,7 +17,7 @@ function Mentors() {
         console.log(response.data);
       })
       .catch(() => {
-        alert("bosta");
+        alert("meleca");
       });
   }, []);
 
@@ -59,8 +59,8 @@ function Mentors() {
                   >
                     <h3>{post.name}</h3>
                   </a>
-                  <p>{post.description}</p>
-                  <a href={post.linkedin}>
+                  <p>{post.details}</p>
+                  <a href="/singleMentor">
                     <button className="buttonStandard">View Profile</button>
                   </a>
                 </div>
