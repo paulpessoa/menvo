@@ -8,11 +8,13 @@ function FormSchedule () {
             <input type="hidden" name="data[id]"/>
             <input type="text" name="data[name]" placeholder="name"/>
             <input type="text" name="data[subject]" placeholder="subject" rows='5'/>
+            <textarea type="textarea" name="data[details]" placeholder="write some details here..."/>
             <input type="url" name="data[linkedin]" placeholder="linkedin"/>
             <input type="file" name="data[file]"/>
             <button className="buttonStandard" type='submit'>Schedule</button>
             <ul>
-                <li><a className="linkStandard" href="/About">Terms Accept</a></li>
+              
+                <li><input type='checkbox'required/><a className="linkStandard" href="/About">  Terms Accept</a></li>
                 <li><a className="linkStandard" href="/Mentors">Mentorship Guide</a></li>
             </ul>
         </form>

@@ -581,14 +581,14 @@ header nav ul li a .FiLogOut {
   transition: 110ms;
 }
 .formSchedule form {
-  width: 100%;
-  max-width: 400px;
+  width: 90%;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 0px auto;
 }
-.formSchedule form input {
+.formSchedule form input, .formSchedule form textarea {
   max-width: 100%;
   border: none;
   margin-bottom: 10px;
@@ -599,6 +599,10 @@ header nav ul li a .FiLogOut {
   transition: 80ms;
   border-radius: 25px;
   font-size: 16px;
+}
+.formSchedule form textarea {
+  resize: none;
+  min-height: 70px !important;
 }
 .formSchedule form ul {
   position: relative;

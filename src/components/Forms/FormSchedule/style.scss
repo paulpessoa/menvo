@@ -8,13 +8,13 @@
         transition: 110ms;
     }
     form {
-        width: 100%;
-        max-width: 400px;
+        width: 90%;
+        max-width: 500px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         margin: 0px auto;
-        input {
+        input, textarea {
             max-width: 100%;
             border: none;
             margin-bottom: 10px;
@@ -26,7 +26,11 @@
             border-radius: 25px;
             font-size: 16px;
         }
-       
+        textarea{
+            resize: none;
+            min-height: 70px!important;
+        }
+
         ul {
             position: relative;
             animation-name: menu;
