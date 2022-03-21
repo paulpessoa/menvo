@@ -30,45 +30,46 @@
       }
     }
   }
+  .mainSubject h3 {
+    top: 10px;
+    right: 10px;
+    text-align: right;
+    position: absolute;
+    background-color: $color1;
+    padding: 4px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    color: #fff;
+    font-weight: 500;
+    &:hover {
+      background-color: $color2;
+    }
+  }
+  
+  .infoMentor {
+    padding: 25px;
+    p {
+      margin: 20px auto;
+      font-size: 16px;
+      color: #3b3b3b;
+      text-align: justify;
+  
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      line-height: 16px;     /* fallback */
+      max-height: 80px;      /* fallback */
+      -webkit-line-clamp: 5; /* number of lines to show */
+      -webkit-box-orient: vertical;
+  
+    }
+    button {
+      width: 100%;
+    }
+  }
+  
 }
 
-.mainSubject h3 {
-  top: 10px;
-  right: 10px;
-  text-align: right;
-  position: absolute;
-  background-color: $color1;
-  padding: 4px 14px;
-  border-radius: 50px;
-  font-size: 12px;
-  color: #fff;
-  font-weight: 500;
-  &:hover {
-    background-color: $color2;
-  }
-}
-
-.infoMentor {
-  padding: 25px;
-  p {
-    margin: 20px auto;
-    font-size: 16px;
-    color: #3b3b3b;
-    text-align: justify;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    line-height: 16px;     /* fallback */
-    max-height: 80px;      /* fallback */
-    -webkit-line-clamp: 5; /* number of lines to show */
-    -webkit-box-orient: vertical;
-
-  }
-  button {
-    width: 100%;
-  }
-}
 
 @media screen and (min-width: 1201px) and (max-width: 4000px) {
   .cardMentor {
