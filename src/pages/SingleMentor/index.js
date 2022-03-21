@@ -1,7 +1,7 @@
 import { FaSlidersH } from "react-icons/fa";
 import SidebarMentor from "../../components/SidebarMentor";
 import FormSchedule from "../../components/Forms/FormSchedule";
-import CardMentor from "../../components/CardMentor";
+import CardSingleMentor from "../../components/CardSingleMentor";
 
 function SingleMentor() {
   return (
@@ -10,8 +10,8 @@ function SingleMentor() {
         <div className="sideBar">
           <SidebarMentor />
         </div>
-        <div className="singleMentor">
-          <CardMentor />
+        <div className="cardDetailsMentor">
+          <CardSingleMentor />
           <FormSchedule />
           <div onClick={awaitBuild} className="filterButonIcon">
             <FaSlidersH />

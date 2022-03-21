@@ -132,6 +132,10 @@
   width: 25%;
 }
 
+.cardDetailsMentor {
+  margin: 10px;
+}
+
 .feedMentor {
   width: 75%;
   display: flex;
@@ -408,8 +412,7 @@ header nav ul li a .FiLogOut {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
 }
-
-.mainSubject h3 {
+.cardMentor .mainSubject h3 {
   top: 10px;
   right: 10px;
   text-align: right;
@@ -421,14 +424,13 @@ header nav ul li a .FiLogOut {
   color: #fff;
   font-weight: 500;
 }
-.mainSubject h3:hover {
+.cardMentor .mainSubject h3:hover {
   background-color: #0f7185;
 }
-
-.infoMentor {
+.cardMentor .infoMentor {
   padding: 25px;
 }
-.infoMentor p {
+.cardMentor .infoMentor p {
   margin: 20px auto;
   font-size: 16px;
   color: #3b3b3b;
@@ -444,7 +446,7 @@ header nav ul li a .FiLogOut {
   /* number of lines to show */
   -webkit-box-orient: vertical;
 }
-.infoMentor button {
+.cardMentor .infoMentor button {
   width: 100%;
 }
 
@@ -490,6 +492,131 @@ header nav ul li a .FiLogOut {
 
   .cardMentor {
     max-width: 90%;
+  }
+}
+.cardSingleMentor {
+  display: flex;
+  max-width: 90%;
+  margin: 0px auto;
+  border-radius: 6px;
+  box-shadow: 0.1px 0.1px 4px #c0c0c0;
+  background-color: #fff;
+  padding: 20px;
+  flex-direction: row;
+  align-items: center;
+}
+.cardSingleMentor .cardMentorPhoto {
+  width: 180px;
+  height: 180px;
+  border-radius: 100px;
+  margin: 0px 20px 20px;
+  overflow: hidden;
+  position: relative;
+  border: 4px solid #b0b0b0;
+  transition: 0.4s ease;
+  box-shadow: 0.1px 0.1px 8px #c0c0c0;
+}
+.cardSingleMentor .cardMentorPhoto:hover {
+  border: 4px solid #0f7185;
+  transition: 0.5s ease;
+  box-shadow: 0.1px 0.1px 8px #c0c0c0;
+}
+.cardSingleMentor .cardMentorPhoto img {
+  top: 0;
+  background-size: cover;
+  height: 220px;
+  -webkit-transition: 0.4s ease;
+  transition: 0.4s ease;
+  transform: scale(1.06);
+}
+.cardSingleMentor .cardMentorPhoto img:hover {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+.cardSingleMentor .infoMentor {
+  width: 70%;
+  padding: 25px;
+}
+.cardSingleMentor .infoMentor .mainSubject h3 {
+  float: right;
+  background-color: #006276;
+  padding: 4px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+}
+.cardSingleMentor .infoMentor .mainSubject h3:hover {
+  background-color: #0f7185;
+}
+.cardSingleMentor .infoMentor p {
+  margin: 40px auto;
+  font-size: 16px;
+  color: #3b3b3b;
+  text-align: justify;
+}
+
+.starsMentor {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media screen and (min-width: 1201px) and (max-width: 4000px) {
+  .cardSingleMentor {
+    max-width: 90%;
+  }
+
+  .filterButonIcon {
+    display: none;
+  }
+}
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .cardMentor {
+    max-width: 45%;
+  }
+
+  .filterButonIcon {
+    display: none;
+  }
+}
+@media screen and (min-width: 601px) and (max-width: 800px) {
+  .cardMentor {
+    max-width: 40%;
+  }
+
+  .sideBar {
+    display: none;
+  }
+
+  .cardSingleMentor {
+    flex-wrap: wrap;
+    max-width: 80%;
+  }
+  .cardSingleMentor .divName {
+    margin: 0px auto;
+  }
+  .cardSingleMentor .infoMentor {
+    min-width: 85%;
+  }
+}
+@media screen and (max-width: 600px) {
+  .sideBar {
+    display: none;
+  }
+
+  .cardMentor {
+    max-width: 90%;
+  }
+
+  .cardSingleMentor {
+    flex-wrap: wrap;
+    max-width: 80%;
+  }
+  .cardSingleMentor .divName {
+    margin: 0px auto;
+  }
+  .cardSingleMentor .infoMentor {
+    min-width: 85%;
   }
 }
 .sidebarMentor {
@@ -581,14 +708,14 @@ header nav ul li a .FiLogOut {
   transition: 110ms;
 }
 .formSchedule form {
-  width: 100%;
-  max-width: 400px;
+  width: 90%;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin: 0px auto;
 }
-.formSchedule form input {
+.formSchedule form input, .formSchedule form textarea {
   max-width: 100%;
   border: none;
   margin-bottom: 10px;
@@ -599,6 +726,10 @@ header nav ul li a .FiLogOut {
   transition: 80ms;
   border-radius: 25px;
   font-size: 16px;
+}
+.formSchedule form textarea {
+  resize: none;
+  min-height: 70px !important;
 }
 .formSchedule form ul {
   position: relative;
