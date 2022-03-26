@@ -35,7 +35,7 @@ const Header = () => {
                 <Link to="/Mentors">Mentors</Link>
               </li>
               <li>
-                <Link to="/Register"><button>Register</button> </Link>
+                <Link to="/UserAccess"><button>Access</button> </Link>
             </li>
             {/* <li>
                 <a className={classOn ? "show" : "hide"} href="/login">
