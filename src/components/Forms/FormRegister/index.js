@@ -1,11 +1,4 @@
 function FormRegister () {
-    
-  let name = document.querySelector('.input_name');
-  let newmail = document.querySelector('.input_newmail');
-  let pass = document.querySelector('.input_pass');
-  let confirmpass = document.querySelector('.input_confirmpass');
-  let btn_register = document.querySelector('.btn_register');
-  
   
   return (  
       
@@ -30,7 +23,6 @@ function FormRegister () {
     function submitRegister (event) {
         event.preventDefault();
         alert('New User!!!!')
-        console.log((name).value, (newmail).textContent)
     }
   };
   
