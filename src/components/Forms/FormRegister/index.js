@@ -1,10 +1,24 @@
 function FormRegister () {
+<<<<<<< HEAD
+=======
+    
+  let name = document.querySelector('.input_name');
+  let newmail = document.querySelector('.input_newmail');
+  let pass = document.querySelector('.input_pass');
+  let confirmpass = document.querySelector('.input_confirmpass');
+  let btn_register = document.querySelector('.btn_register');
+  
+>>>>>>> f3962f198fe074c49e36af5e314386f8f77e421b
   
   return (  
       
       <div className="form">
       <div className="formLogin">
+<<<<<<< HEAD
         <h3>New Users</h3>
+=======
+        <h3>New User</h3>
+>>>>>>> f3962f198fe074c49e36af5e314386f8f77e421b
         <form onSubmit={submitRegister}>
             <input className="input_name" type="text" placeholder="name"/>
             <input className="input_newmail" type="email" placeholder="e-mail"/>
@@ -23,6 +37,10 @@ function FormRegister () {
     function submitRegister (event) {
         event.preventDefault();
         alert('New User!!!!')
+<<<<<<< HEAD
+=======
+        console.log((name).value, (newmail).textContent)
+>>>>>>> f3962f198fe074c49e36af5e314386f8f77e421b
     }
   };
   
