@@ -1,9 +1,5 @@
 function FormLogin () {
-  let mail = document.querySelector('.input_mail');
-  let pass = document.querySelector('.pass');
-  let btn_Login = document.querySelector('.btn_Login');
-  
-  
+   
   return (  
       
       <div className="form">
@@ -26,7 +22,6 @@ function FormLogin () {
     function submitLogin (event) {
         event.preventDefault();
         alert('Welcome!!!!')
-        console.log((mail).value, (pass).value,( btn_Login).type);
     }
   };
   
