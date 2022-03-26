@@ -1,10 +1,10 @@
-function FormRegister () {
-  
+function FormRegister () {  
   return (  
       
       <div className="form">
       <div className="formLogin">
-        <h3>New User</h3>
+        <h3>New Users</h3>
+
         <form onSubmit={submitRegister}>
             <input className="input_name" type="text" placeholder="name"/>
             <input className="input_newmail" type="email" placeholder="e-mail"/>
@@ -23,6 +23,7 @@ function FormRegister () {
     function submitRegister (event) {
         event.preventDefault();
         alert('New User!!!!')
+
     }
   };
   
