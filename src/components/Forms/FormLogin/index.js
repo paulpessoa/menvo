@@ -10,7 +10,7 @@ function FormLogin () {
       <div className="formLogin">
         <h3>Welcome</h3>
         <form onSubmit={submitLogin}>
-            <input className="input_mail" type="mail" placeholder="e-mail"/>
+            <input className="input_mail" type="email" placeholder="e-mail"/>
             <input className="input_pass" type="password" placeholder="password"/>
             <button className="buttonStandard btn_Login" type = 'submit'>Login</button>
             <ul>
@@ -25,7 +25,8 @@ function FormLogin () {
 
     function submitLogin (event) {
         event.preventDefault();
-        alert('Hey dude!!!!')
+        alert('Welcome!!!!')
+        console.log((mail).value, (pass).value,( btn_Login).type);
     }
   };
   
