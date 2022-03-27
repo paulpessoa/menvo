@@ -209,6 +209,11 @@ p {
   font-size: 24px;
 }
 
+@media (max-width: 800px) {
+  .Mentors {
+    padding: 0px 30px;
+  }
+}
 .Mentors {
   display: flex;
   margin: 0px auto;
@@ -529,6 +534,8 @@ header nav ul li a .FiLogOut {
 }
 .cardMentor .infoMentor p {
   margin: 20px auto;
+  font-size: 16px;
+  color: #3b3b3b;
   text-align: justify;
   overflow: hidden;
   text-overflow: ellipsis;
