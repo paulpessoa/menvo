@@ -60,7 +60,7 @@ function Mentors() {
                     <h3>{post.name}</h3>
                   </a>
                   <p>{post.details}</p>
-                  <a href="/singleMentor">
+                  <a href={post.linkedin}>
                     <button className="buttonStandard">View Profile</button>
                   </a>
                 </div>

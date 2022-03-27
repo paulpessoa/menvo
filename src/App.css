@@ -209,11 +209,6 @@ p {
   font-size: 24px;
 }
 
-@media (max-width: 800px) {
-  .Mentors {
-    padding: 0px 30px;
-  }
-}
 .Mentors {
   display: flex;
   margin: 0px auto;
@@ -483,13 +478,13 @@ header nav ul li a .FiLogOut {
 }
 
 .cardMentor {
-  min-width: 150px;
   width: 100%;
-  margin: 10px auto;
+  margin: 10px auto 20px;
   border-radius: 6px;
   transition: 0.1s;
   box-shadow: 0.1px 0.1px 4px #c0c0c0;
   background-color: #fff;
+  width: 280px;
 }
 .cardMentor:hover {
   transition: 0.3s;
@@ -501,11 +496,9 @@ header nav ul li a .FiLogOut {
   border-radius: 6px 6px 0px 0px;
 }
 .cardMentor .cardMentorPhoto img {
-  padding: -5px;
-  top: 0;
-  border-radius: 6px 6px 0px 0px;
+  border-radius: 10px;
   background-size: cover;
-  height: 220px;
+  width: 100%;
   -webkit-transition: 0.4s ease;
   transition: 0.4s ease;
   transform: scale(1.06);
@@ -542,9 +535,9 @@ header nav ul li a .FiLogOut {
   display: -webkit-box;
   line-height: 16px;
   /* fallback */
-  max-height: 80px;
+  max-height: 100px;
   /* fallback */
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 6;
   /* number of lines to show */
   -webkit-box-orient: vertical;
 }
