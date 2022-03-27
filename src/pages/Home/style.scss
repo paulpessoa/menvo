@@ -1,20 +1,83 @@
-.Home {
-    background-image: url(https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    .bannerHome {
-        background-color: rgba(255, 255, 255, 0.644);
-        width: 200px;
-        height: 200px;
-        margin: 0px auto;
-        padding: 60px;
-        border-radius: 200px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+.bannerHome {
+  background-image: url("https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg");
+  background-size: cover;
+}
+.bannerHomeGlass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6.5px);
+  -webkit-backdrop-filter: blur(6.5px);
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  img {
+    width: 500px;
+  }
+  h1 {
+    font-size: 36px;
+    color: $color1;
+  }
+  p {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    color: $back-color;
+  }
+}
+
+.sectionWay {
+  background-color: #f0f0f0;
+  padding-top: 50px;
+  padding-bottom: 50px;
+
+  h2 {
+    text-align: center;
+    font-size: 32px;
+    color: $color1;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+  .container {
+    justify-content: space-between;
+    .cardWay {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      text-align: center;
+      justify-content: space-evenly;
+      border-radius: 6px;
+      height: 250px;
+      width: 300px;
+      background-color: #fff;
+      padding: 20px;
+
+      box-shadow: 1px 1px 20px 1px #d6d6d6;
+      margin: 10px;
+      &:hover {
+        box-shadow: 1px 1px 14px 2px #b6b6b6;
+      }
     }
+    h3 {
+      text-align: center;
+      font-size: 18px;
+      color: $color1;
+    }
+  }
+  p {
+    color: $back-color;
+  }
+}
+
+.sectionMeet {
+  background-color: blue;
+  height: 300px;
+}
+
+.sectionPurpuse {
+    background-color: green;
+    height: 300px;
+}
+
+.sectionContact {
+    background-color: red;
+    height: 300px;
 }
