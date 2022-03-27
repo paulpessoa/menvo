@@ -20,7 +20,6 @@ body {
   max-width: 1200px;
   width: 100%;
   margin: 0px auto;
-  
 }
 
 h1 {
@@ -76,15 +75,16 @@ p {
   -webkit-backdrop-filter: blur(6.5px);
   height: 700px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.bannerHomeGlass .divl,
+.bannerHomeGlass .divr {
+  min-width: 50%;
+  padding: 10px;
 }
 .bannerHomeGlass img {
-  width: 500px;
-}
-.bannerHomeGlass h1 {
-  font-size: 36px;
-  color: #006276;
+  max-width: 80%;
 }
 .bannerHomeGlass p {
   margin-top: 20px;
@@ -144,6 +144,28 @@ p {
   height: 300px;
 }
 
+@media (max-width: 800px) {
+  .container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+  }
+  .container .divr,
+.container .divl {
+    width: 90%;
+    margin: 0px auto;
+    text-align: center;
+  }
+  .container .divr h1,
+.container .divl h1 {
+    font-size: 22px;
+  }
+  .container .divr p,
+.container .divl p {
+    text-align: justify;
+    padding: 10px;
+  }
+}
 .Mentors {
   display: flex;
   margin: 0px auto;

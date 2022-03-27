@@ -8,14 +8,15 @@
   -webkit-backdrop-filter: blur(6.5px);
   height: 700px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  img {
-    width: 500px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  .divl,
+  .divr {
+    min-width: 50%;
+    padding: 10px;
   }
-  h1 {
-    font-size: 36px;
-    color: $color1;
+  img {
+    max-width: 80%;
   }
   p {
     margin-top: 20px;
@@ -69,11 +70,32 @@
 }
 
 .sectionPurpuse {
-    background-color: green;
-    height: 300px;
+  background-color: green;
+  height: 300px;
 }
 
 .sectionContact {
-    background-color: red;
-    height: 300px;
+  background-color: red;
+  height: 300px;
+}
+
+@media (max-width: 800px) {
+  .container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    .divr,
+    .divl {
+      width: 90%;
+      margin: 0px auto;
+      text-align: center;
+      h1 {
+        font-size: 22px;
+      }
+      p {
+        text-align: justify;
+        padding: 10px;
+      }
+    }
+  }
 }
