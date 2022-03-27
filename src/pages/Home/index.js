@@ -7,14 +7,14 @@ function Home() {
       <section className="bannerHome">
       <section className="bannerHomeGlass">
         <div className="container">
-        <div>
+        <div className="divl">
           <h1> Connections between students, interns and volunteer mentors</h1>
           <p>Schedule an appointment and receive the link to the mentorship by video call, follow the recommendations and increase your chances for the job market.</p>
           <a href="/Mentors">
             <button className="buttonStandard">Find a Mentor</button>
           </a>
         </div>
-        <div>
+        <div className="divr">
           <img src={img0202} alt="Menvo People"/>
         </div>
         </div>
