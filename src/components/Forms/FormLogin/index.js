@@ -4,8 +4,8 @@ function FormLogin () {
       
       <div className="form">
       <div className="formLogin">
-        <h3>Welcome</h3>
         <form onSubmit={submitLogin}>
+        <h3>Welcome</h3>
             <input className="input_mail" type="email" placeholder="e-mail"/>
             <input className="input_pass" type="password" placeholder="password"/>
             <button className="buttonStandard btn_Login" type = 'submit'>Login</button>

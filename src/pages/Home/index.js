@@ -1,41 +1,42 @@
-import {
-  FaFacebookSquare,
-  FaLinkedin,
-  FaInstagram,
-  FaGithub,
-} from "react-icons/fa";
+import {FaFacebookSquare,  FaLinkedin,  FaInstagram,  FaGithub} from "react-icons/fa";
 
+import img0202 from '../../assets/img/img0202.png';
 function Home() {
   return (
     <div className="Home">
       <section className="bannerHome">
+      <section className="bannerHomeGlass">
+        <div className="container">
         <div>
-          <h1> First Page</h1>
+          <h1> Connections between students, interns and volunteer mentors</h1>
+          <p>Schedule an appointment and receive the link to the mentorship by video call, follow the recommendations and increase your chances for the job market.</p>
           <a href="/Mentors">
             <button className="buttonStandard">Find a Mentor</button>
           </a>
         </div>
         <div>
-          <h1>image</h1>
+          <img src={img0202} alt="Menvo People"/>
         </div>
+        </div>
+      </section>
       </section>
 
       <section className="sectionWay">
         <h2>It's simpler than you might think...</h2>
-        <div>
-          <div>
+        <div className="container">
+          <div className="cardWay">
             <spam>icon</spam>
             <h3>Search</h3>
             <p>Filter by area of training/work, gender and other topics.</p>
           </div>
           
-          <div>
+          <div className="cardWay">
             <spam>icon</spam>
             <h3>Profile</h3>
             <p>Look at experiences and/or knowledge in your area of interest.</p>
           </div>
           
-          <div>
+          <div className="cardWay">
             <spam>icon</spam>
             <h3>Schedule</h3>
             <p>Submit the form and wait for the contact confirming the date and time of your mentorship.</p>
@@ -44,12 +45,9 @@ function Home() {
 
         </div>
 
-        <div>
-          <h1>asdasd</h1>
-        </div>
       </section>
 
-      <section className="section Meet">
+      <section className="sectionMeet">
         <div>
           <h2>image</h2>
         </div>
@@ -76,7 +74,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="section Purpuse">
+      <section className="sectionPurpuse">
         <div>
           <h2>Purpose</h2>
           <p>
@@ -98,7 +96,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="section Contact">
+      <section className="sectionContact">
         <h2>image</h2>
         <div>
           <div>
