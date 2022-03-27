@@ -1,13 +1,12 @@
 import FormLogin from "../../components/Forms/FormLogin";
 import FormRegister from "../../components/Forms/FormRegister";
-function UserAccess () {
-    return (  
-      <div className="UserAccess">
- 
-        <FormLogin/>
-        <FormRegister/>
-      </div>
-    );
-  };
-  
-  export default UserAccess;
+function UserAccess() {
+  return (
+    <div className="UserAccess">    
+      <FormLogin />
+      <FormRegister />
+    </div>
+  );
+}
+
+export default UserAccess;

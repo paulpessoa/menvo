@@ -1,4 +1,7 @@
-header{
+header {
+  .container {
+    width: 90%;
+  }
   width: 100%;
   background-color: #fff;
   img {
@@ -33,9 +36,6 @@ header{
   }
 }
 
-
-
-
 header nav ul li a button {
   position: relative;
   animation-name: menu;
@@ -51,53 +51,56 @@ header nav ul li a button {
   font-weight: 500;
   cursor: pointer;
   margin-bottom: -20px;
-  &:hover{
+  &:hover {
     background-color: $color2;
     border: 2px solid $color2;
   }
 }
 
-
-header nav ul li a .FiLogOut{
+header nav ul li a .FiLogOut {
   position: relative;
   top: 2px;
   left: 2px;
 }
 
 @keyframes menu {
-  0%   { left:0px; top: -100px;}
-  100% { left: 0px; top:0px;}
-  
+  0% {
+    left: 0px;
+    top: -100px;
+  }
+  100% {
+    left: 0px;
+    top: 0px;
+  }
 }
 
-@media (max-width: 630px){
- .hero .container{
-   flex-direction: column;
-   text-align: center;
- }
+@media (max-width: 630px) {
+  .hero .container {
+    flex-direction: column;
+    text-align: center;
+  }
 
- .form-group{
-   display: block;
- }
+  .form-group {
+    display: block;
+  }
 }
 
-@media (max-width: 1020px){
- 
-   .menu-section nav{
+@media (max-width: 1020px) {
+  .menu-section nav {
     display: none;
   }
 
   .one,
   .two,
-  .three{
-    background-color:$color1;
+  .three {
+    background-color: $color1;
     height: 5px;
     max-width: 1020px;
-    width: 90%; 
+    width: 90%;
     margin: 6px auto;
     transition-duration: 0.3s;
   }
-  .menu-toggle{
+  .menu-toggle {
     cursor: pointer;
     width: 30px;
     height: 30px;
@@ -106,7 +109,7 @@ header nav ul li a .FiLogOut{
   /*Fullscreen*/
   .menu-section.on {
     position: absolute;
-    top:0;
+    top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -117,54 +120,50 @@ header nav ul li a .FiLogOut{
     align-items: center;
   }
 
-  .menu-section.on nav{
+  .menu-section.on nav {
     display: block;
   }
 
-  
-  .menu-section.on .menu-toggle{
+  .menu-section.on .menu-toggle {
     position: absolute;
     right: 30px;
     top: 30px;
   }
 
-  
-  .menu-section.on .menu-toggle .one{
+  .menu-section.on .menu-toggle .one {
     transform: rotate(45deg) translate(7px, 7px);
     background-color: #fff;
   }
 
-  .menu-section.on .menu-toggle .two{
-   opacity: 0;
-
+  .menu-section.on .menu-toggle .two {
+    opacity: 0;
   }
 
-  .menu-section.on .menu-toggle .three{
+  .menu-section.on .menu-toggle .three {
     transform: rotate(-45deg) translate(8px, -9px);
     background-color: #fff;
   }
 
-  .menu-section.on nav ul{
+  .menu-section.on nav ul {
     text-align: center;
     display: block;
   }
 
-  .menu-section.on nav ul a{ 
-   transition-duration:  0.5s;
-   font-size: 1rem;
+  .menu-section.on nav ul a {
+    transition-duration: 0.5s;
+    font-size: 1rem;
     display: block;
     color: #fff;
     padding: 1rem;
   }
 
-
   .menu-section.on nav ul a button {
-    transition-duration:  0.5s;
+    transition-duration: 0.5s;
     font-size: 1rem;
-     display: block;
-     color: #fff;
-     padding: 1rem;
-    border-radius: 50px;  
+    display: block;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 50px;
     padding: 8px 22px;
     background-color: #fff;
     border: 2px solid #fff;
@@ -172,36 +171,28 @@ header nav ul li a .FiLogOut{
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
-    
   }
-  
-  .menu-section.on nav ul a button:hover{
+
+  .menu-section.on nav ul a button:hover {
     background-color: #bedce2;
     border: 2px solid #bedce2;
     color: #004350;
   }
 
-
-
-  
-  
-header nav ul li a .FiLogOut{
-width: 40px;
-}
-  .menu-section.on nav ul .hide{ 
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     padding: 0rem;
-     font-size: 1rem;
-   }
-
-}
-
-@media (max-width: 320px){
-  #form h3{
+  header nav ul li a .FiLogOut {
+    width: 40px;
+  }
+  .menu-section.on nav ul .hide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0rem;
     font-size: 1rem;
   }
-
 }
 
+@media (max-width: 320px) {
+  #form h3 {
+    font-size: 1rem;
+  }
+}
