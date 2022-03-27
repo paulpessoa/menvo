@@ -3,9 +3,9 @@ function FormRegister () {
       
       <div className="form">
       <div className="formLogin">
-        <h3>New Users</h3>
 
         <form onSubmit={submitRegister}>
+        <h3>New Users</h3>
             <input className="input_name" type="text" placeholder="name"/>
             <input className="input_newmail" type="email" placeholder="e-mail"/>
             <input className="input_pass" type="password" placeholder="password"/>

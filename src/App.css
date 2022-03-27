@@ -8,11 +8,8 @@
   text-decoration: none;
 }
 
-.About, .Home, .Register {
-  min-height: 80vh;
+body {
   background-color: #f0f0f0;
-  text-align: center;
-  padding-top: 50px;
 }
 
 .container {
@@ -51,25 +48,87 @@
   color: #0f7185;
 }
 
-.Home {
-  background-image: url(https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg);
+.bannerHome {
+  background-image: url("https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg");
   background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+}
+
+.bannerHomeGlass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6.5px);
+  -webkit-backdrop-filter: blur(6.5px);
+  height: 700px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.Home .bannerHome {
-  background-color: rgba(255, 255, 255, 0.644);
-  width: 200px;
-  height: 200px;
-  margin: 0px auto;
-  padding: 60px;
-  border-radius: 200px;
+.bannerHomeGlass img {
+  width: 500px;
+}
+.bannerHomeGlass h1 {
+  font-size: 36px;
+  color: #006276;
+}
+.bannerHomeGlass p {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: #262a32;
+}
+
+.sectionWay {
+  background-color: #f0f0f0;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+.sectionWay h2 {
+  text-align: center;
+  font-size: 32px;
+  color: #006276;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+.sectionWay .container {
+  justify-content: space-between;
+}
+.sectionWay .container .cardWay {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: column;
-  justify-content: center;
+  text-align: center;
+  justify-content: space-evenly;
+  border-radius: 6px;
+  height: 250px;
+  width: 300px;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 1px 1px 20px 1px #d6d6d6;
+  margin: 10px;
+}
+.sectionWay .container .cardWay:hover {
+  box-shadow: 1px 1px 14px 2px #b6b6b6;
+}
+.sectionWay .container h3 {
+  text-align: center;
+  font-size: 18px;
+  color: #006276;
+}
+.sectionWay p {
+  color: #262a32;
+}
+
+.sectionMeet {
+  background-color: blue;
+  height: 300px;
+}
+
+.sectionPurpuse {
+  background-color: green;
+  height: 300px;
+}
+
+.sectionContact {
+  background-color: red;
+  height: 300px;
 }
 
 .Mentors {
@@ -160,6 +219,21 @@
   color: #fff;
   z-index: 10;
   font-size: 24px;
+}
+
+.UserAccess {
+  height: 80vh;
+}
+.UserAccess .container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0px auto;
+}
+@media (max-width: 630px) {
+  .UserAccess {
+    padding: 10px;
+  }
 }
 
 header {
@@ -659,6 +733,7 @@ header nav ul li a .FiLogOut {
 
 .formLogin {
   margin: 50px auto;
+  text-align: center;
 }
 .formLogin h3 {
   margin-bottom: 20px;
@@ -668,6 +743,9 @@ header nav ul li a .FiLogOut {
   transition: 110ms;
 }
 .formLogin form {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 30px;
   width: 100%;
   max-width: 400px;
   display: flex;
@@ -686,6 +764,7 @@ header nav ul li a .FiLogOut {
   transition: 80ms;
   border-radius: 25px;
   font-size: 16px;
+  background-color: #f0f0f0;
 }
 .formLogin form ul {
   position: relative;
