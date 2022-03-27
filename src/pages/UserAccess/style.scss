@@ -1,0 +1,13 @@
+.UserAccess {
+  height: 80vh;
+  .container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0px auto;
+  }
+
+  @media (max-width: 630px) {
+    padding: 10px;
+  }
+}
