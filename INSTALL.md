@@ -14,7 +14,5 @@ https://sass-lang.com/install
 
 <code>sass --watch src/App.scss:src/App.css</code>
 
-
-React Share button
-https://github.com/nygardk/react-share
-https://www.youtube.com/watch?v=9WzIACv_mxs
+npm install react-icons --save
+https://react-icons.github.io/react-icons/
