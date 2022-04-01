@@ -1,10 +1,7 @@
 # MENVO - Personal "Volunteer Mentoring" Project
 
 
-<a href="https://menvo.com.br/" target="_blank"><img src="./src/assets/img/menvo1.gif" alt="Menvo Home Page Preview"/></a>
-<a href="https://menvo.com.br/" target="_blank"><img src="./src/assets/img/menvo2.gif" alt="Menvo Feed Mentors Page Preview"/></a>
-<a href="https://menvo.com.br/" target="_blank"><img src="./src/assets/img/menvo3.gif" alt="Menvo Single Profile Mentor Page Preview"/></a>
-
+<a href="https://menvo.com.br/" target="_blank"><img src="./src/assets/img/menvoprint.png" alt="Menvo Page Preview"/></a>
 
 Access Figma Project: <a href="https://www.figma.com/file/wrHHY7yyZFlbtgGujHHo7M/Menvo---Projeto-Latino-Ware?node-id=303%3A1896" target="_blank">Click here</a>
 
