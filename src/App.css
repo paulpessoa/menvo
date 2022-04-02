@@ -66,14 +66,11 @@ p {
 }
 
 .bannerHome {
-  background-image: url("https://raw.githubusercontent.com/paulpessoa/menvo/main/src/assets/img/menvopeople.jpg");
   background-size: cover;
+  background-color: #fff;
 }
 
 .bannerHomeGlass {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(6.5px);
-  -webkit-backdrop-filter: blur(6.5px);
   height: 700px;
   display: flex;
   flex-direction: row;
@@ -105,10 +102,10 @@ p {
 }
 .sectionWay .cardsContainer {
   width: 100%;
-  padding: 10px;
+  padding: 20px 20px 100px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  grid-gap: 10px;
+  grid-gap: 50px;
 }
 .sectionWay .cardsContainer .cardWay {
   display: flex;
@@ -117,10 +114,15 @@ p {
   text-align: center;
   justify-content: space-evenly;
   border-radius: 6px;
-  height: 250px;
+  height: 300px;
   background-color: #fff;
   padding: 20px;
   box-shadow: 1px 1px 20px 1px #d6d6d6;
+}
+.sectionWay .cardsContainer .cardWay img {
+  max-width: 100px;
+  margin: 0px auto;
+  padding: 10px;
 }
 .sectionWay .cardsContainer .cardWay:hover {
   box-shadow: 1px 1px 14px 2px #b6b6b6;
