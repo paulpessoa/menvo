@@ -25,19 +25,25 @@
 }
 
 .sectionWay {
-  background-color: #f0f0f0;
-  padding-top: 50px;
+  position: relative;
+  background-color: $gray-color1;
   padding-bottom: 50px;
 
   h2 {
     text-align: center;
     font-size: 32px;
     color: $color1;
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding: 50px 0;
   }
-  .container {
-    justify-content: space-between;
+
+  .cardsContainer {
+    width: 100%;
+    padding: 10px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 10px;
+
     .cardWay {
       display: flex;
       flex-wrap: wrap;
@@ -46,16 +52,15 @@
       justify-content: space-evenly;
       border-radius: 6px;
       height: 250px;
-      width: 300px;
       background-color: #fff;
       padding: 20px;
 
       box-shadow: 1px 1px 20px 1px #d6d6d6;
-      margin: 10px;
       &:hover {
         box-shadow: 1px 1px 14px 2px #b6b6b6;
       }
     }
+
     h3 {
       text-align: center;
       font-size: 18px;
@@ -64,19 +69,108 @@
   }
 }
 
+@mixin imageResize {
+  img {
+    max-width: 500px;
+    width: 90%;
+    margin: 20px auto;
+  }
+}
+
+@mixin textAlign($alignH2, $alignP) {
+  div.textContainer {
+    padding: 20px;
+
+    h2 {
+      text-align: $alignH2;
+      margin-bottom: 20px;
+    }
+
+    p {
+      text-align: $alignP;
+    }
+  }
+}
+
+@mixin displayFlex {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+svg.wave {
+  path.waveToDown-gray {
+    fill: $gray-color1;
+  }
+
+  path.waveToDown-white {
+    fill: #fff;
+  }
+}
+
 .sectionMeet {
-  background-color: blue;
-  height: 300px;
+  background-color: $gray-color1;
+
+  @include displayFlex;
+  @include imageResize;
+  @include textAlign(center, justify);
 }
 
 .sectionPurpuse {
-  background-color: green;
-  height: 300px;
+  background-color: #fff;
+  
+  div.flexContainer {
+    @include displayFlex;
+    @include imageResize;
+    @include textAlign(center, justify);
+  }
 }
 
 .sectionContact {
-  background-color: red;
-  height: 300px;
+  background-color: $gray-color1;
+  
+  div.flexContainer {
+    @include displayFlex;
+    @include imageResize;
+  }
+
+
+  h3, p {
+    text-align: center;
+  }
+
+  ul.social_list {
+    display: flex;
+    justify-content: center;
+
+    li {
+      margin: 20px;
+      font-size: 25px;
+  
+      a {
+        color: $color1;
+      }
+    }
+  }
+}
+
+@media (min-width: 820px) {
+  .sectionMeet {
+    flex-direction: row;
+    align-items: center;
+
+    padding: 0 30px;
+
+    @include textAlign(right, right);
+  }
+
+  .sectionPurpuse div.flexContainer {
+    flex-direction: row-reverse;
+    align-items: center;
+    padding: 0 30px;
+
+    @include textAlign(left, left);
+  }
 }
 
 @media (max-width: 800px) {
