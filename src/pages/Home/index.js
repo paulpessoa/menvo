@@ -3,7 +3,12 @@ import {FaFacebookSquare,  FaLinkedin,  FaInstagram,  FaGithub} from "react-icon
 import img0202 from '../../assets/img/img0202.png';
 import onlineTeamMeetingImg from './../../assets/img/online_team_meeting_.png';
 import problemSolvingImg from './../../assets/img/problem_solving.png';
-import accountantImg from './../../assets/img/accountant.png'
+import accountantImg from './../../assets/img/accountant.png';
+import recruitment from './../../assets/icons/recruitment.png';
+import schedule from './../../assets/icons/schedule.png';
+import search from './../../assets/icons/search.png';
+
+
 
 function Home() {
   return (
@@ -33,19 +38,19 @@ function Home() {
         <h2>It's simpler than you might think...</h2>
         <div className="cardsContainer container">
           <div className="cardWay">
-            <span>icon</span>
+            <img src={recruitment} alt="Search"/>
             <h3>Search</h3>
             <p>Filter by area of training/work, gender and other topics.</p>
           </div>
           
           <div className="cardWay">
-            <span>icon</span>
+            <img src={search} alt="Profile"/>
             <h3>Profile</h3>
             <p>Look at experiences and/or knowledge in your area of interest.</p>
           </div>
           
           <div className="cardWay">
-            <span>icon</span>
+          <img src={schedule} alt="Schedule"/>
             <h3>Schedule</h3>
             <p>Submit the form and wait for the contact confirming the date and time of your mentorship.</p>
           </div>

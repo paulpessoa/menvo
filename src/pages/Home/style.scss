@@ -55,7 +55,11 @@
       height: 250px;
       background-color: #fff;
       padding: 20px;
-
+      img {
+        max-width: 100px;
+        margin: 0px auto;
+        padding: 10px;
+      }
       box-shadow: 1px 1px 20px 1px #d6d6d6;
       &:hover {
         box-shadow: 1px 1px 14px 2px #b6b6b6;
