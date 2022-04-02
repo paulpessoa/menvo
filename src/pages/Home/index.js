@@ -52,7 +52,7 @@ function Home() {
           <div className="cardWay">
           <img src={schedule} alt="Schedule"/>
             <h3>Schedule</h3>
-            <p>Submit the form and wait for the contact with the date and time of your mentorship.</p>
+            <p>Submit the form and wait for the contact with your mentorship guidance.</p>
           </div>
         </div>
 
