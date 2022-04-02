@@ -7,6 +7,7 @@
   padding: 0px;
   list-style-type: none;
   text-decoration: none;
+  box-sizing: border-box;
 }
 
 body {
@@ -92,21 +93,24 @@ p {
 }
 
 .sectionWay {
+  position: relative;
   background-color: #f0f0f0;
-  padding-top: 50px;
   padding-bottom: 50px;
 }
 .sectionWay h2 {
   text-align: center;
   font-size: 32px;
   color: #006276;
-  padding-top: 50px;
-  padding-bottom: 50px;
+  padding: 50px 0;
 }
-.sectionWay .container {
-  justify-content: space-between;
+.sectionWay .cardsContainer {
+  width: 100%;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-gap: 10px;
 }
-.sectionWay .container .cardWay {
+.sectionWay .cardsContainer .cardWay {
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
@@ -114,36 +118,133 @@ p {
   justify-content: space-evenly;
   border-radius: 6px;
   height: 250px;
-  width: 300px;
   background-color: #fff;
   padding: 20px;
   box-shadow: 1px 1px 20px 1px #d6d6d6;
-  margin: 10px;
 }
-.sectionWay .container .cardWay:hover {
+.sectionWay .cardsContainer .cardWay:hover {
   box-shadow: 1px 1px 14px 2px #b6b6b6;
 }
-.sectionWay .container h3 {
+.sectionWay .cardsContainer h3 {
   text-align: center;
   font-size: 18px;
   color: #006276;
 }
 
+svg.wave path.waveToDown-gray {
+  fill: #f0f0f0;
+}
+svg.wave path.waveToDown-white {
+  fill: #fff;
+}
+
 .sectionMeet {
-  background-color: blue;
-  height: 300px;
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.sectionMeet img {
+  max-width: 500px;
+  width: 90%;
+  margin: 20px auto;
+}
+.sectionMeet div.textContainer {
+  padding: 20px;
+}
+.sectionMeet div.textContainer h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.sectionMeet div.textContainer p {
+  text-align: justify;
 }
 
 .sectionPurpuse {
-  background-color: green;
-  height: 300px;
+  background-color: #fff;
+}
+.sectionPurpuse div.flexContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.sectionPurpuse div.flexContainer img {
+  max-width: 500px;
+  width: 90%;
+  margin: 20px auto;
+}
+.sectionPurpuse div.flexContainer div.textContainer {
+  padding: 20px;
+}
+.sectionPurpuse div.flexContainer div.textContainer h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.sectionPurpuse div.flexContainer div.textContainer p {
+  text-align: justify;
 }
 
 .sectionContact {
-  background-color: red;
-  height: 300px;
+  background-color: #f0f0f0;
+}
+.sectionContact div.flexContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.sectionContact div.flexContainer img {
+  max-width: 500px;
+  width: 90%;
+  margin: 20px auto;
+}
+.sectionContact h3, .sectionContact p {
+  text-align: center;
+}
+.sectionContact ul.social_list {
+  display: flex;
+  justify-content: center;
+}
+.sectionContact ul.social_list li {
+  margin: 20px;
+  font-size: 25px;
+}
+.sectionContact ul.social_list li a {
+  color: #006276;
 }
 
+@media (min-width: 820px) {
+  .sectionMeet {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 30px;
+  }
+  .sectionMeet div.textContainer {
+    padding: 20px;
+  }
+  .sectionMeet div.textContainer h2 {
+    text-align: right;
+    margin-bottom: 20px;
+  }
+  .sectionMeet div.textContainer p {
+    text-align: right;
+  }
+
+  .sectionPurpuse div.flexContainer {
+    flex-direction: row-reverse;
+    align-items: center;
+    padding: 0 30px;
+  }
+  .sectionPurpuse div.flexContainer div.textContainer {
+    padding: 20px;
+  }
+  .sectionPurpuse div.flexContainer div.textContainer h2 {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  .sectionPurpuse div.flexContainer div.textContainer p {
+    text-align: left;
+  }
+}
 @media (max-width: 800px) {
   .container {
     display: flex;
