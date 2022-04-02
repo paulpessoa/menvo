@@ -31,7 +31,7 @@ function Home() {
         </svg>
 
         <h2>It's simpler than you might think...</h2>
-        <div className="cardsContainer">
+        <div className="cardsContainer container">
           <div className="cardWay">
             <span>icon</span>
             <h3>Search</h3>
@@ -53,7 +53,7 @@ function Home() {
 
       </section>
 
-      <section className="sectionMeet">
+      <section className="sectionMeet container">
         <img src={onlineTeamMeetingImg} alt="image meet us" />
 
         <div className="textContainer">
@@ -83,7 +83,7 @@ function Home() {
           <path className="waveToDown-gray" fillOpacity="1" d="M0,256L48,224C96,192,192,128,288,101.3C384,75,480,85,576,122.7C672,160,768,224,864,213.3C960,203,1056,117,1152,112C1248,107,1344,181,1392,218.7L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
         </svg>
 
-        <div className="flexContainer">
+        <div className="flexContainer container">
           <img src={problemSolvingImg} alt="problem solving image" />
 
           <div className="textContainer">
