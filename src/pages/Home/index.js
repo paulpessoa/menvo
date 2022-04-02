@@ -40,19 +40,19 @@ function Home() {
           <div className="cardWay">
             <img src={recruitment} alt="Search"/>
             <h3>Search</h3>
-            <p>Filter by area of training/work, gender and other topics.</p>
+            <p>Filter by region, city, causes, work area, gender and other topics.</p>
           </div>
           
           <div className="cardWay">
             <img src={search} alt="Profile"/>
             <h3>Profile</h3>
-            <p>Look at experiences and/or knowledge in your area of interest.</p>
+            <p>Look at experiences and academy knowledge in your area of interest.</p>
           </div>
           
           <div className="cardWay">
           <img src={schedule} alt="Schedule"/>
             <h3>Schedule</h3>
-            <p>Submit the form and wait for the contact confirming the date and time of your mentorship.</p>
+            <p>Submit the form and wait for the contact with the date and time of your mentorship.</p>
           </div>
         </div>
 
