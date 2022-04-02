@@ -3,7 +3,12 @@ import {FaFacebookSquare,  FaLinkedin,  FaInstagram,  FaGithub} from "react-icon
 import img0202 from '../../assets/img/img0202.png';
 import onlineTeamMeetingImg from './../../assets/img/online_team_meeting_.png';
 import problemSolvingImg from './../../assets/img/problem_solving.png';
-import accountantImg from './../../assets/img/accountant.png'
+import accountantImg from './../../assets/img/accountant.png';
+import recruitment from './../../assets/icons/recruitment.png';
+import schedule from './../../assets/icons/schedule.png';
+import search from './../../assets/icons/search.png';
+
+
 
 function Home() {
   return (
@@ -31,29 +36,29 @@ function Home() {
         </svg>
 
         <h2>It's simpler than you might think...</h2>
-        <div className="cardsContainer">
+        <div className="cardsContainer container">
           <div className="cardWay">
-            <span>icon</span>
+            <img src={recruitment} alt="Search"/>
             <h3>Search</h3>
-            <p>Filter by area of training/work, gender and other topics.</p>
+            <p>Filter by region, city, causes, work area, gender and other topics.</p>
           </div>
           
           <div className="cardWay">
-            <span>icon</span>
+            <img src={search} alt="Profile"/>
             <h3>Profile</h3>
-            <p>Look at experiences and/or knowledge in your area of interest.</p>
+            <p>Look at experiences and academy knowledge in your area of interest.</p>
           </div>
           
           <div className="cardWay">
-            <span>icon</span>
+          <img src={schedule} alt="Schedule"/>
             <h3>Schedule</h3>
-            <p>Submit the form and wait for the contact confirming the date and time of your mentorship.</p>
+            <p>Submit the form and wait for the contact with your mentorship guidance.</p>
           </div>
         </div>
 
       </section>
 
-      <section className="sectionMeet">
+      <section className="sectionMeet container">
         <img src={onlineTeamMeetingImg} alt="image meet us" />
 
         <div className="textContainer">
@@ -83,7 +88,7 @@ function Home() {
           <path className="waveToDown-gray" fillOpacity="1" d="M0,256L48,224C96,192,192,128,288,101.3C384,75,480,85,576,122.7C672,160,768,224,864,213.3C960,203,1056,117,1152,112C1248,107,1344,181,1392,218.7L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
         </svg>
 
-        <div className="flexContainer">
+        <div className="flexContainer container">
           <img src={problemSolvingImg} alt="problem solving image" />
 
           <div className="textContainer">
