@@ -24,3 +24,11 @@
     // Forms
     @import "../src/components/Forms/FormLogin/style.scss";
     @import "../src/components/Forms/FormSchedule/style.scss";
+
+
+
+    .add-button {
+        position: absolute;
+        top: 1px;
+        left: 1px;
+      }
