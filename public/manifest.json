@@ -1,6 +1,7 @@
 {
   "short_name": "Menvo",
-  "name": "Menvo - Mentores Voluntários",
+  "name": "menvo.com.br",
+  "description": "Find free mentorships",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#006276",
+  "background_color": "#006276",
+  "scope": "/"
 }
