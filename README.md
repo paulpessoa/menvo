@@ -1,34 +1,59 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MENVO - Personal "Volunteer Mentoring" Project
 
-## Getting Started
+<a href="https://menvo.com.br/" target="_blank"><img src="./src/assets/img/menvoprint.png" alt="Menvo Page Preview"/></a>
 
-First, run the development server:
+Access Figma Project: <a href="https://www.figma.com/file/wrHHY7yyZFlbtgGujHHo7M/Menvo---Projeto-Latino-Ware?node-id=303%3A1896" target="_blank">Click here</a>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Spaces:
+- [x] FrontEnd (in progress)
+- [ ] BackEnd
+- [ ] DataBase
+- [ ] API
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages:
+- [ ] Home
+- [ ] About
+- [x] Mentors Feed
+- [ ] Single Mentor
+- [ ] Courses
+- [ ] Oportunities
+- [ ] MenvoCast (redirect to AudioPlataforms)
+- [ ] Store
+- [ ] Panel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Components:
+- [x] Header
+- [ ] Footer
+- [ ] sibeBar
+- [ ] sideBarMentor
+- [x] sideBarSearch
+- [x] cardMentor
+- [ ] sectionMentor
+- [ ] formScheduleMentor
+- [ ] formLoginRegister (Modal)
+- [ ] Guider
+- [ ] slidePartners
+- [ ] newsLetters
+- [ ] Footer
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Structure:
+- [x] Hekoru
+- [x] SheetDB
+- [ ] Firebase
+- [x] CloudFlare
 
-## Learn More
+## Languages and Libs:
+- [x] Sass
+- [x] ReactJs
+- [ ] NodeJs
+- [x] Mui Material
+- [x] React Icon
 
-To learn more about Next.js, take a look at the following resources:
+## Documentation:
+- [ ] README
+- [ ] Contributing guidelines
+- [ ] Code of Conduct
+- [ ] Support Us
+- [ ] License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+<a href="https://opensource.guide/pt/starting-a-project/" target="_blank">Open Source Guide</a>
