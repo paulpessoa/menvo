@@ -1,0 +1,209 @@
+@import "../app/globals.scss";
+
+.bannerHome {
+  background-size: cover;
+  background-color: #fff;
+}
+
+.bannerHomeGlass {
+  height: 700px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .divl,
+  .divr {
+    min-width: 50%;
+    padding: 10px;
+  }
+
+  img {
+    max-width: 80%;
+  }
+
+  p {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+.sectionWay {
+  position: relative;
+  background-color: $gray-color1;
+  padding-bottom: 50px;
+
+  h2 {
+    text-align: center;
+    font-size: 32px;
+    color: $color1;
+    padding: 50px 0;
+  }
+
+  .cardsContainer {
+    width: 100%;
+    padding: 20px 20px 100px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 50px;
+
+    .cardWay {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      text-align: center;
+      justify-content: space-evenly;
+      border-radius: 6px;
+      height: 300px;
+      background-color: #fff;
+      padding: 20px;
+
+      img {
+        max-width: 100px;
+        margin: 0px auto;
+        padding: 10px;
+      }
+
+      box-shadow: 1px 1px 20px 1px #d6d6d6;
+
+      &:hover {
+        box-shadow: 1px 1px 14px 2px #b6b6b6;
+      }
+    }
+
+    h3 {
+      text-align: center;
+      font-size: 18px;
+      color: $color1;
+    }
+  }
+}
+
+@mixin imageResize {
+  img {
+    max-width: 500px;
+    width: 90%;
+    margin: 20px auto;
+  }
+}
+
+@mixin textAlign($alignH2, $alignP) {
+  div.textContainer {
+    padding: 20px;
+
+    h2 {
+      text-align: $alignH2;
+      margin-bottom: 20px;
+    }
+
+    p {
+      text-align: $alignP;
+    }
+  }
+}
+
+@mixin displayFlex {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+svg.wave {
+  path.waveToDown-gray {
+    fill: $gray-color1;
+  }
+
+  path.waveToDown-white {
+    fill: #fff;
+  }
+}
+
+.sectionMeet {
+  background-color: $gray-color1;
+
+  @include displayFlex;
+  @include imageResize;
+  @include textAlign(center, justify);
+}
+
+.sectionPurpuse {
+  background-color: #fff;
+
+  div.flexContainer {
+    @include displayFlex;
+    @include imageResize;
+    @include textAlign(center, justify);
+  }
+}
+
+.sectionContact {
+  background-color: $gray-color1;
+
+  div.flexContainer {
+    @include displayFlex;
+    @include imageResize;
+  }
+
+
+  h3,
+  p {
+    text-align: center;
+  }
+
+  ul.social_list {
+    display: flex;
+    justify-content: center;
+
+    li {
+      margin: 20px;
+      font-size: 25px;
+
+      a {
+        color: $color1;
+      }
+    }
+  }
+}
+
+@media (min-width: 820px) {
+  .sectionMeet {
+    flex-direction: row;
+    align-items: center;
+
+    padding: 0 30px;
+
+    @include textAlign(right, right);
+  }
+
+  .sectionPurpuse div.flexContainer {
+    flex-direction: row-reverse;
+    align-items: center;
+    padding: 0 30px;
+
+    @include textAlign(left, left);
+  }
+}
+
+@media (max-width: 800px) {
+  .container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+
+    .divr,
+    .divl {
+      width: 90%;
+      margin: 0px auto;
+      text-align: center;
+
+      h1 {
+        font-size: 22px;
+      }
+
+      p {
+        text-align: justify;
+        padding: 10px;
+      }
+    }
+  }
+}
