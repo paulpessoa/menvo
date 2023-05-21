@@ -45,7 +45,8 @@ function Mentors() {
                 {/* Mentor Photo */}
                 <div className="cardMentorPhoto">
                   <a href={post.linkedin} target="_blank" rel="noreferrer">
-                  <Image width={500} height={500} className="mentorPhoto" src={post.file || '/images/thumbnail-default.jpg'} alt={post.name}
+                  <Image width={500} height={500} className="mentorPhoto" src={post.file ?? "/images/no-image.jpg"} alt="Photo_Profile"
+                  
                     />
                   </a>
 
