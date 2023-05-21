@@ -1,0 +1,129 @@
+@import "../../globals.scss";
+
+.cardSingleMentor {
+  display: flex;
+  max-width: 90%;
+  margin: 0px auto;
+  border-radius: 6px;
+  box-shadow: 0.1px 0.1px 4px #c0c0c0;
+  background-color: #fff;
+  padding: 20px;
+  flex-direction: row;
+  align-items: center;
+
+  .cardMentorPhoto {
+    width: 180px;
+    height: 180px;
+    border-radius: 100px;
+    margin: 0px 20px 20px;
+    overflow: hidden;
+    position: relative;
+    border: 4px solid #b0b0b0;
+    transition: 0.4s ease;
+    box-shadow: 0.1px 0.1px 8px #c0c0c0;
+    &:hover {
+      border: 4px solid $color2;
+      transition: 0.5s ease;
+      box-shadow: 0.1px 0.1px 8px #c0c0c0;
+    }
+    img {
+      top: 0;
+      background-size: cover;
+      height: 220px;
+      -webkit-transition: 0.4s ease;
+      transition: 0.4s ease;
+      transform: scale(1.06);
+      &:hover {
+        -webkit-transform: scale(1.1);
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .infoMentor {
+    width: 70%;
+    .mainSubject h3 {
+      float: right;
+
+      background-color: $color1;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 500;
+      &:hover {
+        background-color: $color2;
+      }
+    }
+
+    padding: 25px;
+    p {
+      margin: 40px auto;
+      font-size: 16px;
+      color: #3b3b3b;
+      text-align: justify;
+    }
+  }
+}
+
+.starsMentor {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media screen and (min-width: 1201px) and (max-width: 4000px) {
+  .cardSingleMentor {
+    max-width: 90%;
+  }
+  .filterButonIcon {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 801px) and (max-width: 1200px) {
+  .cardMentor {
+    max-width: 45%;
+  }
+  .filterButonIcon {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 601px) and (max-width: 800px) {
+  .cardMentor {
+    max-width: 40%;
+  }
+  .sideBar {
+    display: none;
+  }
+
+  .cardSingleMentor {
+    .divName {
+      margin: 0px auto;
+    }
+    .infoMentor {
+      min-width: 85%;
+    }
+    flex-wrap: wrap;
+    max-width: 80%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .sideBar {
+    display: none;
+  }
+  .cardMentor {
+    max-width: 90%;
+  }
+  .cardSingleMentor {
+    .divName {
+      margin: 0px auto;
+    }
+    .infoMentor {
+      min-width: 85%;
+    }
+    flex-wrap: wrap;
+    max-width: 80%;
+  }
+}
