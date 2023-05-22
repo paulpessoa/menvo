@@ -39,7 +39,7 @@ function Mentors() {
           <SidebarMentor />
         </div>
 
-        <div className="feedMentor">
+     <div className="feedMentor">
           {mentor.map((post, key) => {
             return (
               <div className="cardMentor" key={key}>
