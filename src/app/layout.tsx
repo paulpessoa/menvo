@@ -13,17 +13,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <Head>
         <meta charSet="utf-8" />
-        <title>Menvo</title>
+        <title>Menvo1</title>
         <meta name="description" content="Menvo is a free mentoring plataform for students looking for their first professional opportunities." />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="preload" href="/fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        {/* Outros itens relevantes que você deseja adicionar ao <head> */}
       </Head>
       <body className={inter.className}>
         <Providers >
-          <Header/>
+          <Header />
           {children}
-          <Footer/>
+          <Footer />
         </Providers>
       </body>
     </html>
