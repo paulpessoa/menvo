@@ -1,5 +1,5 @@
-import React from 'react'
-import "./page.scss"
+import React from 'react';
+import "./page.scss";
 import Image from 'next/image';
 
 function Home() {

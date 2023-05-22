@@ -195,6 +195,10 @@ svg.wave {
       width: 90%;
       margin: 0px auto;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
 
       h1 {
         font-size: 22px;
@@ -205,5 +209,6 @@ svg.wave {
         padding: 10px;
       }
     }
+
   }
 }
