@@ -1,8 +1,9 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../../../api/api";
 import "./style.scss";
 import Image from 'next/image';
+import Link from "next/link";
 
 import { FaSlidersH } from "react-icons/fa";
 import SidebarMentor from "../components/SidebarMentor";
@@ -10,9 +11,9 @@ import SidebarMentor from "../components/SidebarMentor";
 interface Mentor {
   name: string;
   subject: string;
-  details: string;
+  bio: string;
   linkedin?: string;
-  file: string;
+  photo: string;
 }
 
 function Mentors() {
@@ -20,7 +21,7 @@ function Mentors() {
 
   useEffect(() => {
     axios
-      .get("https://sheetdb.io/api/v1/m9wh0c99r9ojz")
+      .get("/mentors")
       .then((response) => {
         console.log("tudo certo");
         setMentor(response.data);
@@ -44,32 +45,37 @@ function Mentors() {
               <div className="cardMentor" key={key}>
                 {/* Mentor Photo */}
                 <div className="cardMentorPhoto">
-                  <a href={post.linkedin} target="_blank" rel="noreferrer">
-                  <Image width={500} height={500} className="mentorPhoto" src={post.file} alt="Photo_Profile"
+                  <Link href={post.linkedin || '#'} target="_blank" rel="noreferrer">
+                    <Image
+                      width={500}
+                      height={500}
+                      className="mentorPhoto"
+                      src={post.photo || "/images/no-image.jpg"}
+                      alt="Photo_Profile"
                     />
-                  </a>
+                  </Link>
 
                   {/* tag main subject */}
                   <div className="mainSubject">
-                    <a href={post.linkedin} target="_blank" rel="noreferrer">
+                    <Link href={post.linkedin || '#'} target="_blank" rel="noreferrer">
                       <h3>{post.subject}</h3>
-                    </a>
+                    </Link>
                   </div>
                 </div>
                 {/* tag subject */}
                 <div className="infoMentor">
-                  <a
+                  <Link
                     className="linkStandard"
-                    href={post.linkedin}
+                    href={post.linkedin || '#'}
                     target="_blank"
                     rel="noreferrer"
                   >
                     <h3>{post.name}</h3>
-                  </a>
-                  <p>{post.details}</p>
-                  <a href={post.linkedin}>
+                  </Link>
+                  <p>{post.bio}</p>
+                  <Link href={post.linkedin || '#'}>
                     <button className="buttonStandard">View Profile</button>
-                  </a>
+                  </Link>
                 </div>
               </div>
             );
