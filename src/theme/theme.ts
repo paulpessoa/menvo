@@ -21,7 +21,7 @@ export const darkTheme = createTheme({
     },
     background: {
       default: cyan[900], // Cyan
-      paper: cyan[800], // Dark Cyan
+      paper: cyan[900], // Dark Cyan
     },
     divider: "rgba(255, 255, 255, 0.12)",
     primary: {
@@ -55,14 +55,14 @@ export const lightTheme = createTheme({
       disabledBackground: "#e5ffff", // Light Cyan
     },
     background: {
-      default: "#f0f0f0", // White
-      paper: cyan[50], // Light Grey
+      default: "#ffffff", // White
+      paper: "#ffffff", // Light Grey
     },
     divider: "rgba(0, 0, 0, 0.12)",
     primary: {
       light: "#e5ffff", // Light Cyan
-      main: "#00e5ff", // Cyan
-      dark: cyan[900], // Dark Cyan
+      main: "#ffffff", // Cyan
+      dark: "#ffffff", // Dark Cyan
       contrastText: "#000",
     },
     secondary: {
