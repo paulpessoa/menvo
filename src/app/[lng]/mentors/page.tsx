@@ -1,12 +1,12 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import axios from "../../../api/api";
+import axios from "../../../../api/api";
 import "./style.scss";
 import Image from 'next/image';
 import Link from "next/link";
 
 import { FaSlidersH } from "react-icons/fa";
-import SidebarMentor from "../components/SidebarMentor";
+import SidebarMentor from "../../components/SidebarMentor";
 
 interface Mentor {
   name: string;

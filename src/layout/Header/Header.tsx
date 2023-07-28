@@ -7,9 +7,11 @@ import Image from 'next/image';
 import { IconButton } from "@mui/material";
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { useTranslation } from '../../app/i18n'
 
-export default function Header({ switchTheme, isDark }: { switchTheme: any, isDark: any }) {
+const Header = async ({ switchTheme, isDark, lng }: { switchTheme: any, isDark: any, lng: string }) => {
   const [classOn, setClassOn] = useState(false);
+  const { t } = await useTranslation(lng, 'translation')
 
   return (
     <header>
@@ -29,19 +31,19 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
           <nav>
             <ul>
               <li>
-                <Link href="/about">About</Link>
+                <Link href="/about">{t('about')}</Link>
               </li>
               <li>
-                <Link href="/mentors">Mentors</Link>
+                <Link href="/mentors">{t('mentors')}</Link>
               </li>
               <li>
                 <Link href="https://form.jotform.com/222677863783674" target="_blank">
-                  WhatsApp Group
+                  {t('whatsappGroup')}
                 </Link>
               </li>
               <li>
                 <Link href="/user-access">
-                  <button>Access</button>{" "}
+                  <button>{t('access')}</button>{" "}
                 </Link>
               </li>
               <li>
@@ -57,4 +59,6 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
       </div>
     </header>
   );
-};
+}
+
+export default Header

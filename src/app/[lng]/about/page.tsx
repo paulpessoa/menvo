@@ -2,14 +2,15 @@ import React from 'react';
 import "./style.scss";
 import Image from 'next/image';
 
-function About() {
+import { useTranslation } from '../../i18n'
+
+export const About = async ({ lng }: { lng: string }) => {
+  const { t } = await useTranslation(lng, 'translation')
   return (
     <div className="About">
 
-
       <section className="sectionMeet">
         <section className="container">
-
 
           <Image width={400} height={400} src="/images/online_team_meeting_.png" alt="image meet us" />
 
@@ -71,5 +72,3 @@ function About() {
     </div>
   );
 };
-
-export default About;

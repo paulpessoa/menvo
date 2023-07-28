@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import axios from '../../../api/api';
+import axios from '../../../../api/api';
 
 interface FormData {
   name: string;

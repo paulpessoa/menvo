@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import "./style.scss";
 
 import { FaSlidersH } from "react-icons/fa";
-import SidebarMentor from "../components/SidebarMentor";
-import FormSchedule from "../components/Forms/FormSchedule";
-import CardSingleMentor from "../components/CardSingleMentor";
+import SidebarMentor from "../../components/SidebarMentor";
+import FormSchedule from "../../components/Forms/FormSchedule";
+import CardSingleMentor from "../../components/CardSingleMentor";
 
 function SingleMentor() {
   const [isMounted, setIsMounted] = useState(false);
