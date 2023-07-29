@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { useTranslation } from '../../i18n'
 
-export const About = async ({ lng }: { lng: string }) => {
+const About = async ({ lng }: { lng: string }) => {
   const { t } = await useTranslation(lng, 'translation')
   return (
     <div className="About">
@@ -72,3 +72,5 @@ export const About = async ({ lng }: { lng: string }) => {
     </div>
   );
 };
+
+export default About
