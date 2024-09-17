@@ -14,6 +14,7 @@ interface Mentor {
   bio: string;
   linkedin?: string;
   photo: string;
+  slug: string;
 }
 
 function Mentors() {
@@ -39,7 +40,7 @@ function Mentors() {
           <SidebarMentor />
         </div>
 
-     <div className="feedMentor">
+        <div className="feedMentor">
           {mentor.map((post, key) => {
             return (
               <div className="cardMentor" key={key}>
@@ -66,14 +67,14 @@ function Mentors() {
                 <div className="infoMentor">
                   <Link
                     className="linkStandard"
-                    href={post.linkedin || '#'}
+                    href={post.linkedin ?? '#'}
                     target="_blank"
                     rel="noreferrer"
                   >
                     <h3>{post.name}</h3>
                   </Link>
                   <p>{post.bio}</p>
-                  <Link href={post.linkedin || '#'}>
+                  <Link href={`/mentors/${post.slug}`}>
                     <button className="buttonStandard">View Profile</button>
                   </Link>
                 </div>
