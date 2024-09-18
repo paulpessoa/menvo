@@ -1,7 +1,7 @@
 "use client"
 import './globals.scss'
 import React, { useState } from 'react'
-import { lightTheme, darkTheme } from '@/theme/theme'
+import { lightTheme, darkTheme } from 'theme'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 
 import { Inter } from 'next/font/google'
