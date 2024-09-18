@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import axios from "../../../api/api";
+import api from "api";
 import "./style.scss";
 import Image from 'next/image';
 import Link from "next/link";
@@ -8,33 +8,27 @@ import Link from "next/link";
 import { FaSlidersH } from "react-icons/fa";
 import SidebarMentor from "../components/SidebarMentor";
 
-interface Mentor {
-  name: string;
-  subject: string;
-  bio: string;
-  linkedin?: string;
-  photo: string;
-  slug: string;
-}
+import { Mentor } from "types";
 
 function Mentors() {
   const [mentor, setMentor] = useState<Mentor[]>([]);
-
+  function awaitBuild() {
+    alert("We are building this!");
+  }
   useEffect(() => {
-    axios
+    api
       .get("/mentors")
       .then((response) => {
-        console.log("tudo certo");
         setMentor(response.data);
-        console.log(response.data);
       })
       .catch(() => {
-        alert("meleca");
+        alert("Estamos em manutenção, tente novamente mais tarde.");
       });
   }, []);
 
   return (
     <div className="Mentors">
+
       <div className="container">
         <div className="sideBar">
           <SidebarMentor />
@@ -87,11 +81,9 @@ function Mentors() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
-  function awaitBuild() {
-    alert("We are building this!");
-  }
+
 }
 
 export default Mentors;

@@ -46,7 +46,7 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
               </li>
               <li>
                 <IconButton aria-label="theme switch"
-                  sx={{ m: 0, p: 0 }} onClick={switchTheme} style={{ color: isDark ? "#ffff00" : "#006276" }} >
+                  sx={{ m: 0, p: 0 }} onClick={switchTheme} style={{ color: isDark ? "#ffff00" : "#000000" }} >
                   {isDark ? <Brightness7Icon /> : <Brightness4Icon />}
                 </IconButton>
 

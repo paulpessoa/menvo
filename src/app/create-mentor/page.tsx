@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import axios from '../../../api/api';
+import api from 'api';
 
 interface FormData {
   name: string;
@@ -45,7 +45,7 @@ export default function MyForm() {
     event.preventDefault();
 
     try {
-      const response = await axios.post('/mentors', formData);
+      const response = await api.post('/mentors', formData);
       console.log(formData);
 
       // Lide com a resposta da API aqui
