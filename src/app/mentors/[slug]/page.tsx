@@ -1,27 +1,17 @@
-import SidebarMentor from "@/app/components/SidebarMentor";
-import axios from "axios";
 import React, { Suspense } from "react";
 import Image from "next/image";
 import "./style.scss";
 import { Button, Link, Tag, Text, HStack, Card, Flex, Box, Heading, CircularProgress, ButtonGroup } from '@chakra-ui/react';
-
-const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}`;
-const config = {
-  headers: {
-    Authorization: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "", // Assuming it's a valid token
-    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "", // Assuming it's a valid API key
-  },
-};
+import api from "api";
+import { Mentor } from "types";
 
 async function getMentor(slug: string) {
-  const res = await axios.get(`${url}/rest/v1/mentors?slug=eq.${slug}`, config)
+  const res = await api.get(`/mentors?slug=eq.${slug}`)
   return res.data[0]
 }
 
 export default async function MentorPage({ params: { slug } }: { readonly params: { readonly slug: string } }) {
-
-  const mentor = await getMentor(slug)
-  console.log(`Mentor: ${mentor}`)
+  const mentor: Mentor = await getMentor(slug)
   const { name, description, photo, bio, linkedin, subject, calendar } = mentor
   return (
     <div className="Mentors">
