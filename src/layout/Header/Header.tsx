@@ -39,11 +39,11 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
                   WhatsApp Group
                 </Link>
               </li> */}
-              <li>
+              {/* <li>
                 <Link href="/login">
                   <button>Access</button>{" "}
                 </Link>
-              </li>
+              </li> */}
               {/* <li>
                 <IconButton aria-label="theme switch"
                   sx={{ m: 0, p: 0 }} onClick={switchTheme} style={{ color: isDark ? "#ffff00" : "#000000" }} >
