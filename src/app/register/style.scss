@@ -1,0 +1,59 @@
+@import "../../app/globals.scss";
+
+.formLogin {
+  max-width: 100%;
+  margin: 50px auto;
+  text-align: center;
+  h2 {
+    padding: 30px 0px 20px;
+  }
+  form {
+    background-color: #fff;
+    border-radius: 10px;
+
+    @media (min-width: 631px) {
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0px auto;
+    }
+    input {
+      max-width: 100%;
+      border: none;
+      margin-bottom: 10px;
+      padding: 12px 22px;
+      border-radius: 25px;
+      font-size: 16px;
+      background-color: #f0f0f0;
+    }
+    ul {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0px 30px;
+    }
+  }
+}
+
+@media (max-width: 630px) {
+  .form {
+    margin: 20px;
+
+    .formLogin {
+      margin: 0px auto;
+      max-width: 90%;
+
+      input {
+        max-width: 250px;
+        width: 100%;
+        min-width: 100px;
+      }
+      button {
+        max-width: 300px;
+        width: 100%;
+      }
+    }
+  }
+}
