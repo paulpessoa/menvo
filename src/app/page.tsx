@@ -31,19 +31,19 @@ function Home() {
         <h2>It&apos;s simpler than you might think...</h2>
         <div className="cardsContainer container">
           <div className="cardWay">
-            <Image width={200} height={200} src="/images/icons/recruitment.png" alt="Search" />
+            <Image width={200} height={200} src="/images/icons/undraw_the_search_s0xf.svg" alt="Search" />
             <h3>Search</h3>
             <p>Filter by region, city, causes, work area, gender and other topics.</p>
           </div>
 
           <div className="cardWay">
-            <Image width={200} height={200} src="/images/icons/search.png" alt="Profile" />
+            <Image width={200} height={200} src="/images/icons/undraw_professional_card_otb4.svg" alt="Profile" />
             <h3>Profile</h3>
             <p>Look at experiences and academy knowledge in your area of interest.</p>
           </div>
 
           <div className="cardWay">
-            <Image width={200} height={200} src="/images/icons/schedule.png" alt="Schedule" />
+            <Image width={200} height={200} src="/images/icons/undraw_online_calendar_re_wk3t.svg" alt="Schedule" />
             <h3>Schedule</h3>
             <p>Submit the form and wait for the contact with your mentorship guidance.</p>
           </div>

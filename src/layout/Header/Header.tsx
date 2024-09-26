@@ -34,23 +34,23 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
               <li>
                 <Link href="/mentors">Mentors</Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="https://form.jotform.com/222677863783674" target="_blank">
                   WhatsApp Group
                 </Link>
-              </li>
-              <li>
-                <Link href="/user-access">
+              </li> */}
+              {/* <li>
+                <Link href="/login">
                   <button>Access</button>{" "}
                 </Link>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <IconButton aria-label="theme switch"
                   sx={{ m: 0, p: 0 }} onClick={switchTheme} style={{ color: isDark ? "#ffff00" : "#000000" }} >
                   {isDark ? <Brightness7Icon /> : <Brightness4Icon />}
                 </IconButton>
 
-              </li>
+              </li> */}
             </ul>
           </nav>
         </div>
