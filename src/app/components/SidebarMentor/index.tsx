@@ -12,20 +12,20 @@ function SidebarMentor({ data }: any) {
 
         <li>
           <h4>Talk About</h4>
-          <input type="radio" name="talk" title=""/>
+          <input type="radio" name="talk"/>
           <label for="huey">Volunteering</label>
           <br />
-          <input type="radio" name="talk" title=""/>
+          <input type="radio" name="talk"/>
           <label for="huey">First Job</label>
           <br />
-          <input type="radio" defaultChecked name="talk" title="" />
+          <input type="radio" defaultChecked name="talk"/>
           <label for="huey">Student Exchange</label>
           <br />
         </li>
 
         <li>
           <h4>Carrer</h4>
-          <input type="radio" name="carrer" title=""/>
+          <input type="radio" name="carrer"/>
           <label for="huey">Teacher</label>
           <br />
           <input type="radio" name="carrer" />
