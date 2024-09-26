@@ -58,7 +58,7 @@
   - [x] Home
   - [x] About
   - [x] Mentors Feed
-  - [ ] Single Mentor
+  - [x] Single Mentor
   - [ ] Courses
   - [ ] Oportunities
   - [ ] MenvoCast (redirect to AudioPlataforms)
