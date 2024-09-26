@@ -1,7 +1,7 @@
 import React from "react";
 import "./style.scss";
 
-function SidebarMentor() {
+function SidebarMentor({ data }: any) {
   return (
     <div className="sidebarMentor">
       <ul>
@@ -12,20 +12,20 @@ function SidebarMentor() {
 
         <li>
           <h4>Talk About</h4>
-          <input type="radio" name="talk" />
+          <input type="radio" name="talk" title=""/>
           <label for="huey">Volunteering</label>
           <br />
-          <input type="radio" name="talk" />
+          <input type="radio" name="talk" title=""/>
           <label for="huey">First Job</label>
           <br />
-          <input type="radio" defaultChecked name="talk" />
+          <input type="radio" defaultChecked name="talk" title="" />
           <label for="huey">Student Exchange</label>
           <br />
         </li>
 
         <li>
           <h4>Carrer</h4>
-          <input type="radio" name="carrer" />
+          <input type="radio" name="carrer" title=""/>
           <label for="huey">Teacher</label>
           <br />
           <input type="radio" name="carrer" />
@@ -70,7 +70,7 @@ function SidebarMentor() {
           <label for="huey">United Kingdom</label>
           <br />
         </li>
-        
+
         <li>
           <h4>City</h4>
           <input type="checkbox" />
@@ -79,7 +79,7 @@ function SidebarMentor() {
           <input type="checkbox" defaultChecked />
           <label for="huey">Quixadá</label>
           <br />
-          <input type="checkbox" />
+          <input type="checkbox" defaultChecked/>
           <label for="huey">London</label>
           <br />
           <input type="checkbox" />
