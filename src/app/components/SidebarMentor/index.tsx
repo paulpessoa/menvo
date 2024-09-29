@@ -12,97 +12,97 @@ function SidebarMentor({ data }: any) {
 
         <li>
           <h4>Talk About</h4>
-          <input type="radio" name="talk"/>
-          <label for="huey">Volunteering</label>
+          <input type="radio" id="volunteering" name="talk" title="talk" />
+          <label htmlFor="volunteering">Volunteering</label>
           <br />
-          <input type="radio" name="talk"/>
-          <label for="huey">First Job</label>
+          <input type="radio" id="firstJob" name="talk" title="talk" />
+          <label htmlFor="firstJob">First Job</label>
           <br />
-          <input type="radio" defaultChecked name="talk"/>
-          <label for="huey">Student Exchange</label>
+          <input type="radio" id="studentExchange" defaultChecked name="talk" title="talk" />
+          <label htmlFor="studentExchange">Student Exchange</label>
           <br />
         </li>
 
         <li>
           <h4>Carrer</h4>
-          <input type="radio" name="carrer"/>
-          <label for="huey">Teacher</label>
+          <input type="radio" id="teacher" name="carrer" title="carrer" />
+          <label htmlFor="teacher">Teacher</label>
           <br />
-          <input type="radio" name="carrer" />
-          <label for="huey">Nurse</label>
+          <input type="radio" id="nurse" name="carrer" title="carrer" />
+          <label htmlFor="nurse">Nurse</label>
           <br />
-          <input type="radio" defaultChecked name="carrer" />
-          <label for="huey">Entrepreneur</label>
+          <input type="radio" id="entrepreneur" defaultChecked name="carrer" />
+          <label htmlFor="entrepreneur">Entrepreneur</label>
           <br />
-          <input type="radio" defaultChecked name="carrer" />
-          <label for="huey">Veterinarian</label>
+          <input type="radio" id="veterinarian" defaultChecked name="carrer" />
+          <label htmlFor="veterinarian">Veterinarian</label>
           <br />
         </li>
 
         <li>
           <h4>Academy</h4>
-          <input type="radio" name="academy" />
-          <label for="huey">Engineering</label>
+          <input type="radio" id="engineering" name="academy" title="academy" />
+          <label htmlFor="engineering">Engineering</label>
           <br />
-          <input type="radio" name="academy" />
-          <label for="huey">Medicine</label>
+          <input type="radio" id="medicine" name="academy" title="academy" />
+          <label htmlFor="medicine">Medicine</label>
           <br />
-          <input type="radio" defaultChecked name="academy" />
-          <label for="huey">Pedagogy</label>
+          <input type="radio" id="pedagogy" defaultChecked name="academy" />
+          <label htmlFor="pedagogy">Pedagogy</label>
           <br />
         </li>
 
         <li>
           <h4>Region</h4>
-          <input type="checkbox" />
-          <label for="huey">Colombia</label>
+          <input type="checkbox" id="colombia" title="region" />
+          <label htmlFor="colombia">Colombia</label>
           <br />
-          <input type="checkbox" defaultChecked />
-          <label for="huey">Pernambuco</label>
+          <input type="checkbox" id="pernambuco" defaultChecked title="region" />
+          <label htmlFor="pernambuco">Pernambuco</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">Portugal</label>
+          <input type="checkbox" id="portugal" title="region" />
+          <label htmlFor="portugal">Portugal</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">Canadá</label>
+          <input type="checkbox" id="canada" title="region" />
+          <label htmlFor="canada">Canadá</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">United Kingdom</label>
+          <input type="checkbox" id="uk" title="region" />
+          <label htmlFor="uk">United Kingdom</label>
           <br />
         </li>
 
         <li>
           <h4>City</h4>
-          <input type="checkbox" />
-          <label for="huey">Recife</label>
+          <input type="checkbox" id="recife" title="city" />
+          <label htmlFor="recife">Recife</label>
           <br />
-          <input type="checkbox" defaultChecked />
-          <label for="huey">Quixadá</label>
+          <input type="checkbox" id="quixada" defaultChecked title="city" />
+          <label htmlFor="quixada">Quixadá</label>
           <br />
-          <input type="checkbox" defaultChecked/>
-          <label for="huey">London</label>
+          <input type="checkbox" id="london" defaultChecked title="city" />
+          <label htmlFor="london">London</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">Bangalore</label>
+          <input type="checkbox" id="bangalore" title="city" />
+          <label htmlFor="bangalore">Bangalore</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">Paraná</label>
+          <input type="checkbox" id="parana" title="city" />
+          <label htmlFor="parana">Paraná</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">Olinda</label>
+          <input type="checkbox" id="olinda" title="city" />
+          <label htmlFor="olinda">Olinda</label>
           <br />
         </li>
 
         <li>
           <h4>Your Way</h4>
-          <input type="checkbox" />
-          <label for="huey">Woman</label>
+          <input type="checkbox" id="woman" title="way" />
+          <label htmlFor="woman">Woman</label>
           <br />
-          <input type="checkbox" defaultChecked />
-          <label for="huey">+50</label>
+          <input type="checkbox" id="plus50" defaultChecked title="way" />
+          <label htmlFor="plus50">+50</label>
           <br />
-          <input type="checkbox" />
-          <label for="huey">LGBTQIA+</label>
+          <input type="checkbox" id="lgbtqia" title="way" />
+          <label htmlFor="lgbtqia">LGBTQIA+</label>
           <br />
         </li>
 
