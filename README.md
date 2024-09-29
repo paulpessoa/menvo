@@ -68,7 +68,7 @@
 #### Components:
   - [x] Header
   - [x] Footer
-  - [x] sibeBar
+  - [ ] sibeBar
   - [x] sideBarMentor
   - [x] sideBarSearch
   - [x] cardMentor
