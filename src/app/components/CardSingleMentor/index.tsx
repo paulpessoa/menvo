@@ -9,11 +9,9 @@ function CardSingleMentor({ data }: any) {
 
   return (
     <div className="cardSingleMentor">
-      {/* Mentor Photo */}
-
       <div className="divName">
         <div id="solitario" className="cardMentorPhoto">
-          <a href={linkedin} target="_blank" rel="noreferrer">
+          <a href={linkedin} target="_blank" rel="noreferrer" title={name}>
             <Image
               className="mentorPhoto"
               src={photo}
@@ -26,25 +24,21 @@ function CardSingleMentor({ data }: any) {
 
         <a
           className="linkStandard"
-          href="https://google.com"
+          href={linkedin}
           target="_blank"
           rel="noreferrer"
         >
           <h3>{name}</h3>
         </a>
       </div>
-      {/* tag subject */}
       <div className="infoMentor">
-        {/* tag main subject */}
         <div className="mainSubject">
-          <a href="https://google.com" target="_blank" rel="noreferrer">
+          <a href={linkedin} target="_blank" rel="noreferrer">
             <h3>{subject}</h3>
           </a>
         </div>
-
         <p>{bio}</p>
         <p>{description}</p>
-
         <div className="starsMentor">
           <div className="range">
             <FaStar />
