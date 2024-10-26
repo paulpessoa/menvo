@@ -12,6 +12,21 @@ interface Mentor extends User {
   slug: string;
   description: string;
   calendar: string;
+  career: string;
+  academy: string;
+  region: string;
+  city: string;
+  talkAbout: string[];
+  tags: string[];
+}
+interface FilterState {
+  search: string;
+  talkAbout: string;
+  career: string;
+  academy: string;
+  regions: string[];
+  cities: string[];
+  tags: string[];
 }
 
-export type { Mentor, User };
+export type { Mentor, User, FilterState };
