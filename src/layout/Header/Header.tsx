@@ -4,7 +4,7 @@ import "./style.scss";
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
@@ -15,7 +15,7 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
     <header>
       <div className="container">
         <Link href="/">
-          <Image width={500} height={500} src="/images/logo.png" className="logo-cyan" alt="Logo Menvo" />
+          <Image width={160} height={84} src="/images/logo.png" className="logo-cyan" alt="Logo Menvo" />
         </Link>
         <div
           className={classOn ? "menu-section on" : "menu-section"}
@@ -29,10 +29,20 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
           <nav>
             <ul>
               <li>
-                <Link href="/about">About</Link>
+                <Link href="/about">Quem Somos</Link>
               </li>
               <li>
-                <Link href="/mentors">Mentors</Link>
+                <Link href="/mentors">Mentores</Link>
+              </li>
+              <li>
+                <Link href="/about">Cursos e Eventos</Link>
+              </li>
+              <li>
+                <Link href="/about">Empresas e Parceiros</Link>
+              </li>
+              <li>
+                <button className="buttonStandard">Acesso/Cadastro</button>
+
               </li>
               {/* <li>
                 <Link href="https://form.jotform.com/222677863783674" target="_blank">
@@ -44,17 +54,11 @@ export default function Header({ switchTheme, isDark }: { switchTheme: any, isDa
                   <button>Access</button>{" "}
                 </Link>
               </li> */}
-              {/* <li>
-                <IconButton aria-label="theme switch"
-                  sx={{ m: 0, p: 0 }} onClick={switchTheme} style={{ color: isDark ? "#ffff00" : "#000000" }} >
-                  {isDark ? <Brightness7Icon /> : <Brightness4Icon />}
-                </IconButton>
 
-              </li> */}
             </ul>
           </nav>
         </div>
       </div>
-    </header>
+    </header >
   );
 };

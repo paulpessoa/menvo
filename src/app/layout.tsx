@@ -5,7 +5,6 @@ import { lightTheme, darkTheme } from 'theme'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 
 import { Inter } from 'next/font/google'
-import Providers from './providers'
 import Header from '../layout/Header/Header'
 import Footer from '../layout/Footer/Footer'
 import Head from 'next/head';
@@ -29,11 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
         <CssBaseline />
         <body className={inter.className}>
-          <Providers >
-            <Header switchTheme={switchTheme} isDark={isDark} />
-            {children}
-            <Footer />
-          </Providers>
+          <Header switchTheme={switchTheme} isDark={isDark} />
+          {children}
+          <Footer />
         </body>
       </ThemeProvider>
     </html>
