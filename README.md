@@ -49,7 +49,6 @@
 - [x] [Axios](https://axios-http.com/ptbr/docs/intro) - Cliente HTTP baseado em promessas para o navegador e Node.js
 - [x] [ReactJs](https://react.dev/) - The library for web and native user interfaces
 - [x] [Typescript](https://www.typescriptlang.org/) - TypeScript is JavaScript with syntax for types.
-- [x] [Chakra UI](https://chakra-ui.com) - Create accessible React apps with speed
 - [x] [Mui Material](https://mui.com/) - Move faster with intuitive React UI tools
 - [x] [React Icon](https://react-icons.github.io/react-icons/) - Include popular icons in your React projects easily 
 
