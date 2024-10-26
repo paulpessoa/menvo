@@ -8,6 +8,7 @@ import { Inter } from 'next/font/google'
 import Header from '../layout/Header/Header'
 import Footer from '../layout/Footer/Footer'
 import Head from 'next/head';
+import GoogleAnalytics from 'utils/google-analytics'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
         </body>
       </ThemeProvider>
+      <GoogleAnalytics />
     </html>
   )
 }
