@@ -1,6 +1,7 @@
 import React from 'react';
 import "./page.scss";
 import Image from 'next/image';
+import DisclaimerForm from './components/DisclaimerForm';
 
 function Home() {
   return (
@@ -48,8 +49,9 @@ function Home() {
             <p>Submit the form and wait for the contact with your mentorship guidance.</p>
           </div>
         </div>
-
       </section>
+
+      <DisclaimerForm />
 
     </div>
   );
