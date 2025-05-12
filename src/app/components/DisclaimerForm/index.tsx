@@ -39,7 +39,7 @@ const DisclaimerForm = () => {
     return (
       <div className="disclaimerForm submitted">
         <h3>Thank you for your feedback!</h3>
-        <p>We'll keep you updated about our launch in June.</p>
+        <p>We&apos;ll keep you updated about our launch in June.</p>
       </div>
     );
   }
@@ -48,7 +48,7 @@ const DisclaimerForm = () => {
     <div className="disclaimerForm">
       <div className="disclaimerContent">
         <h2>Coming Soon!</h2>
-        <p>We're working hard to bring you more mentors and exciting features. Our official launch is scheduled for June 2024.</p>
+        <p>We&apos;re working hard to bring you more mentors and exciting features. Our official launch is scheduled for June 2024.</p>
         <p>Want to be notified when we launch? Leave your contact information below!</p>
       </div>
 
