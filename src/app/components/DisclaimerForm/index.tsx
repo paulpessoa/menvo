@@ -10,6 +10,7 @@ const DisclaimerForm = () => {
   const [rating, setRating] = useState(0);
   const [suggestion, setSuggestion] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,11 +36,16 @@ const DisclaimerForm = () => {
     }
   };
 
+  if (!isVisible) return null;
+
   if (submitted) {
     return (
       <div className="disclaimerForm submitted">
-        <h3>Thank you for your feedback!</h3>
-        <p>We&apos;ll keep you updated about our launch in June.</p>
+        <div className="disclaimerContent">
+          <button className="closeButton" onClick={() => setIsVisible(false)}>×</button>
+          <h3>Thank you for your feedback!</h3>
+          <p>We&apos;ll keep you updated about our launch in June.</p>
+        </div>
       </div>
     );
   }
@@ -47,68 +53,69 @@ const DisclaimerForm = () => {
   return (
     <div className="disclaimerForm">
       <div className="disclaimerContent">
+        <button className="closeButton" onClick={() => setIsVisible(false)}>×</button>
         <h2>Coming Soon!</h2>
         <p>We&apos;re working hard to bring you more mentors and exciting features. Our official launch is scheduled for June 2024.</p>
         <p>Want to be notified when we launch? Leave your contact information below!</p>
-      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="formGroup">
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="formGroup">
-          <input
-            type="email"
-            placeholder="Your Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="formGroup">
-          <input
-            type="tel"
-            placeholder="Your Phone (optional)"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
-
-        <div className="formGroup rating">
-          <label>How do you feel about this initiative?</label>
-          <div className="stars">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                className={`star ${star <= rating ? 'filled' : ''}`}
-                onClick={() => setRating(star)}
-              >
-                ★
-              </span>
-            ))}
+        <form onSubmit={handleSubmit}>
+          <div className="formGroup">
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </div>
-        </div>
 
-        <div className="formGroup">
-          <textarea
-            placeholder="Any suggestions for us? (optional)"
-            value={suggestion}
-            onChange={(e) => setSuggestion(e.target.value)}
-          />
-        </div>
+          <div className="formGroup">
+            <input
+              type="email"
+              placeholder="Your Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <button type="submit" className="buttonStandard">
-          Submit
-        </button>
-      </form>
+          <div className="formGroup">
+            <input
+              type="tel"
+              placeholder="Your Phone (optional)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <div className="formGroup rating">
+            <label>How do you feel about this initiative?</label>
+            <div className="stars">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  className={`star ${star <= rating ? 'filled' : ''}`}
+                  onClick={() => setRating(star)}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="formGroup">
+            <textarea
+              placeholder="Any suggestions for us? (optional)"
+              value={suggestion}
+              onChange={(e) => setSuggestion(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" className="buttonStandard">
+            Submit
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
