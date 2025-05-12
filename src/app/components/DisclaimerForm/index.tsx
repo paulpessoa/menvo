@@ -20,14 +20,17 @@ const DisclaimerForm = ({ onClose }: DisclaimerFormProps) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
         onClose?.();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onClose]);
 
@@ -119,7 +122,7 @@ const DisclaimerForm = ({ onClose }: DisclaimerFormProps) => {
           </div>
 
           <div className="formGroup rating">
-            <label>How excited are you about our launch?</label>
+            <label>What do you think of this initiative?</label>
             <div className="stars">
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
