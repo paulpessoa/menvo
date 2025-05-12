@@ -1,7 +1,6 @@
 import React from 'react';
 import "./page.scss";
 import Image from 'next/image';
-import DisclaimerForm from './components/DisclaimerForm';
 
 function Home() {
   return (
@@ -50,9 +49,6 @@ function Home() {
           </div>
         </div>
       </section>
-
-      <DisclaimerForm />
-
     </div>
   );
 }
