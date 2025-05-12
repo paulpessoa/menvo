@@ -48,9 +48,7 @@ function Home() {
             <p>Submit the form and wait for the contact with your mentorship guidance.</p>
           </div>
         </div>
-
       </section>
-
     </div>
   );
 }

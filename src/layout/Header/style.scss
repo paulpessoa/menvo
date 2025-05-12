@@ -1,37 +1,50 @@
 @import "../../app/globals.scss";
 
 header {
-  .container {
-    width: 90%;
-  }
   width: 100%;
   background-color: #fff;
+
+  .container {
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   img {
     width: 160px;
     margin-right: 0;
     padding: 15px 0;
     margin: 0px;
   }
+
   nav {
     display: flex;
+    align-items: center;
+
     ul {
       display: flex;
+      align-items: center;
+      gap: 1rem;
+
       li {
         list-style: none;
+        display: flex;
+        align-items: center;
+
         a {
+          color: #666;
           text-decoration: none;
-          font-weight: 500;
-          color: $color1;
           font-size: 16px;
-          padding: 1rem;
-          transition: all 250ms linear 0s;
-          position: relative;
-          animation-name: menu;
-          animation-duration: 1s;
-          transition: 100ms;
+          transition: color 0.3s ease;
+
           &:hover {
-            color: $color2;
+            color: #006276;
           }
+        }
+
+        button {
+          margin: 0;
         }
       }
     }

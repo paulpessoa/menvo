@@ -6,10 +6,12 @@ import GoogleIcon from '@mui/icons-material/Google';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PhoneIcon from '@mui/icons-material/Phone';
 
+type Provider = 'google' | 'github' | 'facebook' | 'twitter';
+
 const LoginPage = () => {
     const [email, setEmail] = useState('');
 
-    const handleLogin = async (provider) => {
+    const handleLogin = async (provider: Provider) => {
         let { error } = await supabase.auth.signInWithOAuth({
             provider: provider,
         });
