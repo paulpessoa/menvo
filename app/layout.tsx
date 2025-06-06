@@ -13,12 +13,13 @@ export const metadata: Metadata = {
   title: "MENVO - Free Mentorship Platform",
   description: "Connect with volunteer mentors for free mentorship sessions",
   generator: "v0.dev",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  }
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({
@@ -32,9 +33,6 @@ export default function RootLayout({
       suppressHydrationWarning
       // cz-shortcut-listen="true"
     >
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-      </head>
       <body className={inter.className}>
         <Providers>
           <div className="flex min-h-screen flex-col">
