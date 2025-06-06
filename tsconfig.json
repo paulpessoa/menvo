@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
     "allowJs": true,
+    "target": "ES6",
     "skipLibCheck": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -24,46 +23,19 @@
       }
     ],
     "paths": {
-      "*": [
-        "./src/*",
+      "@/*": [
         "./*"
-      ],
-      "services/*": [
-        "./services/*"
-      ],
-      "store/*": [
-        "./store/*"
-      ],
-      "types/*": [
-        "./types/*"
-      ],
-      "utils/*": [
-        "./utils/*"
-      ],
-      "components/*": [
-        "./src/app/components/*",
-        "./src/components/*"
-      ],
-      "layouts/*": [
-        "./src/app/layouts/*",
-        "./src/layouts/*"
-      ],
-      "hooks/*": [
-        "./src/hooks/*"
-      ],
+      ]
     }
   },
   "include": [
-    ".",
     "next-env.d.ts",
-    ".next/types/**/*.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx"
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    ".next"
+    // ".next"
   ]
 }
