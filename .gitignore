@@ -6,6 +6,8 @@
 # next.js
 /.next/
 /out/
+.next/
+out/
 
 # production
 /build
@@ -21,7 +23,11 @@ pnpm-lock.yaml
 yarn.lock
 
 # env files
-.env*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # vercel
 .vercel
@@ -29,3 +35,11 @@ yarn.lock
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Turbo (caso esteja usando)
+.turbo/
