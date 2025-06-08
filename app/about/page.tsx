@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Globe, Heart, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Contributors } from "@/components/Contributors"
+import { Partners } from "@/components/Partners"
 
 export default function AboutPage() {
     const { t } = useTranslation()
@@ -172,28 +173,10 @@ export default function AboutPage() {
           </p>
         </div>
       </div>
-
-      <div className="text-center mb-16">
-        <h2 id="partners" className="text-2xl font-bold mb-4 scroll-mt-20">{t("about.ourPartners.title")}</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-          {t("about.ourPartners.description")}
-        </p>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex justify-center">
-              <Image
-                src="/placeholder-logo.svg"
-                width={150}
-                height={75}
-                alt={t("about.ourPartners.partnerLogoAlt", { number: i })}
-                className="opacity-70 hover:opacity-100 transition-opacity"
-              />
-            </div>
-          ))}
-        </div>
+ 
+      <div className="text-center mb-16" id="partners">
+        <Partners />
       </div>
-
       <div className="bg-muted rounded-lg p-8 md:p-12 text-center">
         <h2 className="text-2xl font-bold mb-4">{t("about.joinOurMission.title")}</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
