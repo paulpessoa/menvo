@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Globe, Heart, Users } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { Contributors } from "@/components/Contributors"
 
 export default function AboutPage() {
     const { t } = useTranslation()
@@ -132,10 +133,21 @@ export default function AboutPage() {
               {t("about.ourTeam.paragraph3")}
             </p>
             <Button asChild>
-              <Link href="/contact">{t("about.ourTeam.joinTeam")}</Link>
+              <Link    href="https://wa.me/5581995097377?text=Olá!%20Vi%20o%20projeto%20e%20me%20interessei%20bastante.%20Gostaria%20de%20ajudar%20com%20algo%20se%20for%20possível..."
+                target="_blank"
+                rel="noopener noreferrer">
+                  {t("about.ourTeam.joinTeam")}</Link>
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold text-center mb-4">{t("about.contributors.title")}</h2>
+        <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-8">
+          {t("about.contributors.description")}
+        </p>
+        <Contributors />
       </div>
 
       <div className="bg-primary-600 text-primary-foreground rounded-lg p-8 md:p-12 mb-16">

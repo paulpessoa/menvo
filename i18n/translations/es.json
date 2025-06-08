@@ -137,6 +137,12 @@
       },
       "description": "Estos números representan personas reales cuyas vidas han sido impactadas positivamente a través de conexiones de mentoría en nuestra plataforma."
     },
+    "contributors": {
+      "title": "Nuestros Contribuidores",
+      "description": "Conoce a los voluntarios que ayudan a desarrollar la plataforma mientras aprenden y aumentan sus oportunidades en el mercado laboral",
+      "contributions": "{{count}} contribuciones",
+      "viewRepository": "Ver Repositorio"
+    },
     "ourPartners": {
       "title": "Nuestros Socios",
       "description": "Estamos orgullosos de colaborar con organizaciones que comparten nuestra visión de hacer que la mentoría sea accesible para todos.",

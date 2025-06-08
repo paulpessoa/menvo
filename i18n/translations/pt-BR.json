@@ -137,6 +137,12 @@
       },
       "description": "Esses números representam pessoas reais cujas vidas foram impactadas positivamente através de conexões de mentoria em nossa plataforma."
     },
+    "contributors": {
+      "title": "Nossos Contribuidores",
+      "description": "Conheça os voluntários que ajudam a desenvolver a plataforma enquanto aprendem e aumentam suas chances no mercado de trabalho",
+      "contributions": "{{count}} contribuições",
+      "viewRepository": "Ver Repositório"
+    },
     "ourPartners": {
       "title": "Nossos Parceiros",
       "description": "Temos orgulho de colaborar com organizações que compartilham nossa visão de tornar a mentoria acessível para todos.",
