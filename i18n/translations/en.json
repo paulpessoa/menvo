@@ -25,7 +25,9 @@
     "name": "Name",
     "firstName": "First Name",
     "lastName": "Last Name",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "close": "Close",
+    "submitting": "Submitting..."
   },
   "header": {
     "title": "Volunteer Mentor Platform",
@@ -513,6 +515,49 @@
     "links": {
       "privacy": "Privacy Policy",
       "cookies": "Cookie Policy"
+    },
+    "warning": {
+      "title": "Attention",
+      "message": "The platform is currently under development. We're very happy to receive your feedback and opinion on what you've seen so far!",
+      "dismiss": "Got it",
+      "giveFeedback": "Give Feedback"
+    },
+    "feedback": {
+      "title": "What did you think of Menvo?",
+      "description": "Your opinion is very important to us! Tell us what you thought of the platform.",
+      "openFeedback": "Open Feedback",
+      "helpUsImprove": "Help us improve the platform",
+      "commentPlaceholder": "Tell us what you thought of the platform...",
+      "emailPlaceholder": "Your email (optional)",
+      "submit": "Submit Feedback",
+      "thankYou": "Thank you for your feedback!",
+      "error": "Error submitting feedback. Please try again.",
+      "ratingRequired": "Please select a rating.",
+      "rateStars": "Rate with {{count}} stars"
+    }
+  },
+  "metadata": {
+    "title": "MENVO - Volunteer Mentoring Platform",
+    "description": "Connecting mentors and mentees for free mentoring sessions",
+    "keywords": [
+      "mentoring",
+      "volunteer mentoring",
+      "professional development",
+      "career",
+      "learning",
+      "mentors",
+      "mentees",
+      "education",
+      "personal development"
+    ],
+    "og": {
+      "title": "MENVO - Volunteer Mentoring Platform",
+      "description": "Connecting mentors and mentees for free mentoring sessions",
+      "siteName": "MENVO"
+    },
+    "twitter": {
+      "title": "MENVO - Volunteer Mentoring Platform",
+      "description": "Connecting mentors and mentees for free mentoring sessions"
     }
   }
 }
