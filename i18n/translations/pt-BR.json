@@ -25,7 +25,9 @@
     "name": "Nome",
     "firstName": "Nome",
     "lastName": "Sobrenome",
-    "loading": "Carregando..."
+    "loading": "Carregando...",
+    "close": "Fechar",
+    "submitting": "Enviando..."
   },
   "header": {
     "title": "Plataforma de Mentoria Voluntária",
@@ -513,6 +515,49 @@
     "links": {
       "privacy": "Política de Privacidade",
       "cookies": "Política de Cookies"
+    }
+  },
+  "warning": {
+    "title": "Atenção",
+    "message": "A plataforma está em fase de desenvolvimento. Ficamos muito felizes em receber seu feedback e opinião sobre o que você achou do que viu até agora!",
+    "dismiss": "Entendi",
+    "giveFeedback": "Dar Feedback"
+  },
+  "feedback": {
+    "title": "O que você achou da Menvo?",
+    "description": "Sua opinião é muito importante para nós! Conte-nos o que você achou da plataforma.",
+    "openFeedback": "Abrir Feedback",
+    "helpUsImprove": "Ajude-nos a melhorar a plataforma",
+    "commentPlaceholder": "Conte-nos o que você achou da plataforma...",
+    "emailPlaceholder": "Seu e-mail (opcional)",
+    "submit": "Enviar Feedback",
+    "thankYou": "Obrigado pelo seu feedback!",
+    "error": "Erro ao enviar feedback. Tente novamente.",
+    "ratingRequired": "Por favor, selecione uma avaliação.",
+    "rateStars": "Avaliar com {{count}} estrelas"
+  },
+  "metadata": {
+    "title": "MENVO - Plataforma de Mentoria Voluntária",
+    "description": "Conectando mentores e mentees para sessões gratuitas de mentoria",
+    "keywords": [
+      "mentoria",
+      "mentoria voluntária",
+      "desenvolvimento profissional",
+      "carreira",
+      "aprendizado",
+      "mentores",
+      "mentorados",
+      "educação",
+      "desenvolvimento pessoal"
+    ],
+    "og": {
+      "title": "MENVO - Plataforma de Mentoria Voluntária",
+      "description": "Conectando mentores e mentees para sessões gratuitas de mentoria",
+      "siteName": "MENVO"
+    },
+    "twitter": {
+      "title": "MENVO - Plataforma de Mentoria Voluntária",
+      "description": "Conectando mentores e mentees para sessões gratuitas de mentoria"
     }
   }
 }

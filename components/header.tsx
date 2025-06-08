@@ -60,21 +60,19 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1">
                 <Globe className="h-4 w-4" />
-                <span className="sr-only">Change Language</span>
+                <span>{currentLanguage === 'en' ? 'EN' : currentLanguage === 'pt-BR' ? 'PT' : 'ES'}</span>
+                <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLanguage('en')} className="flex items-center gap-2">
-                <Image src="/flags/us.svg" alt="English" width={20} height={15} />
-                <span className="sr-only">{t('common.english')}</span>
+              <DropdownMenuItem onClick={() => changeLanguage('en')}>
+                {t('common.english')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLanguage('pt-BR')} className="flex items-center gap-2">
-                <Image src="/flags/br.svg" alt="Português" width={20} height={15} />
-                <span className="sr-only">{t('common.portuguese')}</span>
+              <DropdownMenuItem onClick={() => changeLanguage('pt-BR')}>
+                {t('common.portuguese')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLanguage('es')} className="flex items-center gap-2">
-                <Image src="/flags/es.svg" alt="Español" width={20} height={15} />
-                <span className="sr-only">{t('common.spanish')}</span>
+              <DropdownMenuItem onClick={() => changeLanguage('es')}>
+                {t('common.spanish')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

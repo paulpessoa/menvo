@@ -25,7 +25,9 @@
     "name": "Nombre",
     "firstName": "Nombre",
     "lastName": "Apellido",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "close": "Cerrar",
+    "submitting": "Enviando..."
   },
   "header": {
     "title": "Plataforma de Mentoria Voluntaria",
@@ -513,6 +515,49 @@
     "links": {
       "privacy": "Política de Privacidad",
       "cookies": "Política de Cookies"
+    },
+    "warning": {
+      "title": "Atención",
+      "message": "La plataforma está actualmente en desarrollo. ¡Nos alegra mucho recibir tus comentarios y opiniones sobre lo que has visto hasta ahora!",
+      "dismiss": "Entendido",
+      "giveFeedback": "Dar Comentarios"
+    },
+    "feedback": {
+      "title": "¿Qué te pareció Menvo?",
+      "description": "¡Tu opinión es muy importante para nosotros! Cuéntanos qué te pareció la plataforma.",
+      "openFeedback": "Abrir Comentarios",
+      "helpUsImprove": "Ayúdanos a mejorar la plataforma",
+      "commentPlaceholder": "Cuéntanos qué te pareció la plataforma...",
+      "emailPlaceholder": "Tu correo electrónico (opcional)",
+      "submit": "Enviar Comentarios",
+      "thankYou": "¡Gracias por tus comentarios!",
+      "error": "Error al enviar comentarios. Inténtalo de nuevo.",
+      "ratingRequired": "Por favor, selecciona una calificación.",
+      "rateStars": "Calificar con {{count}} estrellas"
+    }
+  },
+  "metadata": {
+    "title": "MENVO - Plataforma de Mentoría Voluntaria",
+    "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría",
+    "keywords": [
+      "mentoría",
+      "mentoría voluntaria",
+      "desarrollo profesional",
+      "carrera",
+      "aprendizaje",
+      "mentores",
+      "mentorizados",
+      "educación",
+      "desarrollo personal"
+    ],
+    "og": {
+      "title": "MENVO - Plataforma de Mentoría Voluntaria",
+      "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría",
+      "siteName": "MENVO"
+    },
+    "twitter": {
+      "title": "MENVO - Plataforma de Mentoría Voluntaria",
+      "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría"
     }
   }
 }

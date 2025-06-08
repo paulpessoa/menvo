@@ -29,6 +29,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "react-i18next"
 import type { MentorFilters, MentorProfile } from "@/services/mentors/mentors"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import { WarningBanner } from "@/components/WarningBanner"
 
 interface FilterState extends Omit<MentorFilters, 'page' | 'limit'> {
   page: number
@@ -48,6 +49,114 @@ function useDebounce<T>(value: T, delay: number): T {
   }, [value, delay])
   return debouncedValue
 }
+
+// Add mock mentors data
+const mockMentors: MentorProfile[] = [
+
+{
+    id: "1",
+    first_name: "Paul",
+    last_name: "Pessoa",
+    avatar_url: "/images/paul-pessoa.jpg",
+    current_position: "Engenheiro de Software",
+    current_company: "Traive Finance",
+    location: "Recife, Brasil",
+    bio: "Engenheiro de software com ampla experiência em startups e hackathons. Atua principalmente com React, arquitetura modular e projetos open source. Fundador da Menvo.com.br e idealizador do Estagionauta.",
+    availability: "available" as const,
+    mentor_skills: [
+      "React",
+      "Arquitetura de Frontend",
+      "Next.js",
+      "Open Source",
+      "Carreira em tecnologia"
+    ],
+    languages: ["pt-BR", "en"]
+  },
+  {
+    id: "2",
+    first_name: "Ismaela",
+    last_name: "Silva",
+    avatar_url: "/images/ismaela-silva.jpg",
+    current_position: "Jornalista e Redatora",
+    current_company: "Movimento Circular",
+    location: "Recife, Brasil",
+    bio: "Jornalista com experiência em redação criativa, produção de conteúdo e comunicação social. Apaixonada por educação, impacto social e iniciativas colaborativas.",
+    availability: "available" as const,
+    mentor_skills: [
+      "Comunicação",
+      "Redação criativa",
+      "Jornalismo",
+      "Storytelling",
+      "Gestão de conteúdo"
+    ],
+    languages: ["pt-BR", "en"]
+  },
+  {
+    id: "6",
+    first_name: "Sarah",
+    last_name: "Johnson",
+    avatar_url: "https://i.pravatar.cc/300?img=1",
+    current_position: "Senior Software Engineer",
+    current_company: "Google",
+    location: "São Paulo, Brasil",
+    bio: "Desenvolvedora com mais de 10 anos de experiência em desenvolvimento web e mobile. Especialista em React, Node.js e arquitetura de software.",
+    availability: "available" as const,
+    mentor_skills: ["React", "Node.js", "TypeScript", "Arquitetura de Software"],
+    languages: ["pt-BR", "en"]
+  },
+  {
+    id: "7",
+    first_name: "Carlos",
+    last_name: "Silva",
+    avatar_url: "https://i.pravatar.cc/300?img=2",
+    current_position: "Product Manager",
+    current_company: "Microsoft",
+    location: "Rio de Janeiro, Brasil",
+    bio: "Product Manager com experiência em startups e grandes empresas. Especialista em metodologias ágeis e gestão de produtos digitais.",
+    availability: "available" as const,
+    mentor_skills: ["Product Management", "Agile", "UX Research", "Strategy"],
+    languages: ["pt-BR", "en", "es"]
+  },
+  {
+    id: "3",
+    first_name: "Ana",
+    last_name: "Martinez",
+    avatar_url: "https://i.pravatar.cc/300?img=3",
+    current_position: "UX/UI Designer",
+    current_company: "Apple",
+    location: "Belo Horizonte, Brasil",
+    bio: "Designer com foco em experiência do usuário e interfaces. Trabalhou em projetos para grandes empresas e startups.",
+    availability: "busy" as const,
+    mentor_skills: ["UI Design", "UX Research", "Figma", "Design Systems"],
+    languages: ["pt-BR", "es"]
+  },
+  {
+    id: "4",
+    first_name: "Pedro",
+    last_name: "Santos",
+    avatar_url: "https://i.pravatar.cc/300?img=4",
+    current_position: "Data Scientist",
+    current_company: "Amazon",
+    location: "Curitiba, Brasil",
+    bio: "Cientista de dados com experiência em machine learning e análise de dados. Especialista em Python e R.",
+    availability: "available" as const,
+    mentor_skills: ["Python", "Machine Learning", "Data Analysis", "R"],
+    languages: ["pt-BR", "en"]
+  },
+  {
+    id: "5",
+    first_name: "Mariana",
+    last_name: "Oliveira",
+    avatar_url: "https://i.pravatar.cc/300?img=5",
+    current_position: "DevOps Engineer",
+    current_company: "AWS",
+    location: "Porto Alegre, Brasil",
+    bio: "Engenheira DevOps com experiência em cloud computing e automação. Especialista em AWS e Kubernetes.",
+    availability: "available" as const,
+    mentor_skills: ["AWS", "Kubernetes", "Docker", "CI/CD"],
+    languages: ["pt-BR", "en"]
+  }
+]
 
 export default function MentorsPage() {
   const { t } = useTranslation()
@@ -84,6 +193,16 @@ export default function MentorsPage() {
     sortBy: filters.sortBy || "name-asc"
   })
   const { data: filterOptions, isLoading: isLoadingFilters } = useFilterOptions()
+
+  // Modify the mentors data to use mock data when there's an error
+  const mentorsToDisplay = error || !mentorsData ? {
+    mentors: mockMentors,
+    totalCount: mockMentors.length,
+    currentPage: 1,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false
+  } : mentorsData
 
   // Handler para filtros (apenas altera o pendingFilters)
   const handlePendingFilterChange = (key: keyof FilterState, value: any) => {
@@ -410,6 +529,7 @@ export default function MentorsPage() {
 
   return (
     <div className="container py-8 md:py-12">
+      <WarningBanner />
       <div className="flex flex-col space-y-6">
         {/* Header */}
         <div className="flex flex-col space-y-2">
@@ -420,33 +540,32 @@ export default function MentorsPage() {
         </div>
 
         {/* Search Bar */}
-     <div className="flex flex-col md:flex-row gap-4 items-start">
-  <div className="relative w-full md:flex-1">
-    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-    <Input 
-      type="search" 
-      placeholder={t("mentors.searchPlaceholder")}
-      className="w-full pl-10"
-      value={pendingFilters.search}
-      onChange={(e) => handleSearchChange(e.target.value)}
-    />
-  </div>
+        <div className="flex flex-col md:flex-row gap-4 items-start">
+          <div className="relative w-full md:flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input 
+              type="search" 
+              placeholder={t("mentors.searchPlaceholder")}
+              className="w-full pl-10"
+              value={pendingFilters.search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+            />
+          </div>
 
-  {/* Mobile: FilterSection + ClearFilters centralizados */}
-  <div className="flex gap-2 justify-center items-center w-full md:hidden">
-    <FilterSection />
-    {isAnyFilterActive && (
-      <Button 
-        variant="outline" 
-        onClick={clearFilters}
-        className="whitespace-nowrap"
-      >
-        {t("mentors.clearFilters")}
-      </Button>
-    )}
-  </div>
-</div>
-
+          {/* Mobile: FilterSection + ClearFilters centralizados */}
+          <div className="flex gap-2 justify-center items-center w-full md:hidden">
+            <FilterSection />
+            {isAnyFilterActive && (
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="whitespace-nowrap"
+              >
+                {t("mentors.clearFilters")}
+              </Button>
+            )}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
           {/* Desktop Sidebar Filters */}
@@ -461,12 +580,12 @@ export default function MentorsPage() {
               <p className="text-sm text-muted-foreground">
                 {isLoading 
                   ? t("common.loading")
-                  : t("mentors.showingResults", { count: mentorsData?.totalCount || 0 })
+                  : t("mentors.showingResults", { count: mentorsToDisplay?.totalCount || 0 })
                 }
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">{t("mentors.sortBy")}:</span>
-                <Select disabled value={pendingFilters.sortBy || 'name-asc'} onValueChange={handleSortChange}>
+                <Select value={pendingFilters.sortBy || 'name-asc'} onValueChange={handleSortChange}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue />
                   </SelectTrigger>
@@ -484,12 +603,21 @@ export default function MentorsPage() {
               <MentorsGridSkeleton />
             ) : error ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">Erro ao carregar mentores. Tente novamente.</p>
+                <p className="text-muted-foreground mb-6">Usando dados de exemplo enquanto o banco de dados está indisponível.</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {mockMentors.map((mentor) => (
+                    <MentorCard 
+                      key={mentor.id} 
+                      mentor={mentor} 
+                      onViewProfile={() => handleViewProfile(mentor)}
+                    />
+                  ))}
+                </div>
               </div>
-            ) : mentorsData?.mentors && mentorsData.mentors.length > 0 ? (
+            ) : mentorsToDisplay?.mentors && mentorsToDisplay.mentors.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mentorsData.mentors.map((mentor) => (
+                  {mentorsToDisplay.mentors.map((mentor) => (
                     <MentorCard 
                       key={mentor.id} 
                       mentor={mentor} 
@@ -499,12 +627,12 @@ export default function MentorsPage() {
                 </div>
                 
                 {/* Paginação */}
-                {mentorsData.totalPages > 1 && (
+                {!error && mentorsToDisplay.totalPages > 1 && (
                   <div className="flex items-center justify-center space-x-4 mt-8">
                     <Button
                       variant="outline"
                       onClick={() => handlePageChange(filters.page - 1)}
-                      disabled={!mentorsData.hasPreviousPage}
+                      disabled={!mentorsToDisplay.hasPreviousPage}
                     >
                       <ChevronLeft className="h-4 w-4 mr-2" />
                       {t("mentors.pagination.previous")}
@@ -512,15 +640,15 @@ export default function MentorsPage() {
                     
                     <span className="text-sm text-muted-foreground">
                       {t("mentors.pagination.page", { 
-                        current: mentorsData.currentPage, 
-                        total: mentorsData.totalPages 
+                        current: mentorsToDisplay.currentPage, 
+                        total: mentorsToDisplay.totalPages 
                       })}
                     </span>
                     
                     <Button
                       variant="outline"
                       onClick={() => handlePageChange(filters.page + 1)}
-                      disabled={!mentorsData.hasNextPage}
+                      disabled={!mentorsToDisplay.hasNextPage}
                     >
                       {t("mentors.pagination.next")}
                       <ChevronRight className="h-4 w-4 ml-2" />
