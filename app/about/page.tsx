@@ -39,7 +39,7 @@ export default function AboutPage() {
         </div>
         <div className="flex justify-center">
           <Image
-            src="/placeholder.svg?height=400&width=500&text=Our+Story"
+            src="/images/about/hackathon-latinoware-paul-ismaela-italo.jpg"
             width={500}
             height={400}
             alt={t("about.ourStoryImageAlt")}
@@ -112,7 +112,7 @@ export default function AboutPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
         <div className="flex justify-center order-last md:order-first">
           <Image
-            src="/placeholder.svg?height=400&width=500&text=Our+Team"
+            src="/images/about/menvo-team.png"
             width={500}
             height={400}
             alt={t("about.ourTeamImageAlt")}
