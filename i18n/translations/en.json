@@ -137,6 +137,12 @@
       },
       "description": "These numbers represent real people whose lives have been positively impacted through mentorship connections on our platform."
     },
+    "contributors": {
+      "title": "Our Contributors",
+      "description": "Meet the volunteers who help develop the platform while learning and increasing their chances in the job market",
+      "contributions": "{{count}} contributions",
+      "viewRepository": "View Repository"
+    },
     "ourPartners": {
       "title": "Our Partners",
       "description": "We're proud to collaborate with organizations that share our vision of making mentorship accessible to all.",
