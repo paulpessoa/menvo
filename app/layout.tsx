@@ -33,6 +33,9 @@ export default function RootLayout({
       suppressHydrationWarning
       // cz-shortcut-listen="true"
     >
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body className={inter.className}>
         <Providers>
           <div className="flex min-h-screen flex-col">
