@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { FeedbackBanner } from '@/components/FeedbackBanner'
 import { WarningBanner } from "@/components/WarningBanner"
 import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -119,6 +120,17 @@ export default function RootLayout({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
+          <Script
+          id="clarity-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "rz28fusa38");`,
+          }}
+        />
       </head>
       <body className={inter.className}>
         <Providers>
