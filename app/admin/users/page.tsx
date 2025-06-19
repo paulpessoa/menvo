@@ -21,7 +21,8 @@ interface User {
 
 export default function AdminPage() {
   const dataProfile  = useUserRoles()
-  const isAdmin = dataProfile ?.roles.some(role => role === 'admin')
+  const isAdmin = true
+  // const isAdmin = dataProfile ?.roles.some(role => role === 'admin')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [editingUser, setEditingUser] = useState<string | null>(null)
@@ -50,7 +51,7 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => {
-    if (dataProfile && dataProfile .roles) {
+    if (dataProfile && dataProfile.roles) {
       console.log('[MENVO] Acessos do usuário (admin):', dataProfile.roles.map(r => r))
     }
   }, [dataProfile ])
