@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Eye, Edit, Save, X } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useUserRoles } from '../context/user-roles-context'
+import { useUserRoles } from '@/hooks/useUserRoles'
 
 interface User {
   id: string
