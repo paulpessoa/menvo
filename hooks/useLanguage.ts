@@ -7,7 +7,8 @@ export const useLanguage = () => {
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     setCurrentLanguage(lng);
-  };
+    localStorage.setItem('language', lng); // <-- salva no localStorage garantindo que na próxima vez que o usuário acessar a aplicação,
+  };                                      // ela já esteja no idioma que ele selecionou, sem precisar escolher novamente.
 
   useEffect(() => {
     const language = localStorage.getItem('language') || 'pt-BR';
