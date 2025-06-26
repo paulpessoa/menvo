@@ -195,14 +195,7 @@ export default function MentorsPage() {
   const { data: filterOptions, isLoading: isLoadingFilters } = useFilterOptions()
 
   // Modify the mentors data to use mock data when there's an error
-  const mentorsToDisplay = error || !mentorsData ? {
-    mentors: mockMentors,
-    totalCount: mockMentors.length,
-    currentPage: 1,
-    totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false
-  } : mentorsData
+  const mentorsToDisplay = mentorsData || { mentors: [], totalCount: 0, currentPage: 1, totalPages: 1, hasNextPage: false, hasPreviousPage: false }
 
   // Handler para filtros (apenas altera o pendingFilters)
   const handlePendingFilterChange = (key: keyof FilterState, value: any) => {
