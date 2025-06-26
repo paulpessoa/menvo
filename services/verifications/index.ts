@@ -1,4 +1,3 @@
-
 import type { Database } from "@/types/database"
 import { supabase } from "../auth"
 
