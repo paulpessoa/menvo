@@ -11,7 +11,6 @@ import { useEffect, useState } from "react"
 export default function Home() {
     const { t } = useTranslation()
     const images = [
-      "/images/g.jpg",
       "/images/f.jpg",
       "/images/e.jpg",
       "/images/d.jpg",
