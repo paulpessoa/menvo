@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [errorCode, setErrorCode] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
@@ -55,12 +56,16 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setErrorCode(null)
     setIsLoading(true)
     try {
       await auth.signIn(email, password)
-      // router.push('/')
     } catch (err: any) {
-      setError(err?.message || "Login failed")
+      if (err?.code === "email_not_confirmed") {
+        setErrorCode("email_not_confirmed")
+      } else {
+        setError(err?.message || "Login failed")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -131,6 +136,14 @@ export default function LoginPage() {
               </div>
               <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
             </div>
+            {errorCode === "email_not_confirmed" && (
+              <div className="bg-blue-50 text-blue-800 rounded p-2 text-sm mb-2 flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                </svg>
+                {t("login.emailNotConfirmedInfo")}
+              </div>
+            )}
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button className="w-full" type="submit" disabled={isLoading}>
               {isLoading ? t("login.loggingIn") : t("login.loginButton")}

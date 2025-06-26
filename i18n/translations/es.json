@@ -270,7 +270,8 @@
     "google": "Google",
     "linkedin": "LinkedIn",
     "github": "GitHub",
-    "connecting": "Conectando..."
+    "connecting": "Conectando...",
+    "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico."
   },
   "register": {
     "title": "Crea tu cuenta",

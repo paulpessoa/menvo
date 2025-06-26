@@ -1,241 +1,165 @@
--- Enable necessary extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
 
--- Create custom types
-CREATE TYPE user_role AS ENUM ('mentee', 'mentor', 'admin');
-CREATE TYPE user_status AS ENUM ('pending', 'active', 'suspended', 'rejected');
-CREATE TYPE mentor_status AS ENUM ('pending_verification', 'verification_scheduled', 'verified', 'rejected', 'suspended');
-CREATE TYPE session_status AS ENUM ('scheduled', 'completed', 'cancelled', 'no_show');
-CREATE TYPE verification_status AS ENUM ('pending', 'scheduled', 'completed', 'rejected');
-
--- Profiles table (extends auth.users)
-CREATE TABLE profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT NOT NULL,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  full_name TEXT NOT NULL,
-  avatar_url TEXT,
-  bio TEXT,
-  location TEXT,
-  languages TEXT[] DEFAULT '{}',
-  role user_role NOT NULL DEFAULT 'mentee',
-  status user_status NOT NULL DEFAULT 'pending',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  last_login TIMESTAMPTZ
+CREATE TABLE public.admin_actions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  admin_id uuid NOT NULL,
+  action_type text NOT NULL,
+  target_type text NOT NULL CHECK (target_type = ANY (ARRAY['user'::text, 'mentor'::text, 'session'::text, 'review'::text])),
+  target_id uuid NOT NULL,
+  details jsonb NOT NULL DEFAULT '{}'::jsonb,
+  reason text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT admin_actions_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_actions_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.profiles(id)
 );
-
--- Mentors table
-CREATE TABLE mentors (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE NOT NULL,
-  title TEXT NOT NULL,
-  company TEXT,
-  experience_years INTEGER NOT NULL CHECK (experience_years >= 0),
-  expertise_areas TEXT[] NOT NULL DEFAULT '{}',
-  topics TEXT[] NOT NULL DEFAULT '{}',
-  inclusion_tags TEXT[] DEFAULT '{}',
-  linkedin_url TEXT,
-  portfolio_url TEXT,
-  academic_background TEXT,
-  current_work TEXT,
-  areas_of_interest TEXT,
-  session_duration INTEGER DEFAULT 45 CHECK (session_duration > 0),
-  timezone TEXT NOT NULL DEFAULT 'UTC',
-  status mentor_status NOT NULL DEFAULT 'pending_verification',
-  verification_notes TEXT,
-  verified_at TIMESTAMPTZ,
-  verified_by UUID REFERENCES profiles(id),
-  rating DECIMAL(3,2) DEFAULT 0.0 CHECK (rating >= 0 AND rating <= 5),
-  total_sessions INTEGER DEFAULT 0 CHECK (total_sessions >= 0),
-  total_reviews INTEGER DEFAULT 0 CHECK (total_reviews >= 0),
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE public.mentor_availability (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  mentor_id uuid NOT NULL,
+  day_of_week integer NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
+  start_time time without time zone NOT NULL,
+  end_time time without time zone NOT NULL,
+  is_available boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT mentor_availability_pkey PRIMARY KEY (id),
+  CONSTRAINT mentor_availability_mentor_id_fkey FOREIGN KEY (mentor_id) REFERENCES public.mentors(id)
 );
-
--- Mentor verification table
-CREATE TABLE mentor_verification (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE NOT NULL,
-  verification_type TEXT NOT NULL CHECK (verification_type IN ('initial', 'renewal')),
-  status verification_status NOT NULL DEFAULT 'pending',
-  scheduled_at TIMESTAMPTZ,
-  completed_at TIMESTAMPTZ,
-  verified_by UUID REFERENCES profiles(id),
-  notes TEXT,
-  documents_submitted BOOLEAN DEFAULT false,
-  identity_verified BOOLEAN DEFAULT false,
-  expertise_verified BOOLEAN DEFAULT false,
-  background_check BOOLEAN DEFAULT false,
-  rejection_reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE public.mentor_verification (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  mentor_id uuid NOT NULL,
+  verification_type text NOT NULL CHECK (verification_type = ANY (ARRAY['initial'::text, 'renewal'::text])),
+  status USER-DEFINED NOT NULL DEFAULT 'pending'::verification_status,
+  scheduled_at timestamp with time zone,
+  completed_at timestamp with time zone,
+  verified_by uuid,
+  notes text,
+  documents_submitted boolean DEFAULT false,
+  identity_verified boolean DEFAULT false,
+  expertise_verified boolean DEFAULT false,
+  background_check boolean DEFAULT false,
+  rejection_reason text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT mentor_verification_pkey PRIMARY KEY (id),
+  CONSTRAINT mentor_verification_verified_by_fkey FOREIGN KEY (verified_by) REFERENCES public.profiles(id),
+  CONSTRAINT mentor_verification_mentor_id_fkey FOREIGN KEY (mentor_id) REFERENCES public.mentors(id)
 );
-
--- Mentor availability table
-CREATE TABLE mentor_availability (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE NOT NULL,
-  day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(mentor_id, day_of_week, start_time, end_time)
+CREATE TABLE public.mentors (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid NOT NULL UNIQUE,
+  title text NOT NULL,
+  company text,
+  experience_years integer NOT NULL CHECK (experience_years >= 0),
+  expertise_areas ARRAY NOT NULL DEFAULT '{}'::text[],
+  topics ARRAY NOT NULL DEFAULT '{}'::text[],
+  inclusion_tags ARRAY DEFAULT '{}'::text[],
+  linkedin_url text,
+  portfolio_url text,
+  academic_background text,
+  current_work text,
+  areas_of_interest text,
+  session_duration integer DEFAULT 45 CHECK (session_duration > 0),
+  timezone text NOT NULL DEFAULT 'UTC'::text,
+  status USER-DEFINED NOT NULL DEFAULT 'pending_verification'::mentor_status,
+  verification_notes text,
+  verified_at timestamp with time zone,
+  verified_by uuid,
+  rating numeric DEFAULT 0.0 CHECK (rating >= 0::numeric AND rating <= 5::numeric),
+  total_sessions integer DEFAULT 0 CHECK (total_sessions >= 0),
+  total_reviews integer DEFAULT 0 CHECK (total_reviews >= 0),
+  is_available boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT mentors_pkey PRIMARY KEY (id),
+  CONSTRAINT mentors_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT mentors_verified_by_fkey FOREIGN KEY (verified_by) REFERENCES public.profiles(id)
 );
-
--- Mentorship sessions table
-CREATE TABLE mentorship_sessions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE NOT NULL,
-  mentee_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  scheduled_at TIMESTAMPTZ NOT NULL,
-  duration INTEGER NOT NULL DEFAULT 45 CHECK (duration > 0),
-  status session_status NOT NULL DEFAULT 'scheduled',
-  topics TEXT[] NOT NULL DEFAULT '{}',
-  mentee_notes TEXT,
-  mentor_notes TEXT,
-  meeting_url TEXT,
-  completed_at TIMESTAMPTZ,
-  cancelled_at TIMESTAMPTZ,
-  cancellation_reason TEXT,
-  cancelled_by UUID REFERENCES profiles(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE public.mentorship_sessions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  mentor_id uuid NOT NULL,
+  mentee_id uuid NOT NULL,
+  scheduled_at timestamp with time zone NOT NULL,
+  duration integer NOT NULL DEFAULT 45 CHECK (duration > 0),
+  status USER-DEFINED NOT NULL DEFAULT 'scheduled'::session_status,
+  topics ARRAY NOT NULL DEFAULT '{}'::text[],
+  mentee_notes text,
+  mentor_notes text,
+  meeting_url text,
+  completed_at timestamp with time zone,
+  cancelled_at timestamp with time zone,
+  cancellation_reason text,
+  cancelled_by uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT mentorship_sessions_pkey PRIMARY KEY (id),
+  CONSTRAINT mentorship_sessions_mentee_id_fkey FOREIGN KEY (mentee_id) REFERENCES public.profiles(id),
+  CONSTRAINT mentorship_sessions_cancelled_by_fkey FOREIGN KEY (cancelled_by) REFERENCES public.profiles(id),
+  CONSTRAINT mentorship_sessions_mentor_id_fkey FOREIGN KEY (mentor_id) REFERENCES public.mentors(id)
 );
-
--- Reviews table
-CREATE TABLE reviews (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  session_id UUID REFERENCES mentorship_sessions(id) ON DELETE CASCADE NOT NULL,
-  reviewer_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  reviewed_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  comment TEXT,
-  is_public BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(session_id, reviewer_id)
+CREATE TABLE public.permissions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name text NOT NULL UNIQUE,
+  description text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT permissions_pkey PRIMARY KEY (id)
 );
-
--- Admin actions table (for audit trail)
-CREATE TABLE admin_actions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  admin_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  action_type TEXT NOT NULL,
-  target_type TEXT NOT NULL CHECK (target_type IN ('user', 'mentor', 'session', 'review')),
-  target_id UUID NOT NULL,
-  details JSONB NOT NULL DEFAULT '{}',
-  reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  email text NOT NULL,
+  first_name text NOT NULL,
+  last_name text NOT NULL,
+  full_name text NOT NULL,
+  avatar_url text,
+  bio text,
+  location text,
+  languages ARRAY DEFAULT '{}'::text[],
+  role USER-DEFINED NOT NULL DEFAULT 'mentee'::user_role,
+  status USER-DEFINED NOT NULL DEFAULT 'pending'::user_status,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  last_login timestamp with time zone,
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
-
--- Create indexes for better performance
-CREATE INDEX idx_profiles_role ON profiles(role);
-CREATE INDEX idx_profiles_status ON profiles(status);
-CREATE INDEX idx_mentors_status ON mentors(status);
-CREATE INDEX idx_mentors_user_id ON mentors(user_id);
-CREATE INDEX idx_mentors_topics ON mentors USING GIN(topics);
-CREATE INDEX idx_mentors_expertise ON mentors USING GIN(expertise_areas);
-CREATE INDEX idx_mentors_location ON profiles(location);
-CREATE INDEX idx_sessions_mentor_id ON mentorship_sessions(mentor_id);
-CREATE INDEX idx_sessions_mentee_id ON mentorship_sessions(mentee_id);
-CREATE INDEX idx_sessions_scheduled_at ON mentorship_sessions(scheduled_at);
-CREATE INDEX idx_sessions_status ON mentorship_sessions(status);
-CREATE INDEX idx_reviews_reviewed_id ON reviews(reviewed_id);
-CREATE INDEX idx_verification_mentor_id ON mentor_verification(mentor_id);
-CREATE INDEX idx_verification_status ON mentor_verification(status);
-
--- Create view for verified mentors (public access)
-CREATE VIEW verified_mentors AS
-SELECT 
-  m.id,
-  m.user_id,
-  p.full_name,
-  p.avatar_url,
-  p.bio,
-  p.location,
-  p.languages,
-  m.title,
-  m.company,
-  m.experience_years,
-  m.expertise_areas,
-  m.topics,
-  m.inclusion_tags,
-  m.rating,
-  m.total_sessions,
-  m.total_reviews,
-  m.is_available
-FROM mentors m
-JOIN profiles p ON m.user_id = p.id
-WHERE m.status = 'verified' 
-  AND p.status = 'active' 
-  AND m.is_available = true;
-
--- Create functions for updating timestamps
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Create triggers for updated_at
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_mentors_updated_at BEFORE UPDATE ON mentors FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_mentor_verification_updated_at BEFORE UPDATE ON mentor_verification FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_mentor_availability_updated_at BEFORE UPDATE ON mentor_availability FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_mentorship_sessions_updated_at BEFORE UPDATE ON mentorship_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Function to handle new user registration
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO profiles (id, email, first_name, last_name, full_name, role)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'user_type', 'mentee')::user_role
-  );
-  RETURN NEW;
-END;
-$$ language 'plpgsql' SECURITY DEFINER;
-
--- Trigger for new user registration
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-
--- Function to update mentor rating
-CREATE OR REPLACE FUNCTION update_mentor_rating()
-RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE mentors 
-  SET 
-    rating = (
-      SELECT ROUND(AVG(rating)::numeric, 2)
-      FROM reviews 
-      WHERE reviewed_id = (SELECT user_id FROM mentors WHERE id = NEW.mentor_id)
-    ),
-    total_reviews = (
-      SELECT COUNT(*)
-      FROM reviews 
-      WHERE reviewed_id = (SELECT user_id FROM mentors WHERE id = NEW.mentor_id)
-    )
-  WHERE id = NEW.mentor_id;
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Trigger to update mentor rating when review is added/updated
-CREATE TRIGGER update_mentor_rating_trigger
-  AFTER INSERT OR UPDATE ON reviews
-  FOR EACH ROW EXECUTE FUNCTION update_mentor_rating();
+CREATE TABLE public.reviews (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  session_id uuid NOT NULL,
+  reviewer_id uuid NOT NULL,
+  reviewed_id uuid NOT NULL,
+  rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  comment text,
+  is_public boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT reviews_pkey PRIMARY KEY (id),
+  CONSTRAINT reviews_reviewed_id_fkey FOREIGN KEY (reviewed_id) REFERENCES public.profiles(id),
+  CONSTRAINT reviews_reviewer_id_fkey FOREIGN KEY (reviewer_id) REFERENCES public.profiles(id),
+  CONSTRAINT reviews_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.mentorship_sessions(id)
+);
+CREATE TABLE public.role_permissions (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  role_id uuid,
+  permission_id uuid,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT role_permissions_pkey PRIMARY KEY (id),
+  CONSTRAINT role_permissions_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id),
+  CONSTRAINT role_permissions_permission_id_fkey FOREIGN KEY (permission_id) REFERENCES public.permissions(id)
+);
+CREATE TABLE public.roles (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name text NOT NULL UNIQUE,
+  description text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT roles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_roles (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  user_id uuid,
+  role_id uuid,
+  is_primary boolean DEFAULT false,
+  assigned_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT user_roles_pkey PRIMARY KEY (id),
+  CONSTRAINT user_roles_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.roles(id),
+  CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
