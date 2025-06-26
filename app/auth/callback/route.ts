@@ -47,6 +47,25 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = createRouteHandlerClient({ cookies })
     await supabase.auth.exchangeCodeForSession(code)
+
+    // NOVO: atribuir role default "mentee" se não houver
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+
+      if (!roles || roles.length === 0) {
+        await supabase.from('user_roles').insert({
+          user_id: user.id,
+          role_type: 'mentee',
+          is_primary: true,
+          status: 'active'
+        })
+      }
+    }
   }
 
   // URL to redirect to after sign in process completes

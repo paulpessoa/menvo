@@ -6,6 +6,8 @@ ALTER TABLE mentor_availability ENABLE ROW LEVEL SECURITY;
 ALTER TABLE mentorship_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_actions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
+ALTER TABLE newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to check if user is admin
 CREATE OR REPLACE FUNCTION is_admin(user_id UUID)
@@ -163,3 +165,32 @@ CREATE POLICY "Admins can view admin actions" ON admin_actions
 
 -- Grant access to verified_mentors view
 GRANT SELECT ON verified_mentors TO authenticated, anon;
+
+-- FEEDBACK POLICIES
+-- Qualquer usuário pode inserir feedback (autenticado ou não)
+CREATE POLICY "Anyone can insert feedback" ON feedback
+  FOR INSERT WITH CHECK (true);
+
+-- Usuário autenticado pode ver seu próprio feedback ou feedbacks anônimos
+CREATE POLICY "Users can view own feedback" ON feedback
+  FOR SELECT USING (user_id IS NULL OR user_id = auth.uid());
+
+-- Admin pode ver todos os feedbacks
+CREATE POLICY "Admins can view all feedback" ON feedback
+  FOR SELECT USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+
+-- NEWSLETTER POLICIES
+-- Qualquer usuário pode se inscrever na newsletter
+CREATE POLICY "Anyone can subscribe to newsletter" ON newsletter_subscriptions
+  FOR INSERT WITH CHECK (true);
+
+-- Usuário pode ver/cancelar sua própria inscrição (por email)
+CREATE POLICY "User can view own subscription" ON newsletter_subscriptions
+  FOR SELECT USING (email = auth.email());
+
+CREATE POLICY "User can unsubscribe own subscription" ON newsletter_subscriptions
+  FOR UPDATE USING (email = auth.email());
+
+-- Admin pode ver todas as inscrições
+CREATE POLICY "Admins can view all newsletter subscriptions" ON newsletter_subscriptions
+  FOR SELECT USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));

@@ -3,12 +3,18 @@ import { useEffect, useState, createContext, useContext } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/services/auth/supabase'
 import { useMutation } from '@tanstack/react-query'
+import {jwtDecode} from 'jwt-decode'
 
 interface AuthContextType {
   user: any
   isAuthenticated: boolean
   loading: boolean
   logout: () => Promise<void>
+}
+
+interface DecodedToken {
+  role?: string
+  [key: string]: any
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -23,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true)
 
     const { data: authUser, error: authError } = await supabase.auth.getUser()
+    const { data: sessionData } = await supabase.auth.getSession()
 
     if (authError || !authUser.user) {
       console.error(authError)
@@ -30,21 +37,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
       return
     }
-    setUser(authUser.user)
+
+    let roleFromToken: string | undefined = undefined
+    if (sessionData?.session?.access_token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(sessionData.session.access_token)
+        roleFromToken = decoded.role
+      } catch (e) {
+        console.error('Failed to decode JWT token', e)
+      }
+    }
+
+    setUser({
+      ...authUser.user,
+      role: roleFromToken
+    })
     setLoading(false)
   }
   getUser()
 
   const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
   if (session?.user) {
-    const { data: userData } = await supabase
-      .from('users')
-      .select('roles')
-      .eq('id', session.user.id)
-      .single()
+
+    let roleFromToken: string | undefined = undefined
+    if (session.access_token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(session.access_token)
+        roleFromToken = decoded.role
+      } catch (e) {
+        console.error('Failed to decode JWT token', e)
+      }
+    }
+
     setUser({
       ...session.user,
-      ...userData || null
+      role: roleFromToken
     })
   } else {
     setUser(null)
@@ -83,7 +110,7 @@ export function useLoginMutation() {
       return data
     }
   })
-} 
+}
 
 
 // "use client"
