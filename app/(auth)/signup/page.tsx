@@ -295,7 +295,7 @@ function SignupForm() {
 export default function SignupPage() {
   const router = useRouter()
 
-  const estamosLotados = true
+  const estamosLotados = false
 
   return (
     <div className="relative">
