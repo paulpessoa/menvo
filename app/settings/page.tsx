@@ -240,4 +240,4 @@ export default function SettingsPage() {
       </Tabs>
     </div>
   )
-} 
+}

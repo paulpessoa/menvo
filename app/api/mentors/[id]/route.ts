@@ -19,4 +19,4 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 404 })
   }
   return NextResponse.json(data)
-} 
+}

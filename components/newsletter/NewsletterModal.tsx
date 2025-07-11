@@ -247,4 +247,4 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
       </DialogContent>
     </Dialog>
   )
-} 
+}

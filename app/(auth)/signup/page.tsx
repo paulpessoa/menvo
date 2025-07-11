@@ -1,122 +1,139 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Github, Linkedin, AlertTriangle, Info } from "lucide-react"
-import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
-import { auth } from '@/services/auth/supabase'
+import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { UserType, useSignupMutation } from '@/hooks/useSignupForm'
-import { useTranslation } from "react-i18next"
 import { useAuth } from "@/hooks/useAuth"
+import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+import { WaitingList } from "@/components/WaitingList"
 
-export default function SignupPage() {
+type UserType = "mentee" | "mentor"
+
+function SignupForm() {
   const { t } = useTranslation()
-  const { user } = useAuth()
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
+  const { isAuthenticated, signUp, signInWithGoogle, signInWithLinkedIn } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [fullName, setFullName] = useState("")
   const [userType, setUserType] = useState<UserType>("mentee")
+  const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
-  const [isGitHubLoading, setIsGitHubLoading] = useState(false)
-  const [oauthError, setOauthError] = useState("")
-  const signupMutation = useSignupMutation()
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState(false)
   const router = useRouter()
 
   // Redirecionar usuários já logados
   useEffect(() => {
-    if (user) {
-      router.push('/')
+    if (isAuthenticated) {
+      router.push("/dashboard")
     }
-  }, [user, router])
+  }, [isAuthenticated, router])
 
-  // Não renderizar se o usuário está logado (evita flash de conteúdo)
-  if (user) {
-    return null
-  }
-
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    signupMutation.mutate({ email, password, firstName, lastName, userType })
+    setError("")
+
+    if (password !== confirmPassword) {
+      setError(t("register.passwordValidation.passwordsDontMatch") || "As senhas não coincidem")
+      return
+    }
+
+    if (password.length < 6) {
+      setError(t("register.passwordValidation.passwordTooShort") || "A senha deve ter pelo menos 6 caracteres")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      await signUp({
+        email,
+        password,
+        fullName,
+        userType,
+      })
+
+      setSuccess(true)
+      toast.success(t("register.success") || "Conta criada! Verifique seu email.")
+    } catch (err: any) {
+      setError(err.message)
+      toast.error(err.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleSignup = async () => {
-    setOauthError("")
+    setError("")
     setIsGoogleLoading(true)
     try {
-      await auth.signInWithGoogle()
-      // O redirecionamento será feito automaticamente pelo OAuth
+      await signInWithGoogle()
     } catch (err: any) {
-      setOauthError(err?.message || "Google signup failed")
+      setError(err.message)
+      toast.error(err.message)
       setIsGoogleLoading(false)
     }
   }
 
   const handleLinkedInSignup = async () => {
-    setOauthError("")
+    setError("")
     setIsLinkedInLoading(true)
     try {
-      await auth.signInWithLinkedIn()
-      // O redirecionamento será feito automaticamente pelo OAuth
+      await signInWithLinkedIn()
     } catch (err: any) {
-      setOauthError(err?.message || "LinkedIn signup failed")
+      setError(err.message)
+      toast.error(err.message)
       setIsLinkedInLoading(false)
     }
   }
 
-  const handleGitHubSignup = async () => {
-    setOauthError("")
-    setIsGitHubLoading(true)
-    try {
-      await auth.signInWithGitHub()
-      // O redirecionamento será feito automaticamente pelo OAuth
-    } catch (err: any) {
-      setOauthError(err?.message || "GitHub signup failed")
-      setIsGitHubLoading(false)
-    }
-  }
-
-  if (signupMutation.status === 'success') {
+  if (success) {
     return (
       <div className="container max-w-lg py-16 flex flex-col items-center text-center">
         <Card>
           <CardHeader>
-            <CardTitle>{t("register.confirmEmail")}</CardTitle>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+              <Mail className="h-6 w-6 text-blue-600" />
+            </div>
+            <CardTitle>{t("register.confirmEmail") || "Confirme seu email"}</CardTitle>
             <CardDescription>
-              {t("register.confirmEmailDescription", { email })}
+              {t("register.confirmEmailDescription", { email }) || `Enviamos um link de confirmação para ${email}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-800">
-                <strong>{t("register.nextSteps")}</strong>
-              </p>
-              <ol className="mt-2 list-decimal list-inside text-sm text-blue-700 space-y-1">
-                {(t("register.nextStepsList", { returnObjects: true }) as string[]).map((step, index) => (
-                  <li key={index}>{step}</li>
-                ))}
-              </ol>
-            </div>
             <p className="text-muted-foreground text-sm">
-              {t("register.afterConfirmation")}
+              {t("register.afterConfirmation") || "Após confirmar seu email, você poderá fazer login na plataforma."}
             </p>
+
             <div className="rounded-lg bg-yellow-50 p-3">
               <p className="text-xs text-yellow-800">
-                <strong>{t("register.didntReceiveEmail")}</strong> {t("register.checkSpam")}
+                <strong>{t("register.didntReceiveEmail") || "Não recebeu o email?"}</strong>{" "}
+                {t("register.checkSpam") || "Verifique sua caixa de spam."}
               </p>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <Link href="/confirmation">
-              <Button className="w-full">{t("register.goToVerification")}</Button>
-            </Link>
+          <CardFooter className="flex flex-col gap-2">
+            <Button asChild className="w-full">
+              <Link href="/login">
+                {t("register.goToLogin") || "Ir para Login"}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full bg-transparent">
+              <Link href="/">{t("register.goToHome") || "Voltar ao Início"}</Link>
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -127,17 +144,20 @@ export default function SignupPage() {
     <div className="container max-w-5xl py-10 md:py-16">
       <Card className="mx-auto max-w-md">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle>{t("register.signupTitle")}</CardTitle>
-          <CardDescription>{t("register.description")}</CardDescription>
+          <CardTitle>{t("register.signupTitle") || "Criar Conta"}</CardTitle>
+          <CardDescription>{t("register.description") || "Junte-se à nossa comunidade de mentoria"}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Seletor de Tipo de Usuário */}
+          <UserTypeSelector userType={userType} setUserType={(type) => setUserType(type)} />
+
           {/* OAuth Buttons */}
           <div className="grid grid-cols-1 gap-2">
-            <Button 
-              variant="outline" 
-              className="w-full" 
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={handleGoogleSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isGitHubLoading || signupMutation.status === 'pending'}
+              disabled={isGoogleLoading || isLinkedInLoading || isLoading}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -156,104 +176,139 @@ export default function SignupPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   fill="#EA4335"
                 />
-                <path d="M1 1h22v22H1z" fill="none" />
               </svg>
-              {isGoogleLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.google")}`}
+              {isGoogleLoading
+                ? t("login.connecting") || "Conectando..."
+                : `${t("login.continueWith") || "Continuar com"} Google`}
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
+
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={handleLinkedInSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isGitHubLoading || signupMutation.status === 'pending'}
+              disabled={isGoogleLoading || isLinkedInLoading || isLoading}
             >
               <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
-              {isLinkedInLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.linkedin")}`}
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={handleGitHubSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isGitHubLoading || signupMutation.status === 'pending'}
-            >
-              <Github className="mr-2 h-4 w-4" />
-              {isGitHubLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.github")}`}
+              {isLinkedInLoading
+                ? t("login.connecting") || "Conectando..."
+                : `${t("login.continueWith") || "Continuar com"} LinkedIn`}
             </Button>
           </div>
-          
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                {t("register.orContinueWith")}
+                {t("register.orContinueWith") || "Ou continue com email"}
               </span>
             </div>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first-name">{t("register.firstName")}</Label>
-                <Input id="first-name" placeholder={t("register.firstNamePlaceholder")} value={firstName} onChange={e => setFirstName(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name">{t("register.lastName")}</Label>
-                <Input id="last-name" placeholder={t("register.lastNamePlaceholder")} value={lastName} onChange={e => setLastName(e.target.value)} required />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("register.email")}</Label>
-              <Input id="email" type="email" placeholder={t("register.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("register.password")}</Label>
-              <Input id="password" type="password" placeholder={t("register.passwordPlaceholder")} value={password} onChange={e => setPassword(e.target.value)} required />
-            </div>
-            <UserTypeSelector userType={userType} setUserType={setUserType} />
-            {(signupMutation.status === 'error' || oauthError) && (
-              <div className="rounded-lg bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      {oauthError || (signupMutation.error as Error)?.message}
-                    </h3>
-                    {(signupMutation.error as Error)?.message?.includes('over_email_send_rate_limit') && (
-                      <div className="mt-2 text-sm text-red-700">
-                        <p>
-                          Por ser uma plataforma gratuita, temos um limite de envio de emails por hora. 
-                          Por favor, tente novamente em 1 hora ou entre em contato com nosso suporte se precisar de ajuda imediata.
-                        </p>
-                      </div>
-                    )}
-                  </div>
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <p className="text-sm text-red-800">{error}</p>
                 </div>
               </div>
             )}
-            <Button className="w-full" type="submit" disabled={signupMutation.status === 'pending' || isGoogleLoading || isLinkedInLoading || isGitHubLoading}>
-              {signupMutation.status === 'pending' ? (
+
+            <div className="space-y-2">
+              <Label htmlFor="fullName">{t("register.firstName") || "Nome Completo"}</Label>
+              <Input
+                id="fullName"
+                type="text"
+                placeholder={t("register.firstNamePlaceholder") || "Digite seu nome completo"}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">{t("register.email") || "Email"}</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={t("register.emailPlaceholder") || "seu@email.com"}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">{t("register.password") || "Senha"}</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder={t("register.passwordPlaceholder") || "Mínimo 6 caracteres"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">{t("register.confirmPassword") || "Confirmar Senha"}</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder={t("register.confirmPasswordPlaceholder") || "Confirme sua senha"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  {t("register.creatingAccount")}
+                  {t("register.creatingAccount") || "Criando conta..."}
                 </span>
               ) : (
-                <><span>{t("register.registerButton")}</span><ArrowRight className="ml-2 h-4 w-4" /></>
+                <>
+                  <span>{t("register.registerButton") || "Criar Conta"}</span>
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
               )}
             </Button>
           </form>
         </CardContent>
         <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
-            {t("register.alreadyHaveAccount")}{" "}
-            <Link href="/login" className="text-primary-600 hover:underline">
-              {t("register.signIn")}
+            {t("register.alreadyHaveAccount") || "Já tem uma conta?"}{" "}
+            <Link href="/login" className="text-primary hover:underline">
+              {t("register.signIn") || "Fazer login"}
             </Link>
           </div>
         </CardFooter>
       </Card>
     </div>
   )
-} 
+}
+
+export default function SignupPage() {
+  const router = useRouter()
+
+  const estamosLotados = false
+
+  return (
+    <div className="relative">
+      <div className={estamosLotados ? 'blur-sm pointer-events-none' : ''}>
+        <Suspense fallback={<div>Carregando...</div>}>
+          <SignupForm />
+        </Suspense>
+      </div>
+      {estamosLotados  && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center">
+          <WaitingList isOpen onClose={() => router.push('/')} />
+        </div>
+      )}
+    </div>
+  )
+}

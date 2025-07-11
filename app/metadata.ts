@@ -56,4 +56,4 @@ export async function generateMetadata({ params: { lang } }: GenerateMetadataPro
       },
     },
   }
-} 
+}

@@ -246,4 +246,4 @@ export function NewsletterDashboard() {
       </Card>
     </div>
   )
-} 
+}

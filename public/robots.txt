@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://menvo.com.br/sitemap.xml 
+Sitemap: https://menvo.com.br/sitemap.xml

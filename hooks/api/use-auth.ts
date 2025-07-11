@@ -1,197 +1,151 @@
-"use client"
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { useToast } from "@/hooks/use-toast"
 
-// Auth keys
-const authKeys = {
-  user: ["auth", "user"] as const,
-  session: ["auth", "session"] as const,
-}
+const supabase = createClient()
 
-// API functions
-const authApi = {
-  // Get current user
-  getCurrentUser: async () => {
-    const res = await fetch("/api/auth/me", {
-      credentials: "include",
-    })
-    if (!res.ok) throw new Error("Failed to fetch user")
-    return res.json()
-  },
-
-  // Login
-  login: async (credentials: { email: string; password: string }) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(credentials),
-    })
-    if (!res.ok) {
-      const error = await res.json()
-      throw new Error(error.error || "Login failed")
-    }
-    return res.json()
-  },
-
-  // Register
-  register: async (userData: any) => {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    })
-    if (!res.ok) {
-      const error = await res.json()
-      throw new Error(error.error || "Registration failed")
-    }
-    return res.json()
-  },
-
-  // Logout
-  logout: async () => {
-    const res = await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    })
-    if (!res.ok) {
-      const error = await res.json()
-      throw new Error(error.error || "Logout failed")
-    }
-    return res.json()
-  },
-
-  // Update profile
-  updateProfile: async (updates: any) => {
-    const res = await fetch("/api/auth/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(updates),
-    })
-    if (!res.ok) {
-      const error = await res.json()
-      throw new Error(error.error || "Failed to update profile")
-    }
-    return res.json()
-  },
-}
-
-// Hook for current user
+// Get current user
 export function useCurrentUser() {
   return useQuery({
-    queryKey: authKeys.user,
-    queryFn: authApi.getCurrentUser,
-    retry: false,
-    refetchOnMount: true,
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser()
+
+        // Don't treat missing session as an error
+        if (error && error.message === "Auth session missing!") {
+          return { data: null }
+        }
+
+        if (error) {
+          throw error
+        }
+
+        return { data: user }
+      } catch (error) {
+        // Handle auth session missing gracefully
+        if (error instanceof Error && error.message.includes("Auth session missing")) {
+          return { data: null }
+        }
+        throw error
+      }
+    },
+    retry: false, // Don't retry auth errors
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 
-// Hook for login
+// Login mutation
 export function useLogin() {
   const queryClient = useQueryClient()
   const router = useRouter()
-  const { toast } = useToast()
 
   return useMutation({
-    mutationFn: authApi.login,
+    mutationFn: async ({ email, password }: { email: string; password: string }) => {
+      console.log("🔐 useLogin: Iniciando login para:", email)
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        console.error("❌ useLogin: Erro no login:", error.message)
+        throw error
+      }
+      
+      console.log("✅ useLogin: Login bem-sucedido para:", email)
+      console.log("📋 useLogin: Dados da sessão:", {
+        user: data.user?.email,
+        session: !!data.session,
+        accessToken: data.session?.access_token ? "PRESENTE" : "AUSENTE"
+      })
+      
+      return data
+    },
     onSuccess: (data) => {
-      queryClient.setQueryData(authKeys.user, data)
-      toast({
-        title: "Login realizado com sucesso!",
-        description: `Bem-vindo de volta, ${data.data.profile.first_name}!`,
-      })
-      router.push("/dashboard")
+      console.log("🎉 useLogin: onSuccess chamado")
+      console.log("👤 useLogin: Usuário logado:", data.user?.email)
+      
+      // Invalidate and refetch user data
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+      console.log("🔄 useLogin: Queries invalidadas")
+      
+      // Redirecionar para home após login bem-sucedido
+      console.log("🏠 useLogin: Redirecionando para home após login")
+      router.push('/')
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Erro ao fazer login",
-        description: error.message,
-        variant: "destructive",
-      })
+    onError: (error) => {
+      console.error("💥 useLogin: onError chamado:", error)
     },
+    onSettled: () => {
+      console.log("🏁 useLogin: onSettled chamado - mutação finalizada")
+    }
   })
 }
 
-// Hook for registration
+// Register mutation
 export function useRegister() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: authApi.register,
-    onSuccess: (data) => {
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Verifique seu email para confirmar a conta.",
+    mutationFn: async (userData: any) => {
+      const { data, error } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        options: {
+          data: {
+            full_name: userData.full_name,
+            user_type: userData.user_type,
+          },
+        },
       })
-      router.push("/login")
+
+      if (error) throw error
+      return data
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Erro ao criar conta",
-        description: error.message,
-        variant: "destructive",
-      })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] })
     },
   })
 }
 
-// Hook for logout
+// Logout mutation
 export function useLogout() {
   const queryClient = useQueryClient()
   const router = useRouter()
-  const { toast } = useToast()
 
   return useMutation({
-    mutationFn: authApi.logout,
-    onSuccess: () => {
-      queryClient.removeQueries({ queryKey: authKeys.user })
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso.",
-      })
-      router.push("/")
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Erro ao fazer logout",
-        description: error.message,
-        variant: "destructive",
-      })
+    onSuccess: () => {
+      // Clear all cached data
+      queryClient.clear()
+      
+      // Redirecionar para home após logout
+      console.log("🏠 useLogout: Redirecionando para home após logout")
+      router.push('/')
     },
   })
 }
 
-// Hook for profile update
+// Update profile mutation
 export function useUpdateProfile() {
   const queryClient = useQueryClient()
-  const { toast } = useToast()
 
   return useMutation({
-    mutationFn: authApi.updateProfile,
-    onSuccess: (data) => {
-      queryClient.setQueryData(authKeys.user, (old: any) => ({
-        ...old,
-        profile: {
-          ...old.profile,
-          ...data.profile,
-        },
-      }))
-      queryClient.invalidateQueries({ queryKey: authKeys.user })
-      toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
-      })
+    mutationFn: async (updates: any) => {
+      const { data, error } = await supabase.auth.updateUser(updates)
+      if (error) throw error
+      return data
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Erro ao atualizar perfil",
-        description: error.message,
-        variant: "destructive",
-      })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] })
     },
   })
 }
