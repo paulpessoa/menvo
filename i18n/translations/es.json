@@ -274,6 +274,7 @@
       "github": "GitHub",
       "connecting": "Conectando...",
       "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
+      "dontHaveAccount": "¿No tienes una cuenta?",
       "error": {
         "invalidCredentials": "Correo electrónico o contraseña incorrectos. Verifica tus credenciales e inténtalo de nuevo.",
         "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",

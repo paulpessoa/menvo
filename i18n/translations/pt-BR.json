@@ -98,6 +98,7 @@
     "connecting": "Conectando...",
     "success": "Login realizado com sucesso!",
     "emailNotConfirmedInfo": "Verifique sua caixa de entrada para confirmar seu e-mail.",
+    "dontHaveAccount": "Não tem uma conta?",
     "error": {
       "invalidCredentials": "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.",
       "emailNotConfirmed": "E-mail não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.",
