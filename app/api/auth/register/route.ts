@@ -1,66 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/api-utils'
+import { type NextRequest, NextResponse } from "next/server"
+import { createSupabaseServerClient } from "@/lib/api-utils"
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient()
-    const { email, password, firstName, lastName, role } = await request.json()
+    const { email, password, firstName, lastName, userType } = await request.json()
 
-    // Registrar o usuário no Supabase
+    // Registrar o usuário no Supabase com metadata
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
+          user_type: userType || "pending",
+        },
+      },
     })
 
     if (authError) {
-      return NextResponse.json(
-        { error: 'Erro ao registrar usuário', details: authError.message },
-        { status: 400 }
-      )
+      console.error("Auth error:", authError)
+      return NextResponse.json({ error: "Erro ao registrar usuário", details: authError.message }, { status: 400 })
     }
 
-  //   const { error: updateError } = await supabase.auth.updateUser({
-  //   data: {
-  //     role: [role]
-  //   }
-  // })
+    if (!authData.user) {
+      return NextResponse.json({ error: "Usuário não foi criado" }, { status: 400 })
+    }
 
-  //  if (updateError) {
-  //     return NextResponse.json(
-  //       { error: 'Erro ao registrar informacoes do usuário', details: updateError.message },
-  //       { status: 400 }
-  //     )
-  //   }
+    // The trigger should handle the profile creation automatically
+    // But let's add a fallback just in case
+    try {
+      const { data: existingProfile } = await supabase.from("profiles").select("id").eq("id", authData.user.id).single()
 
-    // 2. Adicionar à tabela profiles (se o usuário foi criado)
-    if (authData.user) {
-      const { error: dbError } = await supabase
-        .from('profiles')
-        .insert([{
+      if (!existingProfile) {
+        // Fallback: create profile manually if trigger didn't work
+        const { error: profileError } = await supabase.from("profiles").insert({
           id: authData.user.id,
-          email,
-          status: 'pending'
-        }])
+          email: authData.user.email,
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
+          role: (userType || "pending") as any,
+          status: "pending",
+          verification_status: "pending",
+        })
 
-      if (dbError) {
-        console.error('Erro ao inserir na tabela profiles:', dbError)
-        // Não retorna erro aqui pois o usuário já foi criado na auth
+        if (profileError) {
+          console.error("Profile creation error:", profileError)
+        }
       }
+    } catch (fallbackError) {
+      console.error("Fallback profile creation error:", fallbackError)
     }
 
     return NextResponse.json({
-      message: 'Usuário registrado com sucesso',
+      message: "Usuário registrado com sucesso",
       user: {
-        id: authData.user?.id,
-        email: authData.user?.email,
-      }
+        id: authData.user.id,
+        email: authData.user.email,
+      },
     })
-
   } catch (error) {
-    console.error('Erro no endpoint de registro:', error)
+    console.error("Erro no endpoint de registro:", error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { error: "Erro interno do servidor", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 },
     )
   }
 }
