@@ -222,4 +222,4 @@ export const useHasPendingSessions = (mentorId?: string) => {
     hasPending: (sessions?.length || 0) > 0,
     pendingCount: sessions?.length || 0
   }
-} 
+}

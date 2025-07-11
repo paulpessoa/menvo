@@ -63,4 +63,4 @@ Você também pode ajudar o projeto crescer:
 
 - Criando novos desafios
 - Sugerindo mudanças e melhorias
-- Fazendo parte de nossa [comunidade](https://discord.XXXXXX) no Discord
+- Fazendo parte de nossa [comunidade](https://discord.gg/5tWy7Zgm) no Discord

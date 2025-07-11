@@ -42,4 +42,4 @@ export function ResendConfirmationEmail({ email }: ResendConfirmationEmailProps)
       )}
     </div>
   )
-} 
+}

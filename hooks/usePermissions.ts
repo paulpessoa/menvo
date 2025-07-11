@@ -1,5 +1,31 @@
-import { useAuth } from '@/hooks/useAuth'
-import { useUserProfile } from '@/hooks/useUserProfile'
+"use client"
+
+import { useAuth } from "./useAuth"
+
+export type Permission =
+  | "view_mentors"
+  | "book_sessions"
+  | "provide_mentorship"
+  | "manage_availability"
+  | "admin_users"
+  | "admin_verifications"
+  | "admin_system"
+
+export type Role = "mentee" | "mentor" | "admin"
+
+const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+  mentee: ["view_mentors", "book_sessions"],
+  mentor: ["view_mentors", "book_sessions", "provide_mentorship", "manage_availability"],
+  admin: [
+    "view_mentors",
+    "book_sessions",
+    "provide_mentorship",
+    "manage_availability",
+    "admin_users",
+    "admin_verifications",
+    "admin_system",
+  ],
+}
 
 // Tipos de roles disponíveis
 export type UserRoleType = 
@@ -110,67 +136,40 @@ export const PERMISSIONS: Permission[] = [
   }
 ]
 
-// Hook para verificar permissões
-export const usePermissions = () => {
-  const { user, isAuthenticated } = useAuth()
-  const { data: userProfile } = useUserProfile()
+export function usePermissions() {
+  const { user } = useAuth()
 
-  // Verifica se o usuário tem uma permissão específica
-  const hasPermission = (permissionId: string): boolean => {
-    if (!isAuthenticated || !userProfile) return false
-
-    const permission = PERMISSIONS.find(p => p.id === permissionId)
-    if (!permission) return false
-
-    // Se o usuário não tem email confirmado, só tem acesso a permissões de viewer
-    if (!user?.email_confirmed_at) {
-      return permission.roles.includes('viewer')
-    }
-
-    // Verifica se alguma das roles do usuário tem a permissão
-    return userProfile.roles.some(role => 
-      permission.roles.includes(role)
-    )
+  const hasPermission = (permission: Permission): boolean => {
+    if (!user?.user_metadata?.role) return false
+    return ROLE_PERMISSIONS[user.user_metadata.role as Role]?.includes(permission) || false
   }
 
-  // Verifica se o usuário tem todas as permissões listadas
-  const hasAllPermissions = (permissionIds: string[]): boolean => {
-    return permissionIds.every(id => hasPermission(id))
+  const hasAnyPermission = (permissions: Permission[]): boolean => {
+    return permissions.some((permission) => hasPermission(permission))
   }
 
-  // Verifica se o usuário tem pelo menos uma das permissões listadas
-  const hasAnyPermission = (permissionIds: string[]): boolean => {
-    return permissionIds.some(id => hasPermission(id))
+  const hasAllPermissions = (permissions: Permission[]): boolean => {
+    return permissions.every((permission) => hasPermission(permission))
   }
 
-  // Retorna todas as permissões que o usuário tem acesso
-  const getUserPermissions = (): Permission[] => {
-    if (!isAuthenticated || !userProfile) return []
-
-    return PERMISSIONS.filter(permission => 
-      userProfile.roles.some(role => 
-        permission.roles.includes(role)
-      )
-    )
-  }
+  const canViewMentors = hasPermission("view_mentors")
+  const canBookSessions = hasPermission("book_sessions")
+  const canProvideMentorship = hasPermission("provide_mentorship")
+  const canManageAvailability = hasPermission("manage_availability")
+  const canAdminUsers = hasPermission("admin_users")
+  const canAdminVerifications = hasPermission("admin_verifications")
+  const canAdminSystem = hasPermission("admin_system")
 
   return {
     hasPermission,
-    hasAllPermissions,
     hasAnyPermission,
-    getUserPermissions
+    hasAllPermissions,
+    canViewMentors,
+    canBookSessions,
+    canProvideMentorship,
+    canManageAvailability,
+    canAdminUsers,
+    canAdminVerifications,
+    canAdminSystem,
   }
 }
-
-// Hook para verificar se o usuário precisa confirmar email
-export const useEmailConfirmation = () => {
-  const { user } = useAuth()
-  
-  const needsEmailConfirmation = () => {
-    return user && !user.email_confirmed_at
-  }
-
-  return {
-    needsEmailConfirmation
-  }
-} 

@@ -51,4 +51,4 @@ export function useProfile(userId?: string) {
     isUpdating: mutation.isPending,
     uploadProfilePhoto,
   }
-} 
+}

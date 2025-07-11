@@ -4,12 +4,12 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from './providers'
 import Header from "@/components/header"
-import Footer from "@/components/footer"
 import { Toaster } from "@/components/ui/toaster"
+import Footer from "@/components/footer"
 import { FeedbackBanner } from '@/components/FeedbackBanner'
-import { WarningBanner } from "@/components/WarningBanner"
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from "next/script"
+import { AuthGuard } from "@/components/auth/AuthGuard"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -134,15 +134,15 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
+          <AuthGuard>
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
             <FeedbackBanner />
-            <WarningBanner />
             <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-          </div>
-          <Toaster />
+          </div> 
+          </AuthGuard>
         </Providers>
       </body>
     </html>

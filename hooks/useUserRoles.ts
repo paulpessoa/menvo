@@ -131,4 +131,4 @@ export const useCanAccessMenteeFeatures = () => {
 export const useIsEmailConfirmed = () => {
   const { data: userWithRoles } = useUserRoles()
   return !!userWithRoles?.email_confirmed_at
-} 
+}

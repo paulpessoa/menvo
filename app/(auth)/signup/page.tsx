@@ -7,25 +7,22 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Github, Linkedin, AlertTriangle, Info } from "lucide-react"
-import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
+import { ArrowRight, Loader2, Linkedin, AlertTriangle, Info, Mail, User } from "lucide-react"
 import { auth } from '@/services/auth/supabase'
 import { useRouter } from "next/navigation"
-import { UserType, useSignupMutation } from '@/hooks/useSignupForm'
+import { useSignupMutation } from '@/hooks/useSignupForm'
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/hooks/useAuth"
+
 
 export default function SignupPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [userType, setUserType] = useState<UserType>("mentee")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
-  const [isGitHubLoading, setIsGitHubLoading] = useState(false)
   const [oauthError, setOauthError] = useState("")
   const signupMutation = useSignupMutation()
   const router = useRouter()
@@ -44,7 +41,20 @@ export default function SignupPage() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault()
-    signupMutation.mutate({ email, password, firstName, lastName, userType })
+    
+    // Validar se as senhas coincidem
+    if (password !== confirmPassword) {
+      setOauthError(t("register.passwordValidation.passwordsDontMatch"))
+      return
+    }
+    
+    // Validar se a senha tem pelo menos 6 caracteres
+    if (password.length < 6) {
+      setOauthError(t("register.passwordValidation.passwordTooShort"))
+      return
+    }
+    
+    signupMutation.mutate({ email, password })
   }
 
   const handleGoogleSignup = async () => {
@@ -71,52 +81,44 @@ export default function SignupPage() {
     }
   }
 
-  const handleGitHubSignup = async () => {
-    setOauthError("")
-    setIsGitHubLoading(true)
-    try {
-      await auth.signInWithGitHub()
-      // O redirecionamento será feito automaticamente pelo OAuth
-    } catch (err: any) {
-      setOauthError(err?.message || "GitHub signup failed")
-      setIsGitHubLoading(false)
-    }
-  }
-
   if (signupMutation.status === 'success') {
     return (
       <div className="container max-w-lg py-16 flex flex-col items-center text-center">
         <Card>
           <CardHeader>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+              <Mail className="h-6 w-6 text-blue-600" />
+            </div>
             <CardTitle>{t("register.confirmEmail")}</CardTitle>
             <CardDescription>
               {t("register.confirmEmailDescription", { email })}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-800">
-                <strong>{t("register.nextSteps")}</strong>
-              </p>
-              <ol className="mt-2 list-decimal list-inside text-sm text-blue-700 space-y-1">
-                {(t("register.nextStepsList", { returnObjects: true }) as string[]).map((step, index) => (
-                  <li key={index}>{step}</li>
-                ))}
-              </ol>
-            </div>
+      
+            {/* Next Steps */}
+          
+            
             <p className="text-muted-foreground text-sm">
               {t("register.afterConfirmation")}
             </p>
+            
             <div className="rounded-lg bg-yellow-50 p-3">
               <p className="text-xs text-yellow-800">
                 <strong>{t("register.didntReceiveEmail")}</strong> {t("register.checkSpam")}
               </p>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <Link href="/confirmation">
-              <Button className="w-full">{t("register.goToVerification")}</Button>
-            </Link>
+          <CardFooter className="flex flex-col gap-2">
+            <Button asChild className="w-full">
+              <Link href="/login">
+                {t("register.goToLogin")}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full bg-transparent">
+              <Link href="/">{t("register.goToHome")}</Link>
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -137,7 +139,7 @@ export default function SignupPage() {
               variant="outline" 
               className="w-full" 
               onClick={handleGoogleSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isGitHubLoading || signupMutation.status === 'pending'}
+              disabled={isGoogleLoading || isLinkedInLoading || signupMutation.status === 'pending'}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -164,19 +166,10 @@ export default function SignupPage() {
               variant="outline" 
               className="w-full"
               onClick={handleLinkedInSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isGitHubLoading || signupMutation.status === 'pending'}
+              disabled={isGoogleLoading || isLinkedInLoading || signupMutation.status === 'pending'}
             >
               <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
               {isLinkedInLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.linkedin")}`}
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={handleGitHubSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isGitHubLoading || signupMutation.status === 'pending'}
-            >
-              <Github className="mr-2 h-4 w-4" />
-              {isGitHubLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.github")}`}
             </Button>
           </div>
           
@@ -192,48 +185,65 @@ export default function SignupPage() {
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first-name">{t("register.firstName")}</Label>
-                <Input id="first-name" placeholder={t("register.firstNamePlaceholder")} value={firstName} onChange={e => setFirstName(e.target.value)} required />
+            
+            {/* Exibir erro de validação */}
+            {oauthError && (
+              <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <p className="text-sm text-red-800">{oauthError}</p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name">{t("register.lastName")}</Label>
-                <Input id="last-name" placeholder={t("register.lastNamePlaceholder")} value={lastName} onChange={e => setLastName(e.target.value)} required />
-              </div>
-            </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="email">{t("register.email")}</Label>
               <Input id="email" type="email" placeholder={t("register.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("register.password")}</Label>
-              <Input id="password" type="password" placeholder={t("register.passwordPlaceholder")} value={password} onChange={e => setPassword(e.target.value)} required />
-            </div>
-            <UserTypeSelector userType={userType} setUserType={setUserType} />
-            {(signupMutation.status === 'error' || oauthError) && (
-              <div className="rounded-lg bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder={t("register.passwordPlaceholder")} 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required 
+                className={password.length > 0 && password.length < 6 ? "border-yellow-500 focus:border-yellow-500" : ""}
+              />
+              {password.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">{t("register.passwordValidation.passwordStrength")}</p>
+                  <div className="flex gap-1">
+                    <div className={`h-1 flex-1 rounded ${password.length >= 6 ? 'bg-green-500' : password.length >= 4 ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
+                    <div className={`h-1 flex-1 rounded ${password.length >= 8 ? 'bg-green-500' : password.length >= 6 ? 'bg-yellow-500' : 'bg-gray-300'}`}></div>
+                    <div className={`h-1 flex-1 rounded ${password.length >= 10 ? 'bg-green-500' : password.length >= 8 ? 'bg-yellow-500' : 'bg-gray-300'}`}></div>
                   </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      {oauthError || (signupMutation.error as Error)?.message}
-                    </h3>
-                    {(signupMutation.error as Error)?.message?.includes('over_email_send_rate_limit') && (
-                      <div className="mt-2 text-sm text-red-700">
-                        <p>
-                          Por ser uma plataforma gratuita, temos um limite de envio de emails por hora. 
-                          Por favor, tente novamente em 1 hora ou entre em contato com nosso suporte se precisar de ajuda imediata.
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {password.length < 6 ? t("register.passwordValidation.passwordTooWeak") : password.length < 8 ? t("register.passwordValidation.passwordMedium") : t("register.passwordValidation.passwordStrong")}
+                  </p>
                 </div>
-              </div>
-            )}
-            <Button className="w-full" type="submit" disabled={signupMutation.status === 'pending' || isGoogleLoading || isLinkedInLoading || isGitHubLoading}>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">{t("register.confirmPassword")}</Label>
+              <Input 
+                id="confirmPassword" 
+                type="password" 
+                placeholder={t("register.confirmPasswordPlaceholder")} 
+                value={confirmPassword} 
+                onChange={e => setConfirmPassword(e.target.value)} 
+                required 
+                className={confirmPassword && password !== confirmPassword ? "border-red-500 focus:border-red-500" : ""}
+              />
+              {confirmPassword && password !== confirmPassword && (
+                <p className="text-xs text-red-600">{t("register.passwordValidation.passwordsDontMatchError")}</p>
+              )}
+              {confirmPassword && password === confirmPassword && confirmPassword.length > 0 && (
+                <p className="text-xs text-green-600">{t("register.passwordValidation.passwordsMatch")}</p>
+              )}
+            </div>
+            <Button className="w-full" type="submit" disabled={signupMutation.status === 'pending' || isGoogleLoading || isLinkedInLoading }>
               {signupMutation.status === 'pending' ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin h-4 w-4 mr-2" />
@@ -256,4 +266,4 @@ export default function SignupPage() {
       </Card>
     </div>
   )
-} 
+}

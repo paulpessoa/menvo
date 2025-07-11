@@ -259,4 +259,4 @@ export function SessionDetailsModal({ isOpen, onClose, session, isMentor }: Sess
       </DialogContent>
     </Dialog>
   )
-} 
+}

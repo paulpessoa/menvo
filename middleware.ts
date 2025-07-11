@@ -11,10 +11,10 @@ const publicRoutes = [
   '/signup',
   '/forgot-password',
   '/reset-password',
-  '/confirmation',
   '/unauthorized',
   '/welcome',
   '/unsubscribe',
+  '/confirmation',
   '/auth/callback',
   '/api/auth/google',
   '/api/auth/linkedin',
@@ -44,45 +44,66 @@ const protectedRoutes = [
   '/admin'
 ]
 
-export async function middleware(request: NextRequest) {
-  try {
-    // Criar cliente Supabase para o middleware
-    const res = NextResponse.next()
-    const supabase = createMiddlewareClient({ req: request, res })
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
 
-    // Atualizar sessão se necessário
-    const { data: { session }, error } = await supabase.auth.getSession()
+  // Refresh session if expired - required for Server Components
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-    if (error) {
-      console.error('Auth error:', error)
+  // Se não há sessão, permitir acesso a rotas públicas
+  if (!session) {
+    // Rotas que requerem autenticação
+    const protectedRoutes = ['/dashboard', '/profile', '/mentorship', '/settings']
+    const isProtectedRoute = protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route))
+    
+    if (isProtectedRoute) {
+      return NextResponse.redirect(new URL('/login', req.url))
     }
-
-    const path = request.nextUrl.pathname
-
-    // Se for rota pública, permite acesso
-    if (publicRoutes.some(route => path.startsWith(route))) {
-      return res
-    }
-
-    // Se não estiver autenticado e tentar acessar rota protegida, redireciona para login
-    if (!session && protectedRoutes.some(route => path.startsWith(route))) {
-      const redirectUrl = new URL('/login', request.url)
-      redirectUrl.searchParams.set('redirectTo', path)
-      return NextResponse.redirect(redirectUrl)
-    }
-
-    // Verificar se email está confirmado para rotas que exigem confirmação
-    if (emailConfirmationRequired.some(route => path.startsWith(route))) {
-      if (!session?.user?.email_confirmed_at) {
-        return NextResponse.redirect(new URL('/confirmation', request.url))
-      }
-    }
-
+    
     return res
-  } catch (error) {
-    console.error('Middleware error:', error)
-    return NextResponse.next()
   }
+
+  // Se há sessão, verificar role no JWT
+  if (session) {
+    try {
+      const currentPath = req.nextUrl.pathname
+      const userRole = session.user.user_metadata?.role
+
+      // Se usuário não tem role definida no JWT, permitir acesso
+      // O AuthGuard vai mostrar o modal de seleção de role
+      if (!userRole) {
+        // Não redirecionar, deixar o AuthGuard lidar com isso
+        return NextResponse.next()
+      }
+
+      // Verificar permissões baseadas na role do JWT
+      if (userRole) {
+        // Rotas que requerem role específica
+        const adminRoutes = ['/admin']
+        const mentorRoutes = ['/mentor-dashboard', '/mentor-sessions']
+        
+        const isAdminRoute = adminRoutes.some(route => currentPath.startsWith(route))
+        const isMentorRoute = mentorRoutes.some(route => currentPath.startsWith(route))
+        
+        if (isAdminRoute && userRole !== 'admin') {
+          return NextResponse.redirect(new URL('/unauthorized', req.url))
+        }
+        
+        if (isMentorRoute && userRole !== 'mentor') {
+          return NextResponse.redirect(new URL('/unauthorized', req.url))
+        }
+      }
+
+    } catch (error) {
+      console.error('Erro no middleware:', error)
+      // Em caso de erro, permitir acesso
+    }
+  }
+
+  return res
 }
 
 export const config = {

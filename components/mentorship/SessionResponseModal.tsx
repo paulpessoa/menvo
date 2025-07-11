@@ -205,4 +205,4 @@ export function SessionResponseModal({ isOpen, onClose, session }: SessionRespon
       </DialogContent>
     </Dialog>
   )
-} 
+}

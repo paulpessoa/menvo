@@ -26,6 +26,7 @@
     "firstName": "Nome",
     "lastName": "Sobrenome",
     "loading": "Carregando...",
+    "saving": "Salvando...",
     "close": "Fechar",
     "submitting": "Enviando..."
   },
@@ -256,11 +257,12 @@
     }
   },
   "login": {
-    "title": "Bem-vindo",
-    "description": "Entre na sua conta para continuar",
+    "title": "Bem-vindo de volta",
+    "description": "Entre na sua conta para acessar a plataforma",
     "email": "E-mail",
     "emailPlaceholder": "nome@exemplo.com",
     "password": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
     "forgotPassword": "Esqueceu a senha?",
     "loginButton": "Entrar",
     "loggingIn": "Entrando...",
@@ -271,13 +273,19 @@
     "linkedin": "LinkedIn",
     "github": "GitHub",
     "connecting": "Conectando...",
-    "emailNotConfirmedInfo": "Verifique sua caixa de entrada para confirmar seu e-mail."
+      "emailNotConfirmedInfo": "Verifique sua caixa de entrada para confirmar seu e-mail.",
+      "error": {
+        "invalidCredentials": "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.",
+        "emailNotConfirmed": "E-mail não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.",
+        "tooManyAttempts": "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.",
+        "networkError": "Erro de conexão. Verifique sua internet e tente novamente."
+      }
   },
   "register": {
-    "title": "Crie sua conta",
-    "subtitle": "Junte-se à nossa comunidade para se conectar com mentores e crescer profissionalmente",
-    "signupTitle": "Cadastro",
-    "description": "Preencha os dados para começar",
+    "title": "Junte-se à Menvo",
+    "subtitle": "Conecte-se com mentores voluntários e desenvolva sua carreira gratuitamente",
+    "signupTitle": "Criar Conta",
+    "description": "Preencha seus dados para começar sua jornada",
     "firstName": "Nome",
     "firstNamePlaceholder": "Digite seu nome",
     "lastName": "Sobrenome",
@@ -287,6 +295,8 @@
     "emailInvalid": "E-mail inválido",
     "password": "Senha",
     "passwordPlaceholder": "Crie uma senha",
+    "confirmPassword": "Confirmar Senha",
+    "confirmPasswordPlaceholder": "Digite a senha novamente",
     "mentor": "Mentor",
     "mentee": "Mentorado",
     "registerButton": "Registrar",
@@ -300,32 +310,62 @@
     "nextStepsList": [
       "Verifique sua caixa de entrada (e pasta de spam)",
       "Clique no link de confirmação no email",
-      "Seja redirecionado automaticamente para o site",
-      "Complete seu perfil e comece a explorar!"
+      "Escolha seu tipo de usuário (mentor ou mentorado)",
+      "Complete seu perfil com suas informações",
+      "Aguarde a validação da nossa equipe (apenas para mentores)"
     ],
-    "afterConfirmation": "Após a confirmação, complete seu perfil e agende uma call de validação. Nossa equipe entrará em contato para validar suas informações.",
+    "afterConfirmation": "Após confirmar seu e-mail, você poderá escolher se quer ser mentor ou mentorado e completar seu perfil. Mentores passarão por uma validação da nossa equipe antes de serem publicados.",
     "didntReceiveEmail": "Não recebeu o e-mail?",
-    "checkSpam": "Verifique sua pasta de spam ou lixo eletrônico. Se ainda não encontrar, você pode tentar fazer login e reenviar o email de confirmação.",
+    "checkSpam": "Verifique sua pasta de spam ou lixo eletrônico. O link de confirmação expira em 24 horas.",
+    "emailExpired": "O link de confirmação expirou?",
+    "emailExpiredDescription": "Se o link de confirmação expirou (24 horas), você pode usar a opção 'Esqueci minha senha' para redefinir e confirmar sua conta.",
+    "resendEmail": "Reenviar e-mail",
+    "emailExpiredAction": "Link expirado? Redefinir senha",
+    "tryAgain": "Tentar novamente",
+    "emailConfirmed": "Email Confirmado!",
+    "emailConfirmedDescription": "Seu email foi confirmado com sucesso. Agora escolha como você quer usar a plataforma.",
+    "selectRoleDescription": "Escolha como você quer usar a plataforma:",
+    "mentee": "Mentorado",
+    "mentor": "Mentor",
+    "menteeDescription": "Busco orientação e desenvolvimento profissional",
+    "mentorDescription": "Quero compartilhar conhecimento e orientar outros profissionais",
+    "continue": "Continuar",
+    "welcome": {
+      "title": "Bem-vindo ao Menvo!",
+      "description": "Sua conta foi confirmada com sucesso. Agora escolha como você quer usar a plataforma.",
+      "selectRoleDescription": "Escolha como você quer usar a plataforma:",
+      "continue": "Continuar"
+    },
     "goToLogin": "Ir para Login",
+    "passwordValidation": {
+      "passwordsDontMatch": "As senhas não coincidem",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+      "passwordStrength": "Força da senha:",
+      "passwordTooWeak": "Senha muito curta",
+      "passwordMedium": "Senha média",
+      "passwordStrong": "Senha forte",
+      "passwordsMatch": "✓ Senhas coincidem",
+      "passwordsDontMatchError": "As senhas não coincidem"
+    },
     "goToHome": "Voltar ao Início",
     "goToVerification": "Ir para página de verificação",
     "userType": {
-      "title": "Eu sou:",
+      "title": "Como você quer participar?",
       "mentee": {
         "title": "Mentorado",
-        "description": "Busco orientação e acompanhamento"
+        "description": "Busco orientação para desenvolver minha carreira"
       },
       "mentor": {
         "title": "Mentor",
-        "description": "Quero compartilhar conhecimento"
+        "description": "Quero compartilhar minha experiência e ajudar outros"
       },
       "company": {
         "title": "Empresa",
-        "description": "Quero indicar nossos profissionais"
+        "description": "Quero indicar profissionais da nossa empresa"
       },
       "recruiter": {
         "title": "Recrutador",
-        "description": "Busco profissionais qualificados"
+        "description": "Busco profissionais qualificados para oportunidades"
       }
     }
   },

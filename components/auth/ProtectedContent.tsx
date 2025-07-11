@@ -77,4 +77,4 @@ export function ProtectedContent({ children, requireMentor = false, className = 
   }
 
   return <>{children}</>
-} 
+}

@@ -26,6 +26,7 @@
     "firstName": "First Name",
     "lastName": "Last Name",
     "loading": "Loading...",
+    "saving": "Saving...",
     "close": "Close",
     "submitting": "Submitting..."
   },
@@ -255,29 +256,36 @@
       "contactSupport": "Contact Support"
     }
   },
-  "login": {
-   "title": "Welcome",
-   "description": "Sign in to your account to continue",
-   "email": "Email",
-    "emailPlaceholder": "name@example.com",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
-    "loginButton": "Log in",
-    "loggingIn": "Logging in...",
-    "noAccount": "Don't have an account?",
-    "signUp": "Sign up",
-    "continueWith": "Continue with",
-    "google": "Google",
-    "linkedin": "LinkedIn", 
-    "github": "GitHub",
-    "connecting": "Connecting...",
-    "emailNotConfirmedInfo": "Check your inbox to verify your email."
-  },
-  "register": {
-    "title": "Create your account",
-    "subtitle": "Join our community to connect with mentors and grow professionally",
-    "signupTitle": "Sign Up",
-    "description": "Fill in the details to get started",
+      "login": {
+      "title": "Welcome back",
+      "description": "Sign in to your account to access the platform",
+      "email": "Email",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "loginButton": "Log in",
+      "loggingIn": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "continueWith": "Continue with",
+      "google": "Google",
+      "linkedin": "LinkedIn", 
+      "github": "GitHub",
+      "connecting": "Connecting...",
+      "emailNotConfirmedInfo": "Check your inbox to verify your email.",
+      "error": {
+        "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
+        "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
+        "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
+        "networkError": "Connection error. Please check your internet and try again."
+      }
+    },
+      "register": {
+      "title": "Join Menvo",
+      "subtitle": "Connect with volunteer mentors and develop your career for free",
+      "signupTitle": "Create Account",
+      "description": "Fill in your details to start your journey",
     "firstName": "First Name",
     "firstNamePlaceholder": "Enter your first name",
     "lastName": "Last Name",
@@ -287,6 +295,8 @@
     "emailInvalid": "Invalid email",
     "password": "Password",
     "passwordPlaceholder": "Create a password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Enter password again",
     "mentor": "Mentor",
     "mentee": "Mentee",
     "registerButton": "Register",
@@ -299,33 +309,63 @@
     "nextSteps": "Next steps:",
     "nextStepsList": [
       "Check your inbox (and spam folder)",
-      "Click the confirmation link in the email", 
-      "Be automatically redirected to the website",
-      "Complete your profile and start exploring!"
+      "Click the confirmation link in the email",
+      "Choose your user type (mentor or mentee)",
+      "Complete your profile with your information",
+      "Wait for our team validation (mentors only)"
     ],
-    "afterConfirmation": "After confirmation, complete your profile and schedule a validation call. Our team will contact you to validate your information.",
+    "afterConfirmation": "After confirming your email, you'll be able to choose whether you want to be a mentor or mentee and complete your profile. Mentors will go through a validation process with our team before being published.",
     "didntReceiveEmail": "Didn't receive the email?",
-    "checkSpam": "Check your spam or junk folder. If you still can't find it, you can try logging in and resending the confirmation email.",
+    "checkSpam": "Check your spam or junk folder. The confirmation link expires in 24 hours.",
+    "emailExpired": "Confirmation link expired?",
+    "emailExpiredDescription": "If the confirmation link expired (24 hours), you can use the 'Forgot my password' option to reset and confirm your account.",
+    "resendEmail": "Resend email",
+    "emailExpiredAction": "Link expired? Reset password",
+    "tryAgain": "Try again",
+    "emailConfirmed": "Email Confirmed!",
+    "emailConfirmedDescription": "Your email has been confirmed successfully. Now choose how you want to use the platform.",
+    "selectRoleDescription": "Choose how you want to use the platform:",
+    "mentee": "Mentee",
+    "mentor": "Mentor",
+    "menteeDescription": "I seek guidance and professional development",
+    "mentorDescription": "I want to share knowledge and guide other professionals",
+    "continue": "Continue",
+    "welcome": {
+      "title": "Welcome to Menvo!",
+      "description": "Your account has been confirmed successfully. Now choose how you want to use the platform.",
+      "selectRoleDescription": "Choose how you want to use the platform:",
+      "continue": "Continue"
+    },
     "goToLogin": "Go to Login",
+    "passwordValidation": {
+      "passwordsDontMatch": "Passwords don't match",
+      "passwordTooShort": "Password must be at least 6 characters long",
+      "passwordStrength": "Password strength:",
+      "passwordTooWeak": "Password too weak",
+      "passwordMedium": "Medium password",
+      "passwordStrong": "Strong password",
+      "passwordsMatch": "✓ Passwords match",
+      "passwordsDontMatchError": "Passwords don't match"
+    },
     "goToHome": "Back to Home",
     "goToVerification": "Go to verification page",
     "userType": {
-      "title": "I am:",
+      "title": "How do you want to participate?",
       "mentee": {
         "title": "Mentee",
-        "description": "I seek guidance and support"
+        "description": "I seek guidance to develop my career"
       },
       "mentor": {
         "title": "Mentor",
-        "description": "Want to share knowledge"
+        "description": "I want to share my experience and help others"
       },
       "company": {
         "title": "Company",
-        "description": "Enroll my company's professionals"
+        "description": "I want to enroll professionals from our company"
       },
       "recruiter": {
         "title": "Recruiter",
-        "description": "Seeking qualified professionals"
+        "description": "I'm seeking qualified professionals for opportunities"
       }
     }
   },

@@ -64,4 +64,4 @@ export async function GET(req: NextRequest) {
     hasNextPage: page < Math.ceil((count || 0) / limit),
     hasPreviousPage: page > 1
   })
-} 
+}

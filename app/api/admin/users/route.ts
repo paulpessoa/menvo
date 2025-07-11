@@ -24,4 +24,4 @@ export async function GET(req: NextRequest) {
     roles: (roles || []).filter(r => r.user_id === profile.user_id)
   }))
   return NextResponse.json({ users })
-} 
+}

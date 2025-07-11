@@ -59,4 +59,4 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: updateError.message }, { status: 400 })
   }
   return NextResponse.json(data)
-} 
+}

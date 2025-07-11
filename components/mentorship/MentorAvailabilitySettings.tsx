@@ -375,4 +375,4 @@ export function MentorAvailabilitySettings({ isOpen, onClose }: MentorAvailabili
       </DialogContent>
     </Dialog>
   )
-} 
+}

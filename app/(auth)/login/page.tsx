@@ -1,169 +1,216 @@
 "use client"
 
-import Link from "next/link"
+import type React from "react"
+
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Github, Linkedin } from "lucide-react"
-import { auth } from '@/services/auth/supabase'
-import { EmailConfirmationBanner } from '@/components/auth/EmailConfirmationBanner'
-import { useTranslation } from "react-i18next"
+import { ArrowRight, Loader2, Linkedin, AlertTriangle } from "lucide-react"
+import { auth } from "@/services/auth/supabase"
+import { createClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
-import { supabase } from "@/services/auth/supabase"
+import { useTranslation } from "react-i18next"
 
 export default function LoginPage() {
   const { t } = useTranslation()
-  const { user, loading } = useAuth()
+  const { user, loading, isAuthenticated, login } = useAuth()
+
+  // Função para traduzir mensagens de erro
+  const getErrorMessage = (error: any) => {
+    if (!error) return ""
+    
+    const errorMessage = error.message?.toLowerCase() || ""
+    const errorCode = error.code?.toLowerCase() || ""
+    
+    // Verificar códigos de erro específicos
+    if (errorCode === "invalid_credentials" || errorMessage.includes("invalid login credentials")) {
+      return t("login.error.invalidCredentials")
+    }
+    
+    // Verificar email não confirmado
+    if (errorMessage.includes("email not confirmed") || errorMessage.includes("unconfirmed email")) {
+      return t("login.error.emailNotConfirmed")
+    }
+    
+    // Verificar muitas tentativas
+    if (errorMessage.includes("too many requests") || errorMessage.includes("rate limit")) {
+      return t("login.error.tooManyAttempts")
+    }
+    
+    // Verificar erros de rede
+    if (errorMessage.includes("network") || errorMessage.includes("connection") || errorMessage.includes("fetch")) {
+      return t("login.error.networkError")
+    }
+    
+    // Verificar usuário não encontrado
+    if (errorMessage.includes("user not found") || errorMessage.includes("no user found")) {
+      return t("login.error.invalidCredentials")
+    }
+    
+    // Verificar senha incorreta
+    if (errorMessage.includes("invalid password") || errorMessage.includes("wrong password")) {
+      return t("login.error.invalidCredentials")
+    }
+    
+    // Fallback para mensagens não traduzidas
+    return error.message || t("login.error.invalidCredentials")
+  }
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [errorCode, setErrorCode] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
-  const [isGitHubLoading, setIsGitHubLoading] = useState(false)
+  const [isPasswordlessLoading, setIsPasswordlessLoading] = useState(false)
+  const [oauthError, setOauthError] = useState("")
+  const [passwordlessEmail, setPasswordlessEmail] = useState("")
+  const [passwordlessSent, setPasswordlessSent] = useState(false)
+  const [loginError, setLoginError] = useState("")
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   const router = useRouter()
 
   // Redirecionar usuários já logados
   useEffect(() => {
-    if (!loading && user) {
-      router.push('/')
+    if (user) {
+      // Verificar se usuário precisa selecionar role
+      const checkUserRole = async () => {
+        try {
+          const supabase = createClient()
+          const { data: { user: currentUser } } = await supabase.auth.getUser()
+          if (currentUser) {
+            // Verificar se usuário tem role definida
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', currentUser.id)
+              .single()
+            
+            if (!profile?.role) {
+              // Não redirecionar, deixar o AuthGuard lidar com isso
+            } else {
+              router.push("/")
+            }
+          }
+        } catch (error) {
+          router.push("/")
+        }
+      }
+      
+      checkUserRole()
     }
-  }, [user, loading, router])
+  }, [user, router, isAuthenticated])
 
-  // Mostrar loading enquanto verifica autenticação
-  if (loading) {
-    return (
-      <div className="container max-w-5xl py-10 md:py-16">
-        <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-pulse text-muted-foreground">
-            {t("common.loading") || "Carregando..."}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Não renderizar se o usuário está logado (evita flash de conteúdo)
+  // Não renderizar se o usuário está logado
   if (user) {
     return null
   }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setErrorCode(null)
-    setIsLoading(true)
+    setLoginError("")
+    setIsLoggingIn(true)
+    
     try {
-      await auth.signIn(email, password)
-    } catch (err: any) {
-      if (err?.code === "email_not_confirmed") {
-        setErrorCode("email_not_confirmed")
-      } else {
-        setError(err?.message || "Login failed")
-      }
+      await login({ email, password })
+      // O AuthProvider vai lidar com o redirecionamento via onAuthStateChange
+    } catch (error: any) {
+      setLoginError(error.message)
     } finally {
-      setIsLoading(false)
+      setIsLoggingIn(false)
     }
   }
 
   const handleGoogleLogin = async () => {
-    setError("")
+    setOauthError("")
     setIsGoogleLoading(true)
     try {
       await auth.signInWithGoogle()
-      // O redirecionamento será feito automaticamente pelo OAuth
     } catch (err: any) {
-      setError(err?.message || "Google login failed")
+      setOauthError(getErrorMessage(err))
       setIsGoogleLoading(false)
     }
   }
 
   const handleLinkedInLogin = async () => {
-    setError("")
+    setOauthError("")
     setIsLinkedInLoading(true)
     try {
       await auth.signInWithLinkedIn()
-      // O redirecionamento será feito automaticamente pelo OAuth
     } catch (err: any) {
-      setError(err?.message || "LinkedIn login failed")
+      setOauthError(getErrorMessage(err))
       setIsLinkedInLoading(false)
     }
   }
 
-  const handleGitHubLogin = async () => {
-    setError("")
-    setIsGitHubLoading(true)
+  const handlePasswordlessLogin = async () => {
+    if (!passwordlessEmail) return
+
+    setIsPasswordlessLoading(true)
     try {
-      await auth.signInWithGitHub()
-      // O redirecionamento será feito automaticamente pelo OAuth
+      const supabase = createClient()
+      await supabase.auth.signInWithOtp({
+        email: passwordlessEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+      setPasswordlessSent(true)
     } catch (err: any) {
-      setError(err?.message || "GitHub login failed")
-      setIsGitHubLoading(false)
+      setOauthError(getErrorMessage(err))
+    } finally {
+      setIsPasswordlessLoading(false)
     }
+  }
+
+  if (passwordlessSent) {
+    return (
+      <div className="container max-w-lg py-16 flex flex-col items-center text-center">
+        <Card>
+          <CardHeader>
+            <CardTitle>Link de Acesso Enviado!</CardTitle>
+            <CardDescription>Enviamos um link de acesso para {passwordlessEmail}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg bg-blue-50 p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Próximos passos:</strong>
+              </p>
+              <ol className="mt-2 list-decimal list-inside text-sm text-blue-700 space-y-1">
+                <li>Verifique sua caixa de entrada</li>
+                <li>Clique no link de acesso</li>
+                <li>Você será redirecionado automaticamente</li>
+              </ol>
+            </div>
+            <p className="text-muted-foreground text-sm">O link expira em 1 hora por segurança.</p>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <Button onClick={() => setPasswordlessSent(false)} variant="outline">
+              Tentar Novamente
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    )
   }
 
   return (
     <div className="container max-w-5xl py-10 md:py-16">
-      {/* <div className="flex flex-col items-center text-center space-y-2 mb-8">
-        <h1 className="text-3xl font-bold">{t("login.title")}</h1>
-        <p className="text-muted-foreground max-w-[600px]">
-          {t("login.description")}
-        </p>
-      </div> */}
-    <Card className="mx-auto max-w-md">
+      <Card className="mx-auto max-w-md">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle>{t("login.title")}</CardTitle>
-          <CardDescription>{t("login.description")}</CardDescription>
+          <CardTitle>{t("login.title") || "Entrar"}</CardTitle>
+          <CardDescription>{t("login.description") || "Acesse sua conta"}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <EmailConfirmationBanner />
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t("login.email")}</Label>
-              <Input id="email" type="email" placeholder={t("login.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">{t("login.password")}</Label>
-                <Link href="/forgot-password" className="text-sm text-primary-600 hover:underline">
-                  {t("login.forgotPassword")}
-                </Link>
-              </div>
-              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-            </div>
-            {errorCode === "email_not_confirmed" && (
-              <div className="bg-blue-50 text-blue-800 rounded p-2 text-sm mb-2 flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
-                </svg>
-                {t("login.emailNotConfirmedInfo")}
-              </div>
-            )}
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? t("login.loggingIn") : t("login.loginButton")}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <div className="text-center text-sm text-muted-foreground">
-            {t("login.noAccount")}{" "}
-            <Link href="/signup" className="text-primary-600 hover:underline">
-              {t("login.signUp")}
-            </Link>
-          </div>
-          <Separator />
+          {/* OAuth Buttons */}
           <div className="grid grid-cols-1 gap-2">
-            <Button 
-              variant="outline" 
-              className="w-full" 
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={handleGoogleLogin}
-              disabled={isGoogleLoading || isLinkedInLoading}
+              disabled={isGoogleLoading || isLinkedInLoading || isLoggingIn}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -184,26 +231,92 @@ export default function LoginPage() {
                 />
                 <path d="M1 1h22v22H1z" fill="none" />
               </svg>
-              {isGoogleLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.google")}`}
+              {isGoogleLoading ? "Conectando..." : "Continuar com Google"}
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
+
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={handleLinkedInLogin}
-              disabled={isGoogleLoading || isLinkedInLoading}
+              disabled={isGoogleLoading || isLinkedInLoading || isLoggingIn}
             >
               <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
-              {isLinkedInLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.linkedin")}`}
+              {isLinkedInLoading ? "Conectando..." : "Continuar com LinkedIn"}
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={handleGitHubLogin}
-              disabled={isGoogleLoading || isLinkedInLoading}
-            >
-              <Github className="mr-2 h-4 w-4" />
-              {isGitHubLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.github")}`}
+
+          </div>      
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                 {t("login.continueWith")}
+              </span>
+            </div>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {(loginError || oauthError) && (
+              <div className="rounded-lg bg-red-50 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      {oauthError || loginError}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Button className="w-full" type="submit" disabled={isLoggingIn}>
+              {isLoggingIn ? (
+                <span className="flex items-center justify-center">
+                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  Entrando...
+                </span>
+              ) : (
+                <>
+                  <span>Entrar</span>
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
+          </form>
+        </CardContent>
+        <CardFooter>
+          <div className="text-center text-sm text-muted-foreground w-full">
+            Não tem uma conta?{" "}
+            <Link href="/signup" className="text-primary-600 hover:underline">
+              Cadastre-se
+            </Link>
           </div>
         </CardFooter>
       </Card>
