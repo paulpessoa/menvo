@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase"
 interface AuthContextType {
   user: User | null
   loading: boolean
+  isAuthenticated: boolean
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, metadata?: any) => Promise<void>
   signOut: () => Promise<void>
@@ -113,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     loading,
+    isAuthenticated: !!user,
     signIn,
     signUp,
     signOut,
