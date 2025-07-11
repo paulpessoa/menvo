@@ -19,6 +19,7 @@ export type AppPermission =
   | "admin_system"
   | "validate_activities"
   | "moderate_content"
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
   public: {
@@ -30,16 +31,11 @@ export interface Database {
           first_name: string | null
           last_name: string | null
           full_name: string | null
-          slug: string | null
           avatar_url: string | null
           bio: string | null
           location: string | null
-          role: UserRole
-          status: UserStatus
-          is_volunteer: boolean
-          email_confirmed_at: string | null
-          verified_at: string | null
-          verified_by: string | null
+          user_role: Database["public"]["Enums"]["user_role"]
+          verification_status: Database["public"]["Enums"]["verification_status"]
           created_at: string
           updated_at: string
         }
@@ -48,33 +44,27 @@ export interface Database {
           email: string
           first_name?: string | null
           last_name?: string | null
-          slug?: string | null
+          full_name?: string | null
           avatar_url?: string | null
           bio?: string | null
           location?: string | null
-          role?: UserRole
-          status?: UserStatus
-          is_volunteer?: boolean
-          email_confirmed_at?: string | null
-          verified_at?: string | null
-          verified_by?: string | null
+          user_role?: Database["public"]["Enums"]["user_role"]
+          verification_status?: Database["public"]["Enums"]["verification_status"]
           created_at?: string
           updated_at?: string
         }
         Update: {
+          id?: string
           email?: string
           first_name?: string | null
           last_name?: string | null
-          slug?: string | null
+          full_name?: string | null
           avatar_url?: string | null
           bio?: string | null
           location?: string | null
-          role?: UserRole
-          status?: UserStatus
-          is_volunteer?: boolean
-          email_confirmed_at?: string | null
-          verified_at?: string | null
-          verified_by?: string | null
+          user_role?: Database["public"]["Enums"]["user_role"]
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          created_at?: string
           updated_at?: string
         }
       }
@@ -247,10 +237,61 @@ export interface Database {
           read_at?: string | null
         }
       }
+      mentor_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          current_position: string | null
+          current_company: string | null
+          years_experience: number | null
+          education_level: string | null
+          languages: string[] | null
+          mentor_skills: string[] | null
+          availability: Database["public"]["Enums"]["availability_status"]
+          rating: number | null
+          total_sessions: number | null
+          verified_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          current_position?: string | null
+          current_company?: string | null
+          years_experience?: number | null
+          education_level?: string | null
+          languages?: string[] | null
+          mentor_skills?: string[] | null
+          availability?: Database["public"]["Enums"]["availability_status"]
+          rating?: number | null
+          total_sessions?: number | null
+          verified_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          current_position?: string | null
+          current_company?: string | null
+          years_experience?: number | null
+          education_level?: string | null
+          languages?: string[] | null
+          mentor_skills?: string[] | null
+          availability?: Database["public"]["Enums"]["availability_status"]
+          rating?: number | null
+          total_sessions?: number | null
+          verified_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Enums: {
-      user_role: UserRole
-      user_status: UserStatus
+      user_role: "pending" | "mentee" | "mentor" | "admin"
+      verification_status: "pending" | "verified" | "rejected"
+      availability_status: "available" | "busy" | "unavailable"
       session_status: SessionStatus
       validation_status: ValidationStatus
       notification_type: NotificationType

@@ -1,87 +1,130 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Linkedin, AlertTriangle, Info, Mail, User } from "lucide-react"
-import { auth } from '@/services/auth/supabase'
+import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useSignupMutation } from '@/hooks/useSignupForm'
-import { useTranslation } from "react-i18next"
 import { useAuth } from "@/hooks/useAuth"
+import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { toast } from "sonner"
 
+type UserType = "mentee" | "mentor"
 
-export default function SignupPage() {
-  const { t } = useTranslation()
-  const { user } = useAuth()
+function SignupForm() {
+  const { isAuthenticated } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [userType, setUserType] = useState<UserType>("mentee")
+  const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
-  const [oauthError, setOauthError] = useState("")
-  const signupMutation = useSignupMutation()
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState(false)
   const router = useRouter()
+  const supabase = createClientComponentClient()
 
   // Redirecionar usuários já logados
   useEffect(() => {
-    if (user) {
-      router.push('/')
+    if (isAuthenticated) {
+      router.push("/dashboard")
     }
-  }, [user, router])
+  }, [isAuthenticated, router])
 
-  // Não renderizar se o usuário está logado (evita flash de conteúdo)
-  if (user) {
-    return null
-  }
-
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Validar se as senhas coincidem
+    setError("")
+
     if (password !== confirmPassword) {
-      setOauthError(t("register.passwordValidation.passwordsDontMatch"))
+      setError("As senhas não coincidem")
       return
     }
-    
-    // Validar se a senha tem pelo menos 6 caracteres
+
     if (password.length < 6) {
-      setOauthError(t("register.passwordValidation.passwordTooShort"))
+      setError("A senha deve ter pelo menos 6 caracteres")
       return
     }
-    
-    signupMutation.mutate({ email, password })
+
+    setIsLoading(true)
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            user_role: userType,
+          },
+        },
+      })
+
+      if (error) throw error
+
+      if (data.user) {
+        setSuccess(true)
+        toast.success("Conta criada! Verifique seu email.")
+      }
+    } catch (err: any) {
+      setError(err.message || "Erro ao criar conta")
+      toast.error("Erro ao criar conta")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleSignup = async () => {
-    setOauthError("")
+    setError("")
     setIsGoogleLoading(true)
+
     try {
-      await auth.signInWithGoogle()
-      // O redirecionamento será feito automaticamente pelo OAuth
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            user_role: userType,
+          },
+        },
+      })
+
+      if (error) throw error
     } catch (err: any) {
-      setOauthError(err?.message || "Google signup failed")
+      setError(err.message || "Erro ao conectar com Google")
       setIsGoogleLoading(false)
     }
   }
 
   const handleLinkedInSignup = async () => {
-    setOauthError("")
+    setError("")
     setIsLinkedInLoading(true)
+
     try {
-      await auth.signInWithLinkedIn()
-      // O redirecionamento será feito automaticamente pelo OAuth
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "linkedin_oidc",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            user_role: userType,
+          },
+        },
+      })
+
+      if (error) throw error
     } catch (err: any) {
-      setOauthError(err?.message || "LinkedIn signup failed")
+      setError(err.message || "Erro ao conectar com LinkedIn")
       setIsLinkedInLoading(false)
     }
   }
 
-  if (signupMutation.status === 'success') {
+  if (success) {
     return (
       <div className="container max-w-lg py-16 flex flex-col items-center text-center">
         <Card>
@@ -89,35 +132,29 @@ export default function SignupPage() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Mail className="h-6 w-6 text-blue-600" />
             </div>
-            <CardTitle>{t("register.confirmEmail")}</CardTitle>
-            <CardDescription>
-              {t("register.confirmEmailDescription", { email })}
-            </CardDescription>
+            <CardTitle>Confirme seu email</CardTitle>
+            <CardDescription>Enviamos um link de confirmação para {email}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-      
-            {/* Next Steps */}
-          
-            
             <p className="text-muted-foreground text-sm">
-              {t("register.afterConfirmation")}
+              Após confirmar seu email, você poderá fazer login na plataforma.
             </p>
-            
+
             <div className="rounded-lg bg-yellow-50 p-3">
               <p className="text-xs text-yellow-800">
-                <strong>{t("register.didntReceiveEmail")}</strong> {t("register.checkSpam")}
+                <strong>Não recebeu o email?</strong> Verifique sua caixa de spam.
               </p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-2">
             <Button asChild className="w-full">
               <Link href="/login">
-                {t("register.goToLogin")}
+                Ir para Login
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full bg-transparent">
-              <Link href="/">{t("register.goToHome")}</Link>
+              <Link href="/">Voltar ao Início</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -129,17 +166,20 @@ export default function SignupPage() {
     <div className="container max-w-5xl py-10 md:py-16">
       <Card className="mx-auto max-w-md">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle>{t("register.signupTitle")}</CardTitle>
-          <CardDescription>{t("register.description")}</CardDescription>
+          <CardTitle>Criar Conta</CardTitle>
+          <CardDescription>Junte-se à nossa comunidade de mentoria</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Seletor de Tipo de Usuário */}
+          <UserTypeSelector userType={userType} setUserType={setUserType} />
+
           {/* OAuth Buttons */}
           <div className="grid grid-cols-1 gap-2">
-            <Button 
-              variant="outline" 
-              className="w-full" 
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={handleGoogleSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || signupMutation.status === 'pending'}
+              disabled={isGoogleLoading || isLinkedInLoading || isLoading}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
@@ -158,112 +198,107 @@ export default function SignupPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   fill="#EA4335"
                 />
-                <path d="M1 1h22v22H1z" fill="none" />
               </svg>
-              {isGoogleLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.google")}`}
+              {isGoogleLoading ? "Conectando..." : "Continuar com Google"}
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={handleLinkedInSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || signupMutation.status === 'pending'}
+              disabled={isGoogleLoading || isLinkedInLoading || isLoading}
             >
               <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
-              {isLinkedInLoading ? t("login.connecting") : `${t("login.continueWith")} ${t("login.linkedin")}`}
+              {isLinkedInLoading ? "Conectando..." : "Continuar com LinkedIn"}
             </Button>
           </div>
-          
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {t("register.orContinueWith")}
-              </span>
+              <span className="bg-background px-2 text-muted-foreground">Ou continue com email</span>
             </div>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
-            
-            {/* Exibir erro de validação */}
-            {oauthError && (
+            {error && (
               <div className="rounded-lg bg-red-50 p-3 border border-red-200">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <p className="text-sm text-red-800">{oauthError}</p>
+                  <p className="text-sm text-red-800">{error}</p>
                 </div>
               </div>
             )}
-            
+
             <div className="space-y-2">
-              <Label htmlFor="email">{t("register.email")}</Label>
-              <Input id="email" type="email" placeholder={t("register.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("register.password")}</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder={t("register.passwordPlaceholder")} 
-                value={password} 
-                onChange={e => setPassword(e.target.value)} 
-                required 
-                className={password.length > 0 && password.length < 6 ? "border-yellow-500 focus:border-yellow-500" : ""}
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
-              {password.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">{t("register.passwordValidation.passwordStrength")}</p>
-                  <div className="flex gap-1">
-                    <div className={`h-1 flex-1 rounded ${password.length >= 6 ? 'bg-green-500' : password.length >= 4 ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
-                    <div className={`h-1 flex-1 rounded ${password.length >= 8 ? 'bg-green-500' : password.length >= 6 ? 'bg-yellow-500' : 'bg-gray-300'}`}></div>
-                    <div className={`h-1 flex-1 rounded ${password.length >= 10 ? 'bg-green-500' : password.length >= 8 ? 'bg-yellow-500' : 'bg-gray-300'}`}></div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {password.length < 6 ? t("register.passwordValidation.passwordTooWeak") : password.length < 8 ? t("register.passwordValidation.passwordMedium") : t("register.passwordValidation.passwordStrong")}
-                  </p>
-                </div>
-              )}
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t("register.confirmPassword")}</Label>
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                placeholder={t("register.confirmPasswordPlaceholder")} 
-                value={confirmPassword} 
-                onChange={e => setConfirmPassword(e.target.value)} 
-                required 
-                className={confirmPassword && password !== confirmPassword ? "border-red-500 focus:border-red-500" : ""}
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Mínimo 6 caracteres"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
-              {confirmPassword && password !== confirmPassword && (
-                <p className="text-xs text-red-600">{t("register.passwordValidation.passwordsDontMatchError")}</p>
-              )}
-              {confirmPassword && password === confirmPassword && confirmPassword.length > 0 && (
-                <p className="text-xs text-green-600">{t("register.passwordValidation.passwordsMatch")}</p>
-              )}
             </div>
-            <Button className="w-full" type="submit" disabled={signupMutation.status === 'pending' || isGoogleLoading || isLinkedInLoading }>
-              {signupMutation.status === 'pending' ? (
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirme sua senha"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  {t("register.creatingAccount")}
+                  Criando conta...
                 </span>
               ) : (
-                <><span>{t("register.registerButton")}</span><ArrowRight className="ml-2 h-4 w-4" /></>
+                <>
+                  <span>Criar Conta</span>
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
               )}
             </Button>
           </form>
         </CardContent>
         <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
-            {t("register.alreadyHaveAccount")}{" "}
-            <Link href="/login" className="text-primary-600 hover:underline">
-              {t("register.signIn")}
+            Já tem uma conta?{" "}
+            <Link href="/login" className="text-primary hover:underline">
+              Fazer login
             </Link>
           </div>
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <SignupForm />
+    </Suspense>
   )
 }
