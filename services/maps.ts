@@ -1,35 +1,19 @@
-export interface Location {
+export interface GeocodeResult {
   lat: number
   lng: number
-}
-
-export interface PlaceResult {
-  place_id: string
   formatted_address: string
-  name: string
-  geometry: {
-    location: Location
-  }
-  types: string[]
-}
-
-export interface GeocodeResult {
-  formatted_address: string
-  geometry: {
-    location: Location
-  }
   place_id: string
-  types: string[]
-  address_components: Array<{
-    long_name: string
-    short_name: string
-    types: string[]
-  }>
 }
 
-export class GoogleMapsService {
-  // Geocodificação - converter endereço em coordenadas (usando API server-side)
-  static async geocode(address: string): Promise<GeocodeResult[]> {
+export interface ReverseGeocodeResult {
+  formatted_address: string
+  place_id: string
+  address_components: any[]
+}
+
+export const mapsService = {
+  // Geocoding: converter endereço em coordenadas
+  geocode: async (address: string): Promise<GeocodeResult | null> => {
     try {
       const response = await fetch("/api/maps/geocode", {
         method: "POST",
@@ -39,48 +23,51 @@ export class GoogleMapsService {
         body: JSON.stringify({ address }),
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Geocoding failed")
+      const result = await response.json()
+
+      if (result.success) {
+        return result.data
+      } else {
+        console.error("Erro no geocoding:", result.error)
+        return null
       }
-
-      const data = await response.json()
-      return data.results
     } catch (error) {
-      console.error("Geocoding error:", error)
-      throw error
+      console.error("Erro ao fazer geocoding:", error)
+      return null
     }
-  }
+  },
 
-  // Geocodificação reversa - converter coordenadas em endereço (usando API server-side)
-  static async reverseGeocode(location: Location): Promise<GeocodeResult[]> {
+  // Reverse Geocoding: converter coordenadas em endereço
+  reverseGeocode: async (lat: number, lng: number): Promise<ReverseGeocodeResult | null> => {
     try {
       const response = await fetch("/api/maps/reverse-geocode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ lat: location.lat, lng: location.lng }),
+        body: JSON.stringify({ lat, lng }),
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Reverse geocoding failed")
-      }
+      const result = await response.json()
 
-      const data = await response.json()
-      return data.results
+      if (result.success) {
+        return result.data
+      } else {
+        console.error("Erro no reverse geocoding:", result.error)
+        return null
+      }
     } catch (error) {
-      console.error("Reverse geocoding error:", error)
-      throw error
+      console.error("Erro ao fazer reverse geocoding:", error)
+      return null
     }
-  }
+  },
 
   // Obter localização atual do usuário
-  static async getCurrentLocation(): Promise<Location> {
-    return new Promise((resolve, reject) => {
+  getCurrentLocation: (): Promise<{ lat: number; lng: number } | null> => {
+    return new Promise((resolve) => {
       if (!navigator.geolocation) {
-        reject(new Error("Geolocation is not supported by this browser"))
+        console.error("Geolocalização não é suportada pelo navegador")
+        resolve(null)
         return
       }
 
@@ -92,77 +79,27 @@ export class GoogleMapsService {
           })
         },
         (error) => {
-          reject(new Error(`Geolocation error: ${error.message}`))
+          console.error("Erro ao obter localização:", error)
+          resolve(null)
         },
         {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 600000,
+          maximumAge: 300000, // 5 minutos
         },
       )
     })
-  }
+  },
 
-  // Calcular distância entre dois pontos
-  static calculateDistance(point1: Location, point2: Location): number {
+  // Calcular distância entre dois pontos (fórmula de Haversine)
+  calculateDistance: (lat1: number, lng1: number, lat2: number, lng2: number): number => {
     const R = 6371 // Raio da Terra em km
-    const dLat = this.toRadians(point2.lat - point1.lat)
-    const dLng = this.toRadians(point2.lng - point1.lng)
-
+    const dLat = ((lat2 - lat1) * Math.PI) / 180
+    const dLng = ((lng2 - lng1) * Math.PI) / 180
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRadians(point1.lat)) *
-        Math.cos(this.toRadians(point2.lat)) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2)
-
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c
-  }
-
-  // Extrair componentes do endereço
-  static extractAddressComponents(result: GeocodeResult) {
-    const components = result.address_components
-    const extracted = {
-      street_number: "",
-      route: "",
-      neighborhood: "",
-      city: "",
-      state: "",
-      country: "",
-      postal_code: "",
-    }
-
-    components.forEach((component) => {
-      const types = component.types
-
-      if (types.includes("street_number")) {
-        extracted.street_number = component.long_name
-      }
-      if (types.includes("route")) {
-        extracted.route = component.long_name
-      }
-      if (types.includes("sublocality") || types.includes("neighborhood")) {
-        extracted.neighborhood = component.long_name
-      }
-      if (types.includes("locality") || types.includes("administrative_area_level_2")) {
-        extracted.city = component.long_name
-      }
-      if (types.includes("administrative_area_level_1")) {
-        extracted.state = component.long_name
-      }
-      if (types.includes("country")) {
-        extracted.country = component.long_name
-      }
-      if (types.includes("postal_code")) {
-        extracted.postal_code = component.long_name
-      }
-    })
-
-    return extracted
-  }
-
-  private static toRadians(degrees: number): number {
-    return degrees * (Math.PI / 180)
-  }
+  },
 }

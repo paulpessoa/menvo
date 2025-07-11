@@ -193,4 +193,30 @@ export class GoogleMapsService {
   private static toRadians(degrees: number): number {
     return degrees * (Math.PI / 180)
   }
+
+  // Serviço simplificado para Google Maps sem API key no cliente
+  static googleMapsService = {
+    // Gerar URL para Google Maps
+    generateMapsUrl: (address: string): string => {
+      const encodedAddress = encodeURIComponent(address)
+      return `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`
+    },
+
+    // Gerar URL para direções
+    generateDirectionsUrl: (origin: string, destination: string): string => {
+      const encodedOrigin = encodeURIComponent(origin)
+      const encodedDestination = encodeURIComponent(destination)
+      return `https://www.google.com/maps/dir/?api=1&origin=${encodedOrigin}&destination=${encodedDestination}`
+    },
+
+    // Gerar URL para Street View
+    generateStreetViewUrl: (lat: number, lng: number): string => {
+      return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`
+    },
+
+    // Validar coordenadas
+    isValidCoordinate: (lat: number, lng: number): boolean => {
+      return typeof lat === "number" && typeof lng === "number" && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180
+    },
+  }
 }

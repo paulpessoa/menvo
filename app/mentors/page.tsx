@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { Suspense, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,7 +14,6 @@ import { useQuery } from "@tanstack/react-query"
 import { createClient } from "@/utils/supabase/client"
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
-import { WaitingList } from "@/components/WaitingList"
 
 interface Mentor {
   id: string
@@ -212,34 +211,10 @@ function MentorsContent() {
   )
 }
 
-
-// export default function MentorsPage() {
-//   return (
-//     <Suspense fallback={<div>Carregando...</div>}>
-//       <MentorsContent />
-//     </Suspense>
-//   )
-// }
-
-
-
 export default function MentorsPage() {
-  const router = useRouter()
-
-  const estamosLotados = true
-
   return (
-    <div className="relative">
-      <div className={estamosLotados ? 'blur-sm pointer-events-none' : ''}>
-        <Suspense fallback={<div>Carregando...</div>}>
-          <MentorsContent />
-        </Suspense>
-      </div>
-      {estamosLotados  && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center">
-          <WaitingList isOpen={true} onClose={() => router.push('/')} />
-        </div>
-      )}
-    </div>
+    <Suspense fallback={<div>Carregando...</div>}>
+      <MentorsContent />
+    </Suspense>
   )
 }

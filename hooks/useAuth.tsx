@@ -1,45 +1,50 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-import type { User } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabase"
+import type React from "react"
+
+import { createContext, useContext, useEffect, useState } from "react"
+import type { User, Session, AuthError } from "@supabase/supabase-js"
+import { createClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
+
+interface SignUpData {
+  email: string
+  password: string
+  fullName: string
+  userType: string
+}
 
 interface AuthContextType {
   user: User | null
+  session: Session | null
   loading: boolean
   isAuthenticated: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, metadata?: any) => Promise<void>
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signUp: (data: SignUpData) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
   signInWithGoogle: () => Promise<void>
-  signInWithGitHub: () => Promise<void>
   signInWithLinkedIn: () => Promise<void>
+  signInWithGitHub: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession()
-        if (error) {
-          console.error("Error getting session:", error)
-        } else {
-          setUser(session?.user ?? null)
-        }
-      } catch (error) {
-        console.error("Error in getInitialSession:", error)
-      } finally {
-        setLoading(false)
-      }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setSession(session)
+      setUser(session?.user ?? null)
+      setLoading(false)
     }
 
     getInitialSession()
@@ -48,79 +53,98 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.id)
+      setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+
+      if (event === "SIGNED_IN") {
+        router.refresh()
+      }
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase, router])
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.toLowerCase().trim(),
+      email,
       password,
     })
-    if (error) throw error
+    return { error }
   }
 
-  const signUp = async (email: string, password: string, metadata?: any) => {
-    const { error } = await supabase.auth.signUp({
-      email: email.toLowerCase().trim(),
-      password,
-      options: {
-        data: metadata || {},
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) throw error
+  const signUp = async ({ email, password, fullName, userType }: SignUpData) => {
+    try {
+      // Usar o endpoint personalizado para registro
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName: fullName.split(" ")[0],
+          lastName: fullName.split(" ").slice(1).join(" ") || fullName.split(" ")[0],
+          userType,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { error: { message: data.error } as AuthError }
+      }
+
+      return { error: null }
+    } catch (error) {
+      return { error: { message: "Erro interno do servidor" } as AuthError }
+    }
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    await supabase.auth.signOut()
+    router.push("/")
   }
 
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
-    if (error) throw error
-  }
-
-  const signInWithGitHub = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (error) throw error
   }
 
   const signInWithLinkedIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "linkedin_oidc",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
-    if (error) throw error
+  }
+
+  const signInWithGitHub = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
   }
 
   const value = {
     user,
+    session,
     loading,
     isAuthenticated: !!user,
     signIn,
     signUp,
     signOut,
     signInWithGoogle,
-    signInWithGitHub,
     signInWithLinkedIn,
+    signInWithGitHub,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
