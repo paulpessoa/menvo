@@ -26,21 +26,24 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refresh session if expired
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  await supabase.auth.getUser()
 
-  // Rotas protegidas que precisam de autenticação
-  const protectedRoutes = ["/dashboard", "/profile", "/settings", "/mentors/[id]"]
+  // Protected routes that require authentication
+  const protectedRoutes = ["/dashboard", "/profile", "/mentors/[id]", "/admin"]
   const isProtectedRoute = protectedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route.replace("[id]", "")),
   )
 
-  // Se é rota protegida e não tem usuário, redireciona para login
-  if (isProtectedRoute && !user) {
-    const redirectUrl = new URL("/login", request.url)
-    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)
-    return NextResponse.redirect(redirectUrl)
+  if (isProtectedRoute) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      const redirectUrl = new URL("/login", request.url)
+      redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   return supabaseResponse
