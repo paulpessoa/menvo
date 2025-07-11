@@ -7,11 +7,11 @@ import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 
 interface ValidationPendingModalProps {
-  isOpen: boolean
+  open: boolean
   onClose?: () => void
 }
 
-export function ValidationPendingModal({ isOpen, onClose }: ValidationPendingModalProps) {
+export function ValidationPendingModal({ open, onClose }: ValidationPendingModalProps) {
   const { user, hasRole } = useAuth()
   const router = useRouter()
 
@@ -57,7 +57,7 @@ export function ValidationPendingModal({ isOpen, onClose }: ValidationPendingMod
   const Icon = statusInfo.icon
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div

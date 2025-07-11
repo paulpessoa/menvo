@@ -15,7 +15,7 @@ interface AuthGuardProps {
 }
 
 export function AuthGuard({ children }: AuthGuardProps) {
-  const { user, profile, loading, isAuthenticated, needsRoleSelection, needsProfileCompletion, needsVerification } =
+  const { user, profile, loading, isAuthenticated, needsRoleSelection, needsVerification } =
     useAuth()
 
   const router = useRouter()
@@ -56,11 +56,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
         return
       }
 
-      if (needsProfileCompletion) {
-        setShowProfileCompletion(true)
-        return
-      }
-
       if (needsVerification) {
         setShowValidationPending(true)
         return
@@ -75,7 +70,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
     loading,
     isAuthenticated,
     needsRoleSelection,
-    needsProfileCompletion,
     needsVerification,
     isPublicRoute,
     pathname,
@@ -100,8 +94,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
       {/* Modals de fluxo de autenticação */}
       <RoleSelectionModal open={showRoleSelection} onClose={() => setShowRoleSelection(false)} />
-
-      <ProfileCompletionModal open={showProfileCompletion} onClose={() => setShowProfileCompletion(false)} />
 
       <ValidationPendingModal open={showValidationPending} onClose={() => setShowValidationPending(false)} />
     </>
