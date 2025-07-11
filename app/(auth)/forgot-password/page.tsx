@@ -1,46 +1,25 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, Mail, Loader2 } from "lucide-react"
-import { auth } from '@/services/auth/supabase'
+import { ArrowLeft, Mail, Loader2, AlertTriangle } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
-export default function ForgotPasswordPage() {
-  const { user, loading } = useAuth()
+function ForgotPasswordForm() {
+  const { t } = useTranslation()
+  const { resetPassword } = useAuth()
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("")
-  const router = useRouter()
-
-  // Redirecionar usuários já logados
-  useEffect(() => {
-    if (!loading && user) {
-      router.push('/')
-    }
-  }, [user, loading, router])
-
-  // Mostrar loading enquanto verifica autenticação
-  if (loading) {
-    return (
-      <div className="container flex h-screen max-w-screen-xl flex-col items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">
-          Carregando...
-        </div>
-      </div>
-    )
-  }
-
-  // Não renderizar se o usuário está logado
-  if (user) {
-    return null
-  }
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,10 +27,12 @@ export default function ForgotPasswordPage() {
     setIsLoading(true)
 
     try {
-      await auth.resetPassword(email)
+      await resetPassword(email)
       setIsSuccess(true)
+      toast.success("Email de recuperação enviado!")
     } catch (err: any) {
       setError(err?.message || "Erro ao enviar email de recuperação")
+      toast.error(err?.message || "Erro ao enviar email de recuperação")
     } finally {
       setIsLoading(false)
     }
@@ -86,9 +67,9 @@ export default function ForgotPasswordPage() {
             </p>
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
-            <Button 
-              variant="outline" 
-              className="w-full"
+            <Button
+              variant="outline"
+              className="w-full bg-transparent"
               onClick={() => {
                 setIsSuccess(false)
                 setEmail("")
@@ -113,26 +94,27 @@ export default function ForgotPasswordPage() {
       <Card className="mx-auto max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Esqueci minha senha</CardTitle>
-          <CardDescription>
-            Digite seu e-mail para receber um link de recuperação
-          </CardDescription>
+          <CardDescription>Digite seu e-mail para receber um link de recuperação</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="Digite seu e-mail" 
-                value={email} 
-                onChange={e => setEmail(e.target.value)} 
-                required 
+              <Input
+                id="email"
+                type="email"
+                placeholder="Digite seu e-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             {error && (
               <div className="rounded-lg bg-red-50 p-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
               </div>
             )}
             <Button className="w-full" type="submit" disabled={isLoading}>
@@ -160,5 +142,13 @@ export default function ForgotPasswordPage() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <ForgotPasswordForm />
+    </Suspense>
   )
 }

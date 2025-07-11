@@ -3,14 +3,14 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Menvo - Plataforma de Mentoria",
-  description: "Conecte-se com mentores experientes e acelere seu crescimento profissional",
+  title: "Menvo - Plataforma de Mentoria Voluntária",
+  description: "Conectando mentores e mentees para sessões gratuitas de mentoria",
     generator: 'v0.dev'
 }
 
