@@ -321,4 +321,4 @@ class RoleService {
   }
 }
 
-export const roleService = new RoleService() 
+export const roleService = new RoleService()

@@ -12,17 +12,17 @@ Gostaria de nos ajudar a melhorar o projeto? Veja este guia contribuição para 
 ## Para começar
 ### Clonando o repositório
 Faça um fork do repositório no GitHub e o clone em sua máquina.
-```bash
+\`\`\`bash
 $ git clone https://github.com/{Seu nome}/menvo.git
 
 $ cd menvo
-```
+\`\`\`
 
 ### Criando a nova branch
 Crie uma nova branch para a alteração que você deseja submeter. Por exemplo:
-```bash
+\`\`\`bash
 $ git checkout -b fix-responsive
-```
+\`\`\`
 Ao executar o comando acima, uma nova branch chamada `fix-responsive` será criada.
 
 **Nota:** O nome da branch deve ser significativo e deve indicar **apenas** a mudança a ser feita. Requisições que não seguirem esse padrão não serão aceitas.
@@ -42,9 +42,9 @@ Lembre-se de começar sua mensagem com uma palavra como: Adicionar, refatorar, d
 
 ## Submetendo suas alterações
 Após ter realizado as mudanças, suba suas mudanças para o repositório remoto:
-```bash
+\`\`\`bash
 $ git push origin fix-responsive
-```
+\`\`\`
 
 Após isso, vá ao seu repositório recém clonado no GitHub, selecione a branch criada e clique em Pull Request.
 

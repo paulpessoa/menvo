@@ -1,120 +1,125 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient } from "@supabase/ssr"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import type { Database } from "@/types/database"
+
+type UserRole = Database["public"]["Enums"]["user_role"]
 
 // Rotas públicas que não precisam de autenticação
 const publicRoutes = [
-  '/',
-  '/about',
-  '/how-it-works',
-  '/login',
-  '/signup',
-  '/forgot-password',
-  '/reset-password',
-  '/unauthorized',
-  '/welcome',
-  '/unsubscribe',
-  '/confirmation',
-  '/auth/callback',
-  '/api/auth/google',
-  '/api/auth/linkedin',
-  '/api/auth/github'
+  "/",
+  "/about",
+  "/how-it-works",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/unauthorized",
+  "/confirmation",
+  "/auth/callback",
+  "/api/auth/google",
+  "/api/auth/linkedin",
+  "/api/auth/github",
 ]
 
-// Rotas que precisam de email confirmado
-const emailConfirmationRequired = [
-  '/mentorship',
-  '/settings',
-  '/calendar',
-  '/messages',
-  '/talents',
-  '/talent',
-  '/admin'
-]
-
-// Rotas que precisam de autenticação
-const protectedRoutes = [
-  '/profile',
-  '/mentorship',
-  '/settings',
-  '/calendar',
-  '/messages',
-  '/talents',
-  '/talent',
-  '/admin'
-]
+// Mapeamento de rotas e permissões necessárias
+const routePermissions: Record<string, string[]> = {
+  "/admin": ["admin_system"],
+  "/admin/users": ["admin_users"],
+  "/admin/verifications": ["admin_verifications"],
+  "/mentorship": ["provide_mentorship"],
+  "/mentor-dashboard": ["provide_mentorship"],
+  "/validate-activities": ["validate_activities"],
+  "/moderate": ["moderate_content"],
+}
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  let supabaseResponse = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  })
 
-  // Refresh session if expired - required for Server Components
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => req.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request: {
+              headers: req.headers,
+            },
+          })
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+        },
+      },
+    },
+  )
+
+  // Refresh session if expired
   const {
     data: { session },
+    error,
   } = await supabase.auth.getSession()
 
-  // Se não há sessão, permitir acesso a rotas públicas
-  if (!session) {
-    // Rotas que requerem autenticação
-    const protectedRoutes = ['/dashboard', '/profile', '/mentorship', '/settings']
-    const isProtectedRoute = protectedRoutes.some(route => req.nextUrl.pathname.startsWith(route))
-    
-    if (isProtectedRoute) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
-    
-    return res
+  const currentPath = req.nextUrl.pathname
+
+  // Verificar se é rota pública
+  const isPublicRoute = publicRoutes.some((route) => currentPath === route || currentPath.startsWith(route + "/"))
+
+  // Se não há sessão e não é rota pública, redirecionar para login
+  if (!session && !isPublicRoute) {
+    const redirectUrl = new URL("/login", req.url)
+    redirectUrl.searchParams.set("redirect", currentPath)
+    return NextResponse.redirect(redirectUrl)
   }
 
-  // Se há sessão, verificar role no JWT
+  // Se há sessão, verificar permissões
   if (session) {
     try {
-      const currentPath = req.nextUrl.pathname
-      const userRole = session.user.user_metadata?.role
+      // Obter role do JWT (Custom Access Token Hook)
+      const userRole = session.user.app_metadata?.user_role as UserRole
 
-      // Se usuário não tem role definida no JWT, permitir acesso
-      // O AuthGuard vai mostrar o modal de seleção de role
-      if (!userRole) {
-        // Não redirecionar, deixar o AuthGuard lidar com isso
-        return NextResponse.next()
+      // Verificar se precisa selecionar role
+      if (userRole === "pending" && currentPath !== "/auth" && !isPublicRoute) {
+        return NextResponse.redirect(new URL("/auth", req.url))
       }
 
-      // Verificar permissões baseadas na role do JWT
-      if (userRole) {
-        // Rotas que requerem role específica
-        const adminRoutes = ['/admin']
-        const mentorRoutes = ['/mentor-dashboard', '/mentor-sessions']
-        
-        const isAdminRoute = adminRoutes.some(route => currentPath.startsWith(route))
-        const isMentorRoute = mentorRoutes.some(route => currentPath.startsWith(route))
-        
-        if (isAdminRoute && userRole !== 'admin') {
-          return NextResponse.redirect(new URL('/unauthorized', req.url))
-        }
-        
-        if (isMentorRoute && userRole !== 'mentor') {
-          return NextResponse.redirect(new URL('/unauthorized', req.url))
+      // Verificar permissões específicas da rota
+      for (const [routePattern, requiredPermissions] of Object.entries(routePermissions)) {
+        if (currentPath.startsWith(routePattern)) {
+          // Buscar permissões da role no banco
+          const { data: permissions } = await supabase
+            .from("role_permissions")
+            .select("permission")
+            .eq("role", userRole)
+
+          const userPermissions = permissions?.map((p) => p.permission) || []
+
+          // Verificar se tem pelo menos uma das permissões necessárias
+          const hasRequiredPermission = requiredPermissions.some((permission) =>
+            userPermissions.includes(permission as any),
+          )
+
+          if (!hasRequiredPermission) {
+            return NextResponse.redirect(new URL("/unauthorized", req.url))
+          }
         }
       }
-
     } catch (error) {
-      console.error('Erro no middleware:', error)
-      // Em caso de erro, permitir acesso
+      console.error("Erro no middleware:", error)
+      // Em caso de erro, permitir acesso mas logar o erro
     }
   }
 
-  return res
+  return supabaseResponse
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
-  ],
-} 
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|public/).*)"],
+}

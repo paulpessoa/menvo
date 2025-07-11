@@ -117,4 +117,4 @@ describe('useUser', () => {
 
     expect(result.current.user?.error).toBeTruthy()
   })
-}) 
+})

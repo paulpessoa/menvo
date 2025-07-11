@@ -1,87 +1,55 @@
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/api-utils'
+import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/utils/supabase/server"
+import type { Database } from "@/types/database"
+
+type UserRole = Database["public"]["Enums"]["user_role"]
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = createSupabaseServerClient()
-    
+    const supabase = await createClient()
+
     // Verificar se usuário está autenticado
- const { data, error } = await ( await supabaseAdmin).auth.admin.updateUserById(
-    userId,
-    {
-      app_metadata: { role: 'pending' }
-    }
-  )    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Usuário não autenticado' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Usuário não autenticado" }, { status: 401 })
     }
 
     // Obter dados da requisição
     const { role } = await request.json()
-    
-    if (!role || !['mentor', 'mentee', 'admin'].includes(role)) {
-      return NextResponse.json(
-        { error: 'Role inválida' },
-        { status: 400 }
-      )
+
+    if (!role || !["mentee", "mentor", "volunteer"].includes(role)) {
+      return NextResponse.json({ error: "Role inválida" }, { status: 400 })
     }
 
-    // Atualizar role no JWT
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { role: role }
-    })
+    // Atualizar role na tabela profiles
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        role: role as UserRole,
+        status: "pending",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id)
 
     if (updateError) {
-      console.error('Erro ao atualizar role no JWT:', updateError)
-      return NextResponse.json(
-        { error: 'Erro ao atualizar role no JWT' },
-        { status: 500 }
-      )
+      console.error("Erro ao atualizar perfil:", updateError)
+      return NextResponse.json({ error: "Erro ao atualizar perfil" }, { status: 500 })
     }
 
-    // Inserir/atualizar role na tabela profiles
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .upsert({
-        id: user.id,
-        email: user.email,
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Role atualizada com sucesso",
         role: role,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'id'
-      })
-
-    if (profileError) {
-      console.error('Erro ao atualizar perfil:', profileError)
-      return NextResponse.json(
-        { error: 'Erro ao atualizar perfil' },
-        { status: 500 }
-      )
-    }
-
-    // Refresh da sessão para aplicar mudanças
-    await supabase.auth.refreshSession()
-
-    return NextResponse.json(
-      { 
-        success: true, 
-        message: 'Role atualizada com sucesso',
-        role: role
       },
-      { status: 200 }
+      { status: 200 },
     )
-
   } catch (error) {
-    console.error('Erro no endpoint update-role:', error)
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
+    console.error("Erro no endpoint update-role:", error)
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
-} 
+}

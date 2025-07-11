@@ -4,33 +4,33 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { User } from "@supabase/supabase-js"
 import { createClient } from "@/utils/supabase/client"
 import type { Database } from "@/types/database"
-import router from "next/router"
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"]
+type UserRole = Database["public"]["Enums"]["user_role"]
+type UserStatus = Database["public"]["Enums"]["user_status"]
 
 interface AuthContextType {
   user: User | null
   profile: Profile | null
   loading: boolean
-  signOut: () => Promise<void>
-  refreshProfile: () => Promise<void>
-  login: (params: { email: string; password: string }) => Promise<any>
+
   // Estados computados
   isAuthenticated: boolean
   needsRoleSelection: boolean
   needsProfileCompletion: boolean
   needsVerification: boolean
-  canAccessMentorFeatures: boolean
-  canAccessAdminFeatures: boolean
-  isProfileComplete: boolean
-  // Role management
-  userState: any
-  userPermissions: string[]
+
+  // Permissões
   hasPermission: (permission: string) => boolean
   hasAnyPermission: (permissions: string[]) => boolean
-  hasAllPermissions: (permissions: string[]) => boolean
-  updateUserRole: (role: string) => Promise<any>
-  completeUserProfile: (data: any) => Promise<any>
+  hasRole: (role: UserRole) => boolean
+  hasAnyRole: (roles: UserRole[]) => boolean
+
+  // Ações
+  signOut: () => Promise<void>
+  refreshProfile: () => Promise<void>
+  login: (params: { email: string; password: string }) => Promise<void>
+  updateRole: (role: UserRole) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -41,50 +41,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  const fetchProfile = async (userId: string, userRole?: string) => {
-    const role = userRole
-    
-    if (!role) {
-      return null
-    }
-    
+  const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
 
       if (error) {
-        if (error.code === "PGRST116") {
-          const { data: newProfile, error: createError } = await supabase
-            .from("profiles")
-            .insert({
-              id: userId,
-              email: user?.email || '',
-              role: role,
-              status: 'pending',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .select()
-            .single()
-
-          if (createError) {
-            return null
-          }
-
-          return newProfile
-        } else {
-          return null
-        }
+        console.error("Erro ao buscar perfil:", error)
+        return null
       }
 
       return data
     } catch (error) {
+      console.error("Erro ao buscar perfil:", error)
       return null
     }
   }
 
   const refreshProfile = async () => {
     if (user) {
-      const profileData = await fetchProfile(user.id, user.user_metadata?.role)
+      const profileData = await fetchProfile(user.id)
       setProfile(profileData)
     }
   }
@@ -96,20 +71,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const {
           data: { session },
+          error,
         } = await supabase.auth.getSession()
-        
+
+        if (error) {
+          console.error("Erro ao obter sessão:", error)
+          return
+        }
+
         if (!mounted) return
-        
+
         setUser(session?.user ?? null)
 
         if (session?.user) {
-          const profileData = await fetchProfile(session.user.id, session.user.user_metadata?.role)
+          const profileData = await fetchProfile(session.user.id)
           if (mounted) {
             setProfile(profileData)
           }
         }
       } catch (error) {
-        // Ignore errors
+        console.error("Erro ao obter sessão:", error)
       } finally {
         if (mounted) {
           setLoading(false)
@@ -123,11 +104,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
-      
+
+      console.log("Auth state changed:", event, session?.user?.id)
+
       setUser(session?.user ?? null)
 
       if (session?.user) {
-        const profileData = await fetchProfile(session.user.id, session.user.user_metadata?.role)
+        const profileData = await fetchProfile(session.user.id)
         if (mounted) {
           setProfile(profileData)
         }
@@ -147,9 +130,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    await supabase.auth.refreshSession()
-    
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error("Erro ao fazer logout:", error)
+      throw error
+    }
+
     setUser(null)
     setProfile(null)
   }
@@ -160,81 +146,93 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error.message.includes("Invalid login credentials")) {
         throw new Error("E-mail ou senha inválidos.")
       }
+      if (error.message.includes("Email not confirmed")) {
+        throw new Error("Por favor, confirme seu e-mail antes de fazer login.")
+      }
       throw new Error("Erro ao fazer login. Tente novamente.")
     }
-    return true
   }
 
-  // Estados computados
+  const updateRole = async (role: UserRole) => {
+    if (!user) throw new Error("Usuário não autenticado")
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        role,
+        status: "pending",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id)
+
+    if (error) {
+      console.error("Erro ao atualizar role:", error)
+      throw new Error("Erro ao atualizar role")
+    }
+
+    // Refresh do perfil para obter dados atualizados
+    await refreshProfile()
+  }
+
+  // Estados computados baseados no JWT e perfil
+  const userRole = user?.app_metadata?.user_role as UserRole
+  const userStatus = user?.app_metadata?.user_status as UserStatus
+
   const isAuthenticated = !!user
-  const needsRoleSelection = !!(user && user.email_confirmed_at && !user.user_metadata?.role)
-  const needsProfileCompletion = !!(user && user.user_metadata?.role && profile && profile.status === "pending")
-  const needsVerification = !!(user && user.user_metadata?.role === "mentor" && profile && profile.status === "pending")
-  const canAccessMentorFeatures = !!(user?.user_metadata?.role === "mentor" && profile?.status === "active")
-  const canAccessAdminFeatures = !!(user?.user_metadata?.role === "admin")
-  const isProfileComplete = !!(profile?.status === "active")
+  const needsRoleSelection = !!(user && userRole === "pending")
+  const needsProfileCompletion = !!(user && userRole && userRole !== "pending" && profile?.status === "pending")
+  const needsVerification = !!(user && userRole === "mentee" && profile?.status === "pending")
+
+  // Sistema de permissões baseado no JWT
+  const rolePermissions: Record<UserRole, string[]> = {
+    pending: [],
+    mentee: ["view_mentors"],
+    mentor: ["view_mentors", "provide_mentorship", "manage_availability"],
+    admin: [
+      "view_mentors",
+      "provide_mentorship",
+      "manage_availability",
+      "admin_users",
+      "admin_verifications",
+      "admin_system",
+    ],
+    volunteer: ["view_mentors", "validate_activities"],
+    moderator: ["view_mentors", "validate_activities", "moderate_content"],
+  }
+
+  const hasPermission = (permission: string): boolean => {
+    if (!userRole) return false
+    return rolePermissions[userRole]?.includes(permission) || false
+  }
+
+  const hasAnyPermission = (permissions: string[]): boolean => {
+    return permissions.some((permission) => hasPermission(permission))
+  }
+
+  const hasRole = (role: UserRole): boolean => {
+    return userRole === role
+  }
+
+  const hasAnyRole = (roles: UserRole[]): boolean => {
+    return roles.includes(userRole)
+  }
 
   const value: AuthContextType = {
     user,
     profile,
     loading,
-    signOut,
-    refreshProfile,
-    login,
     isAuthenticated,
     needsRoleSelection,
     needsProfileCompletion,
     needsVerification,
-    canAccessMentorFeatures,
-    canAccessAdminFeatures,
-    isProfileComplete,
-    // Role management - Baseado no JWT
-    userState: null,
-    userPermissions: user?.user_metadata?.role ? [user.user_metadata.role] : [],
-    hasPermission: (permission: string) => user?.user_metadata?.role === permission,
-    hasAnyPermission: (permissions: string[]) => permissions.some(p => user?.user_metadata?.role === p),
-    hasAllPermissions: (permissions: string[]) => permissions.every(p => user?.user_metadata?.role === p),
-    updateUserRole: async (role: string) => {
-      try {
-        const { error } = await supabase.auth.updateUser({
-          data: { role: role }
-        })
-        
-        if (error) {
-          return { success: false }
-        }
-        
-        await supabase.auth.refreshSession()
-        
-        return { success: true }
-      } catch (error) {
-        return { success: false }
-      }
-    },
-    completeUserProfile: async (data: any) => {
-      try {
-        if (!user) return { success: false }
-        
-        const { error } = await supabase
-          .from("profiles")
-          .upsert({
-            id: user.id,
-            email: user.email,
-            role: user.user_metadata?.role,
-            ...data,
-            status: 'completed',
-            updated_at: new Date().toISOString(),
-          })
-        
-        if (error) {
-          return { success: false }
-        }
-        
-        return { success: true }
-      } catch (error) {
-        return { success: false }
-      }
-    },
+    hasPermission,
+    hasAnyPermission,
+    hasRole,
+    hasAnyRole,
+    signOut,
+    refreshProfile,
+    login,
+    updateRole,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
@@ -247,7 +245,3 @@ export function useAuth() {
   }
   return context
 }
-// Hook para mutação de login
-// export function useLoginMutation() {
-//   return useLogin()
-// }
