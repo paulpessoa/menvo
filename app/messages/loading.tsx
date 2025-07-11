@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export default function MessagesLoading() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -12,7 +12,7 @@ export default function MessagesLoading() {
         </div>
 
         {/* Search and filters */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <div className="mb-6 flex gap-4">
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-32" />
           <Skeleton className="h-10 w-32" />
@@ -21,28 +21,29 @@ export default function MessagesLoading() {
         {/* Messages list */}
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Card key={i} className="hover:shadow-md transition-shadow">
+            <Card key={i}>
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <Skeleton className="h-10 w-10 rounded-full" />
                     <div>
                       <Skeleton className="h-4 w-32 mb-1" />
                       <Skeleton className="h-3 w-24" />
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Skeleton className="h-6 w-16 rounded-full" />
-                    <Skeleton className="h-3 w-20" />
-                  </div>
+                  <Skeleton className="h-6 w-16" />
                 </div>
               </CardHeader>
               <CardContent>
                 <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-3/4 mb-3" />
-                <div className="flex justify-between items-center">
-                  <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="flex justify-between items-center mt-4">
+                  <Skeleton className="h-3 w-20" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -50,8 +51,8 @@ export default function MessagesLoading() {
         </div>
 
         {/* Pagination */}
-        <div className="mt-8 flex justify-center">
-          <div className="flex space-x-2">
+        <div className="flex justify-center mt-8">
+          <div className="flex gap-2">
             {Array.from({ length: 5 }).map((_, i) => (
               <Skeleton key={i} className="h-10 w-10" />
             ))}
