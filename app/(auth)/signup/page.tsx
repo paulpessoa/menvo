@@ -2,58 +2,57 @@
 
 import type React from "react"
 
-import { useState, useEffect, Suspense } from "react"
-import Link from "next/link"
+import { Suspense, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { toast } from "sonner"
-
-type UserType = "mentee" | "mentor"
+import { createClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
+import { toast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 function SignupForm() {
-  const { isAuthenticated } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [userType, setUserType] = useState<UserType>("mentee")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  const [userType, setUserType] = useState<"mentee" | "mentor" | null>(null)
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClientComponentClient()
-
-  // Redirecionar usuários já logados
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/dashboard")
-    }
-  }, [isAuthenticated, router])
+  const supabase = createClient()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
+
+    if (!userType) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione se você quer ser mentor ou mentee",
+        variant: "destructive",
+      })
+      return
+    }
 
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem")
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem",
+        variant: "destructive",
+      })
       return
     }
 
     if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres")
+      toast({
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres",
+        variant: "destructive",
+      })
       return
     }
 
-    setIsLoading(true)
+    setLoading(true)
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -61,235 +60,108 @@ function SignupForm() {
         password,
         options: {
           data: {
-            user_role: userType,
+            user_type: userType,
           },
         },
       })
 
-      if (error) throw error
+      if (error) {
+        throw error
+      }
 
       if (data.user) {
-        setSuccess(true)
-        toast.success("Conta criada! Verifique seu email.")
+        // Criar perfil inicial
+        const { error: profileError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          email: data.user.email!,
+          role: userType,
+          status: "pending",
+        })
+
+        if (profileError) {
+          console.error("Erro ao criar perfil:", profileError)
+        }
+
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Verifique seu e-mail para confirmar sua conta.",
+        })
+
+        router.push("/auth/verification")
       }
-    } catch (err: any) {
-      setError(err.message || "Erro ao criar conta")
-      toast.error("Erro ao criar conta")
+    } catch (error: any) {
+      console.error("Erro no signup:", error)
+      toast({
+        title: "Erro ao criar conta",
+        description: error.message || "Tente novamente mais tarde",
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
-  }
-
-  const handleGoogleSignup = async () => {
-    setError("")
-    setIsGoogleLoading(true)
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            user_role: userType,
-          },
-        },
-      })
-
-      if (error) throw error
-    } catch (err: any) {
-      setError(err.message || "Erro ao conectar com Google")
-      setIsGoogleLoading(false)
-    }
-  }
-
-  const handleLinkedInSignup = async () => {
-    setError("")
-    setIsLinkedInLoading(true)
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "linkedin_oidc",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            user_role: userType,
-          },
-        },
-      })
-
-      if (error) throw error
-    } catch (err: any) {
-      setError(err.message || "Erro ao conectar com LinkedIn")
-      setIsLinkedInLoading(false)
-    }
-  }
-
-  if (success) {
-    return (
-      <div className="container max-w-lg py-16 flex flex-col items-center text-center">
-        <Card>
-          <CardHeader>
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <Mail className="h-6 w-6 text-blue-600" />
-            </div>
-            <CardTitle>Confirme seu email</CardTitle>
-            <CardDescription>Enviamos um link de confirmação para {email}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground text-sm">
-              Após confirmar seu email, você poderá fazer login na plataforma.
-            </p>
-
-            <div className="rounded-lg bg-yellow-50 p-3">
-              <p className="text-xs text-yellow-800">
-                <strong>Não recebeu o email?</strong> Verifique sua caixa de spam.
-              </p>
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-2">
-            <Button asChild className="w-full">
-              <Link href="/login">
-                Ir para Login
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="w-full bg-transparent">
-              <Link href="/">Voltar ao Início</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    )
   }
 
   return (
-    <div className="container max-w-5xl py-10 md:py-16">
-      <Card className="mx-auto max-w-md">
-        <CardHeader className="flex flex-col items-center">
-          <CardTitle>Criar Conta</CardTitle>
-          <CardDescription>Junte-se à nossa comunidade de mentoria</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Criar Conta</CardTitle>
+          <CardDescription className="text-center">Junte-se à nossa comunidade de mentoria</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Seletor de Tipo de Usuário */}
-          <UserTypeSelector userType={userType} setUserType={setUserType} />
-
-          {/* OAuth Buttons */}
-          <div className="grid grid-cols-1 gap-2">
-            <Button
-              variant="outline"
-              className="w-full bg-transparent"
-              onClick={handleGoogleSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isLoading}
-            >
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  fill="#4285F4"
-                />
-                <path
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  fill="#34A853"
-                />
-                <path
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  fill="#FBBC05"
-                />
-                <path
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  fill="#EA4335"
-                />
-              </svg>
-              {isGoogleLoading ? "Conectando..." : "Continuar com Google"}
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full bg-transparent"
-              onClick={handleLinkedInSignup}
-              disabled={isGoogleLoading || isLinkedInLoading || isLoading}
-            >
-              <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
-              {isLinkedInLoading ? "Conectando..." : "Continuar com LinkedIn"}
-            </Button>
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Ou continue com email</span>
-            </div>
-          </div>
-
+        <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3 border border-red-200">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+            <div>
+              <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                placeholder="seu@email.com"
               />
             </div>
 
-            <div className="space-y-2">
+            <div>
               <Label htmlFor="password">Senha</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Mínimo 6 caracteres"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                placeholder="Mínimo 6 caracteres"
               />
             </div>
 
-            <div className="space-y-2">
+            <div>
               <Label htmlFor="confirmPassword">Confirmar Senha</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirme sua senha"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                placeholder="Digite a senha novamente"
               />
             </div>
 
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Criando conta...
-                </span>
-              ) : (
-                <>
-                  <span>Criar Conta</span>
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
+            <UserTypeSelector value={userType} onChange={setUserType} />
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Criando conta..." : "Criar Conta"}
             </Button>
           </form>
-        </CardContent>
-        <CardFooter>
-          <div className="text-center text-sm text-muted-foreground w-full">
-            Já tem uma conta?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Fazer login
-            </Link>
+
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              Já tem uma conta?{" "}
+              <Link href="/login" className="text-blue-600 hover:underline">
+                Fazer login
+              </Link>
+            </p>
           </div>
-        </CardFooter>
+        </CardContent>
       </Card>
     </div>
   )

@@ -1,12 +1,10 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import type { Database } from "@/types/database"
+import { createClient } from "@/utils/supabase/client"
 
-// Singleton para evitar múltiplas instâncias
-let supabaseClient: ReturnType<typeof createClientComponentClient<Database>> | null = null
+let supabaseInstance: ReturnType<typeof createClient> | null = null
 
 export function getSupabaseClient() {
-  if (!supabaseClient) {
-    supabaseClient = createClientComponentClient<Database>()
+  if (!supabaseInstance) {
+    supabaseInstance = createClient()
   }
-  return supabaseClient
+  return supabaseInstance
 }
