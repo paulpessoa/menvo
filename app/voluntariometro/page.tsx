@@ -1,191 +1,32 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import {
-  Search,
-  ArrowUpDown,
-  Clock,
-  Activity,
-  TrendingUp,
-  Users,
-  Download,
-  CheckCircle,
-  XCircle,
-  BarChart3,
-  Eye,
-  EyeOff,
-} from "lucide-react"
+import { useMemo } from "react"
+import { Activity, TrendingUp, Users, Clock, BarChart3 } from "lucide-react"
 
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
-import { useAuth } from "@/hooks/useAuth"
-import { useVolunteerActivities, useVolunteerStats, useValidateActivity } from "@/hooks/api/use-volunteer-activities"
+import { useVolunteerStats } from "@/hooks/api/use-volunteer-activities"
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82ca9d", "#ffc658"]
 
 export default function VoluntariometroPage() {
-  const { user } = useAuth()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [sortBy, setSortBy] = useState<"date" | "hours" | "name">("date")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
-  const [validationNotes, setValidationNotes] = useState("")
-  const [selectedActivity, setSelectedActivity] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState("public")
+  const { data: stats, isLoading } = useVolunteerStats()
 
-  const isAdminOrModerator = user?.role === "admin" || user?.role === "moderator"
-  const isVolunteer = user?.volunteer_role === true || user?.role === "volunteer"
+  const chartData = useMemo(() => {
+    if (!stats) return { monthlyData: [], typeData: [] }
 
-  // Determine which data to fetch based on tab and user role
-  const shouldFetchAll = activeTab === "admin" && isAdminOrModerator
-  const shouldFetchOwn = activeTab === "personal" && isVolunteer
+    // Prepare monthly data for chart
+    const monthlyData = stats.monthly_stats.slice(-6) // Last 6 months
 
-  const {
-    data: activities,
-    isLoading,
-    refetch,
-  } = useVolunteerActivities({
-    search: searchTerm,
-    // status: statusFilter === "all" ? undefined : statusFilter,
-    sortBy,
-    sortOrder,
-    // userOnly: shouldFetchOwn,
-  })
+    // Prepare activity type data for pie chart
+    const typeData = stats.activities_by_type.map((item, index) => ({
+      ...item,
+      fill: COLORS[index % COLORS.length],
+    }))
 
-  const { data: stats } = useVolunteerStats()
-  const validateActivity = useValidateActivity()
-
-  // Chart data for public view (only validated activities)
-  const publicChartData = useMemo(() => {
-    if (!activities) return { monthly: [], byType: [], statusData: [] }
-
-    const validatedActivities = activities.filter((activity: any) => activity.status === "validated")
-
-    // Monthly data
-    const monthlyData = validatedActivities.reduce((acc: any, activity: any) => {
-      const month = format(new Date(activity.date), "MMM yyyy", { locale: ptBR })
-      const existing = acc.find((item: any) => item.month === month)
-      if (existing) {
-        existing.hours += Number.parseFloat(activity.hours)
-        existing.activities += 1
-      } else {
-        acc.push({ month, hours: Number.parseFloat(activity.hours), activities: 1 })
-      }
-      return acc
-    }, [])
-
-    // By type data
-    const byTypeData = validatedActivities.reduce((acc: any, activity: any) => {
-      const existing = acc.find((item: any) => item.type === activity.activity_type)
-      if (existing) {
-        existing.hours += Number.parseFloat(activity.hours)
-        existing.count += 1
-      } else {
-        acc.push({ type: activity.activity_type, hours: Number.parseFloat(activity.hours), count: 1 })
-      }
-      return acc
-    }, [])
-
-    return { monthly: monthlyData, byType: byTypeData, statusData: [] }
-  }, [activities])
-
-  // Chart data for admin view (all activities)
-  const adminChartData = useMemo(() => {
-    if (!activities) return { monthly: [], byType: [], statusData: [] }
-
-    // Monthly data
-    const monthlyData = activities.reduce((acc: any, activity: any) => {
-      const month = format(new Date(activity.date), "MMM yyyy", { locale: ptBR })
-      const existing = acc.find((item: any) => item.month === month)
-      if (existing) {
-        existing.hours += Number.parseFloat(activity.hours)
-        existing.activities += 1
-      } else {
-        acc.push({ month, hours: Number.parseFloat(activity.hours), activities: 1 })
-      }
-      return acc
-    }, [])
-
-    // By type data
-    const byTypeData = activities.reduce((acc: any, activity: any) => {
-      const existing = acc.find((item: any) => item.type === activity.activity_type)
-      if (existing) {
-        existing.hours += Number.parseFloat(activity.hours)
-        existing.count += 1
-      } else {
-        acc.push({ type: activity.activity_type, hours: Number.parseFloat(activity.hours), count: 1 })
-      }
-      return acc
-    }, [])
-
-    // Status data
-    const statusData = activities.reduce((acc: any, activity: any) => {
-      const existing = acc.find((item: any) => item.status === activity.status)
-      if (existing) {
-        existing.count += 1
-      } else {
-        acc.push({ status: activity.status, count: 1 })
-      }
-      return acc
-    }, [])
-
-    return { monthly: monthlyData, byType: byTypeData, statusData }
-  }, [activities])
-
-  const handleValidation = async (activityId: string, status: "validated" | "rejected") => {
-    try {
-      await validateActivity.mutateAsync({
-        activityId,
-        status,
-        notes: validationNotes,
-      })
-      setValidationNotes("")
-      setSelectedActivity(null)
-      refetch()
-    } catch (error) {
-      console.error("Erro ao validar atividade:", error)
-    }
-  }
-
-  const exportToCSV = () => {
-    if (!activities) return
-
-    const csvContent = [
-      ["Nome", "Email", "Data", "Horas", "Atividade", "Descrição", "Status", "Validado por", "Data de Validação"].join(
-        ",",
-      ),
-      ...activities.map((activity: any) =>
-        [
-          activity.profiles?.first_name + " " + activity.profiles?.last_name,
-          activity.profiles?.email,
-          format(new Date(activity.date), "dd/MM/yyyy"),
-          activity.hours,
-          activity.activity_type,
-          activity.description || "",
-          activity.status,
-          activity.validator?.first_name + " " + activity.validator?.last_name || "",
-          activity.validated_at ? format(new Date(activity.validated_at), "dd/MM/yyyy HH:mm") : "",
-        ].join(","),
-      ),
-    ].join("\n")
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const link = document.createElement("a")
-    link.href = URL.createObjectURL(blob)
-    link.download = `voluntariado_${format(new Date(), "yyyy-MM-dd")}.csv`
-    link.click()
-  }
+    return { monthlyData, typeData }
+  }, [stats])
 
   if (isLoading) {
     return (
@@ -197,31 +38,194 @@ export default function VoluntariometroPage() {
     )
   }
 
-  const [testResponse, setTestResponse] = useState<any>(null)
-
-  const handleTestBackendQuery = async () => {
-    try {
-      const res = await fetch("/api/volunteer-activities")
-      const data = await res.json()
-      setTestResponse(data)
-    } catch (error) {
-      setTestResponse({ error: "Failed to fetch from backend" })
-    }
+  if (!stats) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="text-center">
+          <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Dados não disponíveis</h3>
+          <p className="text-muted-foreground">Não foi possível carregar as estatísticas de voluntariado.</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-4">Debug Voluntariômetro</h1>
-      <Button onClick={handleTestBackendQuery} className="mb-4">
-        Test Backend Query
-      </Button>
-      <pre className="bg-gray-100 p-4 rounded text-xs overflow-x-auto mb-4">
-        {JSON.stringify(activities, null, 2)}
-      </pre>
-      <h2 className="text-lg font-semibold mb-2">Test Query Response</h2>
-      <pre className="bg-gray-100 p-4 rounded text-xs overflow-x-auto">
-        {testResponse ? JSON.stringify(testResponse, null, 2) : "No test query run yet."}
-      </pre>
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Voluntariômetro</h1>
+          <p className="text-muted-foreground text-lg">
+            Acompanhe o impacto das atividades de voluntariado em nossa comunidade
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total de Atividades</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total_activities}</div>
+              <p className="text-xs text-muted-foreground">atividades validadas</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Voluntários Ativos</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total_volunteers}</div>
+              <p className="text-xs text-muted-foreground">pessoas contribuindo</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Horas Totais</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total_hours}h</div>
+              <p className="text-xs text-muted-foreground">tempo dedicado</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Média por Atividade</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {stats.total_activities > 0 ? (stats.total_hours / stats.total_activities).toFixed(1) : 0}h
+              </div>
+              <p className="text-xs text-muted-foreground">horas por atividade</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Monthly Activities Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Atividades por Mês
+              </CardTitle>
+              <CardDescription>Evolução das atividades nos últimos meses</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  activities: {
+                    label: "Atividades",
+                    color: "hsl(var(--chart-1))",
+                  },
+                }}
+                className="h-[300px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData.monthlyData}>
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => value.split(" ")[0]} // Show only month name
+                    />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="activities" fill="var(--color-activities)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Activity Types Pie Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Tipos de Atividades
+              </CardTitle>
+              <CardDescription>Distribuição por categoria</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={{}} className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData.typeData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ activity_type, percent }) => `${activity_type}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="count"
+                    >
+                      {chartData.typeData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload
+                          return (
+                            <div className="bg-background border rounded-lg p-2 shadow-md">
+                              <p className="font-medium">{data.activity_type}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {data.count} atividades ({data.total_hours}h)
+                              </p>
+                            </div>
+                          )
+                        }
+                        return null
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Activity Types Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Detalhamento por Tipo de Atividade</CardTitle>
+            <CardDescription>Estatísticas detalhadas de cada categoria</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats.activities_by_type.map((type, index) => (
+                <div key={type.activity_type} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                    <div>
+                      <h4 className="font-medium">{type.activity_type}</h4>
+                      <p className="text-sm text-muted-foreground">{type.count} atividades</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">{type.total_hours}h</div>
+                    <div className="text-sm text-muted-foreground">
+                      {(type.total_hours / type.count).toFixed(1)}h média
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

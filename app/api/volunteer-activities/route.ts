@@ -11,54 +11,45 @@ export async function GET(request: NextRequest) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    if (authError) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    // Get user profile to check role
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user?.id).single()
 
     // Parse query parameters
-    const userId = searchParams.get("user_id")
     const status = searchParams.get("status")
-    const type = searchParams.get("type")
-    const page = Number.parseInt(searchParams.get("page") || "1")
-    const limit = Number.parseInt(searchParams.get("limit") || "10")
-    const offset = (page - 1) * limit
+    const userOnly = searchParams.get("user_only") === "true"
 
     let query = supabase
       .from("volunteer_activities")
       .select(`
         *,
-        activity_type:volunteer_activity_types(name, icon, color),
         user:profiles(full_name, avatar_url),
         validator:profiles!volunteer_activities_validated_by_fkey(full_name)
       `)
       .order("created_at", { ascending: false })
 
-    // Apply filters based on user role and permissions
-    if (profile?.role === "admin") {
-      // Admins can see all activities
-      if (userId) query = query.eq("user_id", userId)
-      if (status) query = query.eq("status", status)
+    // Apply filters
+    if (status) {
+      query = query.eq("status", status)
+    }
+
+    // If user_only is true, only show user's own activities (requires auth)
+    if (userOnly) {
+      if (authError || !user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
+      query = query.eq("user_id", user.id)
     } else {
-      // Regular users can only see their own activities or validated public ones
-      if (userId && userId === user?.id) {
-        // User viewing their own activities
-        query = query.eq("user_id", user?.id)
-      } else {
-        // Public view - only validated activities
+      // For public access, only show validated activities
+      if (!user) {
         query = query.eq("status", "validated")
-        if (userId) query = query.eq("user_id", userId)
+      } else {
+        // For authenticated users, check their role
+        const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
+
+        // Only admins and moderators can see all activities
+        if (profile?.role !== "admin" && profile?.role !== "moderator") {
+          query = query.eq("status", "validated")
+        }
       }
     }
-
-    if (type) {
-      query = query.eq("activity_type.name", type)
-    }
-
-    // Apply pagination
-    query = query.range(offset, offset + limit - 1)
 
     const { data: activities, error } = await query
 
@@ -67,32 +58,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Failed to fetch activities" }, { status: 500 })
     }
 
-    // Get total count for pagination
-    let countQuery = supabase.from("volunteer_activities").select("*", { count: "exact", head: true })
-
-    if (profile?.role !== "admin") {
-      if (userId && userId === user?.id) {
-        countQuery = countQuery.eq("user_id", user?.id)
-      } else {
-        countQuery = countQuery.eq("status", "validated")
-        if (userId) countQuery = countQuery.eq("user_id", userId)
-      }
-    } else {
-      if (userId) countQuery = countQuery.eq("user_id", userId)
-      if (status) countQuery = countQuery.eq("status", status)
-    }
-
-    const { count } = await countQuery
-
-    return NextResponse.json({
-      activities,
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit),
-      },
-    })
+    return NextResponse.json({ activities })
   } catch (error) {
     console.error("Error in volunteer activities API:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -108,18 +74,19 @@ export async function POST(request: NextRequest) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
+
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const body = await request.json()
-    const { activity_type_id, title, description, hours, date, location, organization, evidence_url } = body
+    const { title, activity_type, description, hours, date } = body
 
     // Validate required fields
-    if (!title || !hours || !date) {
+    if (!title || !activity_type || !hours || !date) {
       return NextResponse.json(
         {
-          error: "Missing required fields: title, hours, date",
+          error: "Missing required fields: title, activity_type, hours, date",
         },
         { status: 400 },
       )
@@ -140,14 +107,11 @@ export async function POST(request: NextRequest) {
       .from("volunteer_activities")
       .insert({
         user_id: user.id,
-        activity_type_id,
         title,
+        activity_type,
         description,
         hours: Number.parseFloat(hours),
         date,
-        location,
-        organization,
-        evidence_url,
         status: "pending",
       })
       .select("*")

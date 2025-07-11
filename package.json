@@ -16,7 +16,7 @@
   "dependencies": {
     "@googlemaps/js-api-loader": "latest",
     "@hookform/resolvers": "latest",
-    "@next/third-parties": "^15.3.4",
+    "@next/third-parties": "latest",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",

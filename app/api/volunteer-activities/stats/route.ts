@@ -1,115 +1,67 @@
 import { createClient } from "@/utils/supabase/server"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient()
-    const { searchParams } = new URL(request.url)
 
-    // Get current user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-    if (authError) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Get only validated activities for public stats
+    const { data: activities, error } = await supabase
+      .from("volunteer_activities")
+      .select("*")
+      .eq("status", "validated")
+
+    if (error) {
+      console.error("Error fetching activities for stats:", error)
+      return NextResponse.json({ error: "Failed to fetch statistics" }, { status: 500 })
     }
 
-    // Get user profile to check role
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user!.id).single()
+    // Calculate statistics
+    const totalActivities = activities.length
+    const totalHours = activities.reduce((sum, activity) => sum + activity.hours, 0)
 
-    const userId = searchParams.get("user_id")
-    const isAdmin = profile?.role === "admin"
-    const isPersonalView = userId === user!.id
+    // Get unique volunteers count
+    const uniqueVolunteers = new Set(activities.map((activity) => activity.user_id)).size
 
-    // Build base query
-    let baseQuery = supabase.from("volunteer_activities").select("*")
-
-    if (!isAdmin) {
-      if (isPersonalView) {
-        baseQuery = baseQuery.eq("user_id", user!.id)
-      } else {
-        baseQuery = baseQuery.eq("status", "validated")
-        if (userId) {
-          baseQuery = baseQuery.eq("user_id", userId)
-        }
+    // Group by activity type
+    const activitiesByType = activities.reduce((acc: any, activity) => {
+      const type = activity.activity_type
+      if (!acc[type]) {
+        acc[type] = { activity_type: type, count: 0, total_hours: 0 }
       }
-    } else if (userId) {
-      baseQuery = baseQuery.eq("user_id", userId)
-    }
-
-    const { data: allActivities, error: activitiesError } = await baseQuery
-
-    if (activitiesError) {
-      console.error("Error fetching activities:", activitiesError)
-      return NextResponse.json({ error: "Failed to fetch activities" }, { status: 500 })
-    }
-
-    // Calculate stats from the data
-    const totalActivities = allActivities?.length || 0
-    const totalHours = allActivities?.reduce((sum, activity) => sum + Number(activity.hours), 0) || 0
-    const validatedActivities = allActivities?.filter(activity => activity.status === "validated").length || 0
-    const pendingActivities = allActivities?.filter(activity => activity.status === "pending").length || 0
-    const rejectedActivities = allActivities?.filter(activity => activity.status === "rejected").length || 0
-
-    // Calculate last 30 days stats
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    const activitiesLast30Days = allActivities?.filter(activity => new Date(activity.date) >= thirtyDaysAgo).length || 0
-    const hoursLast30Days = allActivities
-      ?.filter(activity => new Date(activity.date) >= thirtyDaysAgo)
-      .reduce((sum, activity) => sum + Number(activity.hours), 0) || 0
-
-    // Calculate last 7 days stats
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-    const activitiesLast7Days = allActivities?.filter(activity => new Date(activity.date) >= sevenDaysAgo).length || 0
-    const hoursLast7Days = allActivities
-      ?.filter(activity => new Date(activity.date) >= sevenDaysAgo)
-      .reduce((sum, activity) => sum + Number(activity.hours), 0) || 0
-
-    // Get activities by type
-    const activitiesByType = allActivities?.reduce((acc, activity) => {
-      const type = activity.title || "Outro"
-      const existing = acc.find((item: any) => item.type === type)
-      if (existing) {
-        existing.hours += Number(activity.hours)
-        existing.count += 1
-      } else {
-        acc.push({ type, hours: Number(activity.hours), count: 1 })
-      }
+      acc[type].count += 1
+      acc[type].total_hours += activity.hours
       return acc
-    }, [] as any[]) || []
+    }, {})
 
-    // Get hours by status
-    const hoursByStatus = allActivities?.reduce((acc, activity) => {
-      const existing = acc.find((item: any) => item.status === activity.status)
-      if (existing) {
-        existing.total_hours += Number(activity.hours)
-        existing.count += 1
-      } else {
-        acc.push({ status: activity.status, total_hours: Number(activity.hours), count: 1 })
+    // Group by month
+    const monthlyStats = activities.reduce((acc: any, activity) => {
+      const date = new Date(activity.date)
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+      const monthName = date.toLocaleDateString("pt-BR", { year: "numeric", month: "long" })
+
+      if (!acc[monthKey]) {
+        acc[monthKey] = { month: monthName, activities: 0, hours: 0 }
       }
+      acc[monthKey].activities += 1
+      acc[monthKey].hours += activity.hours
       return acc
-    }, [] as any[]) || []
+    }, {})
 
-    return NextResponse.json({
+    const stats = {
       total_activities: totalActivities,
-      total_volunteers: new Set(allActivities?.map(a => a.user_id) || []).size,
-      total_hours: totalHours,
-      avg_hours_per_activity: totalActivities > 0 ? totalHours / totalActivities : 0,
-      validated_activities: validatedActivities,
-      pending_activities: pendingActivities,
-      rejected_activities: rejectedActivities,
-      activities_last_30_days: activitiesLast30Days,
-      hours_last_30_days: hoursLast30Days,
-      activities_last_7_days: activitiesLast7Days,
-      hours_last_7_days: hoursLast7Days,
-      activities_by_type: activitiesByType,
-      hours_by_status: hoursByStatus,
-    })
+      total_volunteers: uniqueVolunteers,
+      total_hours: Math.round(totalHours * 10) / 10,
+      validated_activities: totalActivities,
+      pending_activities: 0, // Not shown in public stats
+      rejected_activities: 0, // Not shown in public stats
+      activities_by_type: Object.values(activitiesByType),
+      monthly_stats: Object.values(monthlyStats).sort((a: any, b: any) => a.month.localeCompare(b.month)),
+    }
+
+    return NextResponse.json(stats)
   } catch (error) {
-    console.error("Error in volunteer activities stats API:", error)
+    console.error("Error in volunteer stats API:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

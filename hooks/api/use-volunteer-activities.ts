@@ -4,70 +4,48 @@ import { toast } from "sonner"
 export interface VolunteerActivity {
   id: string
   user_id: string
-  date: string
-  hours: number
+  title: string
   activity_type: string
   description?: string
-  location?: string
+  hours: number
+  date: string
   status: "pending" | "validated" | "rejected"
   validated_by?: string
   validated_at?: string
   validation_notes?: string
   created_at: string
   updated_at: string
-  profiles?: {
-    first_name: string
-    last_name: string
-    email: string
+  user?: {
+    full_name: string
     avatar_url?: string
   }
   validator?: {
-    first_name: string
-    last_name: string
+    full_name: string
   }
-}
-
-export interface VolunteerActivityType {
-  id: string
-  name: string
-  description?: string
-  is_active: boolean
 }
 
 export interface VolunteerStats {
   total_activities: number
   total_volunteers: number
   total_hours: number
-  avg_hours_per_activity: number
   validated_activities: number
   pending_activities: number
   rejected_activities: number
-  activities_last_30_days: number
-  hours_last_30_days: number
-  activities_last_7_days: number
-  hours_last_7_days: number
+  activities_by_type: Array<{
+    activity_type: string
+    count: number
+    total_hours: number
+  }>
+  monthly_stats: Array<{
+    month: string
+    activities: number
+    hours: number
+  }>
 }
 
 interface VolunteerActivitiesFilters {
-  search?: string
   status?: "pending" | "validated" | "rejected"
-  sortBy?: "date" | "hours" | "name"
-  sortOrder?: "asc" | "desc"
-  userOnly?: boolean
-}
-
-// Get volunteer activity types
-export const useVolunteerActivityTypes = () => {
-  return useQuery({
-    queryKey: ["volunteer-activity-types"],
-    queryFn: async (): Promise<VolunteerActivityType[]> => {
-      const response = await fetch("/api/volunteer-activities/types")
-      if (!response.ok) {
-        throw new Error("Erro ao buscar tipos de atividades")
-      }
-      return response.json()
-    },
-  })
+  user_only?: boolean
 }
 
 // Get volunteer activities
@@ -77,22 +55,21 @@ export const useVolunteerActivities = (filters: VolunteerActivitiesFilters = {})
     queryFn: async (): Promise<VolunteerActivity[]> => {
       const params = new URLSearchParams()
 
-      if (filters.search) params.append("search", filters.search)
       if (filters.status) params.append("status", filters.status)
-      if (filters.sortBy) params.append("sortBy", filters.sortBy)
-      if (filters.sortOrder) params.append("sortOrder", filters.sortOrder)
-      if (filters.userOnly) params.append("userOnly", "true")
+      if (filters.user_only) params.append("user_only", "true")
 
       const response = await fetch(`/api/volunteer-activities?${params.toString()}`)
       if (!response.ok) {
         throw new Error("Erro ao buscar atividades de voluntariado")
       }
-      return response.json()
+
+      const data = await response.json()
+      return data.activities || data
     },
   })
 }
 
-// Get volunteer statistics
+// Get volunteer statistics (public)
 export const useVolunteerStats = () => {
   return useQuery({
     queryKey: ["volunteer-stats"],
@@ -112,37 +89,18 @@ export const useCreateVolunteerActivity = () => {
 
   return useMutation({
     mutationFn: async (data: {
-      date: string
-      hours: number
+      title: string
       activity_type: string
       description?: string
-      location?: string
+      hours: number
+      date: string
     }) => {
-      // First, get the activity type ID
-      const typeResponse = await fetch("/api/volunteer-activities/types")
-      if (!typeResponse.ok) {
-        throw new Error("Erro ao buscar tipos de atividades")
-      }
-      const types = await typeResponse.json()
-      const activityType = types.find((type: any) => type.name === data.activity_type)
-      
-      if (!activityType) {
-        throw new Error("Tipo de atividade não encontrado")
-      }
-
       const response = await fetch("/api/volunteer-activities", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          activity_type_id: activityType.id,
-          title: data.activity_type,
-          description: data.description,
-          hours: data.hours,
-          date: data.date,
-          location: data.location,
-        }),
+        body: JSON.stringify(data),
       })
 
       if (!response.ok) {
