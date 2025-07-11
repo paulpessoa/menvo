@@ -58,6 +58,7 @@
     "cmdk": "latest",
     "date-fns": "latest",
     "embla-carousel-react": "latest",
+    "googlemaps": "latest",
     "i18next": "latest",
     "input-otp": "latest",
     "jwt-decode": "latest",

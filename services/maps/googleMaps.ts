@@ -1,57 +1,11 @@
-import { Loader } from '@googlemaps/js-api-loader';
+import { Loader } from "@googlemaps/js-api-loader"
+import * as google from "googlemaps"
 
 const loader = new Loader({
   apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
   version: "weekly",
-  libraries: ["places"]
-});
-
-export const googleMaps = {
-  init: async () => {
-    try {
-      await loader.load();
-      return window.google;
-    } catch (error) {
-      console.error('Error loading Google Maps:', error);
-      throw error;
-    }
-  },
-
-  getGeocode: async (address: string) => {
-    const google = await googleMaps.init();
-    const geocoder = new google.maps.Geocoder();
-    
-    return new Promise((resolve, reject) => {
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK) {
-          resolve(results[0]);
-        } else {
-          reject(status);
-        }
-      });
-    });
-  },
-
-  getPlaceDetails: async (placeId: string) => {
-    const google = await googleMaps.init();
-    const placesService = new google.maps.places.PlacesService(document.createElement('div'));
-    
-    return new Promise((resolve, reject) => {
-      placesService.getDetails(
-        { placeId },
-        (result, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK) {
-            resolve(result);
-          } else {
-            reject(status);
-          }
-        }
-      );
-    });
-  }
-};
-
-
+  libraries: ["places"],
+})
 
 export interface Location {
   lat: number
@@ -75,6 +29,11 @@ export interface GeocodeResult {
   }
   place_id: string
   types: string[]
+  address_components: Array<{
+    long_name: string
+    short_name: string
+    types: string[]
+  }>
 }
 
 export class GoogleMapsService {
@@ -138,6 +97,11 @@ export class GoogleMapsService {
             },
             place_id: result.place_id,
             types: result.types,
+            address_components: result.address_components.map((component) => ({
+              long_name: component.long_name,
+              short_name: component.short_name,
+              types: component.types,
+            })),
           }))
           resolve(formattedResults)
         } else {
@@ -167,6 +131,11 @@ export class GoogleMapsService {
             },
             place_id: result.place_id,
             types: result.types,
+            address_components: result.address_components.map((component) => ({
+              long_name: component.long_name,
+              short_name: component.short_name,
+              types: component.types,
+            })),
           }))
           resolve(formattedResults)
         } else {
@@ -254,6 +223,48 @@ export class GoogleMapsService {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c
+  }
+
+  // Extrair componentes do endereço
+  static extractAddressComponents(result: GeocodeResult) {
+    const components = result.address_components
+    const extracted = {
+      street_number: "",
+      route: "",
+      neighborhood: "",
+      city: "",
+      state: "",
+      country: "",
+      postal_code: "",
+    }
+
+    components.forEach((component) => {
+      const types = component.types
+
+      if (types.includes("street_number")) {
+        extracted.street_number = component.long_name
+      }
+      if (types.includes("route")) {
+        extracted.route = component.long_name
+      }
+      if (types.includes("sublocality") || types.includes("neighborhood")) {
+        extracted.neighborhood = component.long_name
+      }
+      if (types.includes("locality") || types.includes("administrative_area_level_2")) {
+        extracted.city = component.long_name
+      }
+      if (types.includes("administrative_area_level_1")) {
+        extracted.state = component.long_name
+      }
+      if (types.includes("country")) {
+        extracted.country = component.long_name
+      }
+      if (types.includes("postal_code")) {
+        extracted.postal_code = component.long_name
+      }
+    })
+
+    return extracted
   }
 
   private static toRadians(degrees: number): number {
