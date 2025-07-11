@@ -132,4 +132,4 @@ export const newsletterService = {
       conversion_rate: totalCount > 0 ? Math.round((activeCount / totalCount) * 100) : 0
     }
   }
-} 
+}

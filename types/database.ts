@@ -1,8 +1,25 @@
-export type UserRole = "mentee" | "mentor" | "admin"
+export type UserRole = "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
 export type UserStatus = "pending" | "active" | "suspended" | "rejected"
-export type MentorStatus = "pending_verification" | "verification_scheduled" | "verified" | "rejected" | "suspended"
 export type SessionStatus = "scheduled" | "completed" | "cancelled" | "no_show"
-export type VerificationStatus = "pending" | "scheduled" | "completed" | "rejected"
+export type ValidationStatus = "pending" | "validated" | "rejected" | "suspended"
+export type NotificationType =
+  | "session_reminder"
+  | "session_cancelled"
+  | "new_message"
+  | "profile_verified"
+  | "activity_validated"
+  | "system_update"
+export type AppPermission =
+  | "view_mentors"
+  | "book_sessions"
+  | "provide_mentorship"
+  | "manage_availability"
+  | "admin_users"
+  | "admin_verifications"
+  | "admin_system"
+  | "validate_activities"
+  | "moderate_content"
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
   public: {
@@ -11,207 +28,135 @@ export interface Database {
         Row: {
           id: string
           email: string
-          first_name: string
-          last_name: string
-          full_name: string
+          first_name: string | null
+          last_name: string | null
+          full_name: string | null
           avatar_url: string | null
           bio: string | null
           location: string | null
-          languages: string[]
-          role: UserRole
-          status: UserStatus
+          user_role: Database["public"]["Enums"]["user_role"]
+          verification_status: Database["public"]["Enums"]["verification_status"]
           created_at: string
           updated_at: string
-          last_login: string | null
         }
         Insert: {
           id: string
           email: string
-          first_name: string
-          last_name: string
-          full_name: string
+          first_name?: string | null
+          last_name?: string | null
+          full_name?: string | null
           avatar_url?: string | null
           bio?: string | null
           location?: string | null
-          languages?: string[]
-          role: UserRole
-          status?: UserStatus
+          user_role?: Database["public"]["Enums"]["user_role"]
+          verification_status?: Database["public"]["Enums"]["verification_status"]
           created_at?: string
           updated_at?: string
-          last_login?: string | null
         }
         Update: {
           id?: string
           email?: string
-          first_name?: string
-          last_name?: string
-          full_name?: string
+          first_name?: string | null
+          last_name?: string | null
+          full_name?: string | null
           avatar_url?: string | null
           bio?: string | null
           location?: string | null
-          languages?: string[]
+          user_role?: Database["public"]["Enums"]["user_role"]
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      role_permissions: {
+        Row: {
+          id: number
+          role: UserRole
+          permission: AppPermission
+        }
+        Insert: {
+          role: UserRole
+          permission: AppPermission
+        }
+        Update: {
           role?: UserRole
-          status?: UserStatus
-          updated_at?: string
-          last_login?: string | null
+          permission?: AppPermission
         }
       }
-      mentors: {
+      volunteer_activity_types: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          icon: string | null
+          color: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          icon?: string | null
+          color?: string | null
+          created_at?: string
+        }
+        Update: {
+          name?: string
+          description?: string | null
+          icon?: string | null
+          color?: string | null
+        }
+      }
+      volunteer_activities: {
         Row: {
           id: string
           user_id: string
+          activity_type_id: string | null
           title: string
-          company: string | null
-          experience_years: number
-          expertise_areas: string[]
-          topics: string[]
-          inclusion_tags: string[]
-          linkedin_url: string | null
-          portfolio_url: string | null
-          academic_background: string | null
-          current_work: string | null
-          areas_of_interest: string | null
-          session_duration: number
-          timezone: string
-          status: MentorStatus
-          verification_notes: string | null
-          verified_at: string | null
-          verified_by: string | null
-          rating: number
-          total_sessions: number
-          total_reviews: number
-          is_available: boolean
+          description: string | null
+          hours: number
+          date: string
+          location: string | null
+          organization: string | null
+          evidence_url: string | null
+          status: ValidationStatus
+          validated_by: string | null
+          validated_at: string | null
+          validation_notes: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
+          activity_type_id?: string | null
           title: string
-          company?: string | null
-          experience_years: number
-          expertise_areas: string[]
-          topics: string[]
-          inclusion_tags?: string[]
-          linkedin_url?: string | null
-          portfolio_url?: string | null
-          academic_background?: string | null
-          current_work?: string | null
-          areas_of_interest?: string | null
-          session_duration?: number
-          timezone: string
-          status?: MentorStatus
-          verification_notes?: string | null
-          verified_at?: string | null
-          verified_by?: string | null
-          rating?: number
-          total_sessions?: number
-          total_reviews?: number
-          is_available?: boolean
+          description?: string | null
+          hours: number
+          date: string
+          location?: string | null
+          organization?: string | null
+          evidence_url?: string | null
+          status?: ValidationStatus
+          validated_by?: string | null
+          validated_at?: string | null
+          validation_notes?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
+          activity_type_id?: string | null
           title?: string
-          company?: string | null
-          experience_years?: number
-          expertise_areas?: string[]
-          topics?: string[]
-          inclusion_tags?: string[]
-          linkedin_url?: string | null
-          portfolio_url?: string | null
-          academic_background?: string | null
-          current_work?: string | null
-          areas_of_interest?: string | null
-          session_duration?: number
-          timezone?: string
-          status?: MentorStatus
-          verification_notes?: string | null
-          verified_at?: string | null
-          verified_by?: string | null
-          rating?: number
-          total_sessions?: number
-          total_reviews?: number
-          is_available?: boolean
-          updated_at?: string
-        }
-      }
-      mentor_verification: {
-        Row: {
-          id: string
-          mentor_id: string
-          verification_type: "initial" | "renewal"
-          status: VerificationStatus
-          scheduled_at: string | null
-          completed_at: string | null
-          verified_by: string | null
-          notes: string | null
-          documents_submitted: boolean
-          identity_verified: boolean
-          expertise_verified: boolean
-          background_check: boolean
-          rejection_reason: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          mentor_id: string
-          verification_type: "initial" | "renewal"
-          status?: VerificationStatus
-          scheduled_at?: string | null
-          completed_at?: string | null
-          verified_by?: string | null
-          notes?: string | null
-          documents_submitted?: boolean
-          identity_verified?: boolean
-          expertise_verified?: boolean
-          background_check?: boolean
-          rejection_reason?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          verification_type?: "initial" | "renewal"
-          status?: VerificationStatus
-          scheduled_at?: string | null
-          completed_at?: string | null
-          verified_by?: string | null
-          notes?: string | null
-          documents_submitted?: boolean
-          identity_verified?: boolean
-          expertise_verified?: boolean
-          background_check?: boolean
-          rejection_reason?: string | null
-          updated_at?: string
-        }
-      }
-      mentor_availability: {
-        Row: {
-          id: string
-          mentor_id: string
-          day_of_week: number // 0-6 (Sunday-Saturday)
-          start_time: string // HH:MM format
-          end_time: string // HH:MM format
-          is_available: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          mentor_id: string
-          day_of_week: number
-          start_time: string
-          end_time: string
-          is_available?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          day_of_week?: number
-          start_time?: string
-          end_time?: string
-          is_available?: boolean
+          description?: string | null
+          hours?: number
+          date?: string
+          location?: string | null
+          organization?: string | null
+          evidence_url?: string | null
+          status?: ValidationStatus
+          validated_by?: string | null
+          validated_at?: string | null
+          validation_notes?: string | null
           updated_at?: string
         }
       }
@@ -239,7 +184,7 @@ export interface Database {
           mentor_id: string
           mentee_id: string
           scheduled_at: string
-          duration: number
+          duration?: number
           status?: SessionStatus
           topics: string[]
           mentee_notes?: string | null
@@ -267,89 +212,90 @@ export interface Database {
           updated_at?: string
         }
       }
-      reviews: {
+      notifications: {
         Row: {
           id: string
-          session_id: string
-          reviewer_id: string
-          reviewed_id: string
-          rating: number
-          comment: string | null
-          is_public: boolean
+          user_id: string
+          type: NotificationType
+          title: string
+          message: string
+          data: Record<string, any> | null
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: NotificationType
+          title: string
+          message: string
+          data?: Record<string, any> | null
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          read_at?: string | null
+        }
+      }
+      mentor_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          current_position: string | null
+          current_company: string | null
+          years_experience: number | null
+          education_level: string | null
+          languages: string[] | null
+          mentor_skills: string[] | null
+          availability: Database["public"]["Enums"]["availability_status"]
+          rating: number | null
+          total_sessions: number | null
+          verified_at: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          session_id: string
-          reviewer_id: string
-          reviewed_id: string
-          rating: number
-          comment?: string | null
-          is_public?: boolean
+          user_id: string
+          current_position?: string | null
+          current_company?: string | null
+          years_experience?: number | null
+          education_level?: string | null
+          languages?: string[] | null
+          mentor_skills?: string[] | null
+          availability?: Database["public"]["Enums"]["availability_status"]
+          rating?: number | null
+          total_sessions?: number | null
+          verified_at?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
-          rating?: number
-          comment?: string | null
-          is_public?: boolean
-          updated_at?: string
-        }
-      }
-      admin_actions: {
-        Row: {
-          id: string
-          admin_id: string
-          action_type: string
-          target_type: "user" | "mentor" | "session" | "review"
-          target_id: string
-          details: Record<string, any>
-          reason: string | null
-          created_at: string
-        }
-        Insert: {
           id?: string
-          admin_id: string
-          action_type: string
-          target_type: "user" | "mentor" | "session" | "review"
-          target_id: string
-          details: Record<string, any>
-          reason?: string | null
+          user_id?: string
+          current_position?: string | null
+          current_company?: string | null
+          years_experience?: number | null
+          education_level?: string | null
+          languages?: string[] | null
+          mentor_skills?: string[] | null
+          availability?: Database["public"]["Enums"]["availability_status"]
+          rating?: number | null
+          total_sessions?: number | null
+          verified_at?: string | null
           created_at?: string
-        }
-        Update: {
-          admin_id?: string
-          action_type?: string
-          target_type?: "user" | "mentor" | "session" | "review"
-          target_id?: string
-          details?: Record<string, any>
-          reason?: string | null
+          updated_at?: string
         }
       }
     }
-    Views: {
-      verified_mentors: {
-        Row: {
-          id: string
-          user_id: string
-          full_name: string
-          avatar_url: string | null
-          bio: string | null
-          location: string | null
-          languages: string[]
-          title: string
-          company: string | null
-          experience_years: number
-          expertise_areas: string[]
-          topics: string[]
-          inclusion_tags: string[]
-          rating: number
-          total_sessions: number
-          total_reviews: number
-          is_available: boolean
-        }
-      }
+    Enums: {
+      user_role: "pending" | "mentee" | "mentor" | "admin"
+      verification_status: "pending" | "verified" | "rejected"
+      availability_status: "available" | "busy" | "unavailable"
+      session_status: SessionStatus
+      validation_status: ValidationStatus
+      notification_type: NotificationType
+      app_permission: AppPermission
     }
   }
 }

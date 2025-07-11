@@ -1,73 +1,60 @@
-// import { createClient } from '@/utils/supabase/client'
-// import { NextResponse } from 'next/server'
-// // The client you created from the Server-Side Auth instructions
-
-// export async function GET(request: Request) {
-//   const { searchParams, origin } = new URL(request.url)
-//   const code = searchParams.get('code')
-//   // if "next" is in param, use it as the redirect URL
-//   let next = searchParams.get('next') ?? '/'
-//   if (!next.startsWith('/')) {
-//     // if "next" is not a relative URL, use the default
-//     next = '/'
-//   }
-
-//   if (code) {
-//     const supabase = await createClient()
-//     const { error } = await supabase.auth.exchangeCodeForSession(code)
-//     if (!error) {
-//       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-//       const isLocalEnv = process.env.NODE_ENV === 'development'
-//       if (isLocalEnv) {
-//         // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-//         return NextResponse.redirect(`${origin}${next}`)
-//       } else if (forwardedHost) {
-//         return NextResponse.redirect(`https://${forwardedHost}${next}`)
-//       } else {
-//         return NextResponse.redirect(`${origin}${next}`)
-//       }
-//     }
-//   }
-
-//   // return the user to an error page with instructions
-//   return NextResponse.redirect(`${origin}/auth/auth-code-error`)
-// }
-
-
-
-
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get('code')
+  const code = requestUrl.searchParams.get("code")
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
-    await supabase.auth.exchangeCodeForSession(code)
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
-    // NOVO: atribuir role default "mentee" se não houver
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
+    try {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
-      if (!roles || roles.length === 0) {
-        await supabase.from('user_roles').insert({
-          user_id: user.id,
-          role_type: 'mentee',
-          is_primary: true,
-          status: 'active'
-        })
+      if (error) {
+        console.error("Error exchanging code for session:", error)
+        return NextResponse.redirect(new URL("/login?error=auth_error", request.url))
       }
+
+      // Check if user has a profile
+      if (data.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", data.user.id)
+          .single()
+
+        if (profileError || !profile) {
+          // Create profile if it doesn't exist
+          const { error: createError } = await supabase.from("profiles").insert({
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: data.user.user_metadata?.full_name || data.user.user_metadata?.name,
+            first_name: data.user.user_metadata?.given_name,
+            last_name: data.user.user_metadata?.family_name,
+            avatar_url: data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture,
+            role: "mentee", // Default role
+            status: "pending",
+            verification_status: "pending",
+          })
+
+          if (createError) {
+            console.error("Error creating profile:", createError)
+          }
+        }
+      }
+
+      // Redirect to dashboard or intended page
+      const redirectTo = requestUrl.searchParams.get("redirectTo") || "/dashboard"
+      return NextResponse.redirect(new URL(redirectTo, request.url))
+    } catch (error) {
+      console.error("Auth callback error:", error)
+      return NextResponse.redirect(new URL("/login?error=callback_error", request.url))
     }
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/', requestUrl.origin))
-} 
+  // No code provided, redirect to login
+  return NextResponse.redirect(new URL("/login", request.url))
+}

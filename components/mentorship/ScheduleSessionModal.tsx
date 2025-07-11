@@ -256,4 +256,4 @@ export function ScheduleSessionModal({
       </DialogContent>
     </Dialog>
   )
-} 
+}

@@ -21,4 +21,4 @@ export function useContributors() {
     queryFn: fetchContributors,
     staleTime: 1000 * 60 * 60, // 1 hour
   })
-} 
+}

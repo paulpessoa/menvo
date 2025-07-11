@@ -46,4 +46,4 @@ export async function PATCH(
     return NextResponse.json({ error: profileError.message }, { status: 400 })
   }
   return NextResponse.json(profile)
-} 
+}

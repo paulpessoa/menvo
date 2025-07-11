@@ -15,8 +15,8 @@ export function UserTypeSelector({ userType, setUserType }: UserTypeSelectorProp
   const userTypes = [
     { id: 'mentee' as UserType, icon: GraduationCap, title: t('register.userType.mentee.title'), description: t('register.userType.mentee.description') },
     { id: 'mentor' as UserType, icon: Users, title: t('register.userType.mentor.title'), description: t('register.userType.mentor.description') },
-    { id: 'company' as UserType, icon: Building2, title: t('register.userType.company.title'), description: t('register.userType.company.description') },
-    { id: 'recruiter' as UserType, icon: Briefcase, title: t('register.userType.recruiter.title'), description: t('register.userType.recruiter.description') },
+    // { id: 'company' as UserType, icon: Building2, title: t('register.userType.company.title'), description: t('register.userType.company.description') },
+    // { id: 'recruiter' as UserType, icon: Briefcase, title: t('register.userType.recruiter.title'), description: t('register.userType.recruiter.description') },
   ]
 
   const handleTypeChange = (value: string) => {

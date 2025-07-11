@@ -128,4 +128,4 @@ export function useUser() {
     confirmEmail,
     hasPermission
   }
-} 
+}

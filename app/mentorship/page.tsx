@@ -226,4 +226,4 @@ function SessionCard({ session, isMentor, onRespond, onViewDetails, onComplete }
       </CardContent>
     </Card>
   )
-} 
+}

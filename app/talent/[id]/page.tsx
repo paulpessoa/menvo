@@ -523,4 +523,4 @@ function TalentProfileSkeleton() {
       </div>
     </div>
   )
-} 
+}

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 
+
 export type UserType = 'mentee' | 'mentor' | 'company' | 'recruiter'
 
 interface SignupData {
@@ -37,7 +38,7 @@ export function useSignupMutation() {
       return response.json()
     },
     onSuccess: () => {
-      router.push('/confirmation')
+      // Não redirecionar - o componente de confirmação será exibido na mesma página
     }
   })
 }

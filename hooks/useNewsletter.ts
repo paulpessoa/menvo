@@ -83,4 +83,4 @@ export const useNewsletterStats = () => {
     queryKey: ['newsletter-stats'],
     queryFn: newsletterService.getStats
   })
-} 
+}

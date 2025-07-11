@@ -208,4 +208,4 @@ export class UserService {
       throw new Error(error.message || 'Erro ao buscar perfil do usuário')
     }
   }
-} 
+}
