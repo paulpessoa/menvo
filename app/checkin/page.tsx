@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { CalendarIcon, Clock, Activity, FileText, CheckCircle, MapPin } from "lucide-react"
+import { CalendarIcon, Clock, Activity, CheckCircle, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,29 +15,45 @@ import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
-import { useCreateVolunteerActivity, useVolunteerActivityTypes } from "@/hooks/api/use-volunteer-activities"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useCreateVolunteerActivity, useVolunteerActivities } from "@/hooks/api/use-volunteer-activities"
 
 const volunteerActivitySchema = z.object({
+  title: z.string().min(1, "Título é obrigatório"),
+  activity_type: z.string().min(1, "Tipo de atividade é obrigatório"),
+  description: z.string().optional(),
+  hours: z.number().min(0.5, "Mínimo de 0.5 horas").max(24, "Máximo de 24 horas"),
   date: z.date({
     required_error: "Data é obrigatória",
   }),
-  hours: z.number().min(0.5, "Mínimo de 0.5 horas").max(24, "Máximo de 24 horas"),
-  activity_type: z.string().min(1, "Selecione um tipo de atividade"),
-  description: z.string().optional(),
-  location: z.string().optional(),
 })
 
 type VolunteerActivityForm = z.infer<typeof volunteerActivitySchema>
 
+const ACTIVITY_TYPES = [
+  "Mentoria",
+  "Ensino/Educação",
+  "Desenvolvimento de Software",
+  "Design/UX",
+  "Marketing/Comunicação",
+  "Gestão de Projetos",
+  "Consultoria",
+  "Evento/Workshop",
+  "Revisão de Conteúdo",
+  "Suporte Técnico",
+  "Outro",
+]
+
 export default function CheckinPage() {
   const { user } = useAuth()
-  const [date, setDate] = useState<Date>(new Date())
+  const [showForm, setShowForm] = useState(false)
   const createActivity = useCreateVolunteerActivity()
-  const { data: activityTypes } = useVolunteerActivityTypes()
+
+  // Fetch user's own activities
+  const { data: activities, isLoading } = useVolunteerActivities({ user_only: true })
 
   const {
     register,
@@ -49,10 +65,12 @@ export default function CheckinPage() {
   } = useForm<VolunteerActivityForm>({
     resolver: zodResolver(volunteerActivitySchema),
     defaultValues: {
-      date: new Date(),
       hours: 1,
+      date: new Date(),
     },
   })
+
+  const selectedDate = watch("date")
 
   // Check if user can access volunteer area
   if (!user) {
@@ -72,190 +90,212 @@ export default function CheckinPage() {
   }
 
   const onSubmit = async (data: VolunteerActivityForm) => {
-    if (!date) return
-
-    const activityData = {
-      ...data,
-      date: format(date, "yyyy-MM-dd"),
-    }
-
     try {
-      await createActivity.mutateAsync(activityData)
+      await createActivity.mutateAsync({
+        ...data,
+        date: format(data.date, "yyyy-MM-dd"),
+      })
       reset()
-      setDate(new Date())
+      setShowForm(false)
     } catch (error) {
       console.error("Erro ao registrar atividade:", error)
     }
   }
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "validated":
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Validada
+          </Badge>
+        )
+      case "rejected":
+        return <Badge variant="destructive">Rejeitada</Badge>
+      default:
+        return <Badge variant="secondary">Pendente</Badge>
+    }
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold">Minhas Atividades de Voluntariado</h1>
+            <p className="text-muted-foreground">Registre e acompanhe suas contribuições</p>
+          </div>
+          <Button onClick={() => setShowForm(!showForm)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Atividade
+          </Button>
+        </div>
+
+        {showForm && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Registrar Nova Atividade
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Título da Atividade *</Label>
+                    <Input
+                      id="title"
+                      placeholder="Ex: Mentoria em React"
+                      {...register("title")}
+                      className={cn(errors.title && "border-red-500")}
+                    />
+                    {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="activity_type">Tipo de Atividade *</Label>
+                    <select
+                      id="activity_type"
+                      {...register("activity_type")}
+                      className={cn(
+                        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                        errors.activity_type && "border-red-500",
+                      )}
+                    >
+                      <option value="">Selecione um tipo</option>
+                      {ACTIVITY_TYPES.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.activity_type && <p className="text-sm text-red-500">{errors.activity_type.message}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Data da Atividade *</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !selectedDate && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : "Selecione uma data"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={(date) => setValue("date", date || new Date())}
+                          disabled={(date) => date > new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="hours">Horas Trabalhadas *</Label>
+                    <Input
+                      id="hours"
+                      type="number"
+                      step="0.5"
+                      min="0.5"
+                      max="24"
+                      placeholder="1.5"
+                      {...register("hours", { valueAsNumber: true })}
+                      className={cn(errors.hours && "border-red-500")}
+                    />
+                    {errors.hours && <p className="text-sm text-red-500">{errors.hours.message}</p>}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Descrição (Opcional)</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Descreva o que foi realizado, resultados obtidos, pessoas impactadas, etc."
+                    {...register("description")}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button type="submit" disabled={createActivity.isPending}>
+                    {createActivity.isPending ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Registrando...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Registrar Atividade
+                      </>
+                    )}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                    Cancelar
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Activities List */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Check-in de Voluntariado
-            </CardTitle>
-            <CardDescription>
-              Registre suas atividades de voluntariado para contribuir com nossa comunidade
-            </CardDescription>
+            <CardTitle>Histórico de Atividades</CardTitle>
+            <CardDescription>Suas atividades registradas e seus status de validação</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* User Info */}
-            <div className="mb-6 p-4 bg-muted rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
-                  {user?.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-medium">
-                    {user?.first_name} {user?.last_name}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
-                </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
-            </div>
-
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Date and Hours */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <CalendarIcon className="h-4 w-4" />
-                    Data da Atividade *
-                  </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP", { locale: ptBR }) : "Selecione uma data"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={(selectedDate) => {
-                          setDate(selectedDate || new Date())
-                          setValue("date", selectedDate || new Date())
-                        }}
-                        initialFocus
-                        disabled={(date) => date > new Date()}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {!date && <p className="text-sm text-red-500">Data é obrigatória</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="hours" className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Horas Trabalhadas *
-                  </Label>
-                  <Input
-                    id="hours"
-                    type="number"
-                    step="0.5"
-                    min="0.5"
-                    max="24"
-                    placeholder="1.5"
-                    {...register("hours", { valueAsNumber: true })}
-                    className={cn(errors.hours && "border-red-500")}
-                  />
-                  {errors.hours && <p className="text-sm text-red-500">{errors.hours.message}</p>}
-                </div>
+            ) : activities && activities.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Horas</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {activities.map((activity) => (
+                    <TableRow key={activity.id}>
+                      <TableCell className="font-medium">{activity.title}</TableCell>
+                      <TableCell>{activity.activity_type}</TableCell>
+                      <TableCell>{format(new Date(activity.date), "dd/MM/yyyy")}</TableCell>
+                      <TableCell>{activity.hours}h</TableCell>
+                      <TableCell>{getStatusBadge(activity.status)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-8">
+                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Nenhuma atividade registrada</h3>
+                <p className="text-muted-foreground mb-4">Comece registrando sua primeira atividade de voluntariado!</p>
+                <Button onClick={() => setShowForm(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Registrar Primeira Atividade
+                </Button>
               </div>
-
-              {/* Activity Type */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Activity className="h-4 w-4" />
-                  Tipo de Atividade *
-                </Label>
-                <Select onValueChange={(value) => setValue("activity_type", value)}>
-                  <SelectTrigger className={cn(errors.activity_type && "border-red-500")}>
-                    <SelectValue placeholder="Selecione o tipo de atividade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {activityTypes?.map((type) => (
-                      <SelectItem key={type.id} value={type.name}>
-                        {type.name}
-                        {type.description && <span className="text-muted-foreground ml-2">- {type.description}</span>}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.activity_type && <p className="text-sm text-red-500">{errors.activity_type.message}</p>}
-              </div>
-
-              {/* Location */}
-              <div className="space-y-2">
-                <Label htmlFor="location" className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Local (Opcional)
-                </Label>
-                <Input id="location" placeholder="Ex: Online, São Paulo - SP, Evento XYZ" {...register("location")} />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Descrição da Atividade (Opcional)
-                </Label>
-                <Textarea
-                  id="description"
-                  placeholder="Descreva brevemente o que foi realizado, resultados obtidos, pessoas impactadas, etc."
-                  {...register("description")}
-                  rows={4}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Detalhe sua contribuição para ajudar na validação da atividade
-                </p>
-              </div>
-
-              {/* Validation Notice */}
-              <Alert>
-                <CheckCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Sua atividade será registrada como "pendente" e passará por validação da equipe de moderadores
-                  voluntários antes de ser contabilizada oficialmente.
-                </AlertDescription>
-              </Alert>
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={createActivity.isPending}>
-                {createActivity.isPending ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Registrando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Registrar Atividade de Voluntariado
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Tips */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-lg">💡 Dicas para um bom registro</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p>• Seja específico sobre o tipo de atividade realizada</p>
-            <p>• Inclua detalhes sobre o impacto ou resultado da sua contribuição</p>
-            <p>• Registre as horas de forma honesta e precisa</p>
-            <p>• Se possível, mencione quantas pessoas foram impactadas</p>
-            <p>• Atividades regulares podem ser registradas separadamente</p>
+            )}
           </CardContent>
         </Card>
       </div>
