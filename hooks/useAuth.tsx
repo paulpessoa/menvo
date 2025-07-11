@@ -1,150 +1,211 @@
 "use client"
 
-import type React from "react"
-
-import { createContext, useContext, useEffect, useState } from "react"
-import type { User, Session, AuthError } from "@supabase/supabase-js"
-import { createClient } from "@/utils/supabase/client"
-import { useRouter } from "next/navigation"
-
-interface SignUpData {
-  email: string
-  password: string
-  fullName: string
-  userType: string
-}
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import type { User } from "@supabase/supabase-js"
+import { supabase } from "@/lib/supabase"
 
 interface AuthContextType {
   user: User | null
-  session: Session | null
   loading: boolean
-  isAuthenticated: boolean
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signUp: (data: SignUpData) => Promise<{ error: AuthError | null }>
+  signUp: (data: { email: string; password: string; fullName: string; userType: string }) => Promise<{ error?: any }>
+  signIn: (email: string, password: string) => Promise<{ error?: any }>
+  signInWithGoogle: () => Promise<{ error?: any }>
+  signInWithLinkedIn: () => Promise<{ error?: any }>
+  signInWithGitHub: () => Promise<{ error?: any }>
   signOut: () => Promise<void>
-  signInWithGoogle: () => Promise<void>
-  signInWithLinkedIn: () => Promise<void>
-  signInWithGitHub: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
-  const router = useRouter()
 
   useEffect(() => {
     // Get initial session
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setSession(session)
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
-    }
-
-    getInitialSession()
+    })
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session)
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
-
-      if (event === "SIGNED_IN") {
-        router.refresh()
-      }
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase, router])
+  }, [])
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
-  }
-
-  const signUp = async ({ email, password, fullName, userType }: SignUpData) => {
+  const signUp = async ({
+    email,
+    password,
+    fullName,
+    userType,
+  }: { email: string; password: string; fullName: string; userType: string }) => {
     try {
-      // Usar o endpoint personalizado para registro
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      console.log("🔄 Iniciando signUp:", { email, fullName, userType })
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.toLowerCase().trim(),
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            user_type: userType,
+            first_name: fullName.split(" ")[0] || "",
+            last_name: fullName.split(" ").slice(1).join(" ") || "",
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName: fullName.split(" ")[0],
-          lastName: fullName.split(" ").slice(1).join(" ") || fullName.split(" ")[0],
-          userType,
-        }),
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        return { error: { message: data.error } as AuthError }
+      if (error) {
+        console.error("❌ Erro no signUp:", error)
+        return { error }
       }
 
+      console.log("✅ SignUp bem-sucedido:", data.user?.id)
       return { error: null }
     } catch (error) {
-      return { error: { message: "Erro interno do servidor" } as AuthError }
+      console.error("❌ Erro inesperado no signUp:", error)
+      return { error }
+    }
+  }
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      console.log("🔄 Iniciando signIn:", { email })
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase().trim(),
+        password,
+      })
+
+      if (error) {
+        console.error("❌ Erro no signIn:", error)
+        return { error }
+      }
+
+      console.log("✅ SignIn bem-sucedido:", data.user?.id)
+      return { error: null }
+    } catch (error) {
+      console.error("❌ Erro inesperado no signIn:", error)
+      return { error }
+    }
+  }
+
+  const signInWithGoogle = async () => {
+    try {
+      console.log("🔄 Iniciando Google OAuth")
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
+      })
+
+      if (error) {
+        console.error("❌ Erro no Google OAuth:", error)
+        return { error }
+      }
+
+      console.log("✅ Google OAuth iniciado")
+      return { error: null }
+    } catch (error) {
+      console.error("❌ Erro inesperado no Google OAuth:", error)
+      return { error }
+    }
+  }
+
+  const signInWithLinkedIn = async () => {
+    try {
+      console.log("🔄 Iniciando LinkedIn OAuth")
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "linkedin_oidc",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: "consent",
+          },
+        },
+      })
+
+      if (error) {
+        console.error("❌ Erro no LinkedIn OAuth:", error)
+        return { error }
+      }
+
+      console.log("✅ LinkedIn OAuth iniciado")
+      return { error: null }
+    } catch (error) {
+      console.error("❌ Erro inesperado no LinkedIn OAuth:", error)
+      return { error }
+    }
+  }
+
+  const signInWithGitHub = async () => {
+    try {
+      console.log("🔄 Iniciando GitHub OAuth")
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: "consent",
+          },
+        },
+      })
+
+      if (error) {
+        console.error("❌ Erro no GitHub OAuth:", error)
+        return { error }
+      }
+
+      console.log("✅ GitHub OAuth iniciado")
+      return { error: null }
+    } catch (error) {
+      console.error("❌ Erro inesperado no GitHub OAuth:", error)
+      return { error }
     }
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/")
-  }
+    try {
+      console.log("🔄 Iniciando signOut")
 
-  const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-  }
+      const { error } = await supabase.auth.signOut()
 
-  const signInWithLinkedIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "linkedin_oidc",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-  }
+      if (error) {
+        console.error("❌ Erro no signOut:", error)
+        throw error
+      }
 
-  const signInWithGitHub = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+      console.log("✅ SignOut bem-sucedido")
+    } catch (error) {
+      console.error("❌ Erro inesperado no signOut:", error)
+      throw error
+    }
   }
 
   const value = {
     user,
-    session,
     loading,
-    isAuthenticated: !!user,
-    signIn,
     signUp,
-    signOut,
+    signIn,
     signInWithGoogle,
     signInWithLinkedIn,
     signInWithGitHub,
+    signOut,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
