@@ -1,10 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createSupabaseServerClient } from "@/lib/api-utils"
+import { createClient } from "@/utils/supabase/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createClient()
     const { email, password, firstName, lastName, userType } = await request.json()
+
+    // Validate input
+    if (!email || !password || !firstName || !lastName) {
+      return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 })
+    }
 
     // Registrar o usuário no Supabase com metadata
     const { data: authData, error: authError } = await supabase.auth.signUp({
