@@ -20,141 +20,60 @@ export interface GeocodeResult {
   }
   place_id: string
   types: string[]
+  address_components: Array<{
+    long_name: string
+    short_name: string
+    types: string[]
+  }>
 }
 
 export class GoogleMapsService {
-  private static apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!
-  private static isLoaded = false
-  private static loadPromise: Promise<void> | null = null
-
-  // Carregar a API do Google Maps
-  static async loadGoogleMaps(): Promise<void> {
-    if (this.isLoaded) return
-    if (this.loadPromise) return this.loadPromise
-
-    this.loadPromise = new Promise((resolve, reject) => {
-      if (typeof window === "undefined") {
-        reject(new Error("Google Maps can only be loaded in the browser"))
-        return
-      }
-
-      if (window.google && window.google.maps) {
-        this.isLoaded = true
-        resolve()
-        return
-      }
-
-      const script = document.createElement("script")
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&libraries=places`
-      script.async = true
-      script.defer = true
-
-      script.onload = () => {
-        this.isLoaded = true
-        resolve()
-      }
-
-      script.onerror = () => {
-        reject(new Error("Failed to load Google Maps API"))
-      }
-
-      document.head.appendChild(script)
-    })
-
-    return this.loadPromise
-  }
-
-  // Geocodificação - converter endereço em coordenadas
+  // Geocodificação - converter endereço em coordenadas (usando API server-side)
   static async geocode(address: string): Promise<GeocodeResult[]> {
-    await this.loadGoogleMaps()
-
-    return new Promise((resolve, reject) => {
-      const geocoder = new google.maps.Geocoder()
-
-      geocoder.geocode({ address }, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK && results) {
-          const formattedResults: GeocodeResult[] = results.map((result) => ({
-            formatted_address: result.formatted_address,
-            geometry: {
-              location: {
-                lat: result.geometry.location.lat(),
-                lng: result.geometry.location.lng(),
-              },
-            },
-            place_id: result.place_id,
-            types: result.types,
-          }))
-          resolve(formattedResults)
-        } else {
-          reject(new Error(`Geocoding failed: ${status}`))
-        }
+    try {
+      const response = await fetch("/api/maps/geocode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address }),
       })
-    })
-  }
 
-  // Geocodificação reversa - converter coordenadas em endereço
-  static async reverseGeocode(location: Location): Promise<GeocodeResult[]> {
-    await this.loadGoogleMaps()
-
-    return new Promise((resolve, reject) => {
-      const geocoder = new google.maps.Geocoder()
-      const latLng = new google.maps.LatLng(location.lat, location.lng)
-
-      geocoder.geocode({ location: latLng }, (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK && results) {
-          const formattedResults: GeocodeResult[] = results.map((result) => ({
-            formatted_address: result.formatted_address,
-            geometry: {
-              location: {
-                lat: result.geometry.location.lat(),
-                lng: result.geometry.location.lng(),
-              },
-            },
-            place_id: result.place_id,
-            types: result.types,
-          }))
-          resolve(formattedResults)
-        } else {
-          reject(new Error(`Reverse geocoding failed: ${status}`))
-        }
-      })
-    })
-  }
-
-  // Buscar lugares próximos
-  static async searchNearbyPlaces(location: Location, radius: number, type?: string): Promise<PlaceResult[]> {
-    await this.loadGoogleMaps()
-
-    return new Promise((resolve, reject) => {
-      const map = new google.maps.Map(document.createElement("div"))
-      const service = new google.maps.places.PlacesService(map)
-
-      const request: google.maps.places.PlaceSearchRequest = {
-        location: new google.maps.LatLng(location.lat, location.lng),
-        radius,
-        type: type as any,
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Geocoding failed")
       }
 
-      service.nearbySearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          const formattedResults: PlaceResult[] = results.map((place) => ({
-            place_id: place.place_id!,
-            formatted_address: place.vicinity || "",
-            name: place.name || "",
-            geometry: {
-              location: {
-                lat: place.geometry!.location!.lat(),
-                lng: place.geometry!.location!.lng(),
-              },
-            },
-            types: place.types || [],
-          }))
-          resolve(formattedResults)
-        } else {
-          reject(new Error(`Places search failed: ${status}`))
-        }
+      const data = await response.json()
+      return data.results
+    } catch (error) {
+      console.error("Geocoding error:", error)
+      throw error
+    }
+  }
+
+  // Geocodificação reversa - converter coordenadas em endereço (usando API server-side)
+  static async reverseGeocode(location: Location): Promise<GeocodeResult[]> {
+    try {
+      const response = await fetch("/api/maps/reverse-geocode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ lat: location.lat, lng: location.lng }),
       })
-    })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Reverse geocoding failed")
+      }
+
+      const data = await response.json()
+      return data.results
+    } catch (error) {
+      console.error("Reverse geocoding error:", error)
+      throw error
+    }
   }
 
   // Obter localização atual do usuário
@@ -199,6 +118,48 @@ export class GoogleMapsService {
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c
+  }
+
+  // Extrair componentes do endereço
+  static extractAddressComponents(result: GeocodeResult) {
+    const components = result.address_components
+    const extracted = {
+      street_number: "",
+      route: "",
+      neighborhood: "",
+      city: "",
+      state: "",
+      country: "",
+      postal_code: "",
+    }
+
+    components.forEach((component) => {
+      const types = component.types
+
+      if (types.includes("street_number")) {
+        extracted.street_number = component.long_name
+      }
+      if (types.includes("route")) {
+        extracted.route = component.long_name
+      }
+      if (types.includes("sublocality") || types.includes("neighborhood")) {
+        extracted.neighborhood = component.long_name
+      }
+      if (types.includes("locality") || types.includes("administrative_area_level_2")) {
+        extracted.city = component.long_name
+      }
+      if (types.includes("administrative_area_level_1")) {
+        extracted.state = component.long_name
+      }
+      if (types.includes("country")) {
+        extracted.country = component.long_name
+      }
+      if (types.includes("postal_code")) {
+        extracted.postal_code = component.long_name
+      }
+    })
+
+    return extracted
   }
 
   private static toRadians(degrees: number): number {
