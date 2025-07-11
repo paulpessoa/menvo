@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Linkedin, AlertTriangle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ArrowRight, Loader2, Linkedin, AlertTriangle, Eye, EyeOff } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -20,18 +20,21 @@ function LoginForm() {
   const { isAuthenticated, login, signInWithGoogle, signInWithLinkedIn } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   // Redirecionar usuários já logados
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard")
+      const redirectTo = searchParams.get("redirectTo") || "/dashboard"
+      router.push(redirectTo)
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router, searchParams])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,11 +43,12 @@ function LoginForm() {
 
     try {
       await login({ email, password })
+      const redirectTo = searchParams.get("redirectTo") || "/dashboard"
+      router.push(redirectTo)
       toast.success(t("login.success") || "Login realizado com sucesso!")
-      router.push("/dashboard")
-    } catch (error: any) {
-      setError(error.message)
-      toast.error(error.message)
+    } catch (err: any) {
+      setError(err.message)
+      toast.error(err.message)
     } finally {
       setIsLoading(false)
     }
@@ -78,8 +82,8 @@ function LoginForm() {
     <div className="container max-w-5xl py-10 md:py-16">
       <Card className="mx-auto max-w-md">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle>{t("login.title") || "Entrar"}</CardTitle>
-          <CardDescription>{t("login.description") || "Acesse sua conta"}</CardDescription>
+          <CardTitle>{t("login.loginTitle") || "Entrar"}</CardTitle>
+          <CardDescription>{t("login.description") || "Acesse sua conta na plataforma"}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* OAuth Buttons */}
@@ -108,7 +112,9 @@ function LoginForm() {
                   fill="#EA4335"
                 />
               </svg>
-              {isGoogleLoading ? t("login.connecting") || "Conectando..." : t("login.continueWith") + " Google"}
+              {isGoogleLoading
+                ? t("login.connecting") || "Conectando..."
+                : `${t("login.continueWith") || "Continuar com"} Google`}
             </Button>
 
             <Button
@@ -118,7 +124,9 @@ function LoginForm() {
               disabled={isGoogleLoading || isLinkedInLoading || isLoading}
             >
               <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
-              {isLinkedInLoading ? t("login.connecting") || "Conectando..." : t("login.continueWith") + " LinkedIn"}
+              {isLinkedInLoading
+                ? t("login.connecting") || "Conectando..."
+                : `${t("login.continueWith") || "Continuar com"} LinkedIn`}
             </Button>
           </div>
 
@@ -134,6 +142,15 @@ function LoginForm() {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">{t("login.email") || "Email"}</Label>
               <Input
@@ -145,36 +162,44 @@ function LoginForm() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("login.password") || "Senha"}</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder={t("login.passwordPlaceholder") || "••••••••"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
 
-            {error && (
-              <div className="rounded-lg bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                  </div>
-                </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{t("login.password") || "Senha"}</Label>
+                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                  {t("login.forgotPassword") || "Esqueceu a senha?"}
+                </Link>
               </div>
-            )}
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={t("login.passwordPlaceholder") || "Digite sua senha"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
+            </div>
 
             <Button className="w-full" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  {t("login.loggingIn") || "Entrando..."}
+                  {t("login.signingIn") || "Entrando..."}
                 </span>
               ) : (
                 <>
@@ -183,19 +208,13 @@ function LoginForm() {
                 </>
               )}
             </Button>
-
-            <div className="text-center">
-              <Link href="/forgot-password" className="text-sm text-muted-foreground hover:text-primary underline">
-                {t("login.forgotPassword") || "Esqueceu sua senha?"}
-              </Link>
-            </div>
           </form>
         </CardContent>
         <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
-            {t("login.noAccount") || "Não tem uma conta?"}{" "}
+            {t("login.dontHaveAccount") || "Não tem uma conta?"}{" "}
             <Link href="/signup" className="text-primary hover:underline">
-              {t("login.signUp") || "Cadastre-se"}
+              {t("login.signUp") || "Cadastrar-se"}
             </Link>
           </div>
         </CardFooter>

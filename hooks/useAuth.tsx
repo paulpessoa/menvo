@@ -10,16 +10,27 @@ interface Profile {
   email: string
   role: "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
   status: "pending" | "active" | "inactive" | "suspended"
+  verification_status: "pending" | "verified" | "rejected"
   full_name?: string
+  first_name?: string
+  last_name?: string
   avatar_url?: string
+  bio?: string
+  location?: string
   created_at: string
   updated_at: string
+}
+
+interface UserPermissions {
+  permissions: string[]
+  roles: string[]
 }
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   profile: Profile | null
+  permissions: UserPermissions | null
   loading: boolean
   isAuthenticated: boolean
   needsRoleSelection: boolean
@@ -58,6 +69,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       return data as Profile
+    },
+    enabled: !!user?.id,
+  })
+
+  // Query para buscar permissões do usuário
+  const { data: permissions } = useQuery({
+    queryKey: ["permissions", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null
+
+      // Buscar roles do usuário
+      const { data: userRoles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select(`
+          role_id,
+          is_primary,
+          roles (
+            name,
+            description
+          )
+        `)
+        .eq("user_id", user.id)
+
+      if (rolesError) {
+        console.error("Erro ao buscar roles:", rolesError)
+        return { permissions: [], roles: [] }
+      }
+
+      // Buscar permissões baseadas nas roles
+      const roleIds = userRoles?.map((ur) => ur.role_id) || []
+
+      if (roleIds.length === 0) {
+        return { permissions: [], roles: [] }
+      }
+
+      const { data: rolePermissions, error: permissionsError } = await supabase
+        .from("role_permissions")
+        .select(`
+          permissions (
+            name,
+            description
+          )
+        `)
+        .in("role_id", roleIds)
+
+      if (permissionsError) {
+        console.error("Erro ao buscar permissões:", permissionsError)
+        return { permissions: [], roles: userRoles?.map((ur) => ur.roles?.name).filter(Boolean) || [] }
+      }
+
+      const permissions = rolePermissions?.map((rp) => rp.permissions?.name).filter(Boolean) || []
+      const roles = userRoles?.map((ur) => ur.roles?.name).filter(Boolean) || []
+
+      return { permissions, roles }
     },
     enabled: !!user?.id,
   })
@@ -156,7 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       options: {
         data: {
           full_name: fullName,
-          user_type: userType,
+          user_type: userType || "mentee",
         },
       },
     })
@@ -168,25 +233,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error
     }
 
-    // Criar perfil inicial se o usuário foi criado
-    if (data.user && userType) {
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: data.user.id,
-        email: data.user.email!,
-        role: userType as any,
-        status: "pending",
-        full_name: fullName,
-      })
-
-      if (profileError) {
-        console.error("Erro ao criar perfil:", profileError)
-      }
-    }
+    return data
   }
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+      redirectTo: `${window.location.origin}/reset-password`,
     })
 
     if (error) {
@@ -231,16 +283,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await refetchProfile()
   }
 
-  // Estados computados baseados no JWT (session)
+  // Estados computados
   const isAuthenticated = !!session?.user
   const needsRoleSelection = !!(session?.user && profile?.role === "pending")
   const needsProfileCompletion = !!(session?.user && profile?.role !== "pending" && profile?.status === "pending")
-  const needsVerification = !!(session?.user && profile?.role === "mentor" && profile?.status === "pending")
+  const needsVerification = !!(
+    session?.user &&
+    profile?.role === "mentor" &&
+    profile?.verification_status === "pending"
+  )
 
   const value: AuthContextType = {
     user,
     session,
     profile: profile || null,
+    permissions: permissions || null,
     loading,
     isAuthenticated,
     needsRoleSelection,
