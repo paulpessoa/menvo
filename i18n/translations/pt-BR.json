@@ -151,8 +151,6 @@
     "emailConfirmed": "Email Confirmado!",
     "emailConfirmedDescription": "Seu email foi confirmado com sucesso. Agora escolha como você quer usar a plataforma.",
     "selectRoleDescription": "Escolha como você quer usar a plataforma:",
-    "mentee": "Mentorado",
-    "mentor": "Mentor",
     "menteeDescription": "Busco orientação e desenvolvimento profissional",
     "mentorDescription": "Quero compartilhar conhecimento e orientar outros profissionais",
     "continue": "Continuar",
@@ -276,5 +274,19 @@
     "termsOfService": "Termos de Serviço",
     "cookiePolicy": "Política de Cookies",
     "allRightsReserved": "Todos os direitos reservados."
+  }
+,
+  "waitingList": {
+    "title": "Junte-se à Lista de Espera",
+    "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Digite seu nome completo",
+    "emailPlaceholder": "seu@email.com",
+    "whatsappLabel": "WhatsApp (opcional)",
+    "whatsappPlaceholder": "Seu número de WhatsApp",
+    "reasonLabel": "Por que você quer fazer parte?",
+    "reasonPlaceholder": "Conte-nos por que você quer participar",
+    "successMessage": "Obrigado pelo seu interesse!",
+    "errorMessage": "Erro ao enviar o formulário"
   }
 }

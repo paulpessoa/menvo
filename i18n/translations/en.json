@@ -326,8 +326,6 @@
     "emailConfirmed": "Email Confirmed!",
     "emailConfirmedDescription": "Your email has been confirmed successfully. Now choose how you want to use the platform.",
     "selectRoleDescription": "Choose how you want to use the platform:",
-    "mentee": "Mentee",
-    "mentor": "Mentor",
     "menteeDescription": "I seek guidance and professional development",
     "mentorDescription": "I want to share knowledge and guide other professionals",
     "continue": "Continue",
@@ -601,5 +599,19 @@
       "title": "MENVO - Volunteer Mentoring Platform",
       "description": "Connecting mentors and mentees for free mentoring sessions"
     }
+  }
+,
+  "waitingList": {
+    "title": "Join the Waiting List",
+    "description": "Thank you for your interest! Please fill out the form below.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter your full name",
+    "emailPlaceholder": "your@email.com",
+    "whatsappLabel": "WhatsApp (optional)",
+    "whatsappPlaceholder": "Your WhatsApp number",
+    "reasonLabel": "Why do you want to be part?",
+    "reasonPlaceholder": "Tell us why you want to join",
+    "successMessage": "Thank you for your interest!",
+    "errorMessage": "Error submitting form"
   }
 }

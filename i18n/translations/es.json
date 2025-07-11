@@ -326,8 +326,6 @@
     "emailConfirmed": "¡Email Confirmado!",
     "emailConfirmedDescription": "Tu email ha sido confirmado exitosamente. Ahora elige cómo quieres usar la plataforma.",
     "selectRoleDescription": "Elige cómo quieres usar la plataforma:",
-    "mentee": "Mentorado",
-    "mentor": "Mentor",
     "menteeDescription": "Busco orientación y desarrollo profesional",
     "mentorDescription": "Quiero compartir conocimiento y orientar a otros profesionales",
     "continue": "Continuar",
@@ -601,5 +599,19 @@
       "title": "MENVO - Plataforma de Mentoría Voluntaria",
       "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría"
     }
+  }
+,
+  "waitingList": {
+    "title": "Únete a la Lista de Espera",
+    "description": "¡Gracias por tu interés! Por favor, completa el siguiente formulario.",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Ingresa tu nombre completo",
+    "emailPlaceholder": "tu@correo.com",
+    "whatsappLabel": "WhatsApp (opcional)",
+    "whatsappPlaceholder": "Tu número de WhatsApp",
+    "reasonLabel": "¿Por qué quieres ser parte?",
+    "reasonPlaceholder": "Cuéntanos por qué quieres unirte",
+    "successMessage": "¡Gracias por tu interés!",
+    "errorMessage": "Error al enviar el formulario"
   }
 }

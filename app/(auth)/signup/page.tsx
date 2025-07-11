@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { WaitingList } from "@/components/WaitingList"
 
 type UserType = "mentee" | "mentor"
 
@@ -148,7 +149,7 @@ function SignupForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Seletor de Tipo de Usuário */}
-          <UserTypeSelector userType={userType} setUserType={setUserType} />
+          <UserTypeSelector userType={userType} setUserType={(type) => setUserType(type)} />
 
           {/* OAuth Buttons */}
           <div className="grid grid-cols-1 gap-2">
@@ -292,9 +293,22 @@ function SignupForm() {
 }
 
 export default function SignupPage() {
+  const router = useRouter()
+
+  const estamosLotados = false
+
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
-      <SignupForm />
-    </Suspense>
+    <div className="relative">
+      <div className={estamosLotados ? 'blur-sm pointer-events-none' : ''}>
+        <Suspense fallback={<div>Carregando...</div>}>
+          <SignupForm />
+        </Suspense>
+      </div>
+      {estamosLotados  && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center">
+          <WaitingList isOpen onClose={() => router.push('/')} />
+        </div>
+      )}
+    </div>
   )
 }
