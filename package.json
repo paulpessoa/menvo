@@ -11,7 +11,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.1.19",
+    "@ai-sdk/openai": "^0.0.29",
     "@hookform/resolvers": "latest",
     "@next/third-parties": "latest",
     "@radix-ui/react-accordion": "latest",
