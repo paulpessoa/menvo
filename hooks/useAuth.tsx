@@ -1,11 +1,8 @@
 "use client"
 
-// Re-exportar do contexto principal para manter compatibilidade
-export { useAuth, AuthProvider } from "@/app/context/auth-context"
-
-// Hook para operações de autenticação
 import { createClient } from "@/utils/supabase/client"
 
+// Hook para operações de autenticação
 export const useAuthOperations = () => {
   const supabase = createClient()
 
@@ -157,4 +154,11 @@ export const useAuthOperations = () => {
     signInWithLinkedIn,
     signInWithGitHub,
   }
+}
+
+// Para compatibilidade com código existente, criar um hook simples
+export const useAuth = () => {
+  // Este hook deve ser usado apenas para operações, não para estado
+  // Para estado de autenticação, use o contexto diretamente
+  return useAuthOperations()
 }
