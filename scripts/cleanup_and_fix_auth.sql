@@ -1,6 +1,6 @@
 -- Limpar funções desnecessárias
 DROP FUNCTION IF EXISTS add_custom_claims(uuid);
-DROP FUNCTION IF EXISTS authorize(text, text, uuid);
+DROP FUNCTION IF EXISTS authorize(text, text, text);
 DROP FUNCTION IF EXISTS drop_all_enums();
 DROP FUNCTION IF EXISTS generate_unique_slug(text, text);
 DROP FUNCTION IF EXISTS get_user_permissions(uuid);
@@ -25,9 +25,9 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'first_name', split_part(COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email), ' ', 1)),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', split_part(COALESCE(NEW.raw_user_meta_data->>'full_name', ''), ' ', 2)),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
     'pending'::user_role,
     'pending'::user_status,
     'pending',
@@ -44,7 +44,7 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- Função para gerar slug do perfil
+-- Função para gerar slug único
 CREATE OR REPLACE FUNCTION generate_profile_slug()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -53,21 +53,20 @@ DECLARE
   counter integer := 0;
 BEGIN
   -- Gerar slug base a partir do nome
-  IF NEW.first_name IS NOT NULL AND NEW.first_name != '' THEN
-    base_slug := lower(regexp_replace(NEW.first_name || '-' || COALESCE(NEW.last_name, ''), '[^a-zA-Z0-9]+', '-', 'g'));
-    base_slug := trim(base_slug, '-');
-  ELSE
-    base_slug := 'user-' || substring(NEW.id::text from 1 for 8);
-  END IF;
-
+  base_slug := lower(regexp_replace(
+    COALESCE(NEW.full_name, NEW.first_name || ' ' || NEW.last_name, NEW.email),
+    '[^a-zA-Z0-9\s]', '', 'g'
+  ));
+  base_slug := regexp_replace(base_slug, '\s+', '-', 'g');
+  
+  -- Garantir que o slug seja único
   final_slug := base_slug;
-
-  -- Verificar se o slug já existe e adicionar número se necessário
+  
   WHILE EXISTS (SELECT 1 FROM profiles WHERE slug = final_slug AND id != NEW.id) LOOP
     counter := counter + 1;
     final_slug := base_slug || '-' || counter;
   END LOOP;
-
+  
   NEW.slug := final_slug;
   RETURN NEW;
 END;
@@ -79,6 +78,15 @@ CREATE TRIGGER generate_profile_slug_trigger
   BEFORE INSERT OR UPDATE ON profiles
   FOR EACH ROW EXECUTE FUNCTION generate_profile_slug();
 
+-- Função para atualizar updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Função para JWT claims customizados
 CREATE OR REPLACE FUNCTION custom_access_token_hook(event jsonb)
 RETURNS jsonb
@@ -88,55 +96,69 @@ AS $$
 DECLARE
   claims jsonb;
   user_role text;
-  user_status text;
 BEGIN
-  -- Buscar role e status do usuário
-  SELECT role, status INTO user_role, user_status
+  -- Buscar a role do usuário na tabela profiles
+  SELECT role INTO user_role
   FROM public.profiles
   WHERE id = (event->>'user_id')::uuid;
 
-  claims := event->'claims';
+  -- Definir claims customizados
+  claims := jsonb_build_object(
+    'user_role', COALESCE(user_role, 'pending'),
+    'app_metadata', jsonb_build_object(
+      'role', COALESCE(user_role, 'pending')
+    )
+  );
 
-  IF user_role IS NOT NULL THEN
-    claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
-  END IF;
-
-  IF user_status IS NOT NULL THEN
-    claims := jsonb_set(claims, '{user_status}', to_jsonb(user_status));
-  END IF;
-
-  -- Retornar evento com claims atualizados
+  -- Retornar o evento com os claims adicionados
   RETURN jsonb_set(event, '{claims}', claims);
 END;
 $$;
 
--- Garantir que a função update_updated_at_column existe
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+-- Garantir que a tabela profiles existe com a estrutura correta
+DO $$
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+  -- Verificar se a coluna role existe, se não, criar
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'profiles' AND column_name = 'role'
+  ) THEN
+    ALTER TABLE profiles ADD COLUMN role user_role DEFAULT 'pending'::user_role;
+  END IF;
 
--- Aplicar trigger de updated_at na tabela profiles se não existir
-DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
-CREATE TRIGGER update_profiles_updated_at
-  BEFORE UPDATE ON profiles
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  -- Verificar se a coluna status existe, se não, criar
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'profiles' AND column_name = 'status'
+  ) THEN
+    ALTER TABLE profiles ADD COLUMN status user_status DEFAULT 'pending'::user_status;
+  END IF;
+END $$;
 
--- Migrar usuários existentes sem perfil
-INSERT INTO public.profiles (id, email, role, status, verification_status, created_at, updated_at)
+-- Criar perfis para usuários existentes que não têm perfil
+INSERT INTO public.profiles (
+  id,
+  email,
+  first_name,
+  last_name,
+  full_name,
+  role,
+  status,
+  verification_status,
+  created_at,
+  updated_at
+)
 SELECT 
-  au.id,
-  au.email,
+  u.id,
+  u.email,
+  COALESCE(u.raw_user_meta_data->>'first_name', split_part(u.email, '@', 1)),
+  COALESCE(u.raw_user_meta_data->>'last_name', ''),
+  COALESCE(u.raw_user_meta_data->>'full_name', u.email),
   'pending'::user_role,
   'pending'::user_status,
   'pending',
-  au.created_at,
+  u.created_at,
   NOW()
-FROM auth.users au
-LEFT JOIN public.profiles p ON au.id = p.id
+FROM auth.users u
+LEFT JOIN public.profiles p ON u.id = p.id
 WHERE p.id IS NULL;
-
-COMMIT;

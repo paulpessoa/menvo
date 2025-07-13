@@ -1,78 +1,174 @@
-"use client"
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useAuth } from "@/app/context/auth-context"
-import { useAuthOperations } from "@/hooks/useAuth"
+import { createClient } from "@/utils/supabase/client"
 
-export function useCurrentUser() {
-  const { user, profile, loading, authenticated } = useAuth()
-
-  return useQuery({
-    queryKey: ["current-user"],
-    queryFn: () => ({ user, profile }),
-    enabled: !loading,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  })
+interface SignUpData {
+  email: string
+  password: string
+  fullName: string
+  userType: string
 }
 
-export function useSignup() {
+interface SignInData {
+  email: string
+  password: string
+}
+
+export const useSignUp = () => {
   const queryClient = useQueryClient()
-  const { signUp } = useAuthOperations()
 
   return useMutation({
-    mutationFn: signUp,
+    mutationFn: async (data: SignUpData) => {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erro no registro")
+      }
+
+      return result
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["current-user"] })
     },
   })
 }
 
-export function useLogin() {
+export const useSignIn = () => {
   const queryClient = useQueryClient()
-  const { signIn } = useAuthOperations()
+  const supabase = createClient()
 
   return useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) => signIn(email, password),
+    mutationFn: async (data: SignInData) => {
+      const { data: result, error } = await supabase.auth.signInWithPassword({
+        email: data.email.toLowerCase().trim(),
+        password: data.password,
+      })
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      return result
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["current-user"] })
     },
   })
 }
 
-export function useLogout() {
+export const useSignOut = () => {
   const queryClient = useQueryClient()
-  const { signOut } = useAuth()
+  const supabase = createClient()
 
   return useMutation({
-    mutationFn: signOut,
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        throw new Error(error.message)
+      }
+    },
     onSuccess: () => {
       queryClient.clear()
     },
   })
 }
 
-export function useOAuthLogin() {
-  const queryClient = useQueryClient()
-  const { signInWithGoogle, signInWithLinkedIn, signInWithGitHub } = useAuthOperations()
+export const useCurrentUser = () => {
+  const supabase = createClient()
+
+  return useQuery({
+    queryKey: ["current-user"],
+    queryFn: async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        return null
+      }
+
+      // Buscar perfil
+      const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+
+      return {
+        user,
+        profile,
+      }
+    },
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+export const useOAuth = () => {
+  const supabase = createClient()
+
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return data
+  }
+
+  const signInWithLinkedIn = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "linkedin_oidc",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          prompt: "consent",
+        },
+      },
+    })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return data
+  }
+
+  const signInWithGitHub = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          prompt: "consent",
+        },
+      },
+    })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return data
+  }
 
   return {
-    google: useMutation({
-      mutationFn: signInWithGoogle,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["current-user"] })
-      },
-    }),
-    linkedin: useMutation({
-      mutationFn: signInWithLinkedIn,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["current-user"] })
-      },
-    }),
-    github: useMutation({
-      mutationFn: signInWithGitHub,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["current-user"] })
-      },
-    }),
+    signInWithGoogle,
+    signInWithLinkedIn,
+    signInWithGitHub,
   }
 }
