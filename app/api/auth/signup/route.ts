@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email, password, fullName e userType são obrigatórios" }, { status: 400 })
     }
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Verificar se o usuário já existe
     const { data: existingUser } = await supabase

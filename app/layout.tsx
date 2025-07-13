@@ -127,16 +127,16 @@ export default function RootLayout({
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "rz28fusa38");`,
+             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+           })(window, document, "clarity", "script", "rz28fusa38");`,
           }}
         />
       </head>
       <body className={inter.className}>
         <Providers>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={null}>
             <div className="flex min-h-screen flex-col">
               <Header />
               <main className="flex-1">{children}</main>
@@ -145,9 +145,10 @@ export default function RootLayout({
               <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
             </div>
           </Suspense>
-          <Analytics />
           <Toaster />
         </Providers>
+        <Analytics />
+        <Toaster />
       </body>
     </html>
   )
