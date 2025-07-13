@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { type NextRequest, NextResponse } from "next/server"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
@@ -16,83 +16,82 @@ export async function POST(request: NextRequest) {
 
     // Validar dados obrigatórios
     if (!email || !password || !fullName || !userType) {
-      return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 })
+      return NextResponse.json({ error: "Dados obrigatórios não fornecidos" }, { status: 400 })
     }
 
-    // Verificar se o usuário já existe
-    const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email)
+    // Verificar se usuário já existe
+    const { data: existingUser } = await supabaseAdmin.auth.admin.getUserByEmail(email)
     if (existingUser.user) {
       return NextResponse.json({ error: "Usuário já existe com este email" }, { status: 400 })
     }
 
     // Criar usuário
-    const { data, error } = await supabase.auth.admin.createUser({
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase().trim(),
       password,
-      email_confirm: true, // Confirmar email automaticamente para desenvolvimento
       user_metadata: {
         full_name: fullName,
+        user_type: userType,
         first_name: fullName.split(" ")[0] || "",
         last_name: fullName.split(" ").slice(1).join(" ") || "",
-        user_type: userType,
       },
+      email_confirm: false, // Requer confirmação de email
     })
 
     if (error) {
-      console.error("❌ Erro ao criar usuário:", error)
-      return NextResponse.json({ error: error.message || "Erro ao criar usuário" }, { status: 400 })
+      console.error("❌ Erro no signup:", error)
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    if (!data.user) {
-      return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
-    }
-
-    console.log("✅ Usuário criado:", data.user.id)
+    console.log("✅ Usuário criado:", data.user?.id)
 
     // Verificar se o perfil foi criado pelo trigger
-    let profileCreated = false
-    let attempts = 0
-    const maxAttempts = 5
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .select("*")
+      .eq("id", data.user!.id)
+      .single()
 
-    while (!profileCreated && attempts < maxAttempts) {
-      const { data: profile } = await supabase.from("profiles").select("id").eq("id", data.user.id).single()
+    if (profileError || !profile) {
+      console.log("⚠️ Perfil não encontrado, criando manualmente...")
 
-      if (profile) {
-        profileCreated = true
-        console.log("✅ Perfil criado automaticamente pelo trigger")
-      } else {
-        attempts++
-        await new Promise((resolve) => setTimeout(resolve, 500)) // Aguardar 500ms
+      // Criar perfil manualmente se o trigger falhou
+      const { error: insertError } = await supabaseAdmin.from("profiles").insert({
+        id: data.user!.id,
+        email: data.user!.email!,
+        first_name: fullName.split(" ")[0] || "",
+        last_name: fullName.split(" ").slice(1).join(" ") || "",
+        full_name: fullName,
+        role: "pending",
+        status: "pending",
+        verification_status: "pending",
+      })
+
+      if (insertError) {
+        console.error("❌ Erro ao criar perfil:", insertError)
+        return NextResponse.json({ error: "Erro ao criar perfil do usuário" }, { status: 500 })
       }
     }
 
-    // Se o trigger não funcionou, criar perfil manualmente
-    if (!profileCreated) {
-      console.log("⚠️ Trigger não funcionou, criando perfil manualmente...")
+    // Atualizar role se fornecida
+    if (userType && userType !== "pending") {
+      const { error: updateError } = await supabaseAdmin
+        .from("profiles")
+        .update({ role: userType })
+        .eq("id", data.user!.id)
 
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: data.user.id,
-        email: email.toLowerCase().trim(),
-        first_name: fullName.split(" ")[0] || "",
-        last_name: fullName.split(" ").slice(1).join(" ") || "",
-        role: userType,
-        status: "pending",
-        email_confirmed_at: new Date().toISOString(),
-      })
-
-      if (profileError) {
-        console.error("❌ Erro ao criar perfil:", profileError)
-        // Não falhar aqui, o perfil pode ser criado depois
-      } else {
-        console.log("✅ Perfil criado manualmente")
+      if (updateError) {
+        console.error("❌ Erro ao atualizar role:", updateError)
       }
     }
 
     return NextResponse.json({
-      message: "Usuário criado com sucesso",
+      success: true,
+      message: "Usuário criado com sucesso. Verifique seu email para confirmar a conta.",
       user: {
-        id: data.user.id,
-        email: data.user.email,
+        id: data.user!.id,
+        email: data.user!.email,
+        email_confirmed_at: data.user!.email_confirmed_at,
       },
     })
   } catch (error) {
