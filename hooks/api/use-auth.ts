@@ -1,40 +1,26 @@
 "use client"
 
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/app/context/auth-context"
+import { useAuthOperations } from "@/hooks/useAuth"
 
-interface SignupData {
-  email: string
-  password: string
-  fullName: string
-  userType: string
-}
+export function useCurrentUser() {
+  const { user, profile, loading, authenticated } = useAuth()
 
-interface LoginData {
-  email: string
-  password: string
+  return useQuery({
+    queryKey: ["current-user"],
+    queryFn: () => ({ user, profile }),
+    enabled: !loading,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
 }
 
 export function useSignup() {
   const queryClient = useQueryClient()
+  const { signUp } = useAuthOperations()
 
   return useMutation({
-    mutationFn: async (data: SignupData) => {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Erro ao criar conta")
-      }
-
-      return response.json()
-    },
+    mutationFn: signUp,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["current-user"] })
     },
@@ -43,24 +29,10 @@ export function useSignup() {
 
 export function useLogin() {
   const queryClient = useQueryClient()
+  const { signIn } = useAuthOperations()
 
   return useMutation({
-    mutationFn: async (data: LoginData) => {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Erro ao fazer login")
-      }
-
-      return response.json()
-    },
+    mutationFn: ({ email, password }: { email: string; password: string }) => signIn(email, password),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["current-user"] })
     },
@@ -68,25 +40,39 @@ export function useLogin() {
 }
 
 export function useLogout() {
-  const { signOut } = useAuth()
   const queryClient = useQueryClient()
+  const { signOut } = useAuth()
 
   return useMutation({
-    mutationFn: async () => {
-      await signOut()
-    },
+    mutationFn: signOut,
     onSuccess: () => {
       queryClient.clear()
     },
   })
 }
 
-export function useCurrentUser() {
-  const { user, profile, loading } = useAuth()
+export function useOAuthLogin() {
+  const queryClient = useQueryClient()
+  const { signInWithGoogle, signInWithLinkedIn, signInWithGitHub } = useAuthOperations()
 
   return {
-    data: user ? { user, profile } : null,
-    isLoading: loading,
-    isAuthenticated: !!user,
+    google: useMutation({
+      mutationFn: signInWithGoogle,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["current-user"] })
+      },
+    }),
+    linkedin: useMutation({
+      mutationFn: signInWithLinkedIn,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["current-user"] })
+      },
+    }),
+    github: useMutation({
+      mutationFn: signInWithGitHub,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["current-user"] })
+      },
+    }),
   }
 }

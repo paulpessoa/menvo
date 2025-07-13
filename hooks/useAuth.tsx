@@ -1,44 +1,13 @@
 "use client"
 
-import { createContext, useEffect, useState, type ReactNode } from "react"
-import type { User } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabase"
+// Re-exportar do contexto principal para manter compatibilidade
+export { useAuth, AuthProvider } from "@/app/context/auth-context"
 
-interface AuthContextType {
-  user: User | null
-  loading: boolean
-  isAuthenticated: boolean
-  signUp: (data: { email: string; password: string; fullName: string; userType: string }) => Promise<{ error?: any }>
-  signIn: (email: string, password: string) => Promise<{ error?: any }>
-  signInWithGoogle: () => Promise<{ error?: any }>
-  signInWithLinkedIn: () => Promise<{ error?: any }>
-  signInWithGitHub: () => Promise<{ error?: any }>
-  signOut: () => Promise<void>
-}
+// Hook para operações de autenticação
+import { createClient } from "@/utils/supabase/client"
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+export const useAuthOperations = () => {
+  const supabase = createClient()
 
   const signUp = async ({
     email,
@@ -49,30 +18,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log("🔄 Iniciando signUp:", { email, fullName, userType })
 
-      const { data, error } = await supabase.auth.signUp({
-        email: email.toLowerCase().trim(),
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            user_type: userType,
-            first_name: fullName.split(" ")[0] || "",
-            last_name: fullName.split(" ").slice(1).join(" ") || "",
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          email: email.toLowerCase().trim(),
+          password,
+          fullName,
+          userType,
+        }),
       })
 
-      if (error) {
-        console.error("❌ Erro no signUp:", error)
-        return { error }
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error("❌ Erro no signUp:", data.error)
+        return { error: data.error }
       }
 
       console.log("✅ SignUp bem-sucedido:", data.user?.id)
-      return { error: null }
+      return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no signUp:", error)
-      return { error }
+      return { error: "Erro inesperado" }
     }
   }
 
@@ -91,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("✅ SignIn bem-sucedido:", data.user?.id)
-      return { error: null }
+      return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no signIn:", error)
       return { error }
@@ -119,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("✅ Google OAuth iniciado")
-      return { error: null }
+      return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no Google OAuth:", error)
       return { error }
@@ -146,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("✅ LinkedIn OAuth iniciado")
-      return { error: null }
+      return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no LinkedIn OAuth:", error)
       return { error }
@@ -173,45 +143,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("✅ GitHub OAuth iniciado")
-      return { error: null }
+      return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no GitHub OAuth:", error)
       return { error }
     }
   }
 
-  const signOut = async () => {
-    try {
-      console.log("🔄 Iniciando signOut")
-
-      const { error } = await supabase.auth.signOut()
-
-      if (error) {
-        console.error("❌ Erro no signOut:", error)
-        throw error
-      }
-
-      console.log("✅ SignOut bem-sucedido")
-    } catch (error) {
-      console.error("❌ Erro inesperado no signOut:", error)
-      throw error
-    }
-  }
-
-  const value = {
-    user,
-    loading,
-    isAuthenticated: !!user,
+  return {
     signUp,
     signIn,
     signInWithGoogle,
     signInWithLinkedIn,
     signInWithGitHub,
-    signOut,
   }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-
-// Manter compatibilidade com código existente
-export { useAuth } from "@/app/context/auth-context"
