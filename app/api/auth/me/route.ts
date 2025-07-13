@@ -1,43 +1,46 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Verificar usuário autenticado
+    // Obter usuário atual
     const {
       data: { user },
-      error: authError,
+      error: userError,
     } = await supabase.auth.getUser()
 
-    if (authError || !user) {
-      return NextResponse.json({ user: null, profile: null }, { status: 200 })
+    if (userError || !user) {
+      return NextResponse.json({
+        user: null,
+        profile: null,
+        authenticated: false,
+      })
     }
 
-    // Buscar perfil do usuário
+    // Buscar perfil
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select(
-        "id, email, first_name, last_name, full_name, role, status, verification_status, avatar_url, bio, location, created_at, updated_at",
-      )
+      .select("*")
       .eq("id", user.id)
       .single()
 
     if (profileError) {
       console.error("⚠️ Erro ao buscar perfil:", profileError)
-      return NextResponse.json({
-        user,
-        profile: null,
-      })
     }
 
     return NextResponse.json({
       user,
-      profile,
+      profile: profile || null,
+      authenticated: true,
     })
   } catch (error) {
     console.error("💥 Erro interno:", error)
-    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
+    return NextResponse.json({
+      user: null,
+      profile: null,
+      authenticated: false,
+    })
   }
 }
