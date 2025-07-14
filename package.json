@@ -1,20 +1,21 @@
 {
-  "name": "my-v0-project",
+  "name": "mentor-connect",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "next build",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
-  },
-  "overrides": {
-    "react-day-picker": {
-      "date-fns": "^3.6.0"
-    }
+    "start": "next start",
+    "test": "jest",
+    "test:all": "npm run test && npm run test:e2e",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "cypress run",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@googlemaps/js-api-loader": "latest",
     "@hookform/resolvers": "latest",
     "@next/third-parties": "latest",
     "@radix-ui/react-accordion": "latest",
@@ -53,24 +54,23 @@
     "@tanstack/react-query": "latest",
     "@tanstack/react-query-devtools": "latest",
     "@testing-library/dom": "latest",
-    "@testing-library/react": "latest",
     "@vercel/analytics": "latest",
-    "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
     "date-fns": "latest",
     "embla-carousel-react": "latest",
-    "googlemaps": "latest",
     "i18next": "latest",
     "input-otp": "latest",
     "jwt-decode": "latest",
     "lucide-react": "^0.454.0",
-    "next": "15.2.4",
+    "mocha": "latest",
+    "next": "14.2.16",
     "next-themes": "latest",
-    "react": "^19",
+    "node-notifier": "latest",
+    "react": "^18",
     "react-day-picker": "latest",
-    "react-dom": "^19",
+    "react-dom": "^18",
     "react-hook-form": "latest",
     "react-i18next": "latest",
     "react-resizable-panels": "latest",
@@ -81,16 +81,24 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
     "vue": "latest",
-    "vue-router": "latest",
-    "zod": "^3.24.1"
+    "vue-router": "latest"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.12",
     "@types/node": "^22",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "cypress": "^13.6.6",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.5",
-    "supabase": "^2.30.4",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }
 }

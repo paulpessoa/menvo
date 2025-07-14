@@ -1,64 +1,89 @@
 "use client"
 
+import type React from "react"
 import { useAuth } from "@/app/context/auth-context"
-import { usePermissions, type Permission } from "@/hooks/usePermissions"
-import type { ReactNode } from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Shield, Loader2 } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
+import { type Permission, hasPermission, hasAnyPermission } from "@/lib/auth/rbac"
 
 interface ProtectedRouteProps {
-  children: ReactNode
+  children: React.ReactNode
   requiredPermissions?: Permission[]
-  fallback?: ReactNode
+  requireAnyPermission?: boolean
+  fallback?: React.ReactNode
 }
 
-export function ProtectedRoute({ children, requiredPermissions = [], fallback }: ProtectedRouteProps) {
-  const { isAuthenticated, loading: authLoading } = useAuth()
-  const { permissions, loading: permsLoading } = usePermissions()
+export function ProtectedRoute({
+  children,
+  requiredPermissions = [],
+  requireAnyPermission = false,
+  fallback = null,
+}: ProtectedRouteProps) {
+  const { user, profile, loading, initialized } = useAuth()
+  const router = useRouter()
 
-  const loading = authLoading || permsLoading
+  useEffect(() => {
+    if (!initialized || loading) return
 
-  if (loading) {
+    // Se não está logado, redireciona para login
+    if (!user) {
+      router.push("/login")
+      return
+    }
+
+    // Se não tem perfil, algo está errado
+    if (!profile) {
+      router.push("/welcome")
+      return
+    }
+
+    // Se o perfil ainda está pending, vai para welcome
+    if (profile.role === "pending") {
+      router.push("/welcome")
+      return
+    }
+
+    // Verificar permissões se foram especificadas
+    if (requiredPermissions.length > 0) {
+      const hasRequiredPermissions = requireAnyPermission
+        ? hasAnyPermission(profile.role, requiredPermissions)
+        : requiredPermissions.every((permission) => hasPermission(profile.role, permission))
+
+      if (!hasRequiredPermissions) {
+        router.push("/unauthorized")
+        return
+      }
+    }
+  }, [user, profile, loading, initialized, requiredPermissions, requireAnyPermission, router])
+
+  // Mostrar loading enquanto inicializa
+  if (!initialized || loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     )
   }
 
-  if (!isAuthenticated) {
-    return (
-      fallback || (
-        <div className="container mx-auto px-4 py-8">
-          <Alert variant="destructive">
-            <Shield className="h-4 w-4" />
-            <AlertDescription className="flex items-center justify-between">
-              <span>Você precisa estar logado para acessar esta página.</span>
-              <Button asChild>
-                <Link href="/login">Fazer login</Link>
-              </Button>
-            </AlertDescription>
-          </Alert>
-        </div>
-      )
-    )
+  // Se não está logado, não renderiza nada (vai redirecionar)
+  if (!user || !profile) {
+    return fallback
   }
 
-  const hasAllRequiredPermissions = requiredPermissions.every((p) => permissions.includes(p))
+  // Se o perfil está pending, não renderiza nada (vai redirecionar)
+  if (profile.role === "pending") {
+    return fallback
+  }
 
-  if (requiredPermissions.length > 0 && !hasAllRequiredPermissions) {
-    return (
-      fallback || (
-        <div className="container mx-auto px-4 py-8">
-          <Alert variant="destructive">
-            <Shield className="h-4 w-4" />
-            <AlertDescription>Você não tem permissão para acessar esta página.</AlertDescription>
-          </Alert>
-        </div>
-      )
-    )
+  // Verificar permissões
+  if (requiredPermissions.length > 0) {
+    const hasRequiredPermissions = requireAnyPermission
+      ? hasAnyPermission(profile.role, requiredPermissions)
+      : requiredPermissions.every((permission) => hasPermission(profile.role, permission))
+
+    if (!hasRequiredPermissions) {
+      return fallback
+    }
   }
 
   return <>{children}</>

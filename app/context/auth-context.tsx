@@ -1,112 +1,280 @@
 "use client"
 
 import type React from "react"
-
-import type { User } from "@supabase/supabase-js"
-import { createContext, useContext, useEffect, useState, useCallback } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
-import { useRouter } from "next/navigation"
-import { jwtDecode } from "jwt-decode"
+import type { User } from "@supabase/supabase-js"
+import type { UserRole, Permission } from "@/lib/auth/rbac"
 
-// Tipagem para os claims customizados no JWT
-interface DecodedToken {
-  exp: number
-  role: string
-  status: string
-  permissions: string[]
+interface Profile {
+  id: string
+  email: string
+  full_name: string | null
+  avatar_url: string | null
+  bio: string | null
+  location: string | null
+  role: UserRole
+  status: "pending" | "active" | "suspended" | "rejected"
+  verification_status: "pending" | "verified" | "rejected"
+  created_at: string
+  updated_at: string
 }
 
 interface AuthContextType {
   user: User | null
-  profile: any | null // Defina uma tipagem mais forte se desejar
-  role: string | null
-  permissions: string[]
-  isAuthenticated: boolean
+  profile: Profile | null
+  permissions: Permission[]
+  role: UserRole | null
   loading: boolean
+  initialized: boolean
+  signUp: (email: string, password: string, fullName: string, userType: string) => Promise<{ error: string | null }>
+  signIn: (email: string, password: string) => Promise<{ error: string | null }>
+  signInWithGoogle: () => Promise<{ error: string | null }>
+  signInWithLinkedIn: () => Promise<{ error: string | null }>
   signOut: () => Promise<void>
+  completeProfile: (data: any) => Promise<{ error: string | null }>
+  refreshProfile: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [profile, setProfile] = useState<any | null>(null)
-  const [role, setRole] = useState<string | null>(null)
-  const [permissions, setPermissions] = useState<string[]>([])
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [permissions, setPermissions] = useState<Permission[]>([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
+  const [initialized, setInitialized] = useState(false)
+
   const supabase = createClient()
 
-  const loadSession = useCallback(
-    async (sessionUser: User | null) => {
-      if (sessionUser) {
-        setUser(sessionUser)
+  const loadUserData = async (currentUser: User | null) => {
+    if (!currentUser) {
+      setUser(null)
+      setProfile(null)
+      setPermissions([])
+      setLoading(false)
+      return
+    }
 
-        // Buscar perfil do usuário
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", sessionUser.id).single()
-        setProfile(profileData)
-
-        // Decodificar o token para obter claims
-        const { data: sessionData } = await supabase.auth.getSession()
-        if (sessionData.session) {
-          try {
-            const decoded: DecodedToken = jwtDecode(sessionData.session.access_token)
-            setRole(decoded.role)
-            setPermissions(decoded.permissions || [])
-          } catch (e) {
-            console.error("Error decoding JWT:", e)
-            setRole(null)
-            setPermissions([])
-          }
-        }
+    try {
+      const response = await fetch("/api/auth/me")
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+        setProfile(data.profile)
+        setPermissions(data.permissions || [])
       } else {
-        // Limpar estado se não houver usuário
-        setUser(null)
+        setUser(currentUser)
         setProfile(null)
-        setRole(null)
         setPermissions([])
       }
-    },
-    [supabase],
-  )
+    } catch (error) {
+      console.error("Erro ao carregar dados do usuário:", error)
+      setUser(currentUser)
+      setProfile(null)
+      setPermissions([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const signUp = async (email: string, password: string, fullName: string, userType: string) => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, fullName, userType }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { error: data.error }
+      }
+
+      return { error: null }
+    } catch (error) {
+      return { error: "Erro inesperado" }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const signIn = async (email: string, password: string) => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setLoading(false)
+        return { error: data.error }
+      }
+
+      await loadUserData(data.user)
+      return { error: null }
+    } catch (error) {
+      setLoading(false)
+      return { error: "Erro inesperado" }
+    }
+  }
+
+  const signInWithGoogle = async () => {
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        setLoading(false)
+        return { error: error.message }
+      }
+
+      return { error: null }
+    } catch (error) {
+      setLoading(false)
+      return { error: "Erro inesperado" }
+    }
+  }
+
+  const signInWithLinkedIn = async () => {
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "linkedin_oidc",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        setLoading(false)
+        return { error: error.message }
+      }
+
+      return { error: null }
+    } catch (error) {
+      setLoading(false)
+      return { error: "Erro inesperado" }
+    }
+  }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    setProfile(null)
-    setRole(null)
-    setPermissions([])
-    router.push("/")
+    setLoading(true)
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+      await supabase.auth.signOut()
+      setUser(null)
+      setProfile(null)
+      setPermissions([])
+    } catch (error) {
+      console.error("Erro no logout:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const completeProfile = async (data: any) => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/auth/complete-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        setLoading(false)
+        return { error: result.error }
+      }
+
+      await refreshProfile()
+      return { error: null }
+    } catch (error) {
+      setLoading(false)
+      return { error: "Erro inesperado" }
+    }
+  }
+
+  const refreshProfile = async () => {
+    if (!user) return
+
+    try {
+      const response = await fetch("/api/auth/me")
+      if (response.ok) {
+        const data = await response.json()
+        setProfile(data.profile)
+        setPermissions(data.permissions || [])
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error)
+    }
   }
 
   useEffect(() => {
-    setLoading(true)
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        loadSession(session?.user ?? null)
-      })
-      .finally(() => setLoading(false))
+    let mounted = true
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setLoading(true)
-      await loadSession(session?.user ?? null)
-      setLoading(false)
+    const initializeAuth = async () => {
+      try {
+        const {
+          data: { user: currentUser },
+        } = await supabase.auth.getUser()
+        if (mounted) {
+          await loadUserData(currentUser)
+          setInitialized(true)
+        }
+      } catch (error) {
+        console.error("Erro ao inicializar auth:", error)
+        if (mounted) {
+          setLoading(false)
+          setInitialized(true)
+        }
+      }
+    }
+
+    initializeAuth()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (mounted) {
+        await loadUserData(session?.user || null)
+        setInitialized(true)
+      }
     })
 
     return () => {
-      authListener.subscription.unsubscribe()
+      mounted = false
+      subscription.unsubscribe()
     }
-  }, [loadSession, supabase.auth])
+  }, [])
 
-  const value = {
+  const value: AuthContextType = {
     user,
     profile,
-    role,
     permissions,
-    isAuthenticated: !!user,
+    role: profile?.role || null,
     loading,
+    initialized,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    signInWithLinkedIn,
     signOut,
+    completeProfile,
+    refreshProfile,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

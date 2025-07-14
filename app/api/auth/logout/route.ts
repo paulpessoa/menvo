@@ -20,11 +20,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("💥 Erro interno no logout:", error)
-    return NextResponse.json(
-      {
-        error: "Erro interno do servidor",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

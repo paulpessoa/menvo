@@ -1,49 +1,37 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
+import { z } from "zod"
+
+const resetPasswordSchema = z.object({
+  password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres"),
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { password, access_token, refresh_token } = await request.json()
-
-    if (!password || !access_token || !refresh_token) {
-      return NextResponse.json({ error: "Dados incompletos" }, { status: 400 })
-    }
-
-    if (password.length < 6) {
-      return NextResponse.json({ error: "Senha deve ter pelo menos 6 caracteres" }, { status: 400 })
-    }
+    const body = await request.json()
+    const { password } = resetPasswordSchema.parse(body)
 
     const supabase = await createClient()
 
-    // Definir sessão com os tokens
-    const { error: sessionError } = await supabase.auth.setSession({
-      access_token,
-      refresh_token,
-    })
-
-    if (sessionError) {
-      console.error("❌ Erro ao definir sessão:", sessionError)
-      return NextResponse.json({ error: "Token inválido ou expirado" }, { status: 401 })
-    }
-
-    // Atualizar senha
-    const { error: updateError } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       password,
     })
 
-    if (updateError) {
-      console.error("❌ Erro ao atualizar senha:", updateError)
-      return NextResponse.json({ error: "Erro ao atualizar senha" }, { status: 500 })
+    if (error) {
+      console.error("Erro ao atualizar senha:", error)
+      return NextResponse.json({ error: "Erro ao atualizar senha" }, { status: 400 })
     }
-
-    console.log("✅ Senha atualizada com sucesso")
 
     return NextResponse.json({
       success: true,
       message: "Senha atualizada com sucesso!",
     })
   } catch (error) {
-    console.error("💥 Erro interno:", error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors[0].message }, { status: 400 })
+    }
+
+    console.error("Erro ao resetar senha:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

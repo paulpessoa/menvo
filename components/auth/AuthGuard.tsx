@@ -2,100 +2,87 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
-import { RoleSelectionModal } from "./RoleSelectionModal"
-import { ProfileCompletionModal } from "./ProfileCompletionModal"
-import { ValidationPendingModal } from "./ValidationPendingModal"
-import { Loader2 } from "lucide-react"
+import { useAuth } from "@/lib/auth/AuthContext"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 interface AuthGuardProps {
   children: React.ReactNode
+  requireAuth?: boolean
+  requiredRole?: string[]
+  fallback?: React.ReactNode
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
-  const { user, profile, loading, isAuthenticated, needsRoleSelection, needsVerification } =
-    useAuth()
-
+export function AuthGuard({ children, requireAuth = true, requiredRole = [], fallback = null }: AuthGuardProps) {
+  const { user, profile, loading, initialized } = useAuth()
   const router = useRouter()
-  const pathname = usePathname()
-  const [showRoleSelection, setShowRoleSelection] = useState(false)
-  const [showProfileCompletion, setShowProfileCompletion] = useState(false)
-  const [showValidationPending, setShowValidationPending] = useState(false)
-
-  // Rotas que não precisam de autenticação
-  const publicRoutes = [
-    "/",
-    "/about",
-    "/how-it-works",
-    "/login",
-    "/signup",
-    "/forgot-password",
-    "/reset-password",
-    "/unauthorized",
-    "/confirmation",
-    "/auth/callback",
-  ]
-
-  const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))
 
   useEffect(() => {
-    if (loading) return
+    if (!initialized || loading) return
 
-    // Se não está autenticado e não é rota pública, redirecionar para login
-    if (!isAuthenticated && !isPublicRoute) {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`)
+    // Se requer autenticação mas não está logado
+    if (requireAuth && !user) {
+      router.push("/login")
       return
     }
 
-    // Se está autenticado, verificar fluxos necessários
-    if (isAuthenticated && !isPublicRoute) {
-      if (needsRoleSelection) {
-        setShowRoleSelection(true)
+    // Se está logado mas não requer autenticação (páginas de auth)
+    if (!requireAuth && user) {
+      // Se o perfil ainda está pending, vai para welcome
+      if (profile?.role === "pending") {
+        router.push("/welcome")
         return
       }
+      // Senão vai para dashboard
+      router.push("/dashboard")
+      return
+    }
 
-      if (needsVerification) {
-        setShowValidationPending(true)
+    // Se requer role específica
+    if (requireAuth && user && profile && requiredRole.length > 0) {
+      if (!requiredRole.includes(profile.role)) {
+        router.push("/unauthorized")
         return
       }
     }
 
-    // Resetar modals se não precisar mais
-    setShowRoleSelection(false)
-    setShowProfileCompletion(false)
-    setShowValidationPending(false)
-  }, [
-    loading,
-    isAuthenticated,
-    needsRoleSelection,
-    needsVerification,
-    isPublicRoute,
-    pathname,
-    router,
-  ])
+    // Se usuário logado tem role pending, redireciona para welcome
+    if (requireAuth && user && profile?.role === "pending") {
+      router.push("/welcome")
+      return
+    }
+  }, [user, profile, loading, initialized, requireAuth, requiredRole, router])
 
-  // Mostrar loading enquanto carrega
-  if (loading) {
+  // Mostrar loading enquanto inicializa
+  if (!initialized || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <Loader2 className="h-6 w-6 animate-spin" />
-          <span>Carregando...</span>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     )
   }
 
-  return (
-    <>
-      {children}
+  // Se requer auth mas não está logado, não renderiza nada (vai redirecionar)
+  if (requireAuth && !user) {
+    return fallback
+  }
 
-      {/* Modals de fluxo de autenticação */}
-      <RoleSelectionModal open={showRoleSelection} onClose={() => setShowRoleSelection(false)} />
+  // Se não requer auth mas está logado, não renderiza nada (vai redirecionar)
+  if (!requireAuth && user) {
+    return fallback
+  }
 
-      <ValidationPendingModal open={showValidationPending} onClose={() => setShowValidationPending(false)} />
-    </>
-  )
+  // Se requer role específica mas não tem
+  if (requireAuth && user && profile && requiredRole.length > 0) {
+    if (!requiredRole.includes(profile.role)) {
+      return fallback
+    }
+  }
+
+  // Se usuário tem role pending em página protegida, não renderiza
+  if (requireAuth && user && profile?.role === "pending") {
+    return fallback
+  }
+
+  return <>{children}</>
 }

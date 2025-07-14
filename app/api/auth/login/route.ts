@@ -1,17 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
+import { z } from "zod"
+
+const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "Senha é obrigatória"),
+})
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password } = body
+    const { email, password } = loginSchema.parse(body)
 
     console.log("🔐 Tentativa de login para:", email)
-
-    // Validações
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email e senha são obrigatórios" }, { status: 400 })
-    }
 
     const supabase = await createClient()
 
@@ -39,18 +40,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Falha no login" }, { status: 500 })
     }
 
-    console.log("✅ Login bem-sucedido para:", authData.user.email)
-
     // Buscar perfil do usuário
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("id, email, first_name, last_name, full_name, role, status, verification_status")
+      .select("*")
       .eq("id", authData.user.id)
       .single()
 
     if (profileError) {
       console.error("⚠️ Erro ao buscar perfil:", profileError)
     }
+
+    console.log("✅ Login bem-sucedido para:", authData.user.email)
 
     return NextResponse.json({
       success: true,
@@ -59,12 +60,11 @@ export async function POST(request: NextRequest) {
       profile: profile || null,
     })
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors[0].message }, { status: 400 })
+    }
+
     console.error("💥 Erro interno no login:", error)
-    return NextResponse.json(
-      {
-        error: "Erro interno do servidor",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

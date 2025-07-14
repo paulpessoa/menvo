@@ -1,60 +1,30 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/utils/supabase/server"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
-  const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get("code")
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get("code")
+  const next = searchParams.get("next") ?? "/"
 
   if (code) {
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
-    try {
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error && data.user) {
+      // Verificar se o usuário tem perfil
+      const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single()
 
-      if (error) {
-        console.error("Error exchanging code for session:", error)
-        return NextResponse.redirect(new URL("/login?error=auth_error", request.url))
+      // Se o perfil tem role pending, redireciona para welcome
+      if (profile?.role === "pending") {
+        return NextResponse.redirect(`${origin}/welcome`)
       }
 
-      // Check if user has a profile
-      if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .single()
-
-        if (profileError || !profile) {
-          // Create profile if it doesn't exist
-          const { error: createError } = await supabase.from("profiles").insert({
-            id: data.user.id,
-            email: data.user.email!,
-            full_name: data.user.user_metadata?.full_name || data.user.user_metadata?.name,
-            first_name: data.user.user_metadata?.given_name,
-            last_name: data.user.user_metadata?.family_name,
-            avatar_url: data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture,
-            role: "mentee", // Default role
-            status: "pending",
-            verification_status: "pending",
-          })
-
-          if (createError) {
-            console.error("Error creating profile:", createError)
-          }
-        }
-      }
-
-      // Redirect to dashboard or intended page
-      const redirectTo = requestUrl.searchParams.get("redirectTo") || "/dashboard"
-      return NextResponse.redirect(new URL(redirectTo, request.url))
-    } catch (error) {
-      console.error("Auth callback error:", error)
-      return NextResponse.redirect(new URL("/login?error=callback_error", request.url))
+      // Senão redireciona para dashboard ou próxima página
+      const redirectUrl = next.startsWith("/") ? `${origin}${next}` : `${origin}/dashboard`
+      return NextResponse.redirect(redirectUrl)
     }
   }
 
-  // No code provided, redirect to login
-  return NextResponse.redirect(new URL("/login", request.url))
+  // Se houve erro, redireciona para login
+  return NextResponse.redirect(`${origin}/login`)
 }
