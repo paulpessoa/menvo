@@ -1,6 +1,9 @@
 import jest from "jest"
 import "@testing-library/jest-dom"
 
+// Optional: configure or set up a testing framework before each test.
+// If you delete this file, remove `setupFilesAfterEnv` from `jest.config.js`
+
 // Mock do Supabase
 jest.mock("@/lib/auth/supabase-client", () => ({
   supabase: {
@@ -39,3 +42,6 @@ jest.mock("next/navigation", () => ({
     get: jest.fn(),
   }),
 }))
+
+// Used for __tests__/testing-library.js
+// Learn more: https://github.com/testing-library/jest-dom

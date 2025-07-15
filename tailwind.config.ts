@@ -28,15 +28,6 @@ const config = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          100: "#e6f2f4",
-          200: "#cce5e9",
-          300: "#99cbcf",
-          400: "#66b0b8",
-          500: "#339ca7",
-          600: "#0f7185", // Your brand color
-          700: "#006276", // Your brand color
-          800: "#004e5f",
-          900: "#003a47",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
