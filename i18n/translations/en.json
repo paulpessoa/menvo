@@ -12,8 +12,8 @@
     "logout": "Logout",
     "language": "Language",
     "english": "English",
-    "portuguese": "Portuguese", 
-    "spanish": "Spanish",
+    "portuguese": "Português",
+    "spanish": "Español",
     "cancel": "Cancel",
     "continue": "Continue",
     "submit": "Submit",
@@ -97,7 +97,7 @@
         "description": "Building a supportive community where knowledge is freely shared and connections are made across backgrounds and borders."
       },
       "accessibility": {
-        "title": "Accessibility", 
+        "title": "Accessibility",
         "description": "Making mentorship accessible to everyone, regardless of their financial situation, location, or background."
       },
       "impact": {
@@ -111,7 +111,7 @@
       "goalNumber": "SDG {{number}}",
       "goals": {
         "qualityEducation": "Quality Education",
-        "genderEquality": "Gender Equality", 
+        "genderEquality": "Gender Equality",
         "decentWork": "Decent Work and Economic Growth",
         "reducedInequalities": "Reduced Inequalities"
       }
@@ -131,7 +131,7 @@
         "label": "Volunteer Mentors"
       },
       "mentorshipSessions": {
-        "count": "5,000+", 
+        "count": "5,000+",
         "label": "Mentorship Sessions"
       },
       "countriesReached": {
@@ -168,7 +168,7 @@
         "title": "Create Your Profile",
         "description": "Sign up and create your profile with details about your background, goals, and interests. This helps us match you with the right mentors.",
         "feature1": "Upload your resume",
-        "feature2": "Add your profile picture", 
+        "feature2": "Add your profile picture",
         "feature3": "Connect your LinkedIn profile"
       },
       "step2": {
@@ -220,7 +220,7 @@
         "title": "Conduct Mentorship Sessions",
         "description": "Connect with mentees via video calls. Share your knowledge, provide guidance, and help them navigate their challenges.",
         "feature1": "Receive session requests",
-        "feature2": "Conduct video mentorship sessions", 
+        "feature2": "Conduct video mentorship sessions",
         "feature3": "Track your impact and sessions"
       },
       "becomeMentor": "Become a Mentor"
@@ -256,37 +256,37 @@
       "contactSupport": "Contact Support"
     }
   },
-      "login": {
-      "title": "Welcome back",
-      "description": "Sign in to your account to access the platform",
-      "email": "Email",
-      "emailPlaceholder": "name@example.com",
-      "password": "Password",
-      "passwordPlaceholder": "Enter your password",
-      "forgotPassword": "Forgot password?",
-      "loginButton": "Log in",
-      "loggingIn": "Logging in...",
-      "noAccount": "Don't have an account?",
-      "signUp": "Sign up",
-      "continueWith": "Continue with",
-      "google": "Google",
-      "linkedin": "LinkedIn", 
-      "github": "GitHub",
-      "connecting": "Connecting...",
-      "emailNotConfirmedInfo": "Check your inbox to verify your email.",
-      "dontHaveAccount": "Don't have an account?",
-      "error": {
-        "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
-        "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
-        "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
-        "networkError": "Connection error. Please check your internet and try again."
-      }
-    },
-      "register": {
-      "title": "Join Menvo",
-      "subtitle": "Connect with volunteer mentors and develop your career for free",
-      "signupTitle": "Create Account",
-      "description": "Fill in your details to start your journey",
+  "login": {
+    "title": "Welcome back",
+    "description": "Sign in to your account to access the platform",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "loginButton": "Log in",
+    "loggingIn": "Logging in...",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "continueWith": "Continue with",
+    "google": "Google",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "connecting": "Connecting...",
+    "emailNotConfirmedInfo": "Check your inbox to verify your email.",
+    "dontHaveAccount": "Don't have an account?",
+    "error": {
+      "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
+      "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
+      "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
+      "networkError": "Connection error. Please check your internet and try again."
+    }
+  },
+  "register": {
+    "title": "Join Menvo",
+    "subtitle": "Connect with volunteer mentors and develop your career for free",
+    "signupTitle": "Create Account",
+    "description": "Fill in your details to start your journey",
     "firstName": "First Name",
     "firstNamePlaceholder": "Enter your first name",
     "lastName": "Last Name",
@@ -417,7 +417,7 @@
       "benefits": {
         "title": "What you can do after logging in:",
         "item1": "View detailed mentor profiles",
-        "item2": "Schedule free mentorship sessions", 
+        "item2": "Schedule free mentorship sessions",
         "item3": "Message mentors directly",
         "item4": "Access your mentorship history"
       },
@@ -599,8 +599,7 @@
       "title": "MENVO - Volunteer Mentoring Platform",
       "description": "Connecting mentors and mentees for free mentoring sessions"
     }
-  }
-,
+  },
   "waitingList": {
     "title": "Join the Waiting List",
     "description": "Thank you for your interest! Please fill out the form below.",

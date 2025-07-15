@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
-import i18n from '../i18n/config';
+"use client"
 
-export const useLanguage = () => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setCurrentLanguage(lng);
-    localStorage.setItem('language', lng); // <-- salva no localStorage garantindo que na próxima vez que o usuário acessar a aplicação,
-  };                                      // ela já esteja no idioma que ele selecionou, sem precisar escolher novamente.
+export function useLanguage() {
+  const { i18n } = useTranslation()
+  const [currentLanguage, setCurrentLanguage] = useState("pt-BR")
 
   useEffect(() => {
-    const language = localStorage.getItem('language') || 'pt-BR';
-    changeLanguage(language);
-  }, []);
+    setCurrentLanguage(i18n.language || "pt-BR")
+  }, [i18n.language])
+
+  const changeLanguage = (language: string) => {
+    i18n.changeLanguage(language)
+    setCurrentLanguage(language)
+  }
 
   return {
     currentLanguage,
     changeLanguage,
-  };
-};
+  }
+}

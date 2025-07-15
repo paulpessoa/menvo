@@ -16,7 +16,9 @@ interface SignupData {
 }
 
 interface CompleteProfileData {
-  role: "mentor" | "mentee" | "volunteer"
+  first_name: string
+  last_name: string
+  role: "mentee" | "mentor" | "volunteer"
   bio?: string
   location?: string
   linkedin_url?: string
@@ -61,27 +63,26 @@ export function useSignup() {
 }
 
 export function useCompleteProfile() {
+  const { updateProfile } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (data: CompleteProfileData) => {
-      const response = await fetch("/api/auth/complete-profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Erro ao completar perfil")
+      const profileData = {
+        ...data,
+        full_name: `${data.first_name} ${data.last_name}`,
+        status: "active" as const,
+        verification_status: data.role === "mentor" ? ("pending" as const) : ("verified" as const),
       }
 
-      return response.json()
+      const result = await updateProfile(profileData)
+      if (result.error) {
+        throw new Error(result.error)
+      }
+      return result
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] })
+      queryClient.invalidateQueries({ queryKey: ["profile"] })
     },
   })
 }

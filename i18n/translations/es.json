@@ -5,14 +5,14 @@
     "findMentors": "Encontrar Mentores",
     "events": "Eventos",
     "howItWorks": "Cómo Funciona",
-    "aboutUs": "Sobre Nosotros",
+    "aboutUs": "Acerca de",
     "title": "Menvo",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "logout": "Cerrar Sesión",
     "language": "Idioma",
-    "english": "Inglés",
-    "portuguese": "Portugués",
+    "english": "English",
+    "portuguese": "Português",
     "spanish": "Español",
     "cancel": "Cancelar",
     "continue": "Continuar",
@@ -79,7 +79,7 @@
     "event.type": "En línea"
   },
   "about": {
-    "badge": "Sobre Nosotros",
+    "badge": "Acerca de",
     "ourMission": {
       "title": "Nuestra Misión",
       "description": "Simplificando la mentoría en conversaciones abiertas. Cualquiera puede compartir su experiencia con quienes la buscan, siempre de forma gratuita."
@@ -256,37 +256,37 @@
       "contactSupport": "Contactar Soporte"
     }
   },
-      "login": {
-      "title": "Bienvenido de vuelta",
-      "description": "Inicia sesión en tu cuenta para acceder a la plataforma",
-      "email": "Correo electrónico",
-      "emailPlaceholder": "nombre@ejemplo.com",
-      "password": "Contraseña",
-      "passwordPlaceholder": "Escribe tu contraseña",
-      "forgotPassword": "¿Olvidaste tu contraseña?",
-      "loginButton": "Iniciar sesión",
-      "loggingIn": "Iniciando sesión...",
-      "noAccount": "¿No tienes una cuenta?",
-      "signUp": "Registrarse",
-      "continueWith": "Continuar con",
-      "google": "Google",
-      "linkedin": "LinkedIn",
-      "github": "GitHub",
-      "connecting": "Conectando...",
-      "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
-      "dontHaveAccount": "¿No tienes una cuenta?",
-      "error": {
-        "invalidCredentials": "Correo electrónico o contraseña incorrectos. Verifica tus credenciales e inténtalo de nuevo.",
-        "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
-        "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
-        "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
-      }
-    },
-      "register": {
-      "title": "Únete a Menvo",
-      "subtitle": "Conéctate con mentores voluntarios y desarrolla tu carrera gratuitamente",
-      "signupTitle": "Crear Cuenta",
-      "description": "Completa tus datos para comenzar tu viaje",
+  "login": {
+    "title": "Bienvenido de vuelta",
+    "description": "Inicia sesión en tu cuenta para acceder a la plataforma",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Escribe tu contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginButton": "Iniciar sesión",
+    "loggingIn": "Iniciando sesión...",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Registrarse",
+    "continueWith": "Continuar con",
+    "google": "Google",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "connecting": "Conectando...",
+    "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "error": {
+      "invalidCredentials": "Correo electrónico o contraseña incorrectos. Verifica tus credenciales e inténtalo de nuevo.",
+      "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
+      "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
+      "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
+    }
+  },
+  "register": {
+    "title": "Únete a Menvo",
+    "subtitle": "Conéctate con mentores voluntarios y desarrolla tu carrera gratuitamente",
+    "signupTitle": "Crear Cuenta",
+    "description": "Completa tus datos para comenzar tu viaje",
     "firstName": "Nombre",
     "firstNamePlaceholder": "Ingresa tu nombre",
     "lastName": "Apellido",
@@ -327,7 +327,15 @@
     "emailConfirmedDescription": "Tu email ha sido confirmado exitosamente. Ahora elige cómo quieres usar la plataforma.",
     "selectRoleDescription": "Elige cómo quieres usar la plataforma:",
     "menteeDescription": "Busco orientación y desarrollo profesional",
-    "mentorDescription": "Quiero compartir conocimiento y orientar a otros profesionales",
+    "mentorDescription": "Quiero compartir mi experiencia y ayudar a otros profesionales",
+    "company": {
+      "title": "Empresa",
+      "description": "Quiero inscribir profesionales de nuestra empresa"
+    },
+    "recruiter": {
+      "title": "Reclutador",
+      "description": "Busco profesionales calificados para oportunidades"
+    },
     "continue": "Continuar",
     "welcome": {
       "title": "¡Bienvenido a Menvo!",
@@ -358,7 +366,7 @@
         "title": "Mentor",
         "description": "Quiero compartir mi experiencia y ayudar a otros"
       },
-       "company": {
+      "company": {
         "title": "Empresa",
         "description": "Quiero inscribir profesionales de nuestra empresa"
       },
@@ -438,7 +446,7 @@
     "howItWorks": "Cómo Funciona",
     "store": "Tienda",
     "company": "Compañía",
-    "aboutUs": "Sobre Nosotros",
+    "aboutUs": "Acerca de",
     "team": "Nuestro Equipo",
     "mission": "Nuestra Misión",
     "partners": "Socios",
@@ -599,8 +607,7 @@
       "title": "MENVO - Plataforma de Mentoría Voluntaria",
       "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría"
     }
-  }
-,
+  },
   "waitingList": {
     "title": "Únete a la Lista de Espera",
     "description": "¡Gracias por tu interés! Por favor, completa el siguiente formulario.",

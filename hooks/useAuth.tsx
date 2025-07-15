@@ -1,6 +1,7 @@
 "use client"
 
 import { createClient } from "@/utils/supabase/client"
+import { useAuth as useAuthContext } from "@/app/context/auth-context"
 
 // Hook para operações de autenticação
 export const useAuthOperations = () => {
@@ -160,5 +161,5 @@ export const useAuthOperations = () => {
 export const useAuth = () => {
   // Este hook deve ser usado apenas para operações, não para estado
   // Para estado de autenticação, use o contexto diretamente
-  return useAuthOperations()
+  return useAuthContext()
 }

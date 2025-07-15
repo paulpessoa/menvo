@@ -4,10 +4,10 @@ import type React from "react"
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/app/context/auth-context"
 import { Toaster } from "@/components/ui/sonner"
+import "@/i18n/config"
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(

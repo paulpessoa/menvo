@@ -8,12 +8,12 @@
     "aboutUs": "Sobre Nós",
     "title": "Menvo",
     "login": "Entrar",
-    "register": "Registrar",
+    "register": "Cadastrar",
     "logout": "Sair",
     "language": "Idioma",
-    "english": "Inglês",
+    "english": "English",
     "portuguese": "Português",
-    "spanish": "Espanhol",
+    "spanish": "Español",
     "cancel": "Cancelar",
     "continue": "Continuar",
     "submit": "Enviar",
@@ -97,7 +97,7 @@
         "description": "Construir uma comunidade acolhedora, onde o conhecimento é compartilhado livremente e conexões são feitas além de origens e fronteiras."
       },
       "accessibility": {
-        "title": "Acessibilidade", 
+        "title": "Acessibilidade",
         "description": "Tornar a mentoria acessível a todos, independentemente de sua situação financeira, localização ou histórico."
       },
       "impact": {
@@ -111,7 +111,7 @@
       "goalNumber": "ODS {{number}}",
       "goals": {
         "qualityEducation": "Educação de Qualidade",
-        "genderEquality": "Igualdade de Gênero", 
+        "genderEquality": "Igualdade de Gênero",
         "decentWork": "Trabalho Decente e Crescimento Econômico",
         "reducedInequalities": "Redução das Desigualdades"
       }
@@ -131,7 +131,7 @@
         "label": "Mentores Voluntários"
       },
       "mentorshipSessions": {
-        "count": "5.000+", 
+        "count": "5.000+",
         "label": "Sessões de Mentoria"
       },
       "countriesReached": {
@@ -452,8 +452,7 @@
     "termsOfService": "Termos de Serviço",
     "cookiePolicy": "Política de Cookies",
     "allRightsReserved": "Todos os direitos reservados."
-  }
-,
+  },
   "waitingList": {
     "title": "Junte-se à Lista de Espera",
     "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",
