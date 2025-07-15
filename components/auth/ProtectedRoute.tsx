@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { useAuth } from "@/app/context/auth-context"
 import { hasPermission, type Permission, type UserRole } from "@/lib/auth/rbac"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { Loader2 } from "lucide-react"
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -18,7 +18,7 @@ export function ProtectedRoute({
   children,
   requiredPermission,
   requiredRole,
-  fallbackPath = "/auth",
+  fallbackPath = "/login",
 }: ProtectedRouteProps) {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
@@ -26,25 +26,21 @@ export function ProtectedRoute({
   useEffect(() => {
     if (loading) return
 
-    // Not authenticated
     if (!user) {
       router.push(fallbackPath)
       return
     }
 
-    // No profile or pending role
     if (!profile || profile.role === "pending") {
       router.push("/welcome")
       return
     }
 
-    // Check required role
     if (requiredRole && profile.role !== requiredRole) {
       router.push("/unauthorized")
       return
     }
 
-    // Check required permission
     if (requiredPermission && !hasPermission(profile.role, requiredPermission)) {
       router.push("/unauthorized")
       return
@@ -54,16 +50,12 @@ export function ProtectedRoute({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
 
-  if (!user || !profile) {
-    return null
-  }
-
-  if (profile.role === "pending") {
+  if (!user || !profile || profile.role === "pending") {
     return null
   }
 

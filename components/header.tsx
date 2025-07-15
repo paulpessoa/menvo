@@ -7,7 +7,6 @@ import {
   Menu,
   User,
   LogOut,
-  Settings,
   Calendar,
   MessageSquare,
   Globe,
@@ -16,9 +15,11 @@ import {
   UserCheck,
   BarChart3,
   Cog,
+  LayoutDashboard,
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
-
+import { useAuth } from "@/app/context/auth-context"
+import { usePermissions } from "@/hooks/usePermissions"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -31,55 +32,55 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
-import { useAuth } from "@/hooks/useAuth"
-import { usePermissions } from "@/hooks/usePermissions"
 import { useTranslation } from "react-i18next"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation()
-
-  const { isAuthenticated, user, profile, signOut } = useAuth()
-  const { canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } =
-    usePermissions()
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, profile, signOut, loading } = useAuth()
+  const { permissions } = usePermissions()
   const pathname = usePathname()
   const { currentLanguage, changeLanguage } = useLanguage()
 
+  const isAuthenticated = !!user
+
   const navigation = [
-    { name: t("common.home"), href: "/" },
     { name: t("common.findMentors"), href: "/mentors" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
     { name: t("common.aboutUs"), href: "/about" },
   ]
 
-  const userNavigation = isAuthenticated
-    ? [
-        { name: "Dashboard", href: "/dashboard", icon: User },
-        { name: "Perfil", href: "/profile", icon: Settings },
-        { name: "Mensagens", href: "/messages", icon: MessageSquare },
-        { name: "Calendário", href: "/calendar", icon: Calendar },
-      ]
-    : []
+  const userNavigation = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Meu Perfil", href: "/profile", icon: User },
+    { name: "Mensagens", href: "/messages", icon: MessageSquare },
+    { name: "Calendário", href: "/calendar", icon: Calendar },
+  ]
 
-  const adminNavigation =
-    isAuthenticated && (canAdminSystem || canAdminUsers || canAdminVerifications)
-      ? [
-          ...(canAdminSystem ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
-          ...(canAdminUsers ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
-          ...(canAdminVerifications ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }] : []),
-          ...(canValidateActivities
-            ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
-            : []),
-          ...(canViewReports ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
-          ...(canAdminSystem ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }] : []),
-        ]
-      : []
+  const adminNavigation = [
+    ...(permissions.includes("system:update-settings") ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
+    ...(permissions.includes("users:list") ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
+    ...(permissions.includes("verifications:list")
+      ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }]
+      : []),
+    ...(permissions.includes("volunteer-activities:validate")
+      ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
+      : []),
+    ...(permissions.includes("reports:view") ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
+    ...(permissions.includes("system:update-settings")
+      ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }]
+      : []),
+  ]
 
   const handleSignOut = async () => {
     await signOut()
     setIsOpen(false)
+  }
+
+  const getAvatarFallback = () => {
+    if (profile?.first_name) return profile.first_name[0].toUpperCase()
+    if (user?.email) return user.email[0].toUpperCase()
+    return "U"
   }
 
   return (
@@ -91,14 +92,13 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary-600 ${
-                pathname === item.href ? "text-primary-600" : "text-foreground/60"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                pathname === item.href ? "text-primary" : "text-muted-foreground"
               }`}
             >
               {item.name}
@@ -121,45 +121,35 @@ export default function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {isAuthenticated ? (
+          {loading ? (
+            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+          ) : isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full p-0">
                   <Avatar>
-                    <AvatarImage
-                      src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || profile?.avatar_url}
-                      alt={profile?.full_name || user?.email || "User"}
-                    />
-                    <AvatarFallback>
-                      {profile?.full_name?.[0]?.toUpperCase() ||
-                        user?.user_metadata?.full_name?.[0]?.toUpperCase() ||
-                        user?.email?.[0]?.toUpperCase() ||
-                        "U"}
-                    </AvatarFallback>
+                    <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "User"} />
+                    <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{profile?.full_name || user?.user_metadata?.full_name || "Usuário"}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email}</p>
-                    {profile?.role && <p className="text-xs text-muted-foreground capitalize">{profile.role}</p>}
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profile?.full_name || "Usuário"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                    {profile?.role && <p className="text-xs text-muted-foreground capitalize pt-1">{profile.role}</p>}
                   </div>
-                </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
-                {/* User Navigation */}
                 {userNavigation.map((item) => (
                   <DropdownMenuItem key={item.name} asChild>
                     <Link href={item.href} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />
-                      {item.name}
+                      <span>{item.name}</span>
                     </Link>
                   </DropdownMenuItem>
                 ))}
-
-                {/* Admin Navigation */}
                 {adminNavigation.length > 0 && (
                   <>
                     <DropdownMenuSeparator />
@@ -168,17 +158,16 @@ export default function Header() {
                       <DropdownMenuItem key={item.name} asChild>
                         <Link href={item.href} className="flex items-center gap-2">
                           <item.icon className="h-4 w-4" />
-                          {item.name}
+                          <span>{item.name}</span>
                         </Link>
                       </DropdownMenuItem>
                     ))}
                   </>
                 )}
-
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2">
+                <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2 cursor-pointer">
                   <LogOut className="h-4 w-4" />
-                  Sair
+                  <span>Sair</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -211,53 +200,49 @@ export default function Header() {
                     {item.name}
                   </Link>
                 ))}
-
+                <DropdownMenuSeparator />
                 {isAuthenticated ? (
                   <>
-                    <div className="border-t pt-4">
-                      {userNavigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className="flex items-center gap-2 px-2 py-1 text-lg"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <item.icon className="h-4 w-4" />
-                          {item.name}
-                        </Link>
-                      ))}
-
-                      {adminNavigation.length > 0 && (
-                        <>
-                          <div className="border-t pt-2 mt-2">
-                            <p className="px-2 py-1 text-sm font-medium text-muted-foreground">Administração</p>
-                            {adminNavigation.map((item) => (
-                              <Link
-                                key={item.name}
-                                href={item.href}
-                                className="flex items-center gap-2 px-2 py-1 text-lg"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                <item.icon className="h-4 w-4" />
-                                {item.name}
-                              </Link>
-                            ))}
-                          </div>
-                        </>
-                      )}
-
-                      <Button
-                        variant="ghost"
-                        onClick={handleSignOut}
-                        className="flex items-center gap-2 px-2 py-1 text-lg justify-start mt-2"
+                    {userNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="flex items-center gap-2 px-2 py-1 text-lg"
+                        onClick={() => setIsOpen(false)}
                       >
-                        <LogOut className="h-4 w-4" />
-                        Sair
-                      </Button>
-                    </div>
+                        <item.icon className="h-4 w-4" />
+                        {item.name}
+                      </Link>
+                    ))}
+                    {adminNavigation.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <p className="px-2 py-1 text-sm font-medium text-muted-foreground">Administração</p>
+                        {adminNavigation.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className="flex items-center gap-2 px-2 py-1 text-lg"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            <item.icon className="h-4 w-4" />
+                            {item.name}
+                          </Link>
+                        ))}
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                    <Button
+                      variant="ghost"
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 px-2 py-1 text-lg justify-start"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sair
+                    </Button>
                   </>
                 ) : (
-                  <div className="border-t pt-4 space-y-2">
+                  <>
                     <Button variant="ghost" asChild className="w-full justify-start">
                       <Link href="/login" onClick={() => setIsOpen(false)}>
                         {t("common.login")}
@@ -268,7 +253,7 @@ export default function Header() {
                         {t("common.register")}
                       </Link>
                     </Button>
-                  </div>
+                  </>
                 )}
               </nav>
             </SheetContent>
