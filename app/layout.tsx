@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
+import { AuthProvider } from "@/lib/auth/AuthContext"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { FeedbackBanner } from "@/components/FeedbackBanner"
@@ -15,9 +16,8 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://menvo.com.br"),
-  title: "Menvo - Plataforma de Mentoria e Voluntariado",
-  description:
-    "Conectando mentores, mentorados e voluntários para transformar vidas através do conhecimento compartilhado.",
+  title: "MENVO - Plataforma de Mentoria Voluntária",
+  description: "Conectando mentores e mentorados para transformar vidas através da mentoria voluntária",
   authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
   creator: "Paul Pessoa",
   publisher: "Menvo",
@@ -40,9 +40,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://menvo.com.br",
-    title: "Menvo - Plataforma de Mentoria e Voluntariado",
-    description:
-      "Conectando mentores, mentorados e voluntários para transformar vidas através do conhecimento compartilhado.",
+    title: "MENVO - Plataforma de Mentoria Voluntária",
+    description: "Conectando mentores e mentorados para transformar vidas através da mentoria voluntária",
     siteName: "Menvo",
     images: [
       {
@@ -55,9 +54,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Menvo - Plataforma de Mentoria e Voluntariado",
-    description:
-      "Conectando mentores, mentorados e voluntários para transformar vidas através do conhecimento compartilhado.",
+    title: "MENVO - Plataforma de Mentoria Voluntária",
+    description: "Conectando mentores e mentorados para transformar vidas através da mentoria voluntária",
     creator: "@paulpessoa",
     images: ["https://menvo.com.br/twitter-image.jpg"],
   },
@@ -134,17 +132,19 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <Providers>
-          <Suspense fallback={null}>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <FeedbackBanner />
-              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-            </div>
-          </Suspense>
-        </Providers>
+        <AuthProvider>
+          <Providers>
+            <Suspense fallback={null}>
+              <div className="flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">{children}</main>
+                <Footer />
+                <FeedbackBanner />
+                <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+              </div>
+            </Suspense>
+          </Providers>
+        </AuthProvider>
         <Analytics />
       </body>
     </html>

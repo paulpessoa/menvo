@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useAuth } from "@/lib/auth/AuthContext"
 import { AuthGuard } from "@/components/auth/AuthGuard"

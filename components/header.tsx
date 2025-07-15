@@ -18,7 +18,7 @@ import {
   LayoutDashboard,
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
-import { useAuth } from "@/app/context/auth-context"
+import { useAuth } from "@/lib/auth/AuthContext"
 import { usePermissions } from "@/hooks/usePermissions"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -200,7 +200,7 @@ export default function Header() {
                     {item.name}
                   </Link>
                 ))}
-                <DropdownMenuSeparator />
+                <div className="border-t pt-4" />
                 {isAuthenticated ? (
                   <>
                     {userNavigation.map((item) => (
@@ -216,7 +216,7 @@ export default function Header() {
                     ))}
                     {adminNavigation.length > 0 && (
                       <>
-                        <DropdownMenuSeparator />
+                        <div className="border-t pt-4" />
                         <p className="px-2 py-1 text-sm font-medium text-muted-foreground">Administração</p>
                         {adminNavigation.map((item) => (
                           <Link
@@ -231,7 +231,7 @@ export default function Header() {
                         ))}
                       </>
                     )}
-                    <DropdownMenuSeparator />
+                    <div className="border-t pt-4" />
                     <Button
                       variant="ghost"
                       onClick={handleSignOut}
@@ -245,12 +245,12 @@ export default function Header() {
                   <>
                     <Button variant="ghost" asChild className="w-full justify-start">
                       <Link href="/login" onClick={() => setIsOpen(false)}>
-                        {t("common.login")}
+                        Entrar
                       </Link>
                     </Button>
                     <Button asChild className="w-full">
                       <Link href="/signup" onClick={() => setIsOpen(false)}>
-                        {t("common.register")}
+                        Cadastrar
                       </Link>
                     </Button>
                   </>
