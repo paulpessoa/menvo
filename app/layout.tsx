@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { Providers } from "./providers"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { FeedbackBanner } from "@/components/FeedbackBanner"
@@ -9,9 +10,6 @@ import { GoogleAnalytics } from "@next/third-parties/google"
 import Script from "next/script"
 import { Analytics } from "@vercel/analytics/react"
 import { Suspense } from "react"
-import { AuthProvider } from "@/app/context/auth-context"
-import { ThemeProvider } from "@/components/theme-provider"
-import { ReactQueryProvider } from "@/app/providers"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -136,21 +134,17 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <ReactQueryProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <AuthProvider>
-              <Suspense fallback={null}>
-                <div className="flex min-h-screen flex-col">
-                  <Header />
-                  <main className="flex-1">{children}</main>
-                  <Footer />
-                  <FeedbackBanner />
-                  <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-                </div>
-              </Suspense>
-            </AuthProvider>
-          </ThemeProvider>
-        </ReactQueryProvider>
+        <Providers>
+          <Suspense fallback={null}>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <FeedbackBanner />
+              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+            </div>
+          </Suspense>
+        </Providers>
         <Analytics />
       </body>
     </html>

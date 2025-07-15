@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
+import { hasPermission } from "@/lib/auth/rbac"
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Verificar autenticação e permissões
     const {
       data: { user },
       error: authError,
@@ -15,75 +15,68 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
     }
 
+    // Verificar se é admin
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
 
-    if (!profile || !["admin", "moderator"].includes(profile.role)) {
-      return NextResponse.json({ error: "Sem permissão para acessar dashboard" }, { status: 403 })
+    if (!profile || !hasPermission(profile.role, "admin.all")) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 403 })
     }
 
     // Buscar estatísticas
     const [
       { count: totalUsers },
-      { count: pendingVerifications },
       { count: totalMentors },
-      { count: activeMentors },
+      { count: totalMentees },
       { count: totalVolunteers },
-      { count: pendingActivities },
-      { count: totalSessions },
-      { count: completedSessions },
+      { count: pendingVerifications },
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .eq("verification_status", "pending")
-        .eq("role", "mentor"),
       supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "mentor"),
-      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "mentor").eq("status", "active"),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "mentee"),
       supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "volunteer"),
-      supabase.from("volunteer_activities").select("*", { count: "exact", head: true }).eq("status", "pending"),
-      supabase.from("mentorship_sessions").select("*", { count: "exact", head: true }),
-      supabase.from("mentorship_sessions").select("*", { count: "exact", head: true }).eq("status", "completed"),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "pending"),
     ])
+
+    // Buscar total de horas de voluntariado
+    const { data: volunteerHours } = await supabase
+      .from("volunteer_activities")
+      .select("hours")
+      .eq("status", "validated")
+
+    const totalVolunteerHours = volunteerHours?.reduce((sum, activity) => sum + activity.hours, 0) || 0
 
     // Buscar atividades recentes
     const { data: recentActivities } = await supabase
       .from("volunteer_activities")
       .select(`
-        *,
-        profiles:user_id (
-          full_name,
-          email
-        )
+        id,
+        title,
+        activity_type,
+        created_at,
+        profiles!volunteer_activities_user_id_fkey(first_name, last_name)
       `)
       .order("created_at", { ascending: false })
       .limit(10)
 
-    // Buscar verificações pendentes
-    const { data: pendingMentors } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("role", "mentor")
-      .eq("verification_status", "pending")
-      .order("created_at", { ascending: true })
-      .limit(10)
+    const formattedActivities =
+      recentActivities?.map((activity) => ({
+        id: activity.id,
+        type: "volunteer_activity",
+        description: `${activity.profiles?.first_name} ${activity.profiles?.last_name} registrou: ${activity.title}`,
+        created_at: activity.created_at,
+      })) || []
 
     return NextResponse.json({
-      stats: {
-        totalUsers: totalUsers || 0,
-        pendingVerifications: pendingVerifications || 0,
-        totalMentors: totalMentors || 0,
-        activeMentors: activeMentors || 0,
-        totalVolunteers: totalVolunteers || 0,
-        pendingActivities: pendingActivities || 0,
-        totalSessions: totalSessions || 0,
-        completedSessions: completedSessions || 0,
-      },
-      recentActivities: recentActivities || [],
-      pendingMentors: pendingMentors || [],
+      totalUsers: totalUsers || 0,
+      totalMentors: totalMentors || 0,
+      totalMentees: totalMentees || 0,
+      totalVolunteers: totalVolunteers || 0,
+      pendingVerifications: pendingVerifications || 0,
+      totalVolunteerHours,
+      recentActivities: formattedActivities,
     })
   } catch (error) {
-    console.error("Erro no dashboard:", error)
+    console.error("Erro ao buscar dashboard:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

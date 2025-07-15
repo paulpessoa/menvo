@@ -3,46 +3,55 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAuth } from "@/app/context/auth-context"
 
-export function useAuthQuery() {
-  const { user, profile, permissions, loading, initialized } = useAuth()
-
-  return {
-    data: { user, profile, permissions },
-    isLoading: loading,
-    isInitialized: initialized,
-  }
+interface LoginData {
+  email: string
+  password: string
 }
 
-export function useSignUp() {
-  const { signUp } = useAuth()
+interface SignupData {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+}
+
+interface CompleteProfileData {
+  role: "mentor" | "mentee" | "volunteer"
+  bio?: string
+  location?: string
+  linkedin_url?: string
+  presentation_video_url?: string
+  expertise_areas?: string
+}
+
+export function useLogin() {
+  const { signIn } = useAuth()
+  const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({
-      email,
-      password,
-      fullName,
-      userType,
-    }: {
-      email: string
-      password: string
-      fullName: string
-      userType: string
-    }) => {
-      const result = await signUp(email, password, fullName, userType)
+    mutationFn: async (data: LoginData) => {
+      const result = await signIn(data.email, data.password)
       if (result.error) {
         throw new Error(result.error)
       }
       return result
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] })
+    },
   })
 }
 
-export function useSignIn() {
-  const { signIn } = useAuth()
+export function useSignup() {
+  const { signUp } = useAuth()
 
   return useMutation({
-    mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      const result = await signIn(email, password)
+    mutationFn: async (data: SignupData) => {
+      const result = await signUp(data.email, data.password, {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        full_name: `${data.firstName} ${data.lastName}`,
+      })
       if (result.error) {
         throw new Error(result.error)
       }
@@ -52,16 +61,24 @@ export function useSignIn() {
 }
 
 export function useCompleteProfile() {
-  const { completeProfile } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: any) => {
-      const result = await completeProfile(data)
-      if (result.error) {
-        throw new Error(result.error)
+    mutationFn: async (data: CompleteProfileData) => {
+      const response = await fetch("/api/auth/complete-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao completar perfil")
       }
-      return result
+
+      return response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auth"] })
@@ -74,17 +91,18 @@ export function useForgotPassword() {
     mutationFn: async (email: string) => {
       const response = await fetch("/api/auth/forgot-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email }),
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error)
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao enviar email de recuperação")
       }
 
-      return data
+      return response.json()
     },
   })
 }
@@ -94,17 +112,32 @@ export function useResetPassword() {
     mutationFn: async (password: string) => {
       const response = await fetch("/api/auth/reset-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ password }),
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error)
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao resetar senha")
       }
 
-      return data
+      return response.json()
+    },
+  })
+}
+
+export function useLogout() {
+  const { signOut } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      await signOut()
+    },
+    onSuccess: () => {
+      queryClient.clear()
     },
   })
 }

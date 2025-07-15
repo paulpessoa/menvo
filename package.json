@@ -15,6 +15,10 @@
     "test:e2e": "cypress run",
     "test:watch": "jest --watch"
   },
+  "overrides": {
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18"
+  },
   "dependencies": {
     "@hookform/resolvers": "latest",
     "@next/third-parties": "latest",
@@ -22,11 +26,14 @@
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",
     "@radix-ui/react-avatar": "latest",
+    "@radix-ui/react-calendar": "^1.0.0",
+    "@radix-ui/react-card": "^1.0.0",
     "@radix-ui/react-checkbox": "latest",
     "@radix-ui/react-collapsible": "latest",
     "@radix-ui/react-context-menu": "latest",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-dropdown-menu": "latest",
+    "@radix-ui/react-form": "^0.0.3",
     "@radix-ui/react-hover-card": "latest",
     "@radix-ui/react-label": "latest",
     "@radix-ui/react-menubar": "latest",
@@ -37,10 +44,13 @@
     "@radix-ui/react-scroll-area": "latest",
     "@radix-ui/react-select": "latest",
     "@radix-ui/react-separator": "latest",
+    "@radix-ui/react-sheet": "^1.0.0",
     "@radix-ui/react-slider": "latest",
     "@radix-ui/react-slot": "latest",
     "@radix-ui/react-switch": "latest",
+    "@radix-ui/react-table": "^1.0.0",
     "@radix-ui/react-tabs": "latest",
+    "@radix-ui/react-textarea": "^1.0.0",
     "@radix-ui/react-toast": "latest",
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
@@ -81,7 +91,8 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
@@ -93,12 +104,12 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "cypress": "^13.6.6",
-    "eslint": "^8",
-    "eslint-config-next": "14.1.0",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.2.16",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.5",
-    "tailwindcss": "^3.3.0",
+    "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
 }

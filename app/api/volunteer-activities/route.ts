@@ -1,67 +1,54 @@
-import { createClient } from "@/utils/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/utils/supabase/server"
+import { z } from "zod"
+
+const createActivitySchema = z.object({
+  title: z.string().min(1, "Título é obrigatório"),
+  activity_type: z.string().min(1, "Tipo de atividade é obrigatório"),
+  description: z.string().optional(),
+  hours: z.number().min(0.5, "Mínimo de 0.5 horas").max(24, "Máximo de 24 horas"),
+  date: z.string(),
+  evidence_url: z.string().url().optional(),
+})
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
+    const userOnly = searchParams.get("user_only") === "true"
 
-    // Get current user
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
 
-    // Parse query parameters
-    const status = searchParams.get("status")
-    const userOnly = searchParams.get("user_only") === "true"
+    if (authError || !user) {
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
+    }
 
     let query = supabase
       .from("volunteer_activities")
       .select(`
         *,
-        user:profiles(full_name, avatar_url),
-        validator:profiles!volunteer_activities_validated_by_fkey(full_name)
+        profiles!volunteer_activities_user_id_fkey(first_name, last_name, email)
       `)
       .order("created_at", { ascending: false })
 
-    // Apply filters
-    if (status) {
-      query = query.eq("status", status)
-    }
-
-    // If user_only is true, only show user's own activities (requires auth)
     if (userOnly) {
-      if (authError || !user) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-      }
       query = query.eq("user_id", user.id)
-    } else {
-      // For public access, only show validated activities
-      if (!user) {
-        query = query.eq("status", "validated")
-      } else {
-        // For authenticated users, check their role
-        const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single()
-
-        // Only admins and moderators can see all activities
-        if (profile?.role !== "admin" && profile?.role !== "moderator") {
-          query = query.eq("status", "validated")
-        }
-      }
     }
 
-    const { data: activities, error } = await query
+    const { data, error } = await query
 
     if (error) {
-      console.error("Error fetching activities:", error)
-      return NextResponse.json({ error: "Failed to fetch activities" }, { status: 500 })
+      console.error("Erro ao buscar atividades:", error)
+      return NextResponse.json({ error: "Erro ao buscar atividades" }, { status: 500 })
     }
 
-    return NextResponse.json({ activities })
+    return NextResponse.json(data)
   } catch (error) {
-    console.error("Error in volunteer activities API:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Erro interno:", error)
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
 
@@ -69,62 +56,51 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Get current user
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
     }
 
     const body = await request.json()
-    const { title, activity_type, description, hours, date } = body
+    const validatedData = createActivitySchema.parse(body)
 
-    // Validate required fields
-    if (!title || !activity_type || !hours || !date) {
-      return NextResponse.json(
-        {
-          error: "Missing required fields: title, activity_type, hours, date",
-        },
-        { status: 400 },
-      )
-    }
-
-    // Validate hours
-    if (hours <= 0 || hours > 24) {
-      return NextResponse.json(
-        {
-          error: "Hours must be between 0.1 and 24",
-        },
-        { status: 400 },
-      )
-    }
-
-    // Create activity
-    const { data: activity, error } = await supabase
+    const { data, error } = await supabase
       .from("volunteer_activities")
       .insert({
         user_id: user.id,
-        title,
-        activity_type,
-        description,
-        hours: Number.parseFloat(hours),
-        date,
+        title: validatedData.title,
+        activity_type: validatedData.activity_type,
+        description: validatedData.description,
+        hours: validatedData.hours,
+        date: validatedData.date,
+        evidence_url: validatedData.evidence_url,
         status: "pending",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       })
-      .select("*")
+      .select()
       .single()
 
     if (error) {
-      console.error("Error creating activity:", error)
-      return NextResponse.json({ error: "Failed to create activity" }, { status: 500 })
+      console.error("Erro ao criar atividade:", error)
+      return NextResponse.json({ error: "Erro ao registrar atividade" }, { status: 500 })
     }
 
-    return NextResponse.json({ activity }, { status: 201 })
+    return NextResponse.json({
+      success: true,
+      message: "Atividade registrada com sucesso!",
+      data,
+    })
   } catch (error) {
-    console.error("Error in volunteer activities POST:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors[0].message }, { status: 400 })
+    }
+
+    console.error("Erro interno:", error)
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

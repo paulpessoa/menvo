@@ -1,89 +1,78 @@
 "use client"
 
 import type React from "react"
+
 import { useAuth } from "@/app/context/auth-context"
+import { hasPermission, type Permission, type UserRole } from "@/lib/auth/rbac"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { type Permission, hasPermission, hasAnyPermission } from "@/lib/auth/rbac"
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  requiredPermissions?: Permission[]
-  requireAnyPermission?: boolean
-  fallback?: React.ReactNode
+  requiredPermission?: Permission
+  requiredRole?: UserRole
+  fallbackPath?: string
 }
 
 export function ProtectedRoute({
   children,
-  requiredPermissions = [],
-  requireAnyPermission = false,
-  fallback = null,
+  requiredPermission,
+  requiredRole,
+  fallbackPath = "/auth",
 }: ProtectedRouteProps) {
-  const { user, profile, loading, initialized } = useAuth()
+  const { user, profile, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!initialized || loading) return
+    if (loading) return
 
-    // Se não está logado, redireciona para login
+    // Not authenticated
     if (!user) {
-      router.push("/login")
+      router.push(fallbackPath)
       return
     }
 
-    // Se não tem perfil, algo está errado
-    if (!profile) {
+    // No profile or pending role
+    if (!profile || profile.role === "pending") {
       router.push("/welcome")
       return
     }
 
-    // Se o perfil ainda está pending, vai para welcome
-    if (profile.role === "pending") {
-      router.push("/welcome")
+    // Check required role
+    if (requiredRole && profile.role !== requiredRole) {
+      router.push("/unauthorized")
       return
     }
 
-    // Verificar permissões se foram especificadas
-    if (requiredPermissions.length > 0) {
-      const hasRequiredPermissions = requireAnyPermission
-        ? hasAnyPermission(profile.role, requiredPermissions)
-        : requiredPermissions.every((permission) => hasPermission(profile.role, permission))
-
-      if (!hasRequiredPermissions) {
-        router.push("/unauthorized")
-        return
-      }
+    // Check required permission
+    if (requiredPermission && !hasPermission(profile.role, requiredPermission)) {
+      router.push("/unauthorized")
+      return
     }
-  }, [user, profile, loading, initialized, requiredPermissions, requireAnyPermission, router])
+  }, [user, profile, loading, requiredPermission, requiredRole, router, fallbackPath])
 
-  // Mostrar loading enquanto inicializa
-  if (!initialized || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
 
-  // Se não está logado, não renderiza nada (vai redirecionar)
   if (!user || !profile) {
-    return fallback
+    return null
   }
 
-  // Se o perfil está pending, não renderiza nada (vai redirecionar)
   if (profile.role === "pending") {
-    return fallback
+    return null
   }
 
-  // Verificar permissões
-  if (requiredPermissions.length > 0) {
-    const hasRequiredPermissions = requireAnyPermission
-      ? hasAnyPermission(profile.role, requiredPermissions)
-      : requiredPermissions.every((permission) => hasPermission(profile.role, permission))
+  if (requiredRole && profile.role !== requiredRole) {
+    return null
+  }
 
-    if (!hasRequiredPermissions) {
-      return fallback
-    }
+  if (requiredPermission && !hasPermission(profile.role, requiredPermission)) {
+    return null
   }
 
   return <>{children}</>

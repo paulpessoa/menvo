@@ -1,391 +1,225 @@
--- =============================================
--- SCRIPT COMPLETO DE CONFIGURAÇÃO DE AUTENTICAÇÃO
--- =============================================
+-- ===================================================================
+-- SCRIPT DE CONFIGURAÇÃO COMPLETO E IDEMPOTENTE PARA O BANCO DE DADOS
+-- V.2.1 - Corrige erro de sintaxe `TIMESTAMPTZ WITH TIME ZONE`
+-- ===================================================================
 
--- 1. Limpar e recriar tabelas se necessário
-DROP TABLE IF EXISTS volunteer_activities CASCADE;
-DROP TABLE IF EXISTS mentorship_sessions CASCADE;
-DROP TABLE IF EXISTS mentor_profiles CASCADE;
-DROP TABLE IF EXISTS notifications CASCADE;
+BEGIN;
 
--- 2. Criar enum para roles se não existir
-DO $$ BEGIN
-    CREATE TYPE user_role AS ENUM ('pending', 'mentee', 'mentor', 'admin', 'volunteer', 'moderator');
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
+-- Habilitar a extensão pgcrypto se não estiver habilitada
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 3. Recriar tabela profiles com estrutura completa
-DROP TABLE IF EXISTS profiles CASCADE;
-CREATE TABLE profiles (
-    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
-    full_name TEXT,
-    avatar_url TEXT,
-    bio TEXT,
-    location TEXT,
-    linkedin_url TEXT,
-    presentation_video_url TEXT,
-    expertise_areas TEXT,
-    role user_role DEFAULT 'pending' NOT NULL,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'suspended', 'rejected')),
-    verification_status TEXT DEFAULT 'pending' CHECK (verification_status IN ('pending', 'verified', 'rejected')),
-    verified_by UUID REFERENCES auth.users(id),
-    verified_at TIMESTAMPTZ,
-    verification_notes TEXT,
+-- 1. DEFINIÇÃO DE TIPOS (ENUMS)
+-- Garante que os tipos ENUM existam antes de usá-los.
+DO $$ BEGIN CREATE TYPE public.user_role AS ENUM ('pending', 'mentee', 'mentor', 'admin', 'volunteer', 'moderator'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.user_status AS ENUM ('pending', 'active', 'suspended', 'rejected'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.verification_status AS ENUM ('pending', 'verified', 'rejected'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.session_status AS ENUM ('pending', 'confirmed', 'completed', 'cancelled', 'rejected'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.volunteer_activity_status AS ENUM ('pending', 'validated', 'rejected'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.notification_type AS ENUM ('info', 'success', 'warning', 'error'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.notification_category AS ENUM ('system', 'mentorship', 'verification', 'volunteer'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+DO $$ BEGIN CREATE TYPE public.availability_status AS ENUM ('available', 'busy', 'unavailable'); EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- 2. CRIAÇÃO E ATUALIZAÇÃO DE TABELAS
+-- Usa `CREATE TABLE IF NOT EXISTS` e `ALTER TABLE` para robustez.
+
+-- Tabela `profiles`
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+-- Adiciona colunas à tabela `profiles` se não existirem
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email TEXT UNIQUE;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS first_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS last_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bio TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS linkedin_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS personal_website_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS portfolio_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS presentation_video_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS slug TEXT UNIQUE;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS current_position TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS current_company TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS city TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS state TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS latitude REAL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS longitude REAL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role public.user_role DEFAULT 'pending'::public.user_role NOT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status public.user_status DEFAULT 'pending'::public.user_status NOT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS verification_status public.verification_status DEFAULT 'pending'::public.verification_status NOT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS verified_by UUID REFERENCES public.profiles(id);
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS verification_notes TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS expertise_areas TEXT[];
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS topics TEXT[];
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS inclusion_tags TEXT[];
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS languages TEXT[];
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS mentorship_approach TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS what_to_expect TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS ideal_mentee TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS cv_url TEXT;
+
+-- Tabela `mentor_profiles`
+CREATE TABLE IF NOT EXISTS public.mentor_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
+    availability public.availability_status DEFAULT 'available'::public.availability_status,
+    hourly_rate NUMERIC(10, 2),
+    languages TEXT[],
+    timezone TEXT,
+    meeting_preferences JSONB,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- 4. Criar tabela de perfis de mentores
-CREATE TABLE mentor_profiles (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE NOT NULL,
-    availability TEXT DEFAULT 'available' CHECK (availability IN ('available', 'busy', 'unavailable')),
-    hourly_rate DECIMAL(10,2),
-    languages TEXT[] DEFAULT ARRAY['pt-BR'],
-    timezone TEXT DEFAULT 'America/Sao_Paulo',
-    meeting_preferences JSONB DEFAULT '{}',
-    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
-);
-
--- 5. Criar tabela de sessões de mentoria
-CREATE TABLE mentorship_sessions (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    mentor_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-    mentee_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+-- Tabela `mentorship_sessions`
+CREATE TABLE IF NOT EXISTS public.mentorship_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    mentor_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    mentee_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     description TEXT,
     scheduled_at TIMESTAMPTZ NOT NULL,
     duration_minutes INTEGER DEFAULT 60,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled', 'rejected')),
+    status public.session_status DEFAULT 'pending'::public.session_status,
     meeting_url TEXT,
     notes TEXT,
     feedback_mentor TEXT,
     feedback_mentee TEXT,
-    rating_mentor INTEGER CHECK (rating_mentor >= 1 AND rating_mentor <= 5),
-    rating_mentee INTEGER CHECK (rating_mentee >= 1 AND rating_mentee <= 5),
+    rating_mentor INTEGER CHECK (rating_mentor BETWEEN 1 AND 5),
+    rating_mentee INTEGER CHECK (rating_mentee BETWEEN 1 AND 5),
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- 6. Criar tabela de atividades de voluntariado
-CREATE TABLE volunteer_activities (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+-- Tabela `volunteer_activities`
+CREATE TABLE IF NOT EXISTS public.volunteer_activities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     activity_type TEXT NOT NULL,
     description TEXT,
-    hours DECIMAL(5,2) NOT NULL CHECK (hours > 0),
+    hours NUMERIC(5, 2) NOT NULL CHECK (hours > 0),
     date DATE NOT NULL,
     location TEXT,
     organization TEXT,
     evidence_url TEXT,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'validated', 'rejected')),
-    validated_by UUID REFERENCES profiles(id),
+    status public.volunteer_activity_status DEFAULT 'pending'::public.volunteer_activity_status,
+    validated_by UUID REFERENCES public.profiles(id),
     validated_at TIMESTAMPTZ,
     validation_notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- 7. Criar tabela de notificações
-CREATE TABLE notifications (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+-- Tabela `notifications`
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     message TEXT NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('info', 'success', 'warning', 'error')),
-    category TEXT NOT NULL CHECK (category IN ('system', 'mentorship', 'verification', 'volunteer')),
-    read BOOLEAN DEFAULT FALSE,
-    data JSONB DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
+-- Adiciona colunas à tabela `notifications` se não existirem (CORREÇÃO DO ERRO)
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS type public.notification_type DEFAULT 'info'::public.notification_type NOT NULL;
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS category public.notification_category DEFAULT 'system'::public.notification_category NOT NULL;
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS read BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE public.notifications ADD COLUMN IF NOT EXISTS data JSONB;
 
--- 8. Criar índices para performance
-CREATE INDEX idx_profiles_role ON profiles(role);
-CREATE INDEX idx_profiles_status ON profiles(status);
-CREATE INDEX idx_profiles_verification_status ON profiles(verification_status);
-CREATE INDEX idx_profiles_email ON profiles(email);
 
-CREATE INDEX idx_mentor_profiles_user_id ON mentor_profiles(user_id);
-CREATE INDEX idx_mentor_profiles_availability ON mentor_profiles(availability);
+-- 3. FUNÇÕES E TRIGGERS DO BANCO DE DADOS
 
-CREATE INDEX idx_mentorship_sessions_mentor_id ON mentorship_sessions(mentor_id);
-CREATE INDEX idx_mentorship_sessions_mentee_id ON mentorship_sessions(mentee_id);
-CREATE INDEX idx_mentorship_sessions_status ON mentorship_sessions(status);
-CREATE INDEX idx_mentorship_sessions_scheduled_at ON mentorship_sessions(scheduled_at);
-
-CREATE INDEX idx_volunteer_activities_user_id ON volunteer_activities(user_id);
-CREATE INDEX idx_volunteer_activities_status ON volunteer_activities(status);
-CREATE INDEX idx_volunteer_activities_date ON volunteer_activities(date);
-
-CREATE INDEX idx_notifications_user_id ON notifications(user_id);
-CREATE INDEX idx_notifications_read ON notifications(read);
-CREATE INDEX idx_notifications_created_at ON notifications(created_at);
-
--- 9. Configurar RLS (Row Level Security)
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE mentor_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE mentorship_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE volunteer_activities ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-
--- 10. Políticas RLS para profiles
-CREATE POLICY "Usuários podem ver perfis públicos" ON profiles
-    FOR SELECT USING (
-        status = 'active' OR 
-        auth.uid() = id OR 
-        EXISTS (
-            SELECT 1 FROM profiles p 
-            WHERE p.id = auth.uid() 
-            AND p.role IN ('admin', 'moderator')
-        )
-    );
-
-CREATE POLICY "Usuários podem atualizar próprio perfil" ON profiles
-    FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Admins podem gerenciar todos os perfis" ON profiles
-    FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM profiles p 
-            WHERE p.id = auth.uid() 
-            AND p.role = 'admin'
-        )
-    );
-
--- 11. Políticas RLS para mentor_profiles
-CREATE POLICY "Mentores podem ver próprio perfil" ON mentor_profiles
-    FOR SELECT USING (
-        user_id = auth.uid() OR
-        EXISTS (
-            SELECT 1 FROM profiles p 
-            WHERE p.id = auth.uid() 
-            AND p.role IN ('admin', 'moderator')
-        )
-    );
-
-CREATE POLICY "Mentores podem atualizar próprio perfil" ON mentor_profiles
-    FOR UPDATE USING (user_id = auth.uid());
-
--- 12. Políticas RLS para mentorship_sessions
-CREATE POLICY "Participantes podem ver sessões" ON mentorship_sessions
-    FOR SELECT USING (
-        mentor_id = auth.uid() OR 
-        mentee_id = auth.uid() OR
-        EXISTS (
-            SELECT 1 FROM profiles p 
-            WHERE p.id = auth.uid() 
-            AND p.role IN ('admin', 'moderator')
-        )
-    );
-
-CREATE POLICY "Participantes podem atualizar sessões" ON mentorship_sessions
-    FOR UPDATE USING (mentor_id = auth.uid() OR mentee_id = auth.uid());
-
-CREATE POLICY "Mentorados podem criar sessões" ON mentorship_sessions
-    FOR INSERT WITH CHECK (mentee_id = auth.uid());
-
--- 13. Políticas RLS para volunteer_activities
-CREATE POLICY "Voluntários podem ver próprias atividades" ON volunteer_activities
-    FOR SELECT USING (
-        user_id = auth.uid() OR
-        EXISTS (
-            SELECT 1 FROM profiles p 
-            WHERE p.id = auth.uid() 
-            AND p.role IN ('admin', 'moderator')
-        )
-    );
-
-CREATE POLICY "Voluntários podem criar atividades" ON volunteer_activities
-    FOR INSERT WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Voluntários podem atualizar próprias atividades" ON volunteer_activities
-    FOR UPDATE USING (user_id = auth.uid());
-
--- 14. Políticas RLS para notifications
-CREATE POLICY "Usuários podem ver próprias notificações" ON notifications
-    FOR SELECT USING (user_id = auth.uid());
-
-CREATE POLICY "Usuários podem atualizar próprias notificações" ON notifications
-    FOR UPDATE USING (user_id = auth.uid());
-
--- 15. Função para criar perfil automaticamente
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.profiles (id, email, full_name, role, status, verification_status)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
-        'pending',
-        'pending',
-        'pending'
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 16. Trigger para criar perfil automaticamente
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- 17. Função para atualizar updated_at
+-- Função para manter `updated_at` atualizado
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 18. Triggers para updated_at
-CREATE TRIGGER profiles_updated_at BEFORE UPDATE ON profiles
-    FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+-- Triggers para `updated_at`
+DROP TRIGGER IF EXISTS on_update_profiles ON public.profiles;
+CREATE TRIGGER on_update_profiles BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+-- (Adicione triggers para outras tabelas se necessário)
 
-CREATE TRIGGER mentor_profiles_updated_at BEFORE UPDATE ON mentor_profiles
-    FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+-- Função para criar um perfil quando um novo usuário se registra em `auth.users`
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.profiles (id, email, full_name, first_name, last_name)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        NEW.raw_user_meta_data->>'full_name',
+        NEW.raw_user_meta_data->>'first_name',
+        NEW.raw_user_meta_data->>'last_name'
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE TRIGGER mentorship_sessions_updated_at BEFORE UPDATE ON mentorship_sessions
-    FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+-- Trigger para `handle_new_user`
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
-CREATE TRIGGER volunteer_activities_updated_at BEFORE UPDATE ON volunteer_activities
-    FOR EACH ROW EXECUTE FUNCTION handle_updated_at();
+-- 4. POLÍTICAS DE SEGURANÇA (RLS)
 
--- 19. Inserir usuário admin padrão (substitua pelo seu email)
-INSERT INTO auth.users (
-    id,
-    instance_id,
-    email,
-    encrypted_password,
-    email_confirmed_at,
-    created_at,
-    updated_at,
-    raw_app_meta_data,
-    raw_user_meta_data,
-    is_super_admin,
-    role
-) VALUES (
-    gen_random_uuid(),
-    '00000000-0000-0000-0000-000000000000',
-    'admin@menvo.com.br', -- SUBSTITUA PELO SEU EMAIL
-    crypt('admin123', gen_salt('bf')),
-    NOW(),
-    NOW(),
-    NOW(),
-    '{"provider": "email", "providers": ["email"]}',
-    '{"full_name": "Administrador"}',
-    false,
-    'authenticated'
-) ON CONFLICT (email) DO NOTHING;
+-- Habilitar RLS em todas as tabelas
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mentor_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.mentorship_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.volunteer_activities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- 20. Atualizar perfil do admin
-UPDATE profiles 
-SET role = 'admin', status = 'active', verification_status = 'verified'
-WHERE email = 'admin@menvo.com.br';
+-- Políticas para `profiles`
+DROP POLICY IF EXISTS "Public can view basic profile info." ON public.profiles;
+CREATE POLICY "Public can view basic profile info." ON public.profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Users can insert their own profile." ON public.profiles;
+CREATE POLICY "Users can insert their own profile." ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update their own profile." ON public.profiles;
+CREATE POLICY "Users can update their own profile." ON public.profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins can manage all profiles." ON public.profiles;
+CREATE POLICY "Admins can manage all profiles." ON public.profiles FOR ALL USING ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'admin');
 
--- 21. Configurar storage bucket para avatars
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', true)
+-- Políticas para `volunteer_activities`
+DROP POLICY IF EXISTS "Users can manage their own volunteer activities." ON public.volunteer_activities;
+CREATE POLICY "Users can manage their own volunteer activities." ON public.volunteer_activities FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Admins/Moderators can manage all volunteer activities." ON public.volunteer_activities;
+CREATE POLICY "Admins/Moderators can manage all volunteer activities." ON public.volunteer_activities FOR ALL USING ((SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('admin', 'moderator'));
+
+-- (Adicione políticas para outras tabelas conforme necessário)
+
+-- 5. CONFIGURAÇÃO DO STORAGE
+
+-- Criar bucket para fotos de perfil
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('profile-photos', 'profile-photos', true, 5242880, ARRAY['image/jpeg', 'image/png', 'image/webp'])
 ON CONFLICT (id) DO NOTHING;
 
--- 22. Política de storage para avatars
-CREATE POLICY "Usuários podem fazer upload de avatars" ON storage.objects
-    FOR INSERT WITH CHECK (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+-- Políticas de acesso para o bucket `profile-photos`
+DROP POLICY IF EXISTS "Public can view profile photos." ON storage.objects;
+CREATE POLICY "Public can view profile photos." ON storage.objects FOR SELECT USING (bucket_id = 'profile-photos');
 
-CREATE POLICY "Avatars são públicos" ON storage.objects
-    FOR SELECT USING (bucket_id = 'avatars');
+DROP POLICY IF EXISTS "Authenticated users can upload profile photos." ON storage.objects;
+CREATE POLICY "Authenticated users can upload profile photos." ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'profile-photos' AND auth.role() = 'authenticated');
 
-CREATE POLICY "Usuários podem atualizar próprios avatars" ON storage.objects
-    FOR UPDATE USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+DROP POLICY IF EXISTS "Users can update their own profile photo." ON storage.objects;
+CREATE POLICY "Users can update their own profile photo." ON storage.objects FOR UPDATE USING (auth.uid() = owner) WITH CHECK (bucket_id = 'profile-photos');
 
-CREATE POLICY "Usuários podem deletar próprios avatars" ON storage.objects
-    FOR DELETE USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+DROP POLICY IF EXISTS "Users can delete their own profile photo." ON storage.objects;
+CREATE POLICY "Users can delete their own profile photo." ON storage.objects FOR DELETE USING (auth.uid() = owner AND bucket_id = 'profile-photos');
 
--- 23. Função para notificações
-CREATE OR REPLACE FUNCTION public.create_notification(
-    p_user_id UUID,
-    p_title TEXT,
-    p_message TEXT,
-    p_type TEXT DEFAULT 'info',
-    p_category TEXT DEFAULT 'system',
-    p_data JSONB DEFAULT '{}'
-)
-RETURNS UUID AS $$
-DECLARE
-    notification_id UUID;
-BEGIN
-    INSERT INTO notifications (user_id, title, message, type, category, data)
-    VALUES (p_user_id, p_title, p_message, p_type, p_category, p_data)
-    RETURNING id INTO notification_id;
-    
-    RETURN notification_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- 6. ÍNDICES PARA PERFORMANCE
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
+CREATE INDEX IF NOT EXISTS idx_profiles_status ON public.profiles(status);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id_read ON public.notifications(user_id, read);
 
--- 24. Função para estatísticas do dashboard
-CREATE OR REPLACE FUNCTION public.get_dashboard_stats()
-RETURNS JSON AS $$
-DECLARE
-    result JSON;
-BEGIN
-    SELECT json_build_object(
-        'total_users', (SELECT COUNT(*) FROM profiles),
-        'pending_verifications', (SELECT COUNT(*) FROM profiles WHERE role = 'mentor' AND verification_status = 'pending'),
-        'total_mentors', (SELECT COUNT(*) FROM profiles WHERE role = 'mentor'),
-        'active_mentors', (SELECT COUNT(*) FROM profiles WHERE role = 'mentor' AND status = 'active'),
-        'total_volunteers', (SELECT COUNT(*) FROM profiles WHERE role = 'volunteer'),
-        'pending_activities', (SELECT COUNT(*) FROM volunteer_activities WHERE status = 'pending'),
-        'total_sessions', (SELECT COUNT(*) FROM mentorship_sessions),
-        'completed_sessions', (SELECT COUNT(*) FROM mentorship_sessions WHERE status = 'completed')
-    ) INTO result;
-    
-    RETURN result;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 25. Conceder permissões necessárias
-GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated;
-
--- =============================================
--- SCRIPT CONCLUÍDO COM SUCESSO!
--- =============================================
-
--- Para verificar se tudo foi criado corretamente:
-SELECT 
-    'profiles' as table_name, 
-    COUNT(*) as count 
-FROM profiles
-UNION ALL
-SELECT 
-    'mentor_profiles' as table_name, 
-    COUNT(*) as count 
-FROM mentor_profiles
-UNION ALL
-SELECT 
-    'mentorship_sessions' as table_name, 
-    COUNT(*) as count 
-FROM mentorship_sessions
-UNION ALL
-SELECT 
-    'volunteer_activities' as table_name, 
-    COUNT(*) as count 
-FROM volunteer_activities
-UNION ALL
-SELECT 
-    'notifications' as table_name, 
-    COUNT(*) as count 
-FROM notifications;
-
--- Verificar se o usuário admin foi criado
-SELECT email, role, status, verification_status 
-FROM profiles 
-WHERE email = 'admin@menvo.com.br';
+COMMIT;
