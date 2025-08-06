@@ -1,160 +1,188 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, ArrowRight, Users, Calendar, MessageSquare } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/use-toast'
+import { useAuth } from '@/hooks/useAuth'
+import { useUserProfile } from '@/hooks/useUserProfile'
+import { updateUserProfile } from '@/services/auth/supabase'
+import { Loader2Icon } from 'lucide-react'
+import { Database } from '@/types/database'
+
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
 
 export default function WelcomePage() {
-  const { user, loading } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const { userProfile, loading: profileLoading, mutateProfile } = useUserProfile(user?.id)
   const router = useRouter()
-  const [userName, setUserName] = useState("")
+
+  const [formData, setFormData] = useState<Partial<UserProfile>>({
+    full_name: '',
+    username: '',
+    bio: '',
+    location: '',
+    occupation: '',
+    skills: [],
+    interests: [],
+  })
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login')
+    if (!authLoading && !profileLoading && user && userProfile) {
+      // If profile is already complete, redirect to dashboard
+      if (userProfile.is_profile_complete) {
+        router.push('/dashboard')
+      } else {
+        // Pre-fill with existing data if any
+        setFormData({
+          full_name: userProfile.full_name || user.user_metadata.full_name || '',
+          username: userProfile.username || '',
+          bio: userProfile.bio || '',
+          location: userProfile.location || '',
+          occupation: userProfile.occupation || '',
+          skills: userProfile.skills || [],
+          interests: userProfile.interests || [],
+        })
+      }
     }
-    
-    if (user) {
-      // Extrair nome do email ou usar dados do perfil
-      const name = user.user_metadata?.first_name || 
-                   user.email?.split('@')[0] || 
-                   'Usuário'
-      setUserName(name)
-    }
-  }, [user, loading, router])
+  }, [user, userProfile, authLoading, profileLoading, router])
 
-  if (loading) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData((prev) => ({ ...prev, [id]: value }))
+  }
+
+  const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'skills' | 'interests') => {
+    const value = e.target.value
+    setFormData((prev) => ({ ...prev, [field]: value.split(',').map((item) => item.trim()) }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) {
+      toast({
+        title: 'Erro de autenticação',
+        description: 'Você precisa estar logado para completar seu perfil.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setLoading(true)
+    try {
+      const updates = {
+        ...formData,
+        is_profile_complete: true, // Mark profile as complete
+      }
+
+      const { error } = await updateUserProfile(user.id, updates)
+
+      if (error) {
+        throw error
+      }
+
+      mutateProfile() // Trigger re-fetch of profile data
+      toast({
+        title: 'Perfil completo!',
+        description: 'Suas informações foram salvas com sucesso. Bem-vindo à Menvo!',
+        variant: 'default',
+      })
+      router.push('/dashboard') // Redirect to dashboard
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao completar perfil',
+        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (authLoading || profileLoading) {
     return (
-      <div className="container flex h-screen max-w-screen-xl flex-col items-center justify-center">
-        <div className="animate-pulse">Carregando...</div>
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2Icon className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando...</span>
       </div>
     )
   }
 
   if (!user) {
+    // Should not happen if ProtectedRoute is working, but as a fallback
+    router.push('/login')
     return null
   }
 
   return (
-    <div className="container max-w-4xl py-16">
-      <div className="text-center space-y-6">
-        {/* Header de Boas-vindas */}
-        <div className="space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900">
-              Bem-vindo ao Menvo, {userName}! 🎉
-            </h1>
-            <p className="text-xl text-muted-foreground mt-2">
-              Sua conta foi confirmada com sucesso. Agora você faz parte da nossa comunidade!
-            </p>
-          </div>
-        </div>
-
-        {/* Cards de Próximos Passos */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-4">
-                <Users className="h-6 w-6 text-blue-600" />
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+      <Card className="w-full max-w-3xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold">Bem-vindo à Menvo!</CardTitle>
+          <CardDescription>
+            Por favor, complete seu perfil para começar sua jornada de mentoria.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="grid gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="full_name">Nome Completo</Label>
+                <Input id="full_name" value={formData.full_name || ''} onChange={handleChange} required />
               </div>
-              <CardTitle className="text-lg">Explore Mentores</CardTitle>
-              <CardDescription>
-                Descubra mentores incríveis em diversas áreas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild className="w-full">
-                <Link href="/mentors">
-                  Encontrar Mentores
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 mb-4">
-                <MessageSquare className="h-6 w-6 text-purple-600" />
+              <div className="grid gap-2">
+                <Label htmlFor="username">Nome de Usuário (Slug)</Label>
+                <Input id="username" value={formData.username || ''} onChange={handleChange} placeholder="será usado na URL do seu perfil" />
               </div>
-              <CardTitle className="text-lg">Complete seu Perfil</CardTitle>
-              <CardDescription>
-                Adicione mais informações para melhorar sua experiência
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/settings">
-                  Editar Perfil
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mb-4">
-                <Calendar className="h-6 w-6 text-green-600" />
+            <div className="grid gap-2">
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea id="bio" value={formData.bio || ''} onChange={handleChange} rows={4} placeholder="Fale um pouco sobre você..." />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="location">Localização</Label>
+                <Input id="location" value={formData.location || ''} onChange={handleChange} placeholder="Cidade, País" />
               </div>
-              <CardTitle className="text-lg">Agende uma Mentoria</CardTitle>
-              <CardDescription>
-                Comece sua jornada de aprendizado hoje mesmo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild variant="outline" className="w-full">
-                <Link href="/mentorship">
-                  Ver Mentorias
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="grid gap-2">
+                <Label htmlFor="occupation">Ocupação</Label>
+                <Input id="occupation" value={formData.occupation || ''} onChange={handleChange} placeholder="Engenheiro de Software, Designer, etc." />
+              </div>
+            </div>
 
-        {/* Informações Adicionais */}
-        <div className="mt-12 p-6 bg-blue-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            🚀 Próximos Passos Recomendados
-          </h3>
-          <ul className="text-left text-blue-800 space-y-2 max-w-2xl mx-auto">
-            <li className="flex items-start">
-              <span className="font-semibold mr-2">1.</span>
-              Complete seu perfil com suas habilidades e interesses
-            </li>
-            <li className="flex items-start">
-              <span className="font-semibold mr-2">2.</span>
-              Explore nossa comunidade de mentores e encontre o match perfeito
-            </li>
-            <li className="flex items-start">
-              <span className="font-semibold mr-2">3.</span>
-              Agende sua primeira sessão de mentoria gratuita
-            </li>
-            <li className="flex items-start">
-              <span className="font-semibold mr-2">4.</span>
-              Conecte-se com outros membros da comunidade
-            </li>
-          </ul>
-        </div>
+            <div className="grid gap-2">
+              <Label htmlFor="skills">Habilidades (separadas por vírgula)</Label>
+              <Input
+                id="skills"
+                value={formData.skills?.join(', ') || ''}
+                onChange={(e) => handleArrayChange(e, 'skills')}
+                placeholder="React, Node.js, Design UX, Liderança"
+              />
+            </div>
 
-        {/* CTA Principal */}
-        <div className="mt-8">
-          <Button asChild size="lg" className="text-lg px-8 py-3">
-            <Link href="/">
-              Começar a Explorar
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </div>
+            <div className="grid gap-2">
+              <Label htmlFor="interests">Interesses (separadas por vírgula)</Label>
+              <Input
+                id="interests"
+                value={formData.interests?.join(', ') || ''}
+                onChange={(e) => handleArrayChange(e, 'interests')}
+                placeholder="Inteligência Artificial, Sustentabilidade, Empreendedorismo"
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Salvando...' : 'Completar Perfil'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   )
 }

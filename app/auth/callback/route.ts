@@ -1,54 +1,44 @@
-// import { createClient } from '@/utils/supabase/client'
-// import { NextResponse } from 'next/server'
-// // The client you created from the Server-Side Auth instructions
-
-// export async function GET(request: Request) {
-//   const { searchParams, origin } = new URL(request.url)
-//   const code = searchParams.get('code')
-//   // if "next" is in param, use it as the redirect URL
-//   let next = searchParams.get('next') ?? '/'
-//   if (!next.startsWith('/')) {
-//     // if "next" is not a relative URL, use the default
-//     next = '/'
-//   }
-
-//   if (code) {
-//     const supabase = await createClient()
-//     const { error } = await supabase.auth.exchangeCodeForSession(code)
-//     if (!error) {
-//       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-//       const isLocalEnv = process.env.NODE_ENV === 'development'
-//       if (isLocalEnv) {
-//         // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-//         return NextResponse.redirect(`${origin}${next}`)
-//       } else if (forwardedHost) {
-//         return NextResponse.redirect(`https://${forwardedHost}${next}`)
-//       } else {
-//         return NextResponse.redirect(`${origin}${next}`)
-//       }
-//     }
-//   }
-
-//   // return the user to an error page with instructions
-//   return NextResponse.redirect(`${origin}/auth/auth-code-error`)
-// }
-
-
-
-
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/server'
+import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/dashboard' // Default redirect
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies })
-    await supabase.auth.exchangeCodeForSession(code)
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      // After successful login/signup, check if profile is complete
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('Error getting user after callback:', userError);
+        return NextResponse.redirect(`${requestUrl.origin}/login?error=auth_failed`);
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('is_profile_complete')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means no rows found (new user)
+        console.error('Error fetching user profile after callback:', profileError);
+        return NextResponse.redirect(`${requestUrl.origin}/login?error=profile_fetch_failed`);
+      }
+
+      if (!profile || !profile.is_profile_complete) {
+        // Redirect to welcome/onboarding if profile is not complete
+        return NextResponse.redirect(`${requestUrl.origin}/welcome`);
+      }
+
+      return NextResponse.redirect(`${requestUrl.origin}${next}`);
+    }
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/', requestUrl.origin))
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${requestUrl.origin}/login?error=auth_failed`);
 }

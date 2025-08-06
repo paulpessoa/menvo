@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton"
+import { Loader2Icon } from 'lucide-react'
 
 export default function DoarLoading() {
   return (
@@ -83,6 +84,12 @@ export default function DoarLoading() {
           <Skeleton className="h-12 w-36" />
           <Skeleton className="h-12 w-48" />
         </div>
+      </div>
+
+      {/* Full Page Loader */}
+      <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-75 z-50">
+        <Loader2Icon className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando página de doação...</span>
       </div>
     </div>
   )

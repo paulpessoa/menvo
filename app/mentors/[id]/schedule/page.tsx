@@ -21,16 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  ArrowLeft,
-  Calendar as CalendarIcon,
-  Clock,
-  User,
-  MessageSquare,
-  CheckCircle,
-  AlertCircle,
-  Info
-} from "lucide-react"
+import { ArrowLeft, CalendarIcon, Clock, User, MessageSquare, CheckCircle, AlertCircle, Info } from 'lucide-react'
 import { useMentor } from "@/hooks/useMentors"
 import { useAuth } from "@/hooks/useAuth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
@@ -38,6 +29,9 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { format, addDays, isSameDay, isBefore, isAfter } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ScheduleSessionModal } from '@/components/mentorship/ScheduleSessionModal'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 interface SchedulePageProps {
   params: { id: string }
@@ -75,6 +69,11 @@ export default function SchedulePage({ params }: SchedulePageProps) {
   const [topic, setTopic] = useState("")
   const [description, setDescription] = useState("")
   const [menteeNotes, setMenteeNotes] = useState("")
+
+  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
+  const [message, setMessage] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Mock availability data - in real app, this would come from API
   const getAvailableTimeSlots = (date: Date): TimeSlot[] => {
@@ -157,6 +156,35 @@ export default function SchedulePage({ params }: SchedulePageProps) {
     }
   }
 
+  const handleSchedule = () => {
+    if (!date || !selectedTime || !message.trim()) {
+      toast({
+        title: 'Campos obrigatórios',
+        description: 'Por favor, selecione uma data, um horário e escreva uma mensagem.',
+        variant: 'destructive',
+      })
+      return
+    }
+    setIsModalOpen(true)
+  }
+
+  const confirmSchedule = async () => {
+    // Here you would integrate with your backend to actually schedule the session
+    // For now, it's a mock success
+    console.log('Scheduling session with:', mentor?.name)
+    console.log('Date:', date?.toDateString())
+    console.log('Time:', selectedTime)
+    console.log('Message:', message)
+
+    toast({
+      title: 'Sessão Agendada!',
+      description: `Sua sessão com ${mentor?.name} em ${date?.toLocaleDateString()} às ${selectedTime} foi solicitada.`,
+      variant: 'default',
+    })
+    setIsModalOpen(false)
+    router.push('/dashboard') // Redirect to dashboard or a confirmation page
+  }
+
   const canSchedule = () => {
     return user && selectedDate && selectedTimeSlot && topic.trim().length > 0
   }
@@ -167,6 +195,12 @@ export default function SchedulePage({ params }: SchedulePageProps) {
       setShowLoginModal(true)
     }
   }, [user])
+
+  useEffect(() => {
+    if (!mentor) {
+      notFound()
+    }
+  }, [mentor])
 
   if (isLoading) {
     return <ScheduleSkeleton />
@@ -197,7 +231,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
   }
 
   return (
-    <>
+    <ProtectedRoute requiredRoles={['mentee']}>
       <div className="container py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -224,7 +258,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                     <div className="relative h-16 w-16 rounded-full overflow-hidden bg-muted">
                       {mentor.avatar_url ? (
                         <Image
-                          src={mentor.avatar_url}
+                          src={mentor.avatar_url || "/placeholder.svg"}
                           alt={`${mentor.first_name} ${mentor.last_name}`}
                           fill
                           className="object-cover"
@@ -391,6 +425,39 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                   </CardContent>
                 </Card>
               )}
+
+              {/* New Time Selection */}
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Horários Disponíveis</h3>
+                <Select onValueChange={setSelectedTime} value={selectedTime}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione um horário" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getAvailableTimeSlots(selectedDate).map(({ time, available }) => (
+                      <SelectItem key={time} value={time} disabled={!available}>
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* New Message Input */}
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Sua Mensagem para o Mentor</h3>
+                <Textarea
+                  placeholder="Descreva o que você gostaria de discutir na sessão..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={5}
+                />
+              </div>
+
+              {/* New Schedule Button */}
+              <Button className="w-full" onClick={handleSchedule}>
+                Solicitar Sessão
+              </Button>
             </div>
 
             {/* Sidebar */}
@@ -558,7 +625,20 @@ export default function SchedulePage({ params }: SchedulePageProps) {
         onClose={() => setShowLoginModal(false)}
         mentorName={`${mentor.first_name} ${mentor.last_name}`}
       />
-    </>
+
+      {/* Schedule Session Modal */}
+      {mentor && date && selectedTime && (
+        <ScheduleSessionModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={confirmSchedule}
+          mentorName={mentor.name}
+          date={date}
+          time={selectedTime}
+          message={message}
+        />
+      )}
+    </ProtectedRoute>
   )
 }
 

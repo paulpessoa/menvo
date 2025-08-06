@@ -9,33 +9,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  BookOpen,
-  Briefcase,
-  Calendar,
-  Clock,
-  ExternalLink,
-  Flag,
-  Globe,
-  GraduationCap,
-  Heart,
-  Linkedin,
-  MapPin,
-  MessageSquare,
-  Share2,
-  Star,
-  User,
-  CheckCircle,
-  Shield,
-  Languages,
-  Award
-} from "lucide-react"
+import { BookOpen, Briefcase, Calendar, Clock, ExternalLink, Flag, Globe, GraduationCap, Heart, Linkedin, MapPin, MessageSquare, Share2, Star, User, CheckCircle, Shield, Languages, Award } from 'lucide-react'
 import { useMentor } from "@/hooks/useMentors"
 import { useAuth } from "@/hooks/useAuth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { CalendarIcon, MapPinIcon, BriefcaseIcon, GraduationCapIcon, StarIcon, MessageSquareIcon, LinkedinIcon } from 'lucide-react'
+import { mockMentors } from '@/data/mock-mentors'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 interface MentorProfilePageProps {
   params: { id: string }
@@ -175,7 +158,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
   const availabilityStatus = getAvailabilityStatus()
 
   return (
-    <>
+    <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
           <div className="space-y-8">
@@ -184,7 +167,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
               <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-background shadow-lg bg-muted flex-shrink-0">
                 {mentor.avatar_url ? (
                   <Image
-                    src={mentor.avatar_url}
+                    src={mentor.avatar_url || "/placeholder.svg"}
                     alt={`${mentor.first_name} ${mentor.last_name}`}
                     fill
                     className="object-cover"
@@ -363,6 +346,23 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     </div>
                   </div>
                 )}
+
+                {mentor.social && (
+                  <div>
+                    <h2 className="text-xl font-semibold mb-3">Redes Sociais</h2>
+                    <div className="flex gap-4">
+                      {mentor.social.linkedin && (
+                        <Link href={mentor.social.linkedin} target="_blank" rel="noopener noreferrer" passHref>
+                          <Button variant="outline" size="icon">
+                            <LinkedinIcon className="h-5 w-5" />
+                            <span className="sr-only">LinkedIn</span>
+                          </Button>
+                        </Link>
+                      )}
+                      {/* Add other social links as needed */}
+                    </div>
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="expertise" className="space-y-6 pt-4">
@@ -531,13 +531,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
           </div>
         </div>
       </div>
-
-      <LoginRequiredModal 
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        mentorName={`${mentor.first_name} ${mentor.last_name}`}
-      />
-    </>
+    </ProtectedRoute>
   )
 }
 

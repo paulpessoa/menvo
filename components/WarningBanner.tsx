@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { AlertTriangle, X, Star } from 'lucide-react'
+import { AlertTriangleIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import {
@@ -16,43 +16,37 @@ import {
 
 export function WarningBanner() {
   const { t } = useTranslation()
-  const [showBanner, setShowBanner] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false)
 
   useEffect(() => {
     const hasSeenWarning = sessionStorage.getItem('hasSeenWarning')
     if (!hasSeenWarning) {
-      setShowBanner(true)
+      setIsVisible(true)
+    } else {
+      setIsVisible(false)
     }
   }, [])
 
   const handleDismiss = () => {
     sessionStorage.setItem('hasSeenWarning', 'true')
-    setShowBanner(false)
+    setIsVisible(false)
   }
 
-  if (!showBanner) return null
+  if (!isVisible) return null
 
   return (
     <>
       {/* Floating Warning Banner */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
-        <div className="bg-yellow-100 border border-yellow-300 rounded-lg shadow-lg p-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-800 flex-shrink-0 pr-1" />
-              <p className="text-yellow-800 text-sm md:text-base">{t('warning.message')}</p>
-            </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-yellow-800 hover:bg-yellow-200"
-                onClick={handleDismiss}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-           </div>
-        </div>
+      <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-white p-3 flex items-center justify-center gap-4 text-sm">
+        <AlertTriangleIcon className="h-5 w-5 flex-shrink-0" />
+        <p className="text-center">
+          Este é um projeto de código aberto em desenvolvimento. Não insira dados sensíveis.
+        </p>
+        <Button variant="ghost" size="icon" onClick={handleDismiss} className="text-white hover:bg-yellow-600">
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Fechar</span>
+        </Button>
       </div>
 
       {/* Feedback Dialog */}

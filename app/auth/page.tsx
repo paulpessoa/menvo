@@ -1,12 +1,10 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { redirect } from 'next/navigation'
 import { supabase } from "@/services/auth"
 
-export default function AuthCallback() {
-  const router = useRouter()
-
+export default function AuthPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
@@ -14,25 +12,25 @@ export default function AuthCallback() {
 
         if (error) {
           console.error("Auth callback error:", error)
-          router.push("/login?error=auth_callback_failed")
+          redirect("/login?error=auth_callback_failed")
           return
         }
 
         if (data.session) {
           // Successful authentication
-          router.push("/dashboard")
+          redirect("/dashboard")
         } else {
           // No session found
-          router.push("/login")
+          redirect("/login")
         }
       } catch (error) {
         console.error("Auth callback error:", error)
-        router.push("/login?error=auth_callback_failed")
+        redirect("/login?error=auth_callback_failed")
       }
     }
 
     handleAuthCallback()
-  }, [router])
+  }, [])
 
   return (
     <div className="container flex h-screen items-center justify-center">

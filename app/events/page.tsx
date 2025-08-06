@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Grid3X3, Map, Search, SlidersHorizontal } from "lucide-react"
+import { Calendar, Grid3X3, Map, Search, SlidersHorizontal } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 import type { Event, EventFilters as EventFiltersType } from "@/types/events"
 import EventFilters from "@/components/events/event-filters"
 import EventMap from "@/components/events/event-map"
 import EventCard from "@/components/events/event-card"
 import EventCalendar from "@/components/events/event-calendar"
-import { mockEvents } from "@/data/mock-eventss"
+import { mockEvents } from "@/data/mock-events" // Corrected typo from mock-eventss.ts
 
 export default function EventsPage() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list")
@@ -25,6 +27,7 @@ export default function EventsPage() {
     priceRange: [0, 1000],
     dateRange: {},
     tags: [],
+    isFree: undefined,
   })
 
   // Filter events based on current filters
@@ -113,6 +116,7 @@ export default function EventsPage() {
       priceRange: [0, 1000],
       dateRange: {},
       tags: [],
+      isFree: undefined,
     })
   }
 
@@ -126,106 +130,31 @@ export default function EventsPage() {
   ].reduce((sum, count) => sum + count, 0)
 
   return (
-    <div className="container py-8 md:py-12">
-      {/* Header */}
-      <div className="flex flex-col space-y-4 mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Events & Learning</h1>
-            <p className="text-muted-foreground">Discover courses, workshops, and events to accelerate your growth</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="lg:hidden">
-              <SlidersHorizontal className="h-4 w-4 mr-2" />
-              Filters
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-2 h-5 w-5 p-0 text-xs">
-                  {activeFiltersCount}
-                </Badge>
-              )}
-            </Button>
-          </div>
-        </div>
+    <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Eventos da Comunidade</h1>
 
-        {/* Search and View Toggle */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search events, courses, workshops..."
-              className="pl-10"
-              value={filters.search}
-              onChange={(e) => handleFilterChange({ search: e.target.value })}
-            />
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-1">
+            <EventFilters filters={filters} onFiltersChange={handleFilterChange} onClearFilters={clearFilters} />
           </div>
-          <div className="flex items-center gap-2">
-            <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "list" | "map")}>
-              <TabsList>
-                <TabsTrigger value="list" className="flex items-center gap-2">
-                  <Grid3X3 className="h-4 w-4" />
-                  <span className="hidden sm:inline">List</span>
-                </TabsTrigger>
-                <TabsTrigger value="map" className="flex items-center gap-2">
-                  <Map className="h-4 w-4" />
-                  <span className="hidden sm:inline">Map</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+          <div className="lg:col-span-2">
+            <div className="grid gap-6">
+              {filteredEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle>Localização dos Eventos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <EventMap events={filteredEvents} />
+              </CardContent>
+            </Card>
           </div>
-        </div>
-
-        {/* Results count */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Showing {filteredEvents.length} events
-            {activeFiltersCount > 0 && (
-              <Button variant="link" size="sm" onClick={clearFilters} className="ml-2 h-auto p-0">
-                Clear filters
-              </Button>
-            )}
-          </p>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-        {/* Sidebar - Filters and Calendar */}
-        <div className={`space-y-6 ${showFilters ? "block" : "hidden lg:block"}`}>
-          <EventFilters filters={filters} onFiltersChange={handleFilterChange} onClearFilters={clearFilters} />
-          <EventCalendar
-            eventsByDate={eventsByDate}
-            onDateSelect={(date) => {
-              handleFilterChange({
-                dateRange: { start: date, end: date },
-              })
-            }}
-          />
-        </div>
-
-        {/* Main Content */}
-        <div className="space-y-6">
-          <Tabs value={viewMode} className="w-full">
-            <TabsContent value="list" className="mt-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
-              {filteredEvents.length === 0 && (
-                <div className="text-center py-12">
-                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No events found</h3>
-                  <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms</p>
-                  <Button onClick={clearFilters}>Clear all filters</Button>
-                </div>
-              )}
-            </TabsContent>
-            <TabsContent value="map" className="mt-0">
-              <EventMap events={filteredEvents} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </div>
+    </ProtectedRoute>
   )
 }

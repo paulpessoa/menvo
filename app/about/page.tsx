@@ -1,196 +1,150 @@
-"use client"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Globe, Heart, Users } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { Contributors } from "@/components/Contributors"
-import { Partners } from "@/components/Partners"
+import Image from 'next/image'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Contributors } from '@/components/Contributors'
+import { Partners } from '@/components/Partners'
 
 export default function AboutPage() {
-    const { t } = useTranslation()
-
   return (
-      <div className="container py-8 md:py-12">
-      <div className="flex flex-col items-center text-center space-y-4 mb-12">
-        <Badge variant="outline" className="mb-2">
-          {t("about.badge")}
-        </Badge>
-        <h1 id="mission" className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-          {t("about.ourMission.title")}
-        </h1>
-        <p className="text-muted-foreground max-w-[800px] md:text-xl">
-          {t("about.ourMission.description")}
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <section className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4">Sobre a Menvo</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          A Menvo é uma plataforma dedicada a conectar pessoas em busca de orientação com mentores voluntários experientes, promovendo o desenvolvimento pessoal e profissional.
         </p>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold">{t("about.whyWeStarted.title")}</h2>
-          <p className="text-muted-foreground">
-            {t("about.whyWeStarted.paragraph1")}
-          </p>
-          <p className="text-muted-foreground">
-            {t("about.whyWeStarted.paragraph2")}
-          </p>
-          <p className="text-muted-foreground">
-            {t("about.whyWeStarted.paragraph3")}
-          </p>
+      <section className="grid md:grid-cols-2 gap-8 mb-12">
+        <Card className="p-6">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">Nossa Missão</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300">
+              Nossa missão é democratizar o acesso à mentoria de qualidade, criando uma comunidade onde o conhecimento e a experiência são compartilhados livremente. Acreditamos que todos merecem a oportunidade de aprender e crescer, independentemente de sua origem ou condição financeira.
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="p-6">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">Nossa Visão</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300">
+              Ser a principal plataforma global de mentoria voluntária, reconhecida por sua eficácia em conectar talentos e por seu impacto positivo na vida de milhões de pessoas, construindo um futuro mais equitativo e capacitado.
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossa História</h2>
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="space-y-4">
+            <p className="text-gray-700 dark:text-gray-300">
+              A Menvo nasceu da paixão por conectar pessoas e do desejo de tornar a mentoria acessível a todos. Em 2023, durante o Hackathon Latinoware, um grupo de visionários se uniu para criar uma solução que pudesse preencher a lacuna entre quem busca conhecimento e quem tem a experiência para compartilhar.
+            </p>
+            <p className="text-gray-700 dark:text-gray-300">
+              Desde então, a plataforma evoluiu, impulsionada pelo feedback da comunidade e pelo compromisso de nossos voluntários. Continuamos a crescer, expandindo nossa rede de mentores e mentees, e aprimorando nossas ferramentas para facilitar conexões significativas.
+            </p>
+          </div>
+          <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg">
+            <Image
+              src="/images/about/hackathon-latinoware-paul-ismaela-italo.jpg"
+              alt="Menvo Team at Hackathon Latinoware"
+              layout="fill"
+              objectFit="cover"
+              className="rounded-lg"
+            />
+          </div>
         </div>
-        <div className="flex justify-center">
-          <Image
-            src="/images/about/hackathon-latinoware-paul-ismaela-italo.jpg"
-            width={500}
-            height={400}
-            alt={t("about.ourStoryImageAlt")}
-            className="rounded-lg object-cover"
-          />
-        </div>
-      </div>
+      </section>
 
-      <div className="bg-secondary/50 rounded-lg p-8 md:p-12 mb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card className="bg-background">
-            <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">{t("about.values.community.title")}</h3>
-              <p className="text-muted-foreground">
-                {t("about.values.community.description")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-background">
-            <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Heart className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">{t("about.values.accessibility.title")}</h3>
-              <p className="text-muted-foreground">
-                {t("about.values.accessibility.description")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-background">
-            <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Globe className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">{t("about.values.impact.title")}</h3>
-              <p className="text-muted-foreground">
-                {t("about.values.impact.description")}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      <div className="mb-16">
-        <h2 id="sdg" className="text-2xl font-bold text-center mb-8">{t("about.sdg.title")}</h2>
-        <p className="text-muted-foreground text-center max-w-3xl mx-auto mb-8">
-          {t("about.sdg.description")}
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { number: 4, title: t("about.sdg.goals.qualityEducation"), color: "bg-red-100 text-red-800", id: "sdg4" },
-            { number: 5, title: t("about.sdg.goals.genderEquality"), color: "bg-orange-100 text-orange-800", id: "sdg5" },
-            { number: 8, title: t("about.sdg.goals.decentWork"), color: "bg-green-100 text-green-800", id: "sdg8" },
-            { number: 10, title: t("about.sdg.goals.reducedInequalities"), color: "bg-blue-100 text-blue-800", id: "sdg10" },
-          ].map((goal) => (
-            <div key={goal.number} id={goal.id} className={`p-4 rounded-lg ${goal.color} flex flex-col items-center text-center`}>
-              <div className="font-bold text-xl mb-2">{t("about.sdg.goalNumber", { number: goal.number })}</div>
-              <div>{goal.title}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
-        <div className="flex justify-center order-last md:order-first">
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossa Equipe</h2>
+        <div className="relative w-full h-64 md:h-[400px] rounded-lg overflow-hidden shadow-lg mb-8">
           <Image
             src="/images/about/menvo-team.png"
-            width={500}
-            height={400}
-            alt={t("about.ourTeamImageAlt")}
-            className="rounded-lg object-cover"
+            alt="Menvo Team"
+            layout="fill"
+            objectFit="cover"
+            className="rounded-lg"
           />
         </div>
-        <div className="space-y-6">
-          <h2 id="team" className="text-2xl font-bold scroll-mt-20">{t("about.ourTeam.title")}</h2>
-          <div className="space-y-4">
-            <p className="text-muted-foreground">
-              {t("about.ourTeam.paragraph1")}
-            </p>
-            <p className="text-muted-foreground">
-              {t("about.ourTeam.paragraph2")}
-            </p>
-            <p className="text-muted-foreground">
-              {t("about.ourTeam.paragraph3")}
-            </p>
-            <Button asChild>
-              <Link    href="https://wa.me/5581995097377?text=Olá!%20Vi%20o%20projeto%20e%20me%20interessei%20bastante.%20Gostaria%20de%20ajudar%20com%20algo%20se%20for%20possível..."
-                target="_blank"
-                rel="noopener noreferrer">
-                  {t("about.ourTeam.joinTeam")}</Link>
-            </Button>
+        <p className="text-center text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          Somos um grupo diversificado de voluntários, desenvolvedores, designers e entusiastas da educação, todos unidos por um objetivo comum: capacitar indivíduos através do poder da mentoria.
+        </p>
+      </section>
+
+      <Separator className="my-12" />
+
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossos Valores</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="p-6 text-center">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Acessibilidade</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 dark:text-gray-300">
+                Acreditamos que a mentoria deve ser para todos, sem barreiras financeiras ou geográficas.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="p-6 text-center">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Comunidade</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 dark:text-gray-300">
+                Fomentamos um ambiente de apoio mútuo, respeito e colaboração.
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="p-6 text-center">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Crescimento</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 dark:text-gray-300">
+                Nosso foco é o desenvolvimento contínuo de mentees e mentores.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <Separator className="my-12" />
+
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">ODS que Apoiamos</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="flex flex-col items-center text-center">
+            <Image src="/public/images/SDG-4.svg" alt="ODS 4 - Educação de Qualidade" width={100} height={100} />
+            <p className="mt-2 text-sm font-medium">Educação de Qualidade</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <Image src="/public/images/SDG-5.svg" alt="ODS 5 - Igualdade de Gênero" width={100} height={100} />
+            <p className="mt-2 text-sm font-medium">Igualdade de Gênero</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <Image src="/public/images/SDG-8.svg" alt="ODS 8 - Trabalho Decente e Crescimento Econômico" width={100} height={100} />
+            <p className="mt-2 text-sm font-medium">Trabalho Decente e Crescimento Econômico</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <Image src="/public/images/SDG-10.svg" alt="ODS 10 - Redução das Desigualdades" width={100} height={100} />
+            <p className="mt-2 text-sm font-medium">Redução das Desigualdades</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold text-center mb-4">{t("about.contributors.title")}</h2>
-        <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-8">
-          {t("about.contributors.description")}
-        </p>
-        <Contributors />
-      </div>
+      <Separator className="my-12" />
 
-      <div className="bg-primary-600 text-primary-foreground rounded-lg p-8 md:p-12 mb-16">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl font-bold">{t("about.ourImpact.title")}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">{t("about.ourImpact.volunteerMentors.count")}</div>
-              <div>{t("about.ourImpact.volunteerMentors.label")}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">{t("about.ourImpact.mentorshipSessions.count")}</div>
-              <div>{t("about.ourImpact.mentorshipSessions.label")}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">{t("about.ourImpact.countriesReached.count")}</div>
-              <div>{t("about.ourImpact.countriesReached.label")}</div>
-            </div>
-          </div>
-          <p>
-            {t("about.ourImpact.description")}
-          </p>
-        </div>
-      </div>
- 
-      <div className="text-center mb-16" id="partners">
-        <Partners />
-      </div>
-      <div className="bg-muted rounded-lg p-8 md:p-12 text-center">
-        <h2 className="text-2xl font-bold mb-4">{t("about.joinOurMission.title")}</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-          {t("about.joinOurMission.description")}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" asChild>
-            <Link href="/signup">{t("about.joinOurMission.signUpNow")}</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/contact">{t("about.joinOurMission.contactUs")}</Link>
-          </Button>
-        </div>
-      </div>
+      <Contributors />
+
+      <Separator className="my-12" />
+
+      <Partners />
     </div>
   )
 }

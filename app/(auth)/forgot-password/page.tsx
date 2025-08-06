@@ -31,7 +31,7 @@ export default function ForgotPasswordPage() {
       router.push('/login') // Redirect to login after sending email
     } catch (error: any) {
       toast({
-        title: 'Erro ao enviar email',
+        title: 'Erro ao enviar email de recuperação',
         description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
         variant: 'destructive',
       })
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+        <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Esqueceu sua senha?</CardTitle>
           <CardDescription>
             Digite seu email abaixo para receber um link de redefinição de senha.
@@ -63,13 +63,13 @@ export default function ForgotPasswordPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Enviando...' : 'Redefinir Senha'}
+              {loading ? 'Enviando...' : 'Enviar link de redefinição'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Link href="/login" className="text-sm underline">
-            Voltar para o Login
+          <Link href="/login" className="text-sm text-blue-600 hover:underline">
+            Voltar para o login
           </Link>
         </CardFooter>
       </Card>

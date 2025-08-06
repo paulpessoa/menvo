@@ -1,288 +1,117 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Calendar, User, CheckCircle, XCircle, Eye } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
-import { VerificationService } from "@/services/verifications"
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { CheckCircle2Icon, XCircleIcon, Loader2Icon } from 'lucide-react'
+import { toast } from '@/components/ui/use-toast'
+import { supabase } from '@/services/auth/supabase' // Assuming supabase client is exported
 
-export default function VerificationsPage() {
-  const { user } = useAuth()
-  const [verifications, setVerifications] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [selectedVerification, setSelectedVerification] = useState(null)
+export default function VerificationPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
+  const [message, setMessage] = useState('Verificando seu email...')
 
   useEffect(() => {
-    loadVerifications()
-  }, [])
+    const verifyEmail = async () => {
+      const type = searchParams.get('type')
+      const token_hash = searchParams.get('token_hash')
 
-  const loadVerifications = async () => {
-    try {
-      if (user?.id) {
-        const data = await VerificationService.getPendingVerifications(user.id)
-        setVerifications(data)
+      if (type === 'signup' && token_hash) {
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash,
+            type: 'email',
+          })
+
+          if (error) {
+            throw error
+          }
+
+          // After successful verification, update the user's profile to mark email as confirmed
+          const { data: { user }, error: userError } = await supabase.auth.getUser()
+          if (userError || !user) {
+            throw userError || new Error('Could not retrieve user after verification.')
+          }
+
+          const { error: profileUpdateError } = await supabase
+            .from('user_profiles')
+            .update({ email_confirmed: true })
+            .eq('id', user.id)
+
+          if (profileUpdateError) {
+            throw profileUpdateError
+          }
+
+          setStatus('success')
+          setMessage('Seu email foi verificado com sucesso! Você será redirecionado em breve.')
+          toast({
+            title: 'Email Verificado!',
+            description: 'Sua conta foi ativada com sucesso.',
+            variant: 'default',
+          })
+          setTimeout(() => {
+            router.push('/welcome') // Redirect to welcome/onboarding page
+          }, 3000)
+        } catch (error: any) {
+          setStatus('error')
+          setMessage(`Erro na verificação: ${error.message || 'Ocorreu um erro inesperado.'}`)
+          toast({
+            title: 'Erro na Verificação',
+            description: error.message || 'Não foi possível verificar seu email.',
+            variant: 'destructive',
+          })
+        }
+      } else {
+        setStatus('error')
+        setMessage('Link de verificação inválido ou incompleto.')
+        toast({
+          title: 'Link Inválido',
+          description: 'O link de verificação está faltando informações.',
+          variant: 'destructive',
+        })
       }
-    } catch (error) {
-      console.error("Error loading verifications:", error)
-    } finally {
-      setLoading(false)
     }
-  }
 
-  const handleApprove = async (verificationId: string) => {
-    try {
-      await VerificationService.completeVerification({
-        verificationId,
-        adminId: user!.id,
-        passed: true,
-        notes: "Verification completed successfully",
-      })
-      loadVerifications()
-    } catch (error) {
-      console.error("Error approving verification:", error)
-    }
-  }
-
-  const handleReject = async (verificationId: string, reason: string) => {
-    try {
-      await VerificationService.completeVerification({
-        verificationId,
-        adminId: user!.id,
-        passed: false,
-        notes: reason,
-      })
-      loadVerifications()
-    } catch (error) {
-      console.error("Error rejecting verification:", error)
-    }
-  }
-
-  if (loading) {
-    return <div className="container py-8">Loading verifications...</div>
-  }
+    verifyEmail()
+  }, [searchParams, router])
 
   return (
-    <div className="container py-8 md:py-12">
-      <div className="flex flex-col space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mentor Verifications</h1>
-          <p className="text-muted-foreground">Review and approve mentor applications</p>
-        </div>
-
-        <Tabs defaultValue="pending" className="w-full">
-          <TabsList>
-            <TabsTrigger value="pending">Pending ({verifications.length})</TabsTrigger>
-            <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="pending" className="space-y-4">
-            {verifications.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center h-48">
-                  <div className="text-center">
-                    <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No pending verifications</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {verifications.map((verification) => (
-                  <Card key={verification.verification_id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src="/placeholder.svg" />
-                            <AvatarFallback>
-                              {verification.mentor_name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <CardTitle className="text-xl">{verification.mentor_name}</CardTitle>
-                            <CardDescription>{verification.mentor_title}</CardDescription>
-                            <p className="text-sm text-muted-foreground">{verification.mentor_company}</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline">{verification.verification_type}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>Applied {new Date(verification.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <User className="h-4 w-4" />
-                          <span>{verification.mentor_email}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Review Details
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Verification Details</DialogTitle>
-                              <DialogDescription>Review mentor application and documents</DialogDescription>
-                            </DialogHeader>
-                            <VerificationDetails verification={verification} />
-                          </DialogContent>
-                        </Dialog>
-
-                        <Button size="sm" onClick={() => handleApprove(verification.verification_id)}>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve
-                        </Button>
-
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Reject
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Reject Verification</DialogTitle>
-                              <DialogDescription>Please provide a reason for rejection</DialogDescription>
-                            </DialogHeader>
-                            <RejectForm onReject={(reason) => handleReject(verification.verification_id, reason)} />
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="scheduled">
-            <Card>
-              <CardContent className="flex items-center justify-center h-48">
-                <p className="text-muted-foreground">Scheduled verifications will appear here</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="completed">
-            <Card>
-              <CardContent className="flex items-center justify-center h-48">
-                <p className="text-muted-foreground">Completed verifications will appear here</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+      <Card className="w-full max-w-md text-center">
+        <CardHeader>
+          {status === 'loading' && <Loader2Icon className="mx-auto h-12 w-12 animate-spin text-blue-500" />}
+          {status === 'success' && <CheckCircle2Icon className="mx-auto h-12 w-12 text-green-500" />}
+          {status === 'error' && <XCircleIcon className="mx-auto h-12 w-12 text-red-500" />}
+          <CardTitle className="text-2xl font-bold mt-4">
+            {status === 'loading' && 'Verificando...'}
+            {status === 'success' && 'Verificação Concluída!'}
+            {status === 'error' && 'Erro na Verificação'}
+          </CardTitle>
+          <CardDescription className="mt-2">{message}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {status === 'error' && (
+            <div className="mt-4">
+              <Link href="/signup" passHref>
+                <Button>Tentar novamente</Button>
+              </Link>
+            </div>
+          )}
+          {status === 'success' && (
+            <div className="mt-4">
+              <p>Você será redirecionado para a página de boas-vindas em breve.</p>
+              <p>Se não for redirecionado, clique no botão abaixo.</p>
+              <Link href="/welcome" passHref>
+                <Button className="mt-2">Ir para a Página de Boas-Vindas</Button>
+              </Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
-  )
-}
-
-function VerificationDetails({ verification }) {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label className="text-sm font-medium">Name</Label>
-          <p className="text-sm">{verification.mentor_name}</p>
-        </div>
-        <div>
-          <Label className="text-sm font-medium">Email</Label>
-          <p className="text-sm">{verification.mentor_email}</p>
-        </div>
-        <div>
-          <Label className="text-sm font-medium">Title</Label>
-          <p className="text-sm">{verification.mentor_title}</p>
-        </div>
-        <div>
-          <Label className="text-sm font-medium">Company</Label>
-          <p className="text-sm">{verification.mentor_company}</p>
-        </div>
-      </div>
-
-      <div>
-        <Label className="text-sm font-medium">Documents</Label>
-        <div className="mt-2 space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox id="resume" defaultChecked />
-            <Label htmlFor="resume" className="text-sm">
-              Resume/CV
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="linkedin" defaultChecked />
-            <Label htmlFor="linkedin" className="text-sm">
-              LinkedIn Profile
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="portfolio" />
-            <Label htmlFor="portfolio" className="text-sm">
-              Portfolio (Optional)
-            </Label>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function RejectForm({ onReject }) {
-  const [reason, setReason] = useState("")
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (reason.trim()) {
-      onReject(reason)
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="reason">Reason for rejection</Label>
-        <Textarea
-          id="reason"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder="Please provide a detailed reason for rejection..."
-          required
-        />
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline">
-          Cancel
-        </Button>
-        <Button type="submit" variant="destructive">
-          Reject Application
-        </Button>
-      </div>
-    </form>
   )
 }

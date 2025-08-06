@@ -1,45 +1,67 @@
+'use client'
+
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { auth } from '@/services/auth/supabase'
+import { toast } from '@/components/ui/use-toast'
+import { resendConfirmationEmail } from '@/services/auth/supabase' // Assuming this function exists
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-interface ResendConfirmationEmailProps {
-  email: string
-}
-
-export function ResendConfirmationEmail({ email }: ResendConfirmationEmailProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState('')
+export function ResendConfirmationEmail() {
+  const [email, setEmail] = useState('')
+  const [resending, setResending] = useState(false)
 
   const handleResend = async () => {
+    if (!email) {
+      toast({
+        title: 'Email necessário',
+        description: 'Por favor, digite seu email para reenviar o link de confirmação.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setResending(true)
     try {
-      setIsLoading(true)
-      await auth.resendConfirmationEmail(email)
-      setMessage('Confirmation email sent! Please check your inbox.')
+      const { error } = await resendConfirmationEmail(email)
+      if (error) {
+        throw error
+      }
+      toast({
+        title: 'Email de confirmação reenviado!',
+        description: 'Verifique sua caixa de entrada (e spam) para o novo link.',
+        variant: 'default',
+      })
     } catch (error: any) {
-      setMessage(error.message || 'Failed to resend confirmation email')
+      toast({
+        title: 'Erro ao reenviar email',
+        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+        variant: 'destructive',
+      })
     } finally {
-      setIsLoading(false)
+      setResending(false)
     }
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mt-6 p-4 border rounded-lg bg-muted/50">
       <p className="text-sm text-muted-foreground">
-        Didn't receive the confirmation email?
+        Não recebeu o email de confirmação? Digite seu email abaixo para reenviar.
       </p>
-      <Button
-        onClick={handleResend}
-        disabled={isLoading}
-        variant="outline"
-        className="w-full"
-      >
-        {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
+      <div className="grid gap-2">
+        <Label htmlFor="resend-email">Seu Email</Label>
+        <Input
+          id="resend-email"
+          type="email"
+          placeholder="seu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={resending}
+        />
+      </div>
+      <Button onClick={handleResend} disabled={resending} className="w-full">
+        {resending ? 'Reenviando...' : 'Reenviar Email de Confirmação'}
       </Button>
-      {message && (
-        <p className={`text-sm ${message.includes('Failed') ? 'text-red-500' : 'text-green-500'}`}>
-          {message}
-        </p>
-      )}
     </div>
   )
 }

@@ -11,9 +11,11 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, X } from "lucide-react"
+import { CalendarIcon, X, SearchIcon, MapPinIcon } from 'lucide-react'
 import { format } from "date-fns"
 import type { EventFilters as EventFiltersType, EventType, EventFormat, EventSource } from "@/types/events"
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface EventFiltersProps {
   filters: EventFiltersType
@@ -94,6 +96,18 @@ export default function EventFilters({ filters, onFiltersChange, onClearFilters 
     })
   }
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFiltersChange({ search: e.target.value })
+  }
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFiltersChange({ location: e.target.value })
+  }
+
+  const handleCategoryChange = (value: string) => {
+    onFiltersChange({ category: value })
+  }
+
   return (
     <Card className="sticky top-20">
       <CardHeader className="pb-4">
@@ -105,6 +119,24 @@ export default function EventFilters({ filters, onFiltersChange, onClearFilters 
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Search */}
+        <div className="grid gap-2">
+          <Label htmlFor="search">Buscar por Título</Label>
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input id="search" placeholder="Ex: Webinar de IA" className="pl-9" onChange={handleSearchChange} />
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="grid gap-2">
+          <Label htmlFor="location">Localização</Label>
+          <div className="relative">
+            <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input id="location" placeholder="Ex: Online, São Paulo" className="pl-9" onChange={handleLocationChange} />
+          </div>
+        </div>
+
         {/* Event Types */}
         <div className="space-y-3">
           <Label className="text-sm font-medium">Event Type</Label>
@@ -225,13 +257,13 @@ export default function EventFilters({ filters, onFiltersChange, onClearFilters 
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={dateRange.from}
-                selected={dateRange}
-                onSelect={handleDateRangeChange}
-                numberOfMonths={2}
-              />
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange.from}
+                    selected={dateRange}
+                    onSelect={handleDateRangeChange}
+                    numberOfMonths={2}
+                  />
             </PopoverContent>
           </Popover>
           {(filters.dateRange.start || filters.dateRange.end) && (
@@ -247,6 +279,26 @@ export default function EventFilters({ filters, onFiltersChange, onClearFilters 
               Clear date filter
             </Button>
           )}
+        </div>
+
+        <Separator />
+
+        {/* Category */}
+        <div className="grid gap-2">
+          <Label htmlFor="category">Categoria</Label>
+          <Select>
+            <SelectTrigger id="category" onValueChange={handleCategoryChange}>
+              <SelectValue placeholder="Selecione uma categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas</SelectItem>
+              <SelectItem value="tech">Tecnologia</SelectItem>
+              <SelectItem value="business">Negócios</SelectItem>
+              <SelectItem value="personal-dev">Desenvolvimento Pessoal</SelectItem>
+              <SelectItem value="design">Design</SelectItem>
+              <SelectItem value="marketing">Marketing</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Separator />
@@ -268,6 +320,9 @@ export default function EventFilters({ filters, onFiltersChange, onClearFilters 
             ))}
           </div>
         </div>
+
+        <Button className="w-full">Aplicar Filtros</Button>
+        <Button variant="outline" className="w-full">Limpar Filtros</Button>
       </CardContent>
     </Card>
   )

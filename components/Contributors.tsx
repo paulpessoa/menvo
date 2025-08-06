@@ -1,44 +1,56 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useContributors } from '@/hooks/useContributors'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { useTranslation } from "react-i18next"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import Image from 'next/image'
 import { Button } from "@/components/ui/button"
-import { Github } from "lucide-react"
+import { Github } from 'lucide-react'
 
 export function Contributors() {
-  const { t } = useTranslation()
-  const { data: contributors, isLoading } = useContributors()
-
-  if (isLoading || !contributors) {
-    return null
-  }
+  const contributors = [
+    {
+      name: 'Ismaela Silva',
+      role: 'Co-fundadora, Desenvolvedora',
+      avatar: '/public/images/ismaela-silva.jpg',
+      github: 'https://github.com/ismaelasilva',
+    },
+    {
+      name: 'Paul Pessoa',
+      role: 'Co-fundador, Desenvolvedor',
+      avatar: '/public/images/paul-pessoa.jpg',
+      github: 'https://github.com/paulopessoa',
+    },
+    // Add more contributors as needed
+    {
+      name: 'João Ninguém',
+      role: 'Desenvolvedor',
+      avatar: '/placeholder-user.jpg',
+      github: '#',
+    },
+    {
+      name: 'Maria Exemplo',
+      role: 'Designer UX/UI',
+      avatar: '/placeholder-user.jpg',
+      github: '#',
+    },
+  ]
 
   return (
-    <div className="w-full py-8">
-      <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
-        {contributors.map((contributor) => (
-          <TooltipProvider key={contributor.login}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href={contributor.html_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Avatar className="h-12 w-12 transition-transform hover:scale-110">
-                    <AvatarImage src={contributor.avatar_url} alt={contributor.login} />
-                    <AvatarFallback>{contributor.login.slice(0, 2).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="font-medium">{contributor.login}</p>
-                <p className="text-sm text-muted-foreground">
-                  {t('about.contributors.contributions', { count: contributor.contributions })}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+    <section className="mb-12">
+      <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossos Contribuidores</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {contributors.map((contributor, index) => (
+          <Card key={index} className="flex flex-col items-center text-center p-4">
+            <Avatar className="h-24 w-24 mb-4">
+              <AvatarImage src={contributor.avatar || "/placeholder.svg"} alt={contributor.name} />
+              <AvatarFallback>{contributor.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <CardTitle className="text-lg font-semibold">{contributor.name}</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">{contributor.role}</CardDescription>
+            {contributor.github && (
+              <a href={contributor.github} target="_blank" rel="noopener noreferrer" className="mt-2 text-blue-600 hover:underline text-sm">
+                GitHub
+              </a>
+            )}
+          </Card>
         ))}
       </div>
       <div className="flex justify-center mt-8">
@@ -49,10 +61,10 @@ export function Contributors() {
             rel="noopener noreferrer"
           >
             <Github className="h-4 w-4" />
-            {t('about.contributors.viewRepository')}
+            View Repository
           </a>
         </Button>
       </div>
-    </div>
+    </section>
   )
 }

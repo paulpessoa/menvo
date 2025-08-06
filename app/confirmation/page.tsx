@@ -1,87 +1,34 @@
-"use client"
-
-import Link from "next/link"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, CheckCircle, ArrowRight } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { useAuth } from "@/hooks/useAuth"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { MailCheckIcon } from 'lucide-react'
+import { ResendConfirmationEmail } from '@/components/auth/ResendConfirmationEmail'
 
 export default function ConfirmationPage() {
-  const { t } = useTranslation()
-  const { user, loading } = useAuth()
-  const router = useRouter()
-
-  // Redirecionar usuários já logados
-  useEffect(() => {
-    if (!loading && user) {
-      router.push('/')
-    }
-  }, [user, loading, router])
-
-  // Mostrar loading enquanto verifica autenticação
-  if (loading) {
-    return (
-      <div className="container max-w-lg py-16 flex flex-col items-center text-center">
-        <div className="animate-pulse text-muted-foreground">
-          {t("common.loading")}
-        </div>
-      </div>
-    )
-  }
-
-  // Não renderizar se o usuário está logado
-  if (user) {
-    return null
-  }
-
   return (
-    <div className="container max-w-lg py-16 flex flex-col items-center text-center">
-      <Card>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+      <Card className="w-full max-w-md text-center">
         <CardHeader>
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Mail className="h-6 w-6 text-blue-600" />
-          </div>
-          <CardTitle>{t("register.confirmEmail")}</CardTitle>
-          <CardDescription>
-            {t("register.confirmEmailDescription", { email: "seu@email.com" })}
+          <MailCheckIcon className="mx-auto h-12 w-12 text-green-500" />
+          <CardTitle className="text-2xl font-bold mt-4">Verifique seu Email</CardTitle>
+          <CardDescription className="mt-2">
+            Um link de confirmação foi enviado para o seu endereço de email.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-lg bg-blue-50 p-4">
-            <p className="text-sm text-blue-800">
-              <strong>{t("register.nextSteps")}</strong>
-            </p>
-            <ol className="mt-2 list-decimal list-inside text-sm text-blue-700 space-y-1">
-              {(t("register.nextStepsList", { returnObjects: true }) as string[]).map((step, index) => (
-                <li key={index}>{step}</li>
-              ))}
-            </ol>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            {t("register.afterConfirmation")}
+          <p className="text-lg">
+            Por favor, verifique sua caixa de entrada (e a pasta de spam) para ativar sua conta.
           </p>
-          <div className="rounded-lg bg-yellow-50 p-3">
-            <p className="text-xs text-yellow-800">
-              <strong>{t("register.didntReceiveEmail")}</strong> {t("register.checkSpam")}
-            </p>
+          <p className="text-muted-foreground">
+            O link de confirmação expira em breve.
+          </p>
+          <ResendConfirmationEmail />
+          <div className="mt-4">
+            <Link href="/login" passHref>
+              <Button variant="outline">Voltar para o Login</Button>
+            </Link>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-2">
-          <Button asChild className="w-full">
-            <Link href="/login">
-              {t("register.goToLogin")}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/">
-              {t("register.goToHome")}
-            </Link>
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   )

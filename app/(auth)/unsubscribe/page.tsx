@@ -1,130 +1,102 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Mail, CheckCircle, AlertCircle } from "lucide-react"
-import { useNewsletterUnsubscribe } from "@/hooks/useNewsletter"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/use-toast'
+import { unsubscribeFromNewsletter } from '@/services/newsletter/newsletter' // Assuming this service exists
+import Link from 'next/link'
 
 export default function UnsubscribePage() {
-  const [email, setEmail] = useState("")
-  const [isSuccess, setIsSuccess] = useState(false)
-  
-  const unsubscribeMutation = useNewsletterUnsubscribe()
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [unsubscribed, setUnsubscribed] = useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const handleUnsubscribe = async (e: React.FormEvent) => {
+  // Pre-fill email if provided in URL (e.g., from an unsubscribe link)
+  useState(() => {
+    const emailParam = searchParams.get('email')
+    if (emailParam) {
+      setEmail(emailParam)
+    }
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+    setLoading(true)
     try {
-      await unsubscribeMutation.mutateAsync(email)
-      setIsSuccess(true)
-    } catch (error) {
-      // Error is handled by the hook
+      // Call your unsubscribe service
+      const { error } = await unsubscribeFromNewsletter(email)
+      if (error) {
+        throw error
+      }
+      setUnsubscribed(true)
+      toast({
+        title: 'Inscrição cancelada!',
+        description: 'Você foi removido da nossa lista de e-mails com sucesso.',
+        variant: 'default',
+      })
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao cancelar inscrição',
+        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
     }
   }
 
-  if (isSuccess) {
-    return (
-      <div className="container max-w-md py-16 flex flex-col items-center text-center">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-center mb-4">
-              <CheckCircle className="h-12 w-12 text-green-500" />
-            </div>
-            <CardTitle>Inscrição cancelada com sucesso</CardTitle>
-            <CardDescription>
-              Você foi removido da nossa lista de newsletter. Sentiremos sua falta! 😢
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Se mudou de ideia, você pode se inscrever novamente a qualquer momento através do nosso site.
-            </p>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => window.location.href = '/'}
-              >
-                Voltar ao site
-              </Button>
-              <Button 
-                className="flex-1"
-                onClick={() => {
-                  setIsSuccess(false)
-                  setEmail("")
-                }}
-              >
-                Inscrever novamente
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
   return (
-    <div className="container max-w-md py-16">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-center mb-4">
-            <Mail className="h-12 w-12 text-primary" />
-          </div>
-          <CardTitle>Cancelar inscrição da newsletter</CardTitle>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Cancelar Inscrição</CardTitle>
           <CardDescription>
-            Lamentamos que você queira sair. Digite seu email para cancelar a inscrição.
+            {unsubscribed
+              ? 'Sua inscrição foi cancelada com sucesso.'
+              : 'Digite seu email para cancelar sua inscrição em nossa newsletter.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleUnsubscribe} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+          {unsubscribed ? (
+            <div className="text-center space-y-4">
+              <p>Você não receberá mais e-mails de marketing de nós.</p>
+              <Link href="/" passHref>
+                <Button>Voltar para a Página Inicial</Button>
+              </Link>
             </div>
-            
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-amber-800">
-                  <p className="font-medium">Antes de cancelar, considere:</p>
-                  <ul className="mt-1 space-y-1 text-xs">
-                    <li>• Você receberá apenas conteúdo relevante sobre mentoria</li>
-                    <li>• Enviamos no máximo 2 emails por semana</li>
-                    <li>• Você pode se reinscrever a qualquer momento</li>
-                  </ul>
-                </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                />
               </div>
-            </div>
-
-            <Button 
-              type="submit" 
-              variant="destructive"
-              className="w-full"
-              disabled={!email.includes('@') || unsubscribeMutation.isPending}
-            >
-              {unsubscribeMutation.isPending ? 'Cancelando...' : 'Cancelar inscrição'}
-            </Button>
-            
-            <Button 
-              type="button" 
-              variant="outline"
-              className="w-full"
-              onClick={() => window.location.href = '/'}
-            >
-              Voltar ao site
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Processando...' : 'Cancelar Inscrição'}
+              </Button>
+            </form>
+          )}
         </CardContent>
+        {!unsubscribed && (
+          <CardFooter className="flex justify-center">
+            <Link href="/" className="text-sm text-blue-600 hover:underline">
+              Voltar para a Página Inicial
+            </Link>
+          </CardFooter>
+        )}
       </Card>
     </div>
   )

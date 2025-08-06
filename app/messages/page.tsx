@@ -9,28 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
-import {
-  Search,
-  Send,
-  Phone,
-  Video,
-  MoreVertical,
-  Paperclip,
-  Smile,
-  Archive,
-  Trash2,
-  Star,
-  Flag,
-  User,
-  Clock,
-  CheckCheck,
-  Check,
-  MessageSquare,
-  Bell,
-  BellOff,
-  Settings,
-  Plus
-} from "lucide-react"
+import { Search, Send, Phone, Video, MoreVertical, Paperclip, Smile, Archive, Trash2, Star, Flag, User, Clock, CheckCheck, Check, MessageSquare, Bell, BellOff, Settings, Plus } from 'lucide-react'
 import Image from "next/image"
 import { useTranslation } from "react-i18next"
 import { useRouter } from "next/navigation"
@@ -38,13 +17,9 @@ import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { format, isToday, isYesterday, isThisWeek } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { toast } from "sonner"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { MessageSquareIcon, SendIcon } from 'lucide-react'
 
 interface Message {
   id: string
@@ -357,283 +332,103 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <MessageSquare className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">Mensagens</h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Configurações
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Minhas Mensagens</h1>
 
-      <div className="flex-1 container py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 h-full">
-          {/* Conversations List */}
-          <Card className="flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Conversas</CardTitle>
-                <Button size="sm" variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova
-                </Button>
-              </div>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar conversas..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+        <div className="grid md:grid-cols-3 gap-8 h-[70vh]">
+          {/* Left Panel: Conversations List */}
+          <Card className="md:col-span-1 flex flex-col">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquareIcon className="h-6 w-6" />
+                Conversas
+              </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 p-0">
-              <ScrollArea className="h-full">
-                {isLoading ? (
-                  <div className="space-y-4 p-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <Skeleton className="h-12 w-12 rounded-full" />
-                        <div className="flex-1">
-                          <Skeleton className="h-4 w-32 mb-2" />
-                          <Skeleton className="h-3 w-48" />
-                        </div>
-                      </div>
-                    ))}
+            <CardContent className="flex-grow overflow-y-auto p-0">
+              {filteredConversations.map((conversation) => {
+                const participant = getCurrentParticipant(conversation)
+                const isSelected = selectedConversation === conversation.id
+                
+                return (
+                  <div
+                    key={conversation.id}
+                    onClick={() => handleSelectConversation(conversation.id)}
+                    className={`flex items-center gap-4 p-4 border-b cursor-pointer hover:bg-muted ${
+                      conversation.unreadCount > 0 ? 'bg-blue-50 dark:bg-blue-950' : ''
+                    }`}
+                  >
+                    <Avatar>
+                      <AvatarImage src={participant?.avatar || "/placeholder.svg"} alt={participant?.name} />
+                      <AvatarFallback>{participant?.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-grow">
+                      <p className="font-semibold">{participant?.name}</p>
+                      <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage.content}</p>
+                    </div>
+                    {conversation.unreadCount > 0 && (
+                      <span className="h-2 w-2 rounded-full bg-blue-500" aria-label="New messages" />
+                    )}
                   </div>
-                ) : (
-                  <div className="space-y-1">
-                    {filteredConversations.map((conversation) => {
-                      const participant = getCurrentParticipant(conversation)
-                      const isSelected = selectedConversation === conversation.id
-                      
-                      return (
-                        <div
-                          key={conversation.id}
-                          onClick={() => handleSelectConversation(conversation.id)}
-                          className={`flex items-center gap-3 p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
-                            isSelected ? 'bg-muted' : ''
-                          }`}
-                        >
-                          <div className="relative">
-                            <div className="h-12 w-12 rounded-full overflow-hidden bg-muted flex-shrink-0">
-                              {participant?.avatar ? (
-                                <Image
-                                  src={participant.avatar}
-                                  alt={participant.name}
-                                  width={48}
-                                  height={48}
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                                  <User className="h-6 w-6 text-primary/40" />
-                                </div>
-                              )}
-                            </div>
-                            {participant?.online && (
-                              <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 border-2 border-background rounded-full" />
-                            )}
-                          </div>
-                          
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-medium truncate">{participant?.name}</h3>
-                                {conversation.isPinned && (
-                                  <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                                )}
-                                {conversation.isMuted && (
-                                  <BellOff className="h-3 w-3 text-muted-foreground" />
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <span className="text-xs text-muted-foreground">
-                                  {formatMessageTime(conversation.lastMessage.timestamp)}
-                                </span>
-                                {conversation.unreadCount > 0 && (
-                                  <Badge variant="default" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                                    {conversation.unreadCount}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm text-muted-foreground truncate flex-1">
-                                {conversation.lastMessage.senderId === 'current-user' && (
-                                  <span className="mr-1">Você:</span>
-                                )}
-                                {conversation.lastMessage.content}
-                              </p>
-                              {conversation.lastMessage.senderId === 'current-user' && (
-                                <div className="text-muted-foreground">
-                                  {conversation.lastMessage.isRead ? (
-                                    <CheckCheck className="h-3 w-3" />
-                                  ) : (
-                                    <Check className="h-3 w-3" />
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </ScrollArea>
+                )
+              })}
             </CardContent>
           </Card>
 
-          {/* Chat Area */}
-          <Card className="flex flex-col">
+          {/* Right Panel: Chat Window */}
+          <Card className="md:col-span-2 flex flex-col">
             {selectedConversation ? (
               <>
                 {/* Chat Header */}
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {(() => {
-                        const conversation = conversations.find(c => c.id === selectedConversation)
-                        const participant = conversation ? getCurrentParticipant(conversation) : null
-                        
-                        return (
-                          <>
-                            <div className="relative">
-                              <div className="h-10 w-10 rounded-full overflow-hidden bg-muted">
-                                {participant?.avatar ? (
-                                  <Image
-                                    src={participant.avatar}
-                                    alt={participant.name}
-                                    width={40}
-                                    height={40}
-                                    className="object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                                    <User className="h-5 w-5 text-primary/40" />
-                                  </div>
-                                )}
-                              </div>
-                              {participant?.online && (
-                                <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border-2 border-background rounded-full" />
-                              )}
-                            </div>
-                            <div>
-                              <h3 className="font-medium">{participant?.name}</h3>
-                              <p className="text-sm text-muted-foreground">
-                                {participant?.online ? 'Online' : 
-                                 participant?.lastSeen ? `Visto ${formatMessageTime(participant.lastSeen)}` : 'Offline'}
-                              </p>
-                            </div>
-                          </>
-                        )
-                      })()}
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline">
-                        <Phone className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        <Video className="h-4 w-4" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Star className="h-4 w-4 mr-2" />
-                            Fixar conversa
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <BellOff className="h-4 w-4 mr-2" />
-                            Silenciar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <Archive className="h-4 w-4 mr-2" />
-                            Arquivar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Deletar
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
+                <CardHeader className="border-b">
+                  <CardTitle className="flex items-center gap-3">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={mockConversations.find(c => c.id === selectedConversation)?.participants.find(p => p.id !== 'current-user')?.avatar || "/placeholder-user.jpg"} alt="Dr. Ana Paula" />
+                      <AvatarFallback>AP</AvatarFallback>
+                    </Avatar>
+                    {mockConversations.find(c => c.id === selectedConversation)?.participants.find(p => p.id !== 'current-user')?.name}
+                  </CardTitle>
                 </CardHeader>
 
                 <Separator />
 
                 {/* Messages */}
-                <CardContent className="flex-1 p-0">
-                  <ScrollArea className="h-full p-4">
-                    <div className="space-y-4">
-                      {messages.map((message, index) => {
-                        const isOwnMessage = message.senderId === 'current-user'
-                        const showTimestamp = index === 0 || 
-                          Math.abs(message.timestamp.getTime() - messages[index - 1].timestamp.getTime()) > 5 * 60 * 1000
+                <CardContent className="flex-grow overflow-y-auto p-4 space-y-4">
+                  {messages.map((message, index) => {
+                    const isOwnMessage = message.senderId === 'current-user'
+                    const showTimestamp = index === 0 || 
+                      Math.abs(message.timestamp.getTime() - messages[index - 1].timestamp.getTime()) > 5 * 60 * 1000
 
-                        return (
-                          <div key={message.id} className="space-y-2">
-                            {showTimestamp && (
-                              <div className="text-center">
-                                <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                                  {format(message.timestamp, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                                </span>
-                              </div>
-                            )}
-                            
-                            <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                              <div
-                                className={`max-w-[70%] rounded-lg px-3 py-2 ${
-                                  isOwnMessage
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'bg-muted'
-                                }`}
-                              >
-                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                <div className={`flex items-center gap-1 mt-1 ${
-                                  isOwnMessage ? 'justify-end' : 'justify-start'
-                                }`}>
-                                  <span className={`text-xs ${
-                                    isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                                  }`}>
-                                    {format(message.timestamp, 'HH:mm')}
-                                  </span>
-                                  {isOwnMessage && (
-                                    <div className="text-primary-foreground/70">
-                                      {message.isRead ? (
-                                        <CheckCheck className="h-3 w-3" />
-                                      ) : (
-                                        <Check className="h-3 w-3" />
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
+                    return (
+                      <div key={message.id} className="space-y-2">
+                        {showTimestamp && (
+                          <div className="text-center">
+                            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+                              {format(message.timestamp, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                            </span>
                           </div>
-                        )
-                      })}
-                      <div ref={messagesEndRef} />
-                    </div>
-                  </ScrollArea>
+                        )}
+                        
+                        <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                          <div
+                            className={`max-w-[70%] rounded-lg px-3 py-2 ${
+                              isOwnMessage
+                                ? 'bg-primary text-primary-foreground rounded-br-none'
+                                : 'bg-muted rounded-bl-none'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                            <span className={`text-xs ${
+                              isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                            } block text-right mt-1`}>
+                              {formatMessageTime(message.timestamp)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  <div ref={messagesEndRef} />
                 </CardContent>
 
                 <Separator />
@@ -664,15 +459,16 @@ export default function MessagesPage() {
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
                     >
-                      <Send className="h-4 w-4" />
+                      <SendIcon className="h-4 w-4" />
+                      <span className="sr-only">Enviar Mensagem</span>
                     </Button>
                   </div>
                 </CardContent>
               </>
             ) : (
-              <CardContent className="flex-1 flex items-center justify-center">
+              <CardContent className="flex-grow flex items-center justify-center">
                 <div className="text-center space-y-4">
-                  <MessageSquare className="h-16 w-16 mx-auto text-muted-foreground/50" />
+                  <MessageSquareIcon className="h-16 w-16 mx-auto text-muted-foreground/50" />
                   <div>
                     <h3 className="text-lg font-medium">Selecione uma conversa</h3>
                     <p className="text-muted-foreground">
@@ -685,7 +481,7 @@ export default function MessagesPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }
 
@@ -707,12 +503,11 @@ function MessagesSkeleton() {
       <div className="flex-1 container py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 h-full">
           <Card className="flex flex-col">
-            <CardHeader className="pb-4">
+            <CardHeader>
               <div className="flex items-center justify-between">
                 <Skeleton className="h-6 w-20" />
                 <Skeleton className="h-8 w-16" />
               </div>
-              <Skeleton className="h-10 w-full" />
             </CardHeader>
             <CardContent className="flex-1 p-0">
               <div className="space-y-4 p-4">

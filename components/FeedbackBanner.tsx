@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Star, X, MessageSquare } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { XIcon } from 'lucide-react'
+import { Star, MessageSquare } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { useTranslation } from 'react-i18next'
@@ -35,6 +36,11 @@ export function FeedbackBanner() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showThankYou, setShowThankYou] = useState(false)
   const supabase = createClientComponentClient()
+  const [isVisible, setIsVisible] = useState(true)
+
+  if (!isVisible) {
+    return null
+  }
 
   const handleSubmit = async () => {
     if (!rating) {
@@ -83,25 +89,19 @@ export function FeedbackBanner() {
   return (
     <>
       {/* Floating Button with Tooltip */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
-                onClick={() => setIsOpen(true)}
-                aria-label={t('feedback.title')}
-              >
-                <MessageSquare className="h-10 w-10" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="bg-primary text-primary-foreground">
-              <p>{t('feedback.helpUsImprove')}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="fixed bottom-4 right-4 z-50 bg-blue-600 text-white p-4 rounded-lg shadow-lg flex items-center gap-4 max-w-sm">
+        <p className="text-sm">
+          Estamos em fase de testes! Sua opinião é muito importante para nós.
+        </p>
+        <a href="https://forms.gle/your-feedback-form-link" target="_blank" rel="noopener noreferrer">
+          <Button variant="secondary" size="sm" className="text-blue-600">
+            Enviar Feedback
+          </Button>
+        </a>
+        <Button variant="ghost" size="icon" onClick={() => setIsVisible(false)} className="text-white hover:bg-blue-700">
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Fechar</span>
+        </Button>
       </div>
 
       {/* Feedback Dialog */}

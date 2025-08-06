@@ -1,177 +1,220 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
-import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { useToast } from '@/components/ui/use-toast'
-import { UserProfile, user_role } from '@/types/database' // Assuming UserProfile type
+import { toast } from '@/components/ui/use-toast'
+import { useAuth } from '@/hooks/useAuth'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { Database } from '@/types/database'
+import { Loader2Icon } from 'lucide-react'
+import { getAdminUsers, updateAdminUser } from '@/services/auth/supabase' // Using client-side supabase for admin actions
+
+type UserProfile = Database['public']['Tables']['user_profiles']['Row'];
+type UserRole = Database['public']['Enums']['user_role'];
 
 export default function AdminUsersPage() {
-  const { user, isLoading: authLoading, isAdmin } = useAuth()
-  const router = useRouter()
-  const { toast } = useToast()
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [loadingUsers, setLoadingUsers] = useState(true)
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login') // Redirect unauthenticated users
-    } else if (!authLoading && user && !isAdmin) {
-      router.push('/unauthorized') // Redirect non-admin users
-    }
-  }, [user, authLoading, isAdmin, router])
-
-  useEffect(() => {
-    if (isAdmin) {
-      fetchUsers()
-    }
-  }, [isAdmin])
+  const { user, loading: authLoading } = useAuth();
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [editedRole, setEditedRole] = useState<UserRole | undefined>(undefined);
+  const [editedStatus, setEditedStatus] = useState<string | undefined>(undefined); // Assuming status is a string
 
   const fetchUsers = async () => {
-    setLoadingUsers(true)
+    setLoading(true);
+    setError(null);
     try {
-      const response = await fetch('/api/admin/users')
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      const { data, error } = await getAdminUsers();
+      if (error) {
+        throw error;
       }
-      const data: UserProfile[] = await response.json()
-      setUsers(data)
-    } catch (error: any) {
-      console.error('Failed to fetch users:', error)
+      setUsers(data || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch users.');
       toast({
-        title: 'Error',
-        description: `Failed to fetch users: ${error.message}`,
+        title: 'Erro ao carregar usuários',
+        description: err.message || 'Não foi possível carregar a lista de usuários.',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setLoadingUsers(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleUpdateUser = async (userId: string, updates: Partial<UserProfile>) => {
-    setUpdatingUserId(userId)
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchUsers();
+    }
+  }, [user, authLoading]);
+
+  const handleEditClick = (user: UserProfile) => {
+    setCurrentUser(user);
+    setEditedRole(user.role || undefined);
+    setEditedStatus(user.status || undefined);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!currentUser) return;
+
+    setLoading(true);
     try {
-      const response = await fetch('/api/admin/users/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: userId, updates }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      const updates: Partial<UserProfile> = {};
+      if (editedRole !== undefined && editedRole !== currentUser.role) {
+        updates.role = editedRole;
+      }
+      if (editedStatus !== undefined && editedStatus !== currentUser.status) {
+        updates.status = editedStatus;
       }
 
-      const updatedUser: UserProfile = await response.json()
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.id === userId ? { ...u, ...updatedUser } : u))
-      )
+      if (Object.keys(updates).length > 0) {
+        const { data, error } = await updateAdminUser(currentUser.id, updates);
+        if (error) {
+          throw error;
+        }
+        toast({
+          title: 'Usuário atualizado!',
+          description: `O perfil de ${currentUser.full_name} foi atualizado com sucesso.`,
+          variant: 'default',
+        });
+        fetchUsers(); // Re-fetch users to get the latest data
+      } else {
+        toast({
+          title: 'Nenhuma alteração',
+          description: 'Nenhuma alteração foi feita no perfil do usuário.',
+          variant: 'info',
+        });
+      }
+      setIsEditDialogOpen(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to update user.');
       toast({
-        title: 'Success',
-        description: 'User updated successfully.',
-      })
-    } catch (error: any) {
-      console.error('Failed to update user:', error)
-      toast({
-        title: 'Error',
-        description: `Failed to update user: ${error.message}`,
+        title: 'Erro ao atualizar usuário',
+        description: err.message || 'Não foi possível atualizar o perfil do usuário.',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setUpdatingUserId(null)
+      setLoading(false);
     }
-  }
+  };
 
-  if (authLoading || !isAdmin) {
+  if (authLoading || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading or unauthorized...</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2Icon className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando usuários...</span>
       </div>
-    )
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-red-500">
+        Erro: {error}
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loadingUsers ? (
-            <p>Loading users...</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Full Name</TableHead>
-                  <TableHead>Username</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Profile Complete</TableHead>
-                  <TableHead>Actions</TableHead>
+    <ProtectedRoute requiredRoles={['admin']}>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Gerenciamento de Usuários</h1>
+
+        <Card>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome Completo</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Função</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Perfil Completo</TableHead>
+                <TableHead>Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.full_name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.status}</TableCell>
+                  <TableCell>{user.is_profile_complete ? 'Sim' : 'Não'}</TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => handleEditClick(user)}>
+                      Editar
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell>{u.email}</TableCell>
-                    <TableCell>{u.full_name || 'N/A'}</TableCell>
-                    <TableCell>{u.username || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Select
-                        value={u.role}
-                        onValueChange={(value: user_role) => handleUpdateUser(u.id, { role: value })}
-                        disabled={updatingUserId === u.id}
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue placeholder="Select Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="mentee">Mentee</SelectItem>
-                          <SelectItem value="mentor">Mentor</SelectItem>
-                          <SelectItem value="admin">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          id={`profile-complete-${u.id}`}
-                          checked={u.is_profile_complete}
-                          onCheckedChange={(checked) => handleUpdateUser(u.id, { is_profile_complete: checked })}
-                          disabled={updatingUserId === u.id}
-                        />
-                        <Label htmlFor={`profile-complete-${u.id}`}>
-                          {u.is_profile_complete ? 'Yes' : 'No'}
-                        </Label>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {/* Add more actions here if needed, e.g., delete user */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => router.push(`/profile/${u.slug || u.id}`)}
-                      >
-                        View Profile
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  )
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+
+        {currentUser && (
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Editar Usuário: {currentUser.full_name}</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email" className="text-right">
+                    Email
+                  </Label>
+                  <Input id="email" value={currentUser.email || ''} className="col-span-3" disabled />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="role" className="text-right">
+                    Função
+                  </Label>
+                  <Select value={editedRole} onValueChange={(value: UserRole) => setEditedRole(value)}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Selecione a função" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mentee">Mentee</SelectItem>
+                      <SelectItem value="mentor">Mentor</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="status" className="text-right">
+                    Status
+                  </Label>
+                  <Select value={editedStatus} onValueChange={(value: string) => setEditedStatus(value)}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Selecione o status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Ativo</SelectItem>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                      <SelectItem value="suspended">Suspenso</SelectItem>
+                      <SelectItem value="verified">Verificado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleSaveEdit} disabled={loading}>
+                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+    </ProtectedRoute>
+  );
 }

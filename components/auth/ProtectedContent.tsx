@@ -1,80 +1,60 @@
-import { useEffect, useState } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
-import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+'use client'
+
+import { ReactNode } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { useUserRoles } from '@/app/context/user-roles-context'
+import { Loader2Icon } from 'lucide-react'
+import { LoginRequiredModal } from './LoginRequiredModal'
+import { useState } from 'react'
+import { Database } from '@/types/database'
 
 interface ProtectedContentProps {
-  children: React.ReactNode
-  requireMentor?: boolean
-  className?: string
+  children: ReactNode;
+  requiredRoles?: Database['public']['Enums']['user_role'][];
+  fallback?: ReactNode; // Optional fallback content if not authorized
 }
 
-export function ProtectedContent({ children, requireMentor = false, className = '' }: ProtectedContentProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isMentor, setIsMentor] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+export default function ProtectedContent({ children, requiredRoles, fallback }: ProtectedContentProps) {
+  const { user, loading: authLoading } = useAuth()
+  const { userRole, isLoadingRoles } = useUserRoles()
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session) {
-          setIsAuthenticated(true)
-          
-          if (requireMentor) {
-            const { data: userData } = await supabase
-              .from('users')
-              .select('user_type, status')
-              .eq('id', session.user.id)
-              .single()
-            
-            setIsMentor(userData?.user_type === 'mentor' && userData?.status === 'active')
-          }
-        }
-      } catch (error) {
-        console.error('Error checking auth:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    checkAuth()
-  }, [requireMentor])
-
-  if (isLoading) {
-    return <div className="animate-pulse">{children}</div>
-  }
-
-  if (!isAuthenticated || (requireMentor && !isMentor)) {
+  if (authLoading || isLoadingRoles) {
     return (
-      <div className={`relative ${className}`}>
-        <div className="blur-sm pointer-events-none">
-          {children}
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-          <div className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              {!isAuthenticated 
-                ? 'Please log in to access this feature'
-                : 'This feature is only available for validated mentors'}
-            </p>
-            <Button 
-              onClick={() => router.push('/login')}
-              variant="default"
-            >
-              {!isAuthenticated ? 'Log In' : 'Become a Mentor'}
-            </Button>
-          </div>
-        </div>
+      <div className="flex justify-center items-center min-h-[200px]">
+        <Loader2Icon className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando conteúdo...</span>
       </div>
     )
   }
 
+  if (!user) {
+    // User is not logged in
+    return (
+      <>
+        {fallback || (
+          <div className="text-center p-8">
+            <p className="text-lg text-muted-foreground">Você precisa estar logado para ver este conteúdo.</p>
+            <Button onClick={() => setIsLoginModalOpen(true)} className="mt-4">Fazer Login</Button>
+          </div>
+        )}
+        <LoginRequiredModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      </>
+    )
+  }
+
+  if (requiredRoles && !requiredRoles.includes(userRole!)) {
+    // User is logged in but does not have the required role
+    return (
+      fallback || (
+        <div className="text-center p-8 text-red-500">
+          <p className="text-lg">Acesso Negado.</p>
+          <p className="text-muted-foreground">Você não tem permissão para visualizar este conteúdo.</p>
+        </div>
+      )
+    )
+  }
+
+  // User is logged in and has the required role (or no role is required)
   return <>{children}</>
 }

@@ -1,10 +1,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Heart, Coffee, Gift, BookOpen, Users, Trophy, ArrowRight, ExternalLink, Copy } from "lucide-react"
+import { Heart, Coffee, Gift, BookOpen, Users, Trophy, ArrowRight, ExternalLink, Copy } from 'lucide-react'
+import { DollarSignIcon, HeartHandshakeIcon, UsersIcon } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 
 export default function DonatePage() {
   return (
@@ -18,45 +20,6 @@ export default function DonatePage() {
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           Sua contribuição ajuda a manter nossa plataforma e reconhecer o trabalho dos mentores voluntários.
         </p>
-      </div>
-
-      {/* Impact Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>+500 Mentorados</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p>Ajudamos centenas de pessoas a desenvolverem suas carreiras através de mentoria gratuita.</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="text-center">
-            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>+1.200 Sessões</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p>Mais de mil sessões de mentoria realizadas, compartilhando conhecimento e experiências.</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="text-center">
-            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trophy className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>100% Voluntário</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p>Nossa plataforma é mantida por voluntários apaixonados por compartilhar conhecimento.</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Donation Options */}
@@ -203,6 +166,91 @@ export default function DonatePage() {
         </Tabs>
       </div>
 
+      {/* Donation Options Section */}
+      <section className="grid md:grid-cols-3 gap-8 mb-12">
+        <Card className="p-6 text-center">
+          <DollarSignIcon className="mx-auto h-12 w-12 text-green-500 mb-4" />
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">Doação Financeira</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Ajude-nos a cobrir custos operacionais, manutenção da plataforma e expansão de nossos programas.
+            </p>
+            <Button size="lg" className="w-full">Doar Agora</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="p-6 text-center">
+          <HeartHandshakeIcon className="mx-auto h-12 w-12 text-purple-500 mb-4" />
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">Seja um Mentor</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Compartilhe seu conhecimento e experiência, impactando diretamente a vida de alguém.
+            </p>
+            <Button size="lg" variant="outline" className="w-full">Quero ser Mentor</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="p-6 text-center">
+          <UsersIcon className="mx-auto h-12 w-12 text-blue-500 mb-4" />
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold">Voluntariado</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Contribua com suas habilidades em áreas como desenvolvimento, design, marketing, etc.
+            </p>
+            <Button size="lg" variant="outline" className="w-full">Seja um Voluntário</Button>
+          </CardContent>
+        </Card>
+      </section>
+
+      <Separator className="my-12" />
+
+      {/* Impact Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <Card>
+          <CardHeader className="text-center">
+            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle>+500 Mentorados</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p>Ajudamos centenas de pessoas a desenvolverem suas carreiras através de mentoria gratuita.</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="text-center">
+            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle>+1.200 Sessões</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p>Mais de mil sessões de mentoria realizadas, compartilhando conhecimento e experiências.</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="text-center">
+            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trophy className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle>100% Voluntário</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p>Nossa plataforma é mantida por voluntários apaixonados por compartilhar conhecimento.</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator className="my-12" />
+
       {/* How We Use Donations */}
       <div className="mb-16">
         <h2 className="text-3xl font-bold text-center mb-8">Como Usamos as Doações</h2>
@@ -257,6 +305,8 @@ export default function DonatePage() {
           </div>
         </div>
       </div>
+
+      <Separator className="my-12" />
 
       {/* FAQ Section */}
       <div className="mb-16 max-w-3xl mx-auto">
@@ -315,6 +365,8 @@ export default function DonatePage() {
           </Card>
         </div>
       </div>
+
+      <Separator className="my-12" />
 
       {/* CTA Section */}
       <div className="text-center">
