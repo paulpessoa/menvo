@@ -54,19 +54,62 @@ export async function middleware(request: NextRequest) {
     },
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  // Rotas protegidas que requerem autenticação
-  const protectedRoutes = ["/dashboard", "/profile", "/settings", "/mentors/[id]"]
+  // Rotas que requerem autenticação
+  const protectedRoutes = ["/dashboard", "/profile", "/settings", "/onboarding", "/mentors/[id]"]
   const isProtectedRoute = protectedRoutes.some((route) =>
+    request.nextUrl.pathname.startsWith(route.replace("[id]", "")),
+  )
+
+  // Rotas que requerem validação (is_validated = true)
+  const validatedRoutes = ["/dashboard/mentor", "/mentors/[id]/schedule"]
+  const isValidatedRoute = validatedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route.replace("[id]", "")),
   )
 
   // Redirecionar para login se não autenticado em rota protegida
   if (isProtectedRoute && !user) {
-    return NextResponse.redirect(new URL("/login", request.url))
+    const redirectUrl = new URL("/login", request.url)
+    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // Se usuário autenticado, verificar se precisa fazer onboarding
+  if (user && isProtectedRoute && request.nextUrl.pathname !== "/onboarding") {
+    try {
+      // Verificar se usuário tem perfil
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id, role, is_validated")
+        .eq("user_id", user.id)
+        .single()
+
+      // Se não tem perfil, redirecionar para onboarding
+      if (!profile) {
+        return NextResponse.redirect(new URL("/onboarding", request.url))
+      }
+
+      // Validação de permissões para rotas específicas como solicitado no prompt
+      if (isValidatedRoute) {
+        // Verificar se usuário está validado (is_validated = true)
+        if (!profile.is_validated) {
+          const redirectUrl = new URL("/dashboard", request.url)
+          redirectUrl.searchParams.set("error", "profile_not_validated")
+          return NextResponse.redirect(redirectUrl)
+        }
+
+        // Verificar role específica para rotas de mentor
+        if (request.nextUrl.pathname.startsWith("/dashboard/mentor") && profile.role !== "mentor") {
+          return NextResponse.redirect(new URL("/dashboard", request.url))
+        }
+      }
+
+    } catch (error) {
+      console.error("Erro no middleware:", error)
+      // Em caso de erro, redirecionar para onboarding por segurança
+      return NextResponse.redirect(new URL("/onboarding", request.url))
+    }
   }
 
   // Redirecionar usuários autenticados das páginas de auth
