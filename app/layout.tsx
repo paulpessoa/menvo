@@ -1,22 +1,24 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter } from 'next/font/google'
 import "./globals.css"
-import { Providers } from './providers'
+import { AppProviders } from './providers'
+import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
 import { FeedbackBanner } from '@/components/FeedbackBanner'
 import { WarningBanner } from "@/components/WarningBanner"
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from "next/script"
+import { AuthRedirect } from "@/hooks/useAuth"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://menvo.com.br'),
-  title: "MENVO - Plataforma de Mentoria Voluntária",
-  description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+  title: "Menvo - Conectando Mentores e Aprendizes",
+  description: "Plataforma de mentoria para impulsionar sua carreira e desenvolvimento pessoal.",
   authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
   creator: "Paul Pessoa",
   publisher: "MENVO",
@@ -39,22 +41,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://menvo.com.br",
-    title: "MENVO - Plataforma de Mentoria Voluntária",
-    description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+    title: "Menvo - Conectando Mentores e Aprendizes",
+    description: "Plataforma de mentoria para impulsionar sua carreira e desenvolvimento pessoal.",
     siteName: "MENVO",
     images: [
       {
         url: "https://menvo.com.br/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "MENVO - Plataforma de Mentoria Voluntária"
+        alt: "Menvo - Conectando Mentores e Aprendizes"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "MENVO - Plataforma de Mentoria Voluntária",
-    description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+    title: "Menvo - Conectando Mentores e Aprendizes",
+    description: "Plataforma de mentoria para impulsionar sua carreira e desenvolvimento pessoal.",
     creator: "@paulpessoa",
     images: ["https://menvo.com.br/twitter-image.jpg"]
   },
@@ -121,7 +123,7 @@ export default function RootLayout({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
-          <Script
+        <Script
           id="clarity-script"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -134,17 +136,22 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <Providers>
-          <div className="flex min-h-screen flex-col">
+        <AppProviders>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-grow">
+              <AuthRedirect />
+              {children}
+            </main>
             <Footer />
-            <FeedbackBanner />
-            <WarningBanner />
-            <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-          </div>
-          <Toaster />
-        </Providers>
+            <Toaster />
+          </ThemeProvider>
+        </AppProviders>
       </body>
     </html>
   )

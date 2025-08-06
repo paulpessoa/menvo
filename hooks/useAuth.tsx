@@ -1,231 +1,97 @@
 "use client"
-import { useEffect, useState, createContext, useContext } from 'react'
-import { useRouter } from 'next/navigation'
+import { createContext, useContext, useEffect, useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
 import { supabase } from '@/services/auth/supabase'
-import { useMutation } from '@tanstack/react-query'
+import type { Session, User } from '@supabase/supabase-js'
+import { useQueryClient } from "@tanstack/react-query"
 
 interface AuthContextType {
-  user: any
-  isAuthenticated: boolean
-  loading: boolean
+  user: User | null
+  session: Session | null
+  isLoading: boolean
   logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
- useEffect(() => {
-  const getUser = async () => {
-    setLoading(true)
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session)
+        setUser(session?.user ?? null)
+        setIsLoading(false)
 
-    const { data: authUser, error: authError } = await supabase.auth.getUser()
+        if (event === 'SIGNED_OUT') {
+          queryClient.clear()
+          router.push('/')
+        }
+      }
+    )
 
-    if (authError || !authUser.user) {
-      console.error(authError)
-      setUser(null)
-      setLoading(false)
-      return
+    // Get initial session
+    const getInitialSession = async () => {
+      const { data } = await supabase.auth.getSession()
+      setSession(data.session)
+      setUser(data.session?.user ?? null)
+      setIsLoading(false)
     }
-    setUser(authUser.user)
-    setLoading(false)
-  }
-  getUser()
+    getInitialSession()
 
-  const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-  if (session?.user) {
-    const { data: userData } = await supabase
-      .from('users')
-      .select('roles')
-      .eq('id', session.user.id)
-      .single()
-    setUser({
-      ...session.user,
-      ...userData || null
-    })
-  } else {
-    setUser(null)
-  }
-})
-
-  return () => {
-    listener.subscription.unsubscribe()
-  }
-}, [])
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [router, queryClient])
 
   const logout = async () => {
     await supabase.auth.signOut()
-    setUser(null)
-    router.push('/')
   }
 
-  return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  const value = {
+    user,
+    session,
+    isLoading,
+    logout,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
-  return ctx
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider")
+  }
+  return context
 }
 
-export function useLoginMutation() {
-  return useMutation({
-    mutationFn: async ({ email, password }: { email: string, password: string }) => {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw error
-      return data
+// Component to handle redirects for incomplete profiles
+export function AuthRedirect() {
+  const { user, isLoading } = useAuth()
+  const { data: profile } = useUserProfile()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    if (isLoading || !user) return
+
+    const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup')
+    if (isAuthPage && user) {
+      router.push('/dashboard')
+      return
     }
-  })
-} 
 
+    const isWelcomePage = pathname.startsWith('/welcome')
+    if (user && profile && !profile.profile_completed && !isWelcomePage) {
+      router.push('/welcome')
+    }
+  }, [user, profile, isLoading, router, pathname])
 
-// "use client"
-// import { createContext, useContext, useEffect, useState } from "react"
-// import { useRouter } from "next/navigation"
-// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-// import { useAuthMeQuery } from "./useAuthMeQuery"
-// import { supabase } from '@/services/auth/supabase'
-
-// interface User {
-//   id: string
-//   email: string
-//   first_name?: string
-//   last_name?: string
-//   profile_picture_url?: string
-//   roles?: string[]
-//   [key: string]: any // Para campos extras do perfil
-// }
-
-// interface AuthContextType {
-//   user: User | null
-//   isAuthenticated: boolean
-//   isLoading: boolean
-//   login: (data: { email: string; password: string }) => Promise<void>
-//   logout: () => Promise<void>
-//   register: (data: { email: string; password: string; [key: string]: any }) => Promise<void>
-// }
-
-// const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-// export function AuthProvider({ children }: { children: React.ReactNode }) {
-//   const queryClient = useQueryClient()
-//   const router = useRouter()
-//   const [autenticated, setAutenticated] = useState(false)
-//   const { data, isLoading: isAuthLoading, refetch } = useAuthMeQuery("oi")
-
-//   useEffect(() => {
-//     const token = localStorage.getItem('supabase.auth.token')
-//     if (token) {
-//       setAutenticated(true)
-//     } else {
-//       setAutenticated(false)
-//     }
-//   }, [])
-
-//   // Login mutation
-//   const { mutateAsync: login, isPending: isLoggingIn, isSuccess: isLoggedIn } = useMutation({
-//     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-//       const res = await fetch("/api/auth/login", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ email, password }),
-//         credentials: 'include'
-//       })
-//       if (!res.ok) {
-//         const err = await res.json()
-//         throw new Error(err.error || "Login failed")
-//       }
-//       const data = await res.json()
-//       // Save the session data to localStorage
-//       if (data.session) {
-//         localStorage.setItem('supabase.auth.token', JSON.stringify({
-//           currentSession: {
-//             access_token: data.session.access_token,
-//             refresh_token: data.session.refresh_token
-//           }
-//         }))
-//         setAutenticated(true)
-//       }
-//       return data
-//     },
-//     onSuccess: async () => {
-//       await queryClient.invalidateQueries({ queryKey: ["auth-me"] })
-//       await refetch()
-//       router.push("/")
-//     }
-//   })
-
-//   // Logout mutation
-//   const { mutateAsync: logout } = useMutation({
-//     mutationFn: async () => {
-//       const res = await fetch("/api/auth/logout", { 
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         credentials: 'include'
-//       })
-//       if (!res.ok) {
-//         const err = await res.json()
-//         throw new Error(err.error || "Logout failed")
-//       }
-//       // Limpa o localStorage
-//       localStorage.removeItem('supabase.auth.token')
-//       setAutenticated(false)
-//       return res.json()
-//     },
-//     onSuccess: async () => {
-//       await queryClient.invalidateQueries({ queryKey: ["auth-me"] })
-//       await refetch()
-//       router.push("/")
-//     }
-//   })
-
-//   // Register mutation
-//   const { mutateAsync: register } = useMutation({
-//     mutationFn: async (data: { email: string; password: string; [key: string]: any }) => {
-//       const res = await fetch("/api/auth/register", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(data),
-//         credentials: 'include'
-//       })
-//       if (!res.ok) {
-//         const err = await res.json()
-//         throw new Error(err.error || "Register failed")
-//       }
-//       return res.json()
-//     },
-//     onSuccess: async () => {
-//       await queryClient.invalidateQueries({ queryKey: ["auth-me"] })
-//       await refetch()
-//       router.push("/")
-//     }
-//   })
-
-//   return (
-//     <AuthContext.Provider
-//       value={{
-//         user: data?.user ?? null,
-//         isAuthenticated: autenticated || isLoggedIn || !!data?.user,
-//         isLoading: isAuthLoading || isLoggingIn,
-//         login: async (data) => await login(data),
-//         logout: async () => await logout(),
-//         register: async (data) => await register(data),
-//       }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   )
-// }
-
-// export function useAuth() {
-//   const ctx = useContext(AuthContext)
-//   if (!ctx) throw new Error("useAuth must be used within AuthProvider")
-//   return ctx
-// }
+  return null
+}

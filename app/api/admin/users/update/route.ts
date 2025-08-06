@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { createServiceRoleClient } from '@/lib/supabase/service'
 
-export async function GET() {
+export async function POST(req: NextRequest) {
   const supabase = createRouteHandlerClient({ cookies })
   const { data: { session } } = await supabase.auth.getSession()
 
@@ -22,26 +22,25 @@ export async function GET() {
     return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
   }
 
-  // If admin, use service role client to fetch all users
+  const { userId, roles, status } = await req.json()
+
+  if (!userId || !roles || !status) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  // If admin, use service role client to update the user
   const supabaseService = createServiceRoleClient()
-  const { data: users, error } = await supabaseService
+  const { error } = await supabaseService
     .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false })
+    .update({
+      role: roles[0], // Assuming one role for now as per your UI
+      status: status,
+    })
+    .eq('id', userId)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // A simple transformation to match the old structure for the frontend
-  const formattedUsers = users.map(user => ({
-    id: user.id,
-    name: user.full_name,
-    email: user.email,
-    status: user.status,
-    roles: [user.role], // The admin page expects an array
-    email_verified: true, // Assuming email is verified to be in profiles
-  }))
-
-  return NextResponse.json({ users: formattedUsers })
+  return NextResponse.json({ success: true, message: 'User updated successfully' })
 }
