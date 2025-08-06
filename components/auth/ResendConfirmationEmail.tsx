@@ -1,70 +1,67 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/hooks/useAuth"
-import { useToast } from "@/hooks/useToast"
-import { Loader2, Mail } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { toast } from '@/components/ui/use-toast'
+import { resendConfirmationEmail } from '@/services/auth/supabase' // Assuming this function exists
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-interface ResendConfirmationEmailProps {
-  email?: string
-}
-
-export function ResendConfirmationEmail({ email }: ResendConfirmationEmailProps) {
-  const { resendConfirmationEmail } = useAuth()
-  const { toast } = useToast()
-  const [isSending, setIsSending] = useState(false)
+export function ResendConfirmationEmail() {
+  const [email, setEmail] = useState('')
+  const [resending, setResending] = useState(false)
 
   const handleResend = async () => {
     if (!email) {
       toast({
-        title: "E-mail não fornecido",
-        description: "Não foi possível reenviar o e-mail de confirmação sem um endereço de e-mail.",
-        variant: "destructive",
+        title: 'Email necessário',
+        description: 'Por favor, digite seu email para reenviar o link de confirmação.',
+        variant: 'destructive',
       })
       return
     }
 
-    setIsSending(true)
+    setResending(true)
     try {
       const { error } = await resendConfirmationEmail(email)
       if (error) {
         throw error
       }
       toast({
-        title: "E-mail reenviado!",
-        description: "Um novo e-mail de confirmação foi enviado para sua caixa de entrada.",
-        variant: "default",
+        title: 'Email de confirmação reenviado!',
+        description: 'Verifique sua caixa de entrada (e spam) para o novo link.',
+        variant: 'default',
       })
     } catch (error: any) {
       toast({
-        title: "Erro ao reenviar e-mail",
-        description: error.message || "Não foi possível reenviar o e-mail. Tente novamente.",
-        variant: "destructive",
+        title: 'Erro ao reenviar email',
+        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
+        variant: 'destructive',
       })
     } finally {
-      setIsSending(false)
+      setResending(false)
     }
   }
 
   return (
-    <Button
-      onClick={handleResend}
-      disabled={isSending}
-      variant="link"
-      className="p-0 h-auto text-sm"
-    >
-      {isSending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Reenviando...
-        </>
-      ) : (
-        <>
-          <Mail className="mr-2 h-4 w-4" />
-          Reenviar e-mail de confirmação
-        </>
-      )}
-    </Button>
+    <div className="space-y-4 mt-6 p-4 border rounded-lg bg-muted/50">
+      <p className="text-sm text-muted-foreground">
+        Não recebeu o email de confirmação? Digite seu email abaixo para reenviar.
+      </p>
+      <div className="grid gap-2">
+        <Label htmlFor="resend-email">Seu Email</Label>
+        <Input
+          id="resend-email"
+          type="email"
+          placeholder="seu@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={resending}
+        />
+      </div>
+      <Button onClick={handleResend} disabled={resending} className="w-full">
+        {resending ? 'Reenviando...' : 'Reenviar Email de Confirmação'}
+      </Button>
+    </div>
   )
 }

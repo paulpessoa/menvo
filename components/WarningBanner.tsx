@@ -1,33 +1,79 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { X, AlertTriangle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { AlertTriangleIcon, XIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
 
 export function WarningBanner() {
+  const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(true)
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false)
 
-  const handleClose = () => {
+  useEffect(() => {
+    const hasSeenWarning = sessionStorage.getItem('hasSeenWarning')
+    if (!hasSeenWarning) {
+      setIsVisible(true)
+    } else {
+      setIsVisible(false)
+    }
+  }, [])
+
+  const handleDismiss = () => {
+    sessionStorage.setItem('hasSeenWarning', 'true')
     setIsVisible(false)
   }
 
-  if (!isVisible) {
-    return null
-  }
+  if (!isVisible) return null
 
   return (
-    <Card className="bg-yellow-100 border-yellow-300 text-yellow-800 dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-200 rounded-none border-b">
-      <CardContent className="p-3 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4" />
-          <span>Esta é uma versão de demonstração. Dados podem ser redefinidos.</span>
-        </div>
-        <Button variant="ghost" size="icon" onClick={handleClose} className="text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200/50 dark:hover:bg-yellow-800/50">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Fechar aviso</span>
+    <>
+      {/* Floating Warning Banner */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-white p-3 flex items-center justify-center gap-4 text-sm">
+        <AlertTriangleIcon className="h-5 w-5 flex-shrink-0" />
+        <p className="text-center">
+          Este é um projeto de código aberto em desenvolvimento. Não insira dados sensíveis.
+        </p>
+        <Button variant="ghost" size="icon" onClick={handleDismiss} className="text-white hover:bg-yellow-600">
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Fechar</span>
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Feedback Dialog */}
+      <AlertDialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('feedback.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('feedback.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowFeedbackDialog(false)
+                window.dispatchEvent(new CustomEvent('openFeedback'))
+              }}
+            >
+              {t('feedback.openFeedback')}
+            </Button>
+            <AlertDialogAction onClick={() => setShowFeedbackDialog(false)}>
+              {t('common.close')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

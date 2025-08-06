@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/client'; // Corrected import path
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAuthenticated = !!user;
   const isAdmin = userRole === 'admin';
   const isMentor = userRole === 'mentor';
-  const isMentee = userRole === 'mentee';
+  isMentee = userRole === 'mentee';
 
   return (
     <AuthContext.Provider

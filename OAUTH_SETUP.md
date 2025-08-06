@@ -89,4 +89,3 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
 \`\`\`
 
 **Important Security Note**: Never expose your Supabase Service Role Key (`SUPABASE_SERVICE_ROLE_KEY`) or any other sensitive API keys directly in client-side code or public environment variables. Only use `NEXT_PUBLIC_` prefixed variables for client-side access. Server-side operations requiring the Service Role Key should be handled in secure API routes or Server Actions.
-\`\`\`

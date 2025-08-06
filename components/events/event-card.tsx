@@ -1,80 +1,55 @@
-"use client"
-
-import Image from "next/image"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Calendar, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react'
-import { Event } from "@/types/events"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { MapPinIcon, CalendarIcon, ClockIcon } from 'lucide-react'
+import Image from 'next/image'
 
 interface EventCardProps {
-  event: Event
+  event: {
+    id: string;
+    title: string;
+    description: string;
+    date: string;
+    time: string;
+    location: string;
+    image: string;
+  };
 }
 
-export default function EventCard({ event }: EventCardProps) {
-  const formattedDate = format(new Date(event.start_date), "dd 'de' MMMM, yyyy", { locale: ptBR })
-
+export function EventCard({ event }: EventCardProps) {
   return (
-    <Card className="flex flex-col overflow-hidden">
-      <div className="relative h-48 w-full">
+    <Card className="flex flex-col md:flex-row overflow-hidden">
+      <div className="relative w-full md:w-1/3 h-48 md:h-auto">
         <Image
-          src={event.image_url || "/placeholder.svg?height=200&width=400&text=Event Image"}
+          src={event.image || '/placeholder.svg?height=200&width=300&query=event'}
           alt={event.title}
-          fill
-          className="object-cover"
+          layout="fill"
+          objectFit="cover"
+          className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
         />
-        <Badge className="absolute top-3 left-3 text-xs px-2 py-1">
-          {event.type}
-        </Badge>
-        {event.is_free && (
-          <Badge className="absolute top-3 right-3 bg-green-500 text-white text-xs px-2 py-1">
-            Gratuito
-          </Badge>
-        )}
       </div>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-xl font-semibold line-clamp-2">{event.title}</CardTitle>
-        <CardDescription className="line-clamp-2">{event.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow space-y-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4" />
-          <span>{formattedDate}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4" />
-          <span>{event.time}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          <span>{event.location}</span>
-        </div>
-        {!event.is_free && (
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            <span>R$ {event.price.toFixed(2)}</span>
+      <div className="flex flex-col p-6 flex-grow">
+        <CardHeader className="p-0 mb-4">
+          <CardTitle className="text-2xl font-bold">{event.title}</CardTitle>
+          <CardDescription className="text-muted-foreground">{event.description}</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0 flex-grow space-y-2">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            <span>{new Date(event.date).toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
-        )}
-        <div className="flex flex-wrap gap-1 pt-2">
-          <Badge variant="outline">{event.format}</Badge>
-          <Badge variant="secondary">{event.source}</Badge>
-          {event.tags.map((tag, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter className="pt-4">
-        <Link href={event.link} target="_blank" rel="noopener noreferrer" className="w-full">
-          <Button className="w-full">
-            Ver Detalhes <ExternalLink className="ml-2 h-4 w-4" />
-          </Button>
-        </Link>
-      </CardFooter>
+          <div className="flex items-center text-sm text-muted-foreground">
+            <ClockIcon className="mr-2 h-4 w-4" />
+            <span>{event.time}</span>
+          </div>
+          <div className="flex items-center text-sm text-muted-foreground">
+            <MapPinIcon className="mr-2 h-4 w-4" />
+            <span>{event.location}</span>
+          </div>
+        </CardContent>
+        <CardFooter className="p-0 mt-4">
+          <Button className="w-full md:w-auto">Ver Detalhes</Button>
+        </CardFooter>
+      </div>
     </Card>
   )
 }
