@@ -1,5 +1,6 @@
 -- =============================================
 -- SCRIPT COMPLETO PARA CONFIGURAÇÃO DO BANCO
+-- Mentor Connect - Sistema de Mentoria
 -- =============================================
 
 -- Limpar dados existentes (cuidado em produção!)
@@ -7,26 +8,34 @@ DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 DROP POLICY IF EXISTS "Admins can update all profiles" ON profiles;
+DROP POLICY IF EXISTS "Public profiles are viewable" ON profiles;
 DROP POLICY IF EXISTS "Users can view own roles" ON user_roles;
 DROP POLICY IF EXISTS "Admins can manage roles" ON user_roles;
 DROP POLICY IF EXISTS "Admins can view validation requests" ON validation_requests;
 DROP POLICY IF EXISTS "Admins can manage validation requests" ON validation_requests;
+DROP POLICY IF EXISTS "Users can view own validation requests" ON validation_requests;
 
 DROP FUNCTION IF EXISTS create_user_profile();
 DROP FUNCTION IF EXISTS is_admin(uuid);
 DROP FUNCTION IF EXISTS handle_new_user();
+DROP FUNCTION IF EXISTS update_updated_at_column();
 
-DROP TABLE IF EXISTS validation_requests;
-DROP TABLE IF EXISTS user_roles;
-DROP TABLE IF EXISTS profiles;
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+
+DROP TABLE IF EXISTS validation_requests CASCADE;
+DROP TABLE IF EXISTS user_roles CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
 
 DROP TYPE IF EXISTS user_role_enum;
+DROP TYPE IF EXISTS validation_status_enum;
 
 -- =============================================
 -- 1. CRIAÇÃO DE TIPOS ENUM
 -- =============================================
 
 CREATE TYPE user_role_enum AS ENUM ('mentor', 'mentee', 'admin');
+CREATE TYPE validation_status_enum AS ENUM ('pending', 'approved', 'rejected');
 
 -- =============================================
 -- 2. CRIAÇÃO DAS TABELAS
@@ -42,11 +51,18 @@ CREATE TABLE profiles (
     role user_role_enum DEFAULT 'mentee',
     is_validated BOOLEAN DEFAULT FALSE,
     location TEXT,
-    skills TEXT[],
+    skills TEXT[] DEFAULT '{}',
     experience_level TEXT,
     linkedin_url TEXT,
     github_url TEXT,
     website_url TEXT,
+    phone TEXT,
+    company TEXT,
+    position TEXT,
+    years_of_experience INTEGER,
+    languages TEXT[] DEFAULT '{}',
+    timezone TEXT DEFAULT 'America/Sao_Paulo',
+    availability_hours JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -58,6 +74,7 @@ CREATE TABLE user_roles (
     role TEXT NOT NULL,
     assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     assigned_by UUID REFERENCES auth.users(id),
+    is_active BOOLEAN DEFAULT TRUE,
     UNIQUE(user_id, role)
 );
 
@@ -66,11 +83,12 @@ CREATE TABLE validation_requests (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    status validation_status_enum DEFAULT 'pending',
     requested_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     reviewed_at TIMESTAMP WITH TIME ZONE,
     reviewed_by UUID REFERENCES auth.users(id),
     review_notes TEXT,
+    additional_info JSONB DEFAULT '{}',
     UNIQUE(user_id, profile_id)
 );
 
@@ -81,9 +99,13 @@ CREATE TABLE validation_requests (
 CREATE INDEX idx_profiles_user_id ON profiles(user_id);
 CREATE INDEX idx_profiles_role ON profiles(role);
 CREATE INDEX idx_profiles_is_validated ON profiles(is_validated);
+CREATE INDEX idx_profiles_location ON profiles(location);
+CREATE INDEX idx_profiles_skills ON profiles USING GIN(skills);
 CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX idx_user_roles_role ON user_roles(role);
 CREATE INDEX idx_validation_requests_status ON validation_requests(status);
 CREATE INDEX idx_validation_requests_user_id ON validation_requests(user_id);
+CREATE INDEX idx_validation_requests_reviewed_by ON validation_requests(reviewed_by);
 
 -- =============================================
 -- 4. FUNÇÕES AUXILIARES
@@ -102,27 +124,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Função para criar perfil do usuário
-CREATE OR REPLACE FUNCTION create_user_profile()
-RETURNS trigger AS $$
-BEGIN
-    INSERT INTO profiles (user_id, name, avatar_url)
-    VALUES (
-        NEW.id,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1)),
-        NEW.raw_user_meta_data->>'avatar_url'
-    );
-    
-    -- Criar solicitação de validação automaticamente
-    INSERT INTO validation_requests (user_id, profile_id)
-    SELECT NEW.id, p.id
-    FROM profiles p
-    WHERE p.user_id = NEW.id;
-    
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Função para atualizar timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS trigger AS $$
@@ -131,6 +132,42 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Função para criar perfil do usuário automaticamente
+CREATE OR REPLACE FUNCTION create_user_profile()
+RETURNS trigger AS $$
+DECLARE
+    user_name TEXT;
+    user_avatar TEXT;
+BEGIN
+    -- Extrair nome do metadata
+    user_name := COALESCE(
+        NEW.raw_user_meta_data->>'full_name',
+        NEW.raw_user_meta_data->>'name',
+        split_part(NEW.email, '@', 1)
+    );
+    
+    -- Extrair avatar do metadata
+    user_avatar := NEW.raw_user_meta_data->>'avatar_url';
+    
+    -- Inserir perfil
+    INSERT INTO profiles (user_id, name, avatar_url)
+    VALUES (NEW.id, user_name, user_avatar);
+    
+    -- Criar solicitação de validação automaticamente
+    INSERT INTO validation_requests (user_id, profile_id)
+    SELECT NEW.id, p.id
+    FROM profiles p
+    WHERE p.user_id = NEW.id;
+    
+    RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Log do erro (em produção, use um sistema de log adequado)
+        RAISE LOG 'Erro ao criar perfil para usuário %: %', NEW.id, SQLERRM;
+        RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- =============================================
 -- 5. TRIGGERS
@@ -189,30 +226,15 @@ CREATE POLICY "Users can view own validation requests" ON validation_requests
     FOR SELECT USING (auth.uid() = user_id);
 
 -- =============================================
--- 7. INSERIR DADOS INICIAIS
+-- 7. CONFIGURAÇÃO DE STORAGE
 -- =============================================
 
--- Inserir um admin inicial (substitua pelo seu email)
--- IMPORTANTE: Execute isso após criar sua conta
-/*
-UPDATE profiles 
-SET role = 'admin', is_validated = true 
-WHERE user_id = (
-    SELECT id FROM auth.users 
-    WHERE email = 'seu-email@exemplo.com'
-);
-*/
-
--- =============================================
--- 8. CONFIGURAÇÃO DE STORAGE (OPCIONAL)
--- =============================================
-
--- Bucket para avatars
+-- Criar bucket para avatars se não existir
 INSERT INTO storage.buckets (id, name, public) 
 VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Policy para upload de avatars
+-- Policies para storage de avatars
 CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
     FOR SELECT USING (bucket_id = 'avatars');
 
@@ -228,27 +250,100 @@ CREATE POLICY "Users can update their own avatar" ON storage.objects
         AND auth.uid()::text = (storage.foldername(name))[1]
     );
 
+CREATE POLICY "Users can delete their own avatar" ON storage.objects
+    FOR DELETE USING (
+        bucket_id = 'avatars' 
+        AND auth.uid()::text = (storage.foldername(name))[1]
+    );
+
 -- =============================================
--- COMENTÁRIOS PARA REMOÇÃO POSTERIOR
+-- 8. DADOS INICIAIS (OPCIONAL)
+-- =============================================
+
+-- Inserir tipos de atividades voluntárias padrão
+INSERT INTO volunteer_activity_types (name, description, icon, color) VALUES
+('Ensino', 'Atividades relacionadas ao ensino e educação', '📚', '#3B82F6'),
+('Tecnologia', 'Desenvolvimento de software e tecnologia', '💻', '#10B981'),
+('Saúde', 'Atividades na área da saúde', '🏥', '#EF4444'),
+('Meio Ambiente', 'Projetos ambientais e sustentabilidade', '🌱', '#22C55E'),
+('Assistência Social', 'Trabalho social e comunitário', '🤝', '#F59E0B'),
+('Cultura', 'Atividades culturais e artísticas', '🎨', '#8B5CF6'),
+('Esportes', 'Atividades esportivas e recreativas', '⚽', '#06B6D4'),
+('Outros', 'Outras atividades voluntárias', '📋', '#6B7280')
+ON CONFLICT (name) DO NOTHING;
+
+-- =============================================
+-- 9. COMENTÁRIOS E INSTRUÇÕES
 -- =============================================
 
 /*
-INSTRUÇÕES PARA USO:
+INSTRUÇÕES PARA CONFIGURAÇÃO:
 
-1. Execute este script no SQL Editor do Supabase
-2. Configure as variáveis de ambiente no seu projeto Next.js
-3. Após criar sua primeira conta, execute o UPDATE para se tornar admin
-4. Configure OAuth providers no Supabase Dashboard
-5. Teste o fluxo completo de registro/login
+1. EXECUTAR ESTE SCRIPT:
+   - Copie e cole este script no SQL Editor do Supabase
+   - Execute o script completo
 
-VARIÁVEIS DE AMBIENTE NECESSÁRIAS:
-- NEXT_PUBLIC_SUPABASE_URL
-- NEXT_PUBLIC_SUPABASE_ANON_KEY
-- SUPABASE_SERVICE_ROLE_KEY (para operações admin)
+2. CONFIGURAR PRIMEIRO ADMIN:
+   - Crie sua conta normalmente pela aplicação
+   - Execute o comando abaixo substituindo seu email:
+   
+   UPDATE profiles 
+   SET role = 'admin', is_validated = true 
+   WHERE user_id = (
+       SELECT id FROM auth.users 
+       WHERE email = 'seu-email@exemplo.com'
+   );
+
+3. CONFIGURAR OAUTH:
+   - Vá em Authentication > Providers no Supabase Dashboard
+   - Configure Google OAuth com suas credenciais
+   - Configure LinkedIn OAuth com suas credenciais
+   - URLs de callback: https://seudominio.com/auth/callback
+
+4. VARIÁVEIS DE AMBIENTE:
+   - NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
+   - SUPABASE_SERVICE_ROLE_KEY=sua_chave_de_servico (para operações admin)
+
+5. TESTAR O FLUXO:
+   - Registre um novo usuário
+   - Verifique se o perfil foi criado automaticamente
+   - Teste o processo de onboarding
+   - Teste a validação manual no painel admin
+
+ESTRUTURA DAS TABELAS:
+- profiles: Informações do perfil do usuário
+- user_roles: Sistema de roles escalável
+- validation_requests: Solicitações de validação manual
+
+SEGURANÇA:
+- RLS habilitado em todas as tabelas
+- Policies configuradas para acesso seguro
+- Funções com SECURITY DEFINER para operações privilegiadas
 
 PRÓXIMOS PASSOS:
-- Configurar OAuth (Google, LinkedIn)
-- Testar fluxo de onboarding
-- Implementar validação manual
-- Configurar middleware de autenticação
+- Implementar notificações por email
+- Adicionar sistema de avaliações
+- Criar dashboard de analytics
+- Implementar chat em tempo real
 */
+
+-- Verificar se tudo foi criado corretamente
+SELECT 
+    'Tabelas criadas:' as status,
+    COUNT(*) as total
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name IN ('profiles', 'user_roles', 'validation_requests');
+
+SELECT 
+    'Policies criadas:' as status,
+    COUNT(*) as total
+FROM pg_policies 
+WHERE schemaname = 'public';
+
+SELECT 
+    'Functions criadas:' as status,
+    COUNT(*) as total
+FROM pg_proc 
+WHERE proname IN ('is_admin', 'create_user_profile', 'update_updated_at_column');
