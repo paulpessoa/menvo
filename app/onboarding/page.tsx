@@ -7,97 +7,125 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Upload, User, Briefcase } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Loader2, Plus, X, User, MapPin, Briefcase, LinkIcon, Github, Linkedin, Globe, AlertTriangle } from 'lucide-react'
 import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
 
 type UserRole = "mentor" | "mentee"
 
 export default function OnboardingPage() {
-  const { user, session, loading } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  // Form state
   const [formData, setFormData] = useState({
     name: "",
     bio: "",
-    role: "mentee" as UserRole,
+    role: "" as UserRole | "",
     location: "",
-    avatar_url: "",
+    experienceLevel: "",
+    linkedinUrl: "",
+    githubUrl: "",
+    websiteUrl: "",
   })
+  const [skills, setSkills] = useState<string[]>([])
+  const [newSkill, setNewSkill] = useState("")
 
   // Redirect if not authenticated
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push("/login")
     }
-  }, [user, loading, router])
+  }, [user, authLoading, router])
 
   // Pre-fill form with user data if available
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        name: user.user_metadata?.full_name || user.email?.split("@")[0] || "",
-        avatar_url: user.user_metadata?.avatar_url || "",
+        name: user.user_metadata?.full_name || user.user_metadata?.name || "",
       }))
     }
   }, [user])
 
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const addSkill = () => {
+    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
+      setSkills(prev => [...prev, newSkill.trim()])
+      setNewSkill("")
+    }
+  }
+
+  const removeSkill = (skillToRemove: string) => {
+    setSkills(prev => prev.filter(skill => skill !== skillToRemove))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!user) {
-      toast.error("Usuário não autenticado")
+    setError("")
+    setIsLoading(true)
+
+    // Validation
+    if (!formData.name.trim()) {
+      setError("Nome é obrigatório")
+      setIsLoading(false)
       return
     }
 
-    if (!formData.name.trim() || !formData.bio.trim()) {
-      toast.error("Por favor, preencha todos os campos obrigatórios")
+    if (!formData.role) {
+      setError("Selecione seu papel na plataforma")
+      setIsLoading(false)
       return
     }
 
-    setIsSubmitting(true)
+    if (!formData.bio.trim()) {
+      setError("Biografia é obrigatória")
+      setIsLoading(false)
+      return
+    }
 
     try {
-      // Chamar API Route para criar perfil como solicitado no prompt
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: formData.name.trim(),
-          email: user.email,
-          bio: formData.bio.trim(),
-          role: formData.role,
-          avatar_url: formData.avatar_url,
-          location: formData.location.trim(),
+          ...formData,
+          skills,
         }),
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Erro ao criar perfil")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Erro ao criar perfil")
       }
 
-      const result = await response.json()
+      toast.success("Perfil criado com sucesso!")
       
-      toast.success("Perfil criado com sucesso! Aguarde a validação.")
-      
-      // Redirect to dashboard or waiting page
-      router.push("/dashboard")
-      
-    } catch (error: any) {
-      console.error("Erro no onboarding:", error)
-      toast.error(error.message || "Erro ao criar perfil")
+      // Redirect based on role
+      if (formData.role === "mentor") {
+        router.push("/dashboard?welcome=true&validation=pending")
+      } else {
+        router.push("/dashboard?welcome=true")
+      }
+    } catch (err: any) {
+      setError(err.message)
+      toast.error(err.message)
     } finally {
-      setIsSubmitting(false)
+      setIsLoading(false)
     }
   }
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -110,137 +138,223 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Bem-vindo ao Menvo!</CardTitle>
+            <CardTitle className="text-2xl font-bold">Bem-vindo à plataforma!</CardTitle>
             <CardDescription>
-              Complete seu perfil para começar sua jornada de mentoria
+              Complete seu perfil para começar a usar a plataforma de mentoria
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Avatar Section */}
-              <div className="flex flex-col items-center space-y-4">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={formData.avatar_url || "/placeholder.svg"} />
-                  <AvatarFallback className="text-lg">
-                    {formData.name.charAt(0).toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <Button type="button" variant="outline" size="sm">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Alterar Foto
-                </Button>
-              </div>
+              {error && (
+                <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                    <p className="text-sm text-red-800">{error}</p>
+                  </div>
+                </div>
+              )}
 
-              {/* Name Field */}
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo *</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Seu nome completo"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                />
-              </div>
-
-              {/* Role Selection */}
+              {/* Informações Básicas */}
               <div className="space-y-4">
-                <Label>Qual é o seu objetivo na plataforma? *</Label>
-                <RadioGroup
-                  value={formData.role}
-                  onValueChange={(value: UserRole) => setFormData(prev => ({ ...prev, role: value }))}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                >
-                  <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-gray-50">
-                    <RadioGroupItem value="mentee" id="mentee" />
-                    <div className="flex items-center space-x-3">
-                      <User className="h-5 w-5 text-blue-600" />
-                      <div>
-                        <Label htmlFor="mentee" className="font-medium cursor-pointer">
-                          Quero ser Mentorado
-                        </Label>
-                        <p className="text-sm text-gray-600">
-                          Busco orientação e aprendizado
-                        </p>
-                      </div>
-                    </div>
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Informações Básicas
+                </h3>
+
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome Completo *</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    placeholder="Seu nome completo"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="role">Seu papel na plataforma *</Label>
+                  <Select value={formData.role} onValueChange={(value) => handleInputChange("role", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione seu papel" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mentee">
+                        <div className="flex flex-col">
+                          <span className="font-medium">Mentee</span>
+                          <span className="text-sm text-gray-500">Quero receber mentoria</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="mentor">
+                        <div className="flex flex-col">
+                          <span className="font-medium">Mentor</span>
+                          <span className="text-sm text-gray-500">Quero oferecer mentoria</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Biografia *</Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange("bio", e.target.value)}
+                    placeholder="Conte um pouco sobre você, sua experiência e objetivos..."
+                    rows={4}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Localização e Experiência */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Localização e Experiência
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Localização</Label>
+                    <Input
+                      id="location"
+                      value={formData.location}
+                      onChange={(e) => handleInputChange("location", e.target.value)}
+                      placeholder="Cidade, Estado"
+                    />
                   </div>
-                  
-                  <div className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-gray-50">
-                    <RadioGroupItem value="mentor" id="mentor" />
-                    <div className="flex items-center space-x-3">
-                      <Briefcase className="h-5 w-5 text-green-600" />
-                      <div>
-                        <Label htmlFor="mentor" className="font-medium cursor-pointer">
-                          Quero ser Mentor
-                        </Label>
-                        <p className="text-sm text-gray-600">
-                          Quero compartilhar conhecimento
-                        </p>
-                      </div>
-                    </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="experienceLevel">Nível de Experiência</Label>
+                    <Select value={formData.experienceLevel} onValueChange={(value) => handleInputChange("experienceLevel", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="iniciante">Iniciante</SelectItem>
+                        <SelectItem value="intermediario">Intermediário</SelectItem>
+                        <SelectItem value="avancado">Avançado</SelectItem>
+                        <SelectItem value="especialista">Especialista</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </RadioGroup>
+                </div>
               </div>
 
-              {/* Bio Field */}
-              <div className="space-y-2">
-                <Label htmlFor="bio">
-                  {formData.role === "mentor" ? "Experiência e Especialidades" : "Objetivos e Interesses"} *
-                </Label>
-                <Textarea
-                  id="bio"
-                  placeholder={
-                    formData.role === "mentor"
-                      ? "Conte sobre sua experiência profissional, áreas de especialidade e como pode ajudar outros..."
-                      : "Conte sobre seus objetivos, áreas de interesse e o que gostaria de aprender..."
-                  }
-                  value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  rows={4}
-                  required
-                />
+              {/* Habilidades */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" />
+                  Habilidades
+                </h3>
+
+                <div className="space-y-2">
+                  <Label>Adicionar Habilidades</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      placeholder="Ex: React, Marketing, Design..."
+                      onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())}
+                    />
+                    <Button type="button" onClick={addSkill} size="sm">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((skill) => (
+                      <Badge key={skill} variant="secondary" className="flex items-center gap-1">
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => removeSkill(skill)}
+                          className="ml-1 hover:text-red-500"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Location Field */}
-              <div className="space-y-2">
-                <Label htmlFor="location">Localização</Label>
-                <Input
-                  id="location"
-                  type="text"
-                  placeholder="Cidade, Estado/País"
-                  value={formData.location}
-                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                />
+              {/* Links Sociais */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <LinkIcon className="h-5 w-5" />
+                  Links Sociais (Opcional)
+                </h3>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedinUrl" className="flex items-center gap-2">
+                      <Linkedin className="h-4 w-4 text-[#0077B5]" />
+                      LinkedIn
+                    </Label>
+                    <Input
+                      id="linkedinUrl"
+                      value={formData.linkedinUrl}
+                      onChange={(e) => handleInputChange("linkedinUrl", e.target.value)}
+                      placeholder="https://linkedin.com/in/seu-perfil"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="githubUrl" className="flex items-center gap-2">
+                      <Github className="h-4 w-4" />
+                      GitHub
+                    </Label>
+                    <Input
+                      id="githubUrl"
+                      value={formData.githubUrl}
+                      onChange={(e) => handleInputChange("githubUrl", e.target.value)}
+                      placeholder="https://github.com/seu-usuario"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="websiteUrl" className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      Website/Portfolio
+                    </Label>
+                    <Input
+                      id="websiteUrl"
+                      value={formData.websiteUrl}
+                      onChange={(e) => handleInputChange("websiteUrl", e.target.value)}
+                      placeholder="https://seu-site.com"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* Validation Notice */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>Processo de Validação:</strong> Após enviar seu perfil, nossa equipe fará uma revisão manual. 
-                  Você receberá uma notificação quando seu perfil for aprovado e poderá acessar todas as funcionalidades da plataforma.
-                </p>
-              </div>
+              {/* Informação sobre validação para mentores */}
+              {formData.role === "mentor" && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Processo de Validação:</strong> Como mentor, seu perfil passará por uma validação manual 
+                    antes de ficar disponível na plataforma. Você receberá uma notificação quando for aprovado.
+                  </AlertDescription>
+                </Alert>
+              )}
 
-              {/* Submit Button */}
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isSubmitting}
-                size="lg"
-              >
-                {isSubmitting ? (
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Criando Perfil...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Criando perfil...
                   </>
                 ) : (
-                  "Criar Perfil"
+                  "Completar Perfil"
                 )}
               </Button>
             </form>
