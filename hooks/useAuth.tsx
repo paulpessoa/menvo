@@ -1,11 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { createClient } from '@/utils/supabase/client'; // Corrected import path
+import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
-import { user_role } from '@/types/database'; // Import the user_role type
+import { user_role } from '@/types/database';
 
 interface AuthContextType {
   user: User | null;
@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isAuthenticated = !!user;
   const isAdmin = userRole === 'admin';
   const isMentor = userRole === 'mentor';
-  isMentee = userRole === 'mentee';
+  const isMentee = userRole === 'mentee'; // Corrected: added 'const'
 
   return (
     <AuthContext.Provider

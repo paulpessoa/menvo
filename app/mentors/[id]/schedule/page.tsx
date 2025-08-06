@@ -1,226 +1,336 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useMemo } from 'react'
+import { useParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { format, isSameDay, addDays, isBefore, startOfDay } from 'date-fns'
-import { cn } from '@/lib/utils'
-import { Loader2Icon, CalendarDaysIcon, ClockIcon, CheckCircleIcon } from 'lucide-react'
-import { useAuth } from '@/hooks/useAuth'
-import { useMentors } from '@/hooks/useMentors'
-import { useMentorship } from '@/hooks/useMentorship'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from '@/components/ui/use-toast'
-import { useTranslation } from 'react-i18next'
+import { Loader2, CalendarCheckIcon, ClockIcon, UserIcon } from 'lucide-react'
+import { format, addDays, startOfWeek, endOfWeek, isSameDay, isBefore, parseISO } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { ScheduleSessionModal } from '@/components/mentorship/ScheduleSessionModal'
+import { SessionDetailsModal } from '@/components/mentorship/SessionDetailsModal'
+import { SessionResponseModal } from '@/components/mentorship/SessionResponseModal'
+import { useAuth } from '@/hooks/useAuth'
+import { useMentorship } from '@/hooks/useMentorship'
+import { user_profile } from '@/types/database'
+import Link from 'next/link'
 
-export default function ScheduleMentorSessionPage() {
-  const { t } = useTranslation()
+interface MentorProfile extends user_profile {
+  id: string;
+  full_name: string;
+  // Add any other fields needed for display or scheduling
+}
+
+async function fetchMentorProfile(id: string): Promise<MentorProfile> {
+  const response = await fetch(`/api/mentors/${id}`)
+  if (!response.ok) {
+    const errorData = await response.json()
+    throw new Error(errorData.error || 'Failed to fetch mentor profile')
+  }
+  const data = await response.json()
+  return data.data
+}
+
+export default function MentorSchedulePage() {
   const params = useParams()
-  const router = useRouter()
   const mentorId = params.id as string
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
+  const {
+    mentorAvailability,
+    mentorSessions,
+    requestMentorshipSession,
+    respondToMentorshipSession,
+    isLoading: mentorshipLoading,
+    error: mentorshipError,
+  } = useMentorship(mentorId, user?.id)
 
-  const { user, isLoading: authLoading, isMentee } = useAuth()
-  const { mentor, loading: mentorLoading, error: mentorError } = useMentors(mentorId)
-  const { requestMentorshipSession, loading: requestLoading } = useMentorship(user?.id)
+  const { data: mentor, isLoading: mentorLoading, isError: mentorError, error: mentorFetchError } = useQuery<MentorProfile, Error>({
+    queryKey: ['mentorProfile', mentorId],
+    queryFn: () => fetchMentorProfile(mentorId),
+    enabled: !!mentorId,
+  })
 
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
-  const [topic, setTopic] = useState('')
-  const [message, setMessage] = useState('')
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | undefined>(undefined)
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
+  const [isResponseModalOpen, setIsResponseModalOpen] = useState(false)
+  const [sessionToRespond, setSessionToRespond] = useState<any>(null) // Type this properly
+  const [isSessionDetailsModalOpen, setIsSessionDetailsModalOpen] = useState(false)
+  const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null) // Type this properly
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login')
-      toast({
-        title: t('scheduleSession.loginRequiredTitle'),
-        description: t('scheduleSession.loginRequiredDescription'),
-        variant: 'destructive',
-      })
-    } else if (!authLoading && user && !isMentee) {
-      router.push('/unauthorized')
-      toast({
-        title: t('scheduleSession.menteeOnlyTitle'),
-        description: t('scheduleSession.menteeOnlyDescription'),
-        variant: 'destructive',
-      })
+  const isLoading = authLoading || mentorLoading || mentorshipLoading
+
+  const availableTimeSlots = useMemo(() => {
+    if (!selectedDate || !mentorAvailability) return []
+
+    const dayOfWeek = format(selectedDate, 'EEEE', { locale: ptBR }).toLowerCase()
+    const availabilityForDay = mentorAvailability.find(
+      (slot) => slot.day_of_week.toLowerCase() === dayOfWeek
+    )
+
+    if (!availabilityForDay) return []
+
+    const slots = []
+    let currentTime = parseISO(`2000-01-01T${availabilityForDay.start_time}:00`)
+    const endTime = parseISO(`2000-01-01T${availabilityForDay.end_time}:00`)
+
+    while (currentTime < endTime) {
+      const slotEnd = addDays(currentTime, 0) // Use addDays to avoid mutating currentTime directly
+      const formattedSlot = format(currentTime, 'HH:mm')
+      slots.push(formattedSlot)
+      currentTime = addDays(currentTime, 0) // Advance by session duration, assuming 60 min for now
+      currentTime.setMinutes(currentTime.getMinutes() + 60); // Add 60 minutes for next slot
     }
-  }, [authLoading, user, isMentee, router, toast, t])
 
-  if (authLoading || mentorLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2Icon className="h-8 w-8 animate-spin" />
-        <span className="ml-2">{t('common.loading')}</span>
-      </div>
-    )
-  }
+    // Filter out slots that are in the past for the selected date
+    const now = new Date();
+    return slots.filter(slot => {
+      const [hours, minutes] = slot.split(':').map(Number);
+      const slotDateTime = new Date(selectedDate);
+      slotDateTime.setHours(hours, minutes, 0, 0);
+      return !isBefore(slotDateTime, now);
+    });
+  }, [selectedDate, mentorAvailability])
 
-  if (mentorError || !mentor) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center">
-        <h1 className="text-3xl font-bold mb-4">{t('scheduleSession.mentorNotFoundTitle')}</h1>
-        <p className="text-lg mb-6">{t('scheduleSession.mentorNotFoundDescription')}</p>
-        <Button onClick={() => router.push('/mentors')}>{t('scheduleSession.backToMentors')}</Button>
-      </div>
-    )
-  }
-
-  const availableTimes = [
-    '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'
-  ] // Mock available times
-
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date)
-    setSelectedTime(undefined) // Reset time when date changes
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!user?.id || !mentor?.id || !selectedDate || !selectedTime || !topic) {
+  const handleRequestSession = async (menteeId: string, mentorId: string, scheduledTime: string, notes: string) => {
+    if (!selectedDate || !selectedTimeSlot) {
       toast({
-        title: t('scheduleSession.validationErrorTitle'),
-        description: t('scheduleSession.validationErrorDescription'),
+        title: 'Erro',
+        description: 'Por favor, selecione uma data e um horário.',
         variant: 'destructive',
       })
       return
     }
 
-    const scheduledDateTime = new Date(selectedDate)
-    const [hours, minutes] = selectedTime.split(':').map(Number)
-    scheduledDateTime.setHours(hours, minutes, 0, 0)
-
-    if (isBefore(scheduledDateTime, new Date())) {
-      toast({
-        title: t('scheduleSession.pastTimeErrorTitle'),
-        description: t('scheduleSession.pastTimeErrorDescription'),
-        variant: 'destructive',
-      })
-      return
-    }
+    const sessionDateTime = new Date(selectedDate)
+    const [hours, minutes] = selectedTimeSlot.split(':').map(Number)
+    sessionDateTime.setHours(hours, minutes, 0, 0)
 
     try {
-      await requestMentorshipSession(
-        user.id,
-        mentor.id,
-        scheduledDateTime.toISOString(),
-        topic,
-        message
-      )
-      toast({
-        title: t('scheduleSession.successTitle'),
-        description: t('scheduleSession.successDescription'),
-        variant: 'default',
+      await requestMentorshipSession({
+        mentee_id: menteeId,
+        mentor_id: mentorId,
+        scheduled_time: sessionDateTime.toISOString(),
+        notes,
+        status: 'pending',
       })
-      router.push('/calendar') // Redirect to calendar page
+      toast({
+        title: 'Solicitação Enviada!',
+        description: 'Sua solicitação de mentoria foi enviada ao mentor.',
+      })
+      setIsScheduleModalOpen(false)
+      setSelectedTimeSlot(undefined)
     } catch (error: any) {
       toast({
-        title: t('scheduleSession.errorTitle'),
-        description: error.message || t('scheduleSession.errorDescription'),
+        title: 'Erro ao solicitar mentoria',
+        description: error.message || 'Ocorreu um erro inesperado.',
         variant: 'destructive',
       })
     }
+  }
+
+  const handleRespondSession = async (sessionId: string, status: 'accepted' | 'rejected', responseNotes?: string) => {
+    try {
+      await respondToMentorshipSession(sessionId, status, responseNotes)
+      toast({
+        title: 'Resposta Enviada!',
+        description: `A sessão foi ${status === 'accepted' ? 'aceita' : 'rejeitada'} com sucesso.`,
+      })
+      setIsResponseModalOpen(false)
+      setSessionToRespond(null)
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao responder à sessão',
+        description: error.message || 'Ocorreu um erro inesperado.',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleOpenSessionDetails = (session: any) => {
+    setSelectedSessionDetails(session)
+    setIsSessionDetailsModalOpen(true)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando...</span>
+      </div>
+    )
+  }
+
+  if (mentorError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <h1 className="text-3xl font-bold mb-4">Erro ao carregar mentor</h1>
+        <p className="text-lg mb-6">{mentorFetchError?.message || 'Ocorreu um erro inesperado.'}</p>
+        <Link href="/mentors" passHref>
+          <Button>Voltar para a lista de mentores</Button>
+        </Link>
+      </div>
+    )
+  }
+
+  if (!mentor) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <h1 className="text-3xl font-bold mb-4">Mentor não encontrado</h1>
+        <p className="text-lg mb-6">O perfil do mentor que você está procurando não existe ou não está verificado.</p>
+        <Link href="/mentors" passHref>
+          <Button>Voltar para a lista de mentores</Button>
+        </Link>
+      </div>
+    )
   }
 
   return (
-    <ProtectedRoute requiredRoles={['mentee']}>
+    <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
       <div className="container mx-auto px-4 py-8 md:py-12">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">
-          {t('scheduleSession.title', { mentorName: mentor.user_profiles?.full_name || t('common.mentor') })}
+          Agendar Mentoria com {mentor.full_name}
         </h1>
 
-        <Card className="max-w-3xl mx-auto p-6">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{t('scheduleSession.cardTitle')}</CardTitle>
-            <CardDescription>{t('scheduleSession.cardDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="grid gap-6">
-              {/* Date Selection */}
-              <div className="grid gap-2">
-                <Label htmlFor="date">{t('scheduleSession.dateLabel')}</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarDaysIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, t('scheduleSession.dateFormat')) : <span>{t('scheduleSession.pickDate')}</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={handleDateSelect}
-                      initialFocus
-                      disabled={(date) => isBefore(date, startOfDay(new Date()))}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Calendar for Date Selection */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>Selecione uma Data</CardTitle>
+              <CardDescription>Escolha o dia para sua sessão de mentoria.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                disabled={(date) => isBefore(date, new Date())}
+                className="rounded-md border"
+              />
+            </CardContent>
+          </Card>
 
-              {/* Time Selection */}
-              <div className="grid gap-2">
-                <Label htmlFor="time">{t('scheduleSession.timeLabel')}</Label>
-                <Select value={selectedTime} onValueChange={setSelectedTime} disabled={!selectedDate}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t('scheduleSession.selectTime')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableTimes.map(time => (
-                      <SelectItem key={time} value={time}>
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Topic */}
-              <div className="grid gap-2">
-                <Label htmlFor="topic">{t('scheduleSession.topicLabel')}</Label>
-                <Input
-                  id="topic"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder={t('scheduleSession.topicPlaceholder')}
-                  required
-                />
-              </div>
-
-              {/* Message */}
-              <div className="grid gap-2">
-                <Label htmlFor="message">{t('scheduleSession.messageLabel')}</Label>
-                <Textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={t('scheduleSession.messagePlaceholder')}
-                  rows={4}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={requestLoading}>
-                {requestLoading ? (
-                  <>
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                    {t('scheduleSession.loadingButton')}
-                  </>
-                ) : (
-                  t('scheduleSession.submitButton')
-                )}
+          {/* Time Slot Selection */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Selecione um Horário</CardTitle>
+              <CardDescription>
+                Horários disponíveis para {selectedDate ? format(selectedDate, 'PPP', { locale: ptBR }) : 'a data selecionada'}.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {availableTimeSlots.length > 0 ? (
+                availableTimeSlots.map((slot) => (
+                  <Button
+                    key={slot}
+                    variant={selectedTimeSlot === slot ? 'default' : 'outline'}
+                    onClick={() => setSelectedTimeSlot(slot)}
+                    disabled={!isAuthenticated}
+                  >
+                    <ClockIcon className="mr-2 h-4 w-4" />
+                    {slot}
+                  </Button>
+                ))
+              ) : (
+                <p className="col-span-full text-center text-muted-foreground">
+                  Nenhum horário disponível para esta data ou o mentor não configurou sua disponibilidade.
+                </p>
+              )}
+              {!isAuthenticated && (
+                <p className="col-span-full text-center text-red-500 text-sm">
+                  Você precisa estar logado para agendar uma sessão.
+                </p>
+              )}
+            </CardContent>
+            <CardContent className="pt-0">
+              <Button
+                className="w-full"
+                onClick={() => setIsScheduleModalOpen(true)}
+                disabled={!selectedDate || !selectedTimeSlot || !isAuthenticated}
+              >
+                <CalendarCheckIcon className="mr-2 h-4 w-4" />
+                Solicitar Sessão
               </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mentorship Sessions for this Mentor (if applicable) */}
+        {mentorSessions && mentorSessions.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-6 text-center">
+              Suas Sessões com {mentor.full_name}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mentorSessions.map((session) => (
+                <Card key={session.id}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CalendarCheckIcon className="h-5 w-5" />
+                      Sessão em {format(parseISO(session.scheduled_time), 'PPP - HH:mm', { locale: ptBR })}
+                    </CardTitle>
+                    <CardDescription>Status: <span className="capitalize">{session.status}</span></CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {session.notes || 'Sem notas adicionais.'}
+                    </p>
+                    <Button onClick={() => handleOpenSessionDetails(session)} variant="outline" className="w-full">
+                      Ver Detalhes
+                    </Button>
+                    {session.status === 'pending' && user?.id === mentorId && (
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          variant="default"
+                          className="w-full"
+                          onClick={() => { setSessionToRespond(session); setIsResponseModalOpen(true); }}
+                        >
+                          Responder
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Modals */}
+        {mentor && user && selectedDate && selectedTimeSlot && (
+          <ScheduleSessionModal
+            isOpen={isScheduleModalOpen}
+            onClose={() => setIsScheduleModalOpen(false)}
+            mentor={mentor}
+            menteeId={user.id}
+            selectedDate={selectedDate}
+            selectedTimeSlot={selectedTimeSlot}
+            onRequest={handleRequestSession}
+          />
+        )}
+
+        {sessionToRespond && (
+          <SessionResponseModal
+            isOpen={isResponseModalOpen}
+            onClose={() => setIsResponseModalOpen(false)}
+            session={sessionToRespond}
+            onRespond={handleRespondSession}
+          />
+        )}
+
+        {selectedSessionDetails && (
+          <SessionDetailsModal
+            isOpen={isSessionDetailsModalOpen}
+            onClose={() => setIsSessionDetailsModalOpen(false)}
+            session={selectedSessionDetails}
+            currentUserIsMentor={user?.id === mentorId}
+          />
+        )}
       </div>
     </ProtectedRoute>
   )

@@ -1,17 +1,17 @@
 import type { Metadata } from 'next'
 
 export const siteConfig = {
-  name: 'MentorConnect',
-  description: 'Plataforma de mentoria voluntária para conectar mentores e mentees para crescimento pessoal e profissional.',
-  url: 'https://mentorconnect.vercel.app', // Replace with your actual domain
-  ogImage: 'https://mentorconnect.vercel.app/og-image.jpg', // Replace with your actual OG image
+  name: 'Mentor Connect',
+  description: 'Plataforma de mentoria para conectar mentees e mentores.',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  ogImage: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/og-image.jpg`,
   links: {
-    twitter: 'https://twitter.com/vercel', // Replace with your Twitter
-    github: 'https://github.com/vercel/next.js', // Replace with your GitHub
+    twitter: 'https://twitter.com/yourhandle',
+    github: 'https://github.com/yourorg/mentor-connect',
   },
 }
 
-export const metadata: Metadata = {
+export const defaultMetadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
@@ -20,22 +20,21 @@ export const metadata: Metadata = {
   description: siteConfig.description,
   keywords: [
     'mentoria',
-    'voluntariado',
-    'desenvolvimento pessoal',
+    'mentor',
+    'mentee',
     'desenvolvimento profissional',
-    'carreira',
-    'educação',
+    'aprendizado',
+    'comunidade',
     'tecnologia',
-    'startup',
-    'impacto social',
+    'carreira',
   ],
   authors: [
     {
-      name: 'MentorConnect Team',
+      name: 'Mentor Connect Team',
       url: siteConfig.url,
     },
   ],
-  creator: 'MentorConnect Team',
+  creator: 'Mentor Connect Team',
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
@@ -57,7 +56,7 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: '@vercel', // Replace with your Twitter handle
+    creator: siteConfig.links.twitter,
   },
   icons: {
     icon: '/favicon.ico',

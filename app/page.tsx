@@ -1,254 +1,166 @@
-'use client'
-
-import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { ArrowRightIcon, LightbulbIcon, HandshakeIcon, UsersIcon, CalendarDaysIcon, StarIcon, CheckCircleIcon } from 'lucide-react'
+import { UsersIcon, LightbulbIcon, HandshakeIcon, ArrowRightIcon, CalendarDaysIcon, MessageSquareIcon, ShieldCheckIcon } from 'lucide-react'
+import Image from 'next/image'
+import { WavyBackground } from '@/components/wavy-background'
+import { Partners } from '@/components/Partners'
+import { Contributors } from '@/components/Contributors'
+import { FeedbackBanner } from '@/components/FeedbackBanner'
 import { NewsletterModal } from '@/components/newsletter/NewsletterModal'
-import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useAuth } from '@/hooks/useAuth'
-import { useUserRoles } from '@/app/context/user-roles-context'
 
 export default function HomePage() {
-  const { t } = useTranslation()
-  const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false)
-  const { isAuthenticated, isMentor, isMentee, isLoading: authLoading } = useAuth()
-  const { isLoadingRoles } = useUserRoles()
-
-  const handleOpenNewsletterModal = () => {
-    setIsNewsletterModalOpen(true)
-  }
-
-  const handleCloseNewsletterModal = () => {
-    setIsNewsletterModalOpen(false)
-  }
-
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-r from-primary to-primary-foreground text-primary-foreground overflow-hidden">
-        <div className="container px-4 md:px-6 flex flex-col items-center text-center relative z-10">
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none">
-              {t('home.hero.title')}
-            </h1>
-            <p className="mx-auto max-w-[700px] text-lg md:text-xl">
-              {t('home.hero.subtitle')}
-            </p>
-          </div>
-          <div className="space-x-4 mt-8">
+    <>
+      <WavyBackground className="max-w-full mx-auto pb-40">
+        <section className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-80px)] text-center px-4 py-16 md:py-24">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            Conecte-se, Aprenda, Cresça.
+          </h1>
+          <p className="text-lg md:text-xl text-gray-200 mb-10 max-w-3xl">
+            Sua plataforma para encontrar mentores experientes e impulsionar sua carreira, ou compartilhar seu conhecimento e impactar vidas.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/mentors" passHref>
-              <Button variant="secondary" size="lg" className="text-primary">
-                {t('home.hero.findMentorsButton')}
+              <Button size="lg" className="px-8 py-3 text-lg">
+                Encontrar um Mentor <ArrowRightIcon className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/signup" passHref>
-              <Button variant="outline" size="lg" className="text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                {t('home.hero.becomeMentorButton')}
+              <Button size="lg" variant="outline" className="px-8 py-3 text-lg text-white border-white hover:bg-white hover:text-primary">
+                Tornar-se um Mentor
               </Button>
             </Link>
           </div>
-        </div>
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/menvopeople.jpg"
-            alt="Hero Background"
-            layout="fill"
-            objectFit="cover"
-            quality={80}
-            className="opacity-30"
-          />
-        </div>
-      </section>
+        </section>
+      </WavyBackground>
 
-      {/* How It Works Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                {t('home.howItWorks.title')}
-              </h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                {t('home.howItWorks.subtitle')}
-              </p>
-            </div>
+      <div className="container mx-auto px-4 py-16 md:py-24">
+        <section className="mb-16 text-center">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4">Por que Mentor Connect?</h2>
+          <p className="text-lg text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+            Oferecemos uma plataforma intuitiva para você se conectar com a comunidade de mentoria.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
+            <Card className="p-6 text-center">
+              <UsersIcon className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <CardTitle className="text-xl font-semibold mb-2">Comunidade Vibrante</CardTitle>
+              <CardDescription>
+                Junte-se a uma rede crescente de profissionais e estudantes apaixonados por aprender e ensinar.
+              </CardDescription>
+            </Card>
+            <Card className="p-6 text-center">
+              <LightbulbIcon className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <CardTitle className="text-xl font-semibold mb-2">Conhecimento Compartilhado</CardTitle>
+              <CardDescription>
+                Acesse uma vasta gama de conhecimentos e experiências de mentores verificados.
+              </CardDescription>
+            </Card>
+            <Card className="p-6 text-center">
+              <HandshakeIcon className="h-12 w-12 text-primary mb-4 mx-auto" />
+              <CardTitle className="text-xl font-semibold mb-2">Conexões Reais</CardTitle>
+              <CardDescription>
+                Construa relacionamentos significativos que impulsionarão seu desenvolvimento.
+              </CardDescription>
+            </Card>
           </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="grid gap-1">
-              <div className="flex items-center justify-center rounded-full bg-primary p-3 text-primary-foreground w-12 h-12 mb-2">
-                <UsersIcon className="h-6 w-6" />
-              </div>
-              <h3 className="text-xl font-bold">{t('home.howItWorks.step1.title')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('home.howItWorks.step1.description')}
-              </p>
-            </div>
-            <div className="grid gap-1">
-              <div className="flex items-center justify-center rounded-full bg-primary p-3 text-primary-foreground w-12 h-12 mb-2">
-                <LightbulbIcon className="h-6 w-6" />
-              </div>
-              <h3 className="text-xl font-bold">{t('home.howItWorks.step2.title')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('home.howItWorks.step2.description')}
-              </p>
-            </div>
-            <div className="grid gap-1">
-              <div className="flex items-center justify-center rounded-full bg-primary p-3 text-primary-foreground w-12 h-12 mb-2">
-                <HandshakeIcon className="h-6 w-6" />
-              </div>
-              <h3 className="text-xl font-bold">{t('home.howItWorks.step3.title')}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t('home.howItWorks.step3.description')}
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <Link href="/how-it-works" passHref>
-              <Button variant="outline" size="lg">
-                {t('home.howItWorks.learnMoreButton')} <ArrowRightIcon className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Why Choose Us Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-        <div className="container px-4 md:px-6">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                {t('home.whyChooseUs.title')}
-              </h2>
-              <p className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                {t('home.whyChooseUs.subtitle')}
-              </p>
-              <ul className="grid gap-4 py-4">
-                <li>
-                  <CheckCircleIcon className="mr-2 inline-block h-5 w-5 text-primary" />
-                  <span className="font-medium">{t('home.whyChooseUs.feature1.title')}:</span>{' '}
-                  {t('home.whyChooseUs.feature1.description')}
-                </li>
-                <li>
-                  <CheckCircleIcon className="mr-2 inline-block h-5 w-5 text-primary" />
-                  <span className="font-medium">{t('home.whyChooseUs.feature2.title')}:</span>{' '}
-                  {t('home.whyChooseUs.feature2.description')}
-                </li>
-                <li>
-                  <CheckCircleIcon className="mr-2 inline-block h-5 w-5 text-primary" />
-                  <span className="font-medium">{t('home.whyChooseUs.feature3.title')}:</span>{' '}
-                  {t('home.whyChooseUs.feature3.description')}
-                </li>
-              </ul>
+        <Separator className="my-16" />
+
+        <section className="mb-16">
+          <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Como Funciona</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 p-3 rounded-full bg-primary text-primary-foreground">
+                  <SearchIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-semibold mb-2">1. Encontre seu Match</h3>
+                  <p className="text-muted-foreground">
+                    Utilize nossos filtros avançados para encontrar mentores ou mentees com base em habilidades, localização, experiência e muito mais.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 p-3 rounded-full bg-primary text-primary-foreground">
+                  <CalendarDaysIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-semibold mb-2">2. Agende Sessões</h3>
+                  <p className="text-muted-foreground">
+                    Com um calendário intuitivo, agende sessões de mentoria nos horários que melhor se encaixam na sua rotina.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 p-3 rounded-full bg-primary text-primary-foreground">
+                  <MessageSquareIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-semibold mb-2">3. Conecte-se e Cresça</h3>
+                  <p className="text-muted-foreground">
+                    Participe de sessões de mentoria, troque mensagens e construa um relacionamento que impulsionará seu desenvolvimento.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 p-3 rounded-full bg-primary text-primary-foreground">
+                  <ShieldCheckIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-semibold mb-2">4. Perfis Verificados</h3>
+                  <p className="text-muted-foreground">
+                    Garantimos a qualidade da nossa comunidade com um processo de verificação para mentores.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col items-center justify-center">
+            <div className="relative w-full h-80 md:h-[500px] rounded-lg overflow-hidden shadow-xl">
               <Image
-                src="/images/online_presentation_monochromatic.png"
-                width={500}
-                height={500}
-                alt="Why Choose Us"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full"
+                src="/images/online_team_meeting_.png"
+                alt="How it works illustration"
+                layout="fill"
+                objectFit="cover"
+                className="transition-transform duration-300 hover:scale-105"
               />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Testimonials Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                {t('home.testimonials.title')}
-              </h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                {t('home.testimonials.subtitle')}
-              </p>
-            </div>
-          </div>
-          <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 sm:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Avatar className="h-12 w-12 mr-4">
-                    <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="font-bold">{t('home.testimonials.testimonial1.author')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('home.testimonials.testimonial1.role')}</p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground">
-                  {t('home.testimonials.testimonial1.quote')}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Avatar className="h-12 w-12 mr-4">
-                    <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                    <AvatarFallback>AS</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="font-bold">{t('home.testimonials.testimonial2.author')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('home.testimonials.testimonial2.role')}</p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground">
-                  {t('home.testimonials.testimonial2.quote')}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Avatar className="h-12 w-12 mr-4">
-                    <AvatarImage src="/placeholder-user.jpg" alt="Avatar" />
-                    <AvatarFallback>MS</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="font-bold">{t('home.testimonials.testimonial3.author')}</h4>
-                    <p className="text-sm text-muted-foreground">{t('home.testimonials.testimonial3.role')}</p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground">
-                  {t('home.testimonials.testimonial3.quote')}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+        <Separator className="my-16" />
 
-      {/* Call to Action Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
-        <div className="container px-4 md:px-6 text-center">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-              {t('home.callToAction.title')}
-            </h2>
-            <p className="mx-auto max-w-[700px] text-lg md:text-xl">
-              {t('home.callToAction.subtitle')}
-            </p>
-          </div>
-          <div className="mt-8">
-            <Button variant="secondary" size="lg" onClick={handleOpenNewsletterModal}>
-              {t('home.callToAction.button')}
-            </Button>
-          </div>
-        </div>
-      </section>
+        <section className="mb-16">
+          <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Nossos Parceiros</h2>
+          <Partners />
+        </section>
 
-      <NewsletterModal isOpen={isNewsletterModalOpen} onClose={handleCloseNewsletterModal} />
-    </div>
+        <Separator className="my-16" />
+
+        <section className="mb-16">
+          <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Nossos Contribuidores</h2>
+          <Contributors />
+        </section>
+
+        <section className="text-center mt-16">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-6">Pronto para Começar?</h2>
+          <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
+            Junte-se à nossa comunidade e comece sua jornada de mentoria hoje mesmo!
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link href="/signup" passHref>
+              <Button size="lg">Cadastre-se Agora</Button>
+            </Link>
+            <Link href="/how-it-works" passHref>
+              <Button size="lg" variant="outline">Saber Mais</Button>
+            </Link>
+          </div>
+        </section>
+      </div>
+      <NewsletterModal />
+      <FeedbackBanner />
+    </>
   )
 }

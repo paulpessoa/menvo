@@ -1,88 +1,67 @@
-'use client'
-
-import { useState } from 'react'
+import { createClient } from '@/utils/supabase/server'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { SubmitButton } from '../login/submit-button'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/use-toast'
-import { Loader2Icon } from 'lucide-react'
-import { sendPasswordResetEmail } from '@/services/auth/supabase'
-import { useTranslation } from 'react-i18next'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { MailIcon } from 'lucide-react'
 
-export default function ForgotPasswordPage() {
-  const { t } = useTranslation()
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
+export default function ForgotPassword({
+  searchParams,
+}: {
+  searchParams: { message: string }
+}) {
+  const forgotPassword = async (formData: FormData) => {
+    'use server'
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage('')
+    const origin = headers().get('origin')
+    const email = formData.get('email') as string
+    const supabase = createClient()
 
-    try {
-      const { error } = await sendPasswordResetEmail(email)
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/reset-password`,
+    })
 
-      if (error) {
-        throw error
-      }
-
-      setMessage(t('forgotPassword.successMessage'))
-      toast({
-        title: t('forgotPassword.toastSuccessTitle'),
-        description: t('forgotPassword.toastSuccessDescription'),
-        variant: 'default',
-      })
-    } catch (error: any) {
-      toast({
-        title: t('forgotPassword.toastErrorTitle'),
-        description: error.message || t('forgotPassword.toastErrorDescription'),
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
+    if (error) {
+      return redirect(`/forgot-password?message=${error.message}`)
     }
+
+    return redirect('/forgot-password?message=Check email to reset password')
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">{t('forgotPassword.title')}</CardTitle>
-          <CardDescription>{t('forgotPassword.description')}</CardDescription>
+          <CardTitle className="text-3xl font-bold">Esqueceu a Senha?</CardTitle>
+          <CardDescription>
+            Digite seu e-mail para receber um link de redefinição de senha.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('forgotPassword.emailLabel')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+          <form className="grid gap-4" action={forgotPassword}>
+            <div className="grid gap-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input id="email" type="email" name="email" placeholder="m@example.com" required />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  {t('forgotPassword.loadingButton')}
-                </>
-              ) : (
-                t('forgotPassword.submitButton')
-              )}
-            </Button>
-            {message && (
-              <p className="text-center text-sm text-green-600">{message}</p>
+            <SubmitButton
+              className="w-full"
+              pendingText="Enviando..."
+            >
+              <MailIcon className="mr-2 h-4 w-4" />
+              Enviar Link de Redefinição
+            </SubmitButton>
+            {searchParams?.message && (
+              <p className="mt-4 p-4 text-center text-sm text-muted-foreground">
+                {searchParams.message}
+              </p>
             )}
             <div className="mt-4 text-center text-sm">
-              {t('forgotPassword.rememberPassword')}{' '}
-              <Link href="/login" className="underline">
-                {t('forgotPassword.loginLink')}
+              <Link className="underline" href="/login">
+                Voltar para o Login
               </Link>
             </div>
           </form>

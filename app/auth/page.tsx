@@ -1,39 +1,42 @@
-'use client'
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { LogInIcon, UserPlusIcon } from 'lucide-react'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Loader2Icon } from 'lucide-react'
-import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/components/ui/use-toast'
-import { useTranslation } from 'react-i18next'
+export default async function AuthPage() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-export default function AuthPage() {
-  const { t } = useTranslation()
-  const { isAuthenticated, isLoading } = useAuth()
-  const router = useRouter()
-  const { toast } = useToast()
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        router.push('/dashboard')
-      } else {
-        router.push('/login')
-        toast({
-          title: t('authPage.redirectLoginTitle'),
-          description: t('authPage.redirectLoginDescription'),
-          variant: 'default',
-        })
-      }
-    }
-  }, [isAuthenticated, isLoading, router, toast, t])
+  if (user) {
+    redirect('/dashboard')
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
-      <div className="flex flex-col items-center space-y-4">
-        <Loader2Icon className="h-12 w-12 animate-spin text-primary" />
-        <p className="text-lg text-muted-foreground">{t('authPage.loadingMessage')}</p>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
+      <Card className="w-full max-w-md text-center">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-3xl font-bold">Bem-vindo ao Mentor Connect</CardTitle>
+          <CardDescription>
+            Conecte-se com mentores e mentees para impulsionar seu crescimento.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <Link href="/login" passHref>
+            <Button className="w-full">
+              <LogInIcon className="mr-2 h-4 w-4" />
+              Entrar
+            </Button>
+          </Link>
+          <Link href="/signup" passHref>
+            <Button variant="outline" className="w-full">
+              <UserPlusIcon className="mr-2 h-4 w-4" />
+              Cadastre-se
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
     </div>
   )
 }

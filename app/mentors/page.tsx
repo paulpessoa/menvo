@@ -1,156 +1,165 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { Input } from '@/components/ui/input'
+import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Label } from '@/components/ui/label'
-import { Loader2Icon, SearchIcon, FilterIcon, RefreshCcwIcon } from 'lucide-react'
-import { MentorCard } from '@/components/mentor-card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Loader2, SearchIcon, MapPinIcon, BriefcaseIcon, StarIcon } from 'lucide-react'
 import { MentorFilters } from '@/components/mentor-filters'
-import { useMentors } from '@/hooks/useMentors'
-import { toast } from '@/components/ui/use-toast'
-import { mockMentors } from '@/data/mock-mentors' // Using mock data for now
-import { useTranslation } from 'react-i18next'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { user_profile, user_skill } from '@/types/database'
+
+interface MentorProfile extends user_profile {
+  skills: user_skill[];
+}
+
+async function fetchMentors(filters: any): Promise<MentorProfile[]> {
+  const params = new URLSearchParams()
+  if (filters.skill) params.append('skill', filters.skill)
+  if (filters.location) params.append('location', filters.location)
+  if (filters.language) params.append('language', filters.language)
+  if (filters.minExperience) params.append('minExperience', filters.minExperience.toString())
+  if (filters.maxExperience) params.append('maxExperience', filters.maxExperience.toString())
+
+  const response = await fetch(`/api/mentors?${params.toString()}`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch mentors')
+  }
+  const data = await response.json()
+  return data.data
+}
 
 export default function MentorsPage() {
-  const { t } = useTranslation()
-  const [mentors, setMentors] = useState<typeof mockMentors>([])
-  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterSkills, setFilterSkills] = useState<string[]>([])
-  const [filterLanguage, setFilterLanguage] = useState('all')
-  const [filterExperience, setFilterExperience] = useState<[number, number]>([0, 20]) // [min, max]
+  const [filters, setFilters] = useState({
+    skill: '',
+    location: '',
+    language: '',
+    minExperience: '',
+    maxExperience: '',
+  })
 
-  useEffect(() => {
-    const loadMentors = async () => {
-      setLoading(true)
-      try {
-        // In a real app, you'd fetch from an API:
-        // const { data, error } = await fetchMentors();
-        // if (error) throw error;
-        // setMentors(data);
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API call
-        setMentors(mockMentors) // Use mock data
-      } catch (error: any) {
-        toast({
-          title: t('mentors.fetchErrorTitle'),
-          description: error.message || t('mentors.fetchErrorDescription'),
-          variant: 'destructive',
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadMentors()
-  }, [t])
-
-  const allSkills = useMemo(() => {
-    const skillsSet = new Set<string>()
-    mentors.forEach(mentor => {
-      mentor.skills?.forEach(skill => skillsSet.add(skill.skill_name))
-    })
-    return Array.from(skillsSet).sort()
-  }, [mentors])
-
-  const allLanguages = useMemo(() => {
-    const languagesSet = new Set<string>()
-    mentors.forEach(mentor => {
-      mentor.user_profiles?.languages?.forEach(lang => languagesSet.add(lang))
-    })
-    return ['all', ...Array.from(languagesSet).sort()]
-  }, [mentors])
+  const { data: mentors, isLoading, isError, error } = useQuery<MentorProfile[], Error>({
+    queryKey: ['mentors', filters],
+    queryFn: () => fetchMentors(filters),
+  })
 
   const filteredMentors = useMemo(() => {
-    let filtered = mentors
+    if (!mentors) return []
+    return mentors.filter(mentor =>
+      mentor.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mentor.current_position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mentor.skills?.some(skill => skill.skill_name.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+  }, [mentors, searchTerm])
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (mentor) =>
-          mentor.user_profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          mentor.user_profiles?.occupation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          mentor.bio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          mentor.skills?.some(skill => skill.skill_name.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
-    }
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Carregando mentores...</span>
+      </div>
+    )
+  }
 
-    if (filterSkills.length > 0) {
-      filtered = filtered.filter(mentor =>
-        mentor.skills?.some(skill => filterSkills.includes(skill.skill_name))
-      )
-    }
-
-    if (filterLanguage !== 'all') {
-      filtered = filtered.filter(mentor =>
-        mentor.user_profiles?.languages?.includes(filterLanguage)
-      )
-    }
-
-    filtered = filtered.filter(mentor => {
-      const years = mentor.user_profiles?.years_experience || 0
-      return years >= filterExperience[0] && years <= filterExperience[1]
-    })
-
-    return filtered
-  }, [mentors, searchTerm, filterSkills, filterLanguage, filterExperience])
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <h1 className="text-3xl font-bold mb-4">Erro ao carregar mentores</h1>
+        <p className="text-lg mb-6">{error?.message || 'Ocorreu um erro inesperado.'}</p>
+        <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+      </div>
+    )
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">
-        {t('mentors.title')}
-      </h1>
+    <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Encontre seu Mentor Ideal</h1>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t('mentors.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Filters and Search */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Buscar por nome ou habilidade..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <MentorFilters filters={filters} onFilterChange={setFilters} />
+          </div>
+
+          {/* Mentor List */}
+          <div className="lg:col-span-3">
+            {filteredMentors.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredMentors.map(mentor => (
+                  <Card key={mentor.id} className="flex flex-col">
+                    <CardHeader className="flex flex-col items-center text-center p-4 pb-2">
+                      <Avatar className="h-24 w-24 mb-3 border-2 border-primary-foreground">
+                        <AvatarImage src={mentor.avatar_url || '/placeholder-user.jpg'} alt={mentor.full_name || 'Mentor'} />
+                        <AvatarFallback className="text-4xl">{mentor.full_name?.charAt(0) || 'M'}</AvatarFallback>
+                      </Avatar>
+                      <CardTitle className="text-xl font-bold">{mentor.full_name}</CardTitle>
+                      <CardDescription className="text-sm text-muted-foreground">
+                        {mentor.current_position} {mentor.current_company && `na ${mentor.current_company}`}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow p-4 pt-0">
+                      <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-2">
+                        {mentor.location && (
+                          <>
+                            <MapPinIcon className="h-4 w-4" />
+                            <span>{mentor.location}</span>
+                          </>
+                        )}
+                        {mentor.years_experience !== null && mentor.years_experience !== undefined && (
+                          <>
+                            <span className="mx-1">•</span>
+                            <StarIcon className="h-4 w-4" />
+                            <span>{mentor.years_experience} anos</span>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground text-center mb-4 line-clamp-3">
+                        {mentor.bio || 'Nenhuma biografia disponível.'}
+                      </p>
+                      <div className="flex flex-wrap justify-center gap-2 mb-4">
+                        {mentor.skills?.filter(s => s.is_mentor_skill).slice(0, 3).map((skill, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {skill.skill_name}
+                          </Badge>
+                        ))}
+                        {mentor.skills && mentor.skills.filter(s => s.is_mentor_skill).length > 3 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{mentor.skills.filter(s => s.is_mentor_skill).length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                      <Link href={`/mentors/${mentor.id}`} passHref>
+                        <Button className="w-full">Ver Perfil</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground">Nenhum mentor encontrado com os filtros aplicados.</p>
+              </div>
+            )}
+          </div>
         </div>
-        <MentorFilters
-          allSkills={allSkills}
-          selectedSkills={filterSkills}
-          onSelectSkills={setFilterSkills}
-          allLanguages={allLanguages}
-          selectedLanguage={filterLanguage}
-          onSelectLanguage={setFilterLanguage}
-          experienceRange={filterExperience}
-          onExperienceChange={setFilterExperience}
-        />
-        <Button onClick={() => {
-          setSearchTerm('')
-          setFilterSkills([])
-          setFilterLanguage('all')
-          setFilterExperience([0, 20])
-          // Optionally reload mentors from source if needed
-          // loadMentors();
-        }} variant="outline">
-          <RefreshCcwIcon className="h-4 w-4 mr-2" /> {t('mentors.resetFilters')}
-        </Button>
       </div>
-
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2Icon className="h-8 w-8 animate-spin" />
-          <span className="ml-2">{t('mentors.loadingMentors')}</span>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMentors.length === 0 ? (
-            <p className="col-span-full text-center text-muted-foreground">
-              {t('mentors.noMentorsFound')}
-            </p>
-          ) : (
-            filteredMentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
-            ))
-          )}
-        </div>
-      )}
-    </div>
+    </ProtectedRoute>
   )
 }

@@ -1,14 +1,10 @@
-import { Loader2Icon } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { Loader2 } from 'lucide-react'
 
 export default function Loading() {
-  const { t } = useTranslation()
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
-      <div className="flex flex-col items-center space-y-4">
-        <Loader2Icon className="h-12 w-12 animate-spin text-primary" />
-        <p className="text-lg text-muted-foreground">{t('common.loading')}</p>
-      </div>
+    <div className="flex justify-center items-center min-h-screen">
+      <Loader2 className="h-8 w-8 animate-spin" />
+      <span className="ml-2">Carregando eventos...</span>
     </div>
   )
 }

@@ -1,121 +1,91 @@
-'use client'
-
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { useTranslation } from 'react-i18next'
-import { Globe } from '@/components/globe'
+import { UsersIcon, LightbulbIcon, HandshakeIcon, GlobeIcon } from 'lucide-react'
 import { Contributors } from '@/components/Contributors'
 import { Partners } from '@/components/Partners'
 
 export default function AboutPage() {
-  const { t } = useTranslation()
-
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <section className="mb-12 text-center">
-        <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-6">
-          {t('about.title')}
+      <section className="text-center mb-12">
+        <h1 className="text-5xl font-extrabold text-gray-900 dark:text-gray-50 mb-6 leading-tight">
+          Sobre o Mentor Connect
         </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          {t('about.subtitle')}
+        <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          Nossa missão é conectar mentes brilhantes para impulsionar o crescimento pessoal e profissional.
         </p>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight">{t('about.ourMission.title')}</h2>
-          <p className="text-lg text-muted-foreground">
-            {t('about.ourMission.description')}
+      <section className="grid md:grid-cols-2 gap-12 items-center mb-16">
+        <div className="space-y-6">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-50">Nossa História</h2>
+          <p className="text-lg text-gray-700 dark:text-gray-300">
+            O Mentor Connect nasceu da paixão por compartilhar conhecimento e da crença no poder da mentoria. Percebemos a lacuna entre profissionais experientes dispostos a ajudar e indivíduos em busca de orientação, e decidimos construir uma ponte. Desde o nosso início, temos nos dedicado a criar uma plataforma intuitiva e acessível que facilita essas conexões valiosas.
+          </p>
+          <p className="text-lg text-gray-700 dark:text-gray-300">
+            Acreditamos que todos merecem a oportunidade de aprender com os melhores e que o conhecimento deve ser democratizado. Nossa jornada é impulsionada pelas histórias de sucesso que surgem a cada nova mentoria.
           </p>
         </div>
-        <div className="relative h-64 md:h-96 w-full rounded-lg overflow-hidden shadow-lg">
+        <div className="relative w-full h-80 md:h-96 rounded-lg overflow-hidden shadow-xl">
           <Image
             src="/images/about/menvo-team.png"
-            alt={t('about.ourMission.imageAlt')}
+            alt="Our Team"
             layout="fill"
             objectFit="cover"
-            className="transition-transform duration-500 hover:scale-105"
+            className="transition-transform duration-300 hover:scale-105"
           />
         </div>
       </section>
 
-      <Separator className="my-12" />
+      <Separator className="my-16" />
 
-      <section className="mb-12">
-        <h2 className="text-4xl font-bold tracking-tight text-center mb-8">
-          {t('about.ourValues.title')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="p-6 text-center">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">{t('about.ourValues.value1.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{t('about.ourValues.value1.description')}</CardDescription>
-            </CardContent>
+      <section className="mb-16">
+        <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Nossos Valores</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <Card className="text-center p-6 flex flex-col items-center">
+            <UsersIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">Comunidade</CardTitle>
+            <CardDescription>
+              Construímos um ambiente de apoio onde todos se sentem bem-vindos e valorizados.
+            </CardDescription>
           </Card>
-          <Card className="p-6 text-center">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">{t('about.ourValues.value2.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{t('about.ourValues.value2.description')}</CardDescription>
-            </CardContent>
+          <Card className="text-center p-6 flex flex-col items-center">
+            <LightbulbIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">Crescimento</CardTitle>
+            <CardDescription>
+              Fomentamos o aprendizado contínuo e o desenvolvimento pessoal e profissional.
+            </CardDescription>
           </Card>
-          <Card className="p-6 text-center">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">{t('about.ourValues.value3.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{t('about.ourValues.value3.description')}</CardDescription>
-            </CardContent>
+          <Card className="text-center p-6 flex flex-col items-center">
+            <HandshakeIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">Colaboração</CardTitle>
+            <CardDescription>
+              Acreditamos que juntos podemos alcançar mais, através da troca de experiências.
+            </CardDescription>
+          </Card>
+          <Card className="text-center p-6 flex flex-col items-center">
+            <GlobeIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">Inclusão</CardTitle>
+            <CardDescription>
+              Nos esforçamos para ser uma plataforma acessível e diversa para todos.
+            </CardDescription>
           </Card>
         </div>
       </section>
 
-      <Separator className="my-12" />
+      <Separator className="my-16" />
 
-      <section className="mb-12 text-center">
-        <h2 className="text-4xl font-bold tracking-tight mb-8">
-          {t('about.globalImpact.title')}
-        </h2>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-          {t('about.globalImpact.description')}
-        </p>
-        <div className="flex justify-center items-center gap-8 flex-wrap mb-12">
-          <Image src="/images/SDG-4.svg" alt="SDG 4 Quality Education" width={100} height={100} />
-          <Image src="/images/SDG-5.svg" alt="SDG 5 Gender Equality" width={100} height={100} />
-          <Image src="/images/SDG-8.svg" alt="SDG 8 Decent Work and Economic Growth" width={100} height={100} />
-          <Image src="/images/SDG-10.svg" alt="SDG 10 Reduced Inequalities" width={100} height={100} />
-        </div>
-        <div className="h-[400px] w-full">
-          <Globe />
-        </div>
-      </section>
-
-      <Separator className="my-12" />
-
-      <section className="mb-12">
-        <h2 className="text-4xl font-bold tracking-tight text-center mb-8">
-          {t('about.ourTeam.title')}
-        </h2>
-        <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-8">
-          {t('about.ourTeam.description')}
-        </p>
-        <Contributors />
-      </section>
-
-      <Separator className="my-12" />
-
-      <section className="mb-12">
-        <h2 className="text-4xl font-bold tracking-tight text-center mb-8">
-          {t('about.partners.title')}
-        </h2>
-        <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-8">
-          {t('about.partners.description')}
-        </p>
+      <section className="mb-16">
+        <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Nossos Parceiros</h2>
         <Partners />
+      </section>
+
+      <Separator className="my-16" />
+
+      <section className="mb-16">
+        <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Nossos Contribuidores</h2>
+        <Contributors />
       </section>
     </div>
   )

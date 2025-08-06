@@ -1,186 +1,86 @@
-'use client'
-
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/use-toast'
-import { Loader2Icon, GithubIcon, ChromeIcon, LinkedinIcon } from 'lucide-react'
-import { signUpWithEmail, signInWithOAuth } from '@/services/auth/supabase'
+import { createClient } from '@/utils/supabase/server'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { useTranslation } from 'react-i18next'
-import { UserTypeSelector } from '@/components/auth/UserTypeSelector'
-import { user_role } from '@/types/database'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { SubmitButton } from '../login/submit-button'
+import { UserPlusIcon } from 'lucide-react'
 
-export default function SignupPage() {
-  const { t } = useTranslation()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [role, setRole] = useState<user_role>('mentee') // Default role
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
+export default function Signup({
+  searchParams,
+}: {
+  searchParams: { message: string }
+}) {
+  const signUp = async (formData: FormData) => {
+    'use server'
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    const origin = headers().get('origin')
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
+    const supabase = createClient()
 
     if (password !== confirmPassword) {
-      toast({
-        title: t('signup.passwordMismatchTitle'),
-        description: t('signup.passwordMismatchDescription'),
-        variant: 'destructive',
-      })
-      setLoading(false)
-      return
+      return redirect('/signup?message=Passwords do not match')
     }
 
-    try {
-      const { error } = await signUpWithEmail(email, password, role)
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+      },
+    })
 
-      if (error) {
-        throw error
-      }
-
-      toast({
-        title: t('signup.toastSuccessTitle'),
-        description: t('signup.toastSuccessDescription'),
-        variant: 'default',
-      })
-      router.push('/confirmation') // Redirect to a confirmation page
-    } catch (error: any) {
-      toast({
-        title: t('signup.toastErrorTitle'),
-        description: error.message || t('signup.toastErrorDescription'),
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
+    if (error) {
+      return redirect(`/signup?message=${error.message}`)
     }
-  }
 
-  const handleOAuthSignIn = async (provider: 'github' | 'google' | 'linkedin') => {
-    setLoading(true)
-    try {
-      const { error } = await signInWithOAuth(provider, role)
-      if (error) {
-        throw error
-      }
-      // Supabase handles the redirect for OAuth, so no explicit router.push here
-    } catch (error: any) {
-      toast({
-        title: t('signup.toastOAuthErrorTitle'),
-        description: error.message || t('signup.toastOAuthErrorDescription'),
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
+    return redirect('/signup?message=Check email to continue signup process')
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">{t('signup.title')}</CardTitle>
-          <CardDescription>{t('signup.description')}</CardDescription>
+          <CardTitle className="text-3xl font-bold">Cadastre-se</CardTitle>
+          <CardDescription>
+            Crie sua conta para começar sua jornada de mentoria.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <UserTypeSelector selectedRole={role} onSelectRole={setRole} disabled={loading} />
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+          <form className="grid gap-4" action={signUp}>
+            <div className="grid gap-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input id="email" type="email" name="email" placeholder="m@example.com" required />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {t('signup.orContinueWith')}
-              </span>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input id="password" type="password" name="password" required />
             </div>
-          </div>
-          <div className="grid gap-4">
-            <Button variant="outline" className="w-full" onClick={() => handleOAuthSignIn('github')} disabled={loading}>
-              {loading ? (
-                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <GithubIcon className="mr-2 h-4 w-4" />
-              )}
-              {t('signup.signUpWithGithub')}
-            </Button>
-            <Button variant="outline" className="w-full" onClick={() => handleOAuthSignIn('google')} disabled={loading}>
-              {loading ? (
-                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <ChromeIcon className="mr-2 h-4 w-4" />
-              )}
-              {t('signup.signUpWithGoogle')}
-            </Button>
-            <Button variant="outline" className="w-full" onClick={() => handleOAuthSignIn('linkedin')} disabled={loading}>
-              {loading ? (
-                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <LinkedinIcon className="mr-2 h-4 w-4" />
-              )}
-              {t('signup.signUpWithLinkedin')}
-            </Button>
-          </div>
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+            <div className="grid gap-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input id="confirmPassword" type="password" name="confirmPassword" required />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {t('signup.orSignUpWithEmail')}
-              </span>
-            </div>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('signup.emailLabel')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">{t('signup.passwordLabel')}</Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">{t('signup.confirmPasswordLabel')}</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  {t('signup.loadingButton')}
-                </>
-              ) : (
-                t('signup.submitButton')
-              )}
-            </Button>
+            <SubmitButton
+              className="w-full"
+              pendingText="Cadastrando..."
+            >
+              <UserPlusIcon className="mr-2 h-4 w-4" />
+              Cadastrar
+            </SubmitButton>
+            {searchParams?.message && (
+              <p className="mt-4 p-4 text-center text-sm text-muted-foreground">
+                {searchParams.message}
+              </p>
+            )}
             <div className="mt-4 text-center text-sm">
-              {t('signup.alreadyHaveAccount')}{' '}
-              <Link href="/login" className="underline">
-                {t('signup.loginLink')}
+              Já tem uma conta?{' '}
+              <Link className="underline" href="/login">
+                Entrar
               </Link>
             </div>
           </form>

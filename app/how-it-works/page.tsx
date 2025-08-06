@@ -1,170 +1,208 @@
-'use client'
-
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { CheckCircleIcon, SearchIcon, CalendarDaysIcon, HandshakeIcon, UserPlusIcon, ShieldCheckIcon, LightbulbIcon, TrendingUpIcon } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+import { SearchIcon, CalendarDaysIcon, HandshakeIcon, TrendingUpIcon, ShieldCheckIcon, UserPlusIcon } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
 export default function HowItWorksPage() {
-  const { t } = useTranslation()
-
-  const steps = [
-    {
-      title: t('howItWorks.steps.step1.title'),
-      description: t('howItWorks.steps.step1.description'),
-      image: '/images/how-it-works/register-mentee.jpg',
-      imageAlt: t('howItWorks.steps.step1.imageAlt'),
-      icon: UserPlusIcon,
-    },
-    {
-      title: t('howItWorks.steps.step2.title'),
-      description: t('howItWorks.steps.step2.description'),
-      image: '/images/how-it-works/find.jpg',
-      imageAlt: t('howItWorks.steps.step2.imageAlt'),
-      icon: SearchIcon,
-    },
-    {
-      title: t('howItWorks.steps.step3.title'),
-      description: t('howItWorks.steps.step3.description'),
-      image: '/images/how-it-works/schedule.jpg',
-      imageAlt: t('howItWorks.steps.step3.imageAlt'),
-      icon: CalendarDaysIcon,
-    },
-    {
-      title: t('howItWorks.steps.step4.title'),
-      description: t('howItWorks.steps.step4.description'),
-      image: '/images/how-it-works/grow-together.jpg',
-      imageAlt: t('howItWorks.steps.step4.imageAlt'),
-      icon: HandshakeIcon,
-    },
-  ]
-
-  const mentorSteps = [
-    {
-      title: t('howItWorks.mentorSteps.step1.title'),
-      description: t('howItWorks.mentorSteps.step1.description'),
-      image: '/images/how-it-works/register-mentor.jpg',
-      imageAlt: t('howItWorks.mentorSteps.step1.imageAlt'),
-      icon: UserPlusIcon,
-    },
-    {
-      title: t('howItWorks.mentorSteps.step2.title'),
-      description: t('howItWorks.mentorSteps.step2.description'),
-      image: '/images/how-it-works/verify.jpg',
-      imageAlt: t('howItWorks.mentorSteps.step2.imageAlt'),
-      icon: ShieldCheckIcon,
-    },
-    {
-      title: t('howItWorks.mentorSteps.step3.title'),
-      description: t('howItWorks.mentorSteps.step3.description'),
-      image: '/images/how-it-works/availability.jpg',
-      imageAlt: t('howItWorks.mentorSteps.step3.imageAlt'),
-      icon: LightbulbIcon,
-    },
-    {
-      title: t('howItWorks.mentorSteps.step4.title'),
-      description: t('howItWorks.mentorSteps.step4.description'),
-      image: '/images/how-it-works/grow.jpg',
-      imageAlt: t('howItWorks.mentorSteps.step4.imageAlt'),
-      icon: TrendingUpIcon,
-    },
-  ]
-
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      <section className="mb-12 text-center">
-        <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50 mb-6">
-          {t('howItWorks.title')}
+      <section className="text-center mb-12">
+        <h1 className="text-5xl font-extrabold text-gray-900 dark:text-gray-50 mb-6 leading-tight">
+          Como o Mentor Connect Funciona
         </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          {t('howItWorks.subtitle')}
+        <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          Descubra o processo simples para encontrar seu mentor ideal ou se tornar um mentor impactante.
         </p>
       </section>
 
-      <section className="mb-12">
-        <h2 className="text-4xl font-bold tracking-tight text-center mb-8">
-          {t('howItWorks.forMentees.title')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, index) => (
-            <Card key={index} className="flex flex-col items-center text-center p-6">
-              <div className="relative w-full h-40 mb-4 rounded-md overflow-hidden">
-                <Image
-                  src={step.image || "/placeholder.svg"}
-                  alt={step.imageAlt}
-                  layout="fill"
-                  objectFit="cover"
-                  className="transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-center mb-3">
-                  <step.icon className="h-8 w-8 text-primary mr-2" />
-                  <h3 className="text-xl font-semibold">{step.title}</h3>
-                </div>
-                <p className="text-muted-foreground">{step.description}</p>
-              </div>
-            </Card>
-          ))}
+      <section className="mb-16">
+        <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Para Mentees</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <Card className="flex flex-col items-center text-center p-6">
+            <UserPlusIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">1. Cadastre-se</CardTitle>
+            <CardDescription>
+              Crie sua conta de mentee e preencha seu perfil com suas habilidades e o que você busca aprender.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/register-mentee.jpg"
+                alt="Register as Mentee"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <SearchIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">2. Encontre seu Mentor</CardTitle>
+            <CardDescription>
+              Use nossos filtros avançados para buscar mentores por área de atuação, experiência e mais.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/find.jpg"
+                alt="Find your Mentor"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <CalendarDaysIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">3. Agende uma Sessão</CardTitle>
+            <CardDescription>
+              Escolha a disponibilidade do mentor e agende sua primeira sessão de mentoria.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/schedule.jpg"
+                alt="Schedule a Session"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <HandshakeIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">4. Conecte-se e Aprenda</CardTitle>
+            <CardDescription>
+              Participe da sessão, faça perguntas, receba feedback e comece a crescer.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/grow.jpg"
+                alt="Connect and Learn"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <TrendingUpIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">5. Cresça e Evolua</CardTitle>
+            <CardDescription>
+              Aplique o conhecimento adquirido e veja sua carreira e habilidades decolarem.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/grow-together.jpg"
+                alt="Grow and Evolve"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
         </div>
       </section>
 
-      <Separator className="my-12" />
+      <Separator className="my-16" />
 
-      <section className="mb-12">
-        <h2 className="text-4xl font-bold tracking-tight text-center mb-8">
-          {t('howItWorks.forMentors.title')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {mentorSteps.map((step, index) => (
-            <Card key={index} className="flex flex-col items-center text-center p-6">
-              <div className="relative w-full h-40 mb-4 rounded-md overflow-hidden">
-                <Image
-                  src={step.image || "/placeholder.svg"}
-                  alt={step.imageAlt}
-                  layout="fill"
-                  objectFit="cover"
-                  className="transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-center mb-3">
-                  <step.icon className="h-8 w-8 text-primary mr-2" />
-                  <h3 className="text-xl font-semibold">{step.title}</h3>
-                </div>
-                <p className="text-muted-foreground">{step.description}</p>
-              </div>
-            </Card>
-          ))}
+      <section className="mb-16">
+        <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-gray-50 mb-10">Para Mentores</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <Card className="flex flex-col items-center text-center p-6">
+            <UserPlusIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">1. Cadastre-se como Mentor</CardTitle>
+            <CardDescription>
+              Crie sua conta e preencha seu perfil de mentor com suas áreas de expertise e experiência.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/register-mentor.jpg"
+                alt="Register as Mentor"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <ShieldCheckIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">2. Verificação de Perfil</CardTitle>
+            <CardDescription>
+              Nosso time revisará seu perfil para garantir a qualidade e relevância das mentorias.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/verify.jpg"
+                alt="Profile Verification"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <CalendarDaysIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">3. Defina sua Disponibilidade</CardTitle>
+            <CardDescription>
+              Configure seus horários e dias disponíveis para sessões de mentoria.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/availability.jpg"
+                alt="Set Availability"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <HandshakeIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">4. Conecte-se com Mentees</CardTitle>
+            <CardDescription>
+              Mentees encontrarão seu perfil e agendarão sessões com base em suas habilidades.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/conduct.jpg"
+                alt="Connect with Mentees"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
+          <Card className="flex flex-col items-center text-center p-6">
+            <TrendingUpIcon className="h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-xl font-semibold mb-2">5. Impacte Vidas</CardTitle>
+            <CardDescription>
+              Compartilhe seu conhecimento, ajude outros a crescer e construa sua reputação.
+            </CardDescription>
+            <div className="mt-4 w-full">
+              <Image
+                src="/images/how-it-works/grow-together.jpg"
+                alt="Impact Lives"
+                width={300}
+                height={200}
+                className="rounded-md object-cover w-full h-auto"
+              />
+            </div>
+          </Card>
         </div>
       </section>
 
-      <Separator className="my-12" />
-
-      <section className="mb-12 text-center">
-        <h2 className="text-4xl font-bold tracking-tight mb-8">
-          {t('howItWorks.ourCommitment.title')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="p-6">
-            <CardHeader>
-              <CheckCircleIcon className="h-10 w-10 text-green-500 mb-3 mx-auto" />
-              <CardTitle className="text-xl font-semibold">{t('howItWorks.ourCommitment.commitment1.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{t('howItWorks.ourCommitment.commitment1.description')}</CardDescription>
-            </CardContent>
-          </Card>
-          <Card className="p-6">
-            <CardHeader>
-              <CheckCircleIcon className="h-10 w-10 text-green-500 mb-3 mx-auto" />
-              <CardTitle className="text-xl font-semibold">{t('howItWorks.ourCommitment.commitment2.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{t('howItWorks.ourCommitment.commitment2.description')}</CardDescription>
-            </CardContent>
-          </Card>
+      <section className="text-center mt-16">
+        <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-6">Pronto para Começar?</h2>
+        <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
+          Junte-se à nossa comunidade e comece sua jornada de mentoria hoje mesmo!
+        </p>
+        <div className="flex justify-center gap-4">
+          <Link href="/signup" passHref>
+            <Button size="lg">Cadastre-se Agora</Button>
+          </Link>
+          <Link href="/mentors" passHref>
+            <Button size="lg" variant="outline">Explorar Mentores</Button>
+          </Link>
         </div>
       </section>
     </div>

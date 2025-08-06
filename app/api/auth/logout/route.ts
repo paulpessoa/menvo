@@ -10,5 +10,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ message: 'Logged out successfully' }, { status: 200 })
+  return NextResponse.json({ message: 'Successfully logged out' }, { status: 200 })
 }

@@ -1,87 +1,132 @@
-# OAuth Setup for MentorConnect
+# OAuth Setup for Mentor Connect
 
-This document outlines the steps to set up OAuth providers (GitHub, Google, LinkedIn) for the MentorConnect application using Supabase Auth.
+This guide details how to set up OAuth providers (Google, GitHub, LinkedIn) for your Supabase project, which is used by the Mentor Connect application.
 
 ## Prerequisites
 
-*   A Supabase project.
-*   Your Next.js application configured to use Supabase.
-*   Access to the developer consoles for GitHub, Google, and LinkedIn.
+-   A Supabase project.
+-   Access to your Supabase dashboard.
+-   Developer accounts for Google, GitHub, and LinkedIn.
 
-## 1. Supabase Configuration
+## General Steps for OAuth Providers
 
-First, you need to enable the desired OAuth providers in your Supabase project.
+For each provider, the general steps are:
 
-1.  Go to your Supabase project dashboard.
-2.  Navigate to **Authentication** > **Providers**.
-3.  Enable the providers you want to use (GitHub, Google, LinkedIn).
-4.  For each provider, you will need to enter a **Client ID** and **Client Secret**. Supabase will provide you with a **Redirect URI** (e.g., `https://your-supabase-url.supabase.co/auth/v1/callback`). Copy this URI as you'll need it for the next steps.
+1.  **Create an OAuth Application** on the respective platform's developer console.
+2.  **Configure Redirect URIs**: Add your Supabase callback URL to the OAuth application settings.
+    -   For local development: `http://localhost:3000/auth/callback`
+    -   For production: `https://your-domain.com/auth/callback` (Replace `your-domain.com` with your actual domain)
+3.  **Get Client ID and Client Secret**: Copy these credentials from your OAuth application.
+4.  **Configure Supabase**: Add the Client ID and Client Secret to your Supabase project settings.
+5.  **Update Environment Variables**: Add the credentials to your `.env.local` file for your Next.js application.
+
+---
+
+## 1. Google OAuth Setup
+
+1.  **Go to Google Cloud Console**:
+    -   Visit [Google Cloud Console](https://console.cloud.google.com/).
+    -   Select or create a new project.
+2.  **Enable the Google People API**:
+    -   In the left navigation, go to "APIs & Services" > "Enabled APIs & services".
+    -   Click "+ ENABLE APIS AND SERVICES".
+    -   Search for "Google People API" and enable it.
+3.  **Create OAuth Consent Screen**:
+    -   In the left navigation, go to "APIs & Services" > "OAuth consent screen".
+    -   Choose "External" and click "CREATE".
+    -   Fill in the required information (App name, User support email, Developer contact information).
+    -   Add authorized domains (e.g., `localhost:3000`, `your-domain.com`).
+    -   For "Scopes", you typically need `.../auth/userinfo.email` and `.../auth/userinfo.profile`.
+    -   Add test users if your app is in "Testing" status.
+4.  **Create Credentials**:
+    -   In the left navigation, go to "APIs & Services" > "Credentials".
+    -   Click "+ CREATE CREDENTIALS" > "OAuth client ID".
+    -   Select "Web application" as the Application type.
+    -   Give it a name (e.g., `Mentor Connect Web`).
+    -   **Authorized JavaScript origins**:
+        -   `http://localhost:3000`
+        -   `https://your-domain.com` (your production domain)
+    -   **Authorized redirect URIs**:
+        -   `http://localhost:3000/auth/callback`
+        -   `https://your-domain.com/auth/callback`
+        -   `https://<YOUR_SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback` (Find this in Supabase Auth settings)
+    -   Click "CREATE".
+    -   Copy your **Client ID** and **Client Secret**.
+5.  **Configure Supabase**:
+    -   Go to your Supabase project dashboard.
+    -   Navigate to "Authentication" > "Providers".
+    -   Enable "Google".
+    -   Paste your Google **Client ID** and **Client Secret**.
+6.  **Update `.env.local`**:
+    \`\`\`env
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
+    NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=your_google_client_secret
+    \`\`\`
+
+---
 
 ## 2. GitHub OAuth Setup
 
-1.  Go to [GitHub Developer Settings](https://github.com/settings/developers).
-2.  Navigate to **OAuth Apps** and click **New OAuth App**.
-3.  Fill in the following details:
-    *   **Application name**: `MentorConnect` (or a descriptive name)
-    *   **Homepage URL**: Your application's public URL (e.g., `http://localhost:3000` for local development, or your Vercel deployment URL).
-    *   **Authorization callback URL**: This is the **Redirect URI** you copied from Supabase (e.g., `https://your-supabase-url.supabase.co/auth/v1/callback`).
-4.  Click **Register application**.
-5.  You will be given a **Client ID**. Copy this.
-6.  Click **Generate a new client secret**. Copy this secret.
-7.  In your Supabase dashboard, go to **Authentication** > **Providers** > **GitHub** and paste the **Client ID** and **Client Secret**.
+1.  **Go to GitHub Developer Settings**:
+    -   Visit [GitHub Developer Settings](https://github.com/settings/developers).
+    -   Go to "OAuth Apps" > "New OAuth App".
+2.  **Register a new OAuth application**:
+    -   **Application name**: `Mentor Connect`
+    -   **Homepage URL**: `http://localhost:3000` (or your production domain)
+    -   **Authorization callback URL**:
+        -   `http://localhost:3000/auth/callback`
+        -   `https://your-domain.com/auth/callback`
+        -   `https://<YOUR_SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`
+    -   Click "Register application".
+3.  **Generate a new client secret**:
+    -   Copy your **Client ID**.
+    -   Click "Generate a new client secret" and copy the **Client Secret**.
+4.  **Configure Supabase**:
+    -   Go to your Supabase project dashboard.
+    -   Navigate to "Authentication" > "Providers".
+    -   Enable "GitHub".
+    -   Paste your GitHub **Client ID** and **Client Secret**.
+5.  **Update `.env.local`**:
+    \`\`\`env
+    NEXT_PUBLIC_GITHUB_CLIENT_ID=your_github_client_id
+    NEXT_PUBLIC_GITHUB_CLIENT_SECRET=your_github_client_secret
+    \`\`\`
 
-## 3. Google OAuth Setup
+---
 
-1.  Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2.  Select or create a new project.
-3.  Navigate to **APIs & Services** > **OAuth consent screen**.
-    *   Configure the consent screen (User type: External, App name, User support email, Developer contact information).
-    *   Add test users if your app is in "Testing" status.
-4.  Navigate to **APIs & Services** > **Credentials**.
-5.  Click **+ CREATE CREDENTIALS** > **OAuth client ID**.
-6.  Select **Web application** as the Application type.
-7.  Fill in the details:
-    *   **Name**: `MentorConnect Web Client` (or a descriptive name)
-    *   **Authorized JavaScript origins**: Add your application's public URL (e.g., `http://localhost:3000`, your Vercel deployment URL).
-    *   **Authorized redirect URIs**: Add the **Redirect URI** you copied from Supabase (e.g., `https://your-supabase-url.supabase.co/auth/v1/callback`).
-8.  Click **CREATE**.
-9.  You will be given a **Client ID** and **Client Secret**. Copy these.
-10. In your Supabase dashboard, go to **Authentication** > **Providers** > **Google** and paste the **Client ID** and **Client Secret**.
+## 3. LinkedIn OAuth Setup
 
-## 4. LinkedIn OAuth Setup
+1.  **Go to LinkedIn Developer Portal**:
+    -   Visit [LinkedIn Developer Portal](https://developer.linkedin.com/).
+    -   Go to "My Apps" and click "Create app".
+2.  **Create a new application**:
+    -   Fill in the required details (App name, Company, Privacy policy URL, Business email).
+    -   Upload an App logo.
+    -   Agree to the terms and click "Create app".
+3.  **Configure Auth**:
+    -   In your app's settings, go to "Auth".
+    -   Under "OAuth 2.0 settings", click "Add redirect URL".
+    -   Add the following redirect URLs:
+        -   `http://localhost:3000/auth/callback`
+        -   `https://your-domain.com/auth/callback`
+        -   `https://<YOUR_SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`
+    -   Copy your **Client ID** and **Client Secret**.
+4.  **Configure Supabase**:
+    -   Go to your Supabase project dashboard.
+    -   Navigate to "Authentication" > "Providers".
+    -   Enable "LinkedIn".
+    -   Paste your LinkedIn **Client ID** and **Client Secret**.
+5.  **Update `.env.local`**:
+    \`\`\`env
+    NEXT_PUBLIC_LINKEDIN_CLIENT_ID=your_linkedin_client_id
+    NEXT_PUBLIC_LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
+    \`\`\`
 
-1.  Go to the [LinkedIn Developer Portal](https://developer.linkedin.com/).
-2.  Click **Create app**.
-3.  Fill in the details:
-    *   **App name**: `MentorConnect` (or a descriptive name)
-    *   **LinkedIn Page**: Select or create a LinkedIn Page associated with your app.
-    *   **Privacy policy URL**: Your application's privacy policy URL (e.g., `http://localhost:3000/privacy`).
-    *   **Business email**: Your contact email.
-4.  Click **Create app**.
-5.  Navigate to the **Auth** tab for your new app.
-6.  Under **OAuth 2.0 settings**, click the pencil icon to edit **Redirect URLs**.
-7.  Add the **Redirect URI** you copied from Supabase (e.g., `https://your-supabase-url.supabase.co/auth/v1/callback`).
-8.  Under **Application credentials**, you will find your **Client ID** and **Client Secret**. Copy these.
-9.  In your Supabase dashboard, go to **Authentication** > **Providers** > **LinkedIn** and paste the **Client ID** and **Client Secret**.
+---
 
-## 5. Environment Variables
+## Important Notes
 
-Ensure your Next.js application has the following environment variables set, typically in a `.env.local` file for local development and configured in your Vercel project settings for deployment:
-
-\`\`\`
-NEXT_PUBLIC_SUPABASE_URL=https://your-supabase-url.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-\`\`\`
-
-These are used by the Supabase client in your application. The OAuth client IDs and secrets are handled directly by Supabase's backend, so they don't need to be in your Next.js environment variables unless you are implementing a custom OAuth flow outside of Supabase Auth.
-
-## 6. Testing
-
-After configuring all providers:
-
-1.  Run your Next.js application.
-2.  Navigate to your login page (e.g., `/login`).
-3.  Test the "Sign in with GitHub", "Sign in with Google", and "Sign in with LinkedIn" buttons.
-4.  Verify that users are successfully authenticated and redirected back to your application.
-
-If you encounter any issues, double-check your Client IDs, Client Secrets, and Redirect URIs in both your OAuth provider's developer console and your Supabase dashboard.
+-   **Environment Variables**: Always use environment variables for sensitive credentials. Do not hardcode them in your application.
+-   **Production Deployment**: When deploying to production, ensure your `NEXT_PUBLIC_SITE_URL` and all redirect URIs in your OAuth provider settings and Supabase are updated to your production domain.
+-   **Supabase Callback URL**: The Supabase callback URL (`https://<YOUR_SUPABASE_PROJECT_REF>.supabase.co/auth/v1/callback`) is crucial. Make sure it's included in your OAuth provider's redirect URIs. You can find your project reference in your Supabase project URL (e.g., `https://app.supabase.com/project/<YOUR_SUPABASE_PROJECT_REF>/...`).
+-   **Security**: Never expose your `SUPABASE_SERVICE_ROLE_KEY` on the client-side. It should only be used in server-side environments (e.g., Next.js API routes, Server Actions).

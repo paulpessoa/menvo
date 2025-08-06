@@ -17,9 +17,12 @@ interface UserRolesContextType {
 const UserRolesContext = createContext<UserRolesContextType | undefined>(undefined)
 
 export function UserRolesProvider({ children }: { children: ReactNode }) {
-  const { userRole, isAdmin, isMentor, isMentee, isLoading: isLoadingRoles } = useAuth()
-  const { userProfile, loading: profileLoading } = useUserProfile(userRole?.user_id)
+  const { userRole, isAdmin, isMentor, isMentee, isLoading: authLoading } = useAuth()
+  // userProfile is fetched based on the user ID from useAuth, not userRole directly
+  const { userProfile, loading: profileLoading } = useUserProfile(userRole?.user_id) // Assuming userRole has user_id if it's not null
   const [primaryRole, setPrimaryRole] = useState<user_role | null>(null)
+
+  const isLoadingRoles = authLoading || profileLoading
 
   useEffect(() => {
     if (!isLoadingRoles && userProfile) {

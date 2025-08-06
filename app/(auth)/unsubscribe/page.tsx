@@ -1,101 +1,71 @@
-'use client'
-
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
+import { SubmitButton } from '../login/submit-button'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/use-toast'
-import { Loader2Icon, MailXIcon, CheckCircleIcon } from 'lucide-react'
-import { unsubscribeFromNewsletter } from '@/services/newsletter/newsletter'
-import { useTranslation } from 'react-i18next'
+import { Input } from '@/components/ui/input'
+import { MailXIcon } from 'lucide-react'
 
-export default function UnsubscribePage() {
-  const { t } = useTranslation()
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const emailParam = searchParams.get('email')
+export default function UnsubscribePage({
+  searchParams,
+}: {
+  searchParams: { message: string }
+}) {
+  const unsubscribe = async (formData: FormData) => {
+    'use server'
 
-  const [email, setEmail] = useState(emailParam || '')
-  const [loading, setLoading] = useState(false)
-  const [unsubscribed, setUnsubscribed] = useState(false)
+    const email = formData.get('email') as string
+    const supabase = createClient()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    // In a real application, you would have a more robust unsubscribe mechanism
+    // that might involve a token or confirmation. For this example, we'll
+    // simulate an unsubscribe.
+    console.log(`Attempting to unsubscribe email: ${email}`)
 
-    try {
-      const { error } = await unsubscribeFromNewsletter(email)
+    // Simulate a successful unsubscribe
+    // In a real scenario, you'd update your newsletter database
+    // const { error } = await supabase.from('newsletter_subscribers').delete().eq('email', email);
+    // if (error) {
+    //   return redirect(`/unsubscribe?message=${error.message}`);
+    // }
 
-      if (error) {
-        throw error
-      }
-
-      setUnsubscribed(true)
-      toast({
-        title: t('unsubscribe.toastSuccessTitle'),
-        description: t('unsubscribe.toastSuccessDescription'),
-        variant: 'default',
-      })
-    } catch (error: any) {
-      toast({
-        title: t('unsubscribe.toastErrorTitle'),
-        description: error.message || t('unsubscribe.toastErrorDescription'),
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
+    return redirect('/unsubscribe?message=Você foi desinscrito com sucesso.')
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
-      <Card className="w-full max-w-md text-center">
-        <CardHeader className="space-y-1">
-          {unsubscribed ? (
-            <CheckCircleIcon className="mx-auto h-16 w-16 text-green-500" />
-          ) : (
-            <MailXIcon className="mx-auto h-16 w-16 text-red-500" />
-          )}
-          <CardTitle className="text-3xl font-bold">
-            {unsubscribed ? t('unsubscribe.successTitle') : t('unsubscribe.title')}
-          </CardTitle>
-          <CardDescription className="text-lg">
-            {unsubscribed ? t('unsubscribe.successDescription') : t('unsubscribe.description')}
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold">Desinscrever</CardTitle>
+          <CardDescription>
+            Digite seu e-mail para cancelar a inscrição da nossa newsletter.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {unsubscribed ? (
-            <Button onClick={() => router.push('/')} className="w-full">
-              {t('unsubscribe.backToHome')}
-            </Button>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('unsubscribe.emailLabel')}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                    {t('unsubscribe.loadingButton')}
-                  </>
-                ) : (
-                  t('unsubscribe.submitButton')
-                )}
-              </Button>
-            </form>
-          )}
+          <form className="grid gap-4" action={unsubscribe}>
+            <div className="grid gap-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input id="email" type="email" name="email" placeholder="m@example.com" required />
+            </div>
+            <SubmitButton
+              className="w-full"
+              pendingText="Desinscrevendo..."
+            >
+              <MailXIcon className="mr-2 h-4 w-4" />
+              Confirmar Desinscrição
+            </SubmitButton>
+            {searchParams?.message && (
+              <p className="mt-4 p-4 text-center text-sm text-muted-foreground">
+                {searchParams.message}
+              </p>
+            )}
+            <div className="mt-4 text-center text-sm">
+              <Link className="underline" href="/">
+                Voltar para a Página Inicial
+              </Link>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

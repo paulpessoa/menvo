@@ -5,15 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, UserCheck, Calendar, MessageSquare, AlertTriangle, Clock, CheckCircle, Mail } from 'lucide-react'
+import { Users, UserCheck, Calendar, MessageSquare, AlertTriangle, Clock, CheckCircle, Mail, BarChart } from 'lucide-react'
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import Link from 'next/link'
-import { UsersIcon, CheckCircle2Icon } from 'lucide-react'
+import { UsersIcon, CheckCircleIcon, MailIcon } from 'lucide-react'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { NewsletterDashboard } from '@/components/admin/NewsletterDashboard'
 import { useTranslation } from 'react-i18next'
 
-export default function AdminDashboard() {
+export default function AdminDashboardPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const { t } = useTranslation()
@@ -61,55 +62,53 @@ export default function AdminDashboard() {
   return (
     <ProtectedRoute requiredRoles={['admin']}>
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">{t('adminDashboard.title')}</h1>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Painel Administrativo</h1>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('adminDashboard.usersCard.title')}</CardTitle>
+              <CardTitle className="text-sm font-medium">Gerenciar Usuários</CardTitle>
               <UsersIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <CardDescription className="mb-4">
-                {t('adminDashboard.usersCard.description')}
-              </CardDescription>
+              <CardDescription className="mb-4">Visualize e edite perfis de usuários.</CardDescription>
               <Link href="/admin/users" passHref>
-                <Button className="w-full">{t('adminDashboard.usersCard.button')}</Button>
+                <Button className="w-full">Ir para Usuários</Button>
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('adminDashboard.verificationsCard.title')}</CardTitle>
-              <CheckCircle2Icon className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Verificações de Mentor</CardTitle>
+              <CheckCircleIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <CardDescription className="mb-4">
-                {t('adminDashboard.verificationsCard.description')}
-              </CardDescription>
+              <CardDescription className="mb-4">Revise e aprove perfis de mentores.</CardDescription>
               <Link href="/admin/verifications" passHref>
-                <Button className="w-full">{t('adminDashboard.verificationsCard.button')}</Button>
+                <Button className="w-full">Ir para Verificações</Button>
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('adminDashboard.newsletterCard.title')}</CardTitle>
-              <Mail className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Gerenciar Eventos</CardTitle>
+              <BarChart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <CardDescription className="mb-4">
-                {t('adminDashboard.newsletterCard.description')}
-              </CardDescription>
-              <Link href="/admin/newsletter" passHref>
-                <Button className="w-full">{t('adminDashboard.newsletterCard.button')}</Button>
+              <CardDescription className="mb-4">Crie, edite e visualize eventos.</CardDescription>
+              <Link href="/events" passHref>
+                <Button className="w-full">Ir para Eventos</Button>
               </Link>
             </CardContent>
           </Card>
+        </div>
 
-          {/* Stats Overview */}
+        <NewsletterDashboard />
+
+        {/* Stats Overview */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Usuários</CardTitle>

@@ -1,36 +1,39 @@
-'use client'
-
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { MailCheckIcon } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 
-export default function ConfirmationPage() {
-  const { t } = useTranslation()
+export default async function ConfirmationPage({
+  searchParams,
+}: {
+  searchParams: { message: string }
+}) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    redirect('/dashboard')
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
       <Card className="w-full max-w-md text-center">
         <CardHeader className="space-y-1">
-          <MailCheckIcon className="mx-auto h-16 w-16 text-green-500" />
-          <CardTitle className="text-3xl font-bold">{t('confirmation.title')}</CardTitle>
-          <CardDescription className="text-lg">
-            {t('confirmation.description')}
+          <MailCheckIcon className="mx-auto h-16 w-16 text-green-500 mb-4" />
+          <CardTitle className="text-3xl font-bold">Confirmação de E-mail</CardTitle>
+          <CardDescription>
+            {searchParams.message || 'Um link de confirmação foi enviado para o seu e-mail. Por favor, verifique sua caixa de entrada (e spam) para completar o cadastro.'}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            {t('confirmation.instructions')}
-          </p>
-          <div className="flex flex-col gap-2">
-            <Link href="/login" passHref>
-              <Button className="w-full">{t('confirmation.loginButton')}</Button>
-            </Link>
-            <Link href="/" passHref>
-              <Button variant="outline" className="w-full">{t('confirmation.homeButton')}</Button>
-            </Link>
-          </div>
+        <CardContent className="grid gap-4">
+          <Link href="/login" passHref>
+            <Button className="w-full">Voltar para o Login</Button>
+          </Link>
+          <Link href="/" passHref>
+            <Button variant="outline" className="w-full">Ir para a Página Inicial</Button>
+          </Link>
         </CardContent>
       </Card>
     </div>
