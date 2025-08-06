@@ -1,97 +1,115 @@
-"use client"
-import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { supabase } from '@/services/auth/supabase'
-import type { Session, User } from '@supabase/supabase-js'
-import { useQueryClient } from "@tanstack/react-query"
+'use client'
+
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import { User } from '@supabase/supabase-js'
+import { useRouter, usePathname } from 'next/navigation'
+import { Database } from '@/types/database'
+import { useToast } from '@/components/ui/use-toast'
 
 interface AuthContextType {
   user: User | null
-  session: Session | null
   isLoading: boolean
-  logout: () => Promise<void>
+  isAuthenticated: boolean
+  signOut: () => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
-  const queryClient = useQueryClient()
+  const pathname = usePathname()
+  const supabase = createClient<Database>()
+  const { toast } = useToast()
+
+  const fetchUser = useCallback(async () => {
+    setIsLoading(true)
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error) {
+      console.error('Error fetching user:', error)
+      setUser(null)
+    } else {
+      setUser(user)
+    }
+    setIsLoading(false)
+  }, [supabase])
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-        setIsLoading(false)
+    fetchUser()
 
-        if (event === 'SIGNED_OUT') {
-          queryClient.clear()
-          router.push('/')
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setUser(session?.user || null)
+          if (session?.user && event === 'SIGNED_IN') {
+            // Check if profile is completed
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('profile_completed')
+              .eq('id', session.user.id)
+              .single()
+
+            if (profileError) {
+              console.error('Error fetching profile completion status:', profileError)
+              // Handle error, maybe redirect to a generic error page or just proceed
+            } else if (!profile?.profile_completed && pathname !== '/welcome') {
+              router.push('/welcome')
+            } else if (pathname === '/welcome' && profile?.profile_completed) {
+              router.push('/dashboard') // Redirect if already completed and on welcome page
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null)
+          router.push('/login')
         }
+        setIsLoading(false)
       }
     )
 
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      setSession(data.session)
-      setUser(data.session?.user ?? null)
-      setIsLoading(false)
-    }
-    getInitialSession()
-
     return () => {
-      authListener.subscription.unsubscribe()
+      authListener.unsubscribe()
     }
-  }, [router, queryClient])
+  }, [fetchUser, router, supabase, pathname])
 
-  const logout = async () => {
-    await supabase.auth.signOut()
-  }
+  const signOut = useCallback(async () => {
+    setIsLoading(true)
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error('Error signing out:', error)
+      toast({
+        title: 'Sign Out Failed',
+        description: 'There was an error signing you out. Please try again.',
+        variant: 'destructive',
+      })
+    } else {
+      setUser(null)
+      router.push('/login')
+      toast({
+        title: 'Signed Out',
+        description: 'You have been successfully signed out.',
+      })
+    }
+    setIsLoading(false)
+  }, [supabase, router, toast])
 
-  const value = {
-    user,
-    session,
-    isLoading,
-    logout,
-  }
+  const refreshUser = useCallback(async () => {
+    await fetchUser()
+  }, [fetchUser])
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, signOut, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
-}
-
-// Component to handle redirects for incomplete profiles
-export function AuthRedirect() {
-  const { user, isLoading } = useAuth()
-  const { data: profile } = useUserProfile()
-  const router = useRouter()
-  const pathname = usePathname()
-
-  useEffect(() => {
-    if (isLoading || !user) return
-
-    const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup')
-    if (isAuthPage && user) {
-      router.push('/dashboard')
-      return
-    }
-
-    const isWelcomePage = pathname.startsWith('/welcome')
-    if (user && profile && !profile.profile_completed && !isWelcomePage) {
-      router.push('/welcome')
-    }
-  }, [user, profile, isLoading, router, pathname])
-
-  return null
 }

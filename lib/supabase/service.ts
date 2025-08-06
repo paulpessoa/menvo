@@ -1,16 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 
-// This client is for server-side use ONLY, in protected routes.
-// It has service_role privileges and can bypass RLS policies.
-export const createServiceRoleClient = () => {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('Missing Supabase URL or Service Role Key')
-  }
-  
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
+// Create a single Supabase client for interacting with your database
+// This client uses the service role key and should ONLY be used on the server
+export const createServiceRoleClient = () =>
+  createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
       auth: {
         autoRefreshToken: false,
@@ -18,4 +14,3 @@ export const createServiceRoleClient = () => {
       },
     }
   )
-}

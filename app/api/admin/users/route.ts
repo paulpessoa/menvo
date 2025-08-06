@@ -1,47 +1,23 @@
 import { NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
 import { createServiceRoleClient } from '@/lib/supabase/service'
 
-export async function GET() {
-  const supabase = createRouteHandlerClient({ cookies })
-  const { data: { session } } = await supabase.auth.getSession()
+export async function GET(request: Request) {
+  const supabase = createServiceRoleClient()
+  const { searchParams } = new URL(request.url)
+  const role = searchParams.get('role')
 
-  if (!session) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  let query = supabase.from('profiles').select('*')
+
+  if (role) {
+    query = query.eq('role', role)
   }
 
-  // Check if the user is an admin
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single()
-
-  if (profile?.role !== 'admin') {
-    return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
-  }
-
-  // If admin, use service role client to fetch all users
-  const supabaseService = createServiceRoleClient()
-  const { data: users, error } = await supabaseService
-    .from('profiles')
-    .select('*')
-    .order('created_at', { ascending: false })
+  const { data, error } = await query
 
   if (error) {
+    console.error('Error fetching users:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // A simple transformation to match the old structure for the frontend
-  const formattedUsers = users.map(user => ({
-    id: user.id,
-    name: user.full_name,
-    email: user.email,
-    status: user.status,
-    roles: [user.role], // The admin page expects an array
-    email_verified: true, // Assuming email is verified to be in profiles
-  }))
-
-  return NextResponse.json({ users: formattedUsers })
+  return NextResponse.json(data)
 }

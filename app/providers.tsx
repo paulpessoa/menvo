@@ -1,14 +1,30 @@
-"use client"
+'use client'
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { AuthProvider } from "@/hooks/useAuth"
+import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/toaster'
+import { AuthProvider } from '@/hooks/useAuth'
+import { GoogleAnalytics } from '@/utils/google-analytics'
+import { ReactNode } from 'react'
 
-const queryClient = new QueryClient()
+interface ProvidersProps {
+  children: ReactNode
+}
 
-export function AppProviders({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: ProvidersProps) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>{children}</AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+      <Toaster />
+      {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
+        <GoogleAnalytics ga_id={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
+      ) : null}
+    </ThemeProvider>
   )
 }

@@ -1,3 +1,38 @@
+-- Drop existing objects if they exist to allow for re-running the script
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
+DROP TRIGGER IF EXISTS update_mentors_updated_at ON public.mentors;
+DROP TRIGGER IF EXISTS on_profile_created_or_updated ON public.profiles;
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Public can view active mentor profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Mentors can manage own profile" ON public.mentors;
+DROP POLICY IF EXISTS "Public can view verified mentors" ON public.mentors;
+DROP POLICY IF EXISTS "Admins can manage all mentors" ON public.mentors;
+
+DROP VIEW IF EXISTS public.verified_mentors;
+
+DROP FUNCTION IF EXISTS public.update_updated_at_column() CASCADE;
+DROP FUNCTION IF EXISTS public.generate_slug(name_text TEXT) CASCADE;
+DROP FUNCTION IF EXISTS public.set_profile_slug() CASCADE;
+DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
+DROP FUNCTION IF EXISTS public.is_admin(user_id UUID) CASCADE;
+
+DROP TABLE IF EXISTS public.admin_actions CASCADE;
+DROP TABLE IF EXISTS public.reviews CASCADE;
+DROP TABLE IF EXISTS public.mentorship_sessions CASCADE;
+DROP TABLE IF EXISTS public.mentor_availability CASCADE;
+DROP TABLE IF EXISTS public.mentor_verification CASCADE;
+DROP TABLE IF EXISTS public.mentors CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;
+
+DROP TYPE IF EXISTS user_role;
+DROP TYPE IF EXISTS user_status;
+DROP TYPE IF EXISTS session_status;
+DROP TYPE IF EXISTS verification_status;
+
 -- 1. Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -150,7 +185,7 @@ CREATE INDEX idx_reviews_reviewed_id ON public.reviews(reviewed_id);
 
 -- 5. Views
 CREATE OR REPLACE VIEW public.verified_mentors AS
-SELECT 
+SELECT
   m.id,
   m.user_id,
   p.full_name,
@@ -170,8 +205,8 @@ SELECT
   m.is_available
 FROM public.mentors m
 JOIN public.profiles p ON m.user_id = p.id
-WHERE m.status = 'active' 
-  AND p.status = 'active' 
+WHERE m.status = 'active'
+  AND p.status = 'active'
   AND m.is_available = true;
 
 -- 6. Functions & Triggers
@@ -250,7 +285,7 @@ BEGIN
     user_role_val,
     NEW.raw_user_meta_data->>'avatar_url'
   );
-  
+
   -- If user is a mentor, create a mentor record
   IF user_role_val = 'mentor' THEN
     INSERT INTO public.mentors (user_id) VALUES (NEW.id);
@@ -261,7 +296,6 @@ END;
 $$ language 'plpgsql' SECURITY DEFINER;
 
 -- Trigger for new user registration
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
@@ -276,39 +310,32 @@ CREATE OR REPLACE FUNCTION public.is_admin(user_id UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN EXISTS (
-    SELECT 1 FROM public.profiles 
+    SELECT 1 FROM public.profiles
     WHERE id = user_id AND role = 'admin' AND status = 'active'
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Profiles Policies
-DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
-DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
-DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
 CREATE POLICY "Admins can manage all profiles" ON public.profiles
   FOR ALL USING (public.is_admin(auth.uid()));
 
-DROP POLICY IF EXISTS "Public can view active mentor profiles" ON public.profiles;
 CREATE POLICY "Public can view active mentor profiles" ON public.profiles
   FOR SELECT USING (status = 'active' AND role = 'mentor');
 
 -- Mentors Policies
-DROP POLICY IF EXISTS "Mentors can manage own profile" ON public.mentors;
 CREATE POLICY "Mentors can manage own profile" ON public.mentors
   FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Public can view verified mentors" ON public.mentors;
 CREATE POLICY "Public can view verified mentors" ON public.mentors
   FOR SELECT USING (status = 'active');
 
-DROP POLICY IF EXISTS "Admins can manage all mentors" ON public.mentors;
 CREATE POLICY "Admins can manage all mentors" ON public.mentors
   FOR ALL USING (public.is_admin(auth.uid()));
 
