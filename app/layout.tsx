@@ -2,14 +2,14 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from 'next/font/google'
 import "./globals.css"
-import { AppProviders } from './providers'
+import { Providers } from './providers' // Import the Providers component
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Toaster } from "@/components/ui/toaster"
 import { FeedbackBanner } from '@/components/FeedbackBanner'
 import { WarningBanner } from "@/components/WarningBanner"
-import { GoogleAnalytics } from '@/utils/google-analytics'
+import GoogleAnalytics from '@/utils/google-analytics' // Corrected import
 import { AuthProvider } from '@/hooks/useAuth'
 import Script from "next/script"
 
@@ -17,8 +17,8 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://menvo.com.br'),
-  title: "Menvo - Mentor Connect",
-  description: "Connect with mentors and mentees.",
+  title: "Menvo - Volunteer Mentor Platform",
+  description: "Connect with volunteer mentors and mentees.",
   authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
   creator: "Paul Pessoa",
   publisher: "MENVO",
@@ -41,22 +41,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://menvo.com.br",
-    title: "Menvo - Mentor Connect",
-    description: "Connect with mentors and mentees.",
+    title: "Menvo - Volunteer Mentor Platform",
+    description: "Connect with volunteer mentors and mentees.",
     siteName: "MENVO",
     images: [
       {
         url: "https://menvo.com.br/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Menvo - Mentor Connect"
+        alt: "Menvo - Volunteer Mentor Platform"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Menvo - Mentor Connect",
-    description: "Connect with mentors and mentees.",
+    title: "Menvo - Volunteer Mentor Platform",
+    description: "Connect with volunteer mentors and mentees.",
     creator: "@paulpessoa",
     images: ["https://menvo.com.br/twitter-image.jpg"]
   },
@@ -136,24 +136,24 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <Header />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </AuthProvider>
-          <Toaster />
-        </ThemeProvider>
-        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
-          <GoogleAnalytics ga_id={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
-        ) : null}
+        <GoogleAnalytics />
+        <Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <Header />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </AuthProvider>
+            <Toaster />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   )

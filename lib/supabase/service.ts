@@ -1,16 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/types/database'
+import { createClient } from '@supabase/supabase-js';
 
-// Create a single Supabase client for interacting with your database
-// This client uses the service role key and should ONLY be used on the server
-export const createServiceRoleClient = () =>
-  createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  )
+// Note: This client should only be used on the server-side
+// as it uses the service role key which has elevated privileges.
+export const createServiceRoleClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    throw new Error('Missing Supabase environment variables for service role client.');
+  }
+
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+};

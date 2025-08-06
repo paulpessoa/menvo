@@ -1,115 +1,135 @@
-'use client'
+'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import { User } from '@supabase/supabase-js'
-import { useRouter, usePathname } from 'next/navigation'
-import { Database } from '@/types/database'
-import { useToast } from '@/components/ui/use-toast'
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/use-toast';
+import { user_role } from '@/types/database'; // Import the user_role type
 
 interface AuthContextType {
-  user: User | null
-  isLoading: boolean
-  isAuthenticated: boolean
-  signOut: () => Promise<void>
-  refreshUser: () => Promise<void>
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  isMentor: boolean;
+  isMentee: boolean;
+  userRole: user_role | null;
+  signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-  const pathname = usePathname()
-  const supabase = createClient<Database>()
-  const { toast } = useToast()
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userRole, setUserRole] = useState<user_role | null>(null);
+  const router = useRouter();
+  const { toast } = useToast();
+  const supabase = createClient();
 
-  const fetchUser = useCallback(async () => {
-    setIsLoading(true)
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error) {
-      console.error('Error fetching user:', error)
-      setUser(null)
-    } else {
-      setUser(user)
+  const fetchUserAndProfile = useCallback(async () => {
+    setIsLoading(true);
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+    if (authError) {
+      console.error('Error fetching auth user:', authError);
+      setUser(null);
+      setUserRole(null);
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false)
-  }, [supabase])
+
+    setUser(authUser);
+
+    if (authUser) {
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', authUser.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        setUserRole(null);
+      } else if (profile) {
+        setUserRole(profile.role);
+      }
+    } else {
+      setUserRole(null);
+    }
+    setIsLoading(false);
+  }, [supabase]);
 
   useEffect(() => {
-    fetchUser()
+    fetchUserAndProfile();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          setUser(session?.user || null)
-          if (session?.user && event === 'SIGNED_IN') {
-            // Check if profile is completed
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select('profile_completed')
-              .eq('id', session.user.id)
-              .single()
-
-            if (profileError) {
-              console.error('Error fetching profile completion status:', profileError)
-              // Handle error, maybe redirect to a generic error page or just proceed
-            } else if (!profile?.profile_completed && pathname !== '/welcome') {
-              router.push('/welcome')
-            } else if (pathname === '/welcome' && profile?.profile_completed) {
-              router.push('/dashboard') // Redirect if already completed and on welcome page
-            }
-          }
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null)
-          router.push('/login')
-        }
-        setIsLoading(false)
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        fetchUserAndProfile();
       }
-    )
+    });
 
     return () => {
-      authListener.unsubscribe()
-    }
-  }, [fetchUser, router, supabase, pathname])
+      authListener.unsubscribe();
+    };
+  }, [fetchUserAndProfile, supabase.auth]);
 
   const signOut = useCallback(async () => {
-    setIsLoading(true)
-    const { error } = await supabase.auth.signOut()
+    setIsLoading(true);
+    const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Error signing out:', error)
+      console.error('Error signing out:', error);
       toast({
         title: 'Sign Out Failed',
-        description: 'There was an error signing you out. Please try again.',
+        description: error.message,
         variant: 'destructive',
-      })
+      });
     } else {
-      setUser(null)
-      router.push('/login')
+      setUser(null);
+      setUserRole(null);
       toast({
         title: 'Signed Out',
         description: 'You have been successfully signed out.',
-      })
+      });
+      router.push('/login');
     }
-    setIsLoading(false)
-  }, [supabase, router, toast])
+    setIsLoading(false);
+  }, [supabase.auth, router, toast]);
 
   const refreshUser = useCallback(async () => {
-    await fetchUser()
-  }, [fetchUser])
+    await fetchUserAndProfile();
+  }, [fetchUserAndProfile]);
+
+  const isAuthenticated = !!user;
+  const isAdmin = userRole === 'admin';
+  const isMentor = userRole === 'mentor';
+  const isMentee = userRole === 'mentee';
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, signOut, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        isAuthenticated,
+        isAdmin,
+        isMentor,
+        isMentee,
+        userRole,
+        signOut,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context
-}
+  return context;
+};

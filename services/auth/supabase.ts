@@ -1,121 +1,122 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '@/types/database'
+import { createClient } from '@/utils/supabase/client';
+import { user_role } from '@/types/database'; // Import the user_role type
 
-// Create a single Supabase client for interacting with your database
-export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+const supabase = createClient();
 
-// Function to handle OAuth sign-in with user type
-export const signInWithOAuth = async (provider: 'google' | 'github' | 'linkedin', userType: Database['public']['Enums']['user_role']) => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
-    options: {
-      redirectTo: `${location.origin}/auth/callback`,
-      queryParams: {
-        user_type: userType,
-      },
-    },
-  })
-  if (error) {
-    console.error('OAuth sign-in error:', error)
-    throw error
-  }
-  return data
-}
-
-// Function to handle email/password sign-up with user type
-export const signUpWithEmail = async (email: string, password: string, firstName: string, lastName: string, userType: Database['public']['Enums']['user_role']) => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: `${firstName} ${lastName}`,
-        user_type: userType,
-      },
-      emailRedirectTo: `${location.origin}/auth/callback`,
-    },
-  })
-  if (error) {
-    console.error('Email sign-up error:', error)
-    throw error
-  }
-  return data
-}
-
-// Function to handle email/password sign-in
 export const signInWithEmail = async (email: string, password: string) => {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
-  })
-  if (error) {
-    console.error('Email sign-in error:', error)
-    throw error
-  }
-  return data
-}
+  });
+  return { data, error };
+};
 
-// Function to sign out
+export const signUpWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  });
+  return { data, error };
+};
+
+export const signInWithOAuth = async (provider: 'google' | 'github' | 'linkedin') => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+    },
+  });
+  return { data, error };
+};
+
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  if (error) {
-    console.error('Sign out error:', error)
-    throw error
-  }
-}
+  const { error } = await supabase.auth.signOut();
+  return { error };
+};
 
-// Function to get current user session
-export const getSession = async () => {
-  const { data: { session }, error } = await supabase.auth.getSession()
-  if (error) {
-    console.error('Get session error:', error)
-    throw error
-  }
-  return session
-}
+export const resetPasswordForEmail = async (email: string) => {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
+  });
+  return { error };
+};
 
-// Function to get current user
-export const getUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error) {
-    console.error('Get user error:', error)
-    throw error
-  }
-  return user
-}
+export const updateUserPassword = async (password: string) => {
+  const { data, error } = await supabase.auth.updateUser({ password });
+  return { data, error };
+};
 
-// Function to update user profile in public.profiles table
-export const updateProfile = async (userId: string, updates: Partial<Database['public']['Tables']['profiles']['Update']>) => {
+export const getCurrentUser = async () => {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  return { user, error };
+};
+
+export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
-    .from('profiles')
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  return { data, error };
+};
+
+export const updateUserProfile = async (userId: string, updates: Partial<{
+  full_name: string;
+  username: string;
+  avatar_url: string;
+  website: string;
+  bio: string;
+  location: string;
+  occupation: string;
+  skills: string[];
+  interests: string[];
+  role: user_role;
+  is_profile_complete: boolean;
+  slug: string;
+}>) => {
+  const { data, error } = await supabase
+    .from('user_profiles')
     .update(updates)
     .eq('id', userId)
     .select()
-    .single()
+    .single();
+  return { data, error };
+};
 
-  if (error) {
-    console.error('Error updating profile:', error)
-    throw error
-  }
-  return data
-}
-
-// Function to fetch user profile from public.profiles table
-export const fetchProfile = async (userId: string) => {
+export const getAdminUsers = async () => {
+  // This function should ideally be called from a server component or API route
+  // using the service role key for security, or with RLS policies for admins.
+  // For client-side, ensure RLS is configured to allow admins to view other users.
   const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
+    .from('user_profiles')
+    .select('*');
+  return { data, error };
+};
 
-  if (error) {
-    console.error('Error fetching profile:', error)
-    throw error
-  }
-  return data
-}
+export const updateAdminUser = async (userId: string, updates: Partial<{
+  full_name?: string;
+  username?: string;
+  avatar_url?: string;
+  website?: string;
+  bio?: string;
+  location?: string;
+  occupation?: string;
+  skills?: string[];
+  interests?: string[];
+  role?: user_role;
+  is_profile_complete?: boolean;
+  slug?: string;
+}>) => {
+  // This function should ideally be called from a server component or API route
+  // using the service role key for security.
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update(updates)
+    .eq('id', userId)
+    .select()
+    .single();
+  return { data, error };
+};

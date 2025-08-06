@@ -1,50 +1,41 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createServiceRoleClient } from '@/lib/supabase/service'
-import { UserRole, UserStatus, Database } from '@/types/database'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
-import { Skeleton } from '@/components/ui/skeleton'
-
-interface UserProfile {
-  id: string
-  email: string
-  full_name: string
-  role: UserRole
-  status: UserStatus
-}
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/components/ui/use-toast'
+import { UserProfile, user_role } from '@/types/database' // Assuming UserProfile type
 
 export default function AdminUsersPage() {
-  const { user, isLoading: isAuthLoading } = useAuth()
+  const { user, isLoading: authLoading, isAdmin } = useAuth()
   const router = useRouter()
-  const [users, setUsers] = useState<UserProfile[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
+  const [users, setUsers] = useState<UserProfile[]>([])
+  const [loadingUsers, setLoadingUsers] = useState(true)
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isAuthLoading) {
-      // Check if user is an admin
-      const supabase = createServiceRoleClient() // Use service role client for admin checks on server
-      supabase.from('profiles').select('role').eq('id', user?.id).single()
-        .then(({ data, error }) => {
-          if (error || data?.role !== 'admin') {
-            router.push('/unauthorized') // Redirect if not admin
-          } else {
-            fetchUsers()
-          }
-        })
+    if (!authLoading && !user) {
+      router.push('/login') // Redirect unauthenticated users
+    } else if (!authLoading && user && !isAdmin) {
+      router.push('/unauthorized') // Redirect non-admin users
     }
-  }, [isAuthLoading, user, router])
+  }, [user, authLoading, isAdmin, router])
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchUsers()
+    }
+  }, [isAdmin])
 
   const fetchUsers = async () => {
-    setIsLoading(true)
-    setError(null)
+    setLoadingUsers(true)
     try {
       const response = await fetch('/api/admin/users')
       if (!response.ok) {
@@ -52,142 +43,135 @@ export default function AdminUsersPage() {
       }
       const data: UserProfile[] = await response.json()
       setUsers(data)
-    } catch (err: any) {
-      setError(err.message)
+    } catch (error: any) {
+      console.error('Failed to fetch users:', error)
       toast({
         title: 'Error',
-        description: `Failed to fetch users: ${err.message}`,
+        description: `Failed to fetch users: ${error.message}`,
         variant: 'destructive',
       })
     } finally {
-      setIsLoading(false)
+      setLoadingUsers(false)
     }
   }
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+  const handleUpdateUser = async (userId: string, updates: Partial<UserProfile>) => {
+    setUpdatingUserId(userId)
     try {
       const response = await fetch('/api/admin/users/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: userId, role: newRole }),
+        body: JSON.stringify({ id: userId, updates }),
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
 
       const updatedUser: UserProfile = await response.json()
       setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.id === userId ? { ...u, role: updatedUser.role } : u))
+        prevUsers.map((u) => (u.id === userId ? { ...u, ...updatedUser } : u))
       )
       toast({
         title: 'Success',
-        description: `User ${updatedUser.full_name}'s role updated to ${updatedUser.role}.`,
+        description: 'User updated successfully.',
       })
-    } catch (err: any) {
+    } catch (error: any) {
+      console.error('Failed to update user:', error)
       toast({
         title: 'Error',
-        description: `Failed to update role: ${err.message}`,
+        description: `Failed to update user: ${error.message}`,
         variant: 'destructive',
       })
+    } finally {
+      setUpdatingUserId(null)
     }
   }
 
-  const handleStatusChange = async (userId: string, newStatus: UserStatus) => {
-    try {
-      const response = await fetch('/api/admin/users/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: userId, status: newStatus }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const updatedUser: UserProfile = await response.json()
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.id === userId ? { ...u, status: updatedUser.status } : u))
-      )
-      toast({
-        title: 'Success',
-        description: `User ${updatedUser.full_name}'s status updated to ${updatedUser.status}.`,
-      })
-    } catch (err: any) {
-      toast({
-        title: 'Error',
-        description: `Failed to update status: ${err.message}`,
-        variant: 'destructive',
-      })
-    }
-  }
-
-  if (isAuthLoading || isLoading) {
+  if (authLoading || !isAdmin) {
     return (
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-6">Admin User Management</h1>
-        <Skeleton className="h-10 w-full mb-4" />
-        <Skeleton className="h-[300px] w-full" />
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading or unauthorized...</p>
       </div>
     )
   }
 
-  if (error) {
-    return <div className="container mx-auto py-8 text-red-500">Error: {error}</div>
-  }
-
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Admin User Management</h1>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.full_name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>
-                <Select value={user.role} onValueChange={(value: UserRole) => handleRoleChange(user.id, value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mentee">Mentee</SelectItem>
-                    <SelectItem value="mentor">Mentor</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="company">Company</SelectItem>
-                    <SelectItem value="recruiter">Recruiter</SelectItem>
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell>
-                <Select value={user.status} onValueChange={(value: UserStatus) => handleStatusChange(user.id, value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending_verification">Pending Verification</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                  </SelectContent>
-                </Select>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <Card>
+        <CardHeader>
+          <CardTitle>User Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingUsers ? (
+            <p>Loading users...</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Full Name</TableHead>
+                  <TableHead>Username</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Profile Complete</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell>{u.email}</TableCell>
+                    <TableCell>{u.full_name || 'N/A'}</TableCell>
+                    <TableCell>{u.username || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Select
+                        value={u.role}
+                        onValueChange={(value: user_role) => handleUpdateUser(u.id, { role: value })}
+                        disabled={updatingUserId === u.id}
+                      >
+                        <SelectTrigger className="w-[120px]">
+                          <SelectValue placeholder="Select Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mentee">Mentee</SelectItem>
+                          <SelectItem value="mentor">Mentor</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id={`profile-complete-${u.id}`}
+                          checked={u.is_profile_complete}
+                          onCheckedChange={(checked) => handleUpdateUser(u.id, { is_profile_complete: checked })}
+                          disabled={updatingUserId === u.id}
+                        />
+                        <Label htmlFor={`profile-complete-${u.id}`}>
+                          {u.is_profile_complete ? 'Yes' : 'No'}
+                        </Label>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {/* Add more actions here if needed, e.g., delete user */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/profile/${u.slug || u.id}`)}
+                      >
+                        View Profile
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

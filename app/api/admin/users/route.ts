@@ -1,23 +1,21 @@
-import { NextResponse } from 'next/server'
-import { createServiceRoleClient } from '@/lib/supabase/service'
+import { NextResponse } from 'next/server';
+import { createServiceRoleClient } from '@/lib/supabase/service';
 
 export async function GET(request: Request) {
-  const supabase = createServiceRoleClient()
-  const { searchParams } = new URL(request.url)
-  const role = searchParams.get('role')
+  const supabase = createServiceRoleClient();
 
-  let query = supabase.from('profiles').select('*')
+  // In a real application, you would add authorization checks here
+  // to ensure only admin users can access this endpoint.
+  // For example, check user role from session or a custom claim.
 
-  if (role) {
-    query = query.eq('role', role)
-  }
-
-  const { data, error } = await query
+  const { data: users, error } = await supabase
+    .from('user_profiles')
+    .select('*');
 
   if (error) {
-    console.error('Error fetching users:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Error fetching users:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data)
+  return NextResponse.json(users);
 }

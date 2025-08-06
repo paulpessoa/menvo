@@ -1,343 +1,260 @@
--- Drop existing objects if they exist to allow for re-running the script
-DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
-DROP TRIGGER IF EXISTS update_mentors_updated_at ON public.mentors;
-DROP TRIGGER IF EXISTS on_profile_created_or_updated ON public.profiles;
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-
-DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
-DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
-DROP POLICY IF EXISTS "Admins can manage all profiles" ON public.profiles;
-DROP POLICY IF EXISTS "Public can view active mentor profiles" ON public.profiles;
-DROP POLICY IF EXISTS "Mentors can manage own profile" ON public.mentors;
-DROP POLICY IF EXISTS "Public can view verified mentors" ON public.mentors;
-DROP POLICY IF EXISTS "Admins can manage all mentors" ON public.mentors;
-
-DROP VIEW IF EXISTS public.verified_mentors;
-
-DROP FUNCTION IF EXISTS public.update_updated_at_column() CASCADE;
-DROP FUNCTION IF EXISTS public.generate_slug(name_text TEXT) CASCADE;
-DROP FUNCTION IF EXISTS public.set_profile_slug() CASCADE;
+-- Drop existing objects to ensure a clean slate
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users CASCADE;
 DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
-DROP FUNCTION IF EXISTS public.is_admin(user_id UUID) CASCADE;
-
-DROP TABLE IF EXISTS public.admin_actions CASCADE;
-DROP TABLE IF EXISTS public.reviews CASCADE;
-DROP TABLE IF EXISTS public.mentorship_sessions CASCADE;
-DROP TABLE IF EXISTS public.mentor_availability CASCADE;
-DROP TABLE IF EXISTS public.mentor_verification CASCADE;
+DROP FUNCTION IF EXISTS public.create_profile_slug() CASCADE;
+DROP FUNCTION IF EXISTS public.update_profile_slug() CASCADE;
+DROP TABLE IF EXISTS public.user_profiles CASCADE;
 DROP TABLE IF EXISTS public.mentors CASCADE;
-DROP TABLE IF EXISTS public.profiles CASCADE;
+DROP TABLE IF EXISTS public.mentorship_sessions CASCADE;
+DROP TABLE IF EXISTS public.events CASCADE;
+DROP TABLE IF EXISTS public.newsletter_subscribers CASCADE;
+DROP TYPE IF EXISTS user_role CASCADE;
+DROP TYPE IF EXISTS session_status CASCADE;
 
-DROP TYPE IF EXISTS user_role;
-DROP TYPE IF EXISTS user_status;
-DROP TYPE IF EXISTS session_status;
-DROP TYPE IF EXISTS verification_status;
+-- Create ENUM for user roles
+CREATE TYPE user_role AS ENUM ('mentee', 'mentor', 'admin');
 
--- 1. Extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- Create ENUM for mentorship session status
+CREATE TYPE session_status AS ENUM ('pending', 'accepted', 'rejected', 'completed', 'cancelled');
 
--- 2. Custom Types
-CREATE TYPE user_role AS ENUM ('mentee', 'mentor', 'admin', 'company', 'recruiter');
-CREATE TYPE user_status AS ENUM ('pending_verification', 'active', 'suspended', 'rejected');
-CREATE TYPE session_status AS ENUM ('scheduled', 'completed', 'cancelled', 'no_show');
-CREATE TYPE verification_status AS ENUM ('pending', 'scheduled', 'completed', 'rejected');
-
--- 3. Tables
--- Profiles table (extends auth.users)
-CREATE TABLE public.profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  first_name TEXT,
-  last_name TEXT,
-  full_name TEXT,
-  avatar_url TEXT,
-  bio TEXT,
-  location TEXT,
-  languages TEXT[],
-  role user_role NOT NULL DEFAULT 'mentee',
-  status user_status NOT NULL DEFAULT 'pending_verification',
-  slug TEXT UNIQUE,
-  profile_completed BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  last_login TIMESTAMPTZ
+-- Create user_profiles table
+CREATE TABLE public.user_profiles (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    full_name TEXT,
+    username TEXT UNIQUE,
+    avatar_url TEXT,
+    website TEXT,
+    bio TEXT,
+    location TEXT,
+    occupation TEXT,
+    skills TEXT[],
+    interests TEXT[],
+    role user_role DEFAULT 'mentee'::user_role NOT NULL,
+    is_profile_complete BOOLEAN DEFAULT FALSE NOT NULL,
+    slug TEXT UNIQUE, -- Custom slug for profiles
+    CONSTRAINT username_length CHECK (char_length(username) >= 3)
 );
-COMMENT ON TABLE public.profiles IS 'Stores public-facing profile information for all users.';
 
--- Mentors table (specific data for mentors)
+-- Create mentors table (specific details for mentors)
 CREATE TABLE public.mentors (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE UNIQUE NOT NULL,
-  title TEXT,
-  company TEXT,
-  experience_years INTEGER CHECK (experience_years >= 0),
-  expertise_areas TEXT[],
-  topics TEXT[],
-  inclusion_tags TEXT[],
-  linkedin_url TEXT,
-  portfolio_url TEXT,
-  academic_background TEXT,
-  current_work TEXT,
-  areas_of_interest TEXT,
-  session_duration INTEGER DEFAULT 45 CHECK (session_duration > 0),
-  timezone TEXT DEFAULT 'UTC',
-  status user_status NOT NULL DEFAULT 'pending_verification',
-  verification_notes TEXT,
-  verified_at TIMESTAMPTZ,
-  verified_by UUID REFERENCES public.profiles(id),
-  rating DECIMAL(3,2) DEFAULT 0.0 CHECK (rating >= 0 AND rating <= 5),
-  total_sessions INTEGER DEFAULT 0 CHECK (total_sessions >= 0),
-  total_reviews INTEGER DEFAULT 0 CHECK (total_reviews >= 0),
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-COMMENT ON TABLE public.mentors IS 'Stores mentor-specific professional information.';
-
--- Other tables from your original schema...
--- (mentor_verification, mentor_availability, mentorship_sessions, reviews, admin_actions)
--- These are included for completeness but are unchanged from your original schema.sql
-
-CREATE TABLE public.mentor_verification (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  mentor_id UUID REFERENCES public.mentors(id) ON DELETE CASCADE NOT NULL,
-  verification_type TEXT NOT NULL CHECK (verification_type IN ('initial', 'renewal')),
-  status verification_status NOT NULL DEFAULT 'pending',
-  scheduled_at TIMESTAMPTZ,
-  completed_at TIMESTAMPTZ,
-  verified_by UUID REFERENCES public.profiles(id),
-  notes TEXT,
-  documents_submitted BOOLEAN DEFAULT false,
-  identity_verified BOOLEAN DEFAULT false,
-  expertise_verified BOOLEAN DEFAULT false,
-  background_check BOOLEAN DEFAULT false,
-  rejection_reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+    profile_id UUID REFERENCES public.user_profiles(id) ON DELETE CASCADE NOT NULL PRIMARY KEY,
+    is_verified BOOLEAN DEFAULT FALSE NOT NULL,
+    available_hours JSONB, -- e.g., {'monday': ['09:00-10:00', '14:00-15:00']}
+    mentorship_topics TEXT[],
+    hourly_rate NUMERIC(10, 2),
+    years_of_experience INTEGER,
+    linkedin_url TEXT,
+    github_url TEXT,
+    portfolio_url TEXT
 );
 
-CREATE TABLE public.mentor_availability (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  mentor_id UUID REFERENCES public.mentors(id) ON DELETE CASCADE NOT NULL,
-  day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(mentor_id, day_of_week, start_time, end_time)
-);
-
+-- Create mentorship_sessions table
 CREATE TABLE public.mentorship_sessions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  mentor_id UUID REFERENCES public.mentors(id) ON DELETE CASCADE NOT NULL,
-  mentee_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  scheduled_at TIMESTAMPTZ NOT NULL,
-  duration INTEGER NOT NULL DEFAULT 45 CHECK (duration > 0),
-  status session_status NOT NULL DEFAULT 'scheduled',
-  topics TEXT[] NOT NULL DEFAULT '{}',
-  mentee_notes TEXT,
-  mentor_notes TEXT,
-  meeting_url TEXT,
-  completed_at TIMESTAMPTZ,
-  cancelled_at TIMESTAMPTZ,
-  cancellation_reason TEXT,
-  cancelled_by UUID REFERENCES public.profiles(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    mentee_id UUID REFERENCES public.user_profiles(id) ON DELETE CASCADE NOT NULL,
+    mentor_id UUID REFERENCES public.public.mentors(profile_id) ON DELETE CASCADE NOT NULL,
+    session_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    duration_minutes INTEGER NOT NULL,
+    status session_status DEFAULT 'pending'::session_status NOT NULL,
+    topic TEXT NOT NULL,
+    mentee_notes TEXT,
+    mentor_notes TEXT,
+    meeting_link TEXT,
+    CONSTRAINT fk_mentee FOREIGN KEY (mentee_id) REFERENCES public.user_profiles(id),
+    CONSTRAINT fk_mentor FOREIGN KEY (mentor_id) REFERENCES public.mentors(profile_id)
 );
 
-CREATE TABLE public.reviews (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  session_id UUID REFERENCES public.mentorship_sessions(id) ON DELETE CASCADE NOT NULL,
-  reviewer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  reviewed_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  comment TEXT,
-  is_public BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(session_id, reviewer_id)
+-- Create events table
+CREATE TABLE public.events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    event_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    duration_minutes INTEGER,
+    location TEXT,
+    event_url TEXT,
+    organizer_id UUID REFERENCES public.user_profiles(id) ON DELETE SET NULL,
+    is_online BOOLEAN DEFAULT TRUE NOT NULL
 );
 
-CREATE TABLE public.admin_actions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  admin_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  action_type TEXT NOT NULL,
-  target_type TEXT NOT NULL CHECK (target_type IN ('user', 'mentor', 'session', 'review')),
-  target_id UUID NOT NULL,
-  details JSONB NOT NULL DEFAULT '{}',
-  reason TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+-- Create newsletter_subscribers table
+CREATE TABLE public.newsletter_subscribers (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    subscribed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL
 );
 
+-- RLS Policies for user_profiles
+ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 
--- 4. Indexes
-CREATE INDEX idx_profiles_role ON public.profiles(role);
-CREATE INDEX idx_profiles_status ON public.profiles(status);
-CREATE INDEX idx_mentors_status ON public.mentors(status);
-CREATE INDEX idx_mentors_user_id ON public.mentors(user_id);
-CREATE INDEX idx_mentors_topics ON public.mentors USING GIN(topics);
-CREATE INDEX idx_mentors_expertise ON public.mentors USING GIN(expertise_areas);
-CREATE INDEX idx_sessions_mentor_id ON public.mentorship_sessions(mentor_id);
-CREATE INDEX idx_sessions_mentee_id ON public.mentorship_sessions(mentee_id);
-CREATE INDEX idx_reviews_reviewed_id ON public.reviews(reviewed_id);
+CREATE POLICY "Public profiles are viewable by everyone." ON public.user_profiles
+  FOR SELECT USING (TRUE);
 
--- 5. Views
-CREATE OR REPLACE VIEW public.verified_mentors AS
-SELECT
-  m.id,
-  m.user_id,
-  p.full_name,
-  p.avatar_url,
-  p.bio,
-  p.location,
-  p.languages,
-  m.title,
-  m.company,
-  m.experience_years,
-  m.expertise_areas,
-  m.topics,
-  m.inclusion_tags,
-  m.rating,
-  m.total_sessions,
-  m.total_reviews,
-  m.is_available
-FROM public.mentors m
-JOIN public.profiles p ON m.user_id = p.id
-WHERE m.status = 'active'
-  AND p.status = 'active'
-  AND m.is_available = true;
+CREATE POLICY "Users can insert their own profile." ON public.user_profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
 
--- 6. Functions & Triggers
+CREATE POLICY "Users can update their own profile." ON public.user_profiles
+  FOR UPDATE USING (auth.uid() = id);
 
--- Function to update timestamps
-CREATE OR REPLACE FUNCTION public.update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
+-- RLS Policies for mentors
+ALTER TABLE public.mentors ENABLE ROW LEVEL SECURITY;
 
--- Triggers for updated_at
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE TRIGGER update_mentors_updated_at BEFORE UPDATE ON public.mentors FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
--- ... add for other tables as needed
+CREATE POLICY "Mentors are viewable by everyone." ON public.mentors
+  FOR SELECT USING (TRUE);
 
--- Function to generate a unique slug
-CREATE OR REPLACE FUNCTION public.generate_slug(name_text TEXT)
-RETURNS TEXT AS $$
-DECLARE
-  base_slug TEXT;
-  final_slug TEXT;
-  counter INT := 1;
-BEGIN
-  base_slug := lower(name_text);
-  base_slug := regexp_replace(base_slug, '[^a-z0-9]+', '-', 'g');
-  base_slug := regexp_replace(base_slug, '^-|-$', '', 'g');
-  final_slug := base_slug;
-  WHILE EXISTS (SELECT 1 FROM public.profiles WHERE slug = final_slug) LOOP
-    final_slug := base_slug || '-' || counter;
-    counter := counter + 1;
-  END LOOP;
-  RETURN final_slug;
-END;
-$$ LANGUAGE plpgsql;
+CREATE POLICY "Mentors can insert their own mentor profile." ON public.mentors
+  FOR INSERT WITH CHECK (auth.uid() = profile_id);
 
--- Function to set slug on profile creation/update
-CREATE OR REPLACE FUNCTION public.set_profile_slug()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.full_name IS NOT NULL AND (TG_OP = 'INSERT' OR NEW.full_name != OLD.full_name) THEN
-    NEW.slug := public.generate_slug(NEW.full_name);
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+CREATE POLICY "Mentors can update their own mentor profile." ON public.mentors
+  FOR UPDATE USING (auth.uid() = profile_id);
 
--- Trigger to automatically set the slug
-CREATE TRIGGER on_profile_created_or_updated
-  BEFORE INSERT OR UPDATE ON public.profiles
-  FOR EACH ROW EXECUTE FUNCTION public.set_profile_slug();
+-- RLS Policies for mentorship_sessions
+ALTER TABLE public.mentorship_sessions ENABLE ROW LEVEL SECURITY;
 
--- Function to handle new user registration
+CREATE POLICY "Authenticated users can view their own sessions." ON public.mentorship_sessions
+  FOR SELECT USING (auth.uid() = mentee_id OR auth.uid() = (SELECT profile_id FROM public.mentors WHERE profile_id = mentor_id));
+
+CREATE POLICY "Mentees can create sessions." ON public.mentorship_sessions
+  FOR INSERT WITH CHECK (auth.uid() = mentee_id);
+
+CREATE POLICY "Mentors and mentees can update their own sessions." ON public.mentorship_sessions
+  FOR UPDATE USING (auth.uid() = mentee_id OR auth.uid() = (SELECT profile_id FROM public.mentors WHERE profile_id = mentor_id));
+
+-- RLS Policies for events
+ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Events are viewable by everyone." ON public.events
+  FOR SELECT USING (TRUE);
+
+CREATE POLICY "Authenticated users can create events." ON public.events
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Organizers can update their own events." ON public.events
+  FOR UPDATE USING (auth.uid() = organizer_id);
+
+CREATE POLICY "Organizers can delete their own events." ON public.events
+  FOR DELETE USING (auth.uid() = organizer_id);
+
+-- RLS Policies for newsletter_subscribers
+ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Subscribers can view their own subscription." ON public.newsletter_subscribers
+  FOR SELECT USING (auth.uid() = id); -- Assuming id here refers to user_id if linked, or just true for public
+
+CREATE POLICY "Anyone can subscribe to the newsletter." ON public.newsletter_subscribers
+  FOR INSERT WITH CHECK (TRUE);
+
+CREATE POLICY "Subscribers can unsubscribe." ON public.newsletter_subscribers
+  FOR UPDATE USING (auth.uid() = id OR email = auth.email()); -- Assuming email is unique and can be used for update
+
+CREATE POLICY "Subscribers can delete their own subscription." ON public.newsletter_subscribers
+  FOR DELETE USING (auth.uid() = id OR email = auth.email());
+
+-- Function to handle new user creation in public.user_profiles
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
-DECLARE
-  first_name_val TEXT;
-  last_name_val TEXT;
-  full_name_val TEXT;
-  user_role_val user_role;
 BEGIN
-  first_name_val := COALESCE(NEW.raw_user_meta_data->>'first_name', split_part(NEW.email, '@', 1));
-  last_name_val := COALESCE(NEW.raw_user_meta_data->>'last_name', '');
-  full_name_val := trim(COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', first_name_val || ' ' || last_name_val));
-  user_role_val := COALESCE((NEW.raw_user_meta_data->>'user_type')::user_role, 'mentee');
-
-  INSERT INTO public.profiles (id, email, first_name, last_name, full_name, role, avatar_url)
+  INSERT INTO public.user_profiles (id, full_name, avatar_url, username, is_profile_complete)
   VALUES (
     NEW.id,
-    NEW.email,
-    first_name_val,
-    last_name_val,
-    full_name_val,
-    user_role_val,
-    NEW.raw_user_meta_data->>'avatar_url'
+    NEW.raw_user_meta_data->>'full_name',
+    NEW.raw_user_meta_data->>'avatar_url',
+    NEW.raw_user_meta_data->>'user_name', -- Assuming 'user_name' might come from OAuth providers
+    FALSE -- Mark profile as incomplete on initial creation
   );
-
-  -- If user is a mentor, create a mentor record
-  IF user_role_val = 'mentor' THEN
-    INSERT INTO public.mentors (user_id) VALUES (NEW.id);
-  END IF;
-
   RETURN NEW;
-END;
-$$ language 'plpgsql' SECURITY DEFINER;
-
--- Trigger for new user registration
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- 7. RLS Policies
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.mentors ENABLE ROW LEVEL SECURITY;
--- ... enable for other tables
-
--- Helper function to check for admin role
-CREATE OR REPLACE FUNCTION public.is_admin(user_id UUID)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = user_id AND role = 'admin' AND status = 'active'
-  );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Profiles Policies
-CREATE POLICY "Users can view own profile" ON public.profiles
-  FOR SELECT USING (auth.uid() = id);
+-- Trigger to call handle_new_user on auth.users insert
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
-CREATE POLICY "Users can update own profile" ON public.profiles
-  FOR UPDATE USING (auth.uid() = id);
+-- Function to generate a unique slug for user profiles
+CREATE OR REPLACE FUNCTION public.create_profile_slug()
+RETURNS TRIGGER AS $$
+DECLARE
+    new_slug TEXT;
+    base_slug TEXT;
+    counter INT := 0;
+BEGIN
+    -- Use username or full_name as base for slug
+    IF NEW.username IS NOT NULL AND NEW.username != '' THEN
+        base_slug := lower(regexp_replace(NEW.username, '[^a-zA-Z0-9]+', '-', 'g'));
+    ELSIF NEW.full_name IS NOT NULL AND NEW.full_name != '' THEN
+        base_slug := lower(regexp_replace(NEW.full_name, '[^a-zA-Z0-9]+', '-', 'g'));
+    ELSE
+        base_slug := lower(regexp_replace(gen_random_uuid()::text, '[^a-zA-Z0-9]+', '', 'g'));
+    END IF;
 
-CREATE POLICY "Admins can manage all profiles" ON public.profiles
-  FOR ALL USING (public.is_admin(auth.uid()));
+    -- Ensure slug is unique
+    new_slug := base_slug;
+    LOOP
+        EXIT WHEN NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE slug = new_slug);
+        counter := counter + 1;
+        new_slug := base_slug || '-' || counter;
+    END LOOP;
 
-CREATE POLICY "Public can view active mentor profiles" ON public.profiles
-  FOR SELECT USING (status = 'active' AND role = 'mentor');
+    NEW.slug := new_slug;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Mentors Policies
-CREATE POLICY "Mentors can manage own profile" ON public.mentors
-  FOR ALL USING (auth.uid() = user_id);
+-- Trigger to create slug on insert
+CREATE TRIGGER on_profile_insert_create_slug
+BEFORE INSERT ON public.user_profiles
+FOR EACH ROW
+WHEN (NEW.slug IS NULL)
+EXECUTE FUNCTION public.create_profile_slug();
 
-CREATE POLICY "Public can view verified mentors" ON public.mentors
-  FOR SELECT USING (status = 'active');
+-- Function to update slug if username/full_name changes and slug is not manually set
+CREATE OR REPLACE FUNCTION public.update_profile_slug()
+RETURNS TRIGGER AS $$
+DECLARE
+    new_slug TEXT;
+    base_slug TEXT;
+    counter INT := 0;
+BEGIN
+    -- Only update if username or full_name changed AND slug was not manually set by user
+    IF (OLD.username IS DISTINCT FROM NEW.username OR OLD.full_name IS DISTINCT FROM NEW.full_name) AND OLD.slug = NEW.slug THEN
+        IF NEW.username IS NOT NULL AND NEW.username != '' THEN
+            base_slug := lower(regexp_replace(NEW.username, '[^a-zA-Z0-9]+', '-', 'g'));
+        ELSIF NEW.full_name IS NOT NULL AND NEW.full_name != '' THEN
+            base_slug := lower(regexp_replace(NEW.full_name, '[^a-zA-Z0-9]+', '-', 'g'));
+        ELSE
+            base_slug := lower(regexp_replace(gen_random_uuid()::text, '[^a-zA-Z0-9]+', '', 'g'));
+        END IF;
 
-CREATE POLICY "Admins can manage all mentors" ON public.mentors
-  FOR ALL USING (public.is_admin(auth.uid()));
+        new_slug := base_slug;
+        LOOP
+            EXIT WHEN NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE slug = new_slug AND id != NEW.id);
+            counter := counter + 1;
+            new_slug := base_slug || '-' || counter;
+        END LOOP;
 
--- Grant access to view
-GRANT SELECT ON public.verified_mentors TO authenticated, anon;
+        NEW.slug := new_slug;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to update slug on update
+CREATE TRIGGER on_profile_update_update_slug
+BEFORE UPDATE ON public.user_profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.update_profile_slug();
+
+-- Set up authentication for the `anon` role to allow inserts into `user_profiles`
+-- This is handled by the `handle_new_user` function which runs with `SECURITY DEFINER`
+-- and is triggered by `auth.users` inserts.
+-- No direct RLS policy needed for `anon` on `user_profiles` for initial insert.
+
+-- Enable `auth.uid()` and `auth.email()` for RLS policies
+GRANT USAGE ON SCHEMA auth TO authenticated;
+GRANT SELECT ON TABLE auth.users TO authenticated;

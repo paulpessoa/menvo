@@ -1,30 +1,16 @@
-'use client'
+'use client';
 
-import { ThemeProvider } from '@/components/theme-provider'
-import { Toaster } from '@/components/ui/toaster'
-import { AuthProvider } from '@/hooks/useAuth'
-import { GoogleAnalytics } from '@/utils/google-analytics'
-import { ReactNode } from 'react'
+import { AuthProvider } from '@/hooks/useAuth';
+import { UserRolesProvider } from './context/user-roles-context'; // Keep this if still needed for specific role checks outside AuthProvider
 
-interface ProvidersProps {
-  children: ReactNode
-}
-
-export function Providers({ children }: ProvidersProps) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
-      <AuthProvider>
+    <AuthProvider>
+      {/* UserRolesProvider might be redundant now if useAuth covers all role logic,
+          but keeping it for now if it has other specific functionalities. */}
+      <UserRolesProvider>
         {children}
-      </AuthProvider>
-      <Toaster />
-      {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (
-        <GoogleAnalytics ga_id={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
-      ) : null}
-    </ThemeProvider>
-  )
+      </UserRolesProvider>
+    </AuthProvider>
+  );
 }

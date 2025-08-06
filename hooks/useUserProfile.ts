@@ -1,95 +1,83 @@
-import { useState, useEffect, useCallback } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import { Database } from '@/types/database'
-import { useAuth } from './useAuth'
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { UserProfile } from '@/types/database'; // Assuming you have a UserProfile type
 
-export interface UserProfile {
-  id: string
-  email: string
-  first_name: string | null
-  last_name: string | null
-  full_name: string | null
-  avatar_url: string | null
-  bio: string | null
-  location: string | null
-  languages: string[] | null
-  role: Database['public']['Enums']['user_role']
-  status: Database['public']['Enums']['user_status']
-  slug: string | null
-  profile_completed: boolean
-  created_at: string
-  updated_at: string
-  last_login: string | null
-}
+export const useUserProfile = (userId?: string) => {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
 
-export const useUserProfile = () => {
-  const { user, isLoading: isAuthLoading, isAuthenticated } = useAuth()
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClient<Database>()
-
-  const fetchUserProfile = useCallback(async () => {
-    if (!user) {
-      setProfile(null)
-      setIsLoading(false)
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
+  const fetchUserProfile = useCallback(async (id: string) => {
+    setIsLoading(true);
+    setError(null);
     const { data, error: dbError } = await supabase
-      .from('profiles')
+      .from('user_profiles')
       .select('*')
-      .eq('id', user.id)
-      .single()
+      .eq('id', id)
+      .single();
 
     if (dbError) {
-      console.error('Error fetching user profile:', dbError)
-      setError(dbError.message)
-      setProfile(null)
-    } else {
-      setProfile(data)
+      console.error('Error fetching user profile:', dbError);
+      setError(dbError.message);
+      setProfile(null);
+    } else if (data) {
+      setProfile(data);
     }
-    setIsLoading(false)
-  }, [user, supabase])
+    setIsLoading(false);
+  }, [supabase]);
 
   useEffect(() => {
-    if (!isAuthLoading) {
-      fetchUserProfile()
+    if (userId) {
+      fetchUserProfile(userId);
+    } else {
+      // If no userId is provided, try to fetch the current authenticated user's profile
+      const getAuthenticatedUser = async () => {
+        setIsLoading(true);
+        setError(null);
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          console.error('No authenticated user or error fetching user:', authError);
+          setError(authError?.message || 'No authenticated user.');
+          setProfile(null);
+          setIsLoading(false);
+          return;
+        }
+        fetchUserProfile(user.id);
+      };
+      getAuthenticatedUser();
     }
-  }, [isAuthLoading, fetchUserProfile])
+  }, [userId, fetchUserProfile, supabase.auth]);
 
-  const updateProfile = useCallback(
-    async (updates: Partial<Omit<UserProfile, 'id' | 'email' | 'created_at' | 'updated_at' | 'last_login' | 'slug'>>) => {
-      if (!user) {
-        setError('User not authenticated.')
-        return null
-      }
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
+    setIsLoading(true);
+    setError(null);
+    if (!profile?.id) {
+      setError('No profile ID available for update.');
+      setIsLoading(false);
+      return null;
+    }
 
-      setIsLoading(true)
-      setError(null)
+    const { data, error: updateError } = await supabase
+      .from('user_profiles')
+      .update(updates)
+      .eq('id', profile.id)
+      .select()
+      .single();
 
-      const { data, error: updateError } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id)
-        .select()
-        .single()
+    if (updateError) {
+      console.error('Error updating user profile:', updateError);
+      setError(updateError.message);
+      setIsLoading(false);
+      return null;
+    }
 
-      if (updateError) {
-        console.error('Error updating profile:', updateError)
-        setError(updateError.message)
-        setIsLoading(false)
-        return null
-      } else {
-        setProfile(data)
-        setIsLoading(false)
-        return data
-      }
-    },
-    [user, supabase]
-  )
+    if (data) {
+      setProfile(data);
+    }
+    setIsLoading(false);
+    return data;
+  }, [profile?.id, supabase]);
 
-  return { profile, isLoading, error, updateProfile, refreshProfile: fetchUserProfile }
-}
+  return { profile, isLoading, error, updateProfile, refreshProfile: fetchUserProfile };
+};
