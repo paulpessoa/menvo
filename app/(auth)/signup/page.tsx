@@ -1,131 +1,125 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
-import { signUpWithEmail, signInWithOAuth } from '@/services/auth/supabase'
-import Link from 'next/link'
-import { GithubIcon, ChromeIcon, LinkedinIcon } from 'lucide-react'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Database } from '@/types/database'
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Separator } from "@/components/ui/separator"
+import { Github, Chrome, Linkedin } from 'lucide-react'
+import { useAuth } from "@/hooks/useAuth"
+import { useToast } from "@/hooks/useToast"
+import { useRouter } from "next/navigation"
+import UserTypeSelector from "@/components/auth/UserTypeSelector"
 
 export default function SignupPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [userType, setUserType] = useState<Database['public']['Enums']['user_role']>('mentee')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [userType, setUserType] = useState<"mentee" | "mentor" | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { signUpWithEmail, signInWithOAuth } = useAuth()
+  const { toast } = useToast()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
+    setIsSubmitting(true)
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Erro de validação",
+        description: "As senhas não coincidem.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    if (!userType) {
+      toast({
+        title: "Selecione um tipo de usuário",
+        description: "Por favor, escolha se você é um mentor ou um mentee.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
     try {
-      const { error } = await signUpWithEmail(email, password, firstName, lastName, userType)
+      const { error } = await signUpWithEmail(email, password, userType)
+
       if (error) {
         throw error
       }
+
       toast({
-        title: 'Cadastro bem-sucedido!',
-        description: 'Verifique seu email para confirmar sua conta.',
-        variant: 'default',
+        title: "Cadastro bem-sucedido!",
+        description: "Verifique seu e-mail para confirmar sua conta.",
+        variant: "default",
       })
-      router.push('/confirmation') // Redirect to a confirmation page
+      router.push("/confirmation")
     } catch (error: any) {
       toast({
-        title: 'Erro no cadastro',
-        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
-        variant: 'destructive',
+        title: "Erro no cadastro",
+        description: error.message || "Ocorreu um erro ao tentar se cadastrar. Tente novamente.",
+        variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
-  const handleOAuthSignIn = async (provider: 'google' | 'github' | 'linkedin') => {
-    setLoading(true)
+  const handleOAuthSignIn = async (provider: "google" | "github" | "linkedin") => {
+    setIsSubmitting(true)
     try {
       const { error } = await signInWithOAuth(provider)
       if (error) {
         throw error
       }
-      // Supabase handles the redirect for OAuth, so no explicit push here
+      // Supabase handles redirection for OAuth, so no explicit push here
     } catch (error: any) {
       toast({
-        title: 'Erro no cadastro com ' + provider,
-        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
-        variant: 'destructive',
+        title: "Erro no cadastro com " + provider,
+        description: error.message || "Ocorreu um erro ao tentar se cadastrar com " + provider + ". Tente novamente.",
+        variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Cadastre-se</CardTitle>
           <CardDescription>
-            Crie sua conta ou use uma conta de rede social.
+            Crie sua conta para começar sua jornada de mentoria.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid grid-cols-3 gap-4">
-              <Button variant="outline" onClick={() => handleOAuthSignIn('github')} disabled={loading}>
-                <GithubIcon className="mr-2 h-4 w-4" />
-                GitHub
-              </Button>
-              <Button variant="outline" onClick={() => handleOAuthSignIn('google')} disabled={loading}>
-                <ChromeIcon className="mr-2 h-4 w-4" />
+              <Button variant="outline" onClick={() => handleOAuthSignIn("google")} disabled={isSubmitting}>
+                <Chrome className="mr-2 h-4 w-4" />
                 Google
               </Button>
-              <Button variant="outline" onClick={() => handleOAuthSignIn('linkedin')} disabled={loading}>
-                <LinkedinIcon className="mr-2 h-4 w-4" />
+              <Button variant="outline" onClick={() => handleOAuthSignIn("github")} disabled={isSubmitting}>
+                <Github className="mr-2 h-4 w-4" />
+                GitHub
+              </Button>
+              <Button variant="outline" onClick={() => handleOAuthSignIn("linkedin")} disabled={isSubmitting}>
+                <Linkedin className="mr-2 h-4 w-4" />
                 LinkedIn
               </Button>
             </div>
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Ou continue com</span>
-              </div>
-            </div>
-            <form onSubmit={handleSubmit} className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="first-name">Nome</Label>
-                  <Input
-                    id="first-name"
-                    type="text"
-                    placeholder="João"
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="last-name">Sobrenome</Label>
-                  <Input
-                    id="last-name"
-                    type="text"
-                    placeholder="Silva"
-                    required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+            <Separator className="my-4">OU</Separator>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
                   type="email"
@@ -135,7 +129,7 @@ export default function SignupPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="space-y-2">
                 <Label htmlFor="password">Senha</Label>
                 <Input
                   id="password"
@@ -145,34 +139,43 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label>Tipo de Usuário</Label>
-                <RadioGroup
-                  defaultValue="mentee"
-                  onValueChange={(value: Database['public']['Enums']['user_role']) => setUserType(value)}
-                  className="flex space-x-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="mentee" id="mentee" />
-                    <Label htmlFor="mentee">Mentee</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="mentor" id="mentor" />
-                    <Label htmlFor="mentor">Mentor</Label>
-                  </div>
-                </RadioGroup>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Cadastrando...' : 'Criar Conta'}
+              <UserTypeSelector selectedType={userType} onSelectType={setUserType} />
+              <div className="flex items-center space-x-2">
+                <Checkbox id="terms" required />
+                <Label htmlFor="terms" className="text-sm font-normal">
+                  Eu concordo com os{" "}
+                  <Link href="/terms" className="underline">
+                    Termos de Serviço
+                  </Link>{" "}
+                  e a{" "}
+                  <Link href="/privacy" className="underline">
+                    Política de Privacidade
+                  </Link>
+                  .
+                </Label>
+              </div>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Cadastrando..." : "Cadastrar"}
               </Button>
             </form>
           </div>
+          <div className="mt-4 text-center text-sm">
+            Já tem uma conta?{" "}
+            <Link href="/login" className="underline">
+              Entrar
+            </Link>
+          </div>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Link href="/login" className="text-sm text-blue-600 hover:underline">
-            Já tem uma conta? Faça login
-          </Link>
-        </CardFooter>
       </Card>
     </div>
   )

@@ -1,43 +1,31 @@
-# Contributing to Menvo
+# Contributing to MentorConnect
 
-We welcome contributions to Menvo! Here's how you can help:
+We welcome contributions to the MentorConnect platform! Whether it's a bug report, a new feature, or an improvement to the documentation, your help is greatly appreciated.
 
 ## Getting Started
 
-1.  **Fork the repository**: Start by forking the Menvo repository to your GitHub account.
-2.  **Clone the repository**: Clone your forked repository to your local machine:
+1.  **Fork the Repository**: Start by forking the [MentorConnect repository](https://github.com/paulpessoa/menvo) to your GitHub account.
+2.  **Clone Your Fork**: Clone your forked repository to your local machine:
     \`\`\`bash
     git clone https://github.com/YOUR_USERNAME/menvo.git
-    \`\`\`
-3.  **Install dependencies**: Navigate to the project directory and install the necessary dependencies:
-    \`\`\`bash
     cd menvo
-    npm install # or yarn install
     \`\`\`
-4.  **Set up environment variables**: Create a `.env.local` file in the root of your project and add the required environment variables. Refer to `env.example` for a list of variables.
-5.  **Run the development server**:
+3.  **Create a New Branch**: Create a new branch for your feature or bug fix. Use a descriptive name:
     \`\`\`bash
-    npm run dev # or yarn dev
+    git checkout -b feature/your-feature-name
+    # or
+    git checkout -b bugfix/issue-description
     \`\`\`
-    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4.  **Set Up Your Environment**:
+    *   Install dependencies: `npm install` or `yarn install`
+    *   Set up your `.env.local` file based on `env.example`.
+    *   Run the development server: `npm run dev` or `yarn dev`
 
 ## Making Changes
 
-1.  **Create a new branch**: Before making any changes, create a new branch for your feature or bug fix:
-    \`\`\`bash
-    git checkout -b feature/your-feature-name # or bugfix/your-bug-fix-name
-    \`\`\`
-2.  **Implement your changes**: Write your code, ensuring it adheres to the project's coding style and best practices.
-3.  **Test your changes**: If applicable, write or run tests to ensure your changes work as expected and don't introduce any regressions.
-4.  **Commit your changes**: Write clear and concise commit messages.
-    \`\`\`bash
-    git commit -m "feat: Add new feature" # or "fix: Fix bug in authentication"
-    \`\`\`
-5.  **Push your branch**: Push your changes to your forked repository:
-    \`\`\`bash
-    git push origin feature/your-feature-name
-    \`\`\`
-6.  **Create a Pull Request**: Open a pull request from your forked repository to the `main` branch of the original Menvo repository. Provide a detailed description of your changes.
+1.  **Implement Your Changes**: Write clear, concise, and well-commented code. Ensure your code adheres to the existing coding style.
+2.  **Test Your Changes**: Write (or update) tests for your changes. Ensure all tests pass: `npm test` or `yarn test`
+3.  **Lint Your Code**: Lint your code: `npm run lint` or `yarn lint`
 
 ## Code Style
 
@@ -45,10 +33,19 @@ We use ESLint and Prettier to maintain a consistent code style. Please ensure yo
 
 ## Reporting Bugs
 
-If you find a bug, please open an issue on GitHub and provide as much detail as possible, including steps to reproduce the bug and expected behavior.
+If you find a bug, please open an issue on GitHub. Provide as much detail as possible, including:
+*   A clear and concise description of the bug.
+*   Steps to reproduce the behavior.
+*   Expected behavior.
+*   Screenshots or videos (if applicable).
+*   Your environment (OS, browser, Node.js version, etc.).
 
 ## Feature Requests
 
-If you have an idea for a new feature, feel free to open an issue on GitHub to discuss it.
+If you have an idea for a new feature, please open an issue on GitHub. Describe your idea clearly and explain why you think it would be a valuable addition to the platform.
 
-Thank you for contributing to Menvo!
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+
+Thank you for contributing to MentorConnect!

@@ -171,14 +171,14 @@ export default function SchedulePage({ params }: SchedulePageProps) {
   const confirmSchedule = async () => {
     // Here you would integrate with your backend to actually schedule the session
     // For now, it's a mock success
-    console.log('Scheduling session with:', mentor?.name)
+    console.log('Scheduling session with:', mentor?.first_name)
     console.log('Date:', date?.toDateString())
     console.log('Time:', selectedTime)
     console.log('Message:', message)
 
     toast({
       title: 'Sessão Agendada!',
-      description: `Sua sessão com ${mentor?.name} em ${date?.toLocaleDateString()} às ${selectedTime} foi solicitada.`,
+      description: `Sua sessão com ${mentor?.first_name} em ${date?.toLocaleDateString()} às ${selectedTime} foi solicitada.`,
       variant: 'default',
     })
     setIsModalOpen(false)
@@ -434,7 +434,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                     <SelectValue placeholder="Selecione um horário" />
                   </SelectTrigger>
                   <SelectContent>
-                    {getAvailableTimeSlots(selectedDate).map(({ time, available }) => (
+                    {getAvailableTimeSlots(selectedDate || new Date()).map(({ time, available }) => (
                       <SelectItem key={time} value={time} disabled={!available}>
                         {time}
                       </SelectItem>
@@ -632,7 +632,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onConfirm={confirmSchedule}
-          mentorName={mentor.name}
+          mentorName={`${mentor.first_name} ${mentor.last_name}`}
           date={date}
           time={selectedTime}
           message={message}
@@ -650,55 +650,3 @@ function ScheduleSkeleton() {
           <Skeleton className="h-9 w-16" />
           <div className="flex-1">
             <Skeleton className="h-8 w-64 mb-2" />
-            <Skeleton className="h-4 w-96" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-16 w-16 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-32" />
-                    <Skeleton className="h-4 w-48" />
-                    <div className="flex gap-2">
-                      <Skeleton className="h-5 w-16" />
-                      <Skeleton className="h-5 w-20" />
-                      <Skeleton className="h-5 w-14" />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-40" />
-                <Skeleton className="h-4 w-64" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-64 w-full" />
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-48" />
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}

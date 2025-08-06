@@ -1,92 +1,93 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
-import { updateUserPassword } from '@/services/auth/supabase'
-import Link from 'next/link'
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft } from 'lucide-react'
+import { useAuth } from "@/hooks/useAuth"
+import { useToast } from "@/hooks/useToast"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [tokenValidated, setTokenValidated] = useState(false)
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState("")
+  const { updateUserPassword } = useAuth()
+  const { toast } = useToast()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const accessToken = searchParams.get('access_token')
 
   useEffect(() => {
-    // Supabase automatically handles the token validation on page load
-    // if the user arrived via a password reset email link.
-    // We just need to ensure the user is logged in to update their password.
-    // For simplicity, we'll assume if they are on this page with a token,
-    // Supabase has handled the session.
-    setTokenValidated(true)
-  }, [])
+    if (!accessToken) {
+      setMessage("Token de redefinição de senha ausente ou inválido.")
+      toast({
+        title: "Erro",
+        description: "Token de redefinição de senha ausente ou inválido.",
+        variant: "destructive",
+      })
+    }
+  }, [accessToken, toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setMessage("")
+
     if (password !== confirmPassword) {
+      setMessage("As senhas não coincidem.")
       toast({
-        title: 'Erro de senha',
-        description: 'As senhas não coincidem.',
-        variant: 'destructive',
+        title: "Erro de validação",
+        description: "As senhas digitadas não coincidem.",
+        variant: "destructive",
       })
-      return
-    }
-    if (password.length < 6) {
-      toast({
-        title: 'Senha muito curta',
-        description: 'A senha deve ter pelo menos 6 caracteres.',
-        variant: 'destructive',
-      })
+      setIsSubmitting(false)
       return
     }
 
-    setLoading(true)
+    if (!accessToken) {
+      setMessage("Não foi possível redefinir a senha: token ausente.")
+      toast({
+        title: "Erro",
+        description: "Não foi possível redefinir a senha: token ausente.",
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
     try {
       const { error } = await updateUserPassword(password)
+
       if (error) {
         throw error
       }
+
+      setMessage("Sua senha foi redefinida com sucesso! Você pode fazer login agora.")
       toast({
-        title: 'Senha redefinida com sucesso!',
-        description: 'Sua senha foi atualizada. Você pode fazer login agora.',
-        variant: 'default',
+        title: "Senha redefinida!",
+        description: "Sua senha foi atualizada com sucesso.",
+        variant: "default",
       })
-      router.push('/login')
+      router.push("/login")
     } catch (error: any) {
+      setMessage(error.message || "Ocorreu um erro ao redefinir a senha.")
       toast({
-        title: 'Erro ao redefinir senha',
-        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
-        variant: 'destructive',
+        title: "Erro ao redefinir senha",
+        description: error.message || "Não foi possível redefinir sua senha. Tente novamente.",
+        variant: "destructive",
       })
     } finally {
-      setLoading(false)
+      setIsSubmitting(false)
     }
   }
 
-  if (!tokenValidated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Carregando...</CardTitle>
-            <CardDescription>Validando seu token de redefinição de senha.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>Por favor, aguarde enquanto validamos seu link.</p>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Redefinir Senha</CardTitle>
@@ -95,8 +96,8 @@ export default function ResetPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            <div className="grid gap-2">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
               <Label htmlFor="password">Nova Senha</Label>
               <Input
                 id="password"
@@ -106,7 +107,7 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <div className="grid gap-2">
+            <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
               <Input
                 id="confirm-password"
@@ -116,16 +117,22 @@ export default function ResetPasswordPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Redefinindo...' : 'Redefinir Senha'}
+            <Button type="submit" className="w-full" disabled={isSubmitting || !accessToken}>
+              {isSubmitting ? "Redefinindo..." : "Redefinir Senha"}
             </Button>
+            {message && (
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                {message}
+              </p>
+            )}
           </form>
+          <div className="mt-4 text-center text-sm">
+            <Link href="/login" className="inline-flex items-center gap-1 underline">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar para o login
+            </Link>
+          </div>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <Link href="/login" className="text-sm text-blue-600 hover:underline">
-            Voltar para o login
-          </Link>
-        </CardFooter>
       </Card>
     </div>
   )

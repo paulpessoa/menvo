@@ -1,198 +1,233 @@
-import Image from 'next/image'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { ArrowRight, UserPlus, Search, Calendar, MessageSquare, Award, Lightbulb, Users } from 'lucide-react'
+import { useTranslation } from "react-i18next"
 
 export default function HowItWorksPage() {
+  const { t } = useTranslation()
+
+  const steps = [
+    {
+      icon: <UserPlus className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.steps.register.title'),
+      description: t('howItWorks.steps.register.description'),
+      image: "/images/how-it-works/register-mentee.jpg",
+      alt: "Register as mentee",
+      link: "/signup",
+      linkText: t('howItWorks.steps.register.linkText'),
+    },
+    {
+      icon: <Search className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.steps.find.title'),
+      description: t('howItWorks.steps.find.description'),
+      image: "/images/how-it-works/find.jpg",
+      alt: "Find mentors",
+      link: "/mentors",
+      linkText: t('howItWorks.steps.find.linkText'),
+    },
+    {
+      icon: <Calendar className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.steps.schedule.title'),
+      description: t('howItWorks.steps.schedule.description'),
+      image: "/images/how-it-works/schedule.jpg",
+      alt: "Schedule session",
+      link: "/mentors",
+      linkText: t('howItWorks.steps.schedule.linkText'),
+    },
+    {
+      icon: <MessageSquare className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.steps.connect.title'),
+      description: t('howItWorks.steps.connect.description'),
+      image: "/images/how-it-works/grow.jpg",
+      alt: "Connect and grow",
+      link: "/messages",
+      linkText: t('howItWorks.steps.connect.linkText'),
+    },
+    {
+      icon: <Award className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.steps.grow.title'),
+      description: t('howItWorks.steps.grow.description'),
+      image: "/images/how-it-works/grow-together.jpg",
+      alt: "Achieve goals",
+      link: "/dashboard",
+      linkText: t('howItWorks.steps.grow.linkText'),
+    },
+  ]
+
+  const mentorSteps = [
+    {
+      icon: <UserPlus className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.mentorSteps.register.title'),
+      description: t('howItWorks.mentorSteps.register.description'),
+      image: "/images/how-it-works/register-mentor.jpg",
+      alt: "Register as mentor",
+      link: "/signup",
+      linkText: t('howItWorks.mentorSteps.register.linkText'),
+    },
+    {
+      icon: <Lightbulb className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.mentorSteps.verify.title'),
+      description: t('howItWorks.mentorSteps.verify.description'),
+      image: "/images/how-it-works/verify.jpg",
+      alt: "Get verified",
+      link: "/profile",
+      linkText: t('howItWorks.mentorSteps.verify.linkText'),
+    },
+    {
+      icon: <Calendar className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.mentorSteps.availability.title'),
+      description: t('howItWorks.mentorSteps.availability.description'),
+      image: "/images/how-it-works/availability.jpg",
+      alt: "Set availability",
+      link: "/mentorship",
+      linkText: t('howItWorks.mentorSteps.availability.linkText'),
+    },
+    {
+      icon: <Users className="h-8 w-8 text-primary" />,
+      title: t('howItWorks.mentorSteps.mentor.title'),
+      description: t('howItWorks.mentorSteps.mentor.description'),
+      image: "/images/how-it-works/conduct.jpg",
+      alt: "Conduct sessions",
+      link: "/dashboard",
+      linkText: t('howItWorks.mentorSteps.mentor.linkText'),
+    },
+  ]
+
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <section className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4">Como a Menvo Funciona</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          Conectando mentores e mentees em uma jornada de crescimento e aprendizado.
+    <div className="container mx-auto px-4 py-12">
+      {/* Hero Section */}
+      <section className="text-center mb-16">
+        <h1 className="text-4xl font-bold tracking-tight mb-4">
+          {t('howItWorks.hero.title')}
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          {t('howItWorks.hero.description')}
         </p>
-      </section>
-
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Para Mentees</h2>
-        <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">1. Cadastre-se como Mentee</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Crie sua conta de forma rápida e fácil. Informe seus interesses e áreas de desenvolvimento para que possamos te ajudar a encontrar o mentor ideal.
-            </p>
-            <Link href="/signup" passHref>
-              <Button>Cadastre-se Agora</Button>
-            </Link>
-          </div>
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-            <Image
-              src="/public/images/how-it-works/register-mentee.jpg"
-              alt="Register as Mentee"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg order-2 md:order-1">
-            <Image
-              src="/public/images/how-it-works/find.jpg"
-              alt="Find Mentors"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-          <div className="space-y-4 order-1 md:order-2">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">2. Encontre seu Mentor</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Utilize nossos filtros avançados para buscar mentores por área de atuação, habilidades, idiomas e muito mais. Explore os perfis detalhados para encontrar a melhor combinação.
-            </p>
-            <Link href="/mentors" passHref>
-              <Button variant="outline">Buscar Mentores</Button>
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">3. Agende sua Sessão</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Comunique-se com o mentor escolhido e agende sessões de mentoria diretamente pela plataforma, de acordo com a disponibilidade de ambos.
-            </p>
-            <Button variant="outline">Ver Calendário</Button>
-          </div>
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-            <Image
-              src="/public/images/how-it-works/schedule.jpg"
-              alt="Schedule Session"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg order-2 md:order-1">
-            <Image
-              src="/public/images/how-it-works/grow.jpg"
-              alt="Grow Together"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-          <div className="space-y-4 order-1 md:order-2">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">4. Cresça e Desenvolva-se</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Aproveite a orientação personalizada para alcançar seus objetivos, superar desafios e expandir suas habilidades.
-            </p>
-            <Button variant="outline">Começar a Crescer</Button>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="my-12" />
-
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Para Mentores</h2>
-        <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">1. Cadastre-se como Mentor</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Compartilhe sua experiência e paixão por ajudar. Crie um perfil detalhado destacando suas áreas de expertise e o que você pode oferecer.
-            </p>
-            <Link href="/signup" passHref>
-              <Button>Seja um Mentor</Button>
-            </Link>
-          </div>
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-            <Image
-              src="/public/images/how-it-works/register-mentor.jpg"
-              alt="Register as Mentor"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg order-2 md:order-1">
-            <Image
-              src="/public/images/how-it-works/verify.jpg"
-              alt="Verify Profile"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-          <div className="space-y-4 order-1 md:order-2">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">2. Verificação de Perfil</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Passamos por um processo de verificação para garantir a qualidade e segurança da nossa comunidade. Isso ajuda a construir confiança entre mentores e mentees.
-            </p>
-            <Button variant="outline">Saiba Mais sobre Verificação</Button>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">3. Defina sua Disponibilidade</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Gerencie facilmente seus horários disponíveis para sessões de mentoria, permitindo que os mentees agendem de acordo com sua conveniência.
-            </p>
-            <Button variant="outline">Gerenciar Disponibilidade</Button>
-          </div>
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg">
-            <Image
-              src="/public/images/how-it-works/availability.jpg"
-              alt="Set Availability"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden shadow-lg order-2 md:order-1">
-            <Image
-              src="/public/images/how-it-works/conduct.jpg"
-              alt="Conduct Sessions"
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-          <div className="space-y-4 order-1 md:order-2">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">4. Conecte-se e Impacte</h3>
-            <p className="text-gray-700 dark:text-gray-300">
-              Receba solicitações de mentoria, conduza sessões significativas e veja o impacto positivo que você pode ter na jornada de aprendizado de alguém.
-            </p>
-            <Button variant="outline">Ver Solicitações</Button>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="my-12" />
-
-      <section className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-4">Pronto para Começar?</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
-          Seja você um mentee em busca de orientação ou um mentor disposto a compartilhar, a Menvo é o seu lugar.
-        </p>
-        <div className="flex justify-center gap-4">
+        <div className="mt-8 flex justify-center gap-4">
           <Link href="/signup" passHref>
-            <Button size="lg">Cadastre-se como Mentee</Button>
+            <Button size="lg">
+              {t('howItWorks.hero.getStarted')} <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </Link>
+          <Link href="/mentors" passHref>
+            <Button size="lg" variant="outline">
+              {t('howItWorks.hero.findMentors')}
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <Separator className="my-16" />
+
+      {/* How it Works for Mentees */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          {t('howItWorks.menteeSection.title')}
+        </h2>
+        <div className="space-y-16">
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-center ${
+                index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
+              }`}
+            >
+              <div className={`${index % 2 === 1 ? "lg:col-start-2" : ""}`}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="bg-primary/10 p-3 rounded-full">{step.icon}</div>
+                  <h3 className="text-2xl font-bold">{step.title}</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">{step.description}</p>
+                <Link href={step.link} passHref>
+                  <Button variant="outline">
+                    {step.linkText} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+              <div className={`relative h-64 w-full md:h-80 rounded-lg overflow-hidden shadow-lg ${
+                index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""
+              }`}>
+                <Image
+                  src={step.image || "/placeholder.svg"}
+                  alt={step.alt}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-lg"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <Separator className="my-16" />
+
+      {/* How it Works for Mentors */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-12">
+          {t('howItWorks.mentorSection.title')}
+        </h2>
+        <div className="space-y-16">
+          {mentorSteps.map((step, index) => (
+            <div
+              key={index}
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-8 items-center ${
+                index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
+              }`}
+            >
+              <div className={`${index % 2 === 1 ? "lg:col-start-2" : ""}`}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="bg-primary/10 p-3 rounded-full">{step.icon}</div>
+                  <h3 className="text-2xl font-bold">{step.title}</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">{step.description}</p>
+                <Link href={step.link} passHref>
+                  <Button variant="outline">
+                    {step.linkText} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+              <div className={`relative h-64 w-full md:h-80 rounded-lg overflow-hidden shadow-lg ${
+                index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""
+              }`}>
+                <Image
+                  src={step.image || "/placeholder.svg"}
+                  alt={step.alt}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-lg"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <Separator className="my-16" />
+
+      {/* Call to Action */}
+      <section className="text-center mt-16">
+        <h2 className="text-3xl font-bold mb-4">
+          {t('howItWorks.cta.title')}
+        </h2>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          {t('howItWorks.cta.description')}
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
           <Link href="/signup" passHref>
-            <Button size="lg" variant="outline">Cadastre-se como Mentor</Button>
+            <Button size="lg">
+              {t('howItWorks.cta.joinNow')} <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/about" passHref>
+            <Button size="lg" variant="outline">
+              {t('howItWorks.cta.learnMore')}
+            </Button>
           </Link>
         </div>
       </section>

@@ -1,114 +1,93 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { CheckCircle2Icon, XCircleIcon, Loader2Icon } from 'lucide-react'
-import { toast } from '@/components/ui/use-toast'
-import { supabase } from '@/services/auth/supabase' // Assuming supabase client is exported
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { useAuth } from "@/hooks/useAuth"
+import { useToast } from "@/hooks/useToast"
+import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail"
+import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBanner"
 
-export default function VerificationPage() {
+export default function VerificationsPage() {
+  const { user, loading } = useAuth()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-  const [message, setMessage] = useState('Verificando seu email...')
+  const { toast } = useToast()
+
+  const [verificationStatus, setVerificationStatus] = useState<"pending" | "verified" | "error" | "loading">("loading")
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
-    const verifyEmail = async () => {
-      const type = searchParams.get('type')
-      const token_hash = searchParams.get('token_hash')
-
-      if (type === 'signup' && token_hash) {
-        try {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash,
-            type: 'email',
-          })
-
-          if (error) {
-            throw error
-          }
-
-          // After successful verification, update the user's profile to mark email as confirmed
-          const { data: { user }, error: userError } = await supabase.auth.getUser()
-          if (userError || !user) {
-            throw userError || new Error('Could not retrieve user after verification.')
-          }
-
-          const { error: profileUpdateError } = await supabase
-            .from('user_profiles')
-            .update({ email_confirmed: true })
-            .eq('id', user.id)
-
-          if (profileUpdateError) {
-            throw profileUpdateError
-          }
-
-          setStatus('success')
-          setMessage('Seu email foi verificado com sucesso! Você será redirecionado em breve.')
-          toast({
-            title: 'Email Verificado!',
-            description: 'Sua conta foi ativada com sucesso.',
-            variant: 'default',
-          })
-          setTimeout(() => {
-            router.push('/welcome') // Redirect to welcome/onboarding page
-          }, 3000)
-        } catch (error: any) {
-          setStatus('error')
-          setMessage(`Erro na verificação: ${error.message || 'Ocorreu um erro inesperado.'}`)
-          toast({
-            title: 'Erro na Verificação',
-            description: error.message || 'Não foi possível verificar seu email.',
-            variant: 'destructive',
-          })
-        }
-      } else {
-        setStatus('error')
-        setMessage('Link de verificação inválido ou incompleto.')
+    if (!loading) {
+      if (!user) {
+        // If no user, redirect to login
+        router.push("/login")
         toast({
-          title: 'Link Inválido',
-          description: 'O link de verificação está faltando informações.',
-          variant: 'destructive',
+          title: "Acesso negado",
+          description: "Você precisa estar logado para ver esta página.",
+          variant: "destructive",
         })
+      } else if (user.email_confirmed_at) {
+        // If email is already confirmed, redirect to dashboard
+        setVerificationStatus("verified")
+        setMessage("Seu e-mail já foi verificado. Redirecionando para o painel...")
+        setTimeout(() => {
+          router.push("/dashboard")
+        }, 2000)
+      } else {
+        // Email not confirmed
+        setVerificationStatus("pending")
+        setMessage("Seu e-mail ainda não foi verificado. Por favor, verifique sua caixa de entrada.")
       }
     }
+  }, [user, loading, router, toast])
 
-    verifyEmail()
-  }, [searchParams, router])
+  if (loading || verificationStatus === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="ml-4 text-lg text-muted-foreground">Carregando status de verificação...</p>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null // Should be redirected by useEffect
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
       <Card className="w-full max-w-md text-center">
-        <CardHeader>
-          {status === 'loading' && <Loader2Icon className="mx-auto h-12 w-12 animate-spin text-blue-500" />}
-          {status === 'success' && <CheckCircle2Icon className="mx-auto h-12 w-12 text-green-500" />}
-          {status === 'error' && <XCircleIcon className="mx-auto h-12 w-12 text-red-500" />}
-          <CardTitle className="text-2xl font-bold mt-4">
-            {status === 'loading' && 'Verificando...'}
-            {status === 'success' && 'Verificação Concluída!'}
-            {status === 'error' && 'Erro na Verificação'}
-          </CardTitle>
-          <CardDescription className="mt-2">{message}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {status === 'error' && (
-            <div className="mt-4">
-              <Link href="/signup" passHref>
-                <Button>Tentar novamente</Button>
-              </Link>
-            </div>
+        <CardHeader className="space-y-1">
+          {verificationStatus === "pending" && (
+            <XCircle className="mx-auto h-12 w-12 text-red-500" />
           )}
-          {status === 'success' && (
-            <div className="mt-4">
-              <p>Você será redirecionado para a página de boas-vindas em breve.</p>
-              <p>Se não for redirecionado, clique no botão abaixo.</p>
-              <Link href="/welcome" passHref>
-                <Button className="mt-2">Ir para a Página de Boas-Vindas</Button>
-              </Link>
-            </div>
+          {verificationStatus === "verified" && (
+            <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+          )}
+          <CardTitle className="text-2xl font-bold">
+            {verificationStatus === "pending" && "Verifique seu E-mail"}
+            {verificationStatus === "verified" && "E-mail Verificado!"}
+          </CardTitle>
+          <CardDescription>
+            {message}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {verificationStatus === "pending" && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Um link de verificação foi enviado para <strong>{user.email}</strong>. Por favor, clique no link para ativar sua conta.
+              </p>
+              <ResendConfirmationEmail email={user.email || ""} />
+              <EmailConfirmationBanner />
+            </>
+          )}
+          {verificationStatus === "verified" && (
+            <Button onClick={() => router.push("/dashboard")} className="w-full">
+              Ir para o Painel
+            </Button>
           )}
         </CardContent>
       </Card>

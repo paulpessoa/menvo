@@ -7,12 +7,11 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # Environment variables
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*.local
+.env
 
 # TypeScript
 *.tsbuildinfo
@@ -22,3 +21,23 @@ yarn-error.log*
 
 # Supabase
 supabase/
+
+# dependencies
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# vercel
+.vercel
+
+# prisma
+/prisma/db.sqlite

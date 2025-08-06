@@ -62,7 +62,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --ring: 210 40% 98%;
   }
 }
 
@@ -73,4 +73,130 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom styles for shadcn/ui chart components */
+.recharts-tooltip-label {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.recharts-default-tooltip .recharts-tooltip-item {
+  color: hsl(var(--muted-foreground));
+}
+
+.recharts-default-tooltip .recharts-tooltip-item-name {
+  color: hsl(var(--foreground));
+}
+
+.recharts-default-tooltip .recharts-tooltip-item-value {
+  color: hsl(var(--foreground));
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: hsl(var(--muted-foreground));
+}
+
+.recharts-legend-item-text {
+  color: hsl(var(--foreground));
+}
+
+.recharts-label {
+  fill: hsl(var(--foreground));
+}
+
+.recharts-text {
+  fill: hsl(var(--foreground));
+}
+
+.recharts-tooltip-cursor {
+  stroke: hsl(var(--border));
+}
+
+.recharts-dot {
+  stroke: hsl(var(--background));
+}
+
+.recharts-active-dot {
+  stroke: hsl(var(--primary));
+}
+
+.recharts-line-dot {
+  fill: hsl(var(--primary));
+}
+
+.recharts-bar-rectangle {
+  fill: hsl(var(--primary));
+}
+
+.recharts-area-curve {
+  stroke: hsl(var(--primary));
+  fill: hsl(var(--primary));
+  fill-opacity: 0.2;
+}
+
+.recharts-reference-line-line {
+  stroke: hsl(var(--muted-foreground));
+}
+
+.recharts-reference-line-label {
+  fill: hsl(var(--muted-foreground));
+}
+
+.recharts-sector {
+  fill: hsl(var(--primary));
+}
+
+.recharts-polar-angle-axis-tick-value {
+  fill: hsl(var(--muted-foreground));
+}
+
+.recharts-polar-radius-axis-tick-value {
+  fill: hsl(var(--muted-foreground));
+}
+
+.recharts-radar-polygon {
+  stroke: hsl(var(--primary));
+  fill: hsl(var(--primary));
+  fill-opacity: 0.2;
+}
+
+.recharts-radial-bar-background {
+  fill: hsl(var(--muted));
+}
+
+.recharts-pie-label-line {
+  stroke: hsl(var(--muted-foreground));
+}
+
+.recharts-pie-label-text {
+  fill: hsl(var(--foreground));
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+/* Custom colors for charts */
+.chart-1 {
+  color: hsl(var(--chart-1));
+}
+.chart-2 {
+  color: hsl(var(--chart-2));
+}
+.chart-3 {
+  color: hsl(var(--chart-3));
+}
+.chart-4 {
+  color: hsl(var(--chart-4));
+}
+.chart-5 {
+  color: hsl(var(--chart-5));
+}
+.chart-6 {
+  color: hsl(var(--chart-6));
 }

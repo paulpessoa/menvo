@@ -1,33 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/api-utils'
+import { createClient } from '@/utils/supabase/server'
+import { NextResponse } from 'next/server'
 
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createSupabaseServerClient()
-    
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'linkedin',
-      options: {
-        redirectTo: `${request.headers.get('origin')}/auth/callback`,
-        scopes: 'r_liteprofile r_emailaddress',
-      },
-    })
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
 
-    if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+  if (code) {
+    const supabase = createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
     }
-
-    return NextResponse.json({
-      url: data.url
-    })
-
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    )
   }
+
+  // return the user to an error page with some instructions
+  return NextResponse.redirect(`${requestUrl.origin}/login?error=oauth_failed`)
 }

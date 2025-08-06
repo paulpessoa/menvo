@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { redirect } from 'next/navigation'
-import { supabase } from "@/services/auth"
+import { supabase } from "@/services/auth/supabase" // Corrected import path
 
 export default function AuthPage() {
   useEffect(() => {

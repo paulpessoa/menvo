@@ -1,57 +1,85 @@
-import Image from 'next/image'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Contributors } from '@/components/Contributors'
-import { Partners } from '@/components/Partners'
+"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Users, Lightbulb, Handshake, Goal, Heart, ArrowRight } from 'lucide-react'
+import { Contributors } from "@/components/Contributors"
+import { Partners } from "@/components/Partners"
+import { useTranslation } from "react-i18next"
 
 export default function AboutPage() {
+  const { t } = useTranslation()
+
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <section className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-4">Sobre a Menvo</h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          A Menvo é uma plataforma dedicada a conectar pessoas em busca de orientação com mentores voluntários experientes, promovendo o desenvolvimento pessoal e profissional.
+    <div className="container mx-auto px-4 py-12">
+      {/* Hero Section */}
+      <section className="text-center mb-16">
+        <h1 className="text-4xl font-bold tracking-tight mb-4">
+          {t('about.hero.title')}
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          {t('about.hero.description')}
         </p>
+        <div className="mt-8 flex justify-center gap-4">
+          <Link href="/mentors" passHref>
+            <Button size="lg">
+              {t('about.hero.findMentors')} <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/how-it-works" passHref>
+            <Button size="lg" variant="outline">
+              {t('about.hero.howItWorks')}
+            </Button>
+          </Link>
+        </div>
       </section>
 
-      <section className="grid md:grid-cols-2 gap-8 mb-12">
-        <Card className="p-6">
+      {/* Mission & Vision */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold">Nossa Missão</CardTitle>
+            <Lightbulb className="h-8 w-8 text-primary mb-2" />
+            <CardTitle>{t('about.mission.title')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 dark:text-gray-300">
-              Nossa missão é democratizar o acesso à mentoria de qualidade, criando uma comunidade onde o conhecimento e a experiência são compartilhados livremente. Acreditamos que todos merecem a oportunidade de aprender e crescer, independentemente de sua origem ou condição financeira.
+            <p className="text-muted-foreground">
+              {t('about.mission.description')}
             </p>
           </CardContent>
         </Card>
-        <Card className="p-6">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-semibold">Nossa Visão</CardTitle>
+            <Goal className="h-8 w-8 text-primary mb-2" />
+            <CardTitle>{t('about.vision.title')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 dark:text-gray-300">
-              Ser a principal plataforma global de mentoria voluntária, reconhecida por sua eficácia em conectar talentos e por seu impacto positivo na vida de milhões de pessoas, construindo um futuro mais equitativo e capacitado.
+            <p className="text-muted-foreground">
+              {t('about.vision.description')}
             </p>
           </CardContent>
         </Card>
       </section>
 
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossa História</h2>
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div className="space-y-4">
-            <p className="text-gray-700 dark:text-gray-300">
-              A Menvo nasceu da paixão por conectar pessoas e do desejo de tornar a mentoria acessível a todos. Em 2023, durante o Hackathon Latinoware, um grupo de visionários se uniu para criar uma solução que pudesse preencher a lacuna entre quem busca conhecimento e quem tem a experiência para compartilhar.
-            </p>
-            <p className="text-gray-700 dark:text-gray-300">
-              Desde então, a plataforma evoluiu, impulsionada pelo feedback da comunidade e pelo compromisso de nossos voluntários. Continuamos a crescer, expandindo nossa rede de mentores e mentees, e aprimorando nossas ferramentas para facilitar conexões significativas.
-            </p>
+      <Separator className="my-16" />
+
+      {/* Our Story */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {t('about.ourStory.title')}
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div className="space-y-4 text-muted-foreground">
+            <p>{t('about.ourStory.paragraph1')}</p>
+            <p>{t('about.ourStory.paragraph2')}</p>
+            <p>{t('about.ourStory.paragraph3')}</p>
           </div>
-          <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden shadow-lg">
+          <div className="relative h-64 w-full md:h-96 rounded-lg overflow-hidden shadow-lg">
             <Image
-              src="/images/about/hackathon-latinoware-paul-ismaela-italo.jpg"
-              alt="Menvo Team at Hackathon Latinoware"
+              src="/images/about/menvo-team.png"
+              alt="Menvo Team"
               layout="fill"
               objectFit="cover"
               className="rounded-lg"
@@ -60,91 +88,81 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossa Equipe</h2>
-        <div className="relative w-full h-64 md:h-[400px] rounded-lg overflow-hidden shadow-lg mb-8">
-          <Image
-            src="/images/about/menvo-team.png"
-            alt="Menvo Team"
-            layout="fill"
-            objectFit="cover"
-            className="rounded-lg"
-          />
-        </div>
-        <p className="text-center text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-          Somos um grupo diversificado de voluntários, desenvolvedores, designers e entusiastas da educação, todos unidos por um objetivo comum: capacitar indivíduos através do poder da mentoria.
-        </p>
-      </section>
+      <Separator className="my-16" />
 
-      <Separator className="my-12" />
-
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">Nossos Valores</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="p-6 text-center">
+      {/* Our Values */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {t('about.ourValues.title')}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Acessibilidade</CardTitle>
+              <Users className="h-8 w-8 text-primary mx-auto mb-2" />
+              <CardTitle>{t('about.ourValues.community.title')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300">
-                Acreditamos que a mentoria deve ser para todos, sem barreiras financeiras ou geográficas.
+              <p className="text-muted-foreground">
+                {t('about.ourValues.community.description')}
               </p>
             </CardContent>
           </Card>
-          <Card className="p-6 text-center">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Comunidade</CardTitle>
+              <Handshake className="h-8 w-8 text-primary mx-auto mb-2" />
+              <CardTitle>{t('about.ourValues.collaboration.title')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300">
-                Fomentamos um ambiente de apoio mútuo, respeito e colaboração.
+              <p className="text-muted-foreground">
+                {t('about.ourValues.collaboration.description')}
               </p>
             </CardContent>
           </Card>
-          <Card className="p-6 text-center">
+          <Card className="text-center">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Crescimento</CardTitle>
+              <Heart className="h-8 w-8 text-primary mx-auto mb-2" />
+              <CardTitle>{t('about.ourValues.impact.title')}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 dark:text-gray-300">
-                Nosso foco é o desenvolvimento contínuo de mentees e mentores.
+              <p className="text-muted-foreground">
+                {t('about.ourValues.impact.description')}
               </p>
             </CardContent>
           </Card>
         </div>
       </section>
 
-      <Separator className="my-12" />
+      <Separator className="my-16" />
 
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-50 mb-8">ODS que Apoiamos</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="flex flex-col items-center text-center">
-            <Image src="/public/images/SDG-4.svg" alt="ODS 4 - Educação de Qualidade" width={100} height={100} />
-            <p className="mt-2 text-sm font-medium">Educação de Qualidade</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <Image src="/public/images/SDG-5.svg" alt="ODS 5 - Igualdade de Gênero" width={100} height={100} />
-            <p className="mt-2 text-sm font-medium">Igualdade de Gênero</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <Image src="/public/images/SDG-8.svg" alt="ODS 8 - Trabalho Decente e Crescimento Econômico" width={100} height={100} />
-            <p className="mt-2 text-sm font-medium">Trabalho Decente e Crescimento Econômico</p>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <Image src="/public/images/SDG-10.svg" alt="ODS 10 - Redução das Desigualdades" width={100} height={100} />
-            <p className="mt-2 text-sm font-medium">Redução das Desigualdades</p>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="my-12" />
-
+      {/* Contributors Section */}
       <Contributors />
 
-      <Separator className="my-12" />
+      <Separator className="my-16" />
 
+      {/* Partners Section */}
       <Partners />
+
+      {/* Call to Action */}
+      <section className="text-center mt-16">
+        <h2 className="text-3xl font-bold mb-4">
+          {t('about.cta.title')}
+        </h2>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          {t('about.cta.description')}
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <Link href="/signup" passHref>
+            <Button size="lg">
+              {t('about.cta.becomeMentor')} <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/doar" passHref>
+            <Button size="lg" variant="outline">
+              {t('about.cta.supportUs')}
+            </Button>
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }

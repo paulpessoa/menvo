@@ -1,33 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/service'; // Import the service client
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { user_profile } from '@/types/database';
 
-export async function GET(req: NextRequest) {
-  const supabase = createClient(); // Use the service client for admin operations
+export async function GET(request: Request) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // Ensure only authenticated admins can access this route
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // In a real application, you'd check the user's role here
-  // For now, we'll assume any authenticated user can fetch users,
-  // but for sensitive admin actions, you'd verify `user.app_metadata.user_role === 'admin'`
-  // or query the user_profiles table for their role.
+  // Check if the user is an admin
+  const { data: profile, error: profileError } = await supabase
+    .from('user_profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
 
-  try {
-    const { data: users, error } = await supabase
-      .from('user_profiles')
-      .select('*'); // Select all user profiles
-
-    if (error) {
-      console.error('Error fetching users:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(users, { status: 200 });
-  } catch (error: any) {
-    console.error('Unexpected error fetching users:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  if (profileError || profile?.role !== 'admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching users:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
 }

@@ -1,102 +1,98 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { toast } from '@/components/ui/use-toast'
-import { unsubscribeFromNewsletter } from '@/services/newsletter/newsletter' // Assuming this service exists
-import Link from 'next/link'
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { useSearchParams } from "next/navigation"
+import { useNewsletter } from "@/hooks/useNewsletter"
+import { useToast } from "@/hooks/useToast"
 
 export default function UnsubscribePage() {
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [unsubscribed, setUnsubscribed] = useState(false)
-  const router = useRouter()
   const searchParams = useSearchParams()
+  const email = searchParams.get("email")
+  const token = searchParams.get("token")
+  const { unsubscribe } = useNewsletter()
+  const { toast } = useToast()
 
-  // Pre-fill email if provided in URL (e.g., from an unsubscribe link)
-  useState(() => {
-    const emailParam = searchParams.get('email')
-    if (emailParam) {
-      setEmail(emailParam)
-    }
-  })
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
+  const [message, setMessage] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    try {
-      // Call your unsubscribe service
-      const { error } = await unsubscribeFromNewsletter(email)
-      if (error) {
-        throw error
+  useEffect(() => {
+    const handleUnsubscribe = async () => {
+      if (!email || !token) {
+        setStatus("error")
+        setMessage("Link de descadastro inválido ou incompleto.")
+        toast({
+          title: "Erro no descadastro",
+          description: "Link inválido ou incompleto.",
+          variant: "destructive",
+        })
+        return
       }
-      setUnsubscribed(true)
-      toast({
-        title: 'Inscrição cancelada!',
-        description: 'Você foi removido da nossa lista de e-mails com sucesso.',
-        variant: 'default',
-      })
-    } catch (error: any) {
-      toast({
-        title: 'Erro ao cancelar inscrição',
-        description: error.message || 'Ocorreu um erro inesperado. Tente novamente.',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
+
+      try {
+        const { success, error } = await unsubscribe(email, token)
+
+        if (success) {
+          setStatus("success")
+          setMessage("Você foi descadastrado com sucesso da nossa lista de e-mails.")
+          toast({
+            title: "Descadastro bem-sucedido!",
+            description: "Você não receberá mais nossos e-mails.",
+            variant: "default",
+          })
+        } else {
+          setStatus("error")
+          setMessage(error || "Ocorreu um erro ao tentar descadastrar seu e-mail. O link pode ter expirado ou ser inválido.")
+          toast({
+            title: "Erro no descadastro",
+            description: error || "Não foi possível descadastrar. Tente novamente ou entre em contato.",
+            variant: "destructive",
+          })
+        }
+      } catch (err: any) {
+        setStatus("error")
+        setMessage(err.message || "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.")
+        toast({
+          title: "Erro inesperado",
+          description: err.message || "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
+          variant: "destructive",
+        })
+      }
     }
-  }
+
+    handleUnsubscribe()
+  }, [email, token, unsubscribe, toast])
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
+      <Card className="w-full max-w-md text-center">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Cancelar Inscrição</CardTitle>
+          {status === "loading" && (
+            <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+          )}
+          {status === "success" && (
+            <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+          )}
+          {status === "error" && (
+            <XCircle className="mx-auto h-12 w-12 text-red-500" />
+          )}
+          <CardTitle className="text-2xl font-bold">
+            {status === "loading" && "Processando descadastro..."}
+            {status === "success" && "Descadastro Concluído!"}
+            {status === "error" && "Erro no Descadastro"}
+          </CardTitle>
           <CardDescription>
-            {unsubscribed
-              ? 'Sua inscrição foi cancelada com sucesso.'
-              : 'Digite seu email para cancelar sua inscrição em nossa newsletter.'}
+            {message}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {unsubscribed ? (
-            <div className="text-center space-y-4">
-              <p>Você não receberá mais e-mails de marketing de nós.</p>
-              <Link href="/" passHref>
-                <Button>Voltar para a Página Inicial</Button>
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Processando...' : 'Cancelar Inscrição'}
-              </Button>
-            </form>
-          )}
+          <Link href="/" passHref>
+            <Button className="w-full">Voltar para a Página Inicial</Button>
+          </Link>
         </CardContent>
-        {!unsubscribed && (
-          <CardFooter className="flex justify-center">
-            <Link href="/" className="text-sm text-blue-600 hover:underline">
-              Voltar para a Página Inicial
-            </Link>
-          </CardFooter>
-        )}
       </Card>
     </div>
   )

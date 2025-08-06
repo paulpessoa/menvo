@@ -1,10 +1,14 @@
-import { Loader2Icon } from 'lucide-react'
+"use client"
+
+import { Loader2 } from 'lucide-react'
 
 export default function Loading() {
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <Loader2Icon className="h-8 w-8 animate-spin" />
-      <span className="ml-2">Carregando eventos...</span>
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="text-lg text-muted-foreground">Carregando eventos...</p>
+      </div>
     </div>
   )
 }
