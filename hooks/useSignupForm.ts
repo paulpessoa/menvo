@@ -1,9 +1,7 @@
-"use client"
+import { useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
-import { useMutation } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
-
-export type UserType = "mentee" | "mentor" | "company" | "recruiter"
+export type UserType = 'mentee' | 'mentor' | 'company' | 'recruiter'
 
 interface SignupData {
   email: string
@@ -13,60 +11,33 @@ interface SignupData {
   userType: UserType
 }
 
-interface SignupResponse {
-  success: boolean
-  message: string
-  user: {
-    id: string
-    email: string
-    emailConfirmed: boolean
-  }
-}
-
 export function useSignupMutation() {
   const router = useRouter()
 
   return useMutation({
-    mutationFn: async ({ email, password, firstName, lastName, userType }: SignupData): Promise<SignupResponse> => {
-      console.log("🚀 Iniciando registro:", { email, firstName, lastName, userType })
-
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+    mutationFn: async ({ email, password, firstName, lastName, userType }: SignupData) => {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: email.trim(),
+          email,
           password,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          userType,
+          firstName,
+          lastName,
+          role: userType
         }),
-        credentials: "include",
+        credentials: 'include'
       })
-
-      const data = await response.json()
-
+      
       if (!response.ok) {
-        console.error("❌ Erro na resposta:", data)
-        throw new Error(data.error || `Erro ${response.status}: ${response.statusText}`)
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao registrar usuário')
       }
-
-      console.log("✅ Registro bem-sucedido:", data)
-      return data
+      
+      return response.json()
     },
-    onSuccess: (data) => {
-      console.log("🎉 Mutation bem-sucedida:", data)
-      // Redirecionar para página de confirmação ou dashboard
-      if (!data.user.emailConfirmed) {
-        router.push("/confirmation")
-      } else {
-        router.push("/dashboard")
-      }
-    },
-    onError: (error) => {
-      console.error("💥 Erro na mutation:", error)
-    },
+    onSuccess: () => {
+      router.push('/confirmation')
+    }
   })
 }

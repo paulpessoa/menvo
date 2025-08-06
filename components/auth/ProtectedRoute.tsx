@@ -1,70 +1,80 @@
-"use client"
-
-import type React from "react"
-import { useAuth } from "@/app/context/auth-context"
-import { hasPermission, type Permission, type UserRole } from "@/lib/auth/rbac"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { Loader2 } from "lucide-react"
+import { useAuth } from '@/hooks/useAuth'
+import { useUserProfile } from '@/hooks/useUserProfile'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { UserRoleType } from '@/hooks/usePermissions'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  requiredPermission?: Permission
-  requiredRole?: UserRole
-  fallbackPath?: string
+  requiredRoles?: UserRoleType[]
+  requireEmailConfirmation?: boolean
 }
 
-export function ProtectedRoute({
-  children,
-  requiredPermission,
-  requiredRole,
-  fallbackPath = "/login",
+export function ProtectedRoute({ 
+  children, 
+  requiredRoles = [], 
+  requireEmailConfirmation = true 
 }: ProtectedRouteProps) {
-  const { user, profile, loading } = useAuth()
+  const { user, loading: isLoading} = useAuth()
+  const { data: userProfile } = useUserProfile()
   const router = useRouter()
 
   useEffect(() => {
-    if (loading) return
+    if (!isLoading) {
+      // Se não estiver autenticado, redireciona para login
+      if (!user) {
+        router.push('/login')
+        return
+      }
 
-    if (!user) {
-      router.push(fallbackPath)
-      return
+      // Se precisar confirmar email e não estiver confirmado
+      if (requireEmailConfirmation && !userProfile?.email_confirmed_at) {
+        router.push('/confirmation')
+        return
+      }
+
+      // Se tiver roles específicas requeridas
+      if (requiredRoles.length > 0) {
+        const hasRequiredRole = userProfile?.roles.some(role => 
+          requiredRoles.includes(role)
+        )
+
+        if (!hasRequiredRole) {
+          router.push('/unauthorized')
+          return
+        }
+      }
     }
+  }, [user, isLoading, userProfile, requiredRoles, requireEmailConfirmation, router])
 
-    if (!profile || profile.role === "pending") {
-      router.push("/welcome")
-      return
-    }
-
-    if (requiredRole && profile.role !== requiredRole) {
-      router.push("/unauthorized")
-      return
-    }
-
-    if (requiredPermission && !hasPermission(profile.role, requiredPermission)) {
-      router.push("/unauthorized")
-      return
-    }
-  }, [user, profile, loading, requiredPermission, requiredRole, router, fallbackPath])
-
-  if (loading) {
+  // Mostrar loading enquanto verifica autenticação
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     )
   }
 
-  if (!user || !profile || profile.role === "pending") {
+  // Se não estiver autenticado, não renderiza nada
+  if (!user) {
     return null
   }
 
-  if (requiredRole && profile.role !== requiredRole) {
+  // Se precisar confirmar email e não estiver confirmado, não renderiza nada
+  if (requireEmailConfirmation && !userProfile?.email_confirmed_at) {
     return null
   }
 
-  if (requiredPermission && !hasPermission(profile.role, requiredPermission)) {
-    return null
+  // Se tiver roles específicas requeridas e não tiver nenhuma delas, não renderiza nada
+  if (requiredRoles.length > 0) {
+    const hasRequiredRole = userProfile?.roles.some(role => 
+      requiredRoles.includes(role)
+    )
+
+    if (!hasRequiredRole) {
+      return null
+    }
   }
 
   return <>{children}</>

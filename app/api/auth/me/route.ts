@@ -1,49 +1,50 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
-import { getUserPermissions } from "@/lib/auth/rbac"
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/api-utils'
 
 export async function GET(request: NextRequest) {
+  const authResult = await requireAuth(request)
+  
+  if (authResult instanceof Response) {
+    return authResult // Erro de autenticação
+  }
+
+  const { user, supabase } = authResult
+
+  if (!user?.id) {
+    return NextResponse.json(
+      { error: 'ID do usuário não encontrado' },
+      { status: 400 }
+    )
+  }
+
   try {
-    const supabase = await createClient()
+    // Buscar dados completos do usuário na tabela users
+    const { data: userData, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single()      
 
-    // Verificar se o usuário está autenticado
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
+    if (error) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado na base de dados' },
+        { status: 404 }
+      )
     }
-
-    // Buscar perfil do usuário
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single()
-
-    if (profileError) {
-      console.error("Erro ao buscar perfil:", profileError)
-      return NextResponse.json({ error: "Erro ao buscar perfil" }, { status: 500 })
-    }
-
-    // Obter permissões do usuário
-    const permissions = getUserPermissions(profile.role)
 
     return NextResponse.json({
+      success: true,
       user: {
         id: user.id,
         email: user.email,
-        email_confirmed_at: user.email_confirmed_at,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      },
-      profile,
-      permissions,
+        ...userData,
+      }
     })
+
   } catch (error) {
-    console.error("Erro na API /auth/me:", error)
-    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
   }
 }

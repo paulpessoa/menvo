@@ -1,23 +1,21 @@
-"use client"
+import { useState, useEffect } from 'react';
+import i18n from '../i18n/config';
 
-import { useState, useEffect } from "react"
-import { useTranslation } from "react-i18next"
+export const useLanguage = () => {
+  const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
 
-export function useLanguage() {
-  const { i18n } = useTranslation()
-  const [currentLanguage, setCurrentLanguage] = useState("pt-BR")
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setCurrentLanguage(lng);
+  };
 
   useEffect(() => {
-    setCurrentLanguage(i18n.language || "pt-BR")
-  }, [i18n.language])
-
-  const changeLanguage = (language: string) => {
-    i18n.changeLanguage(language)
-    setCurrentLanguage(language)
-  }
+    const language = localStorage.getItem('language') || 'pt-BR';
+    changeLanguage(language);
+  }, []);
 
   return {
     currentLanguage,
     changeLanguage,
-  }
-}
+  };
+};

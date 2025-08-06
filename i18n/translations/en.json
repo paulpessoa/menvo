@@ -12,8 +12,8 @@
     "logout": "Logout",
     "language": "Language",
     "english": "English",
-    "portuguese": "Português",
-    "spanish": "Español",
+    "portuguese": "Portuguese", 
+    "spanish": "Spanish",
     "cancel": "Cancel",
     "continue": "Continue",
     "submit": "Submit",
@@ -26,7 +26,6 @@
     "firstName": "First Name",
     "lastName": "Last Name",
     "loading": "Loading...",
-    "saving": "Saving...",
     "close": "Close",
     "submitting": "Submitting..."
   },
@@ -97,7 +96,7 @@
         "description": "Building a supportive community where knowledge is freely shared and connections are made across backgrounds and borders."
       },
       "accessibility": {
-        "title": "Accessibility",
+        "title": "Accessibility", 
         "description": "Making mentorship accessible to everyone, regardless of their financial situation, location, or background."
       },
       "impact": {
@@ -111,7 +110,7 @@
       "goalNumber": "SDG {{number}}",
       "goals": {
         "qualityEducation": "Quality Education",
-        "genderEquality": "Gender Equality",
+        "genderEquality": "Gender Equality", 
         "decentWork": "Decent Work and Economic Growth",
         "reducedInequalities": "Reduced Inequalities"
       }
@@ -131,7 +130,7 @@
         "label": "Volunteer Mentors"
       },
       "mentorshipSessions": {
-        "count": "5,000+",
+        "count": "5,000+", 
         "label": "Mentorship Sessions"
       },
       "countriesReached": {
@@ -168,7 +167,7 @@
         "title": "Create Your Profile",
         "description": "Sign up and create your profile with details about your background, goals, and interests. This helps us match you with the right mentors.",
         "feature1": "Upload your resume",
-        "feature2": "Add your profile picture",
+        "feature2": "Add your profile picture", 
         "feature3": "Connect your LinkedIn profile"
       },
       "step2": {
@@ -220,7 +219,7 @@
         "title": "Conduct Mentorship Sessions",
         "description": "Connect with mentees via video calls. Share your knowledge, provide guidance, and help them navigate their challenges.",
         "feature1": "Receive session requests",
-        "feature2": "Conduct video mentorship sessions",
+        "feature2": "Conduct video mentorship sessions", 
         "feature3": "Track your impact and sessions"
       },
       "becomeMentor": "Become a Mentor"
@@ -257,12 +256,11 @@
     }
   },
   "login": {
-    "title": "Welcome back",
-    "description": "Sign in to your account to access the platform",
-    "email": "Email",
+   "title": "Welcome",
+   "description": "Sign in to your account to continue",
+   "email": "Email",
     "emailPlaceholder": "name@example.com",
     "password": "Password",
-    "passwordPlaceholder": "Enter your password",
     "forgotPassword": "Forgot password?",
     "loginButton": "Log in",
     "loggingIn": "Logging in...",
@@ -270,23 +268,15 @@
     "signUp": "Sign up",
     "continueWith": "Continue with",
     "google": "Google",
-    "linkedin": "LinkedIn",
+    "linkedin": "LinkedIn", 
     "github": "GitHub",
-    "connecting": "Connecting...",
-    "emailNotConfirmedInfo": "Check your inbox to verify your email.",
-    "dontHaveAccount": "Don't have an account?",
-    "error": {
-      "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
-      "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
-      "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
-      "networkError": "Connection error. Please check your internet and try again."
-    }
+    "connecting": "Connecting..."
   },
   "register": {
-    "title": "Join Menvo",
-    "subtitle": "Connect with volunteer mentors and develop your career for free",
-    "signupTitle": "Create Account",
-    "description": "Fill in your details to start your journey",
+    "title": "Create your account",
+    "subtitle": "Join our community to connect with mentors and grow professionally",
+    "signupTitle": "Sign Up",
+    "description": "Fill in the details to get started",
     "firstName": "First Name",
     "firstNamePlaceholder": "Enter your first name",
     "lastName": "Last Name",
@@ -296,8 +286,6 @@
     "emailInvalid": "Invalid email",
     "password": "Password",
     "passwordPlaceholder": "Create a password",
-    "confirmPassword": "Confirm Password",
-    "confirmPasswordPlaceholder": "Enter password again",
     "mentor": "Mentor",
     "mentee": "Mentee",
     "registerButton": "Register",
@@ -310,61 +298,33 @@
     "nextSteps": "Next steps:",
     "nextStepsList": [
       "Check your inbox (and spam folder)",
-      "Click the confirmation link in the email",
-      "Choose your user type (mentor or mentee)",
-      "Complete your profile with your information",
-      "Wait for our team validation (mentors only)"
+      "Click the confirmation link in the email", 
+      "Be automatically redirected to the website",
+      "Complete your profile and start exploring!"
     ],
-    "afterConfirmation": "After confirming your email, you'll be able to choose whether you want to be a mentor or mentee and complete your profile. Mentors will go through a validation process with our team before being published.",
+    "afterConfirmation": "After confirmation, complete your profile and schedule a validation call. Our team will contact you to validate your information.",
     "didntReceiveEmail": "Didn't receive the email?",
-    "checkSpam": "Check your spam or junk folder. The confirmation link expires in 24 hours.",
-    "emailExpired": "Confirmation link expired?",
-    "emailExpiredDescription": "If the confirmation link expired (24 hours), you can use the 'Forgot my password' option to reset and confirm your account.",
-    "resendEmail": "Resend email",
-    "emailExpiredAction": "Link expired? Reset password",
-    "tryAgain": "Try again",
-    "emailConfirmed": "Email Confirmed!",
-    "emailConfirmedDescription": "Your email has been confirmed successfully. Now choose how you want to use the platform.",
-    "selectRoleDescription": "Choose how you want to use the platform:",
-    "menteeDescription": "I seek guidance and professional development",
-    "mentorDescription": "I want to share knowledge and guide other professionals",
-    "continue": "Continue",
-    "welcome": {
-      "title": "Welcome to Menvo!",
-      "description": "Your account has been confirmed successfully. Now choose how you want to use the platform.",
-      "selectRoleDescription": "Choose how you want to use the platform:",
-      "continue": "Continue"
-    },
+    "checkSpam": "Check your spam or junk folder. If you still can't find it, you can try logging in and resending the confirmation email.",
     "goToLogin": "Go to Login",
-    "passwordValidation": {
-      "passwordsDontMatch": "Passwords don't match",
-      "passwordTooShort": "Password must be at least 6 characters long",
-      "passwordStrength": "Password strength:",
-      "passwordTooWeak": "Password too weak",
-      "passwordMedium": "Medium password",
-      "passwordStrong": "Strong password",
-      "passwordsMatch": "✓ Passwords match",
-      "passwordsDontMatchError": "Passwords don't match"
-    },
     "goToHome": "Back to Home",
     "goToVerification": "Go to verification page",
     "userType": {
-      "title": "How do you want to participate?",
+      "title": "I am:",
       "mentee": {
         "title": "Mentee",
-        "description": "I seek guidance to develop my career"
+        "description": "I seek guidance and support"
       },
       "mentor": {
         "title": "Mentor",
-        "description": "I want to share my experience and help others"
+        "description": "Want to share knowledge"
       },
       "company": {
         "title": "Company",
-        "description": "I want to enroll professionals from our company"
+        "description": "Enroll my company's professionals"
       },
       "recruiter": {
         "title": "Recruiter",
-        "description": "I'm seeking qualified professionals for opportunities"
+        "description": "Seeking qualified professionals"
       }
     }
   },
@@ -417,7 +377,7 @@
       "benefits": {
         "title": "What you can do after logging in:",
         "item1": "View detailed mentor profiles",
-        "item2": "Schedule free mentorship sessions",
+        "item2": "Schedule free mentorship sessions", 
         "item3": "Message mentors directly",
         "item4": "Access your mentorship history"
       },
@@ -599,18 +559,5 @@
       "title": "MENVO - Volunteer Mentoring Platform",
       "description": "Connecting mentors and mentees for free mentoring sessions"
     }
-  },
-  "waitingList": {
-    "title": "Join the Waiting List",
-    "description": "Thank you for your interest! Please fill out the form below.",
-    "nameLabel": "Name",
-    "namePlaceholder": "Enter your full name",
-    "emailPlaceholder": "your@email.com",
-    "whatsappLabel": "WhatsApp (optional)",
-    "whatsappPlaceholder": "Your WhatsApp number",
-    "reasonLabel": "Why do you want to be part?",
-    "reasonPlaceholder": "Tell us why you want to join",
-    "successMessage": "Thank you for your interest!",
-    "errorMessage": "Error submitting form"
   }
 }

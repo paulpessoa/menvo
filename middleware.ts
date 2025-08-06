@@ -1,83 +1,88 @@
-import { createServerClient } from "@supabase/ssr"
-import { NextResponse, type NextRequest } from "next/server"
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+// Rotas públicas que não precisam de autenticação
+const publicRoutes = [
+  '/',
+  '/about',
+  '/how-it-works',
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/reset-password',
+  '/confirmation',
+  '/unauthorized',
+  '/welcome',
+  '/unsubscribe',
+  '/auth/callback',
+  '/api/auth/google',
+  '/api/auth/linkedin',
+  '/api/auth/github'
+]
+
+// Rotas que precisam de email confirmado
+const emailConfirmationRequired = [
+  '/mentorship',
+  '/settings',
+  '/calendar',
+  '/messages',
+  '/talents',
+  '/talent',
+  '/admin'
+]
+
+// Rotas que precisam de autenticação
+const protectedRoutes = [
+  '/profile',
+  '/mentorship',
+  '/settings',
+  '/calendar',
+  '/messages',
+  '/talents',
+  '/talent',
+  '/admin'
+]
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  try {
+    // Criar cliente Supabase para o middleware
+    const res = NextResponse.next()
+    const supabase = createMiddlewareClient({ req: request, res })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          })
-        },
-      },
-    },
-  )
+    // Atualizar sessão se necessário
+    const { data: { session }, error } = await supabase.auth.getSession()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    if (error) {
+      console.error('Auth error:', error)
+    }
 
-  // Rotas protegidas que requerem autenticação
-  const protectedRoutes = ["/dashboard", "/profile", "/settings", "/mentors/[id]"]
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route.replace("[id]", "")),
-  )
+    const path = request.nextUrl.pathname
 
-  // Redirecionar para login se não autenticado em rota protegida
-  if (isProtectedRoute && !user) {
-    return NextResponse.redirect(new URL("/login", request.url))
+    // Se for rota pública, permite acesso
+    if (publicRoutes.some(route => path.startsWith(route))) {
+      return res
+    }
+
+    // Se não estiver autenticado e tentar acessar rota protegida, redireciona para login
+    if (!session && protectedRoutes.some(route => path.startsWith(route))) {
+      const redirectUrl = new URL('/login', request.url)
+      redirectUrl.searchParams.set('redirectTo', path)
+      return NextResponse.redirect(redirectUrl)
+    }
+
+    // Verificar se email está confirmado para rotas que exigem confirmação
+    if (emailConfirmationRequired.some(route => path.startsWith(route))) {
+      if (!session?.user?.email_confirmed_at) {
+        return NextResponse.redirect(new URL('/confirmation', request.url))
+      }
+    }
+
+    return res
+  } catch (error) {
+    console.error('Middleware error:', error)
+    return NextResponse.next()
   }
-
-  // Redirecionar usuários autenticados das páginas de auth
-  const authRoutes = ["/login", "/signup", "/forgot-password"]
-  const isAuthRoute = authRoutes.includes(request.nextUrl.pathname)
-
-  if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
-  }
-
-  return response
 }
 
 export const config = {
@@ -87,8 +92,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * - public folder
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],
 }

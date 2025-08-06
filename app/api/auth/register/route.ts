@@ -1,156 +1,86 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-// Cliente admin com service role key
-const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
+import { NextRequest, NextResponse } from 'next/server'
+import { createSupabaseServerClient } from '@/lib/api-utils'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { email, password, firstName, lastName, userType } = body
+    const supabase = await createSupabaseServerClient()
+    const { email, password, firstName, lastName, role } = await request.json()
 
-    console.log("📝 Dados recebidos:", { email, firstName, lastName, userType })
-
-    // Validar entrada
-    if (!email || !password || !firstName || !lastName) {
-      console.error("❌ Campos obrigatórios faltando")
-      return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 })
-    }
-
-    // Validar formato do email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json({ error: "Email inválido" }, { status: 400 })
-    }
-
-    // Validar senha
-    if (password.length < 6) {
-      return NextResponse.json({ error: "Senha deve ter pelo menos 6 caracteres" }, { status: 400 })
-    }
-
-    const emailLower = email.toLowerCase().trim()
-    const firstNameTrim = firstName.trim()
-    const lastNameTrim = lastName.trim()
-    const fullName = `${firstNameTrim} ${lastNameTrim}`
-
-    console.log("🔄 Tentando registrar usuário no Supabase Auth...")
-
-    // Registrar usuário no Supabase Auth usando admin client
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: emailLower,
-      password,
-      email_confirm: false, // Requer confirmação por email
-      user_metadata: {
-        first_name: firstNameTrim,
-        last_name: lastNameTrim,
-        full_name: fullName,
-        user_type: userType || "mentee",
-      },
-    })
-
-    if (authError) {
-      console.error("❌ Erro no Supabase Auth:", authError)
-
-      // Tratar erros específicos
-      if (authError.message.includes("already registered") || authError.message.includes("already exists")) {
-        return NextResponse.json({ error: "Este email já está cadastrado" }, { status: 409 })
-      }
-
-      if (authError.message.includes("invalid email")) {
-        return NextResponse.json({ error: "Email inválido" }, { status: 400 })
-      }
-
-      if (authError.message.includes("weak password")) {
-        return NextResponse.json({ error: "Senha muito fraca. Use pelo menos 6 caracteres" }, { status: 400 })
-      }
-
-      return NextResponse.json({ error: "Erro ao registrar usuário", details: authError.message }, { status: 400 })
-    }
-
-    if (!authData.user) {
-      console.error("❌ Usuário não foi criado")
-      return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
-    }
-
-    console.log("✅ Usuário criado no Auth:", authData.user.id)
-
-    // Criar perfil na tabela profiles
-    console.log("🔧 Criando perfil na tabela profiles...")
-
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
-      id: authData.user.id,
-      email: emailLower,
-      first_name: firstNameTrim,
-      last_name: lastNameTrim,
-      full_name: fullName,
-      role: userType || "mentee",
-      status: "pending",
-      verification_status: "pending",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-
-    if (profileError) {
-      console.error("❌ Erro ao criar perfil:", profileError)
-
-      // Se falhar ao criar perfil, deletar usuário do auth
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-
+    if (!email || !password || !firstName || !lastName || !role) {
       return NextResponse.json(
-        {
-          error: "Erro ao criar perfil do usuário",
-          details: profileError.message,
-        },
-        { status: 500 },
+        { error: 'Todos os campos são obrigatórios' },
+        { status: 400 }
       )
     }
 
-    console.log("✅ Perfil criado com sucesso")
-
-    // Enviar email de confirmação
-    try {
-      const { error: emailError } = await supabaseAdmin.auth.admin.generateLink({
-        type: "signup",
-        email: emailLower,
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`,
-        },
-      })
-
-      if (emailError) {
-        console.error("⚠️ Erro ao enviar email de confirmação:", emailError)
-        // Não falhar aqui, pois o usuário já foi criado
-      } else {
-        console.log("✅ Email de confirmação enviado")
+    // Registrar o usuário no Supabase
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          role: role
+        }
       }
-    } catch (emailError) {
-      console.error("⚠️ Erro ao processar email de confirmação:", emailError)
+    })
+
+    if (authError) {
+      return NextResponse.json(
+        { error: 'Erro ao registrar usuário', details: authError.message },
+        { status: 400 }
+      )
     }
 
-    console.log("🎉 Registro concluído com sucesso")
+    const { error: updateError } = await supabase.auth.updateUser({
+    data: {
+      role: [role]
+    }
+  })
+
+   if (updateError) {
+      return NextResponse.json(
+        { error: 'Erro ao registrar informacoes do usuário', details: updateError.message },
+        { status: 400 }
+      )
+    }
+
+    // 2. Adicionar à tabela users (se o usuário foi criado)
+    if (authData.user) {
+      const { error: dbError } = await supabase
+        .from('users')
+        .insert([{
+          id: authData.user.id,
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          role: role,
+          status: 'pending'
+        }])
+
+      if (dbError) {
+        console.error('Erro ao inserir na tabela users:', dbError)
+        // Não retorna erro aqui pois o usuário já foi criado na auth
+      }
+    }
 
     return NextResponse.json({
-      success: true,
-      message: "Usuário registrado com sucesso! Verifique seu email para confirmar a conta.",
+      message: 'Usuário registrado com sucesso',
       user: {
-        id: authData.user.id,
-        email: authData.user.email,
-        emailConfirmed: false,
-      },
+        id: authData.user?.id,
+        email: authData.user?.email,
+        first_name: firstName,
+        last_name: lastName,
+        role: role
+      }
     })
+
   } catch (error) {
-    console.error("💥 Erro interno no endpoint de registro:", error)
+    console.error('Erro no endpoint de registro:', error)
     return NextResponse.json(
-      {
-        error: "Erro interno do servidor",
-        details: error instanceof Error ? error.message : "Erro desconhecido",
-      },
-      { status: 500 },
+      { error: 'Erro interno do servidor', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
     )
   }
 }

@@ -2,25 +2,24 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { Providers } from "./providers"
-import { AuthProvider } from "@/lib/auth/AuthContext"
+import { Providers } from './providers'
 import Header from "@/components/header"
 import Footer from "@/components/footer"
-import { FeedbackBanner } from "@/components/FeedbackBanner"
-import { GoogleAnalytics } from "@next/third-parties/google"
+import { Toaster } from "@/components/ui/toaster"
+import { FeedbackBanner } from '@/components/FeedbackBanner'
+import { WarningBanner } from "@/components/WarningBanner"
+import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from "next/script"
-import { Analytics } from "@vercel/analytics/react"
-import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://menvo.com.br"),
+  metadataBase: new URL('https://menvo.com.br'),
   title: "MENVO - Plataforma de Mentoria Voluntária",
-  description: "Conectando mentores e mentorados para transformar vidas através da mentoria voluntária",
+  description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
   authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
   creator: "Paul Pessoa",
-  publisher: "Menvo",
+  publisher: "MENVO",
   keywords: [
     "mentoria",
     "mentoria voluntária",
@@ -34,30 +33,30 @@ export const metadata: Metadata = {
     "mentoria gratuita",
     "mentoria online",
     "mentoria em tecnologia",
-    "mentoria de carreira",
+    "mentoria de carreira"
   ],
   openGraph: {
     type: "website",
     locale: "pt_BR",
     url: "https://menvo.com.br",
     title: "MENVO - Plataforma de Mentoria Voluntária",
-    description: "Conectando mentores e mentorados para transformar vidas através da mentoria voluntária",
-    siteName: "Menvo",
+    description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+    siteName: "MENVO",
     images: [
       {
         url: "https://menvo.com.br/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Menvo - Plataforma de Mentoria",
-      },
-    ],
+        alt: "MENVO - Plataforma de Mentoria Voluntária"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "MENVO - Plataforma de Mentoria Voluntária",
-    description: "Conectando mentores e mentorados para transformar vidas através da mentoria voluntária",
+    description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
     creator: "@paulpessoa",
-    images: ["https://menvo.com.br/twitter-image.jpg"],
+    images: ["https://menvo.com.br/twitter-image.jpg"]
   },
   robots: {
     index: true,
@@ -65,9 +64,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
   verification: {
@@ -81,10 +80,10 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: dark)", color: "black" }
   ],
   viewport: {
-    width: "device-width",
+    width: 'device-width',
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
@@ -94,22 +93,25 @@ export const metadata: Metadata = {
     "msapplication-TileImage": "/mstile-144x144.png",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
-    "apple-mobile-web-app-title": "Menvo",
-    "application-name": "Menvo",
+    "apple-mobile-web-app-title": "MENVO",
+    "application-name": "MENVO",
     "format-detection": "telephone=no",
     "mobile-web-app-capable": "yes",
     "theme-color": "#ffffff",
   },
-  generator: "v0.dev",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html
+      lang="pt-BR"
+      suppressHydrationWarning
+    >
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -119,33 +121,30 @@ export default function RootLayout({
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
-        <Script
+          <Script
           id="clarity-script"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(c,l,a,r,i,t,y){
-             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-           })(window, document, "clarity", "script", "rz28fusa38");`,
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "rz28fusa38");`,
           }}
         />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <Providers>
-            <Suspense fallback={null}>
-              <div className="flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-                <FeedbackBanner />
-                <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-              </div>
-            </Suspense>
-          </Providers>
-        </AuthProvider>
-        <Analytics />
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <FeedbackBanner />
+            <WarningBanner />
+            <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+          </div>
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )

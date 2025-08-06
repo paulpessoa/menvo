@@ -1,207 +1,217 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { createClient } from "@/utils/supabase/client"
-import { UserPlus, Edit, Trash2, Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import type { user_role, user_status } from "@/types/database"
+import { useEffect, useState } from 'react'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2, Eye, Edit, Save, X } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useUserRoles } from '@/hooks/useUserRoles'
 
-interface UserProfile {
+interface User {
   id: string
+  name: string
   email: string
-  full_name?: string
-  avatar_url?: string
-  role: user_role
-  status: user_status
-  created_at: string
+  status: string
+  roles: string[]
+  email_verified: boolean
 }
 
-export default function AdminUsersPage() {
-  const [users, setUsers] = useState<UserProfile[]>([])
+export default function AdminPage() {
+  const dataProfile  = useUserRoles()
+  const isAdmin = true
+  // const isAdmin = dataProfile ?.roles.some(role => role === 'admin')
+  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedRole, setSelectedRole] = useState<string>("all")
-  const supabase = createClient()
+  const [editingUser, setEditingUser] = useState<string | null>(null)
+  const [editedRoles, setEditedRoles] = useState<string[]>([])
+  const [editedStatus, setEditedStatus] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true)
+  const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false })
-      if (error) throw error
-      setUsers(data || [])
-    } catch (error) {
-      console.error("Erro ao buscar usuários:", error)
-      toast.error("Erro ao carregar usuários")
+      const response = await fetch('/api/admin/users')
+      if (!response.ok) {
+        throw new Error('Failed to fetch users')
+      }
+      const data = await response.json()
+      setUsers(data.users)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch users')
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }
 
   useEffect(() => {
     fetchUsers()
-  }, [fetchUsers])
+  }, [])
 
-  const updateUserRole = async (userId: string, newRole: user_role) => {
+  useEffect(() => {
+    if (dataProfile && dataProfile.roles) {
+      console.log('[MENVO] Acessos do usuário (admin):', dataProfile.roles.map(r => r))
+    }
+  }, [dataProfile ])
+
+  const handleEdit = (user: User) => {
+    setEditingUser(user.id)
+    setEditedRoles(user.roles)
+    setEditedStatus(user.status)
+  }
+
+  const handleCancel = () => {
+    setEditingUser(null)
+    setEditedRoles([])
+    setEditedStatus('')
+  }
+
+  const handleSave = async (userId: string) => {
     try {
-      const { error } = await supabase.from("profiles").update({ role: newRole }).eq("id", userId)
-      if (error) throw error
-      toast.success("Role do usuário atualizada com sucesso!")
-      fetchUsers() // Recarrega a lista
-    } catch (error) {
-      console.error("Erro ao atualizar role:", error)
-      toast.error("Falha ao atualizar a role do usuário.")
+      setError(null)
+      setSuccess(null)
+
+      const response = await fetch('/api/admin/users/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          roles: editedRoles,
+          status: editedStatus,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to update user')
+      }
+
+      setSuccess('User updated successfully')
+      setEditingUser(null)
+      fetchUsers() // Refresh the list
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update user')
     }
   }
-
-  const filteredUsers = users.filter(
-    (user) =>
-      (user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedRole === "all" || user.role === selectedRole),
-  )
-
-  const getRoleColor = (role: string) => {
-    const colors: { [key: string]: string } = {
-      admin: "bg-red-100 text-red-800",
-      mentor: "bg-blue-100 text-blue-800",
-      mentee: "bg-green-100 text-green-800",
-      volunteer: "bg-purple-100 text-purple-800",
-      moderator: "bg-orange-100 text-orange-800",
-      pending: "bg-gray-100 text-gray-800",
-    }
-    return colors[role] || "bg-gray-100 text-gray-800"
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
+  console.log({isAdmin})
 
   return (
-    <ProtectedRoute requiredPermissions={["admin_users"]}>
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Gerenciar Usuários</h1>
-            <p className="text-muted-foreground">Administre usuários, roles e permissões.</p>
+    // <ProtectedRoute requiredRoles={['admin']}>
+      <div className="container py-8">
+        <h1 className="text-3xl font-bold mb-6">Painel Administrativo</h1>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
           </div>
-          <Button disabled>
-            <UserPlus className="h-4 w-4 mr-2" />
-            Adicionar Usuário (Em breve)
-          </Button>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Filtros</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="search">Buscar por Nome ou Email</Label>
-              <Input
-                id="search"
-                placeholder="Buscar..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+        )}
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {success}
+          </div>
+        )}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Usuários da Plataforma</h2>
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="animate-spin h-6 w-6 mr-2" /> Carregando usuários...
             </div>
-            <div className="space-y-2">
-              <Label>Filtrar por Role</Label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as Roles</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="mentor">Mentor</SelectItem>
-                  <SelectItem value="mentee">Mentee</SelectItem>
-                  <SelectItem value="moderator">Moderator</SelectItem>
-                  <SelectItem value="volunteer">Volunteer</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Usuários ({filteredUsers.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Usuário</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Cadastro</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={user.avatar_url || undefined} />
-                          <AvatarFallback>{user.full_name?.[0]?.toUpperCase() || "?"}</AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium">{user.full_name || "Nome não definido"}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Select value={user.role} onValueChange={(value) => updateUserRole(user.id, value as user_role)}>
-                        <SelectTrigger className="w-36">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="mentor">Mentor</SelectItem>
-                          <SelectItem value="mentee">Mentee</SelectItem>
-                          <SelectItem value="moderator">Moderator</SelectItem>
-                          <SelectItem value="volunteer">Volunteer</SelectItem>
-                          <SelectItem value="pending">Pending</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getRoleColor(user.status)}>{user.status}</Badge>
-                    </TableCell>
-                    <TableCell>{new Date(user.created_at).toLocaleDateString("pt-BR")}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" disabled>
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button size="sm" variant="outline" disabled>
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Roles</TableHead>
+                    <TableHead>Verificado</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id} className={editingUser === user.id ? 'bg-blue-50' : ''}>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        {editingUser === user.id ? (
+                          <Select value={editedStatus} onValueChange={setEditedStatus}>
+                            <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="active">Ativo</SelectItem>
+                              <SelectItem value="pending">Pendente</SelectItem>
+                              <SelectItem value="suspended">Suspenso</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>{user.status}</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingUser === user.id ? (
+                          <div className="space-y-2">
+                            {['admin', 'mentor', 'mentee', 'company', 'recruiter'].map((role) => (
+                              <div key={role} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`${user.id}-${role}`}
+                                  checked={editedRoles.includes(role)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setEditedRoles([...editedRoles, role])
+                                    } else {
+                                      setEditedRoles(editedRoles.filter(r => r !== role))
+                                    }
+                                  }}
+                                />
+                                <label
+                                  htmlFor={`${user.id}-${role}`}
+                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {user.roles.map((role) => (
+                              <Badge key={role} variant="secondary">
+                                {role}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={user.email_verified ? "default" : "destructive"}>
+                          {user.email_verified ? "Sim" : "Não"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {editingUser === user.id ? (
+                          <div className="flex space-x-2">
+                            <Button size="sm" onClick={() => handleSave(user.id)}><Save className="h-4 w-4" /></Button>
+                            <Button size="sm" variant="outline" onClick={handleCancel}><X className="h-4 w-4" /></Button>
+                          </div>
+                        ) : (
+                          <div className="flex space-x-2">
+                            <Button size="sm" variant="outline" onClick={() => handleEdit(user)}><Edit className="h-4 w-4" /></Button>
+                            <Button size="sm" variant="outline"><Eye className="h-4 w-4" /></Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </Card>
       </div>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   )
 }

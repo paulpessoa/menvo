@@ -8,12 +8,12 @@
     "aboutUs": "Sobre Nós",
     "title": "Menvo",
     "login": "Entrar",
-    "register": "Cadastrar",
+    "register": "Registrar",
     "logout": "Sair",
     "language": "Idioma",
-    "english": "English",
+    "english": "Inglês",
     "portuguese": "Português",
-    "spanish": "Español",
+    "spanish": "Espanhol",
     "cancel": "Cancelar",
     "continue": "Continuar",
     "submit": "Enviar",
@@ -26,7 +26,6 @@
     "firstName": "Nome",
     "lastName": "Sobrenome",
     "loading": "Carregando...",
-    "saving": "Salvando...",
     "close": "Fechar",
     "submitting": "Enviando..."
   },
@@ -82,32 +81,32 @@
     "badge": "Sobre Nós",
     "ourMission": {
       "title": "Nossa Missão",
-      "description": "Simplificar a mentoria em conversas abertas. Qualquer pessoa pode compartilhar sua experiência com quem está buscando — sempre de forma gratuita."
+      "description": "Lutamos para tornar a mentoria e educação acessíveis para todos, em qualquer lugar."
     },
     "whyWeStarted": {
-      "title": "Por Que Começamos",
-      "paragraph1": "O Menvo nasceu de uma ideia simples: todas as pessoas merecem acesso à mentoria, independentemente de sua origem ou situação financeira. Acreditamos que compartilhar conhecimento e experiências pode transformar vidas e comunidades.",
-      "paragraph2": "Nosso fundador vivenciou na prática o impacto que uma boa mentoria pode ter no crescimento pessoal e profissional. Porém, também percebeu como as oportunidades de mentoria muitas vezes estavam limitadas a quem já tinha conexões ou recursos financeiros.",
-      "paragraph3": "Foi por isso que criamos uma plataforma que torna a mentoria acessível a todos, conectando quem busca orientação com quem está disposto a compartilhar sua experiência — totalmente de graça."
+      "title": "Por que Começamos",
+      "paragraph1": "A Menvo nasceu de uma ideia simples: todos merecem acesso à mentoria, independentemente de sua origem ou situação financeira. Acreditamos que compartilhar conhecimentos e experiências pode transformar vidas e comunidades.",
+      "paragraph2": "Nosso fundador experimentou em primeira mão o impacto que uma boa mentoria pode ter no crescimento pessoal e profissional. No entanto, eles também viram como as oportunidades de mentoria eram frequentemente limitadas àqueles com conexões existentes ou recursos financeiros.",
+      "paragraph3": "É por isso que criamos uma plataforma que torna a mentoria acessível a todos, conectando aqueles que buscam orientação com aqueles dispostos a compartilhar sua experiência – completamente gratuito."
     },
     "ourStoryImageAlt": "Ilustração da nossa história",
     "values": {
       "community": {
         "title": "Comunidade",
-        "description": "Construir uma comunidade acolhedora, onde o conhecimento é compartilhado livremente e conexões são feitas além de origens e fronteiras."
+        "description": "Construindo uma comunidade solidária onde o conhecimento é compartilhado livremente e conexões são feitas através de origens e fronteiras."
       },
       "accessibility": {
         "title": "Acessibilidade",
-        "description": "Tornar a mentoria acessível a todos, independentemente de sua situação financeira, localização ou histórico."
+        "description": "Tornando a mentoria acessível para todos, independentemente de sua situação financeira, localização ou origem."
       },
       "impact": {
         "title": "Impacto",
-        "description": "Gerar mudanças positivas por meio do compartilhamento de conhecimento e conexões significativas que empoderam pessoas."
+        "description": "Criando mudanças positivas ao capacitar indivíduos através do compartilhamento de conhecimento e conexões significativas."
       }
     },
     "sdg": {
       "title": "Objetivos de Desenvolvimento Sustentável",
-      "description": "Nossa plataforma está alinhada aos Objetivos de Desenvolvimento Sustentável (ODS) da ONU, com foco especial em:",
+      "description": "Nossa plataforma se alinha com os Objetivos de Desenvolvimento Sustentável (ODS) das Nações Unidas, focando particularmente em:",
       "goalNumber": "ODS {{number}}",
       "goals": {
         "qualityEducation": "Educação de Qualidade",
@@ -117,13 +116,13 @@
       }
     },
     "ourTeam": {
-      "title": "Nosso Time",
-      "paragraph1": "Somos uma equipe diversa de profissionais apaixonados por tornar a mentoria acessível a todos. Nossos membros vêm de diferentes origens e setores, trazendo uma riqueza de experiências e perspectivas.",
-      "paragraph2": "O que nos une é a crença no poder da mentoria para transformar vidas e o compromisso de criar uma plataforma que facilite conexões significativas.",
-      "paragraph3": "Estamos sempre em busca de pessoas apaixonadas para se juntar à nossa missão. Se você quer contribuir com o Menvo, adoraríamos ouvir você!",
-      "joinTeam": "Junte-se ao Nosso Time"
+      "title": "Nossa Equipe",
+      "paragraph1": "Somos uma equipe diversa de profissionais apaixonados por tornar a mentoria acessível para todos. Nossos membros vêm de várias origens e indústrias, trazendo juntos uma riqueza de experiência e perspectivas.",
+      "paragraph2": "O que nos une é nossa crença no poder da mentoria para transformar vidas e nosso compromisso em criar uma plataforma que facilite conexões significativas.",
+      "paragraph3": "Estamos sempre procurando indivíduos apaixonados para se juntarem à nossa missão. Se você está interessado em contribuir para a Menvo, adoraríamos ouvir de você!",
+      "joinTeam": "Junte-se à Nossa Equipe"
     },
-    "ourTeamImageAlt": "Ilustração do nosso time",
+    "ourTeamImageAlt": "Ilustração da nossa equipe",
     "ourImpact": {
       "title": "Nosso Impacto",
       "volunteerMentors": {
@@ -138,89 +137,89 @@
         "count": "50+",
         "label": "Países Alcançados"
       },
-      "description": "Esses números representam pessoas reais cujas vidas foram positivamente impactadas pelas conexões de mentoria em nossa plataforma."
+      "description": "Esses números representam pessoas reais cujas vidas foram impactadas positivamente através de conexões de mentoria em nossa plataforma."
     },
     "contributors": {
-      "title": "Nossos Colaboradores",
-      "description": "Conheça os voluntários que ajudam a desenvolver a plataforma enquanto aprendem e aumentam suas chances no mercado de trabalho.",
+      "title": "Nossos Contribuidores",
+      "description": "Conheça os voluntários que ajudam a desenvolver a plataforma enquanto aprendem e aumentam suas chances no mercado de trabalho",
       "contributions": "{{count}} contribuições",
       "viewRepository": "Ver Repositório"
     },
     "ourPartners": {
       "title": "Nossos Parceiros",
-      "description": "Temos orgulho de colaborar com organizações que compartilham nossa visão de tornar a mentoria acessível a todos.",
+      "description": "Temos orgulho de colaborar com organizações que compartilham nossa visão de tornar a mentoria acessível para todos.",
       "partnerLogoAlt": "Logo do Parceiro {{number}}"
     },
     "joinOurMission": {
       "title": "Junte-se à Nossa Missão",
-      "description": "Seja para compartilhar sua experiência como mentor ou para buscar orientação como mentorado, você pode fazer parte da nossa missão de tornar a mentoria acessível a todos.",
-      "signUpNow": "Cadastre-se Agora",
-      "contactUs": "Fale Conosco"
+      "description": "Quer você esteja procurando compartilhar sua experiência como mentor ou buscando orientação como mentorado, você pode fazer parte de nossa missão de tornar a mentoria acessível para todos.",
+      "signUpNow": "Inscreva-se Agora",
+      "contactUs": "Entre em Contato"
     }
   },
   "howItWorks": {
-    "title": "Como o Menvo Funciona",
-    "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões de mentoria gratuitas.",
+    "title": "Como Funciona a Menvo",
+    "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões gratuitas de mentoria",
     "forMentees": "Para Mentorados",
     "forMentors": "Para Mentores",
     "mentees": {
       "step1": {
         "title": "Crie Seu Perfil",
-        "description": "Cadastre-se e crie seu perfil com informações sobre sua trajetória, objetivos e interesses. Isso nos ajuda a conectá-lo com os mentores ideais.",
-        "feature1": "Envie seu currículo",
-        "feature2": "Adicione uma foto de perfil",
+        "description": "Inscreva-se e crie seu perfil com detalhes sobre sua origem, objetivos e interesses. Isso nos ajuda a combinar você com os mentores certos.",
+        "feature1": "Faça upload do seu currículo",
+        "feature2": "Adicione sua foto de perfil",
         "feature3": "Conecte seu perfil do LinkedIn"
       },
       "step2": {
-        "title": "Encontre o Mentor Ideal",
-        "description": "Explore nossa comunidade diversa de mentores voluntários. Use filtros para buscar mentores por área de atuação, setor, localização e mais.",
-        "feature1": "Filtre por temas e especialidades",
-        "feature2": "Busque por localização ou idioma",
+        "title": "Encontre o Mentor Certo",
+        "description": "Navegue pela nossa comunidade diversa de mentores voluntários. Use filtros para encontrar mentores baseado em expertise, indústria, localização e mais.",
+        "feature1": "Filtre por tópicos e expertise",
+        "feature2": "Pesquise por localização ou idioma",
         "feature3": "Leia avaliações de outros mentorados"
       },
       "step3": {
         "title": "Agende uma Sessão",
-        "description": "Quando encontrar um mentor com quem gostaria de se conectar, veja sua disponibilidade e agende uma sessão gratuita de 45 minutos.",
-        "feature1": "Veja o calendário do mentor",
-        "feature2": "Escolha o horário mais conveniente",
-        "feature3": "Adicione os temas que deseja discutir"
+        "description": "Depois de encontrar um mentor com quem gostaria de se conectar, veja a disponibilidade dele e agende uma sessão gratuita de mentoria de 45 minutos.",
+        "feature1": "Visualize o calendário do mentor",
+        "feature2": "Selecione um horário conveniente",
+        "feature3": "Adicione tópicos que gostaria de discutir"
       },
       "step4": {
-        "title": "Conecte-se e Evolua",
-        "description": "Encontre-se com seu mentor por videochamada. Compartilhe seus desafios, tire dúvidas e receba orientações personalizadas para alcançar seus objetivos.",
-        "feature1": "Participe pelo link da videochamada",
-        "feature2": "Converse sobre seus objetivos e desafios",
-        "feature3": "Receba orientações personalizadas"
+        "title": "Conecte-se e Cresça",
+        "description": "Encontre-se com seu mentor via chamada de vídeo. Compartilhe seus desafios, faça perguntas e receba orientação personalizada para ajudá-lo a alcançar seus objetivos.",
+        "feature1": "Participe via link de videochamada",
+        "feature2": "Discuta seus objetivos e desafios",
+        "feature3": "Receba orientação personalizada"
       },
       "getStarted": "Comece como Mentorado"
     },
     "mentors": {
       "step1": {
         "title": "Crie Seu Perfil de Mentor",
-        "description": "Cadastre-se e crie seu perfil de mentor com informações sobre sua experiência, áreas de conhecimento e temas com os quais pode ajudar.",
-        "feature1": "Destaque sua experiência e especialidade",
-        "feature2": "Especifique os temas que pode mentorar",
+        "description": "Inscreva-se e crie seu perfil de mentor com detalhes sobre sua expertise, experiência e os tópicos com os quais pode ajudar.",
+        "feature1": "Destaque sua expertise e experiência",
+        "feature2": "Especifique tópicos que pode mentorar",
         "feature3": "Conecte seus perfis profissionais"
       },
       "step2": {
-        "title": "Conclua a Verificação",
-        "description": "Para garantir a segurança da nossa comunidade, todos os mentores passam por um processo de verificação, incluindo uma breve videochamada com nossa equipe.",
+        "title": "Complete a Verificação",
+        "description": "Para a segurança de nossa comunidade, todos os mentores passam por um processo de verificação. Isso inclui uma breve chamada de vídeo com nossa equipe.",
         "feature1": "Agende uma chamada de verificação",
-        "feature2": "Verifique sua identidade e conhecimento",
+        "feature2": "Verifique sua identidade e expertise",
         "feature3": "Seja aprovado para começar a mentorar"
       },
       "step3": {
         "title": "Defina Sua Disponibilidade",
-        "description": "Defina os horários em que estará disponível para mentorar. Você tem total controle da sua agenda e pode atualizá-la a qualquer momento.",
-        "feature1": "Configure sua disponibilidade semanal",
-        "feature2": "Defina a duração das sessões",
-        "feature3": "Atualize seu calendário quando necessário"
+        "description": "Defina quando você está disponível para mentorar. Você tem controle total sobre sua agenda e pode atualizá-la a qualquer momento.",
+        "feature1": "Defina sua disponibilidade semanal",
+        "feature2": "Especifique a duração da sessão",
+        "feature3": "Atualize seu calendário conforme necessário"
       },
       "step4": {
-        "title": "Realize Sessões de Mentoria",
-        "description": "Conecte-se com mentorados por videochamada. Compartilhe seu conhecimento, ofereça orientações e ajude-os a superar desafios.",
+        "title": "Conduza Sessões de Mentoria",
+        "description": "Conecte-se com mentorados via chamadas de vídeo. Compartilhe seu conhecimento, forneça orientação e ajude-os a navegar por seus desafios.",
         "feature1": "Receba solicitações de sessão",
-        "feature2": "Realize sessões de mentoria por vídeo",
+        "feature2": "Conduza sessões de mentoria por vídeo",
         "feature3": "Acompanhe seu impacto e sessões"
       },
       "becomeMentor": "Torne-se um Mentor"
@@ -229,68 +228,57 @@
       "title": "Perguntas Frequentes",
       "q1": {
         "question": "A mentoria é realmente gratuita?",
-        "answer": "Sim, todas as sessões de mentoria na nossa plataforma são totalmente gratuitas. Nossos mentores dedicam seu tempo voluntariamente para ajudar outras pessoas a crescer."
+        "answer": "Sim, todas as sessões de mentoria em nossa plataforma são completamente gratuitas. Nossos mentores oferecem voluntariamente seu tempo para ajudar outros a crescer e se desenvolver."
       },
       "q2": {
-        "question": "Qual a duração das sessões de mentoria?",
-        "answer": "As sessões de mentoria padrão duram 45 minutos. Esse tempo é suficiente para uma conversa significativa, respeitando a agenda de todos."
+        "question": "Quanto tempo duram as sessões de mentoria?",
+        "answer": "As sessões padrão de mentoria duram 45 minutos. Isso proporciona tempo suficiente para uma conversa significativa respeitando a agenda de todos."
       },
       "q3": {
         "question": "Com que frequência posso me encontrar com um mentor?",
-        "answer": "Isso depende da disponibilidade e preferência do mentor. Alguns estão abertos a encontros regulares, enquanto outros preferem encontros pontuais."
+        "answer": "Isso depende da disponibilidade e preferências do mentor. Alguns mentores estão abertos a sessões regulares, enquanto outros podem preferir encontros únicos."
       },
       "q4": {
         "question": "O que acontece se eu precisar cancelar?",
-        "answer": "Pedimos que o cancelamento seja feito com pelo menos 24 horas de antecedência, em respeito ao tempo do mentor. Você pode reagendar facilmente pelo seu painel."
+        "answer": "Pedimos que você cancele com pelo menos 24 horas de antecedência por respeito ao tempo do mentor. Você pode facilmente reagendar através do seu painel."
       },
       "q5": {
         "question": "Como me torno um mentor verificado?",
-        "answer": "Após criar seu perfil de mentor, você precisará agendar uma breve chamada de verificação com nossa equipe. Isso garante a qualidade e segurança da comunidade."
+        "answer": "Após criar seu perfil de mentor, você precisará agendar uma breve chamada de verificação com nossa equipe. Isso ajuda a garantir a qualidade e segurança de nossa comunidade."
       },
       "q6": {
         "question": "Minhas informações estão seguras?",
-        "answer": "Sim, levamos privacidade e segurança muito a sério. Suas informações pessoais são protegidas e compartilhadas apenas com quem você decidir se conectar."
+        "answer": "Sim, levamos a privacidade e segurança a sério. Suas informações pessoais são protegidas e apenas compartilhadas com aqueles que você escolhe se conectar."
       },
       "stillHaveQuestions": "Ainda tem dúvidas?",
-      "supportDescription": "Nossa equipe de suporte está aqui para ajudar com qualquer pergunta que você tenha.",
-      "contactSupport": "Fale com o Suporte"
+      "supportDescription": "Nossa equipe de suporte está aqui para ajudá-lo com qualquer pergunta que possa ter.",
+      "contactSupport": "Contatar Suporte"
     }
   },
   "login": {
-    "title": "Bem-vindo de volta",
-    "description": "Entre na sua conta para acessar a plataforma",
+    "title": "Bem-vindo",
+    "description": "Entre na sua conta para continuar",
     "email": "E-mail",
     "emailPlaceholder": "nome@exemplo.com",
     "password": "Senha",
-    "passwordPlaceholder": "Digite sua senha",
     "forgotPassword": "Esqueceu a senha?",
     "loginButton": "Entrar",
     "loggingIn": "Entrando...",
     "noAccount": "Não tem uma conta?",
     "signUp": "Cadastrar",
     "continueWith": "Continuar com",
-    "orContinueWith": "Ou continue com email",
     "google": "Google",
     "linkedin": "LinkedIn",
     "github": "GitHub",
-    "connecting": "Conectando...",
-    "success": "Login realizado com sucesso!",
-    "emailNotConfirmedInfo": "Verifique sua caixa de entrada para confirmar seu e-mail.",
-    "dontHaveAccount": "Não tem uma conta?",
-    "error": {
-      "invalidCredentials": "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.",
-      "emailNotConfirmed": "E-mail não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.",
-      "tooManyAttempts": "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.",
-      "networkError": "Erro de conexão. Verifique sua internet e tente novamente."
-    }
+    "connecting": "Conectando..."
   },
   "register": {
-    "title": "Junte-se à Menvo",
-    "subtitle": "Conecte-se com mentores voluntários e desenvolva sua carreira gratuitamente",
-    "signupTitle": "Criar Conta",
-    "description": "Preencha seus dados para começar sua jornada",
-    "firstName": "Nome Completo",
-    "firstNamePlaceholder": "Digite seu nome completo",
+    "title": "Crie sua conta",
+    "subtitle": "Junte-se à nossa comunidade para se conectar com mentores e crescer profissionalmente",
+    "signupTitle": "Cadastro",
+    "description": "Preencha os dados para começar",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Digite seu nome",
     "lastName": "Sobrenome",
     "lastNamePlaceholder": "Digite seu sobrenome",
     "email": "E-mail",
@@ -298,8 +286,6 @@
     "emailInvalid": "E-mail inválido",
     "password": "Senha",
     "passwordPlaceholder": "Crie uma senha",
-    "confirmPassword": "Confirmar Senha",
-    "confirmPasswordPlaceholder": "Digite a senha novamente",
     "mentor": "Mentor",
     "mentee": "Mentorado",
     "registerButton": "Registrar",
@@ -307,67 +293,38 @@
     "alreadyHaveAccount": "Já tem uma conta?",
     "signIn": "Entrar",
     "orContinueWith": "Ou continue com email",
-    "success": "Conta criada com sucesso!",
     "confirmEmail": "Confirme seu e-mail",
     "confirmEmailDescription": "Um e-mail de confirmação foi enviado para {{email}}. Por favor, acesse sua caixa de entrada e clique no link para ativar sua conta.",
     "nextSteps": "Próximos passos:",
     "nextStepsList": [
       "Verifique sua caixa de entrada (e pasta de spam)",
       "Clique no link de confirmação no email",
-      "Escolha seu tipo de usuário (mentor ou mentorado)",
-      "Complete seu perfil com suas informações",
-      "Aguarde a validação da nossa equipe (apenas para mentores)"
+      "Seja redirecionado automaticamente para o site",
+      "Complete seu perfil e comece a explorar!"
     ],
-    "afterConfirmation": "Após confirmar seu e-mail, você poderá escolher se quer ser mentor ou mentorado e completar seu perfil. Mentores passarão por uma validação da nossa equipe antes de serem publicados.",
+    "afterConfirmation": "Após a confirmação, complete seu perfil e agende uma call de validação. Nossa equipe entrará em contato para validar suas informações.",
     "didntReceiveEmail": "Não recebeu o e-mail?",
-    "checkSpam": "Verifique sua pasta de spam ou lixo eletrônico. O link de confirmação expira em 24 horas.",
-    "emailExpired": "O link de confirmação expirou?",
-    "emailExpiredDescription": "Se o link de confirmação expirou (24 horas), você pode usar a opção 'Esqueci minha senha' para redefinir e confirmar sua conta.",
-    "resendEmail": "Reenviar e-mail",
-    "emailExpiredAction": "Link expirado? Redefinir senha",
-    "tryAgain": "Tentar novamente",
-    "emailConfirmed": "Email Confirmado!",
-    "emailConfirmedDescription": "Seu email foi confirmado com sucesso. Agora escolha como você quer usar a plataforma.",
-    "selectRoleDescription": "Escolha como você quer usar a plataforma:",
-    "menteeDescription": "Busco orientação e desenvolvimento profissional",
-    "mentorDescription": "Quero compartilhar conhecimento e orientar outros profissionais",
-    "continue": "Continuar",
-    "welcome": {
-      "title": "Bem-vindo ao Menvo!",
-      "description": "Sua conta foi confirmada com sucesso. Agora escolha como você quer usar a plataforma.",
-      "selectRoleDescription": "Escolha como você quer usar a plataforma:",
-      "continue": "Continuar"
-    },
+    "checkSpam": "Verifique sua pasta de spam ou lixo eletrônico. Se ainda não encontrar, você pode tentar fazer login e reenviar o email de confirmação.",
     "goToLogin": "Ir para Login",
     "goToHome": "Voltar ao Início",
     "goToVerification": "Ir para página de verificação",
-    "passwordValidation": {
-      "passwordsDontMatch": "As senhas não coincidem",
-      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
-      "passwordStrength": "Força da senha:",
-      "passwordTooWeak": "Senha muito curta",
-      "passwordMedium": "Senha média",
-      "passwordStrong": "Senha forte",
-      "passwordsMatch": "✓ Senhas coincidem",
-      "passwordsDontMatchError": "As senhas não coincidem"
-    },
     "userType": {
-      "title": "Como você quer participar?",
+      "title": "Eu sou:",
       "mentee": {
         "title": "Mentorado",
-        "description": "Busco orientação para desenvolver minha carreira"
+        "description": "Busco orientação e acompanhamento"
       },
       "mentor": {
         "title": "Mentor",
-        "description": "Quero compartilhar minha experiência e ajudar outros"
+        "description": "Quero compartilhar conhecimento"
       },
       "company": {
         "title": "Empresa",
-        "description": "Quero indicar profissionais da nossa empresa"
+        "description": "Quero indicar nossos profissionais"
       },
       "recruiter": {
         "title": "Recrutador",
-        "description": "Busco profissionais qualificados para oportunidades"
+        "description": "Busco profissionais qualificados"
       }
     }
   },
@@ -453,17 +410,154 @@
     "cookiePolicy": "Política de Cookies",
     "allRightsReserved": "Todos os direitos reservados."
   },
-  "waitingList": {
-    "title": "Junte-se à Lista de Espera",
-    "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",
-    "nameLabel": "Nome",
-    "namePlaceholder": "Digite seu nome completo",
-    "emailPlaceholder": "seu@email.com",
-    "whatsappLabel": "WhatsApp (opcional)",
-    "whatsappPlaceholder": "Seu número de WhatsApp",
-    "reasonLabel": "Por que você quer fazer parte?",
-    "reasonPlaceholder": "Conte-nos por que você quer participar",
-    "successMessage": "Obrigado pelo seu interesse!",
-    "errorMessage": "Erro ao enviar o formulário"
+  "privacy": {
+    "badge": "Privacidade",
+    "title": "Política de Privacidade",
+    "intro": "Sua privacidade é importante para nós. Esta política explica como coletamos, usamos e protegemos seus dados na Menvo.",
+    "dataCollection": {
+      "title": "Coleta de Dados",
+      "text": "Coletamos informações fornecidas por você ao criar uma conta, como nome, e-mail, foto de perfil e informações profissionais. Também coletamos dados de login social (Google, GitHub, LinkedIn) quando você opta por autenticar usando essas plataformas."
+    },
+    "email": {
+      "title": "E-mails e Comunicações",
+      "text": "Utilizamos seu e-mail para comunicações essenciais, notificações de mentorias e novidades. Os e-mails são enviados via Brevo, respeitando sua privacidade e preferências de opt-out."
+    },
+    "photos": {
+      "title": "Fotos e Conteúdo Visual",
+      "text": "Fotos de perfil e imagens enviadas são armazenadas de forma segura no Supabase e usadas apenas para identificação e personalização do seu perfil."
+    },
+    "storage": {
+      "title": "Armazenamento de Dados",
+      "text": "Todos os dados são armazenados de forma segura no Supabase, com acesso restrito à equipe Menvo e conforme as melhores práticas de segurança."
+    },
+    "mentorship": {
+      "title": "Mentorias e Interações",
+      "text": "As informações de sessões de mentoria, avaliações e mensagens são usadas para melhorar a experiência e garantir a segurança da comunidade."
+    },
+    "thirdParty": {
+      "title": "Serviços de Terceiros",
+      "text": "Utilizamos serviços de terceiros como Google, GitHub, LinkedIn (login), Supabase (armazenamento) e Brevo (e-mails). Cada serviço possui sua própria política de privacidade."
+    },
+    "rights": {
+      "title": "Seus Direitos",
+      "text": "Você pode solicitar acesso, correção ou exclusão de seus dados a qualquer momento. Para isso, entre em contato conosco."
+    },
+    "contact": {
+      "title": "Contato",
+      "text": "Dúvidas sobre privacidade? Fale conosco pelo e-mail contato@menvo.com."
+    },
+    "links": {
+      "cookies": "Política de Cookies",
+      "terms": "Termos de Serviço"
+    }
+  },
+  "cookies": {
+    "badge": "Cookies",
+    "title": "Política de Cookies",
+    "intro": "Usamos cookies para melhorar sua experiência, garantir funcionalidades essenciais e analisar o uso da plataforma.",
+    "essential": {
+      "title": "Cookies Essenciais",
+      "text": "Necessários para funcionamento do site, autenticação e segurança. Não podem ser desativados."
+    },
+    "social": {
+      "title": "Login Social",
+      "text": "Cookies podem ser usados para autenticação via Google, GitHub e LinkedIn, facilitando o login seguro."
+    },
+    "preferences": {
+      "title": "Preferências",
+      "text": "Armazenamos suas preferências de idioma e configurações para personalizar sua experiência."
+    },
+    "analytics": {
+      "title": "Análise e Desempenho",
+      "text": "Utilizamos cookies para entender como a plataforma é usada e melhorar nossos serviços."
+    },
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Serviço"
+    }
+  },
+  "terms": {
+    "badge": "Termos",
+    "title": "Termos de Serviço",
+    "intro": "Ao usar a Menvo, você concorda com estes termos. Leia atentamente para entender seus direitos e responsabilidades.",
+    "usage": {
+      "title": "Uso da Plataforma",
+      "text": "A Menvo conecta mentores e mentorados para sessões gratuitas. O uso deve ser respeitoso e conforme as leis vigentes."
+    },
+    "account": {
+      "title": "Conta e Login Social",
+      "text": "Você pode criar conta via e-mail ou login social (Google, GitHub, LinkedIn). Mantenha suas credenciais seguras e não compartilhe sua conta."
+    },
+    "security": {
+      "title": "Segurança",
+      "text": "Adotamos medidas para proteger seus dados, mas você também é responsável por manter sua senha segura."
+    },
+    "content": {
+      "title": "Conteúdo e Fotos",
+      "text": "Você é responsável pelo conteúdo enviado (fotos, textos). Não envie conteúdo ofensivo ou protegido por direitos autorais sem permissão."
+    },
+    "communication": {
+      "title": "Comunicação e E-mails",
+      "text": "Enviaremos comunicações importantes sobre mentorias e novidades. Você pode optar por não receber e-mails promocionais."
+    },
+    "storage": {
+      "title": "Armazenamento e Terceiros",
+      "text": "Dados são armazenados no Supabase e e-mails enviados via Brevo. Utilizamos login social de terceiros."
+    },
+    "rights": {
+      "title": "Direitos e Responsabilidades",
+      "text": "Você pode acessar e excluir seus dados. O uso indevido da plataforma pode resultar em suspensão da conta."
+    },
+    "contact": {
+      "title": "Contato",
+      "text": "Dúvidas? Fale conosco pelo e-mail contato@menvo.com."
+    },
+    "links": {
+      "privacy": "Política de Privacidade",
+      "cookies": "Política de Cookies"
+    }
+  },
+  "warning": {
+    "title": "Atenção",
+    "message": "A plataforma está em fase de desenvolvimento. Ficamos muito felizes em receber seu feedback e opinião sobre o que você achou do que viu até agora!",
+    "dismiss": "Entendi",
+    "giveFeedback": "Dar Feedback"
+  },
+  "feedback": {
+    "title": "O que você achou da Menvo?",
+    "description": "Sua opinião é muito importante para nós! Conte-nos o que você achou da plataforma.",
+    "openFeedback": "Abrir Feedback",
+    "helpUsImprove": "Ajude-nos a melhorar a plataforma",
+    "commentPlaceholder": "Conte-nos o que você achou da plataforma...",
+    "emailPlaceholder": "Seu e-mail (opcional)",
+    "submit": "Enviar Feedback",
+    "thankYou": "Obrigado pelo seu feedback!",
+    "error": "Erro ao enviar feedback. Tente novamente.",
+    "ratingRequired": "Por favor, selecione uma avaliação.",
+    "rateStars": "Avaliar com {{count}} estrelas"
+  },
+  "metadata": {
+    "title": "MENVO - Plataforma de Mentoria Voluntária",
+    "description": "Conectando mentores e mentees para sessões gratuitas de mentoria",
+    "keywords": [
+      "mentoria",
+      "mentoria voluntária",
+      "desenvolvimento profissional",
+      "carreira",
+      "aprendizado",
+      "mentores",
+      "mentorados",
+      "educação",
+      "desenvolvimento pessoal"
+    ],
+    "og": {
+      "title": "MENVO - Plataforma de Mentoria Voluntária",
+      "description": "Conectando mentores e mentees para sessões gratuitas de mentoria",
+      "siteName": "MENVO"
+    },
+    "twitter": {
+      "title": "MENVO - Plataforma de Mentoria Voluntária",
+      "description": "Conectando mentores e mentees para sessões gratuitas de mentoria"
+    }
   }
 }

@@ -1,144 +1,54 @@
-"use client"
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { useState, useEffect } from "react"
-import { useAuth } from "./useAuth"
-import { supabase } from "@/lib/supabase"
+export function useProfile(userId?: string) {
+  // Busca perfil e roles do usuário logado
+  const query = useQuery({
+    queryKey: ['profile', 'me'],
+    queryFn: async () => {
+      const res = await fetch('/api/profiles/me')
+      if (!res.ok) throw new Error('Erro ao buscar perfil')
+      return res.json()
+    },
+    enabled: !!userId, // Só busca se userId estiver presente
+  })
 
-interface Profile {
-  id: string
-  email: string
-  first_name: string | null
-  last_name: string | null
-  full_name: string | null
-  slug: string | null
-  bio: string | null
-  avatar_url: string | null
-  current_position: string | null
-  current_company: string | null
-  linkedin_url: string | null
-  portfolio_url: string | null
-  personal_website_url: string | null
-  address: string | null
-  city: string | null
-  state: string | null
-  country: string | null
-  latitude: number | null
-  longitude: number | null
-  expertise_areas: string[] | null
-  topics: string[] | null
-  inclusion_tags: string[] | null
-  languages: string[] | null
-  mentorship_approach: string | null
-  what_to_expect: string | null
-  ideal_mentee: string | null
-  cv_url: string | null
-  role: string | null
-  status: string | null
-  verification_status: string | null
-  created_at: string
-  updated_at: string
-}
+  // Atualiza perfil
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: async (updates: any) => {
+      const res = await fetch('/api/profiles/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      if (!res.ok) throw new Error('Erro ao atualizar perfil')
+      return res.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile', 'me'] })
+    },
+  })
 
-export function useProfile() {
-  const { user } = useAuth()
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (user) {
-      fetchProfile()
-    } else {
-      setProfile(null)
-      setLoading(false)
-    }
-  }, [user])
-
-  const fetchProfile = async () => {
-    if (!user) return
-
-    try {
-      setLoading(true)
-      setError(null)
-
-      const { data, error: fetchError } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-
-      if (fetchError) {
-        if (fetchError.code === "PGRST116") {
-          // Profile doesn't exist, create it
-          await createProfile()
-        } else {
-          throw fetchError
-        }
-      } else {
-        setProfile(data)
-      }
-    } catch (err) {
-      console.error("Error fetching profile:", err)
-      setError(err instanceof Error ? err.message : "Error fetching profile")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const createProfile = async () => {
-    if (!user) return
-
-    try {
-      const { data, error: createError } = await supabase
-        .from("profiles")
-        .insert({
-          id: user.id,
-          email: user.email || "",
-          first_name: user.user_metadata?.first_name || "",
-          last_name: user.user_metadata?.last_name || "",
-          full_name: user.user_metadata?.full_name || "",
-          role: user.user_metadata?.user_type || "mentee",
-          status: "pending",
-          verification_status: "pending",
-        })
-        .select()
-        .single()
-
-      if (createError) throw createError
-      setProfile(data)
-    } catch (err) {
-      console.error("Error creating profile:", err)
-      setError(err instanceof Error ? err.message : "Error creating profile")
-    }
-  }
-
-  const updateProfile = async (updates: Partial<Profile>) => {
-    if (!user || !profile) return
-
-    try {
-      setError(null)
-
-      const { data, error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id)
-        .select()
-        .single()
-
-      if (updateError) throw updateError
-      setProfile(data)
-      return data
-    } catch (err) {
-      console.error("Error updating profile:", err)
-      setError(err instanceof Error ? err.message : "Error updating profile")
-      throw err
-    }
+  // Helper para upload de foto no Supabase Storage
+  async function uploadProfilePhoto(file: File, userId: string): Promise<string> {
+    const formData = new FormData()
+    formData.append('file', file)
+    // Você pode criar um endpoint /api/upload/profile-photo para lidar com o upload no backend
+    const res = await fetch(`/api/upload/profile-photo?userId=${userId}`, {
+      method: 'POST',
+      body: formData,
+    })
+    if (!res.ok) throw new Error('Erro ao fazer upload da foto')
+    const { url } = await res.json()
+    return url // URL pública da foto
   }
 
   return {
-    profile,
-    loading,
-    error,
-    updateProfile,
-    refetch: fetchProfile,
+    profile: query.data,
+    isLoading: query.isLoading,
+    error: query.error,
+    updateProfile: mutation.mutateAsync,
+    isUpdating: mutation.isPending,
+    uploadProfilePhoto,
   }
 }

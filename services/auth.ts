@@ -76,6 +76,18 @@ export class AuthService {
     return data
   }
 
+  // Login com GitHub
+  static async signInWithGitHub() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) throw error
+    return data
+  }
 
   // Logout
   static async signOut() {

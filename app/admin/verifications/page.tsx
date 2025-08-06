@@ -4,251 +4,285 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { CheckCircle, XCircle, ExternalLink, Play } from "lucide-react"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
-import { createClient } from "@/utils/supabase/client"
-import type { Database } from "@/types/database"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Calendar, User, CheckCircle, XCircle, Eye } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { VerificationService } from "@/services/verifications"
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"]
-
-export default function AdminVerifications() {
-  const [pendingMentors, setPendingMentors] = useState<Profile[]>([])
+export default function VerificationsPage() {
+  const { user } = useAuth()
+  const [verifications, setVerifications] = useState([])
   const [loading, setLoading] = useState(true)
-  const [processingId, setProcessingId] = useState<string | null>(null)
-  const supabase = createClient()
+  const [selectedVerification, setSelectedVerification] = useState(null)
 
   useEffect(() => {
-    fetchPendingMentors()
+    loadVerifications()
   }, [])
 
-  const fetchPendingMentors = async () => {
+  const loadVerifications = async () => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("role", "mentor")
-        .eq("verification_status", "pending")
-        .order("created_at", { ascending: true })
-
-      if (error) throw error
-      setPendingMentors(data || [])
+      if (user?.id) {
+        const data = await VerificationService.getPendingVerifications(user.id)
+        setVerifications(data)
+      }
     } catch (error) {
-      console.error("Error fetching pending mentors:", error)
+      console.error("Error loading verifications:", error)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleVerification = async (mentorId: string, status: "approved" | "rejected", notes?: string) => {
-    setProcessingId(mentorId)
+  const handleApprove = async (verificationId: string) => {
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          verification_status: status,
-          verification_notes: notes,
-          verified_at: status === "approved" ? new Date().toISOString() : null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", mentorId)
-
-      if (error) throw error
-
-      // Remover da lista local
-      setPendingMentors((prev) => prev.filter((mentor) => mentor.id !== mentorId))
-
-      // TODO: Enviar email de notificação
+      await VerificationService.completeVerification({
+        verificationId,
+        adminId: user!.id,
+        passed: true,
+        notes: "Verification completed successfully",
+      })
+      loadVerifications()
     } catch (error) {
-      console.error("Error updating verification status:", error)
-    } finally {
-      setProcessingId(null)
+      console.error("Error approving verification:", error)
     }
   }
 
-  const getYouTubeVideoId = (url: string) => {
-    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/
-    const match = url.match(regex)
-    return match ? match[1] : null
+  const handleReject = async (verificationId: string, reason: string) => {
+    try {
+      await VerificationService.completeVerification({
+        verificationId,
+        adminId: user!.id,
+        passed: false,
+        notes: reason,
+      })
+      loadVerifications()
+    } catch (error) {
+      console.error("Error rejecting verification:", error)
+    }
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
+    return <div className="container py-8">Loading verifications...</div>
   }
 
   return (
-    <ProtectedRoute requiredPermissions={["admin_verifications"]}>
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-6">
-          {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold">Verificações Pendentes</h1>
-            <p className="text-muted-foreground">
-              Revise e aprove mentores aguardando verificação ({pendingMentors.length} pendentes)
-            </p>
-          </div>
+    <div className="container py-8 md:py-12">
+      <div className="flex flex-col space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Mentor Verifications</h1>
+          <p className="text-muted-foreground">Review and approve mentor applications</p>
+        </div>
 
-          {pendingMentors.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <CheckCircle className="h-12 w-12 text-green-500 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Nenhuma verificação pendente</h3>
-                <p className="text-muted-foreground text-center">
-                  Todas as solicitações de mentores foram processadas.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-6">
-              {pendingMentors.map((mentor) => (
-                <Card key={mentor.id} className="overflow-hidden">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
-                          <AvatarImage src={mentor.avatar_url || ""} />
-                          <AvatarFallback className="text-lg">{mentor.full_name?.charAt(0) || "M"}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <CardTitle className="text-xl">{mentor.full_name}</CardTitle>
-                          <CardDescription className="text-base">{mentor.email}</CardDescription>
-                          <Badge variant="outline" className="mt-2">
-                            Cadastrado em {new Date(mentor.created_at!).toLocaleDateString("pt-BR")}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
+        <Tabs defaultValue="pending" className="w-full">
+          <TabsList>
+            <TabsTrigger value="pending">Pending ({verifications.length})</TabsTrigger>
+            <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+          </TabsList>
 
-                  <CardContent className="space-y-6">
-                    {/* Bio */}
-                    <div>
-                      <Label className="text-sm font-semibold">Biografia</Label>
-                      <p className="mt-1 text-sm text-muted-foreground">{mentor.bio || "Não informado"}</p>
-                    </div>
-
-                    {/* Expertise Areas */}
-                    <div>
-                      <Label className="text-sm font-semibold">Áreas de Expertise</Label>
-                      <p className="mt-1 text-sm text-muted-foreground">{mentor.expertise_areas || "Não informado"}</p>
-                    </div>
-
-                    {/* LinkedIn */}
-                    {mentor.linkedin_url && (
-                      <div>
-                        <Label className="text-sm font-semibold">LinkedIn</Label>
-                        <div className="mt-1">
-                          <Button variant="outline" size="sm" asChild>
-                            <a href={mentor.linkedin_url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              Ver Perfil
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Presentation Video */}
-                    {mentor.presentation_video_url && (
-                      <div>
-                        <Label className="text-sm font-semibold">Vídeo de Apresentação</Label>
-                        <div className="mt-2 space-y-2">
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={mentor.presentation_video_url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Abrir no YouTube
-                              </a>
-                            </Button>
-
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  <Play className="h-4 w-4 mr-2" />
-                                  Assistir Aqui
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="max-w-4xl">
-                                <DialogHeader>
-                                  <DialogTitle>Vídeo de Apresentação - {mentor.full_name}</DialogTitle>
-                                </DialogHeader>
-                                <div className="aspect-video">
-                                  {getYouTubeVideoId(mentor.presentation_video_url) ? (
-                                    <iframe
-                                      width="100%"
-                                      height="100%"
-                                      src={`https://www.youtube.com/embed/${getYouTubeVideoId(mentor.presentation_video_url)}`}
-                                      title="Vídeo de apresentação"
-                                      frameBorder="0"
-                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                      allowFullScreen
-                                    />
-                                  ) : (
-                                    <div className="flex items-center justify-center h-full bg-muted">
-                                      <p>URL de vídeo inválida</p>
-                                    </div>
-                                  )}
-                                </div>
-                              </DialogContent>
-                            </Dialog>
+          <TabsContent value="pending" className="space-y-4">
+            {verifications.length === 0 ? (
+              <Card>
+                <CardContent className="flex items-center justify-center h-48">
+                  <div className="text-center">
+                    <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No pending verifications</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {verifications.map((verification) => (
+                  <Card key={verification.verification_id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src="/placeholder.svg" />
+                            <AvatarFallback>
+                              {verification.mentor_name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <CardTitle className="text-xl">{verification.mentor_name}</CardTitle>
+                            <CardDescription>{verification.mentor_title}</CardDescription>
+                            <p className="text-sm text-muted-foreground">{verification.mentor_company}</p>
                           </div>
                         </div>
+                        <Badge variant="outline">{verification.verification_type}</Badge>
                       </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t">
-                      <div className="flex-1">
-                        <Label htmlFor={`notes-${mentor.id}`} className="text-sm font-semibold">
-                          Notas da Verificação (opcional)
-                        </Label>
-                        <Textarea
-                          id={`notes-${mentor.id}`}
-                          placeholder="Adicione observações sobre a verificação..."
-                          className="mt-1"
-                        />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>Applied {new Date(verification.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4" />
+                          <span>{verification.mentor_email}</span>
+                        </div>
                       </div>
 
-                      <div className="flex flex-col gap-2 sm:w-48">
-                        <Button
-                          onClick={() => {
-                            const textarea = document.getElementById(`notes-${mentor.id}`) as HTMLTextAreaElement
-                            handleVerification(mentor.id, "approved", textarea?.value)
-                          }}
-                          disabled={processingId === mentor.id}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
+                      <div className="flex gap-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-2" />
+                              Review Details
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Verification Details</DialogTitle>
+                              <DialogDescription>Review mentor application and documents</DialogDescription>
+                            </DialogHeader>
+                            <VerificationDetails verification={verification} />
+                          </DialogContent>
+                        </Dialog>
+
+                        <Button size="sm" onClick={() => handleApprove(verification.verification_id)}>
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          {processingId === mentor.id ? "Processando..." : "Aprovar"}
+                          Approve
                         </Button>
 
-                        <Button
-                          variant="destructive"
-                          onClick={() => {
-                            const textarea = document.getElementById(`notes-${mentor.id}`) as HTMLTextAreaElement
-                            handleVerification(mentor.id, "rejected", textarea?.value)
-                          }}
-                          disabled={processingId === mentor.id}
-                        >
-                          <XCircle className="h-4 w-4 mr-2" />
-                          {processingId === mentor.id ? "Processando..." : "Rejeitar"}
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                              <XCircle className="h-4 w-4 mr-2" />
+                              Reject
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Reject Verification</DialogTitle>
+                              <DialogDescription>Please provide a reason for rejection</DialogDescription>
+                            </DialogHeader>
+                            <RejectForm onReject={(reason) => handleReject(verification.verification_id, reason)} />
+                          </DialogContent>
+                        </Dialog>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="scheduled">
+            <Card>
+              <CardContent className="flex items-center justify-center h-48">
+                <p className="text-muted-foreground">Scheduled verifications will appear here</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="completed">
+            <Card>
+              <CardContent className="flex items-center justify-center h-48">
+                <p className="text-muted-foreground">Completed verifications will appear here</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  )
+}
+
+function VerificationDetails({ verification }) {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-sm font-medium">Name</Label>
+          <p className="text-sm">{verification.mentor_name}</p>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Email</Label>
+          <p className="text-sm">{verification.mentor_email}</p>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Title</Label>
+          <p className="text-sm">{verification.mentor_title}</p>
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Company</Label>
+          <p className="text-sm">{verification.mentor_company}</p>
         </div>
       </div>
-    </ProtectedRoute>
+
+      <div>
+        <Label className="text-sm font-medium">Documents</Label>
+        <div className="mt-2 space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox id="resume" defaultChecked />
+            <Label htmlFor="resume" className="text-sm">
+              Resume/CV
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="linkedin" defaultChecked />
+            <Label htmlFor="linkedin" className="text-sm">
+              LinkedIn Profile
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="portfolio" />
+            <Label htmlFor="portfolio" className="text-sm">
+              Portfolio (Optional)
+            </Label>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function RejectForm({ onReject }) {
+  const [reason, setReason] = useState("")
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (reason.trim()) {
+      onReject(reason)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="reason">Reason for rejection</Label>
+        <Textarea
+          id="reason"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Please provide a detailed reason for rejection..."
+          required
+        />
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline">
+          Cancel
+        </Button>
+        <Button type="submit" variant="destructive">
+          Reject Application
+        </Button>
+      </div>
+    </form>
   )
 }

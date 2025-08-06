@@ -5,14 +5,14 @@
     "findMentors": "Encontrar Mentores",
     "events": "Eventos",
     "howItWorks": "Cómo Funciona",
-    "aboutUs": "Acerca de",
+    "aboutUs": "Sobre Nosotros",
     "title": "Menvo",
     "login": "Iniciar Sesión",
     "register": "Registrarse",
     "logout": "Cerrar Sesión",
     "language": "Idioma",
-    "english": "English",
-    "portuguese": "Português",
+    "english": "Inglés",
+    "portuguese": "Portugués",
     "spanish": "Español",
     "cancel": "Cancelar",
     "continue": "Continuar",
@@ -26,7 +26,6 @@
     "firstName": "Nombre",
     "lastName": "Apellido",
     "loading": "Cargando...",
-    "saving": "Guardando...",
     "close": "Cerrar",
     "submitting": "Enviando..."
   },
@@ -79,7 +78,7 @@
     "event.type": "En línea"
   },
   "about": {
-    "badge": "Acerca de",
+    "badge": "Sobre Nosotros",
     "ourMission": {
       "title": "Nuestra Misión",
       "description": "Simplificando la mentoría en conversaciones abiertas. Cualquiera puede compartir su experiencia con quienes la buscan, siempre de forma gratuita."
@@ -257,12 +256,11 @@
     }
   },
   "login": {
-    "title": "Bienvenido de vuelta",
-    "description": "Inicia sesión en tu cuenta para acceder a la plataforma",
+    "title": "Bienvenido",
+    "description": "Inicia sesión en tu cuenta para continuar",
     "email": "Correo electrónico",
     "emailPlaceholder": "nombre@ejemplo.com",
     "password": "Contraseña",
-    "passwordPlaceholder": "Escribe tu contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "loginButton": "Iniciar sesión",
     "loggingIn": "Iniciando sesión...",
@@ -272,21 +270,13 @@
     "google": "Google",
     "linkedin": "LinkedIn",
     "github": "GitHub",
-    "connecting": "Conectando...",
-    "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
-    "dontHaveAccount": "¿No tienes una cuenta?",
-    "error": {
-      "invalidCredentials": "Correo electrónico o contraseña incorrectos. Verifica tus credenciales e inténtalo de nuevo.",
-      "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
-      "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
-      "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
-    }
+    "connecting": "Conectando..."
   },
   "register": {
-    "title": "Únete a Menvo",
-    "subtitle": "Conéctate con mentores voluntarios y desarrolla tu carrera gratuitamente",
-    "signupTitle": "Crear Cuenta",
-    "description": "Completa tus datos para comenzar tu viaje",
+    "title": "Crea tu cuenta",
+    "subtitle": "Únete a nuestra comunidad para conectarte con mentores y crecer profesionalmente",
+    "signupTitle": "Registrarse",
+    "description": "Completa los datos para comenzar",
     "firstName": "Nombre",
     "firstNamePlaceholder": "Ingresa tu nombre",
     "lastName": "Apellido",
@@ -296,8 +286,6 @@
     "emailInvalid": "Correo electrónico inválido",
     "password": "Contraseña",
     "passwordPlaceholder": "Crea una contraseña",
-    "confirmPassword": "Confirmar Contraseña",
-    "confirmPasswordPlaceholder": "Escribe la contraseña nuevamente",
     "mentor": "Mentor",
     "mentee": "Mentee",
     "registerButton": "Registrar",
@@ -311,68 +299,32 @@
     "nextStepsList": [
       "Revisa tu bandeja de entrada (y carpeta de spam)",
       "Haz clic en el enlace de confirmación en el correo",
-      "Elige tu tipo de usuario (mentor o mentee)",
-      "Completa tu perfil con tu información",
-      "Espera la validación de nuestro equipo (solo para mentores)"
+      "Serás redirigido automáticamente al sitio web",
+      "¡Completa tu perfil y comienza a explorar!"
     ],
-    "afterConfirmation": "Después de confirmar tu correo, podrás elegir si quieres ser mentor o mentee y completar tu perfil. Los mentores pasarán por una validación de nuestro equipo antes de ser publicados.",
+    "afterConfirmation": "Después de la confirmación, completa tu perfil y programa una llamada de validación. Nuestro equipo se pondrá en contacto para validar tu información.",
     "didntReceiveEmail": "¿No recibiste el correo?",
-    "checkSpam": "Revisa tu carpeta de spam o correo no deseado. El enlace de confirmación expira en 24 horas.",
-    "emailExpired": "¿Expiró el enlace de confirmación?",
-    "emailExpiredDescription": "Si el enlace de confirmación expiró (24 horas), puedes usar la opción 'Olvidé mi contraseña' para restablecer y confirmar tu cuenta.",
-    "resendEmail": "Reenviar correo",
-    "emailExpiredAction": "¿Enlace expirado? Restablecer contraseña",
-    "tryAgain": "Intentar de nuevo",
-    "emailConfirmed": "¡Email Confirmado!",
-    "emailConfirmedDescription": "Tu email ha sido confirmado exitosamente. Ahora elige cómo quieres usar la plataforma.",
-    "selectRoleDescription": "Elige cómo quieres usar la plataforma:",
-    "menteeDescription": "Busco orientación y desarrollo profesional",
-    "mentorDescription": "Quiero compartir mi experiencia y ayudar a otros profesionales",
-    "company": {
-      "title": "Empresa",
-      "description": "Quiero inscribir profesionales de nuestra empresa"
-    },
-    "recruiter": {
-      "title": "Reclutador",
-      "description": "Busco profesionales calificados para oportunidades"
-    },
-    "continue": "Continuar",
-    "welcome": {
-      "title": "¡Bienvenido a Menvo!",
-      "description": "Tu cuenta ha sido confirmada exitosamente. Ahora elige cómo quieres usar la plataforma.",
-      "selectRoleDescription": "Elige cómo quieres usar la plataforma:",
-      "continue": "Continuar"
-    },
+    "checkSpam": "Revisa tu carpeta de spam o correo no deseado. Si aún no lo encuentras, puedes intentar iniciar sesión y reenviar el correo de confirmación.",
     "goToLogin": "Ir al Inicio de Sesión",
-    "passwordValidation": {
-      "passwordsDontMatch": "Las contraseñas no coinciden",
-      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
-      "passwordStrength": "Fortaleza de la contraseña:",
-      "passwordTooWeak": "Contraseña muy débil",
-      "passwordMedium": "Contraseña media",
-      "passwordStrong": "Contraseña fuerte",
-      "passwordsMatch": "✓ Las contraseñas coinciden",
-      "passwordsDontMatchError": "Las contraseñas no coinciden"
-    },
     "goToHome": "Volver al Inicio",
     "goToVerification": "Ir a la página de verificación",
     "userType": {
-      "title": "¿Cómo quieres participar?",
+      "title": "Yo soy:",
       "mentee": {
-        "title": "Mentee",
-        "description": "Busco orientación para desarrollar mi carrera"
+        "title": "Mentorado",
+        "description": "Busco orientación y acompañamiento"
       },
       "mentor": {
         "title": "Mentor",
-        "description": "Quiero compartir mi experiencia y ayudar a otros"
+        "description": "Quiero compartir conocimiento"
       },
-      "company": {
+       "company": {
         "title": "Empresa",
-        "description": "Quiero inscribir profesionales de nuestra empresa"
+        "description": "Inscribir profesionales de mi empresa"
       },
       "recruiter": {
         "title": "Reclutador",
-        "description": "Busco profesionales calificados para oportunidades"
+        "description": "Busco profesionales calificado"
       }
     }
   },
@@ -446,7 +398,7 @@
     "howItWorks": "Cómo Funciona",
     "store": "Tienda",
     "company": "Compañía",
-    "aboutUs": "Acerca de",
+    "aboutUs": "Sobre Nosotros",
     "team": "Nuestro Equipo",
     "mission": "Nuestra Misión",
     "partners": "Socios",
@@ -607,18 +559,5 @@
       "title": "MENVO - Plataforma de Mentoría Voluntaria",
       "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría"
     }
-  },
-  "waitingList": {
-    "title": "Únete a la Lista de Espera",
-    "description": "¡Gracias por tu interés! Por favor, completa el siguiente formulario.",
-    "nameLabel": "Nombre",
-    "namePlaceholder": "Ingresa tu nombre completo",
-    "emailPlaceholder": "tu@correo.com",
-    "whatsappLabel": "WhatsApp (opcional)",
-    "whatsappPlaceholder": "Tu número de WhatsApp",
-    "reasonLabel": "¿Por qué quieres ser parte?",
-    "reasonPlaceholder": "Cuéntanos por qué quieres unirte",
-    "successMessage": "¡Gracias por tu interés!",
-    "errorMessage": "Error al enviar el formulario"
   }
 }

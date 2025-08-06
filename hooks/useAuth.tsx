@@ -1,165 +1,231 @@
 "use client"
+import { useEffect, useState, createContext, useContext } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/services/auth/supabase'
+import { useMutation } from '@tanstack/react-query'
 
-import { createClient } from "@/utils/supabase/client"
-import { useAuth as useAuthContext } from "@/app/context/auth-context"
-
-// Hook para operações de autenticação
-export const useAuthOperations = () => {
-  const supabase = createClient()
-
-  const signUp = async ({
-    email,
-    password,
-    fullName,
-    userType,
-  }: { email: string; password: string; fullName: string; userType: string }) => {
-    try {
-      console.log("🔄 Iniciando signUp:", { email, fullName, userType })
-
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email.toLowerCase().trim(),
-          password,
-          fullName,
-          userType,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        console.error("❌ Erro no signUp:", data.error)
-        return { error: data.error }
-      }
-
-      console.log("✅ SignUp bem-sucedido:", data.user?.id)
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no signUp:", error)
-      return { error: "Erro inesperado" }
-    }
-  }
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      console.log("🔄 Iniciando signIn:", { email })
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.toLowerCase().trim(),
-        password,
-      })
-
-      if (error) {
-        console.error("❌ Erro no signIn:", error)
-        return { error }
-      }
-
-      console.log("✅ SignIn bem-sucedido:", data.user?.id)
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no signIn:", error)
-      return { error }
-    }
-  }
-
-  const signInWithGoogle = async () => {
-    try {
-      console.log("🔄 Iniciando Google OAuth")
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
-      })
-
-      if (error) {
-        console.error("❌ Erro no Google OAuth:", error)
-        return { error }
-      }
-
-      console.log("✅ Google OAuth iniciado")
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no Google OAuth:", error)
-      return { error }
-    }
-  }
-
-  const signInWithLinkedIn = async () => {
-    try {
-      console.log("🔄 Iniciando LinkedIn OAuth")
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "linkedin_oidc",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            prompt: "consent",
-          },
-        },
-      })
-
-      if (error) {
-        console.error("❌ Erro no LinkedIn OAuth:", error)
-        return { error }
-      }
-
-      console.log("✅ LinkedIn OAuth iniciado")
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no LinkedIn OAuth:", error)
-      return { error }
-    }
-  }
-
-  const signInWithGitHub = async () => {
-    try {
-      console.log("🔄 Iniciando GitHub OAuth")
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            prompt: "consent",
-          },
-        },
-      })
-
-      if (error) {
-        console.error("❌ Erro no GitHub OAuth:", error)
-        return { error }
-      }
-
-      console.log("✅ GitHub OAuth iniciado")
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no GitHub OAuth:", error)
-      return { error }
-    }
-  }
-
-  return {
-    signUp,
-    signIn,
-    signInWithGoogle,
-    signInWithLinkedIn,
-    signInWithGitHub,
-  }
+interface AuthContextType {
+  user: any
+  isAuthenticated: boolean
+  loading: boolean
+  logout: () => Promise<void>
 }
 
-// Para compatibilidade com código existente, criar um hook simples
-export const useAuth = () => {
-  // Este hook deve ser usado apenas para operações, não para estado
-  // Para estado de autenticação, use o contexto diretamente
-  return useAuthContext()
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+ useEffect(() => {
+  const getUser = async () => {
+    setLoading(true)
+
+    const { data: authUser, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !authUser.user) {
+      console.error(authError)
+      setUser(null)
+      setLoading(false)
+      return
+    }
+    setUser(authUser.user)
+    setLoading(false)
+  }
+  getUser()
+
+  const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+  if (session?.user) {
+    const { data: userData } = await supabase
+      .from('users')
+      .select('roles')
+      .eq('id', session.user.id)
+      .single()
+    setUser({
+      ...session.user,
+      ...userData || null
+    })
+  } else {
+    setUser(null)
+  }
+})
+
+  return () => {
+    listener.subscription.unsubscribe()
+  }
+}, [])
+
+  const logout = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    router.push('/')
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loading, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
+  return ctx
+}
+
+export function useLoginMutation() {
+  return useMutation({
+    mutationFn: async ({ email, password }: { email: string, password: string }) => {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      return data
+    }
+  })
+} 
+
+
+// "use client"
+// import { createContext, useContext, useEffect, useState } from "react"
+// import { useRouter } from "next/navigation"
+// import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+// import { useAuthMeQuery } from "./useAuthMeQuery"
+// import { supabase } from '@/services/auth/supabase'
+
+// interface User {
+//   id: string
+//   email: string
+//   first_name?: string
+//   last_name?: string
+//   profile_picture_url?: string
+//   roles?: string[]
+//   [key: string]: any // Para campos extras do perfil
+// }
+
+// interface AuthContextType {
+//   user: User | null
+//   isAuthenticated: boolean
+//   isLoading: boolean
+//   login: (data: { email: string; password: string }) => Promise<void>
+//   logout: () => Promise<void>
+//   register: (data: { email: string; password: string; [key: string]: any }) => Promise<void>
+// }
+
+// const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+// export function AuthProvider({ children }: { children: React.ReactNode }) {
+//   const queryClient = useQueryClient()
+//   const router = useRouter()
+//   const [autenticated, setAutenticated] = useState(false)
+//   const { data, isLoading: isAuthLoading, refetch } = useAuthMeQuery("oi")
+
+//   useEffect(() => {
+//     const token = localStorage.getItem('supabase.auth.token')
+//     if (token) {
+//       setAutenticated(true)
+//     } else {
+//       setAutenticated(false)
+//     }
+//   }, [])
+
+//   // Login mutation
+//   const { mutateAsync: login, isPending: isLoggingIn, isSuccess: isLoggedIn } = useMutation({
+//     mutationFn: async ({ email, password }: { email: string; password: string }) => {
+//       const res = await fetch("/api/auth/login", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ email, password }),
+//         credentials: 'include'
+//       })
+//       if (!res.ok) {
+//         const err = await res.json()
+//         throw new Error(err.error || "Login failed")
+//       }
+//       const data = await res.json()
+//       // Save the session data to localStorage
+//       if (data.session) {
+//         localStorage.setItem('supabase.auth.token', JSON.stringify({
+//           currentSession: {
+//             access_token: data.session.access_token,
+//             refresh_token: data.session.refresh_token
+//           }
+//         }))
+//         setAutenticated(true)
+//       }
+//       return data
+//     },
+//     onSuccess: async () => {
+//       await queryClient.invalidateQueries({ queryKey: ["auth-me"] })
+//       await refetch()
+//       router.push("/")
+//     }
+//   })
+
+//   // Logout mutation
+//   const { mutateAsync: logout } = useMutation({
+//     mutationFn: async () => {
+//       const res = await fetch("/api/auth/logout", { 
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         credentials: 'include'
+//       })
+//       if (!res.ok) {
+//         const err = await res.json()
+//         throw new Error(err.error || "Logout failed")
+//       }
+//       // Limpa o localStorage
+//       localStorage.removeItem('supabase.auth.token')
+//       setAutenticated(false)
+//       return res.json()
+//     },
+//     onSuccess: async () => {
+//       await queryClient.invalidateQueries({ queryKey: ["auth-me"] })
+//       await refetch()
+//       router.push("/")
+//     }
+//   })
+
+//   // Register mutation
+//   const { mutateAsync: register } = useMutation({
+//     mutationFn: async (data: { email: string; password: string; [key: string]: any }) => {
+//       const res = await fetch("/api/auth/register", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(data),
+//         credentials: 'include'
+//       })
+//       if (!res.ok) {
+//         const err = await res.json()
+//         throw new Error(err.error || "Register failed")
+//       }
+//       return res.json()
+//     },
+//     onSuccess: async () => {
+//       await queryClient.invalidateQueries({ queryKey: ["auth-me"] })
+//       await refetch()
+//       router.push("/")
+//     }
+//   })
+
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         user: data?.user ?? null,
+//         isAuthenticated: autenticated || isLoggedIn || !!data?.user,
+//         isLoading: isAuthLoading || isLoggingIn,
+//         login: async (data) => await login(data),
+//         logout: async () => await logout(),
+//         register: async (data) => await register(data),
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   )
+// }
+
+// export function useAuth() {
+//   const ctx = useContext(AuthContext)
+//   if (!ctx) throw new Error("useAuth must be used within AuthProvider")
+//   return ctx
+// }
