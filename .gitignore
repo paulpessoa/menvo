@@ -2,44 +2,25 @@
 
 # dependencies
 /node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
 
 # next.js
 /.next/
 /out/
-.next/
-out/
 
 # production
 /build
 
-# debug
+# misc
+.DS_Store
+*.pem
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-
-# lock files from other package managers (keep only package-lock.json for npm)
-pnpm-lock.yaml
-yarn.lock
-
-# env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# vercel
+.env*.local
 .vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Turbo (caso esteja usando)
-.turbo/
+.turbo

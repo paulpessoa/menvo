@@ -1,201 +1,111 @@
-# Configuração OAuth - Google e LinkedIn
+# OAuth Setup for Menvo
 
-Este guia explica como configurar o login com Google e LinkedIn no seu projeto Next.js com Supabase.
+This document outlines the steps to configure OAuth providers (Google, GitHub, LinkedIn) for the Menvo platform using Supabase.
 
-## 📋 Resumo
+## Prerequisites
 
-**Dificuldade:** FÁCIL a MODERADA  
-**Tempo estimado:** 30-45 minutos  
-**Pré-requisitos:** Projeto Supabase ativo
+*   A Supabase project set up and running.
+*   Access to your Supabase project dashboard.
+*   Developer accounts for Google, GitHub, and LinkedIn.
 
-## 🚀 Implementação no Código
+## General Supabase OAuth Configuration
 
-✅ **JÁ IMPLEMENTADO** - O código já foi adicionado ao projeto:
-- Métodos OAuth no `services/auth/supabase.ts`
-- Botões funcionais nas páginas de login e signup
-- Callback route configurado em `app/auth/callback/route.ts`
+1.  **Go to Authentication Settings**: In your Supabase project dashboard, navigate to `Authentication` -> `Providers`.
+2.  **Add Redirect URLs**: For each provider you enable, you will need to add a **Redirect URL**. This is where the user will be redirected after successful authentication with the OAuth provider.
+    *   **For local development**: `http://localhost:3000/auth/callback`
+    *   **For production (Vercel)**: `https://your-vercel-app-url.vercel.app/auth/callback` (Replace `your-vercel-app-url.vercel.app` with your actual domain).
+    *   You can add multiple redirect URLs, separated by commas.
 
-## ⚙️ Configurações Necessárias
+## 1. Google OAuth Setup
 
-### 1. Configuração no Supabase Dashboard
+1.  **Go to Google Cloud Console**:
+    *   Visit [Google Cloud Console](https://console.cloud.google.com/).
+    *   Select or create a new project.
+2.  **Enable Google People API**:
+    *   Navigate to `APIs & Services` -> `Enabled APIs & services`.
+    *   Search for "Google People API" and enable it.
+3.  **Create OAuth Consent Screen**:
+    *   Go to `APIs & Services` -> `OAuth consent screen`.
+    *   Choose "External" user type and click "CREATE".
+    *   Fill in the required information (App name, User support email, Developer contact information).
+    *   Add your authorized domains (e.g., `localhost:3000`, `your-vercel-app-url.vercel.app`).
+    *   Add scopes: At a minimum, you'll need `.../auth/userinfo.email` and `.../auth/userinfo.profile`.
+    *   Add test users if your app is in "Testing" status.
+4.  **Create Credentials**:
+    *   Go to `APIs & Services` -> `Credentials`.
+    *   Click `+ CREATE CREDENTIALS` -> `OAuth client ID`.
+    *   Select "Web application" as the Application type.
+    *   Give it a name (e.g., "Menvo Web Client").
+    *   **Authorized JavaScript origins**: Add your development and production URLs (e.g., `http://localhost:3000`, `https://your-vercel-app-url.vercel.app`).
+    *   **Authorized redirect URIs**: Add the Supabase redirect URLs (e.g., `http://localhost:3000/auth/callback`, `https://your-vercel-app-url.vercel.app/auth/callback`).
+    *   Click "CREATE".
+    *   You will get your **Client ID** and **Client Secret**.
+5.  **Configure in Supabase**:
+    *   In your Supabase dashboard, go to `Authentication` -> `Providers`.
+    *   Enable "Google".
+    *   Paste your Google **Client ID** into `Client ID`.
+    *   Paste your Google **Client Secret** into `Client Secret`.
+    *   Save the settings.
 
-1. Acesse seu [Supabase Dashboard](https://supabase.com/dashboard)
-2. Vá para **Authentication** → **Providers**
-3. Configure os provedores:
+## 2. GitHub OAuth Setup
 
-#### Google:
-- Ative o toggle **Google Enabled**
-- Adicione **Client ID** e **Client Secret** (obtidos no passo 2)
+1.  **Go to GitHub Developer Settings**:
+    *   Visit [GitHub Developer Settings](https://github.com/settings/developers).
+    *   Navigate to `OAuth Apps`.
+2.  **Register a New OAuth Application**:
+    *   Click `New OAuth App`.
+    *   **Application name**: Menvo
+    *   **Homepage URL**: `http://localhost:3000` (or your production URL)
+    *   **Application description**: (Optional)
+    *   **Authorization callback URL**: Add the Supabase redirect URLs (e.g., `http://localhost:3000/auth/callback`, `https://your-vercel-app-url.vercel.app/auth/callback`).
+    *   Click `Register application`.
+3.  **Generate a New Client Secret**:
+    *   After registration, you will see your **Client ID**.
+    *   Click `Generate a new client secret`. Copy this secret immediately as it will only be shown once.
+4.  **Configure in Supabase**:
+    *   In your Supabase dashboard, go to `Authentication` -> `Providers`.
+    *   Enable "GitHub".
+    *   Paste your GitHub **Client ID** into `Client ID`.
+    *   Paste your GitHub **Client Secret** into `Client Secret`.
+    *   Save the settings.
 
-#### LinkedIn:
-- Ative o toggle **LinkedIn (OIDC) Enabled**
-- Adicione **Client ID** e **Client Secret** (obtidos no passo 3)
+## 3. LinkedIn OAuth Setup (OpenID Connect)
 
-### 2. Configuração Google Cloud Console
+Supabase uses LinkedIn's OpenID Connect (OIDC) for authentication.
 
-1. **Acesse o [Google Cloud Console](https://console.cloud.google.com/)**
+1.  **Go to LinkedIn Developer Portal**:
+    *   Visit [LinkedIn Developer Portal](https://developer.linkedin.com/).
+    *   Go to `My Apps`.
+2.  **Create a New Application**:
+    *   Click `Create app`.
+    *   Fill in the required details (App name, Company, Privacy policy URL, Business email).
+    *   Upload an app logo.
+    *   Agree to the terms and click `Create app`.
+3.  **Configure Auth Settings**:
+    *   Once the app is created, navigate to the `Auth` tab.
+    *   **Client ID** and **Client Secret** will be displayed here. Copy them.
+    *   **Redirect URLs**: Add the Supabase redirect URLs (e.g., `http://localhost:3000/auth/callback`, `https://your-vercel-app-url.vercel.app/auth/callback`).
+    *   **Scopes**: Ensure you have at least `r_liteprofile` and `r_emailaddress` selected. For OIDC, you might also need `openid` and `profile`.
+    *   Save changes.
+4.  **Configure in Supabase**:
+    *   In your Supabase dashboard, go to `Authentication` -> `Providers`.
+    *   Enable "LinkedIn (OpenID Connect)".
+    *   Paste your LinkedIn **Client ID** into `Client ID`.
+    *   Paste your LinkedIn **Client Secret** into `Client Secret`.
+    *   Save the settings.
 
-2. **Crie/Selecione um projeto:**
-   - Clique em "Select a project" → "New Project"
-   - Nome: `volunteer-mentor-platform` (ou similar)
+## Environment Variables in Next.js
 
-3. **Configure a tela de consentimento:**
-   - Vá para **APIs & Services** → **OAuth consent screen**
-   - Escolha **External** → **Create**
-   - Preencha:
-     - App name: `Volunteer Mentor Platform`
-     - User support email: seu email
-     - Developer contact: seu email
-   - Em **Authorized domains**, adicione: `supabase.co`
-   - Adicione os scopes:
-     - `../auth/userinfo.email`
-     - `../auth/userinfo.profile`
-     - `openid`
+After configuring the providers in Supabase, you need to add the redirect URLs to your Next.js application's environment variables.
 
-4. **Crie credenciais OAuth:**
-   - Vá para **APIs & Services** → **Credentials**
-   - Clique **Create Credentials** → **OAuth client ID**
-   - Application type: **Web application**
-   - Name: `Volunteer Mentor Platform`
-   
-   **Authorized JavaScript origins:**
-   \`\`\`
-   http://localhost:3000
-   https://seu-dominio.com
-   \`\`\`
-   
-   **Authorized redirect URIs:**
-   \`\`\`
-   https://SEU-PROJECT-REF.supabase.co/auth/v1/callback
-   http://localhost:3000/auth/callback
-   \`\`\`
+In your `.env.local` file (and your Vercel project environment variables for production), add:
 
-5. **Copie as credenciais:**
-   - **Client ID** e **Client Secret**
-   - Cole no Supabase Dashboard (passo 1)
-
-### 3. Configuração LinkedIn Developer
-
-1. **Acesse o [LinkedIn Developer Dashboard](https://www.linkedin.com/developers/)**
-
-2. **Crie uma aplicação:**
-   - Clique **Create App**
-   - App name: `Volunteer Mentor Platform`
-   - LinkedIn Page: Sua página/empresa
-   - App logo: Upload de um logo
-
-3. **Configure produtos:**
-   - Vá para **Products**
-   - Encontre **Sign In with LinkedIn using OpenID Connect**
-   - Clique **Request Access**
-
-4. **Configure autenticação:**
-   - Vá para **Auth**
-   - Em **Authorized Redirect URLs**, adicione:
-   \`\`\`
-   https://SEU-PROJECT-REF.supabase.co/auth/v1/callback
-   http://localhost:3000/auth/callback
-   \`\`\`
-
-5. **Verifique os scopes:**
-   - Certifique-se que estão marcados:
-     - `openid`
-     - `profile`
-     - `email`
-
-6. **Copie as credenciais:**
-   - **Client ID** e **Client Secret**
-   - Cole no Supabase Dashboard (passo 1)
-
-### 4. Configuração para Desenvolvimento Local
-
-Se você estiver usando Supabase CLI localmente, adicione ao `supabase/config.toml`:
-
-\`\`\`toml
-[auth.external.google]
-enabled = true
-client_id = "seu-google-client-id"
-secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
-
-[auth.external.linkedin_oidc]
-enabled = true
-client_id = "seu-linkedin-client-id"
-secret = "env(SUPABASE_AUTH_EXTERNAL_LINKEDIN_SECRET)"
-\`\`\`
-
-E no seu `.env.local`:
 \`\`\`env
-SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=seu-google-client-secret
-SUPABASE_AUTH_EXTERNAL_LINKEDIN_SECRET=seu-linkedin-client-secret
+NEXT_PUBLIC_OAUTH_CALLBACK_URL=https://your-vercel-app-url.vercel.app/auth/callback
+NEXT_PUBLIC_LOCAL_CALLBACK_URL=http://localhost:3000/auth/callback
+NEXT_PUBLIC_SITE_URL=https://your-vercel-app-url.vercel.app # Or http://localhost:3000 for local
 \`\`\`
 
-## 🔧 URLs de Callback
+Replace `https://your-vercel-app-url.vercel.app` with your actual Vercel deployment URL. `NEXT_PUBLIC_SITE_URL` is used for email redirects (e.g., password reset, email confirmation).
 
-**Produção:**
-\`\`\`
-https://SEU-PROJECT-REF.supabase.co/auth/v1/callback
-\`\`\`
-
-**Desenvolvimento:**
-\`\`\`
-http://localhost:3000/auth/callback
-\`\`\`
-
-## ✅ Testando a Implementação
-
-1. **Inicie o servidor de desenvolvimento:**
-   \`\`\`bash
-   npm run dev
-   \`\`\`
-
-2. **Acesse a página de login:**
-   \`\`\`
-   http://localhost:3000/login
-   \`\`\`
-
-3. **Teste os botões OAuth:**
-   - Clique em "Continue with Google"
-   - Clique em "Continue with LinkedIn"
-
-4. **Verifique no Supabase Dashboard:**
-   - Vá para **Authentication** → **Users**
-   - Confirme que novos usuários aparecem após login OAuth
-
-## 🚨 Problemas Comuns
-
-### Erro: "redirect_uri_mismatch"
-- Verifique se as URLs de callback estão corretas
-- Certifique-se que não há espaços extras nas URLs
-
-### Erro: "invalid_client"
-- Verifique se Client ID e Secret estão corretos
-- Confirme que copiou as credenciais completas
-
-### LinkedIn: "unauthorized_client"
-- Certifique-se que solicitou acesso ao "Sign In with LinkedIn using OpenID Connect"
-- Aguarde aprovação (pode levar algumas horas)
-
-### Desenvolvimento local não funciona
-- Adicione `http://localhost:3000` nas origens autorizadas
-- Use `127.0.0.1:3000` se `localhost` não funcionar
-
-## 📝 Próximos Passos
-
-Após configurar OAuth:
-
-1. **Teste em produção** após deploy
-2. **Configure domínio customizado** no Supabase (opcional)
-3. **Adicione GitHub OAuth** seguindo padrão similar
-4. **Implemente logout** em todas as páginas necessárias
-
-## 🔗 Links Úteis
-
-- [Supabase Auth Docs](https://supabase.com/docs/guides/auth)
-- [Google OAuth Setup](https://supabase.com/docs/guides/auth/social-login/auth-google)
-- [LinkedIn OAuth Setup](https://supabase.com/docs/guides/auth/social-login/auth-linkedin)
-- [Google Cloud Console](https://console.cloud.google.com/)
-- [LinkedIn Developer Portal](https://www.linkedin.com/developers/)
-
----
-
-**Dúvidas?** Consulte a documentação oficial ou abra uma issue no repositório.
+By following these steps, your Menvo application should be able to authenticate users using Google, GitHub, and LinkedIn via Supabase.

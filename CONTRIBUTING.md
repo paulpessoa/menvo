@@ -1,66 +1,83 @@
-# Contribuir
-Gostaria de nos ajudar a melhorar o projeto? Veja este guia contribuição para ajudar o Menvo a crescer.
+# Contributing to Menvo
 
-## Tabela de conteúdos
-- [Para começar](#para-começar)
-  - [Clonando o repositório](#clonando-o-repositório)
-  - [Criando a nova branch](#criando-a-nova-branch)
-  - [Nomeando a mensagem de commit](#nomeando-a-mensagem-de-commit)
-- [Submetendo suas alterações](#submetendo-suas-alterações)
-- [Outras formas de contribuir](#outras-formas-de-contribuir)
+We welcome contributions to the Menvo project! Here's how you can help.
 
-## Para começar
-### Clonando o repositório
-Faça um fork do repositório no GitHub e o clone em sua máquina.
-\`\`\`bash
-$ git clone https://github.com/{Seu nome}/menvo.git
+## Getting Started
 
-$ cd menvo
-\`\`\`
+1.  **Fork the repository**: Start by forking the Menvo repository to your GitHub account.
+2.  **Clone the repository**: Clone your forked repository to your local machine:
+    \`\`\`bash
+    git clone https://github.com/YOUR_USERNAME/menvo.git
+    cd menvo
+    \`\`\`
+3.  **Install dependencies**:
+    \`\`\`bash
+    npm install
+    # or
+    yarn install
+    \`\`\`
+4.  **Set up environment variables**: Copy `.env.example` to `.env.local` and fill in the necessary environment variables (e.g., Supabase credentials, OAuth keys).
+    \`\`\`bash
+    cp .env.example .env.local
+    \`\`\`
+5.  **Run the development server**:
+    \`\`\`bash
+    npm run dev
+    # or
+    yarn dev
+    \`\`\`
+    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Criando a nova branch
-Crie uma nova branch para a alteração que você deseja submeter. Por exemplo:
-\`\`\`bash
-$ git checkout -b fix-responsive
-\`\`\`
-Ao executar o comando acima, uma nova branch chamada `fix-responsive` será criada.
+## Making Changes
 
-**Nota:** O nome da branch deve ser significativo e deve indicar **apenas** a mudança a ser feita. Requisições que não seguirem esse padrão não serão aceitas.
+1.  **Create a new branch**: Before making any changes, create a new branch for your feature or bug fix:
+    \`\`\`bash
+    git checkout -b feature/your-feature-name
+    # or
+    git checkout -b bugfix/your-bug-fix-name
+    \`\`\`
+    Choose a descriptive name for your branch.
 
-### Nomeando a mensagem de commit
-Para elaborar uma boa mensagem de commit, você pode imaginar a seguinte frase: "Se aplicado, este commit irá {sua mensagem de commit}". Por exemplo:
+2.  **Implement your changes**: Write your code, ensuring it adheres to the project's coding style and best practices.
 
-*Se aplicado, este commit irá **Corrigir responsividade mal formada**
+3.  **Test your changes**: If you're adding new features, please write tests. If you're fixing a bug, ensure your fix includes a test that reproduces the bug and then passes with your fix.
 
-Ou se preferir, você também pode submeter seus commits em inglês:
+4.  **Commit your changes**: Write clear and concise commit messages.
+    \`\`\`bash
+    git add .
+    git commit -m "feat: Add new feature"
+    # or
+    git commit -m "fix: Resolve bug in authentication"
+    \`\`\`
 
-*If applied, this commit will **Fix malformed responsiveness***
+5.  **Push to your fork**:
+    \`\`\`bash
+    git push origin feature/your-feature-name
+    \`\`\`
 
-Lembre-se de começar sua mensagem com uma palavra como: Adicionar, refatorar, deletar, etc..
+## Submitting a Pull Request
 
-**Nota:** Tente manter suas mensagens com menos de 50 caractéres e detalhar as alterações na descrição do commit. Apesar de não ser obrigatório, esta é uma prática muito conhecida e utilizada na comunidade do Git.
+1.  **Open a Pull Request**: Go to your forked repository on GitHub and click the "Compare & pull request" button.
+2.  **Describe your changes**: Provide a detailed description of your changes, including:
+    *   What problem does this PR solve?
+    *   How does it solve it?
+    *   Any relevant screenshots or GIFs for UI changes.
+    *   Any breaking changes or considerations for reviewers.
+3.  **Link to issues**: If your PR addresses an open issue, link it using keywords like `Closes #123` or `Fixes #456`.
+4.  **Request a review**: Ask one of the project maintainers to review your code.
 
-## Submetendo suas alterações
-Após ter realizado as mudanças, suba suas mudanças para o repositório remoto:
-\`\`\`bash
-$ git push origin fix-responsive
-\`\`\`
+## Code Style
 
-Após isso, vá ao seu repositório recém clonado no GitHub, selecione a branch criada e clique em Pull Request.
+*   We use ESLint and Prettier for code formatting and linting. Please ensure your code passes lint checks before submitting a PR.
+*   Follow the existing code style in the project.
 
-**IMPORTANTE:** Faça o Pull Request da sua branch especificamente para a branch `dev`. Pull Requests enviados a branch `main` serão automaticamente recusados.
+## Reporting Bugs
 
-Faça um comentário geral sobre as mudanças realizadas e, se necessário dê uma descrição sobre as alterações realizadas e sua justificativa (opcional). Por exemplo:
+If you find a bug, please open an issue on GitHub. Provide as much detail as possible, including:
+*   Steps to reproduce the bug.
+*   Expected behavior.
+*   Actual behavior.
+*   Screenshots or error messages.
+*   Your environment (OS, browser, Node.js version).
 
-"**Corrigir #418**
-
-Este PR corrige a issue submetida em relação a um erro de responsividade."
-
-Após isso, seu Pull Request entrará em fase de revisão e, quem sabe, suas alterações sejam integradas ao Menvo!
-
-## Outras formas de contribuir
-Você também pode ajudar o projeto crescer:
-
-- Criando novos desafios
-- Sugerindo mudanças e melhorias
-- Fazendo parte de nossa [comunidade](https://discord.XXXXXX) no Discord
+Thank you for contributing to Menvo!

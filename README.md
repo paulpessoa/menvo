@@ -1,136 +1,145 @@
-# MENVO - "Volunteer Mentoring"
+# Menvo - Volunteer Mentor Platform
 
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
+Menvo is a platform designed to connect aspiring individuals with experienced volunteer mentors. It aims to foster knowledge sharing, personal growth, and community building by facilitating mentorship relationships.
 
-<br />
-<p align="center">
-  <a href="https://www.menvo.com.br/">
-    <img 
-      src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/images/logo512.png"
-      alt="Menvo, a letra M na cor verde com dois pontos, assim fica similar a duas pessoas dando as mãos." 
-      width="100" 
-      height="100"
-    />
-  </a>
-</p>
+## Features
 
-  
-<h3 align="center">Menvo</h3>
+*   **User Authentication**: Secure sign-up and login with email/password and OAuth (Google, GitHub, LinkedIn) via Supabase.
+*   **User Profiles**: Comprehensive profiles for both mentees and mentors, including personal details, skills, interests, and professional background.
+*   **Mentor Search & Filtering**: Easily find mentors based on expertise, availability, and other criteria.
+*   **Mentorship Session Scheduling**: Intuitive calendar-based scheduling for one-on-one mentorship sessions.
+*   **Admin Dashboard**: Tools for administrators to manage users, verify mentors, and oversee platform activity.
+*   **Responsive Design**: Optimized for various devices using Tailwind CSS and Shadcn UI.
+*   **Internationalization (i18n)**: Support for multiple languages (currently Portuguese, English, Spanish).
+*   **SEO Friendly**: Configured for better search engine visibility.
 
-<p align="center">
- MENVO is a free mentoring plataform for students looking for their first professional opportunities. 
-  <br /> 
-</p>
+## Technologies Used
 
-## Índice
+*   **Next.js 14 (App Router)**: React framework for building performant web applications.
+*   **React**: Frontend library for building user interfaces.
+*   **TypeScript**: Strongly typed JavaScript for enhanced code quality.
+*   **Supabase**: Open-source Firebase alternative for backend services (Authentication, Database, Storage).
+*   **Tailwind CSS**: Utility-first CSS framework for rapid UI development.
+*   **Shadcn UI**: Reusable UI components built with Radix UI and Tailwind CSS.
+*   **React Query (TanStack Query)**: For efficient data fetching, caching, and synchronization.
+*   **Zustand**: A small, fast, and scalable bearbones state-management solution.
+*   **Lucide React**: Beautifully crafted open-source icons.
+*   **i18next**: Internationalization framework.
 
-- [Sobre o Projeto](#sobre-o-projeto)
-  - [Tecnologias](#feito-com)
-  - [Estrutura](#estrutura)
-- [Como Utilizar](#instalação)
-- [Como Contribuir](#contribuir)
-- [Autores](#autores)
-- [Comunidade](#comunidade)
-- [Redes sociais](#redes-sociais)
+## Getting Started
 
-## Sobre o Projeto
+Follow these steps to set up and run the project locally.
 
- We connect several professionals through video calls to young people who need references, follow-up or access to resources to help them in the search for and participation in selection processes.
+### Prerequisites
 
-### Feito com
+*   Node.js (v18.x or higher)
+*   npm or Yarn
+*   Git
 
-- [x] [NextJs](https://nextjs.org/) - The React Framework for the Web
-- [x] [Npm](https://npmjs.com/) - Gerenciador de pacotes e dependências
-- [x] [Supabase](https://supabase.com) - Supabase is an open source Firebase alternative.
-- [x] [NodeJs](https://nodejs.org/en) - https://nodejs.org/en
-- [x] [Sass](https://sass-lang.com/install) - Sass has features that don't exist in CSS yet like nesting, mixins, inheritance, and other nifty goodies that help you write robust, maintainable CSS.
-- [x] [Axios](https://axios-http.com/ptbr/docs/intro) - Cliente HTTP baseado em promessas para o navegador e Node.js
-- [x] [ReactJs](https://react.dev/) - The library for web and native user interfaces
-- [x] [Typescript](https://www.typescriptlang.org/) - TypeScript is JavaScript with syntax for types.
-- [x] [Mui Material](https://mui.com/) - Move faster with intuitive React UI tools
-- [x] [React Icon](https://react-icons.github.io/react-icons/) - Include popular icons in your React projects easily 
+### 1. Clone the Repository
 
-### Estrutura
-  #### Pages:
-  - [x] Home
-  - [x] About
-  - [x] Mentors Feed
-  - [x] Single Mentor
-  - [ ] Courses
-  - [ ] Oportunities
-  - [ ] MenvoCast (redirect to AudioPlataforms)
-  - [ ] Store
-  - [ ] Panel
+\`\`\`bash
+git clone https://github.com/your-username/menvo.git
+cd menvo
+\`\`\`
 
-#### Components:
-  - [x] Header
-  - [x] Footer
-  - [ ] sibeBar
-  - [x] sideBarMentor
-  - [x] sideBarSearch
-  - [x] cardMentor
-  - [ ] sectionMentor
-  - [ ] formScheduleMentor
-  - [x] formLoginRegister (Modal)
-  - [ ] Guider
-  - [ ] slidePartners
-  - [ ] newsLetters
+### 2. Install Dependencies
 
+\`\`\`bash
+npm install
+# or
+yarn install
+\`\`\`
 
-## Instalação
-Para clonar o projeto e executá-lo em sua máquina, veja os detalhes em [INSTALLING.md](INSTALLING.md).
+### 3. Set up Supabase
 
-## Contribuir
-Gostaria de contribuir com o projeto? Por favor acesse [CONTRIBUTING.md](CONTRIBUTING.md) para o manual completo de contribuição.
+Menvo uses Supabase for its backend. You'll need to set up a Supabase project and configure your environment variables.
 
-## Autores
-- **Paul Pessoa** - _Trabalho inicial_ - [Paul Pessoa](https://github.com/paulpessoa)
+1.  **Create a Supabase Project**:
+    *   Go to [Supabase](https://supabase.com/) and create a new project.
+    *   Note your Project URL and `anon` public key from `Project Settings` -> `API`.
 
-Veja também a lista de [contribuidores](https://www.menvo.com.br/volunteers) que participaram do projeto.
+2.  **Run Database Migrations**:
+    The `scripts/01-initial-schema.sql` file contains the complete database schema, including tables, types, functions, triggers, and RLS policies.
+    *   In your Supabase project dashboard, navigate to `SQL Editor`.
+    *   Open the `scripts/01-initial-schema.sql` file from this repository.
+    *   Copy the entire content of the SQL file and paste it into the Supabase SQL Editor.
+    *   Click `Run`. This will set up all necessary tables, RLS policies, and functions.
 
-## Comunidade
-Temos uma comunidade exclusiva do Menvo no Discord. Interessado? [Participe](https://discord.gg/xxxxxxxx)!
-Acesse nossa [plataforma](https://www.menvo.com.br/)!
+3.  **Configure OAuth Providers (Optional but Recommended)**:
+    If you plan to use Google, GitHub, or LinkedIn authentication, follow the instructions in `OAUTH_SETUP.md` to configure them in your Supabase project and their respective developer consoles.
 
-## Redes sociais
-Nos siga nas redes sociais!
-<th>
- <td>
-    <a href="https://www.linkedin.com/company/menvo/"  target="_blank">
-      <img 
-        src="https://cdn-icons-png.flaticon.com/512/174/174857.png" 
-        width="30px" 
-        height="30px" 
-        alt="LinkedIn logo"
-      />
-    </a>
-  </td>
-  <td>
-    <a href="https://www.instagram.com/menvobr/"  target="_blank">
-      <img 
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Instagram-Icon.png/480px-Instagram-Icon.png"
-        width="30px"
-        height="30px"
-        alt="Instagram logo"
-      />
-    </a>
-  </td>
-</th>
+### 4. Environment Variables
 
-[forks-shield]: https://img.shields.io/github/forks/paulpessoa/menvo.svg?style=flat-square
-[forks-url]: https://github.com/paulpessoa/menvo/network/members
-[stars-shield]: https://img.shields.io/github/stars/paulpessoa/menvo.svg?style=flat-square
-[stars-url]: https://github.com/paulpessoa/menvo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/paulpessoa/menvo.svg?style=flat-square
-[issues-url]: https://github.com/paulpessoa/menvo/issues
+Create a `.env.local` file in the root of your project and add the following environment variables. Replace the placeholder values with your actual Supabase credentials and other configurations.
 
-## Documentation:
-- [x] README
-- [ ] Contributing guidelines
-- [ ] Code of Conduct
-- [ ] Support Us
-- [ ] License
+\`\`\`env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_PUBLIC_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY # Found in Project Settings -> API -> Project API keys (service_role)
 
-<a href="https://opensource.guide/pt/starting-a-project/" target="_blank">Open Source Guide</a>
+# OAuth Redirect URLs (adjust for your local/production environment)
+NEXT_PUBLIC_OAUTH_CALLBACK_URL=http://localhost:3000/auth/callback # For local development
+NEXT_PUBLIC_LOCAL_CALLBACK_URL=http://localhost:3000/auth/callback # For local development
+NEXT_PUBLIC_SITE_URL=http://localhost:3000 # For local development, change to your production URL for deployment
+
+# Google Analytics (Optional)
+NEXT_PUBLIC_GOOGLE_ANALYTICS=G-XXXXXXXXXX
+
+# Google Maps API Key (Optional, for map features)
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+
+# SheetDB API (Optional, for newsletter integration if used)
+NEXT_PUBLIC_SHEETDB_API_URL=
+SHEETDB_API_KEY=
+\`\`\`
+
+**Important**: For production deployments (e.g., Vercel), you must set these environment variables in your hosting provider's settings. Ensure `NEXT_PUBLIC_OAUTH_CALLBACK_URL` and `NEXT_PUBLIC_SITE_URL` point to your actual production domain.
+
+### 5. Run the Development Server
+
+\`\`\`bash
+npm run dev
+# or
+yarn dev
+\`\`\`
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## Project Structure
+
+\`\`\`
+.
+├── app/                    # Next.js App Router routes, layouts, pages, and API routes
+│   ├── (auth)/             # Authentication related pages (login, signup, etc.)
+│   ├── api/                # API routes (e.g., /api/admin/users)
+│   ├── context/            # React Context providers
+│   ├── ...                 # Other application pages (dashboard, mentors, profile, etc.)
+│   └── layout.tsx          # Root layout
+├── components/             # Reusable React components (UI, custom, shared)
+│   ├── ui/                 # Shadcn UI components (auto-generated)
+│   ├── auth/               # Auth-specific components
+│   ├── events/             # Event-specific components
+│   ├── mentorship/         # Mentorship-specific components
+│   └── ...                 # Other custom components
+├── data/                   # Mock data for development/testing
+├── database/               # SQL schema, RLS policies, functions, triggers
+├── hooks/                  # Custom React hooks (e.g., useAuth, useUserProfile)
+├── i18n/                   # Internationalization configurations and translations
+├── lib/                    # Utility functions and server-side Supabase client
+├── public/                 # Static assets (images, favicons, etc.)
+├── services/               # API service calls (Supabase interactions)
+├── styles/                 # Global CSS
+├── types/                  # TypeScript type definitions
+├── utils/                  # General utility functions (e.g., Supabase client setup)
+└── ...                     # Other configuration files (tailwind.config.ts, tsconfig.json, etc.)
+\`\`\`
+
+## Contributing
+
+We welcome contributions! Please see `CONTRIBUTING.md` for guidelines on how to contribute to this project.
+
+## License
+
+This project is licensed under the MIT License.
