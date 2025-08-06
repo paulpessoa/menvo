@@ -1,93 +1,117 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
-import { useAuth } from "@/hooks/useAuth"
-import { useToast } from "@/hooks/useToast"
-import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail"
-import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBanner"
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Loader2Icon, CheckCircleIcon, XCircleIcon, MailIcon } from 'lucide-react'
+import { verifyEmail } from '@/services/auth/supabase'
+import { useToast } from '@/components/ui/use-toast'
+import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
-export default function VerificationsPage() {
-  const { user, loading } = useAuth()
+export default function EmailVerificationPage() {
+  const { t } = useTranslation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
+
+  const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const { toast } = useToast()
 
-  const [verificationStatus, setVerificationStatus] = useState<"pending" | "verified" | "error" | "loading">("loading")
-  const [message, setMessage] = useState("")
-
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        // If no user, redirect to login
-        router.push("/login")
+    const handleVerification = async () => {
+      if (token_hash && type === 'email_change') {
+        // This page is primarily for email verification after signup.
+        // Email change verification is handled differently by Supabase,
+        // often directly updating the user's email without needing a separate page.
+        // For simplicity, we'll treat it as a general success or error.
+        setVerificationStatus('success')
         toast({
-          title: "Acesso negado",
-          description: "Você precisa estar logado para ver esta página.",
-          variant: "destructive",
+          title: t('emailVerification.emailChangeSuccessTitle'),
+          description: t('emailVerification.emailChangeSuccessDescription'),
+          variant: 'default',
         })
-      } else if (user.email_confirmed_at) {
-        // If email is already confirmed, redirect to dashboard
-        setVerificationStatus("verified")
-        setMessage("Seu e-mail já foi verificado. Redirecionando para o painel...")
-        setTimeout(() => {
-          router.push("/dashboard")
-        }, 2000)
-      } else {
-        // Email not confirmed
-        setVerificationStatus("pending")
-        setMessage("Seu e-mail ainda não foi verificado. Por favor, verifique sua caixa de entrada.")
+        router.push('/dashboard') // Redirect after email change
+        return
+      }
+
+      if (!token_hash || type !== 'signup') {
+        setVerificationStatus('error')
+        toast({
+          title: t('emailVerification.invalidLinkTitle'),
+          description: t('emailVerification.invalidLinkDescription'),
+          variant: 'destructive',
+        })
+        return
+      }
+
+      try {
+        const { error } = await verifyEmail(token_hash)
+
+        if (error) {
+          throw error
+        }
+
+        setVerificationStatus('success')
+        toast({
+          title: t('emailVerification.successTitle'),
+          description: t('emailVerification.successDescription'),
+          variant: 'default',
+        })
+      } catch (error: any) {
+        setVerificationStatus('error')
+        toast({
+          title: t('emailVerification.errorTitle'),
+          description: error.message || t('emailVerification.errorDescription'),
+          variant: 'destructive',
+        })
       }
     }
-  }, [user, loading, router, toast])
 
-  if (loading || verificationStatus === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="ml-4 text-lg text-muted-foreground">Carregando status de verificação...</p>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return null // Should be redirected by useEffect
-  }
+    handleVerification()
+  }, [token_hash, type, router, toast, t])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
       <Card className="w-full max-w-md text-center">
         <CardHeader className="space-y-1">
-          {verificationStatus === "pending" && (
-            <XCircle className="mx-auto h-12 w-12 text-red-500" />
+          {verificationStatus === 'loading' && (
+            <Loader2Icon className="mx-auto h-16 w-16 animate-spin text-primary" />
           )}
-          {verificationStatus === "verified" && (
-            <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+          {verificationStatus === 'success' && (
+            <CheckCircleIcon className="mx-auto h-16 w-16 text-green-500" />
           )}
-          <CardTitle className="text-2xl font-bold">
-            {verificationStatus === "pending" && "Verifique seu E-mail"}
-            {verificationStatus === "verified" && "E-mail Verificado!"}
+          {verificationStatus === 'error' && (
+            <XCircleIcon className="mx-auto h-16 w-16 text-red-500" />
+          )}
+          <CardTitle className="text-3xl font-bold">
+            {verificationStatus === 'loading' && t('emailVerification.loadingTitle')}
+            {verificationStatus === 'success' && t('emailVerification.successTitle')}
+            {verificationStatus === 'error' && t('emailVerification.errorTitle')}
           </CardTitle>
-          <CardDescription>
-            {message}
+          <CardDescription className="text-lg">
+            {verificationStatus === 'loading' && t('emailVerification.loadingDescription')}
+            {verificationStatus === 'success' && t('emailVerification.successDescription')}
+            {verificationStatus === 'error' && t('emailVerification.errorDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {verificationStatus === "pending" && (
-            <>
-              <p className="text-sm text-muted-foreground">
-                Um link de verificação foi enviado para <strong>{user.email}</strong>. Por favor, clique no link para ativar sua conta.
-              </p>
-              <ResendConfirmationEmail email={user.email || ""} />
-              <EmailConfirmationBanner />
-            </>
+          {verificationStatus === 'success' && (
+            <Link href="/login" passHref>
+              <Button className="w-full">{t('emailVerification.loginButton')}</Button>
+            </Link>
           )}
-          {verificationStatus === "verified" && (
-            <Button onClick={() => router.push("/dashboard")} className="w-full">
-              Ir para o Painel
-            </Button>
+          {verificationStatus === 'error' && (
+            <div className="flex flex-col gap-2">
+              <Link href="/signup" passHref>
+                <Button className="w-full">{t('emailVerification.tryAgainButton')}</Button>
+              </Link>
+              <Link href="/" passHref>
+                <Button variant="outline" className="w-full">{t('emailVerification.homeButton')}</Button>
+              </Link>
+            </div>
           )}
         </CardContent>
       </Card>

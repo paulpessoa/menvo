@@ -1,62 +1,68 @@
 import type { Metadata } from 'next'
 
-export const siteMetadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: {
-    default: 'Menvo - Plataforma de Mentoria Voluntária',
-    template: '%s | Menvo',
+export const siteConfig = {
+  name: 'MentorConnect',
+  description: 'Plataforma de mentoria voluntária para conectar mentores e mentees para crescimento pessoal e profissional.',
+  url: 'https://mentorconnect.vercel.app', // Replace with your actual domain
+  ogImage: 'https://mentorconnect.vercel.app/og-image.jpg', // Replace with your actual OG image
+  links: {
+    twitter: 'https://twitter.com/vercel', // Replace with your Twitter
+    github: 'https://github.com/vercel/next.js', // Replace with your GitHub
   },
-  description: 'Conectando mentores e mentees para crescimento pessoal e profissional.',
+}
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
   keywords: [
     'mentoria',
     'voluntariado',
     'desenvolvimento pessoal',
     'desenvolvimento profissional',
     'carreira',
-    'aprendizado',
-    'comunidade',
-    'impacto social',
-    'startup',
-    'tecnologia',
     'educação',
+    'tecnologia',
+    'startup',
+    'impacto social',
   ],
+  authors: [
+    {
+      name: 'MentorConnect Team',
+      url: siteConfig.url,
+    },
+  ],
+  creator: 'MentorConnect Team',
   openGraph: {
-    title: 'Menvo - Plataforma de Mentoria Voluntária',
-    description: 'Conectando mentores e mentees para crescimento pessoal e profissional.',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-    siteName: 'Menvo',
+    type: 'website',
+    locale: 'pt_BR',
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
     images: [
       {
-        url: '/images/menvoprint.png', // Replace with your actual OG image
+        url: siteConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: 'Menvo - Plataforma de Mentoria Voluntária',
+        alt: siteConfig.name,
       },
     ],
-    locale: 'pt_BR',
-    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Menvo - Plataforma de Mentoria Voluntária',
-    description: 'Conectando mentores e mentees para crescimento pessoal e profissional.',
-    images: ['/images/menvoprint.png'], // Replace with your actual Twitter image
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: '@vercel', // Replace with your Twitter handle
   },
   icons: {
     icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/logo192.png',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
   },
-  manifest: '/site.webmanifest',
+  manifest: `${siteConfig.url}/site.webmanifest`,
 }

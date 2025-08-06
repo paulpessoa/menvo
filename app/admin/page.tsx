@@ -5,16 +5,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Users, UserCheck, Calendar, MessageSquare, AlertTriangle, Clock, CheckCircle } from 'lucide-react'
+import { Users, UserCheck, Calendar, MessageSquare, AlertTriangle, Clock, CheckCircle, Mail } from 'lucide-react'
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import Link from 'next/link'
 import { UsersIcon, CheckCircle2Icon } from 'lucide-react'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { useTranslation } from 'react-i18next'
 
 export default function AdminDashboard() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { t } = useTranslation()
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalMentors: 0,
@@ -59,35 +61,50 @@ export default function AdminDashboard() {
   return (
     <ProtectedRoute requiredRoles={['admin']}>
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Painel Administrativo</h1>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">{t('adminDashboard.title')}</h1>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Gerenciar Usuários</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('adminDashboard.usersCard.title')}</CardTitle>
               <UsersIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Visualize e edite perfis de usuários, atribua funções e gerencie acessos.
+                {t('adminDashboard.usersCard.description')}
               </CardDescription>
               <Link href="/admin/users" passHref>
-                <Button className="w-full">Ir para Gerenciamento de Usuários</Button>
+                <Button className="w-full">{t('adminDashboard.usersCard.button')}</Button>
               </Link>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Verificações de Mentor</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('adminDashboard.verificationsCard.title')}</CardTitle>
               <CheckCircle2Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <CardDescription className="mb-4">
-                Revise e aprove perfis de mentores pendentes de verificação.
+                {t('adminDashboard.verificationsCard.description')}
               </CardDescription>
               <Link href="/admin/verifications" passHref>
-                <Button className="w-full">Ir para Verificações</Button>
+                <Button className="w-full">{t('adminDashboard.verificationsCard.button')}</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('adminDashboard.newsletterCard.title')}</CardTitle>
+              <Mail className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="mb-4">
+                {t('adminDashboard.newsletterCard.description')}
+              </CardDescription>
+              <Link href="/admin/newsletter" passHref>
+                <Button className="w-full">{t('adminDashboard.newsletterCard.button')}</Button>
               </Link>
             </CardContent>
           </Card>
@@ -141,19 +158,19 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common administrative tasks</CardDescription>
+            <CardTitle>{t('adminDashboard.quickActions.title')}</CardTitle>
+            <CardDescription>{t('adminDashboard.quickActions.description')}</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Button className="h-20 flex flex-col gap-2" onClick={() => router.push("/admin/verifications")}>
               <AlertTriangle className="h-6 w-6" />
-              <span>Review Verifications</span>
+              <span>{t('adminDashboard.quickActions.reviewVerifications')}</span>
               <Badge variant="destructive">{stats.pendingVerifications}</Badge>
             </Button>
 
             <Button variant="outline" className="h-20 flex flex-col gap-2" onClick={() => router.push("/admin/users")}>
               <Users className="h-6 w-6" />
-              <span>Manage Users</span>
+              <span>{t('adminDashboard.quickActions.manageUsers')}</span>
             </Button>
 
             <Button
@@ -162,7 +179,7 @@ export default function AdminDashboard() {
               onClick={() => router.push("/admin/sessions")}
             >
               <Calendar className="h-6 w-6" />
-              <span>View Sessions</span>
+              <span>{t('adminDashboard.quickActions.viewSessions')}</span>
             </Button>
           </CardContent>
         </Card>
@@ -170,15 +187,15 @@ export default function AdminDashboard() {
         {/* Recent Activity */}
         <Tabs defaultValue="verifications" className="w-full">
           <TabsList>
-            <TabsTrigger value="verifications">Recent Verifications</TabsTrigger>
-            <TabsTrigger value="users">New Users</TabsTrigger>
-            <TabsTrigger value="sessions">Recent Sessions</TabsTrigger>
+            <TabsTrigger value="verifications">{t('adminDashboard.tabs.recentVerifications')}</TabsTrigger>
+            <TabsTrigger value="users">{t('adminDashboard.tabs.newUsers')}</TabsTrigger>
+            <TabsTrigger value="sessions">{t('adminDashboard.tabs.recentSessions')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="verifications" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Pending Mentor Verifications</CardTitle>
+                <CardTitle>{t('adminDashboard.tabs.pendingMentorVerifications')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -191,9 +208,9 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline">
-                          Review
+                          {t('adminDashboard.tabs.review')}
                         </Button>
-                        <Button size="sm">Approve</Button>
+                        <Button size="sm">{t('adminDashboard.tabs.approve')}</Button>
                       </div>
                     </div>
                   ))}
@@ -205,7 +222,7 @@ export default function AdminDashboard() {
           <TabsContent value="users" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Recently Registered Users</CardTitle>
+                <CardTitle>{t('adminDashboard.tabs.recentlyRegisteredUsers')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -227,7 +244,7 @@ export default function AdminDashboard() {
           <TabsContent value="sessions" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Mentorship Sessions</CardTitle>
+                <CardTitle>{t('adminDashboard.tabs.recentMentorshipSessions')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

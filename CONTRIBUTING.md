@@ -1,51 +1,59 @@
 # Contributing to MentorConnect
 
-We welcome contributions to the MentorConnect platform! Whether it's a bug report, a new feature, or an improvement to the documentation, your help is greatly appreciated.
+Thank you for your interest in contributing to MentorConnect! We welcome contributions from everyone. By contributing, you agree to abide by our Code of Conduct.
 
-## Getting Started
+## How to Contribute
 
-1.  **Fork the Repository**: Start by forking the [MentorConnect repository](https://github.com/paulpessoa/menvo) to your GitHub account.
-2.  **Clone Your Fork**: Clone your forked repository to your local machine:
+1.  **Fork the Repository**: Start by forking the MentorConnect repository to your GitHub account.
+2.  **Clone the Repository**: Clone your forked repository to your local machine:
     \`\`\`bash
-    git clone https://github.com/YOUR_USERNAME/menvo.git
-    cd menvo
+    git clone https://github.com/your-username/mentor-connect.git
     \`\`\`
-3.  **Create a New Branch**: Create a new branch for your feature or bug fix. Use a descriptive name:
+3.  **Create a New Branch**: Create a new branch for your feature or bug fix:
     \`\`\`bash
     git checkout -b feature/your-feature-name
     # or
-    git checkout -b bugfix/issue-description
+    git checkout -b bugfix/your-bug-fix-name
     \`\`\`
-4.  **Set Up Your Environment**:
-    *   Install dependencies: `npm install` or `yarn install`
-    *   Set up your `.env.local` file based on `env.example`.
-    *   Run the development server: `npm run dev` or `yarn dev`
-
-## Making Changes
-
-1.  **Implement Your Changes**: Write clear, concise, and well-commented code. Ensure your code adheres to the existing coding style.
-2.  **Test Your Changes**: Write (or update) tests for your changes. Ensure all tests pass: `npm test` or `yarn test`
-3.  **Lint Your Code**: Lint your code: `npm run lint` or `yarn lint`
+4.  **Install Dependencies**: Navigate to the project directory and install the dependencies:
+    \`\`\`bash
+    cd mentor-connect
+    npm install # or yarn install
+    \`\`\`
+5.  **Make Your Changes**: Implement your feature or fix the bug. Ensure your code adheres to the project's coding style and best practices.
+6.  **Test Your Changes**: Run tests to ensure your changes haven't introduced any regressions:
+    \`\`\`bash
+    npm test # or yarn test
+    \`\`\`
+7.  **Commit Your Changes**: Commit your changes with a clear and concise commit message. Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification (e.g., `feat: add new feature`, `fix: resolve bug`).
+    \`\`\`bash
+    git commit -m "feat: Add user profile editing"
+    \`\`\`
+8.  **Push to Your Fork**: Push your changes to your forked repository:
+    \`\`\`bash
+    git push origin feature/your-feature-name
+    \`\`\`
+9.  **Create a Pull Request**: Open a pull request from your forked repository to the `main` branch of the original MentorConnect repository. Provide a detailed description of your changes.
 
 ## Code Style
 
-We use ESLint and Prettier to maintain a consistent code style. Please ensure your code is formatted correctly before submitting a pull request.
+We use ESLint and Prettier for code formatting and linting. Please ensure your code is formatted correctly before submitting a pull request. You can run the following commands:
+
+\`\`\`bash
+npm run lint
+npm run format
+\`\`\`
 
 ## Reporting Bugs
 
-If you find a bug, please open an issue on GitHub. Provide as much detail as possible, including:
-*   A clear and concise description of the bug.
-*   Steps to reproduce the behavior.
-*   Expected behavior.
-*   Screenshots or videos (if applicable).
-*   Your environment (OS, browser, Node.js version, etc.).
+If you find a bug, please open an issue on GitHub. Provide as much detail as possible, including steps to reproduce the bug, expected behavior, and actual behavior.
 
-## Feature Requests
+## Suggesting Features
 
-If you have an idea for a new feature, please open an issue on GitHub. Describe your idea clearly and explain why you think it would be a valuable addition to the platform.
+We welcome feature suggestions! Open an issue on GitHub and describe your idea. Explain why you think it would be a valuable addition to MentorConnect.
 
 ## Code of Conduct
 
-Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+Please review our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing. We expect all contributors to adhere to these guidelines.
 
-Thank you for contributing to MentorConnect!
+Thank you for helping us build a better MentorConnect!

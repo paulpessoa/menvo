@@ -17,30 +17,15 @@ interface UserRolesContextType {
 const UserRolesContext = createContext<UserRolesContextType | undefined>(undefined)
 
 export function UserRolesProvider({ children }: { children: ReactNode }) {
-  const { user, loading: authLoading } = useAuth()
-  const { userProfile, loading: profileLoading } = useUserProfile(user?.id)
-  const [userRole, setUserRole] = useState<user_role | null>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isMentor, setIsMentor] = useState(false)
-  const [isMentee, setIsMentee] = useState(false)
+  const { userRole, isAdmin, isMentor, isMentee, isLoading: isLoadingRoles } = useAuth()
+  const { userProfile, loading: profileLoading } = useUserProfile(userRole?.user_id)
   const [primaryRole, setPrimaryRole] = useState<user_role | null>(null)
-
-  const isLoadingRoles = authLoading || profileLoading
 
   useEffect(() => {
     if (!isLoadingRoles && userProfile) {
-      const role = userProfile.role
-      setUserRole(role)
-      setIsAdmin(role === 'admin')
-      setIsMentor(role === 'mentor')
-      setIsMentee(role === 'mentee')
-      setPrimaryRole(role) // Assuming the 'role' field is the primary one
+      setPrimaryRole(userProfile.role) // Assuming the 'role' field is the primary one
     } else if (!isLoadingRoles && !userProfile) {
       // User is logged in but has no profile or is not logged in
-      setUserRole(null)
-      setIsAdmin(false)
-      setIsMentor(false)
-      setIsMentee(false)
       setPrimaryRole(null)
     }
   }, [isLoadingRoles, userProfile])
@@ -61,7 +46,7 @@ export function UserRolesProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useUserRoles() {
+export const useUserRoles = () => {
   const context = useContext(UserRolesContext)
   if (context === undefined) {
     throw new Error('useUserRoles must be used within a UserRolesProvider')

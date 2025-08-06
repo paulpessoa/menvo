@@ -1,11 +1,19 @@
 "use client"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function DoarLoading() {
+  const { t } = useTranslation()
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-950">
+      {/* Full Page Loader */}
+      <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-75 z-50">
+        <Loader2Icon className="h-12 w-12 animate-spin text-primary" />
+        <p className="text-lg text-muted-foreground">{t('common.loading')}</p>
+      </div>
+
       {/* Hero Section Skeleton */}
       <div className="text-center mb-12">
         <Skeleton className="h-6 w-32 mx-auto mb-4" />
@@ -86,12 +94,6 @@ export default function DoarLoading() {
           <Skeleton className="h-12 w-36" />
           <Skeleton className="h-12 w-48" />
         </div>
-      </div>
-
-      {/* Full Page Loader */}
-      <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-75 z-50">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="text-lg text-muted-foreground">Carregando página de doação...</p>
       </div>
     </div>
   )

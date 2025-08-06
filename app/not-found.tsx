@@ -1,24 +1,30 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { FrownIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function NotFoundPage() {
+  const { t } = useTranslation()
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-950">
       <Card className="w-full max-w-md text-center">
-        <CardHeader>
-          <CardTitle className="text-5xl font-bold text-gray-900 dark:text-gray-50">404</CardTitle>
-          <CardDescription className="mt-2 text-xl">Página Não Encontrada</CardDescription>
+        <CardHeader className="space-y-1">
+          <FrownIcon className="mx-auto h-16 w-16 text-primary" />
+          <CardTitle className="text-3xl font-bold">{t('notFound.title')}</CardTitle>
+          <CardDescription className="text-lg">
+            {t('notFound.description')}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-lg">
-            A página que você está procurando não existe ou foi movida.
-          </p>
           <p className="text-muted-foreground">
-            Por favor, verifique o URL ou volte para a página inicial.
+            {t('notFound.message')}
           </p>
           <Link href="/" passHref>
-            <Button>Voltar para a Página Inicial</Button>
+            <Button className="w-full">{t('notFound.homeButton')}</Button>
           </Link>
         </CardContent>
       </Card>

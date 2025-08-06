@@ -1,160 +1,162 @@
-"use client"
+'use client'
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, Grid3X3, Map, Search, SlidersHorizontal } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
-
-import type { Event, EventFilters as EventFiltersType } from "@/types/events"
-import EventFilters from "@/components/events/event-filters"
-import EventMap from "@/components/events/event-map"
-import EventCard from "@/components/events/event-card"
-import EventCalendar from "@/components/events/event-calendar"
-import { mockEvents } from "@/data/mock-events" // Corrected typo from mock-eventss.ts
+import { useState, useEffect, useMemo } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2Icon, SearchIcon, MapPinIcon, CalendarIcon, FilterIcon, RefreshCcwIcon } from 'lucide-react'
+import { EventCard } from '@/components/events/event-card'
+import { EventFilters } from '@/components/events/event-filters'
+import { EventCalendar } from '@/components/events/event-calendar'
+import { EventMap } from '@/components/events/event-map'
+import { useTranslation } from 'react-i18next'
+import { fetchEvents } from '@/services/events/events'
+import { toast } from '@/components/ui/use-toast'
+import { mockEvents } from '@/data/mock-eventss' // Using mock data for now
 
 export default function EventsPage() {
-  const [viewMode, setViewMode] = useState<"list" | "map">("list")
-  const [showFilters, setShowFilters] = useState(false)
-  const [filters, setFilters] = useState<EventFiltersType>({
-    search: "",
-    types: [],
-    formats: [],
-    sources: [],
-    priceRange: [0, 1000],
-    dateRange: {},
-    tags: [],
-    isFree: undefined,
-  })
+  const { t } = useTranslation()
+  const [events, setEvents] = useState<typeof mockEvents>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterCategory, setFilterCategory] = useState('all')
+  const [filterDate, setFilterDate] = useState<Date | undefined>(undefined)
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'map'>('list') // 'list', 'calendar', 'map'
 
-  // Filter events based on current filters
+  useEffect(() => {
+    const loadEvents = async () => {
+      setLoading(true)
+      try {
+        // In a real app, you'd fetch from an API:
+        // const { data, error } = await fetchEvents();
+        // if (error) throw error;
+        // setEvents(data);
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API call
+        setEvents(mockEvents) // Use mock data
+      } catch (error: any) {
+        toast({
+          title: t('events.fetchErrorTitle'),
+          description: error.message || t('events.fetchErrorDescription'),
+          variant: 'destructive',
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadEvents()
+  }, [t])
+
   const filteredEvents = useMemo(() => {
-    return mockEvents.filter((event) => {
-      // Search filter
-      if (
-        filters.search &&
-        !event.title.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !event.description.toLowerCase().includes(filters.search.toLowerCase())
-      ) {
-        return false
-      }
+    let filtered = events
 
-      // Type filter
-      if (filters.types.length > 0 && !filters.types.includes(event.type)) {
-        return false
-      }
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          event.location.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
 
-      // Format filter
-      if (filters.formats.length > 0 && !filters.formats.includes(event.format)) {
-        return false
-      }
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter((event) => event.category === filterCategory)
+    }
 
-      // Source filter
-      if (filters.sources.length > 0 && !filters.sources.includes(event.source)) {
-        return false
-      }
+    if (filterDate) {
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.date)
+        return (
+          eventDate.getFullYear() === filterDate.getFullYear() &&
+          eventDate.getMonth() === filterDate.getMonth() &&
+          eventDate.getDate() === filterDate.getDate()
+        )
+      })
+    }
 
-      // Price filter
-      if (filters.isFree !== undefined) {
-        if (filters.isFree && !event.is_free) return false
-        if (!filters.isFree && event.is_free) return false
-      }
+    return filtered
+  }, [events, searchTerm, filterCategory, filterDate])
 
-      if (!event.is_free && (event.price < filters.priceRange[0] || event.price > filters.priceRange[1])) {
-        return false
-      }
-
-      // Date filter
-      if (filters.dateRange.start) {
-        const eventDate = new Date(event.start_date)
-        const filterStart = new Date(filters.dateRange.start)
-        if (eventDate < filterStart) return false
-      }
-
-      if (filters.dateRange.end) {
-        const eventDate = new Date(event.start_date)
-        const filterEnd = new Date(filters.dateRange.end)
-        if (eventDate > filterEnd) return false
-      }
-
-      // Tags filter
-      if (filters.tags.length > 0) {
-        const hasMatchingTag = filters.tags.some((tag) => event.tags.includes(tag))
-        if (!hasMatchingTag) return false
-      }
-
-      return true
-    })
-  }, [filters])
-
-  // Group events by date for calendar
-  const eventsByDate = useMemo(() => {
-    const grouped: Record<string, Event[]> = {}
-    filteredEvents.forEach((event) => {
-      const date = event.start_date
-      if (!grouped[date]) {
-        grouped[date] = []
-      }
-      grouped[date].push(event)
-    })
-    return grouped
-  }, [filteredEvents])
-
-  const handleFilterChange = (newFilters: Partial<EventFiltersType>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }))
-  }
-
-  const clearFilters = () => {
-    setFilters({
-      search: "",
-      types: [],
-      formats: [],
-      sources: [],
-      priceRange: [0, 1000],
-      dateRange: {},
-      tags: [],
-      isFree: undefined,
-    })
-  }
-
-  const activeFiltersCount = [
-    filters.types.length,
-    filters.formats.length,
-    filters.sources.length,
-    filters.tags.length,
-    filters.isFree !== undefined ? 1 : 0,
-    filters.dateRange.start || filters.dateRange.end ? 1 : 0,
-  ].reduce((sum, count) => sum + count, 0)
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(mockEvents.map(event => event.category))
+    return ['all', ...Array.from(uniqueCategories)]
+  }, [])
 
   return (
-    <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Eventos da Comunidade</h1>
+    <div className="container mx-auto px-4 py-8 md:py-12">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">
+        {t('events.title')}
+      </h1>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-            <EventFilters filters={filters} onFiltersChange={handleFilterChange} onClearFilters={clearFilters} />
-          </div>
-          <div className="lg:col-span-2">
-            <div className="grid gap-6">
-              {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-            <Card className="mt-8">
-              <CardHeader>
-                <CardTitle>Localização dos Eventos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <EventMap events={filteredEvents} />
-              </CardContent>
-            </Card>
-          </div>
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t('events.searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <EventFilters
+          categories={categories}
+          selectedCategory={filterCategory}
+          onSelectCategory={setFilterCategory}
+          selectedDate={filterDate}
+          onSelectDate={setFilterDate}
+        />
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            onClick={() => setViewMode('list')}
+            size="sm"
+          >
+            {t('events.listView')}
+          </Button>
+          <Button
+            variant={viewMode === 'calendar' ? 'default' : 'outline'}
+            onClick={() => setViewMode('calendar')}
+            size="sm"
+          >
+            <CalendarIcon className="h-4 w-4 mr-2" /> {t('events.calendarView')}
+          </Button>
+          <Button
+            variant={viewMode === 'map' ? 'default' : 'outline'}
+            onClick={() => setViewMode('map')}
+            size="sm"
+          >
+            <MapPinIcon className="h-4 w-4 mr-2" /> {t('events.mapView')}
+          </Button>
         </div>
       </div>
-    </ProtectedRoute>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2Icon className="h-8 w-8 animate-spin" />
+          <span className="ml-2">{t('events.loadingEvents')}</span>
+        </div>
+      ) : (
+        <>
+          {viewMode === 'list' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEvents.length === 0 ? (
+                <p className="col-span-full text-center text-muted-foreground">
+                  {t('events.noEventsFound')}
+                </p>
+              ) : (
+                filteredEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))
+              )}
+            </div>
+          )}
+          {viewMode === 'calendar' && (
+            <EventCalendar events={filteredEvents} />
+          )}
+          {viewMode === 'map' && (
+            <EventMap events={filteredEvents} />
+          )}
+        </>
+      )}
+    </div>
   )
 }

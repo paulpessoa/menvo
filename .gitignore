@@ -23,6 +23,7 @@ yarn-error.log*
 supabase/
 
 # dependencies
+/node_modules
 /.pnp
 .pnp.js
 
@@ -35,9 +36,7 @@ supabase/
 # misc
 .DS_Store
 *.pem
-
-# vercel
 .vercel
-
-# prisma
-/prisma/db.sqlite
+.turbo
+.idea
+*.log

@@ -1,542 +1,296 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useRef } from "react"
-import { useAuth } from "@/hooks/useAuth"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
-import { Search, Send, Phone, Video, MoreVertical, Paperclip, Smile, Archive, Trash2, Star, Flag, User, Clock, CheckCheck, Check, MessageSquare, Bell, BellOff, Settings, Plus } from 'lucide-react'
-import Image from "next/image"
-import { useTranslation } from "react-i18next"
-import { useRouter } from "next/navigation"
-import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
-import { format, isToday, isYesterday, isThisWeek } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import { toast } from "sonner"
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { useState, useEffect, useMemo } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MessageSquareIcon, SendIcon } from 'lucide-react'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Loader2Icon, SendIcon, SearchIcon, MessageSquareIcon, UserIcon } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import { useTranslation } from 'react-i18next'
 
+// Mock data for conversations and messages
 interface Message {
-  id: string
-  content: string
-  senderId: string
-  timestamp: Date
-  isRead: boolean
-  type: 'text' | 'image' | 'file'
-  fileUrl?: string
-  fileName?: string
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: string;
 }
 
 interface Conversation {
-  id: string
-  participants: {
-    id: string
-    name: string
-    avatar?: string
-    role: 'mentor' | 'mentee'
-    online: boolean
-    lastSeen?: Date
-  }[]
-  lastMessage: Message
-  unreadCount: number
-  isPinned: boolean
-  isMuted: boolean
+  id: string;
+  participantIds: string[];
+  lastMessage: Message;
+  unreadCount: number;
+}
+
+const mockUsers = {
+  'user1': { id: 'user1', name: 'Alice Johnson', avatar: '/placeholder-user.jpg' },
+  'user2': { id: 'user2', name: 'Bob Williams', avatar: '/placeholder-user.jpg' },
+  'user3': { id: 'user3', name: 'Charlie Brown', avatar: '/placeholder-user.jpg' },
+  'user4': { id: 'user4', name: 'Diana Prince', avatar: '/placeholder-user.jpg' },
+}
+
+const mockConversations: Conversation[] = [
+  {
+    id: 'conv1',
+    participantIds: ['user1', 'user2'],
+    lastMessage: { id: 'msg5', senderId: 'user2', text: 'Great, see you then!', timestamp: '2023-10-27T10:30:00Z' },
+    unreadCount: 1,
+  },
+  {
+    id: 'conv2',
+    participantIds: ['user1', 'user3'],
+    lastMessage: { id: 'msg8', senderId: 'user1', text: 'I\'ll send you the details soon.', timestamp: '2023-10-26T15:00:00Z' },
+    unreadCount: 0,
+  },
+  {
+    id: 'conv3',
+    participantIds: ['user1', 'user4'],
+    lastMessage: { id: 'msg10', senderId: 'user4', text: 'Thanks for the session!', timestamp: '2023-10-25T09:00:00Z' },
+    unreadCount: 0,
+  },
+]
+
+const mockMessages: { [key: string]: Message[] } = {
+  'conv1': [
+    { id: 'msg1', senderId: 'user1', text: 'Hi Bob, how are you?', timestamp: '2023-10-27T09:00:00Z' },
+    { id: 'msg2', senderId: 'user2', text: 'I\'m good, Alice! Ready for our session?', timestamp: '2023-10-27T09:05:00Z' },
+    { id: 'msg3', senderId: 'user1', text: 'Yes, looking forward to it!', timestamp: '2023-10-27T09:10:00Z' },
+    { id: 'msg4', senderId: 'user2', text: 'Just confirming the time for tomorrow.', timestamp: '2023-10-27T10:00:00Z' },
+    { id: 'msg5', senderId: 'user2', text: 'Great, see you then!', timestamp: '2023-10-27T10:30:00Z' },
+  ],
+  'conv2': [
+    { id: 'msg6', senderId: 'user3', text: 'Hey Charlie, about the project...', timestamp: '2023-10-26T14:00:00Z' },
+    { id: 'msg7', senderId: 'user1', text: 'Sure, what\'s up?', timestamp: '2023-10-26T14:30:00Z' },
+    { id: 'msg8', senderId: 'user1', text: 'I\'ll send you the details soon.', timestamp: '2023-10-26T15:00:00Z' },
+  ],
+  'conv3': [
+    { id: 'msg9', senderId: 'user1', text: 'Thanks for the great session, Diana!', timestamp: '2023-10-25T08:45:00Z' },
+    { id: 'msg10', senderId: 'user4', text: 'Thanks for the session!', timestamp: '2023-10-25T09:00:00Z' },
+  ],
 }
 
 export default function MessagesPage() {
   const { t } = useTranslation()
-  const { user, loading } = useAuth()
-  const router = useRouter()
-  const [showLoginModal, setShowLoginModal] = useState(false)
+  const { user, isLoading: authLoading } = useAuth()
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+  const [currentMessages, setCurrentMessages] = useState<Message[]>([])
+  const [newMessage, setNewMessage] = useState('')
+  const [loadingMessages, setLoadingMessages] = useState(false)
   const [conversations, setConversations] = useState<Conversation[]>([])
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [newMessage, setNewMessage] = useState("")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  // Mock data - in real app, this would come from API
-  const mockConversations: Conversation[] = [
-    {
-      id: '1',
-      participants: [
-        {
-          id: 'user1',
-          name: 'Sarah Johnson',
-          avatar: '/images/mentors/sarah.jpg',
-          role: 'mentor',
-          online: true
-        },
-        {
-          id: 'current-user',
-          name: 'Você',
-          role: 'mentee',
-          online: true
-        }
-      ],
-      lastMessage: {
-        id: 'm1',
-        content: 'Ótimo! Vamos focar na preparação para entrevistas técnicas na nossa próxima sessão.',
-        senderId: 'user1',
-        timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-        isRead: false,
-        type: 'text'
-      },
-      unreadCount: 2,
-      isPinned: true,
-      isMuted: false
-    },
-    {
-      id: '2',
-      participants: [
-        {
-          id: 'user2',
-          name: 'Carlos Silva',
-          avatar: '/images/mentors/carlos.jpg',
-          role: 'mentor',
-          online: false,
-          lastSeen: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
-        },
-        {
-          id: 'current-user',
-          name: 'Você',
-          role: 'mentee',
-          online: true
-        }
-      ],
-      lastMessage: {
-        id: 'm2',
-        content: 'Obrigado pelas dicas sobre React! Foram muito úteis.',
-        senderId: 'current-user',
-        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
-        isRead: true,
-        type: 'text'
-      },
-      unreadCount: 0,
-      isPinned: false,
-      isMuted: false
-    },
-    {
-      id: '3',
-      participants: [
-        {
-          id: 'user3',
-          name: 'Ana Costa',
-          avatar: '/images/mentors/ana.jpg',
-          role: 'mentor',
-          online: true
-        },
-        {
-          id: 'current-user',
-          name: 'Você',
-          role: 'mentee',
-          online: true
-        }
-      ],
-      lastMessage: {
-        id: 'm3',
-        content: 'Confirmo nossa sessão para amanhã às 14h. Até lá!',
-        senderId: 'user3',
-        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-        isRead: true,
-        type: 'text'
-      },
-      unreadCount: 0,
-      isPinned: false,
-      isMuted: true
-    }
-  ]
-
-  const mockMessages: { [key: string]: Message[] } = {
-    '1': [
-      {
-        id: 'm1',
-        content: 'Oi! Como foi o processo seletivo que você mencionou?',
-        senderId: 'user1',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        isRead: true,
-        type: 'text'
-      },
-      {
-        id: 'm2',
-        content: 'Oi Sarah! Foi bem interessante. Consegui passar na primeira etapa, mas agora tenho uma entrevista técnica na próxima semana.',
-        senderId: 'current-user',
-        timestamp: new Date(Date.now() - 90 * 60 * 1000),
-        isRead: true,
-        type: 'text'
-      },
-      {
-        id: 'm3',
-        content: 'Que ótima notícia! Parabéns por passar na primeira etapa. Para a entrevista técnica, você já praticou algoritmos e estruturas de dados?',
-        senderId: 'user1',
-        timestamp: new Date(Date.now() - 60 * 60 * 1000),
-        isRead: true,
-        type: 'text'
-      },
-      {
-        id: 'm4',
-        content: 'Tenho praticado um pouco, mas ainda me sinto inseguro. Você teria algumas dicas específicas?',
-        senderId: 'current-user',
-        timestamp: new Date(Date.now() - 30 * 60 * 1000),
-        isRead: true,
-        type: 'text'
-      },
-      {
-        id: 'm5',
-        content: 'Ótimo! Vamos focar na preparação para entrevistas técnicas na nossa próxima sessão.',
-        senderId: 'user1',
-        timestamp: new Date(Date.now() - 5 * 60 * 1000),
-        isRead: false,
-        type: 'text'
-      }
-    ],
-    '2': [
-      {
-        id: 'm6',
-        content: 'Como está indo com os estudos de React?',
-        senderId: 'user2',
-        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
-        isRead: true,
-        type: 'text'
-      },
-      {
-        id: 'm7',
-        content: 'Obrigado pelas dicas sobre React! Foram muito úteis.',
-        senderId: 'current-user',
-        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
-        isRead: true,
-        type: 'text'
-      }
-    ]
-  }
-
+  // Simulate fetching conversations
   useEffect(() => {
-    if (!loading && !user) {
-      setShowLoginModal(true)
+    if (user) {
+      // In a real app, fetch conversations for the current user
+      // For mock, filter conversations where 'user1' is the current user
+      setConversations(mockConversations.filter(conv => conv.participantIds.includes('user1')))
     }
-  }, [user, loading])
+  }, [user])
 
+  // Simulate fetching messages for a selected conversation
   useEffect(() => {
-    // Simulate loading conversations
-    setTimeout(() => {
-      setConversations(mockConversations)
-      setIsLoading(false)
-    }, 1000)
-  }, [])
-
-  useEffect(() => {
-    // Scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  const handleSelectConversation = (conversationId: string) => {
-    setSelectedConversation(conversationId)
-    setMessages(mockMessages[conversationId] || [])
-    
-    // Mark messages as read
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === conversationId 
-          ? { ...conv, unreadCount: 0 }
-          : conv
-      )
-    )
-  }
-
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return
-
-    const message: Message = {
-      id: `m${Date.now()}`,
-      content: newMessage.trim(),
-      senderId: 'current-user',
-      timestamp: new Date(),
-      isRead: false,
-      type: 'text'
-    }
-
-    setMessages(prev => [...prev, message])
-    setNewMessage("")
-
-    // Update conversation's last message
-    setConversations(prev =>
-      prev.map(conv =>
-        conv.id === selectedConversation
-          ? { ...conv, lastMessage: message }
-          : conv
-      )
-    )
-
-    // Simulate typing and response (in real app, this would be real-time)
-    if (selectedConversation === '1') {
+    if (selectedConversation) {
+      setLoadingMessages(true)
+      // Simulate API call
       setTimeout(() => {
-        const response: Message = {
-          id: `m${Date.now() + 1}`,
-          content: "Perfeito! Vou preparar alguns exercícios específicos para você.",
-          senderId: 'user1',
-          timestamp: new Date(),
-          isRead: false,
-          type: 'text'
-        }
-        setMessages(prev => [...prev, response])
-      }, 2000)
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
-    }
-  }
-
-  const formatMessageTime = (timestamp: Date) => {
-    if (isToday(timestamp)) {
-      return format(timestamp, 'HH:mm')
-    } else if (isYesterday(timestamp)) {
-      return 'Ontem'
-    } else if (isThisWeek(timestamp)) {
-      return format(timestamp, 'EEEE', { locale: ptBR })
+        setCurrentMessages(mockMessages[selectedConversation.id] || [])
+        setLoadingMessages(false)
+      }, 500)
     } else {
-      return format(timestamp, 'dd/MM', { locale: ptBR })
+      setCurrentMessages([])
+    }
+  }, [selectedConversation])
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (newMessage.trim() && selectedConversation && user) {
+      const message: Message = {
+        id: `msg${Date.now()}`,
+        senderId: user.id, // Assuming user.id maps to 'user1' for mock data
+        text: newMessage.trim(),
+        timestamp: new Date().toISOString(),
+      }
+      setCurrentMessages((prev) => [...prev, message])
+      setNewMessage('')
+      // In a real app, send message to backend and update lastMessage in conversation
     }
   }
 
-  const getCurrentParticipant = (conversation: Conversation) => {
-    return conversation.participants.find(p => p.id !== 'current-user')
+  const getParticipantInfo = (conversation: Conversation) => {
+    const otherParticipantId = conversation.participantIds.find(id => id !== 'user1') // Assuming 'user1' is current user
+    return mockUsers[otherParticipantId as keyof typeof mockUsers] || { name: 'Unknown User', avatar: '/placeholder-user.jpg' }
   }
 
-  const filteredConversations = conversations.filter(conv => {
-    const participant = getCurrentParticipant(conv)
-    return participant?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           conv.lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase())
-  })
+  const filteredConversations = useMemo(() => {
+    if (!searchTerm) return conversations
+    return conversations.filter(conv => {
+      const participant = getParticipantInfo(conv)
+      return participant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             conv.lastMessage.text.toLowerCase().includes(searchTerm.toLowerCase())
+    })
+  }, [conversations, searchTerm])
 
-  if (loading) {
-    return <MessagesSkeleton />
-  }
-
-  if (!user) {
+  if (authLoading) {
     return (
-      <LoginRequiredModal 
-        isOpen={showLoginModal}
-        onClose={() => router.push('/')}
-      />
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2Icon className="h-8 w-8 animate-spin" />
+        <span className="ml-2">{t('common.loading')}</span>
+      </div>
     )
   }
 
   return (
     <ProtectedRoute requiredRoles={['mentee', 'mentor', 'admin']}>
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">Minhas Mensagens</h1>
+      <div className="container mx-auto px-4 py-8 md:py-12 h-[calc(100vh-150px)] flex flex-col">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50 mb-8 text-center">
+          {t('messagesPage.title')}
+        </h1>
 
-        <div className="grid md:grid-cols-3 gap-8 h-[70vh]">
-          {/* Left Panel: Conversations List */}
-          <Card className="md:col-span-1 flex flex-col">
+        <div className="flex flex-1 min-h-0 gap-6">
+          {/* Conversation List */}
+          <Card className="w-full md:w-1/3 flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageSquareIcon className="h-6 w-6" />
-                Conversas
+                <MessageSquareIcon className="h-6 w-6" /> {t('messagesPage.conversations')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow overflow-y-auto p-0">
-              {filteredConversations.map((conversation) => {
-                const participant = getCurrentParticipant(conversation)
-                const isSelected = selectedConversation === conversation.id
-                
-                return (
-                  <div
-                    key={conversation.id}
-                    onClick={() => handleSelectConversation(conversation.id)}
-                    className={`flex items-center gap-4 p-4 border-b cursor-pointer hover:bg-muted ${
-                      conversation.unreadCount > 0 ? 'bg-blue-50 dark:bg-blue-950' : ''
-                    }`}
-                  >
-                    <Avatar>
-                      <AvatarImage src={participant?.avatar || "/placeholder.svg"} alt={participant?.name} />
-                      <AvatarFallback>{participant?.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-grow">
-                      <p className="font-semibold">{participant?.name}</p>
-                      <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage.content}</p>
+            <div className="p-4 border-b">
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t('messagesPage.searchConversations')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <ScrollArea className="flex-1 p-4">
+              {filteredConversations.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">{t('messagesPage.noConversations')}</p>
+              ) : (
+                filteredConversations.map((conv) => {
+                  const participant = getParticipantInfo(conv)
+                  return (
+                    <div
+                      key={conv.id}
+                      className={`flex items-center gap-3 p-3 rounded-md cursor-pointer hover:bg-muted transition-colors ${
+                        selectedConversation?.id === conv.id ? 'bg-muted' : ''
+                      }`}
+                      onClick={() => setSelectedConversation(conv)}
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={participant.avatar || "/placeholder.svg"} alt={participant.name} />
+                        <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-center">
+                          <p className="font-medium">{participant.name}</p>
+                          {conv.unreadCount > 0 && (
+                            <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                              {conv.unreadCount}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {conv.lastMessage.text}
+                        </p>
+                      </div>
                     </div>
-                    {conversation.unreadCount > 0 && (
-                      <span className="h-2 w-2 rounded-full bg-blue-500" aria-label="New messages" />
-                    )}
-                  </div>
-                )
-              })}
-            </CardContent>
+                  )
+                })
+              )}
+            </ScrollArea>
           </Card>
 
-          {/* Right Panel: Chat Window */}
-          <Card className="md:col-span-2 flex flex-col">
+          {/* Message Area */}
+          <Card className="w-full md:w-2/3 flex flex-col">
             {selectedConversation ? (
               <>
-                {/* Chat Header */}
-                <CardHeader className="border-b">
-                  <CardTitle className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={mockConversations.find(c => c.id === selectedConversation)?.participants.find(p => p.id !== 'current-user')?.avatar || "/placeholder-user.jpg"} alt="Dr. Ana Paula" />
-                      <AvatarFallback>AP</AvatarFallback>
+                <CardHeader className="border-b flex flex-row items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={getParticipantInfo(selectedConversation).avatar || "/placeholder.svg"} alt={getParticipantInfo(selectedConversation).name} />
+                      <AvatarFallback>{getParticipantInfo(selectedConversation).name.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    {mockConversations.find(c => c.id === selectedConversation)?.participants.find(p => p.id !== 'current-user')?.name}
-                  </CardTitle>
+                    <CardTitle>{getParticipantInfo(selectedConversation).name}</CardTitle>
+                  </div>
                 </CardHeader>
-
-                <Separator />
-
-                {/* Messages */}
-                <CardContent className="flex-grow overflow-y-auto p-4 space-y-4">
-                  {messages.map((message, index) => {
-                    const isOwnMessage = message.senderId === 'current-user'
-                    const showTimestamp = index === 0 || 
-                      Math.abs(message.timestamp.getTime() - messages[index - 1].timestamp.getTime()) > 5 * 60 * 1000
-
-                    return (
-                      <div key={message.id} className="space-y-2">
-                        {showTimestamp && (
-                          <div className="text-center">
-                            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                              {format(message.timestamp, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                            </span>
-                          </div>
-                        )}
-                        
-                        <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                <ScrollArea className="flex-1 p-4">
+                  {loadingMessages ? (
+                    <div className="flex justify-center items-center h-full">
+                      <Loader2Icon className="h-8 w-8 animate-spin" />
+                      <span className="ml-2">{t('messagesPage.loadingMessages')}</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {currentMessages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={cn(
+                            "flex items-end gap-2",
+                            message.senderId === 'user1' ? 'justify-end' : 'justify-start' // Assuming 'user1' is current user
+                          )}
+                        >
+                          {message.senderId !== 'user1' && (
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={mockUsers[message.senderId as keyof typeof mockUsers]?.avatar || '/placeholder-user.jpg'} />
+                              <AvatarFallback>{mockUsers[message.senderId as keyof typeof mockUsers]?.name.charAt(0) || 'U'}</AvatarFallback>
+                            </Avatar>
+                          )}
                           <div
-                            className={`max-w-[70%] rounded-lg px-3 py-2 ${
-                              isOwnMessage
+                            className={cn(
+                              "rounded-lg p-3 max-w-[70%]",
+                              message.senderId === 'user1'
                                 ? 'bg-primary text-primary-foreground rounded-br-none'
                                 : 'bg-muted rounded-bl-none'
-                            }`}
+                            )}
                           >
-                            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                            <span className={`text-xs ${
-                              isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                            } block text-right mt-1`}>
-                              {formatMessageTime(message.timestamp)}
-                            </span>
+                            <p className="text-sm">{message.text}</p>
+                            <p className="text-xs text-right mt-1 opacity-70">
+                              {format(new Date(message.timestamp), 'HH:mm')}
+                            </p>
                           </div>
+                          {message.senderId === 'user1' && (
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={mockUsers[message.senderId as keyof typeof mockUsers]?.avatar || '/placeholder-user.jpg'} />
+                              <AvatarFallback>{mockUsers[message.senderId as keyof typeof mockUsers]?.name.charAt(0) || 'U'}</AvatarFallback>
+                            </Avatar>
+                          )}
                         </div>
-                      </div>
-                    )
-                  })}
-                  <div ref={messagesEndRef} />
-                </CardContent>
-
-                <Separator />
-
-                {/* Message Input */}
-                <CardContent className="p-4">
-                  <div className="flex items-end gap-2">
-                    <Button size="sm" variant="outline">
-                      <Paperclip className="h-4 w-4" />
-                    </Button>
-                    <div className="flex-1 relative">
-                      <Input
-                        placeholder="Digite sua mensagem..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        className="pr-10"
-                      />
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="absolute right-1 top-1/2 -translate-y-1/2"
-                      >
-                        <Smile className="h-4 w-4" />
-                      </Button>
+                      ))}
                     </div>
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!newMessage.trim()}
-                    >
-                      <SendIcon className="h-4 w-4" />
-                      <span className="sr-only">Enviar Mensagem</span>
-                    </Button>
-                  </div>
-                </CardContent>
+                  )}
+                </ScrollArea>
+                <form onSubmit={handleSendMessage} className="p-4 border-t flex items-center gap-2">
+                  <Input
+                    placeholder={t('messagesPage.typeMessage')}
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="flex-1"
+                    disabled={loadingMessages}
+                  />
+                  <Button type="submit" size="icon" disabled={loadingMessages || !newMessage.trim()}>
+                    <SendIcon className="h-4 w-4" />
+                    <span className="sr-only">{t('messagesPage.sendMessage')}</span>
+                  </Button>
+                </form>
               </>
             ) : (
-              <CardContent className="flex-grow flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <MessageSquareIcon className="h-16 w-16 mx-auto text-muted-foreground/50" />
-                  <div>
-                    <h3 className="text-lg font-medium">Selecione uma conversa</h3>
-                    <p className="text-muted-foreground">
-                      Escolha uma conversa na lista para começar a conversar
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
+              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                <MessageSquareIcon className="h-20 w-20 mb-4" />
+                <p className="text-lg">{t('messagesPage.selectConversation')}</p>
+                <p className="text-sm">{t('messagesPage.selectConversationDescription')}</p>
+              </div>
             )}
           </Card>
         </div>
       </div>
     </ProtectedRoute>
-  )
-}
-
-function MessagesSkeleton() {
-  return (
-    <div className="h-screen flex flex-col">
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-6 w-6" />
-              <Skeleton className="h-8 w-32" />
-            </div>
-            <Skeleton className="h-9 w-32" />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 container py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 h-full">
-          <Card className="flex flex-col">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-8 w-16" />
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1 p-0">
-              <div className="space-y-4 p-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <div className="flex-1">
-                      <Skeleton className="h-4 w-32 mb-2" />
-                      <Skeleton className="h-3 w-48" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex flex-col">
-            <CardContent className="flex-1 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <Skeleton className="h-16 w-16 mx-auto rounded" />
-                <div>
-                  <Skeleton className="h-6 w-48 mx-auto mb-2" />
-                  <Skeleton className="h-4 w-64 mx-auto" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
   )
 }
