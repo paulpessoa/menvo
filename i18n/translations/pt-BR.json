@@ -39,7 +39,6 @@
     "hero.description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
     "hero.findMentor": "Encontrar um Mentor",
     "hero.becomeMentor": "Torne-se um Mentor",
-
     "howItWorks.title": "Como Funciona",
     "howItWorks.description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
     "howItWorks.step1.title": "Encontrar um Mentor",
@@ -49,7 +48,6 @@
     "howItWorks.step3.title": "Conecte-se e Cresça",
     "howItWorks.step3.description": "Encontre-se virtualmente, compartilhe experiências e desenvolva suas habilidades com orientação personalizada.",
     "howItWorks.learnMore": "Saiba Mais",
-
     "featuredMentors.title": "Mentores em Destaque",
     "featuredMentors.description": "Conheça alguns de nossos dedicados mentores voluntários",
     "featuredMentors.viewAll": "Ver Todos os Mentores",
@@ -59,7 +57,6 @@
     "mentor.description": "Desenvolvedora Sênior com mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
     "mentor.languages": "Inglês, Espanhol",
     "mentor.viewProfile": "Ver Perfil",
-
     "events.title": "Próximos Eventos",
     "events.description": "Participe de nossos eventos comunitários e sessões de mentoria em grupo",
     "events.card.title": "Painel de Carreira em Tecnologia: Como Entrar no Setor",
@@ -69,12 +66,10 @@
     "events.card.attendees": "{{count}} participantes",
     "events.card.register": "Inscrever-se",
     "events.viewAll": "Ver Todos os Eventos",
-
     "cta.title": "Pronto para Começar?",
     "cta.description": "Junte-se à nossa comunidade hoje e conecte-se com mentores que podem ajudar você a alcançar seus objetivos",
     "cta.signup": "Inscreva-se Agora",
     "cta.learnMore": "Saiba Mais",
-
     "event.type": "Online"
   },
   "about": {
@@ -86,8 +81,8 @@
     "whyWeStarted": {
       "title": "Por que Começamos",
       "paragraph1": "A Menvo nasceu de uma ideia simples: todos merecem acesso à mentoria, independentemente de sua origem ou situação financeira. Acreditamos que compartilhar conhecimentos e experiências pode transformar vidas e comunidades.",
-      "paragraph2": "Nosso fundador experimentou em primeira mão o impacto que uma boa mentoria pode ter no crescimento pessoal e profissional. No entanto, eles também viram como as oportunidades de mentoria eram frequentemente limitadas àqueles com conexões existentes ou recursos financeiros.",
-      "paragraph3": "É por isso que criamos uma plataforma que torna a mentoria acessível a todos, conectando aqueles que buscam orientação com aqueles dispostos a compartilhar sua experiência – completamente gratuito."
+    "paragraph2": "Nosso fundador experimentou em primeira mão o impacto que uma boa mentoria pode ter no crescimento pessoal e profissional. No entanto, eles também viram como as oportunidades de mentoria eram frequentemente limitadas àqueles com conexões existentes ou recursos financeiros.",
+    "paragraph3": "É por isso que criamos uma plataforma que torna a mentoria acessível a todos, conectando aqueles que buscam orientação com aqueles dispostos a compartilhar sua experiência – completamente gratuito."
     },
     "ourStoryImageAlt": "Ilustração da nossa história",
     "values": {
@@ -379,7 +374,7 @@
         "item1": "Ver perfis detalhados dos mentores",
         "item2": "Agendar sessões gratuitas de mentoria",
         "item3": "Enviar mensagens diretas para mentores",
-        "item4": "Acessar seu histórico de mentorias"
+      "item4": "Acessar seu histórico de mentorias"
       },
       "signUp": "Cadastrar",
       "login": "Entrar"

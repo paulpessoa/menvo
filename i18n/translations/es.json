@@ -39,7 +39,6 @@
     "hero.description": "Encuentra orientación, comparte experiencias y crece junto a otros. Nuestra plataforma te conecta con mentores voluntarios para sesiones de mentoría gratuitas.",
     "hero.findMentor": "Encontrar un Mentor",
     "hero.becomeMentor": "Convertirse en Mentor",
-
     "howItWorks.title": "Cómo Funciona",
     "howItWorks.description": "Nuestra plataforma facilita la conexión con mentores y la programación de sesiones",
     "howItWorks.step1.title": "Encontrar un Mentor",
@@ -49,7 +48,6 @@
     "howItWorks.step3.title": "Conéctate y Crece",
     "howItWorks.step3.description": "Reúnete virtualmente, comparte experiencias y desarrolla tus habilidades con orientación personalizada.",
     "howItWorks.learnMore": "Saber Más",
-
     "featuredMentors.title": "Mentores Destacados",
     "featuredMentors.description": "Conoce a algunos de nuestros dedicados mentores voluntarios",
     "featuredMentors.viewAll": "Ver Todos los Mentores",
@@ -59,7 +57,6 @@
     "mentor.description": "Desarrolladora Senior con más de 10 años de experiencia ayudando a nuevos programadores a navegar en la industria tecnológica.",
     "mentor.languages": "Inglés, Español",
     "mentor.viewProfile": "Ver Perfil",
-
     "events.title": "Próximos Eventos",
     "events.description": "Únete a nuestros eventos comunitarios y sesiones de mentoría en grupo",
     "events.card.title": "Panel de Carrera Tecnológica: Cómo Ingresar a la Industria",
@@ -69,12 +66,10 @@
     "events.card.attendees": "{{count}} asistentes",
     "events.card.register": "Registrarse",
     "events.viewAll": "Ver Todos los Eventos",
-
     "cta.title": "¿Listo para Comenzar?",
     "cta.description": "Únete a nuestra comunidad hoy y conéctate con mentores que pueden ayudarte a alcanzar tus metas",
     "cta.signup": "Regístrate Ahora",
     "cta.learnMore": "Saber Más",
-
     "event.type": "En línea"
   },
   "about": {
@@ -318,7 +313,7 @@
         "title": "Mentor",
         "description": "Quiero compartir conocimiento"
       },
-       "company": {
+      "company": {
         "title": "Empresa",
         "description": "Inscribir profesionales de mi empresa"
       },
