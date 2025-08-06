@@ -1,181 +1,141 @@
 "use client"
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { XIcon } from 'lucide-react'
-import { Star, MessageSquare } from 'lucide-react'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { useTranslation } from 'react-i18next'
-import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { X, MessageSquare } from 'lucide-react'
+import { useToast } from "@/hooks/useToast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/useAuth"
 
 export function FeedbackBanner() {
-  const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
-  const { toast } = useToast()
-  const [isOpen, setIsOpen] = useState(false)
-  const [rating, setRating] = useState<number | null>(null)
-  const [comment, setComment] = useState('')
-  const [email, setEmail] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showThankYou, setShowThankYou] = useState(false)
-  const supabase = createClientComponentClient()
   const [isVisible, setIsVisible] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [feedbackText, setFeedbackText] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
+  const { user } = useAuth()
 
-  if (!isVisible) {
-    return null
+  const handleClose = () => {
+    setIsVisible(false)
   }
 
-  const handleSubmit = async () => {
-    if (!rating) {
+  const handleOpenModal = () => {
+    setIsModalOpen(true)
+    if (user?.email) {
+      setContactEmail(user.email)
+    }
+  }
+
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!feedbackText.trim()) {
       toast({
-        title: t('feedback.ratingRequired'),
-        variant: 'destructive',
+        title: "Feedback vazio",
+        description: "Por favor, escreva seu feedback antes de enviar.",
+        variant: "destructive",
       })
       return
     }
 
     setIsSubmitting(true)
-
     try {
-      const { error } = await supabase
-        .from('feedback')
-        .insert([
-          {
-            rating,
-            comment,
-            email: isAuthenticated ? undefined : email,
-            user_id: isAuthenticated ? (await supabase.auth.getUser()).data.user?.id : undefined,
-          },
-        ])
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      console.log("Feedback submitted:", { feedbackText, contactEmail })
 
-      if (error) throw error
-
-      setShowThankYou(true)
-      setRating(null)
-      setComment('')
-      setEmail('')
+      toast({
+        title: "Feedback enviado!",
+        description: "Agradecemos sua contribuição para melhorar a plataforma.",
+        variant: "default",
+      })
+      setFeedbackText("")
+      setContactEmail("")
+      setIsModalOpen(false)
+      setIsVisible(false) // Hide banner after submission
     } catch (error) {
       toast({
-        title: t('feedback.error'),
-        variant: 'destructive',
+        title: "Erro ao enviar feedback",
+        description: "Não foi possível enviar seu feedback. Tente novamente.",
+        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleClose = () => {
-    setIsOpen(false)
-    setShowThankYou(false)
+  if (!isVisible) {
+    return null
   }
 
   return (
     <>
-      {/* Floating Button with Tooltip */}
-      <div className="fixed bottom-4 right-4 z-50 bg-blue-600 text-white p-4 rounded-lg shadow-lg flex items-center gap-4 max-w-sm">
-        <p className="text-sm">
-          Estamos em fase de testes! Sua opinião é muito importante para nós.
-        </p>
-        <a href="https://forms.gle/your-feedback-form-link" target="_blank" rel="noopener noreferrer">
-          <Button variant="secondary" size="sm" className="text-blue-600">
-            Enviar Feedback
-          </Button>
-        </a>
-        <Button variant="ghost" size="icon" onClick={() => setIsVisible(false)} className="text-white hover:bg-blue-700">
-          <XIcon className="h-4 w-4" />
-          <span className="sr-only">Fechar</span>
-        </Button>
-      </div>
+      <Card className="fixed bottom-4 right-4 z-50 w-80 shadow-lg">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            <p className="text-sm font-medium">Tem um feedback?</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={handleOpenModal}>
+              Enviar
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleClose}>
+              <X className="h-4 w-4" />
+              <span className="sr-only">Fechar banner</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Feedback Dialog */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md">
-          {showThankYou ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-center text-2xl">🎉</DialogTitle>
-                <DialogDescription className="text-center text-lg">
-                  {t('feedback.thankYou')}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button onClick={handleClose} className="w-full">
-                  {t('common.close')}
-                </Button>
-              </DialogFooter>
-            </>
-          ) : (
-            <>
-              <DialogHeader>
-                <DialogTitle>{t('feedback.title')}</DialogTitle>
-                <DialogDescription>
-                  {t('feedback.description')}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4">
-                <div className="flex justify-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Button
-                      key={star}
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setRating(star)}
-                      className={`h-8 w-8 ${
-                        rating && star <= rating
-                          ? 'text-yellow-400'
-                          : 'text-gray-300'
-                      }`}
-                      aria-label={t('feedback.rateStars', { count: star })}
-                    >
-                      <Star className="h-5 w-5" />
-                    </Button>
-                  ))}
-                </div>
-
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Enviar Feedback</DialogTitle>
+            <DialogDescription>
+              Ajude-nos a melhorar a plataforma. Seu feedback é muito importante!
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitFeedback}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="feedback">Seu Feedback</Label>
                 <Textarea
-                  placeholder={t('feedback.commentPlaceholder')}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="min-h-[100px]"
+                  id="feedback"
+                  placeholder="O que você achou? O que podemos melhorar?"
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  rows={5}
+                  required
                 />
-
-                {!isAuthenticated && (
-                  <Input
-                    type="email"
-                    placeholder={t('feedback.emailPlaceholder')}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                )}
-
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full"
-                >
-                  {isSubmitting ? t('common.submitting') : t('feedback.submit')}
-                </Button>
               </div>
-            </>
-          )}
+              <div className="grid gap-2">
+                <Label htmlFor="contactEmail">Seu E-mail (Opcional)</Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  placeholder="seu.email@exemplo.com"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Usaremos seu e-mail apenas para entrar em contato sobre seu feedback, se necessário.
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Enviando..." : "Enviar Feedback"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </>

@@ -1,104 +1,103 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import createGlobe from "cobe"
+import { useSpring } from "react-spring"
 
 export function Globe() {
-  const mountRef = useRef<HTMLDivElement>(null)
-  const scene = useRef<THREE.Scene | null>(null)
-  const camera = useRef<THREE.PerspectiveCamera | null>(null)
-  const renderer = useRef<THREE.WebGLRenderer | null>(null)
-  const controls = useRef<OrbitControls | null>(null)
-  const globe = useRef<THREE.Group | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const pointerInteracting = useRef(null)
+  const pointerInteractionMovement = useRef(0)
+  const [{ r }, api] = useSpring(() => ({
+    r: 0,
+    config: {
+      mass: 1,
+      tension: 280,
+      friction: 40,
+      precision: 0.001,
+    },
+  }))
 
   useEffect(() => {
-    if (!mountRef.current) return
-
-    // Scene setup
-    scene.current = new THREE.Scene()
-    camera.current = new THREE.PerspectiveCamera(
-      75,
-      mountRef.current.clientWidth / mountRef.current.clientHeight,
-      0.1,
-      1000
-    )
-    renderer.current = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.current.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight)
-    mountRef.current.appendChild(renderer.current.domElement)
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
-    scene.current.add(ambientLight)
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
-    directionalLight.position.set(5, 5, 5).normalize()
-    scene.current.add(directionalLight)
-
-    // OrbitControls
-    controls.current = new OrbitControls(camera.current, renderer.current.domElement)
-    controls.current.enableDamping = true
-    controls.current.dampingFactor = 0.05
-    controls.current.enableZoom = true
-    controls.current.enablePan = false
-    controls.current.autoRotate = true
-    controls.current.autoRotateSpeed = 0.5
-
-    camera.current.position.z = 2.5
-
-    // Load GLB model (placeholder for a globe model)
-    const loader = new GLTFLoader()
-    loader.load(
-      '/placeholder.glb?query=simple-globe-model', // Placeholder GLB URL
-      (gltf) => {
-        globe.current = gltf.scene
-        globe.current.scale.set(1, 1, 1) // Adjust scale as needed
-        scene.current?.add(globe.current)
+    let phi = 0
+    let width = 0
+    const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth)
+    window.addEventListener("resize", onResize)
+    onResize()
+    const globe = createGlobe(canvasRef.current!, {
+      devicePixelRatio: 2,
+      width: width * 2,
+      height: width * 2,
+      phi: 0,
+      theta: 0.3,
+      dark: 1,
+      diffuse: 3,
+      mapSamples: 16000,
+      mapBrightness: 1.2,
+      baseColor: [0.8, 0.8, 0.8],
+      markerColor: [251 / 255, 100 / 255, 21 / 255],
+      glowColor: [1, 1, 1],
+      markers: [
+        // Example markers for Brazil (São Paulo, Rio de Janeiro, Brasília)
+        { location: [-23.55052, -46.633308], size: 0.05 }, // São Paulo
+        { location: [-22.906847, -43.172897], size: 0.05 }, // Rio de Janeiro
+        { location: [-15.7801, -47.9292], size: 0.05 }, // Brasília
+        // Add more markers as needed for other regions of impact
+      ],
+      onRender: (state) => {
+        // This prevents the globe from spinning if the user is interacting with it
+        if (!pointerInteracting.current) {
+          state.phi = phi + r.get()
+          phi += 0.005
+        }
+        state.width = width * 2
+        state.height = width * 2
       },
-      undefined,
-      (error) => {
-        console.error('An error occurred while loading the GLB model:', error)
-        // Fallback to a simple sphere if GLB fails
-        const geometry = new THREE.SphereGeometry(1, 32, 32)
-        const material = new THREE.MeshPhongMaterial({ color: 0x0077ff, transparent: true, opacity: 0.8 })
-        globe.current = new THREE.Mesh(geometry, material) as unknown as THREE.Group; // Cast to Group for consistency
-        scene.current?.add(globe.current)
-      }
-    )
-
-    // Animation loop
-    const animate = () => {
-      requestAnimationFrame(animate)
-      controls.current?.update()
-      if (globe.current) {
-        // Optional: add subtle rotation if autoRotate is off or for additional effect
-        // globe.current.rotation.y += 0.001;
-      }
-      renderer.current?.render(scene.current!, camera.current!)
-    }
-    animate()
-
-    // Handle window resize
-    const handleResize = () => {
-      if (mountRef.current && camera.current && renderer.current) {
-        camera.current.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight
-        camera.current.updateProjectionMatrix()
-        renderer.current.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight)
-      }
-    }
-    window.addEventListener('resize', handleResize)
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      if (mountRef.current && renderer.current) {
-        mountRef.current.removeChild(renderer.current.domElement)
-        renderer.current.dispose()
-      }
-      controls.current?.dispose()
-      scene.current?.clear()
-    }
+    })
+    return () => globe.destroy()
   }, [])
 
-  return <div ref={mountRef} className="w-full h-full" aria-label="3D Globe Visualization" />
+  return (
+    <div
+      style={{
+        width: "100%",
+        aspectRatio: "1/1",
+        maxWidth: "600px",
+        margin: "auto",
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        onPointerDown={(e) => {
+          pointerInteracting.current = e.clientX - pointerInteractionMovement.current
+          canvasRef.current!.style.cursor = "grabbing"
+        }}
+        onPointerUp={() => {
+          pointerInteracting.current = null
+          canvasRef.current!.style.cursor = "grab"
+        }}
+        onPointerOut={() => {
+          pointerInteracting.current = null
+          canvasRef.current!.style.cursor = "grab"
+        }}
+        onMouseMove={(e) => {
+          if (pointerInteracting.current !== null) {
+            const delta = e.clientX - pointerInteracting.current
+            pointerInteractionMovement.current = delta
+            api.start({ r: delta / 200 })
+          }
+        }}
+        onWheel={(e) => {
+          api.start({ r: e.deltaY })
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          cursor: "grab",
+          contain: "layout paint",
+          opacity: 0.9,
+        }}
+      />
+    </div>
+  )
 }

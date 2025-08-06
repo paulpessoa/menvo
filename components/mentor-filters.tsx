@@ -1,225 +1,191 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
-import { Separator } from "@/components/ui/separator"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import type { MentorFilters } from "@/types/mentors"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { XCircle, Filter } from 'lucide-react'
 
 interface MentorFiltersProps {
-  filters: MentorFilters
-  onFiltersChange: (filters: Partial<MentorFilters>) => void
+  filters: {
+    topics: string[]
+    languages: string[]
+    experienceYears: number[]
+    educationLevels: string[]
+    rating?: number
+    city: string
+    country: string
+    state_province: string
+    inclusionTags: string[]
+  }
+  onFiltersChange: (newFilters: Partial<MentorFiltersProps['filters']>) => void
   onClearFilters: () => void
 }
 
-const topics = ["Career", "Academia", "Tech", "Business", "Leadership", "Personal Development"]
-const languages = ["English", "Spanish", "Portuguese", "French", "German", "Mandarin"]
-const locations = ["United States", "Canada", "United Kingdom", "Germany", "Brazil", "Remote"]
-const experienceLevels = ["Junior", "Mid-level", "Senior"]
-const inclusionTags = ["Women", "LGBTQIA+", "50+", "Neurodivergent", "Black", "Indigenous", "People of Color"]
-
 export default function MentorFilters({ filters, onFiltersChange, onClearFilters }: MentorFiltersProps) {
-  const [expanded, setExpanded] = useState<string[]>(["topics", "languages", "inclusion"])
-
-  const handleTopicChange = (topic: string, checked: boolean) => {
-    const newTopics = checked ? [...filters.topics, topic] : filters.topics.filter((t) => t !== topic)
-    onFiltersChange({ topics: newTopics })
+  const handleCheckboxChange = (filterType: keyof MentorFiltersProps['filters'], value: string | number) => {
+    const currentValues = filters[filterType] as (string | number)[]
+    const newValues = currentValues.includes(value)
+      ? currentValues.filter((item) => item !== value)
+      : [...currentValues, value]
+    onFiltersChange({ [filterType]: newValues })
   }
 
-  const handleLanguageChange = (language: string, checked: boolean) => {
-    const newLanguages = checked ? [...filters.languages, language] : filters.languages.filter((l) => l !== language)
-    onFiltersChange({ languages: newLanguages })
+  const handleSliderChange = (value: number[]) => {
+    onFiltersChange({ rating: value[0] })
   }
 
-  const handleLocationChange = (location: string, checked: boolean) => {
-    const newLocations = checked ? [...filters.locations, location] : filters.locations.filter((l) => l !== location)
-    onFiltersChange({ locations: newLocations })
-  }
-
-  const handleExperienceChange = (level: string, checked: boolean) => {
-    const newLevels = checked
-      ? [...filters.experience_levels, level]
-      : filters.experience_levels.filter((l) => l !== level)
-    onFiltersChange({ experience_levels: newLevels })
-  }
-
-  const handleInclusionTagChange = (tag: string, checked: boolean) => {
-    const newTags = checked ? [...filters.inclusion_tags, tag] : filters.inclusion_tags.filter((t) => t !== tag)
-    onFiltersChange({ inclusion_tags: newTags })
-  }
+  const activeFiltersCount = [
+    filters.topics.length,
+    filters.languages.length,
+    filters.experienceYears.length,
+    filters.educationLevels.length,
+    filters.rating !== undefined ? 1 : 0,
+    filters.city ? 1 : 0,
+    filters.country ? 1 : 0,
+    filters.state_province ? 1 : 0,
+    filters.inclusionTags.length,
+  ].reduce((sum, count) => sum + count, 0)
 
   return (
-    <Card className="sticky top-20">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Filters</CardTitle>
+    <Card className="p-6 sticky top-4">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardTitle className="text-lg">Filtros de Mentores</CardTitle>
+        {activeFiltersCount > 0 && (
           <Button variant="ghost" size="sm" onClick={onClearFilters}>
-            Reset
+            <XCircle className="h-4 w-4 mr-2" />
+            Limpar ({activeFiltersCount})
           </Button>
-        </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
-        <Accordion type="multiple" value={expanded} onValueChange={setExpanded} className="space-y-2">
-          <AccordionItem value="topics" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Topics</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                {topics.map((topic) => (
-                  <div key={topic} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`topic-${topic}`}
-                      checked={filters.topics.includes(topic)}
-                      onCheckedChange={(checked) => handleTopicChange(topic, checked as boolean)}
-                    />
-                    <Label htmlFor={`topic-${topic}`} className="text-sm font-normal cursor-pointer">
-                      {topic}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="location" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Location</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                {locations.map((location) => (
-                  <div key={location} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`location-${location}`}
-                      checked={filters.locations.includes(location)}
-                      onCheckedChange={(checked) => handleLocationChange(location, checked as boolean)}
-                    />
-                    <Label htmlFor={`location-${location}`} className="text-sm font-normal cursor-pointer">
-                      {location}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="languages" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Languages</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                {languages.map((language) => (
-                  <div key={language} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`lang-${language}`}
-                      checked={filters.languages.includes(language)}
-                      onCheckedChange={(checked) => handleLanguageChange(language, checked as boolean)}
-                    />
-                    <Label htmlFor={`lang-${language}`} className="text-sm font-normal cursor-pointer">
-                      {language}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="experience" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Experience Level</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                {experienceLevels.map((level) => (
-                  <div key={level} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`exp-${level}`}
-                      checked={filters.experience_levels.includes(level)}
-                      onCheckedChange={(checked) => handleExperienceChange(level, checked as boolean)}
-                    />
-                    <Label htmlFor={`exp-${level}`} className="text-sm font-normal cursor-pointer">
-                      {level}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="inclusion" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Inclusion Tags</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                {inclusionTags.map((tag) => (
-                  <div key={tag} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`tag-${tag}`}
-                      checked={filters.inclusion_tags.includes(tag)}
-                      onCheckedChange={(checked) => handleInclusionTagChange(tag, checked as boolean)}
-                    />
-                    <Label htmlFor={`tag-${tag}`} className="text-sm font-normal cursor-pointer">
-                      {tag}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="rating" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Minimum Rating</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>{filters.rating_min} stars</span>
-                  <span>5 stars</span>
-                </div>
-                <Slider
-                  value={[filters.rating_min]}
-                  onValueChange={(value) => onFiltersChange({ rating_min: value[0] })}
-                  max={5}
-                  step={0.5}
-                  className="w-full"
+        {/* Topics Filter */}
+        <div>
+          <Label className="mb-2 block font-medium">Tópicos / Habilidades</Label>
+          <div className="space-y-2">
+            {["Desenvolvimento Web", "Carreira", "Liderança", "Design UX/UI", "Marketing Digital", "Data Science"].map((topic) => (
+              <div key={topic} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`topic-${topic}`}
+                  checked={filters.topics.includes(topic)}
+                  onCheckedChange={() => handleCheckboxChange("topics", topic)}
                 />
+                <Label htmlFor={`topic-${topic}`}>{topic}</Label>
               </div>
-            </AccordionContent>
-          </AccordionItem>
+            ))}
+          </div>
+        </div>
 
-          <AccordionItem value="availability" className="border-none">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Availability</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="available-only"
-                    checked={filters.availability}
-                    onCheckedChange={(checked) => onFiltersChange({ availability: checked })}
-                  />
-                  <Label htmlFor="available-only" className="text-sm font-normal">
-                    Available for new sessions
-                  </Label>
-                </div>
+        {/* Languages Filter */}
+        <div>
+          <Label className="mb-2 block font-medium">Idiomas</Label>
+          <div className="space-y-2">
+            {["Português", "Inglês", "Espanhol", "Francês"].map((lang) => (
+              <div key={lang} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`lang-${lang}`}
+                  checked={filters.languages.includes(lang)}
+                  onCheckedChange={() => handleCheckboxChange("languages", lang)}
+                />
+                <Label htmlFor={`lang-${lang}`}>{lang}</Label>
               </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+            ))}
+          </div>
+        </div>
 
-        <Separator />
+        {/* Experience Years Filter */}
+        <div>
+          <Label className="mb-2 block font-medium">Anos de Experiência</Label>
+          <div className="space-y-2">
+            {[1, 3, 5, 10].map((years) => (
+              <div key={years} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`exp-${years}`}
+                  checked={filters.experienceYears.includes(years)}
+                  onCheckedChange={() => handleCheckboxChange("experienceYears", years)}
+                />
+                <Label htmlFor={`exp-${years}`}>{years}+ anos</Label>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <Button className="w-full">Apply Filters</Button>
+        {/* Education Level Filter */}
+        <div>
+          <Label className="mb-2 block font-medium">Nível de Educação</Label>
+          <div className="space-y-2">
+            {["Graduação", "Pós-graduação", "Mestrado", "Doutorado"].map((level) => (
+              <div key={level} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`edu-${level}`}
+                  checked={filters.educationLevels.includes(level)}
+                  onCheckedChange={() => handleCheckboxChange("educationLevels", level)}
+                />
+                <Label htmlFor={`edu-${level}`}>{level}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Rating Filter */}
+        <div>
+          <Label className="mb-2 block font-medium">Avaliação Mínima</Label>
+          <Slider
+            min={0}
+            max={5}
+            step={0.5}
+            value={[filters.rating || 0]}
+            onValueChange={handleSliderChange}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-muted-foreground mt-2">
+            <span>0 Estrelas</span>
+            <span>{filters.rating || 0} Estrelas</span>
+          </div>
+        </div>
+
+        {/* Location Filters */}
+        <div>
+          <Label className="mb-2 block font-medium">Localização</Label>
+          <div className="space-y-2">
+            <Input
+              placeholder="Cidade"
+              value={filters.city}
+              onChange={(e) => onFiltersChange({ city: e.target.value })}
+            />
+            <Input
+              placeholder="Estado/Província"
+              value={filters.state_province}
+              onChange={(e) => onFiltersChange({ state_province: e.target.value })}
+            />
+            <Input
+              placeholder="País"
+              value={filters.country}
+              onChange={(e) => onFiltersChange({ country: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {/* Inclusion Tags Filter (example) */}
+        <div>
+          <Label className="mb-2 block font-medium">Tags de Inclusão</Label>
+          <div className="space-y-2">
+            {["Mulheres na Tech", "LGBTQIA+", "Pessoas Negras", "PCD"].map((tag) => (
+              <div key={tag} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`inclusion-${tag}`}
+                  checked={filters.inclusionTags.includes(tag)}
+                  onCheckedChange={() => handleCheckboxChange("inclusionTags", tag)}
+                />
+                <Label htmlFor={`inclusion-${tag}`}>{tag}</Label>
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

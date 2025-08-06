@@ -1,60 +1,64 @@
-'use client'
+"use client"
 
-import { ReactNode } from 'react'
-import { useAuth } from '@/hooks/useAuth'
-import { useUserRoles } from '@/app/context/user-roles-context'
-import { Loader2Icon } from 'lucide-react'
-import { LoginRequiredModal } from './LoginRequiredModal'
-import { useState } from 'react'
-import { Database } from '@/types/database'
+import { useAuth } from "@/hooks/useAuth"
+import { useUserRoles } from "@/app/context/user-roles-context"
+import { ReactNode } from "react"
+import { Loader2, ShieldOff } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 interface ProtectedContentProps {
-  children: ReactNode;
-  requiredRoles?: Database['public']['Enums']['user_role'][];
-  fallback?: ReactNode; // Optional fallback content if not authorized
+  children: ReactNode
+  requiredRoles?: ('mentee' | 'mentor' | 'admin')[]
+  fallback?: ReactNode
 }
 
-export default function ProtectedContent({ children, requiredRoles, fallback }: ProtectedContentProps) {
+export function ProtectedContent({ children, requiredRoles, fallback }: ProtectedContentProps) {
   const { user, loading: authLoading } = useAuth()
   const { userRole, isLoadingRoles } = useUserRoles()
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
-  if (authLoading || isLoadingRoles) {
+  const isLoading = authLoading || isLoadingRoles
+
+  if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <Loader2Icon className="h-8 w-8 animate-spin" />
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-2">Carregando conteúdo...</span>
       </div>
     )
   }
 
   if (!user) {
-    // User is not logged in
-    return (
-      <>
-        {fallback || (
-          <div className="text-center p-8">
-            <p className="text-lg text-muted-foreground">Você precisa estar logado para ver este conteúdo.</p>
-            <Button onClick={() => setIsLoginModalOpen(true)} className="mt-4">Fazer Login</Button>
-          </div>
-        )}
-        <LoginRequiredModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-      </>
+    return fallback || (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <ShieldOff className="mb-6 h-20 w-20 text-red-500" />
+        <h2 className="mb-3 text-3xl font-bold tracking-tight">Acesso Restrito</h2>
+        <p className="mb-8 max-w-md text-muted-foreground">
+          Você precisa estar logado para visualizar este conteúdo.
+        </p>
+        <Link href="/login" passHref>
+          <Button>Fazer Login</Button>
+        </Link>
+      </div>
     )
   }
 
-  if (requiredRoles && !requiredRoles.includes(userRole!)) {
-    // User is logged in but does not have the required role
-    return (
-      fallback || (
-        <div className="text-center p-8 text-red-500">
-          <p className="text-lg">Acesso Negado.</p>
-          <p className="text-muted-foreground">Você não tem permissão para visualizar este conteúdo.</p>
+  if (requiredRoles && requiredRoles.length > 0) {
+    if (!userRole || !requiredRoles.includes(userRole)) {
+      return fallback || (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+          <ShieldOff className="mb-6 h-20 w-20 text-red-500" />
+          <h2 className="mb-3 text-3xl font-bold tracking-tight">Acesso Não Autorizado</h2>
+          <p className="mb-8 max-w-md text-muted-foreground">
+            Sua conta não possui as permissões necessárias para acessar esta página.
+          </p>
+          <Link href="/dashboard" passHref>
+            <Button>Ir para o Dashboard</Button>
+          </Link>
         </div>
       )
-    )
+    }
   }
 
-  // User is logged in and has the required role (or no role is required)
   return <>{children}</>
 }

@@ -1,62 +1,52 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
-export const siteMetadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+export const metadata: Metadata = {
   title: {
-    default: 'Menvo - Plataforma de Mentoria Voluntária',
-    template: '%s | Menvo',
+    default: "MentorConnect",
+    template: "%s | MentorConnect",
   },
-  description: 'Conectando mentores e mentees para crescimento pessoal e profissional.',
+  description: "Plataforma de mentoria voluntária para conectar mentores e mentees.",
   keywords: [
-    'mentoria',
-    'voluntariado',
-    'desenvolvimento pessoal',
-    'desenvolvimento profissional',
-    'carreira',
-    'aprendizado',
-    'comunidade',
-    'impacto social',
-    'startup',
-    'tecnologia',
-    'educação',
+    "mentoria",
+    "voluntariado",
+    "desenvolvimento profissional",
+    "carreira",
+    "aprendizado",
+    "mentores",
+    "mentees",
+    "comunidade",
+    "tecnologia",
+    "impacto social",
   ],
+  authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
+  creator: "Paul Pessoa",
   openGraph: {
-    title: 'Menvo - Plataforma de Mentoria Voluntária',
-    description: 'Conectando mentores e mentees para crescimento pessoal e profissional.',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-    siteName: 'Menvo',
+    type: "website",
+    locale: "pt_BR",
+    url: "https://www.mentorconnect.com.br", // Replace with your actual domain
+    title: "MentorConnect",
+    description: "Plataforma de mentoria voluntária para conectar mentores e mentees.",
+    siteName: "MentorConnect",
     images: [
       {
-        url: '/images/menvoprint.png', // Replace with your actual OG image
+        url: "/images/og-image.jpg", // Replace with your actual OG image
         width: 1200,
         height: 630,
-        alt: 'Menvo - Plataforma de Mentoria Voluntária',
+        alt: "MentorConnect - Conectando Pessoas, Transformando Carreiras",
       },
     ],
-    locale: 'pt_BR',
-    type: 'website',
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Menvo - Plataforma de Mentoria Voluntária',
-    description: 'Conectando mentores e mentees para crescimento pessoal e profissional.',
-    images: ['/images/menvoprint.png'], // Replace with your actual Twitter image
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    card: "summary_large_image",
+    title: "MentorConnect",
+    description: "Plataforma de mentoria voluntária para conectar mentores e mentees.",
+    images: ["/images/og-image.jpg"], // Replace with your actual Twitter image
+    creator: "@yourtwitterhandle", // Replace with your Twitter handle
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/logo192.png',
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
   },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
 }
