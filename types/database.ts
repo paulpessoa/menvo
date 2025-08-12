@@ -1,5 +1,11 @@
 export type UserRole = "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
-export type UserStatus = "pending" | "active" | "suspended" | "rejected"
+export type UserStatus =
+  | "pending_role_selection"
+  | "incomplete"
+  | "validation_pending"
+  | "active"
+  | "suspended"
+  | "rejected"
 export type SessionStatus = "scheduled" | "completed" | "cancelled" | "no_show"
 export type ValidationStatus = "pending" | "validated" | "rejected" | "suspended"
 export type NotificationType =
@@ -19,6 +25,10 @@ export type AppPermission =
   | "admin_system"
   | "validate_activities"
   | "moderate_content"
+
+export type user_role = UserRole
+export type user_status = UserStatus
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {

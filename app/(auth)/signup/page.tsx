@@ -12,12 +12,9 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
-import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { WaitingList } from "@/components/WaitingList"
-
-type UserType = "mentee" | "mentor"
 
 function SignupForm() {
   const { t } = useTranslation()
@@ -26,7 +23,6 @@ function SignupForm() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
-  const [userType, setUserType] = useState<UserType>("mentee")
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
@@ -34,7 +30,6 @@ function SignupForm() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
 
-  // Redirecionar usuários já logados
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/dashboard")
@@ -62,7 +57,6 @@ function SignupForm() {
         email,
         password,
         fullName,
-        userType,
       })
 
       setSuccess(true)
@@ -148,10 +142,6 @@ function SignupForm() {
           <CardDescription>{t("register.description") || "Junte-se à nossa comunidade de mentoria"}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Seletor de Tipo de Usuário */}
-          <UserTypeSelector userType={userType} setUserType={(type) => setUserType(type)} />
-
-          {/* OAuth Buttons */}
           <div className="grid grid-cols-1 gap-2">
             <Button
               variant="outline"
@@ -299,14 +289,14 @@ export default function SignupPage() {
 
   return (
     <div className="relative">
-      <div className={estamosLotados ? 'blur-sm pointer-events-none' : ''}>
+      <div className={estamosLotados ? "blur-sm pointer-events-none" : ""}>
         <Suspense fallback={<div>Carregando...</div>}>
           <SignupForm />
         </Suspense>
       </div>
-      {estamosLotados  && (
+      {estamosLotados && (
         <div className="fixed inset-0 z-30 flex items-center justify-center">
-          <WaitingList isOpen onClose={() => router.push('/')} />
+          <WaitingList isOpen onClose={() => router.push("/")} />
         </div>
       )}
     </div>

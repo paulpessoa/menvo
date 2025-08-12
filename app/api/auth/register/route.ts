@@ -12,9 +12,9 @@ const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, proces
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, firstName, lastName, userType } = body
+    const { email, password, firstName, lastName } = body
 
-    console.log("📝 Dados recebidos:", { email, firstName, lastName, userType })
+    console.log("📝 Dados recebidos:", { email, firstName, lastName })
 
     // Validar entrada
     if (!email || !password || !firstName || !lastName) {
@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
         first_name: firstNameTrim,
         last_name: lastNameTrim,
         full_name: fullName,
-        user_type: userType || "mentee",
       },
     })
 
@@ -80,7 +79,7 @@ export async function POST(request: NextRequest) {
     console.log("✅ Usuário criado no Auth:", authData.user.id)
 
     // Criar perfil na tabela profiles
-    console.log("🔧 Criando perfil na tabela profiles...")
+    console.log("🔧 Criando perfil básico na tabela profiles...")
 
     const { error: profileError } = await supabaseAdmin.from("profiles").insert({
       id: authData.user.id,
@@ -88,8 +87,7 @@ export async function POST(request: NextRequest) {
       first_name: firstNameTrim,
       last_name: lastNameTrim,
       full_name: fullName,
-      role: userType || "mentee",
-      status: "pending",
+      user_role: "pending",
       verification_status: "pending",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
