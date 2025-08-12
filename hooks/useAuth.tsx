@@ -1,6 +1,8 @@
 "use client"
 
 import { createClient } from "@/utils/supabase/client"
+import { useEffect, useState } from "react"
+import type { User } from "@supabase/supabase-js"
 
 // Hook para operações de autenticação
 export const useAuthOperations = () => {
@@ -158,18 +160,101 @@ export const useAuthOperations = () => {
     }
   }
 
+  const signOut = async () => {
+    try {
+      console.log("🔄 Iniciando signOut")
+
+      const supabase = getSupabaseClient()
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        console.error("❌ Erro no signOut:", error)
+        return { error }
+      }
+
+      console.log("✅ SignOut bem-sucedido")
+      return { error: null }
+    } catch (error) {
+      console.error("❌ Erro inesperado no signOut:", error)
+      return { error }
+    }
+  }
+
   return {
     signUp,
     signIn,
     signInWithGoogle,
     signInWithLinkedIn,
     signInWithGitHub,
+    signOut,
   }
 }
 
-// Para compatibilidade com código existente, criar um hook simples
 export const useAuth = () => {
-  // Este hook deve ser usado apenas para operações, não para estado
-  // Para estado de autenticação, use o contexto diretamente
-  return useAuthOperations()
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  const operations = useAuthOperations()
+
+  useEffect(() => {
+    let mounted = true
+
+    const initializeAuth = async () => {
+      try {
+        const supabase = createClient()
+
+        // Obter sessão atual
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error("Erro ao obter sessão:", error)
+        }
+
+        if (mounted) {
+          setUser(session?.user ?? null)
+          setIsAuthenticated(!!session?.user)
+          setLoading(false)
+        }
+
+        // Escutar mudanças na autenticação
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log("Auth state changed:", event, session?.user?.id)
+
+          if (mounted) {
+            setUser(session?.user ?? null)
+            setIsAuthenticated(!!session?.user)
+            setLoading(false)
+          }
+        })
+
+        return () => {
+          subscription.unsubscribe()
+        }
+      } catch (error) {
+        console.error("Erro ao inicializar autenticação:", error)
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initializeAuth()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  return {
+    user,
+    loading,
+    isAuthenticated,
+    ...operations,
+  }
 }
