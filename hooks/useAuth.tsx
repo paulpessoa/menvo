@@ -4,7 +4,14 @@ import { createClient } from "@/utils/supabase/client"
 
 // Hook para operações de autenticação
 export const useAuthOperations = () => {
-  const supabase = createClient()
+  const getSupabaseClient = () => {
+    try {
+      return createClient()
+    } catch (error) {
+      console.error("Erro ao criar cliente Supabase:", error)
+      throw error
+    }
+  }
 
   const signUp = async ({
     email,
@@ -47,6 +54,7 @@ export const useAuthOperations = () => {
     try {
       console.log("🔄 Iniciando signIn:", { email })
 
+      const supabase = getSupabaseClient()
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.toLowerCase().trim(),
         password,
@@ -69,6 +77,7 @@ export const useAuthOperations = () => {
     try {
       console.log("🔄 Iniciando Google OAuth")
 
+      const supabase = getSupabaseClient()
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -97,6 +106,7 @@ export const useAuthOperations = () => {
     try {
       console.log("🔄 Iniciando LinkedIn OAuth")
 
+      const supabase = getSupabaseClient()
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "linkedin_oidc",
         options: {
@@ -124,6 +134,7 @@ export const useAuthOperations = () => {
     try {
       console.log("🔄 Iniciando GitHub OAuth")
 
+      const supabase = getSupabaseClient()
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {

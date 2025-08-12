@@ -1,29 +1,19 @@
 "use client"
 
 import type React from "react"
-
 import type { User } from "@supabase/supabase-js"
 import { createContext, useContext, useEffect, useState, useCallback } from "react"
-import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { jwtDecode } from "jwt-decode"
-
-// Tipagem para os claims customizados no JWT
-interface DecodedToken {
-  exp: number
-  role: string
-  status: string
-  permissions: string[]
-}
 
 interface AuthContextType {
   user: User | null
-  profile: any | null // Defina uma tipagem mais forte se desejar
+  profile: any | null
   role: string | null
   permissions: string[]
   isAuthenticated: boolean
   loading: boolean
   signOut: () => Promise<void>
+  supabaseReady: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -34,70 +24,98 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(null)
   const [permissions, setPermissions] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [supabaseReady, setSupabaseReady] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
-  const loadSession = useCallback(
-    async (sessionUser: User | null) => {
-      if (sessionUser) {
-        setUser(sessionUser)
+  const checkSupabaseConfig = useCallback(() => {
+    const hasUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL
+    const hasKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    return hasUrl && hasKey
+  }, [])
+
+  const loadSession = useCallback(async () => {
+    if (!checkSupabaseConfig()) {
+      console.warn("Supabase não configurado - variáveis de ambiente ausentes")
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { createClient } = await import("@/utils/supabase/client")
+      const supabase = createClient()
+      setSupabaseReady(true)
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session?.user) {
+        setUser(session.user)
 
         // Buscar perfil do usuário
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", sessionUser.id).single()
-        setProfile(profileData)
+        const { data: profileData } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single()
 
-        // Decodificar o token para obter claims
-        const { data: sessionData } = await supabase.auth.getSession()
-        if (sessionData.session) {
-          try {
-            const decoded: DecodedToken = jwtDecode(sessionData.session.access_token)
-            setRole(decoded.role)
-            setPermissions(decoded.permissions || [])
-          } catch (e) {
-            console.error("Error decoding JWT:", e)
-            setRole(null)
-            setPermissions([])
-          }
-        }
+        setProfile(profileData)
+        setRole(profileData?.role || null)
       } else {
-        // Limpar estado se não houver usuário
         setUser(null)
         setProfile(null)
         setRole(null)
         setPermissions([])
       }
-    },
-    [supabase],
-  )
+
+      const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        if (session?.user) {
+          setUser(session.user)
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single()
+          setProfile(profileData)
+          setRole(profileData?.role || null)
+        } else {
+          setUser(null)
+          setProfile(null)
+          setRole(null)
+          setPermissions([])
+        }
+      })
+
+      return () => {
+        authListener.subscription.unsubscribe()
+      }
+    } catch (error) {
+      console.error("Erro ao configurar autenticação:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [checkSupabaseConfig])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    setProfile(null)
-    setRole(null)
-    setPermissions([])
-    router.push("/")
+    if (!supabaseReady) return
+
+    try {
+      const { createClient } = await import("@/utils/supabase/client")
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      setUser(null)
+      setProfile(null)
+      setRole(null)
+      setPermissions([])
+      router.push("/")
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error)
+    }
   }
 
   useEffect(() => {
-    setLoading(true)
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        loadSession(session?.user ?? null)
-      })
-      .finally(() => setLoading(false))
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setLoading(true)
-      await loadSession(session?.user ?? null)
-      setLoading(false)
-    })
-
-    return () => {
-      authListener.subscription.unsubscribe()
-    }
-  }, [loadSession, supabase.auth])
+    loadSession()
+  }, [loadSession])
 
   const value = {
     user,
@@ -107,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user,
     loading,
     signOut,
+    supabaseReady,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

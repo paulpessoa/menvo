@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 // Helper function to get site URL
 const getSiteUrl = () => {
@@ -11,7 +11,27 @@ const getSiteUrl = () => {
   return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+let _supabase: ReturnType<typeof createClient> | null = null
+
+function getSupabaseClient() {
+  if (!_supabase) {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error("❌ Supabase environment variables are missing:")
+      console.error("- NEXT_PUBLIC_SUPABASE_URL:", !!supabaseUrl)
+      console.error("- NEXT_PUBLIC_SUPABASE_ANON_KEY:", !!supabaseAnonKey)
+      throw new Error("Supabase URL and Anon Key are required. Please check your environment variables.")
+    }
+    _supabase = createClient(supabaseUrl, supabaseAnonKey)
+  }
+  return _supabase
+}
+
+export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(target, prop) {
+    const client = getSupabaseClient()
+    return client[prop as keyof typeof client]
+  },
+})
 
 export const auth = {
   signUp: async (email: string, password: string, metadata?: any) => {
