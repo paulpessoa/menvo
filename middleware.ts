@@ -1,79 +1,22 @@
-import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  const response = NextResponse.next()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: "",
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          })
-        },
-      },
-    },
-  )
+  // Apenas redirecionamentos básicos baseados em rotas
+  const { pathname } = request.nextUrl
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Rotas protegidas que requerem autenticação
-  const protectedRoutes = ["/dashboard", "/profile", "/settings", "/mentors/[id]"]
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route.replace("[id]", "")),
-  )
-
-  // Redirecionar para login se não autenticado em rota protegida
-  if (isProtectedRoute && !user) {
-    return NextResponse.redirect(new URL("/login", request.url))
-  }
-
-  // Redirecionar usuários autenticados das páginas de auth
+  // Se está tentando acessar páginas de auth e já tem cookie de sessão, redireciona
   const authRoutes = ["/login", "/signup", "/forgot-password"]
-  const isAuthRoute = authRoutes.includes(request.nextUrl.pathname)
+  const isAuthRoute = authRoutes.includes(pathname)
 
-  if (isAuthRoute && user) {
+  // Verifica se tem cookie de sessão do Supabase (método simples)
+  const hasSessionCookie =
+    request.cookies.has("sb-access-token") ||
+    request.cookies.has("supabase-auth-token") ||
+    request.cookies.get("sb-localhost-auth-token")
+
+  if (isAuthRoute && hasSessionCookie) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
@@ -81,14 +24,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 }

@@ -1,3 +1,56 @@
+-- Criar tipos ENUM necessários
+DO $$ BEGIN
+    CREATE TYPE user_role AS ENUM ('pending', 'mentee', 'mentor', 'admin', 'moderator');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE user_status AS ENUM ('pending', 'pending_role_selection', 'incomplete', 'validation_pending', 'active', 'suspended', 'rejected');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+-- Criar tabela profiles se não existir
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    email text UNIQUE NOT NULL,
+    first_name text,
+    last_name text,
+    full_name text,
+    slug text UNIQUE,
+    avatar_url text,
+    bio text,
+    role user_role DEFAULT 'pending'::user_role,
+    status user_status DEFAULT 'pending'::user_status,
+    verification_status text DEFAULT 'pending',
+    location text,
+    skills text[],
+    experience_level text,
+    linkedin_url text,
+    github_url text,
+    website_url text,
+    phone text,
+    timezone text,
+    is_available boolean DEFAULT true,
+    email_confirmed_at timestamptz,
+    created_at timestamptz DEFAULT NOW(),
+    updated_at timestamptz DEFAULT NOW()
+);
+
+-- Criar tabela validation_requests se não existir
+CREATE TABLE IF NOT EXISTS public.validation_requests (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+    requested_role user_role NOT NULL,
+    status text DEFAULT 'pending',
+    admin_notes text,
+    reviewed_by uuid REFERENCES public.profiles(id),
+    reviewed_at timestamptz,
+    created_at timestamptz DEFAULT NOW(),
+    updated_at timestamptz DEFAULT NOW()
+);
+
 -- Criar função para atualizar updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -195,6 +248,13 @@ BEGIN
     );
 END;
 $$ language 'plpgsql' security definer;
+
+-- Adicionando índices para performance
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
+CREATE INDEX IF NOT EXISTS idx_profiles_status ON public.profiles(status);
+CREATE INDEX IF NOT EXISTS idx_profiles_slug ON public.profiles(slug);
+CREATE INDEX IF NOT EXISTS idx_validation_requests_user_id ON public.validation_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_validation_requests_status ON public.validation_requests(status);
 
 -- Conceder permissões necessárias
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
