@@ -9,6 +9,10 @@
     "start": "next start"
   },
   "overrides": {
+    "@testing-library/react": {
+      "react": "^19",
+      "react-dom": "^19"
+    },
     "react-day-picker": {
       "date-fns": "^3.6.0"
     }
