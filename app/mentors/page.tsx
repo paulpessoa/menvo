@@ -251,7 +251,9 @@ function MentorsContent() {
                 <Filter className="h-5 w-5 mr-2" />
                 Filtros
                 {activeFiltersCount > 0 && (
-                  <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-accent">{activeFiltersCount}</Badge>
+                  <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground">
+                    {activeFiltersCount}
+                  </Badge>
                 )}
               </Button>
             </div>
@@ -386,7 +388,9 @@ function MentorsContent() {
                     <Filter className="h-4 w-4 mr-2" />
                     Filtros
                     {activeFiltersCount > 0 && (
-                      <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-accent">{activeFiltersCount}</Badge>
+                      <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground">
+                        {activeFiltersCount}
+                      </Badge>
                     )}
                   </Button>
                 )}
@@ -479,7 +483,7 @@ function MentorsContent() {
                             <div className="relative">
                               <Avatar className="w-16 h-16 border-2 border-primary/10">
                                 <AvatarImage src={mentor.avatar_url || "/placeholder.svg"} alt={mentor.full_name} />
-                                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                                <AvatarFallback className="bg-primary rounded-full p-1">
                                   {mentor.first_name?.[0]}
                                   {mentor.last_name?.[0]}
                                 </AvatarFallback>

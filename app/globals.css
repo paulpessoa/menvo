@@ -6,31 +6,33 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 215.4 16.3% 46.9%;
-    --card: 189 100% 97%;
-    --card-foreground: 189 100% 19%;
+    --card: 0 0% 100%;
+    --card-foreground: 215.4 16.3% 46.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 215.4 16.3% 46.9%;
     --primary: 189 100% 19%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 32 95% 44%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 48 100% 96%;
+    /* Removendo cor laranja secundária, mantendo apenas teal */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 32 95% 44%;
-    --accent-foreground: 0 0% 100%;
+    /* Removendo cor laranja do accent, usando teal */
+    --accent: 210 40% 96%;
+    --accent-foreground: 215.4 16.3% 46.9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 189 100% 97%;
-    --input: 0 0% 100%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
     --ring: 189 100% 19%;
     --radius: 0.5rem;
     --sidebar: 0 0% 100%;
     --sidebar-foreground: 215.4 16.3% 46.9%;
-    --sidebar-primary: 32 95% 44%;
+    --sidebar-primary: 189 100% 19%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 189 100% 19%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 189 100% 97%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 215.4 16.3% 46.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 189 100% 19%;
   }
 
@@ -56,9 +58,9 @@
     --ring: 189 70% 30%;
     --sidebar: 222.2 84% 4.9%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 32 95% 44%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 189 70% 30%;
+    --sidebar-primary: 189 70% 30%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
     --sidebar-ring: 189 70% 30%;
