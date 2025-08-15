@@ -9,12 +9,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail, Users, BookOpen } from "lucide-react"
+import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { WaitingList } from "@/components/WaitingList"
+import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 
 function SignupForm() {
   const { t } = useTranslation()
@@ -224,37 +225,7 @@ function SignupForm() {
               </div>
             )}
 
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Você quer ser:</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setUserType("mentor")}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    userType === "mentor"
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <Users className="h-6 w-6 mx-auto mb-2" />
-                  <div className="text-sm font-medium">Mentor</div>
-                  <div className="text-xs text-muted-foreground">Compartilhar conhecimento</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUserType("mentee")}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    userType === "mentee"
-                      ? "border-green-500 bg-green-50 text-green-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <BookOpen className="h-6 w-6 mx-auto mb-2" />
-                  <div className="text-sm font-medium">Mentee</div>
-                  <div className="text-xs text-muted-foreground">Aprender e crescer</div>
-                </button>
-              </div>
-            </div>
+            <UserTypeSelector userType={userType} setUserType={setUserType} />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
