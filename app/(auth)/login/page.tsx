@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,17 @@ export default function LoginPage() {
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { signIn, signInWithGoogle, signInWithLinkedIn } = useAuth()
+  const { signIn, signInWithGoogle, signInWithLinkedIn, isAuthenticated, needsOnboarding } = useAuth()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (needsOnboarding()) {
+        router.push("/onboarding/role-selection")
+      } else {
+        router.push("/dashboard")
+      }
+    }
+  }, [isAuthenticated, needsOnboarding, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +43,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-        router.push("/dashboard")
+        // Will be handled by useEffect when isAuthenticated changes
       }
     } catch (err) {
       setError("Erro inesperado. Tente novamente.")
@@ -60,6 +70,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error.message)
       }
+      // OAuth redirects are handled by the callback route
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login. Tente novamente.")
     } finally {
@@ -75,7 +86,6 @@ export default function LoginPage() {
           <CardDescription className="text-center">Entre na sua conta para continuar</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-
           <div className="space-y-3">
             <Button
               type="button"
@@ -127,7 +137,7 @@ export default function LoginPage() {
             </Button>
           </div>
 
-           <div className="relative">
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full" />
             </div>
@@ -136,8 +146,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          
-          <form onSubmit={handleSubmit} className="space-y-4">            
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <div className="relative">
@@ -192,9 +201,8 @@ export default function LoginPage() {
               </Alert>
             )}
           </form>
-      
         </CardContent>
-           <CardFooter>
+        <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
             Não tem uma conta?{" "}
             <Link href="/signup" className="text-primary-600 hover:underline">

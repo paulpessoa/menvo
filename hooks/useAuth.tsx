@@ -19,13 +19,15 @@ export const useAuthOperations = () => {
     return client
   }
 
-  const signUp = async ({ email, password, fullName }: { email: string; password: string; fullName: string }) => {
+  const signUp = async ({
+    email,
+    password,
+    firstName,
+    lastName,
+    userType,
+  }: { email: string; password: string; firstName: string; lastName: string; userType: "mentor" | "mentee" }) => {
     try {
-      console.log("🔄 Iniciando signUp:", { email, fullName })
-
-      const nameParts = fullName.trim().split(" ")
-      const firstName = nameParts[0] || ""
-      const lastName = nameParts.slice(1).join(" ") || ""
+      console.log("🔄 Iniciando signUp:", { email, firstName, lastName, userType })
 
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -37,6 +39,7 @@ export const useAuthOperations = () => {
           password,
           firstName,
           lastName,
+          userType,
         }),
       })
 
@@ -316,6 +319,16 @@ export const useAuth = () => {
     return profile.role === "pending" || !profile.role
   }
 
+  const needsRoleSelection = () => {
+    if (!user || !profile) return false
+    return !profile.role || profile.role === "pending"
+  }
+
+  const needsVerification = () => {
+    if (!user || !profile) return false
+    return !user.email_confirmed_at
+  }
+
   return {
     user,
     loading,
@@ -323,6 +336,8 @@ export const useAuth = () => {
     profile,
     profileLoading,
     needsOnboarding,
+    needsRoleSelection,
+    needsVerification,
     fetchUserProfile,
     ...operations,
   }
