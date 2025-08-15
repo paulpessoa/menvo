@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
+import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail, Users, BookOpen } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { useTranslation } from "react-i18next"
@@ -18,11 +18,13 @@ import { WaitingList } from "@/components/WaitingList"
 
 function SignupForm() {
   const { t } = useTranslation()
-  const { isAuthenticated, signUp, signInWithGoogle, signInWithLinkedIn } = useAuth()
+  const { isAuthenticated, signUp, signInWithGoogle, signInWithLinkedIn, needsOnboarding } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [fullName, setFullName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [userType, setUserType] = useState<"mentor" | "mentee" | "">("")
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
@@ -32,9 +34,13 @@ function SignupForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard")
+      if (needsOnboarding()) {
+        router.push("/onboarding/role-selection")
+      } else {
+        router.push("/dashboard")
+      }
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, needsOnboarding, router])
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,13 +56,25 @@ function SignupForm() {
       return
     }
 
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("Nome e sobrenome são obrigatórios")
+      return
+    }
+
+    if (!userType) {
+      setError("Selecione se você quer ser mentor ou mentee")
+      return
+    }
+
     setIsLoading(true)
 
     try {
       await signUp({
         email,
         password,
-        fullName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        userType,
       })
 
       setSuccess(true)
@@ -206,16 +224,61 @@ function SignupForm() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName">{t("register.firstName") || "Nome Completo"}</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder={t("register.firstNamePlaceholder") || "Digite seu nome completo"}
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Você quer ser:</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setUserType("mentor")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    userType === "mentor"
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <Users className="h-6 w-6 mx-auto mb-2" />
+                  <div className="text-sm font-medium">Mentor</div>
+                  <div className="text-xs text-muted-foreground">Compartilhar conhecimento</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUserType("mentee")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    userType === "mentee"
+                      ? "border-green-500 bg-green-50 text-green-700"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <BookOpen className="h-6 w-6 mx-auto mb-2" />
+                  <div className="text-sm font-medium">Mentee</div>
+                  <div className="text-xs text-muted-foreground">Aprender e crescer</div>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">{t("register.firstName") || "Nome"}</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder={t("register.firstNamePlaceholder") || "Seu nome"}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">{t("register.lastName") || "Sobrenome"}</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder={t("register.lastNamePlaceholder") || "Seu sobrenome"}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

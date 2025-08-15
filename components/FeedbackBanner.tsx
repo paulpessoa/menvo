@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Star, X, MessageSquare } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { useTranslation } from 'react-i18next'
-import { useAuth } from '@/hooks/useAuth'
-import { useToast } from '@/hooks/useToast'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useState } from "react"
+import { Star, MessageSquare } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { useTranslation } from "react-i18next"
+import { useAuth } from "@/hooks/useAuth"
+import { useToast } from "@/hooks/useToast"
+import { createClient, isSupabaseConfigured } from "@/utils/supabase/client"
 import {
   Dialog,
   DialogContent,
@@ -17,12 +17,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function FeedbackBanner() {
   const { t } = useTranslation()
@@ -30,17 +25,25 @@ export function FeedbackBanner() {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [rating, setRating] = useState<number | null>(null)
-  const [comment, setComment] = useState('')
-  const [email, setEmail] = useState('')
+  const [comment, setComment] = useState("")
+  const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showThankYou, setShowThankYou] = useState(false)
-  const supabase = createClientComponentClient()
 
   const handleSubmit = async () => {
+    if (!isSupabaseConfigured()) {
+      toast({
+        title: "Feedback não disponível",
+        description: "Sistema de feedback temporariamente indisponível.",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (!rating) {
       toast({
-        title: t('feedback.ratingRequired'),
-        variant: 'destructive',
+        title: t("feedback.ratingRequired"),
+        variant: "destructive",
       })
       return
     }
@@ -48,27 +51,30 @@ export function FeedbackBanner() {
     setIsSubmitting(true)
 
     try {
-      const { error } = await supabase
-        .from('feedback')
-        .insert([
-          {
-            rating,
-            comment,
-            email: isAuthenticated ? undefined : email,
-            user_id: isAuthenticated ? (await supabase.auth.getUser()).data.user?.id : undefined,
-          },
-        ])
+      const supabase = createClient()
+      if (!supabase) {
+        throw new Error("Supabase client not available")
+      }
+
+      const { error } = await supabase.from("feedback").insert([
+        {
+          rating,
+          comment,
+          email: isAuthenticated ? undefined : email,
+          user_id: isAuthenticated ? (await supabase.auth.getUser()).data.user?.id : undefined,
+        },
+      ])
 
       if (error) throw error
 
       setShowThankYou(true)
       setRating(null)
-      setComment('')
-      setEmail('')
+      setComment("")
+      setEmail("")
     } catch (error) {
       toast({
-        title: t('feedback.error'),
-        variant: 'destructive',
+        title: t("feedback.error"),
+        variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)
@@ -78,6 +84,10 @@ export function FeedbackBanner() {
   const handleClose = () => {
     setIsOpen(false)
     setShowThankYou(false)
+  }
+
+  if (!isSupabaseConfigured()) {
+    return null
   }
 
   return (
@@ -92,13 +102,13 @@ export function FeedbackBanner() {
                 size="icon"
                 className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
                 onClick={() => setIsOpen(true)}
-                aria-label={t('feedback.title')}
+                aria-label={t("feedback.title")}
               >
                 <MessageSquare className="h-10 w-10" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left" className="bg-primary text-primary-foreground">
-              <p>{t('feedback.helpUsImprove')}</p>
+              <p>{t("feedback.helpUsImprove")}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -111,23 +121,19 @@ export function FeedbackBanner() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl">🎉</DialogTitle>
-                <DialogDescription className="text-center text-lg">
-                  {t('feedback.thankYou')}
-                </DialogDescription>
+                <DialogDescription className="text-center text-lg">{t("feedback.thankYou")}</DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <Button onClick={handleClose} className="w-full">
-                  {t('common.close')}
+                  {t("common.close")}
                 </Button>
               </DialogFooter>
             </>
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle>{t('feedback.title')}</DialogTitle>
-                <DialogDescription>
-                  {t('feedback.description')}
-                </DialogDescription>
+                <DialogTitle>{t("feedback.title")}</DialogTitle>
+                <DialogDescription>{t("feedback.description")}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
@@ -138,12 +144,8 @@ export function FeedbackBanner() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setRating(star)}
-                      className={`h-8 w-8 ${
-                        rating && star <= rating
-                          ? 'text-yellow-400'
-                          : 'text-gray-300'
-                      }`}
-                      aria-label={t('feedback.rateStars', { count: star })}
+                      className={`h-8 w-8 ${rating && star <= rating ? "text-yellow-400" : "text-gray-300"}`}
+                      aria-label={t("feedback.rateStars", { count: star })}
                     >
                       <Star className="h-5 w-5" />
                     </Button>
@@ -151,7 +153,7 @@ export function FeedbackBanner() {
                 </div>
 
                 <Textarea
-                  placeholder={t('feedback.commentPlaceholder')}
+                  placeholder={t("feedback.commentPlaceholder")}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   className="min-h-[100px]"
@@ -160,18 +162,14 @@ export function FeedbackBanner() {
                 {!isAuthenticated && (
                   <Input
                     type="email"
-                    placeholder={t('feedback.emailPlaceholder')}
+                    placeholder={t("feedback.emailPlaceholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 )}
 
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full"
-                >
-                  {isSubmitting ? t('common.submitting') : t('feedback.submit')}
+                <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full">
+                  {isSubmitting ? t("common.submitting") : t("feedback.submit")}
                 </Button>
               </div>
             </>
