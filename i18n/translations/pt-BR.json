@@ -31,16 +31,15 @@
     "submitting": "Enviando..."
   },
   "header": {
-    "title": "Plataforma de Mentoria Voluntária",
+    "title": "MENVO - Mentores Voluntários",
     "subtitle": "Conectando mentores e mentees"
   },
   "home": {
-    "badge.freeMentorship": "Plataforma de Mentoria Gratuita",
+    "badge.freeMentorship": "Plataforma de Mentores Voluntários",
     "hero.title": "Conecte-se com Mentores Voluntários",
     "hero.description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
     "hero.findMentor": "Encontrar um Mentor",
     "hero.becomeMentor": "Torne-se um Mentor",
-
     "howItWorks.title": "Como Funciona",
     "howItWorks.description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
     "howItWorks.step1.title": "Encontrar um Mentor",
@@ -50,17 +49,19 @@
     "howItWorks.step3.title": "Conecte-se e Cresça",
     "howItWorks.step3.description": "Encontre-se virtualmente, compartilhe experiências e desenvolva suas habilidades com orientação personalizada.",
     "howItWorks.learnMore": "Saiba Mais",
-
     "featuredMentors.title": "Mentores em Destaque",
     "featuredMentors.description": "Conheça alguns de nossos dedicados mentores voluntários",
     "featuredMentors.viewAll": "Ver Todos os Mentores",
     "mentor.sampleName": "Sarah Johnson",
     "mentor.field": "Engenharia de Software",
-    "mentor.tags": ["Carreira", "Tecnologia", "Liderança"],
+    "mentor.tags": [
+      "Carreira",
+      "Tecnologia",
+      "Liderança"
+    ],
     "mentor.description": "Desenvolvedora Sênior com mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
     "mentor.languages": "Inglês, Espanhol",
     "mentor.viewProfile": "Ver Perfil",
-
     "events.title": "Próximos Eventos",
     "events.description": "Participe de nossos eventos comunitários e sessões de mentoria em grupo",
     "events.card.title": "Painel de Carreira em Tecnologia: Como Entrar no Setor",
@@ -70,12 +71,10 @@
     "events.card.attendees": "{{count}} participantes",
     "events.card.register": "Inscrever-se",
     "events.viewAll": "Ver Todos os Eventos",
-
     "cta.title": "Pronto para Começar?",
     "cta.description": "Junte-se à nossa comunidade hoje e conecte-se com mentores que podem ajudar você a alcançar seus objetivos",
     "cta.signup": "Inscreva-se Agora",
     "cta.learnMore": "Saiba Mais",
-
     "event.type": "Online"
   },
   "about": {
@@ -97,7 +96,7 @@
         "description": "Construir uma comunidade acolhedora, onde o conhecimento é compartilhado livremente e conexões são feitas além de origens e fronteiras."
       },
       "accessibility": {
-        "title": "Acessibilidade", 
+        "title": "Acessibilidade",
         "description": "Tornar a mentoria acessível a todos, independentemente de sua situação financeira, localização ou histórico."
       },
       "impact": {
@@ -111,7 +110,7 @@
       "goalNumber": "ODS {{number}}",
       "goals": {
         "qualityEducation": "Educação de Qualidade",
-        "genderEquality": "Igualdade de Gênero", 
+        "genderEquality": "Igualdade de Gênero",
         "decentWork": "Trabalho Decente e Crescimento Econômico",
         "reducedInequalities": "Redução das Desigualdades"
       }
@@ -131,7 +130,7 @@
         "label": "Mentores Voluntários"
       },
       "mentorshipSessions": {
-        "count": "5.000+", 
+        "count": "5.000+",
         "label": "Sessões de Mentoria"
       },
       "countriesReached": {
@@ -289,8 +288,8 @@
     "subtitle": "Conecte-se com mentores voluntários e desenvolva sua carreira gratuitamente",
     "signupTitle": "Criar Conta",
     "description": "Preencha seus dados para começar sua jornada",
-    "firstName": "Nome Completo",
-    "firstNamePlaceholder": "Digite seu nome completo",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Digite seu promeiro nome",
     "lastName": "Sobrenome",
     "lastNamePlaceholder": "Digite seu sobrenome",
     "email": "E-mail",
@@ -452,8 +451,7 @@
     "termsOfService": "Termos de Serviço",
     "cookiePolicy": "Política de Cookies",
     "allRightsReserved": "Todos os direitos reservados."
-  }
-,
+  },
   "waitingList": {
     "title": "Junte-se à Lista de Espera",
     "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",

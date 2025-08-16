@@ -35,12 +35,11 @@
     "subtitle": "Conectando mentores y mentees"
   },
   "home": {
-    "badge.freeMentorship": "Plataforma de Mentoría Gratuita",
+    "badge.freeMentorship": "Plataforma de Mentores Voluntarios",
     "hero.title": "Conéctate con Mentores Voluntarios",
     "hero.description": "Encuentra orientación, comparte experiencias y crece junto a otros. Nuestra plataforma te conecta con mentores voluntarios para sesiones de mentoría gratuitas.",
     "hero.findMentor": "Encontrar un Mentor",
     "hero.becomeMentor": "Convertirse en Mentor",
-
     "howItWorks.title": "Cómo Funciona",
     "howItWorks.description": "Nuestra plataforma facilita la conexión con mentores y la programación de sesiones",
     "howItWorks.step1.title": "Encontrar un Mentor",
@@ -50,17 +49,19 @@
     "howItWorks.step3.title": "Conéctate y Crece",
     "howItWorks.step3.description": "Reúnete virtualmente, comparte experiencias y desarrolla tus habilidades con orientación personalizada.",
     "howItWorks.learnMore": "Saber Más",
-
     "featuredMentors.title": "Mentores Destacados",
     "featuredMentors.description": "Conoce a algunos de nuestros dedicados mentores voluntarios",
     "featuredMentors.viewAll": "Ver Todos los Mentores",
     "mentor.sampleName": "Sarah Johnson",
     "mentor.field": "Ingeniería de Software",
-    "mentor.tags": ["Carrera", "Tecnología", "Liderazgo"],
+    "mentor.tags": [
+      "Carrera",
+      "Tecnología",
+      "Liderazgo"
+    ],
     "mentor.description": "Desarrolladora Senior con más de 10 años de experiencia ayudando a nuevos programadores a navegar en la industria tecnológica.",
     "mentor.languages": "Inglés, Español",
     "mentor.viewProfile": "Ver Perfil",
-
     "events.title": "Próximos Eventos",
     "events.description": "Únete a nuestros eventos comunitarios y sesiones de mentoría en grupo",
     "events.card.title": "Panel de Carrera Tecnológica: Cómo Ingresar a la Industria",
@@ -70,12 +71,10 @@
     "events.card.attendees": "{{count}} asistentes",
     "events.card.register": "Registrarse",
     "events.viewAll": "Ver Todos los Eventos",
-
     "cta.title": "¿Listo para Comenzar?",
     "cta.description": "Únete a nuestra comunidad hoy y conéctate con mentores que pueden ayudarte a alcanzar tus metas",
     "cta.signup": "Regístrate Ahora",
     "cta.learnMore": "Saber Más",
-
     "event.type": "En línea"
   },
   "about": {
@@ -256,37 +255,37 @@
       "contactSupport": "Contactar Soporte"
     }
   },
-      "login": {
-      "title": "Bienvenido de vuelta",
-      "description": "Inicia sesión en tu cuenta para acceder a la plataforma",
-      "email": "Correo electrónico",
-      "emailPlaceholder": "nombre@ejemplo.com",
-      "password": "Contraseña",
-      "passwordPlaceholder": "Escribe tu contraseña",
-      "forgotPassword": "¿Olvidaste tu contraseña?",
-      "loginButton": "Iniciar sesión",
-      "loggingIn": "Iniciando sesión...",
-      "noAccount": "¿No tienes una cuenta?",
-      "signUp": "Registrarse",
-      "continueWith": "Continuar con",
-      "google": "Google",
-      "linkedin": "LinkedIn",
-      "github": "GitHub",
-      "connecting": "Conectando...",
-      "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
-      "dontHaveAccount": "¿No tienes una cuenta?",
-      "error": {
-        "invalidCredentials": "Correo electrónico o contraseña incorrectos. Verifica tus credenciales e inténtalo de nuevo.",
-        "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
-        "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
-        "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
-      }
-    },
-      "register": {
-      "title": "Únete a Menvo",
-      "subtitle": "Conéctate con mentores voluntarios y desarrolla tu carrera gratuitamente",
-      "signupTitle": "Crear Cuenta",
-      "description": "Completa tus datos para comenzar tu viaje",
+  "login": {
+    "title": "Bienvenido de vuelta",
+    "description": "Inicia sesión en tu cuenta para acceder a la plataforma",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Escribe tu contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginButton": "Iniciar sesión",
+    "loggingIn": "Iniciando sesión...",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Registrarse",
+    "continueWith": "Continuar con",
+    "google": "Google",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "connecting": "Conectando...",
+    "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "error": {
+      "invalidCredentials": "Correo electrónico o contraseña incorrectos. Verifica tus credenciales e inténtalo de nuevo.",
+      "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
+      "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
+      "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
+    }
+  },
+  "register": {
+    "title": "Únete a Menvo",
+    "subtitle": "Conéctate con mentores voluntarios y desarrolla tu carrera gratuitamente",
+    "signupTitle": "Crear Cuenta",
+    "description": "Completa tus datos para comenzar tu viaje",
     "firstName": "Nombre",
     "firstNamePlaceholder": "Ingresa tu nombre",
     "lastName": "Apellido",
@@ -358,7 +357,7 @@
         "title": "Mentor",
         "description": "Quiero compartir mi experiencia y ayudar a otros"
       },
-       "company": {
+      "company": {
         "title": "Empresa",
         "description": "Quiero inscribir profesionales de nuestra empresa"
       },
@@ -599,8 +598,7 @@
       "title": "MENVO - Plataforma de Mentoría Voluntaria",
       "description": "Conectando mentores y mentorizados para sesiones gratuitas de mentoría"
     }
-  }
-,
+  },
   "waitingList": {
     "title": "Únete a la Lista de Espera",
     "description": "¡Gracias por tu interés! Por favor, completa el siguiente formulario.",

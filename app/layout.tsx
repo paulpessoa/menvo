@@ -15,7 +15,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://menvo.com.br"),
-  title: "MENVO - Plataforma de Mentoria Voluntária",
+  title: "MENVO -  Mentores Voluntários",
   description:
     "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
   authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   publisher: "MENVO",
   keywords: [
     "mentoria",
-    "mentoria voluntária",
+    "mentores voluntários",
     "desenvolvimento profissional",
     "carreira",
     "aprendizado",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://menvo.com.br",
-    title: "MENVO - Plataforma de Mentoria Voluntária",
+    title: "MENVO -  Mentores Voluntários",
     description:
       "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
     siteName: "MENVO",
@@ -49,13 +49,13 @@ export const metadata: Metadata = {
         url: "https://menvo.com.br/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "MENVO - Plataforma de Mentoria Voluntária",
+        alt: "MENVO -  Mentores Voluntários",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MENVO - Plataforma de Mentoria Voluntária",
+    title: "MENVO -  Mentores Voluntários",
     description:
       "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
     creator: "@paulpessoa",
