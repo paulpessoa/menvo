@@ -48,12 +48,12 @@ function SignupForm() {
     setError("")
 
     if (password !== confirmPassword) {
-      setError(t("register.passwordValidation.passwordsDontMatch") || "As senhas não coincidem")
+      setError(t("register.passwordValidation.passwordsDontMatch"))
       return
     }
 
     if (password.length < 6) {
-      setError(t("register.passwordValidation.passwordTooShort") || "A senha deve ter pelo menos 6 caracteres")
+      setError(t("register.passwordValidation.passwordTooShort"))
       return
     }
 
@@ -79,7 +79,7 @@ function SignupForm() {
       })
 
       setSuccess(true)
-      toast.success(t("register.success") || "Conta criada! Verifique seu email.")
+      toast.success(t("register.success"))
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -120,32 +120,32 @@ function SignupForm() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Mail className="h-6 w-6 text-blue-600" />
             </div>
-            <CardTitle>{t("register.confirmEmail") || "Confirme seu email"}</CardTitle>
+            <CardTitle>{t("register.confirmEmail")}</CardTitle>
             <CardDescription>
               {t("register.confirmEmailDescription", { email }) || `Enviamos um link de confirmação para ${email}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground text-sm">
-              {t("register.afterConfirmation") || "Após confirmar seu email, você poderá fazer login na plataforma."}
+              {t("register.afterConfirmation")}
             </p>
 
             <div className="rounded-lg bg-yellow-50 p-3">
               <p className="text-xs text-yellow-800">
-                <strong>{t("register.didntReceiveEmail") || "Não recebeu o email?"}</strong>{" "}
-                {t("register.checkSpam") || "Verifique sua caixa de spam."}
+                <strong>{t("register.didntReceiveEmail")}</strong>{" "}
+                {t("register.checkSpam")}
               </p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-2">
             <Button asChild className="w-full">
               <Link href="/login">
-                {t("register.goToLogin") || "Ir para Login"}
+                {t("register.goToLogin")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full bg-transparent">
-              <Link href="/">{t("register.goToHome") || "Voltar ao Início"}</Link>
+              <Link href="/">{t("register.goToHome")}</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -157,8 +157,8 @@ function SignupForm() {
     <div className="container max-w-5xl py-10 md:py-16">
       <Card className="mx-auto max-w-md">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle>{t("register.signupTitle") || "Criar Conta"}</CardTitle>
-          <CardDescription>{t("register.description") || "Junte-se à nossa comunidade de mentoria"}</CardDescription>
+          <CardTitle>{t("register.signupTitle")}</CardTitle>
+          <CardDescription>{t("register.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-2">
@@ -187,8 +187,7 @@ function SignupForm() {
                 />
               </svg>
               {isGoogleLoading
-                ? t("login.connecting") || "Conectando..."
-                : `${t("login.continueWith") || "Continuar com"} Google`}
+                ? t("login.connecting") : `${t("login.continueWith")} Google`}
             </Button>
 
             <Button
@@ -199,8 +198,8 @@ function SignupForm() {
             >
               <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
               {isLinkedInLoading
-                ? t("login.connecting") || "Conectando..."
-                : `${t("login.continueWith") || "Continuar com"} LinkedIn`}
+                ? t("login.connecting")
+                : `${t("login.continueWith")} LinkedIn`}
             </Button>
           </div>
 
@@ -210,7 +209,7 @@ function SignupForm() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                {t("register.orContinueWith") || "Ou continue com email"}
+                {t("register.orContinueWith")}
               </span>
             </div>
           </div>
@@ -229,22 +228,22 @@ function SignupForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">{t("register.firstName") || "Nome"}</Label>
+                <Label htmlFor="firstName">{t("register.firstName")}</Label>
                 <Input
                   id="firstName"
                   type="text"
-                  placeholder={t("register.firstNamePlaceholder") || "Seu nome"}
+                  placeholder={t("register.firstNamePlaceholder")}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">{t("register.lastName") || "Sobrenome"}</Label>
+                <Label htmlFor="lastName">{t("register.lastName")}</Label>
                 <Input
                   id="lastName"
                   type="text"
-                  placeholder={t("register.lastNamePlaceholder") || "Seu sobrenome"}
+                  placeholder={t("register.lastNamePlaceholder")}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -253,11 +252,11 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">{t("register.email") || "Email"}</Label>
+              <Label htmlFor="email">{t("register.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t("register.emailPlaceholder") || "seu@email.com"}
+                placeholder={t("register.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -265,11 +264,11 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t("register.password") || "Senha"}</Label>
+              <Label htmlFor="password">{t("register.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder={t("register.passwordPlaceholder") || "Mínimo 6 caracteres"}
+                placeholder={t("register.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -277,26 +276,26 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t("register.confirmPassword") || "Confirmar Senha"}</Label>
+              <Label htmlFor="confirmPassword">{t("register.confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder={t("register.confirmPasswordPlaceholder") || "Confirme sua senha"}
+                placeholder={t("register.confirmPasswordPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
 
-            <Button className="w-full" type="submit" disabled={isLoading}>
+              <Button className="w-full" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  {t("register.creatingAccount") || "Criando conta..."}
+                  {t("register.creatingAccount")}
                 </span>
               ) : (
                 <>
-                  <span>{t("register.registerButton") || "Criar Conta"}</span>
+                  <span>{t("register.registerButton")}</span>
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -305,9 +304,9 @@ function SignupForm() {
         </CardContent>
         <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
-            {t("register.alreadyHaveAccount") || "Já tem uma conta?"}{" "}
+            {t("register.alreadyHaveAccount")}{" "}
             <Link href="/login" className="text-primary hover:underline">
-              {t("register.signIn") || "Fazer login"}
+              {t("register.signIn")}
             </Link>
           </div>
         </CardFooter>
@@ -317,22 +316,12 @@ function SignupForm() {
 }
 
 export default function SignupPage() {
-  const router = useRouter()
-
-  const estamosLotados = false
-
   return (
     <div className="relative">
-      <div className={estamosLotados ? "blur-sm pointer-events-none" : ""}>
+        {/* TODO: Adicionar tradução */}
         <Suspense fallback={<div>Carregando...</div>}>
           <SignupForm />
         </Suspense>
-      </div>
-      {estamosLotados && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center">
-          <WaitingList isOpen onClose={() => router.push("/")} />
-        </div>
-      )}
     </div>
   )
 }
