@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import "@/i18n/config" // Adicionando importação da configuração do i18next para resolver erro NO_I18NEXT_INSTANCE
 import { Providers } from "./providers"
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
