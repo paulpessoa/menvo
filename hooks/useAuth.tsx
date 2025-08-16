@@ -1,30 +1,35 @@
 "use client"
 
-import { createClient } from "@/utils/supabase/client"
+import { createClient, isSupabaseConfigured } from "@/utils/supabase/client"
 import { useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
 
 // Hook para operações de autenticação
 export const useAuthOperations = () => {
   const getSupabaseClient = () => {
-    try {
-      return createClient()
-    } catch (error) {
-      console.error("Erro ao criar cliente Supabase:", error)
-      throw error
+    if (!isSupabaseConfigured()) {
+      throw new Error("Supabase não está configurado. Verifique as variáveis de ambiente.")
     }
+
+    const client = createClient()
+    if (!client) {
+      throw new Error("Não foi possível criar o cliente Supabase.")
+    }
+
+    return client
   }
 
   const signUp = async ({
     email,
     password,
-    fullName,
+    firstName,
+    lastName,
     userType,
-  }: { email: string; password: string; fullName: string; userType: string }) => {
+  }: { email: string; password: string; firstName: string; lastName: string; userType: "mentor" | "mentee" }) => {
     try {
-      console.log("🔄 Iniciando signUp:", { email, fullName, userType })
+      console.log("🔄 Iniciando signUp:", { email, firstName, lastName, userType })
 
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +37,8 @@ export const useAuthOperations = () => {
         body: JSON.stringify({
           email: email.toLowerCase().trim(),
           password,
-          fullName,
+          firstName,
+          lastName,
           userType,
         }),
       })
@@ -41,14 +47,14 @@ export const useAuthOperations = () => {
 
       if (!response.ok) {
         console.error("❌ Erro no signUp:", data.error)
-        return { error: data.error }
+        throw new Error(data.error)
       }
 
       console.log("✅ SignUp bem-sucedido:", data.user?.id)
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no signUp:", error)
-      return { error: "Erro inesperado" }
+      throw error
     }
   }
 
@@ -64,14 +70,14 @@ export const useAuthOperations = () => {
 
       if (error) {
         console.error("❌ Erro no signIn:", error)
-        return { error }
+        throw error
       }
 
       console.log("✅ SignIn bem-sucedido:", data.user?.id)
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no signIn:", error)
-      return { error }
+      throw error
     }
   }
 
@@ -93,14 +99,14 @@ export const useAuthOperations = () => {
 
       if (error) {
         console.error("❌ Erro no Google OAuth:", error)
-        return { error }
+        throw error
       }
 
       console.log("✅ Google OAuth iniciado")
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no Google OAuth:", error)
-      return { error }
+      throw error
     }
   }
 
@@ -121,14 +127,14 @@ export const useAuthOperations = () => {
 
       if (error) {
         console.error("❌ Erro no LinkedIn OAuth:", error)
-        return { error }
+        throw error
       }
 
       console.log("✅ LinkedIn OAuth iniciado")
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no LinkedIn OAuth:", error)
-      return { error }
+      throw error
     }
   }
 
@@ -149,14 +155,14 @@ export const useAuthOperations = () => {
 
       if (error) {
         console.error("❌ Erro no GitHub OAuth:", error)
-        return { error }
+        throw error
       }
 
       console.log("✅ GitHub OAuth iniciado")
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no GitHub OAuth:", error)
-      return { error }
+      throw error
     }
   }
 
@@ -169,14 +175,14 @@ export const useAuthOperations = () => {
 
       if (error) {
         console.error("❌ Erro no signOut:", error)
-        return { error }
+        throw error
       }
 
       console.log("✅ SignOut bem-sucedido")
       return { error: null }
     } catch (error) {
       console.error("❌ Erro inesperado no signOut:", error)
-      return { error }
+      throw error
     }
   }
 
@@ -194,15 +200,58 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [profile, setProfile] = useState<any>(null)
+  const [profileLoading, setProfileLoading] = useState(false)
 
   const operations = useAuthOperations()
+
+  const fetchUserProfile = async (userId: string) => {
+    if (!isSupabaseConfigured()) {
+      console.warn("Supabase não configurado, pulando busca de perfil")
+      return null
+    }
+
+    try {
+      setProfileLoading(true)
+      const supabase = createClient()
+      if (!supabase) return null
+
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
+
+      if (error) {
+        console.error("Erro ao buscar perfil:", error)
+        return null
+      }
+
+      return data
+    } catch (error) {
+      console.error("Erro ao buscar perfil:", error)
+      return null
+    } finally {
+      setProfileLoading(false)
+    }
+  }
 
   useEffect(() => {
     let mounted = true
 
     const initializeAuth = async () => {
+      if (!isSupabaseConfigured()) {
+        console.warn("Supabase não configurado, pulando inicialização de auth")
+        if (mounted) {
+          setLoading(false)
+        }
+        return
+      }
+
       try {
         const supabase = createClient()
+        if (!supabase) {
+          if (mounted) {
+            setLoading(false)
+          }
+          return
+        }
 
         // Obter sessão atual
         const {
@@ -217,6 +266,12 @@ export const useAuth = () => {
         if (mounted) {
           setUser(session?.user ?? null)
           setIsAuthenticated(!!session?.user)
+
+          if (session?.user) {
+            const userProfile = await fetchUserProfile(session.user.id)
+            setProfile(userProfile)
+          }
+
           setLoading(false)
         }
 
@@ -229,6 +284,14 @@ export const useAuth = () => {
           if (mounted) {
             setUser(session?.user ?? null)
             setIsAuthenticated(!!session?.user)
+
+            if (session?.user && event === "SIGNED_IN") {
+              const userProfile = await fetchUserProfile(session.user.id)
+              setProfile(userProfile)
+            } else if (!session?.user) {
+              setProfile(null)
+            }
+
             setLoading(false)
           }
         })
@@ -251,10 +314,31 @@ export const useAuth = () => {
     }
   }, [])
 
+  const needsOnboarding = () => {
+    if (!profile) return false
+    return profile.role === "pending" || !profile.role
+  }
+
+  const needsRoleSelection = () => {
+    if (!user || !profile) return false
+    return !profile.role || profile.role === "pending"
+  }
+
+  const needsVerification = () => {
+    if (!user || !profile) return false
+    return !user.email_confirmed_at
+  }
+
   return {
     user,
     loading,
     isAuthenticated,
+    profile,
+    profileLoading,
+    needsOnboarding,
+    needsRoleSelection,
+    needsVerification,
+    fetchUserProfile,
     ...operations,
   }
 }

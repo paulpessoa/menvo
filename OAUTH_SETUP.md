@@ -43,7 +43,7 @@ Este guia explica como configurar o login com Google e LinkedIn no seu projeto N
    - Vá para **APIs & Services** → **OAuth consent screen**
    - Escolha **External** → **Create**
    - Preencha:
-     - App name: `Volunteer Mentor Platform`
+     - App name: `MENVO - Volunteer Mentors`
      - User support email: seu email
      - Developer contact: seu email
    - Em **Authorized domains**, adicione: `supabase.co`
@@ -56,7 +56,7 @@ Este guia explica como configurar o login com Google e LinkedIn no seu projeto N
    - Vá para **APIs & Services** → **Credentials**
    - Clique **Create Credentials** → **OAuth client ID**
    - Application type: **Web application**
-   - Name: `Volunteer Mentor Platform`
+   - Name: `MENVO - Volunteer Mentors`
    
    **Authorized JavaScript origins:**
    \`\`\`
@@ -80,7 +80,7 @@ Este guia explica como configurar o login com Google e LinkedIn no seu projeto N
 
 2. **Crie uma aplicação:**
    - Clique **Create App**
-   - App name: `Volunteer Mentor Platform`
+   - App name: `MENVO - Volunteer Mentors`
    - LinkedIn Page: Sua página/empresa
    - App logo: Upload de um logo
 

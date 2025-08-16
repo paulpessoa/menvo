@@ -12,14 +12,19 @@ const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, proces
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, firstName, lastName } = body
+    const { email, password, firstName, lastName, userType } = body
 
-    console.log("📝 Dados recebidos:", { email, firstName, lastName })
+    console.log("📝 Dados recebidos:", { email, firstName, lastName, userType })
 
     // Validar entrada
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !userType) {
       console.error("❌ Campos obrigatórios faltando")
       return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 })
+    }
+
+    // Validar userType
+    if (!["mentor", "mentee"].includes(userType)) {
+      return NextResponse.json({ error: "Tipo de usuário inválido" }, { status: 400 })
     }
 
     // Validar formato do email
@@ -36,11 +41,10 @@ export async function POST(request: NextRequest) {
     const emailLower = email.toLowerCase().trim()
     const firstNameTrim = firstName.trim()
     const lastNameTrim = lastName.trim()
-    const fullName = `${firstNameTrim} ${lastNameTrim}`
+    const displayName = `${firstNameTrim} ${lastNameTrim}`
 
     console.log("🔄 Tentando registrar usuário no Supabase Auth...")
 
-    // Registrar usuário no Supabase Auth usando admin client
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: emailLower,
       password,
@@ -48,7 +52,9 @@ export async function POST(request: NextRequest) {
       user_metadata: {
         first_name: firstNameTrim,
         last_name: lastNameTrim,
-        full_name: fullName,
+        full_name: displayName,
+        display_name: displayName, // Adicionado display_name
+        user_type: userType,
       },
     })
 
@@ -78,17 +84,17 @@ export async function POST(request: NextRequest) {
 
     console.log("✅ Usuário criado no Auth:", authData.user.id)
 
-    // Criar perfil na tabela profiles
-    console.log("🔧 Criando perfil básico na tabela profiles...")
+    console.log("🔧 Criando perfil na tabela profiles...")
 
     const { error: profileError } = await supabaseAdmin.from("profiles").insert({
       id: authData.user.id,
       email: emailLower,
       first_name: firstNameTrim,
       last_name: lastNameTrim,
-      full_name: fullName,
-      user_role: "pending",
-      verification_status: "pending",
+      display_name: displayName, // Adicionado display_name
+      role: userType, // Usar role selecionada em vez de "pending"
+      verification_status: userType === "mentor" ? "pending_validation" : "active", // Mentores precisam de validação
+      status: "active",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
@@ -109,6 +115,30 @@ export async function POST(request: NextRequest) {
     }
 
     console.log("✅ Perfil criado com sucesso")
+
+    if (userType === "mentor") {
+      console.log("🔧 Criando solicitação de validação para mentor...")
+
+      const { error: validationError } = await supabaseAdmin.from("validation_requests").insert({
+        user_id: authData.user.id,
+        request_type: "mentor_validation",
+        status: "pending",
+        submitted_at: new Date().toISOString(),
+        data: {
+          first_name: firstNameTrim,
+          last_name: lastNameTrim,
+          email: emailLower,
+          role: userType,
+        },
+      })
+
+      if (validationError) {
+        console.error("⚠️ Erro ao criar solicitação de validação:", validationError)
+        // Não falhar aqui, pois o usuário já foi criado
+      } else {
+        console.log("✅ Solicitação de validação criada")
+      }
+    }
 
     // Enviar email de confirmação
     try {
@@ -139,6 +169,7 @@ export async function POST(request: NextRequest) {
         id: authData.user.id,
         email: authData.user.email,
         emailConfirmed: false,
+        role: userType,
       },
     })
   } catch (error) {
