@@ -5,19 +5,19 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 215.4 16.3% 46.9%;
+    /* Restaurando cor preta para títulos principais */
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 215.4 16.3% 46.9%;
+    /* Restaurando cor preta para texto de cards */
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215.4 16.3% 46.9%;
+    --popover-foreground: 222.2 84% 4.9%;
     --primary: 189 100% 19%;
     --primary-foreground: 0 0% 100%;
-    /* Removendo cor laranja secundária, mantendo apenas teal */
     --secondary: 210 40% 96%;
     --secondary-foreground: 215.4 16.3% 46.9%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    /* Removendo cor laranja do accent, usando teal */
     --accent: 210 40% 96%;
     --accent-foreground: 215.4 16.3% 46.9%;
     --destructive: 0 84.2% 60.2%;
