@@ -41,19 +41,19 @@ const roles = [
       "Desenvolver habilidades de liderança",
     ],
   },
-  {
-    id: "volunteer",
-    name: "Voluntário",
-    description: "Desejo contribuir com atividades voluntárias e causas sociais",
-    icon: Heart,
-    color: "bg-purple-100 text-purple-800",
-    benefits: [
-      "Participar de projetos sociais",
-      "Registrar horas de voluntariado",
-      "Conectar com ONGs",
-      "Fazer a diferença na comunidade",
-    ],
-  },
+  // {
+  //   id: "volunteer",
+  //   name: "Voluntário",
+  //   description: "Desejo contribuir com atividades voluntárias e causas sociais",
+  //   icon: Heart,
+  //   color: "bg-purple-100 text-purple-800",
+  //   benefits: [
+  //     "Participar de projetos sociais",
+  //     "Registrar horas de voluntariado",
+  //     "Conectar com ONGs",
+  //     "Fazer a diferença na comunidade",
+  //   ],
+  // },
 ]
 
 export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
@@ -111,7 +111,6 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
         })
       }
 
-      await refreshProfile()
       toast.success("Perfil atualizado com sucesso!")
       onClose()
     } catch (error) {
@@ -124,7 +123,7 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Escolha seu perfil</DialogTitle>
           <DialogDescription>
@@ -132,7 +131,7 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
           {roles.map((role) => (
             <Card
               key={role.id}
@@ -151,7 +150,7 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
                 <CardTitle className="text-lg">{role.name}</CardTitle>
                 <CardDescription>{role.description}</CardDescription>
               </CardHeader>
-              <CardContent>
+              {/* <CardContent>
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Benefícios:</p>
                   <ul className="text-sm text-muted-foreground space-y-1">
@@ -163,7 +162,7 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
                     ))}
                   </ul>
                 </div>
-              </CardContent>
+              </CardContent> */}
             </Card>
           ))}
         </div>
