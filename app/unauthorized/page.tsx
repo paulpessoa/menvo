@@ -16,11 +16,10 @@ export default function UnauthorizedPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
             <Shield className="h-8 w-8 text-destructive" />
           </div>
-          <CardTitle className="text-2xl">Acesso Negado</CardTitle>
+          <CardTitle className="text-2xl font-bold">Acesso Negado</CardTitle>
           <CardDescription>
-            Você não tem permissão para acessar esta página. Entre em contato com o administrador se acredita que isso é
-            um erro.
-          </CardDescription>
+            Você não tem permissão para acessar esta página.
+           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button onClick={() => router.back()} variant="outline" className="w-full">
@@ -31,6 +30,11 @@ export default function UnauthorizedPage() {
             <Link href="/dashboard">
               <Home className="h-4 w-4 mr-2" />
               Ir para Dashboard
+            </Link>
+          </Button>
+          <Button asChild className="w-full mt-2">
+            <Link href="/contact">
+              Contatar Suporte
             </Link>
           </Button>
         </CardContent>
