@@ -82,12 +82,6 @@ export const metadata: Metadata = {
   category: "education",
   classification: "Platform",
   referrer: "origin-when-cross-origin",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   other: {
     "msapplication-TileColor": "#ffffff",
     "msapplication-TileImage": "/mstile-144x144.png",
@@ -117,7 +111,6 @@ export default function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
-        <meta name="theme-color" content="#ffffff" />
         <Script
           id="clarity-script"
           strategy="afterInteractive"
