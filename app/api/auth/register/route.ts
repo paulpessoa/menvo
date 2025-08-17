@@ -45,16 +45,18 @@ export async function POST(request: NextRequest) {
 
     console.log("🔄 Tentando registrar usuário no Supabase Auth...")
 
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    // Usar signUp normal que envia automaticamente o email de confirmação
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
       email: emailLower,
       password,
-      email_confirm: false, // Requer confirmação por email
-      user_metadata: {
-        first_name: firstNameTrim,
-        last_name: lastNameTrim,
-        full_name: displayName,
-        display_name: displayName, // Adicionado display_name
-        user_type: userType,
+      options: {
+        data: {
+          first_name: firstNameTrim,
+          last_name: lastNameTrim,
+          full_name: displayName,
+          user_type: userType,
+        },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback?type=signup`,
       },
     })
 
@@ -84,81 +86,10 @@ export async function POST(request: NextRequest) {
 
     console.log("✅ Usuário criado no Auth:", authData.user.id)
 
-    console.log("🔧 Criando perfil na tabela profiles...")
+    console.log("✅ Perfil será criado automaticamente pelo trigger")
 
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
-      id: authData.user.id,
-      email: emailLower,
-      first_name: firstNameTrim,
-      last_name: lastNameTrim,
-      display_name: displayName, // Adicionado display_name
-      role: userType, // Usar role selecionada em vez de "pending"
-      verification_status: userType === "mentor" ? "pending_validation" : "active", // Mentores precisam de validação
-      status: "active",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-
-    if (profileError) {
-      console.error("❌ Erro ao criar perfil:", profileError)
-
-      // Se falhar ao criar perfil, deletar usuário do auth
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-
-      return NextResponse.json(
-        {
-          error: "Erro ao criar perfil do usuário",
-          details: profileError.message,
-        },
-        { status: 500 },
-      )
-    }
-
-    console.log("✅ Perfil criado com sucesso")
-
-    if (userType === "mentor") {
-      console.log("🔧 Criando solicitação de validação para mentor...")
-
-      const { error: validationError } = await supabaseAdmin.from("validation_requests").insert({
-        user_id: authData.user.id,
-        request_type: "mentor_validation",
-        status: "pending",
-        submitted_at: new Date().toISOString(),
-        data: {
-          first_name: firstNameTrim,
-          last_name: lastNameTrim,
-          email: emailLower,
-          role: userType,
-        },
-      })
-
-      if (validationError) {
-        console.error("⚠️ Erro ao criar solicitação de validação:", validationError)
-        // Não falhar aqui, pois o usuário já foi criado
-      } else {
-        console.log("✅ Solicitação de validação criada")
-      }
-    }
-
-    // Enviar email de confirmação
-    try {
-      const { error: emailError } = await supabaseAdmin.auth.admin.generateLink({
-        type: "signup",
-        email: emailLower,
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`,
-        },
-      })
-
-      if (emailError) {
-        console.error("⚠️ Erro ao enviar email de confirmação:", emailError)
-        // Não falhar aqui, pois o usuário já foi criado
-      } else {
-        console.log("✅ Email de confirmação enviado")
-      }
-    } catch (emailError) {
-      console.error("⚠️ Erro ao processar email de confirmação:", emailError)
-    }
+    console.log("✅ Validation request será criada automaticamente pelo trigger se necessário")
+    console.log("✅ Email de confirmação será enviado automaticamente pelo Supabase")
 
     console.log("🎉 Registro concluído com sucesso")
 

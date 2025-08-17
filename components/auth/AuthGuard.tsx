@@ -36,6 +36,11 @@ export function AuthGuard({ children }: AuthGuardProps) {
     "/unauthorized",
     "/confirmation",
     "/auth/callback",
+    "/auth/confirmed",
+    "/auth/error",
+    "/auth/resend-confirmation",
+    "/test-callback", // Para debug
+    "/mentors"
   ]
 
   const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))

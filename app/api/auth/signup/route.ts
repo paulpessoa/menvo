@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
           first_name: fullName.split(" ")[0] || "",
           last_name: fullName.split(" ").slice(1).join(" ") || "",
         },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=signup`,
       },
     })
 
