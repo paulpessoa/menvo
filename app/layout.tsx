@@ -122,8 +122,11 @@ export default function RootLayout({
             })(window, document, "clarity", "script", "rz28fusa38");`,
           }}
           />
-          <!-- Hotjar Tracking Code for https://menvo.com.br -->
-          <script>
+          <Script
+          id="hotjar-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
               (function(h,o,t,j,a,r){
                   h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
                   h._hjSettings={hjid:6496770,hjsv:6};
@@ -132,7 +135,9 @@ export default function RootLayout({
                   r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
                   a.appendChild(r);
               })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-          </script>
+            `,
+          }}
+        />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
