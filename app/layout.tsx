@@ -123,20 +123,19 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <Providers>
           <AuthGuard>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <FeedbackBanner />
-            <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-          </div>
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <FeedbackBanner />
+              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+            </div>
           </AuthGuard>
           <Toaster />
         </Providers>
-        <Toaster />
       </body>
     </html>
   )

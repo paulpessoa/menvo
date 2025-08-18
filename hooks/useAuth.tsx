@@ -1,12 +1,107 @@
 "use client"
 
 import { createClient, isSupabaseConfigured } from "@/utils/supabase/client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import type { User } from "@supabase/supabase-js"
 
-// Hook para operações de autenticação
-export const useAuthOperations = () => {
-  const getSupabaseClient = () => {
+// Types
+export interface UserProfile {
+  id: string
+  email: string
+  first_name: string | null
+  last_name: string | null
+  full_name: string
+  slug: string | null
+  avatar_url: string | null
+  bio: string | null
+  location: string | null
+  role: 'pending' | 'mentee' | 'mentor' | 'admin' | 'volunteer' | 'moderator'
+  status: 'pending' | 'active' | 'suspended' | 'rejected'
+  verification_status: 'pending' | 'pending_validation' | 'active' | 'rejected'
+  expertise_areas: string[] | null
+  linkedin_url: string | null
+  github_url: string | null
+  website_url: string | null
+  is_available: boolean
+  timezone: string | null
+  verified_at: string | null
+  verification_notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface JWTClaims {
+  role: string
+  status: string
+  permissions: string[]
+  user_id: string
+}
+
+export interface AuthState {
+  user: User | null
+  profile: UserProfile | null
+  claims: JWTClaims | null
+  loading: boolean
+  profileLoading: boolean
+  isAuthenticated: boolean
+  supabaseReady: boolean
+}
+
+export interface AuthOperations {
+  signUp: (data: SignUpData) => Promise<AuthResult>
+  signIn: (email: string, password: string) => Promise<AuthResult>
+  signInWithGoogle: () => Promise<AuthResult>
+  signInWithLinkedIn: () => Promise<AuthResult>
+  signInWithGitHub: () => Promise<AuthResult>
+  signOut: () => Promise<void>
+  resetPassword: (email: string) => Promise<AuthResult>
+  refreshProfile: () => Promise<void>
+  updateProfile: (updates: Partial<UserProfile>) => Promise<void>
+}
+
+export interface SignUpData {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  userType: 'mentor' | 'mentee'
+}
+
+export interface AuthResult {
+  error: Error | null
+  data?: any
+}
+
+export interface UseAuthReturn extends AuthState, AuthOperations {
+  // Helper methods
+  needsRoleSelection: () => boolean
+  needsVerification: () => boolean
+  hasRole: (role: string) => boolean
+  hasPermission: (permission: string) => boolean
+  hasAnyPermission: (permissions: string[]) => boolean
+  
+  // Convenience getters
+  isAdmin: boolean
+  isMentor: boolean
+  isMentee: boolean
+  isVolunteer: boolean
+  isModerator: boolean
+  isPending: boolean
+}
+
+// Consolidated useAuth hook
+export const useAuth = (): UseAuthReturn => {
+  // State
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [claims, setClaims] = useState<JWTClaims | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [supabaseReady, setSupabaseReady] = useState(false)
+
+  // Supabase client getter
+  const getSupabaseClient = useCallback(() => {
     if (!isSupabaseConfigured()) {
       throw new Error("Supabase não está configurado. Verifique as variáveis de ambiente.")
     }
@@ -17,17 +112,95 @@ export const useAuthOperations = () => {
     }
 
     return client
-  }
+  }, [])
 
-  const signUp = async ({
-    email,
-    password,
-    firstName,
-    lastName,
-    userType,
-  }: { email: string; password: string; firstName: string; lastName: string; userType: "mentor" | "mentee" }) => {
+  // Extract JWT claims from session
+  const extractJWTClaims = useCallback((session: any): JWTClaims | null => {
+    if (!session?.access_token) return null
+
     try {
-      console.log("🔄 Iniciando signUp:", { email, firstName, lastName, userType })
+      // Decode JWT payload (base64 decode the middle part)
+      const payload = JSON.parse(atob(session.access_token.split('.')[1]))
+      
+      return {
+        role: payload.role || 'pending',
+        status: payload.status || 'pending',
+        permissions: payload.permissions || [],
+        user_id: payload.user_id || payload.sub
+      }
+    } catch (error) {
+      console.error("Erro ao extrair claims do JWT:", error)
+      return null
+    }
+  }, [])
+
+  // Fetch user profile
+  const fetchUserProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
+    if (!isSupabaseConfigured()) {
+      console.warn("Supabase não configurado, pulando busca de perfil")
+      return null
+    }
+
+    try {
+      setProfileLoading(true)
+      const supabase = getSupabaseClient()
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single()
+
+      if (error) {
+        console.error("Erro ao buscar perfil:", error)
+        return null
+      }
+
+      return data as UserProfile
+    } catch (error) {
+      console.error("Erro ao buscar perfil:", error)
+      return null
+    } finally {
+      setProfileLoading(false)
+    }
+  }, [getSupabaseClient])
+
+  // Refresh profile data
+  const refreshProfile = useCallback(async () => {
+    if (!user?.id) return
+    
+    const updatedProfile = await fetchUserProfile(user.id)
+    if (updatedProfile) {
+      setProfile(updatedProfile)
+    }
+  }, [user?.id, fetchUserProfile])
+
+  // Update profile
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
+    if (!user?.id) throw new Error("Usuário não autenticado")
+
+    try {
+      const supabase = getSupabaseClient()
+      
+      const { error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", user.id)
+
+      if (error) throw error
+
+      // Refresh profile after update
+      await refreshProfile()
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error)
+      throw error
+    }
+  }, [user?.id, getSupabaseClient, refreshProfile])
+
+  // Authentication operations
+  const signUp = useCallback(async (data: SignUpData): Promise<AuthResult> => {
+    try {
+      console.log("🔄 Iniciando signUp:", { email: data.email, firstName: data.firstName, lastName: data.lastName, userType: data.userType })
 
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -35,30 +208,30 @@ export const useAuthOperations = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email.toLowerCase().trim(),
-          password,
-          firstName,
-          lastName,
-          userType,
+          email: data.email.toLowerCase().trim(),
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          userType: data.userType,
         }),
       })
 
-      const data = await response.json()
+      const result = await response.json()
 
       if (!response.ok) {
-        console.error("❌ Erro no signUp:", data.error)
-        throw new Error(data.error)
+        console.error("❌ Erro no signUp:", result.error)
+        throw new Error(result.error)
       }
 
-      console.log("✅ SignUp bem-sucedido:", data.user?.id)
-      return { error: null, data }
+      console.log("✅ SignUp bem-sucedido:", result.user?.id)
+      return { error: null, data: result }
     } catch (error) {
       console.error("❌ Erro inesperado no signUp:", error)
-      throw error
+      return { error: error as Error }
     }
-  }
+  }, [])
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string): Promise<AuthResult> => {
     try {
       console.log("🔄 Iniciando signIn:", { email })
 
@@ -77,11 +250,11 @@ export const useAuthOperations = () => {
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no signIn:", error)
-      throw error
+      return { error: error as Error }
     }
-  }
+  }, [getSupabaseClient])
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async (): Promise<AuthResult> => {
     try {
       console.log("🔄 Iniciando Google OAuth")
 
@@ -106,11 +279,11 @@ export const useAuthOperations = () => {
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no Google OAuth:", error)
-      throw error
+      return { error: error as Error }
     }
-  }
+  }, [getSupabaseClient])
 
-  const signInWithLinkedIn = async () => {
+  const signInWithLinkedIn = useCallback(async (): Promise<AuthResult> => {
     try {
       console.log("🔄 Iniciando LinkedIn OAuth")
 
@@ -134,11 +307,11 @@ export const useAuthOperations = () => {
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no LinkedIn OAuth:", error)
-      throw error
+      return { error: error as Error }
     }
-  }
+  }, [getSupabaseClient])
 
-  const signInWithGitHub = async () => {
+  const signInWithGitHub = useCallback(async (): Promise<AuthResult> => {
     try {
       console.log("🔄 Iniciando GitHub OAuth")
 
@@ -162,11 +335,11 @@ export const useAuthOperations = () => {
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no GitHub OAuth:", error)
-      throw error
+      return { error: error as Error }
     }
-  }
+  }, [getSupabaseClient])
 
-  const signOut = async () => {
+  const signOut = useCallback(async (): Promise<void> => {
     try {
       console.log("🔄 Iniciando signOut")
 
@@ -178,60 +351,65 @@ export const useAuthOperations = () => {
         throw error
       }
 
+      // Clear state
+      setUser(null)
+      setProfile(null)
+      setClaims(null)
+      setIsAuthenticated(false)
+
       console.log("✅ SignOut bem-sucedido")
-      return { error: null }
     } catch (error) {
       console.error("❌ Erro inesperado no signOut:", error)
       throw error
     }
-  }
+  }, [getSupabaseClient])
 
-  return {
-    signUp,
-    signIn,
-    signInWithGoogle,
-    signInWithLinkedIn,
-    signInWithGitHub,
-    signOut,
-  }
-}
-
-export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [profile, setProfile] = useState<any>(null)
-  const [profileLoading, setProfileLoading] = useState(false)
-
-  const operations = useAuthOperations()
-
-  const fetchUserProfile = async (userId: string) => {
-    if (!isSupabaseConfigured()) {
-      console.warn("Supabase não configurado, pulando busca de perfil")
-      return null
-    }
-
+  const resetPassword = useCallback(async (email: string): Promise<AuthResult> => {
     try {
-      setProfileLoading(true)
-      const supabase = createClient()
-      if (!supabase) return null
+      console.log("🔄 Iniciando resetPassword:", { email });
 
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).single()
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/update-password`,
+      });
 
       if (error) {
-        console.error("Erro ao buscar perfil:", error)
-        return null
+        console.error("❌ Erro no resetPassword:", error);
+        throw error;
       }
 
-      return data
+      console.log("✅ Email de reset enviado com sucesso");
+      return { error: null, data };
     } catch (error) {
-      console.error("Erro ao buscar perfil:", error)
-      return null
-    } finally {
-      setProfileLoading(false)
+      console.error("❌ Erro inesperado no resetPassword:", error);
+      return { error: error as Error };
     }
-  }
+  }, [getSupabaseClient]);
 
+  // Helper methods
+  const needsRoleSelection = useCallback((): boolean => {
+    if (!user || !profile) return false
+    return !profile.role || profile.role === 'pending'
+  }, [user, profile])
+
+  const needsVerification = useCallback((): boolean => {
+    if (!user || !profile) return false
+    return profile.role === 'mentor' && profile.verification_status === 'pending_validation'
+  }, [user, profile])
+
+  const hasRole = useCallback((role: string): boolean => {
+    return claims?.role === role || profile?.role === role
+  }, [claims?.role, profile?.role])
+
+  const hasPermission = useCallback((permission: string): boolean => {
+    return claims?.permissions?.includes(permission) || false
+  }, [claims?.permissions])
+
+  const hasAnyPermission = useCallback((permissions: string[]): boolean => {
+    return permissions.some(p => hasPermission(p))
+  }, [hasPermission])
+
+  // Initialize authentication
   useEffect(() => {
     let mounted = true
 
@@ -245,51 +423,61 @@ export const useAuth = () => {
       }
 
       try {
-        const supabase = createClient()
-        if (!supabase) {
-          if (mounted) {
-            setLoading(false)
-          }
-          return
-        }
+        const supabase = getSupabaseClient()
+        setSupabaseReady(true)
 
-        // Obter sessão atual
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession()
+        // Get current session
+        const { data: { session }, error } = await supabase.auth.getSession()
 
         if (error) {
           console.error("Erro ao obter sessão:", error)
         }
 
         if (mounted) {
-          setUser(session?.user ?? null)
-          setIsAuthenticated(!!session?.user)
-
           if (session?.user) {
+            setUser(session.user)
+            setIsAuthenticated(true)
+            
+            // Extract JWT claims
+            const jwtClaims = extractJWTClaims(session)
+            setClaims(jwtClaims)
+
+            // Fetch profile
             const userProfile = await fetchUserProfile(session.user.id)
             setProfile(userProfile)
+          } else {
+            setUser(null)
+            setProfile(null)
+            setClaims(null)
+            setIsAuthenticated(false)
           }
 
           setLoading(false)
         }
 
-        // Escutar mudanças na autenticação
-        const {
-          data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log("Auth state changed:", event, session?.user?.id)
 
           if (mounted) {
-            setUser(session?.user ?? null)
-            setIsAuthenticated(!!session?.user)
+            if (session?.user) {
+              setUser(session.user)
+              setIsAuthenticated(true)
 
-            if (session?.user && event === "SIGNED_IN") {
-              const userProfile = await fetchUserProfile(session.user.id)
-              setProfile(userProfile)
-            } else if (!session?.user) {
+              // Extract JWT claims
+              const jwtClaims = extractJWTClaims(session)
+              setClaims(jwtClaims)
+
+              // Fetch profile on sign in or token refresh
+              if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+                const userProfile = await fetchUserProfile(session.user.id)
+                setProfile(userProfile)
+              }
+            } else {
+              setUser(null)
               setProfile(null)
+              setClaims(null)
+              setIsAuthenticated(false)
             }
 
             setLoading(false)
@@ -312,33 +500,50 @@ export const useAuth = () => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [getSupabaseClient, extractJWTClaims, fetchUserProfile])
 
-  const needsOnboarding = () => {
-    if (!profile) return false
-    return profile.role === "pending" || !profile.role
-  }
-
-  const needsRoleSelection = () => {
-    if (!user || !profile) return false
-    return !profile.role || profile.role === "pending"
-  }
-
-  const needsVerification = () => {
-    if (!user || !profile) return false
-    return !user.email_confirmed_at
-  }
+  // Convenience getters
+  const isAdmin = hasRole('admin')
+  const isMentor = hasRole('mentor')
+  const isMentee = hasRole('mentee')
+  const isVolunteer = hasRole('volunteer')
+  const isModerator = hasRole('moderator')
+  const isPending = hasRole('pending')
 
   return {
+    // State
     user,
-    loading,
-    isAuthenticated,
     profile,
+    claims,
+    loading,
     profileLoading,
-    needsOnboarding,
+    isAuthenticated,
+    supabaseReady,
+
+    // Operations
+    signUp,
+    signIn,
+    signInWithGoogle,
+    signInWithLinkedIn,
+    signInWithGitHub,
+    signOut,
+    resetPassword,
+    refreshProfile,
+    updateProfile,
+
+    // Helper methods
     needsRoleSelection,
     needsVerification,
-    fetchUserProfile,
-    ...operations,
+    hasRole,
+    hasPermission,
+    hasAnyPermission,
+
+    // Convenience getters
+    isAdmin,
+    isMentor,
+    isMentee,
+    isVolunteer,
+    isModerator,
+    isPending,
   }
 }

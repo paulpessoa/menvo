@@ -1,12 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Star, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useTranslation } from "react-i18next"
-import { useAuth } from "@/hooks/useAuth"
 import { useToast } from "@/hooks/useToast"
 import { createClient, isSupabaseConfigured } from "@/utils/supabase/client"
 import {
@@ -15,9 +14,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
+  DialogFooter
 } from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip"
+import { useAuth } from "@/hooks/useAuth"
 
 export function FeedbackBanner() {
   const { t } = useTranslation()
@@ -29,13 +34,19 @@ export function FeedbackBanner() {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showThankYou, setShowThankYou] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Evitar hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async () => {
     if (!isSupabaseConfigured()) {
       toast({
         title: "Feedback não disponível",
         description: "Sistema de feedback temporariamente indisponível.",
-        variant: "destructive",
+        variant: "destructive"
       })
       return
     }
@@ -43,7 +54,7 @@ export function FeedbackBanner() {
     if (!rating) {
       toast({
         title: t("feedback.ratingRequired"),
-        variant: "destructive",
+        variant: "destructive"
       })
       return
     }
@@ -61,8 +72,12 @@ export function FeedbackBanner() {
           rating,
           comment,
           email: isAuthenticated ? undefined : email,
-          user_id: isAuthenticated ? (await supabase.auth.getUser()).data.user?.id : undefined,
-        },
+          user_id: isAuthenticated
+            ? (
+              await supabase.auth.getUser()
+            ).data.user?.id
+            : undefined
+        }
       ])
 
       if (error) throw error
@@ -74,7 +89,7 @@ export function FeedbackBanner() {
     } catch (error) {
       toast({
         title: t("feedback.error"),
-        variant: "destructive",
+        variant: "destructive"
       })
     } finally {
       setIsSubmitting(false)
@@ -86,7 +101,8 @@ export function FeedbackBanner() {
     setShowThankYou(false)
   }
 
-  if (!isSupabaseConfigured()) {
+  // Não renderizar até estar montado no cliente para evitar hydration mismatch
+  if (!mounted || !isSupabaseConfigured()) {
     return null
   }
 
@@ -107,7 +123,10 @@ export function FeedbackBanner() {
                 <MessageSquare className="h-10 w-10" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="left" className="bg-primary text-primary-foreground">
+            <TooltipContent
+              side="left"
+              className="bg-primary text-primary-foreground"
+            >
               <p>{t("feedback.helpUsImprove")}</p>
             </TooltipContent>
           </Tooltip>
@@ -121,7 +140,9 @@ export function FeedbackBanner() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl">🎉</DialogTitle>
-                <DialogDescription className="text-center text-lg">{t("feedback.thankYou")}</DialogDescription>
+                <DialogDescription className="text-center text-lg">
+                  {t("feedback.thankYou")}
+                </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <Button onClick={handleClose} className="w-full">
@@ -133,7 +154,9 @@ export function FeedbackBanner() {
             <>
               <DialogHeader>
                 <DialogTitle>{t("feedback.title")}</DialogTitle>
-                <DialogDescription>{t("feedback.description")}</DialogDescription>
+                <DialogDescription>
+                  {t("feedback.description")}
+                </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
@@ -144,7 +167,10 @@ export function FeedbackBanner() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setRating(star)}
-                      className={`h-8 w-8 ${rating && star <= rating ? "text-yellow-400" : "text-gray-300"}`}
+                      className={`h-8 w-8 ${rating && star <= rating
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                        }`}
                       aria-label={t("feedback.rateStars", { count: star })}
                     >
                       <Star className="h-5 w-5" />
@@ -168,7 +194,11 @@ export function FeedbackBanner() {
                   />
                 )}
 
-                <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="w-full"
+                >
                   {isSubmitting ? t("common.submitting") : t("feedback.submit")}
                 </Button>
               </div>
