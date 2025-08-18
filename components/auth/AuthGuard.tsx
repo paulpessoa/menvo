@@ -1,49 +1,42 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
-import { RoleSelectionModal } from "./RoleSelectionModal"
-import { ProfileCompletionModal } from "./ProfileCompletionModal"
+import { useAuth } from "@/app/context/auth-context"
 import { ValidationPendingModal } from "./ValidationPendingModal"
 import { Loader2 } from "lucide-react"
+import { publicRoutes } from "@/config/routes"
 
 interface AuthGuardProps {
   children: React.ReactNode
+  requiredPermissions?: string[]
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
-  const { user, profile, loading, isAuthenticated, needsRoleSelection, needsVerification } =
-    useAuth()
+export function AuthGuard({ children, requiredPermissions }: AuthGuardProps) {
+  const {
+    user,
+    profile,
+    loading,
+    isAuthenticated,
+    needsRoleSelection,
+    needsVerification,
+    hasAnyPermission
+  } = useAuth()
 
   const router = useRouter()
   const pathname = usePathname()
-  const [showRoleSelection, setShowRoleSelection] = useState(false)
-  const [showProfileCompletion, setShowProfileCompletion] = useState(false)
   const [showValidationPending, setShowValidationPending] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Rotas que não precisam de autenticação
-  const publicRoutes = [
-    "/",
-    "/about",
-    "/how-it-works",
-    "/login",
-    "/signup",
-    "/forgot-password",
-    "/reset-password",
-    "/unauthorized",
-    "/confirmation",
-    "/auth/callback",
-    "/auth/confirmed",
-    "/auth/error",
-    "/auth/resend-confirmation",
-    "/test-callback", // Para debug
-    "/mentors"
-  ]
+  // Evitar hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))
+  const isPublicRoute = publicRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  )
 
   useEffect(() => {
     if (loading) return
@@ -56,20 +49,23 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     // Se está autenticado, verificar fluxos necessários
     if (isAuthenticated && !isPublicRoute) {
-      if (needsRoleSelection) {
-        setShowRoleSelection(true)
+      if (needsRoleSelection() && pathname !== "/onboarding/role-selection") {
+        router.push("/onboarding/role-selection")
         return
       }
 
-      if (needsVerification) {
+      if (needsVerification()) {
         setShowValidationPending(true)
+        return
+      }
+
+      if (requiredPermissions && !hasAnyPermission(requiredPermissions)) {
+        router.push("/unauthorized")
         return
       }
     }
 
     // Resetar modals se não precisar mais
-    setShowRoleSelection(false)
-    setShowProfileCompletion(false)
     setShowValidationPending(false)
   }, [
     loading,
@@ -79,7 +75,21 @@ export function AuthGuard({ children }: AuthGuardProps) {
     isPublicRoute,
     pathname,
     router,
+    requiredPermissions,
+    hasAnyPermission
   ])
+
+  // Evitar hydration mismatch - não renderizar até estar montado no cliente
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Carregando...</span>
+        </div>
+      </div>
+    )
+  }
 
   // Mostrar loading enquanto carrega
   if (loading) {
@@ -98,9 +108,10 @@ export function AuthGuard({ children }: AuthGuardProps) {
       {children}
 
       {/* Modals de fluxo de autenticação */}
-      <RoleSelectionModal open={showRoleSelection} onClose={() => setShowRoleSelection(false)} />
-
-      <ValidationPendingModal open={showValidationPending} onClose={() => setShowValidationPending(false)} />
+      <ValidationPendingModal
+        open={showValidationPending}
+        onClose={() => setShowValidationPending(false)}
+      />
     </>
   )
 }

@@ -1,11 +1,11 @@
 "use client"
 
-import { useAuth } from "./useAuth.consolidated"
+import { useAuth } from "./useAuth"
 
 // Permission types based on the RBAC system
 export type Permission =
   | "view_mentors"
-  | "view_profiles" 
+  | "view_profiles"
   | "update_own_profile"
   | "book_sessions"
   | "provide_mentorship"
@@ -18,7 +18,13 @@ export type Permission =
   | "moderate_content"
   | "moderate_verifications"
 
-export type UserRole = "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
+export type UserRole =
+  | "pending"
+  | "mentee"
+  | "mentor"
+  | "admin"
+  | "volunteer"
+  | "moderator"
 
 export interface UsePermissionsReturn {
   // Current user state
@@ -75,56 +81,60 @@ export function usePermissions(): UsePermissionsReturn {
     isMentee,
     isVolunteer,
     isModerator,
-    isPending,
+    isPending
   } = useAuth()
 
   // Enhanced permission checking with fallbacks
   const enhancedHasPermission = (permission: Permission): boolean => {
     if (loading) return false
-    
+
     // First check JWT claims (most up-to-date)
     if (claims?.permissions?.includes(permission)) return true
-    
+
     // Fallback to role-based checking if claims not available
     return hasPermission(permission)
   }
 
   const enhancedHasRole = (role: UserRole): boolean => {
     if (loading) return false
-    
+
     // Check both JWT claims and profile
     return claims?.role === role || profile?.role === role || hasRole(role)
   }
 
   const hasAllPermissions = (permissions: Permission[]): boolean => {
     if (loading) return false
-    return permissions.every(p => enhancedHasPermission(p))
+    return permissions.every((p) => enhancedHasPermission(p))
   }
 
   const enhancedHasAnyPermission = (permissions: Permission[]): boolean => {
     if (loading) return false
-    return permissions.some(p => enhancedHasPermission(p)) || hasAnyPermission(permissions)
+    return (
+      permissions.some((p) => enhancedHasPermission(p)) ||
+      hasAnyPermission(permissions)
+    )
   }
 
   // Status checkers
-  const isActive = profile?.status === 'active'
-  const isPendingStatus = profile?.status === 'pending'
-  const isSuspended = profile?.status === 'suspended'
+  const isActive = profile?.status === "active"
+  const isPendingStatus = profile?.status === "pending"
+  const isSuspended = profile?.status === "suspended"
 
   // Verification checkers
-  const isVerified = profile?.verification_status === 'active'
-  const needsVerification = profile?.verification_status === 'pending_validation'
-  const isRejected = profile?.verification_status === 'rejected'
+  const isVerified = profile?.verification_status === "active"
+  const needsVerification =
+    profile?.verification_status === "pending_validation"
+  const isRejected = profile?.verification_status === "rejected"
 
   // Specific permission checkers (commonly used)
-  const canViewMentors = enhancedHasPermission('view_mentors')
-  const canBookSessions = enhancedHasPermission('book_sessions')
-  const canProvideMentorship = enhancedHasPermission('provide_mentorship')
-  const canManageAvailability = enhancedHasPermission('manage_availability')
-  const canAdminUsers = enhancedHasPermission('admin_users')
-  const canAdminSystem = enhancedHasPermission('admin_system')
-  const canModerateContent = enhancedHasPermission('moderate_content')
-  const canValidateActivities = enhancedHasPermission('validate_activities')
+  const canViewMentors = enhancedHasPermission("view_mentors")
+  const canBookSessions = enhancedHasPermission("book_sessions")
+  const canProvideMentorship = enhancedHasPermission("provide_mentorship")
+  const canManageAvailability = enhancedHasPermission("manage_availability")
+  const canAdminUsers = enhancedHasPermission("admin_users")
+  const canAdminSystem = enhancedHasPermission("admin_system")
+  const canModerateContent = enhancedHasPermission("moderate_content")
+  const canValidateActivities = enhancedHasPermission("validate_activities")
 
   return {
     // Current user state
@@ -165,6 +175,6 @@ export function usePermissions(): UsePermissionsReturn {
     canAdminUsers,
     canAdminSystem,
     canModerateContent,
-    canValidateActivities,
+    canValidateActivities
   }
 }

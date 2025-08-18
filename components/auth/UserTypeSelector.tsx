@@ -5,12 +5,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useTranslation } from "react-i18next"
 import { Card } from "@/components/ui/card"
 import { GraduationCap, Users } from "lucide-react"
+import { Dispatch, SetStateAction } from "react"
 
-type UserType = "mentor" | "mentee" | ""
+type UserType = "mentor" | "mentee"
 
 interface UserTypeSelectorProps {
   userType: UserType
-  setUserType: (type: UserType) => void
+  setUserType: Dispatch<SetStateAction<UserType>>
 }
 
 export function UserTypeSelector({ userType, setUserType }: UserTypeSelectorProps) {
@@ -35,7 +36,9 @@ export function UserTypeSelector({ userType, setUserType }: UserTypeSelectorProp
 
   const handleTypeChange = (value: string) => {
     console.log("Valor selecionado:", value)
-    setUserType(value as UserType)
+    if (value === "mentor" || value === "mentee") {
+      setUserType(value)
+    }
   }
 
   return (
@@ -46,9 +49,8 @@ export function UserTypeSelector({ userType, setUserType }: UserTypeSelectorProp
           <div key={type.id} className="relative">
             <label htmlFor={type.id} className="cursor-pointer">
               <Card
-                className={`p-3 transition-all hover:border-primary ${
-                  userType === type.id ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border"
-                }`}
+                className={`p-3 transition-all hover:border-primary ${userType === type.id ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border"
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex items-center h-5">

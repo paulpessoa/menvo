@@ -20,17 +20,17 @@ export default function LoginPage() {
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { signIn, signInWithGoogle, signInWithLinkedIn, isAuthenticated, needsOnboarding } = useAuth()
+  const { signIn, signInWithGoogle, signInWithLinkedIn, isAuthenticated, needsRoleSelection } = useAuth()
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (needsOnboarding()) {
+      if (needsRoleSelection()) {
         router.push("/onboarding/role-selection")
       } else {
         router.push("/dashboard")
       }
     }
-  }, [isAuthenticated, needsOnboarding, router])
+  }, [isAuthenticated, needsRoleSelection, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
