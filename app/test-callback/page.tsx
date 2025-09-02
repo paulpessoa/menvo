@@ -31,7 +31,7 @@ export default function TestCallbackPage() {
   const checkUser = async () => {
     setLoading(true)
     try {
-      const response = await fetch("/api/auth/user")
+      const response = await fetch("/api/auth/me")
       const data = await response.json()
       setResult(data)
     } catch (error) {
@@ -50,7 +50,7 @@ export default function TestCallbackPage() {
             Use esta página para testar o fluxo de confirmação de email
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email para teste</Label>
@@ -67,7 +67,7 @@ export default function TestCallbackPage() {
             <Button onClick={testCallback} disabled={loading}>
               {loading ? "Testando..." : "Testar Callback"}
             </Button>
-            
+
             <Button onClick={checkUser} disabled={loading} variant="outline">
               Verificar Usuário Atual
             </Button>

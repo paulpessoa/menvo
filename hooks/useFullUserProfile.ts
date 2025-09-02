@@ -6,7 +6,7 @@ export function useFullUserProfile() {
   return useQuery({
     queryKey: ['full-user-profile'],
     queryFn: async () => {
-      const res = await fetch('/api/profiles/me')
+      const res = await fetch('/api/auth/me')
       if (!res.ok) throw new Error('Erro ao buscar perfil completo')
       return res.json()
     }
