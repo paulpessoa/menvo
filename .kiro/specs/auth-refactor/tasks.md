@@ -240,15 +240,24 @@
   - Integrar com sistema de agendamentos
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 9. Implementar agendamento básico com Google Calendar
-- [ ] 9.1 Configurar integração com Google Calendar API
+- [x] 9. Implementar agendamento básico com Google Calendar
+
+
+
+
+
+- [x] 9.1 Configurar integração com Google Calendar API
+
+
   - Configurar credenciais do Google Calendar no ambiente
   - Implementar autenticação OAuth para Google Calendar
   - Criar funções helper para operações do Calendar
   - Testar criação de eventos básicos
   - _Requirements: 11.5_
 
-- [ ] 9.2 Implementar fluxo de agendamento
+- [x] 9.2 Implementar fluxo de agendamento
+
+
   - Criar interface para mentee solicitar agendamento
   - Implementar verificação de disponibilidade do mentor
   - Criar registro na tabela appointments
