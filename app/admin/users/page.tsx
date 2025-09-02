@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { RequireAdmin } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
 import { UserPlus, Edit, Trash2, Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -90,7 +90,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <ProtectedRoute requiredPermissions={["admin_users"]}>
+    <RequireAdmin>
       <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="flex items-center justify-between">
           <div>
@@ -202,6 +202,6 @@ export default function AdminUsersPage() {
           </CardContent>
         </Card>
       </div>
-    </ProtectedRoute>
+    </RequireAdmin>
   )
 }

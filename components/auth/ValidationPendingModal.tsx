@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Clock, CheckCircle, AlertCircle } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 
 interface ValidationPendingModalProps {

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Mail, Lock } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { Separator } from "@radix-ui/react-separator"
 
 export default function LoginPage() {
@@ -20,7 +20,10 @@ export default function LoginPage() {
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { signIn, signInWithGoogle, signInWithLinkedIn, isAuthenticated, needsRoleSelection } = useAuth()
+  const { signIn, signInWithProvider, user, role, loading } = useAuth()
+
+  const isAuthenticated = !!user && !loading
+  const needsRoleSelection = () => user && !role
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -38,15 +41,10 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const { error } = await signIn(email, password)
-
-      if (error) {
-        setError(error.message)
-      } else {
-        // Will be handled by useEffect when isAuthenticated changes
-      }
-    } catch (err) {
-      setError("Erro inesperado. Tente novamente.")
+      await signIn(email, password)
+      // Will be handled by useEffect when isAuthenticated changes
+    } catch (err: any) {
+      setError(err.message || "Erro inesperado. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -57,19 +55,7 @@ export default function LoginPage() {
     setError("")
 
     try {
-      let result
-      switch (provider) {
-        case "google":
-          result = await signInWithGoogle()
-          break
-        case "linkedin":
-          result = await signInWithLinkedIn()
-          break
-      }
-
-      if (result?.error) {
-        setError(result.error.message)
-      }
+      await signInWithProvider(provider)
       // OAuth redirects are handled by the callback route
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login. Tente novamente.")

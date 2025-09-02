@@ -9,8 +9,7 @@ import Footer from "@/components/footer"
 import { FeedbackBanner } from "@/components/FeedbackBanner"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import Script from "next/script"
-import { AuthGuard } from "@/components/auth/AuthGuard"
-// import { AuthGuard } from "@/components/auth/AuthGuard"
+import { RequireAuth } from "@/lib/auth"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -155,15 +154,13 @@ export default function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
-          <AuthGuard>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <FeedbackBanner />
-              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-            </div>
-          </AuthGuard>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <FeedbackBanner />
+            <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+          </div>
           <Toaster />
         </Providers>
       </body>

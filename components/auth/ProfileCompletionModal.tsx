@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { createClient } from "@/utils/supabase/client"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 
 interface ProfileCompletionModalProps {
   isOpen: boolean
@@ -58,7 +58,7 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
   if (!isOpen) return null
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={() => { }}>
       <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Complete seu perfil</DialogTitle>

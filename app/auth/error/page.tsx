@@ -7,30 +7,64 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertCircle, RefreshCw } from "lucide-react"
 
 const errorMessages = {
-  auth_error: "Erro na autenticação. O link pode ter expirado.",
+  oauth_error: "Erro na autenticação com provedor externo. Tente novamente.",
+  callback_error: "Erro no processo de confirmação. O link pode estar inválido.",
+  verification_error: "Erro na verificação. O link pode ter expirado ou ser inválido.",
+  token_expired: "O link de verificação expirou. Solicite um novo email.",
+  token_invalid: "Link de verificação inválido. Verifique se você clicou no link correto.",
+  unknown_callback_type: "Tipo de verificação não reconhecido.",
   profile_creation_failed: "Erro ao criar perfil. Tente fazer login novamente.",
-  callback_error: "Erro no processo de confirmação.",
+  auth_error: "Erro na autenticação. O link pode ter expirado.",
   expired_link: "Link de confirmação expirado.",
   invalid_link: "Link de confirmação inválido.",
-  default: "Ocorreu um erro durante a confirmação do email."
+  default: "Ocorreu um erro durante a verificação."
 }
 
 export default function AuthErrorPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string>("")
+  const [callbackType, setCallbackType] = useState<string>("")
 
   useEffect(() => {
     const errorType = searchParams.get("error") || "default"
+    const type = searchParams.get("type") || ""
     setError(errorMessages[errorType as keyof typeof errorMessages] || errorMessages.default)
+    setCallbackType(type)
   }, [searchParams])
 
   const handleRetry = () => {
-    router.push("/login")
+    router.push("/auth/login")
   }
 
   const handleResendEmail = () => {
-    router.push("/auth/resend-confirmation")
+    // Redirect to appropriate page based on callback type
+    switch (callbackType) {
+      case 'signup':
+        router.push("/auth/confirm-email")
+        break
+      case 'recovery':
+        router.push("/auth/forgot-password")
+        break
+      case 'invite':
+        router.push("/auth/login") // Admin needs to resend invite
+        break
+      default:
+        router.push("/auth/confirm-email")
+    }
+  }
+
+  const getResendButtonText = () => {
+    switch (callbackType) {
+      case 'signup':
+        return "Reenviar Email de Confirmação"
+      case 'recovery':
+        return "Solicitar Nova Recuperação"
+      case 'invite':
+        return "Contatar Administrador"
+      default:
+        return "Reenviar Email"
+    }
   }
 
   return (
@@ -47,7 +81,7 @@ export default function AuthErrorPage() {
             {error}
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-4">
@@ -56,24 +90,24 @@ export default function AuthErrorPage() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Button 
+            <Button
               onClick={handleRetry}
               className="w-full"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Tentar Fazer Login
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               onClick={handleResendEmail}
               className="w-full"
             >
-              Reenviar Email de Confirmação
+              {getResendButtonText()}
             </Button>
 
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               onClick={() => router.push("/")}
               className="w-full"
             >

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, GraduationCap, Heart, CheckCircle } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
 
@@ -135,9 +135,8 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
           {roles.map((role) => (
             <Card
               key={role.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                selectedRole === role.id ? "ring-2 ring-primary" : ""
-              }`}
+              className={`cursor-pointer transition-all hover:shadow-md ${selectedRole === role.id ? "ring-2 ring-primary" : ""
+                }`}
               onClick={() => setSelectedRole(role.id)}
             >
               <CardHeader>

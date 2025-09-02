@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { CheckCircle, XCircle, ExternalLink, Play } from "lucide-react"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { RequireAdmin } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
 import type { Database } from "@/types/database"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -84,7 +84,7 @@ export default function AdminVerifications() {
   }
 
   return (
-    <ProtectedRoute requiredPermissions={["admin_verifications"]}>
+    <RequireAdmin>
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Header */}
@@ -249,6 +249,6 @@ export default function AdminVerifications() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
+    </RequireAdmin>
   )
 }

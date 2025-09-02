@@ -5,27 +5,35 @@ import type React from "react"
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { ArrowRight, Loader2, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { WaitingList } from "@/components/WaitingList"
-import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 
 function SignupForm() {
   const { t } = useTranslation()
-  const { isAuthenticated, signUp, signInWithGoogle, signInWithLinkedIn, needsRoleSelection } = useAuth()
+  const { user, role, loading, signUp, signInWithProvider } = useAuth()
+
+  const isAuthenticated = !!user && !loading
+  const needsRoleSelection = () => user && !role
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
-  const [userType, setUserType] = useState<"mentor" | "mentee" | "">("")
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
@@ -62,22 +70,10 @@ function SignupForm() {
       return
     }
 
-    if (!userType) {
-      setError("Selecione se você quer ser mentor ou mentee")
-      return
-    }
-
     setIsLoading(true)
 
     try {
-      await signUp({
-        email,
-        password,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        userType,
-      })
-
+      await signUp(email, password, firstName.trim(), lastName.trim())
       setSuccess(true)
       toast.success(t("register.success"))
     } catch (err: any) {
@@ -92,7 +88,7 @@ function SignupForm() {
     setError("")
     setIsGoogleLoading(true)
     try {
-      await signInWithGoogle()
+      await signInWithProvider('google')
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -104,7 +100,7 @@ function SignupForm() {
     setError("")
     setIsLinkedInLoading(true)
     try {
-      await signInWithLinkedIn()
+      await signInWithProvider('linkedin')
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -122,7 +118,8 @@ function SignupForm() {
             </div>
             <CardTitle>{t("register.confirmEmail")}</CardTitle>
             <CardDescription>
-              {t("register.confirmEmailDescription", { email }) || `Enviamos um link de confirmação para ${email}`}
+              {t("register.confirmEmailDescription", { email }) ||
+                `Enviamos um link de confirmação para ${email}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -187,7 +184,8 @@ function SignupForm() {
                 />
               </svg>
               {isGoogleLoading
-                ? t("login.connecting") : `${t("login.continueWith")} Google`}
+                ? t("login.connecting")
+                : `${t("login.continueWith")} Google`}
             </Button>
 
             <Button
@@ -229,8 +227,6 @@ function SignupForm() {
                 </div>
               </div>
             )}
-
-            <UserTypeSelector userType={userType} setUserType={setUserType} />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -282,7 +278,9 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t("register.confirmPassword")}</Label>
+              <Label htmlFor="confirmPassword">
+                {t("register.confirmPassword")}
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"

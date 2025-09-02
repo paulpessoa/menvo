@@ -31,7 +31,7 @@ import {
   Award
 } from "lucide-react"
 import { useMentor } from "@/hooks/useMentors"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -60,7 +60,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
           <Button onClick={() => setShowLoginModal(true)}>{t("mentors.loginRequired.login")}</Button>
           <Button variant="outline" onClick={() => setShowLoginModal(true)}>{t("mentors.loginRequired.signUp")}</Button>
         </div>
-        <LoginRequiredModal 
+        <LoginRequiredModal
           isOpen={showLoginModal}
           onClose={() => setShowLoginModal(false)}
           mentorName={mentor ? `${mentor.first_name} ${mentor.last_name}` : ""}
@@ -214,26 +214,26 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     <div className="flex items-center gap-1">
                       <Briefcase className="h-4 w-4" />
                       <span>
-                        {mentor.current_position} 
+                        {mentor.current_position}
                         {mentor.current_company && ` na ${mentor.current_company}`}
                       </span>
                     </div>
                   )}
-                  
+
                   {formatLocation() && (
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
                       <span>{formatLocation()}</span>
                     </div>
                   )}
-                  
+
                   {formatLanguages() && (
                     <div className="flex items-center gap-1">
                       <Languages className="h-4 w-4" />
                       <span>{formatLanguages()}</span>
                     </div>
                   )}
-                  
+
                   {formatExperience() && (
                     <div className="flex items-center gap-1">
                       <Award className="h-4 w-4" />
@@ -250,20 +250,20 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-1">
-                  <Badge 
+                  <Badge
                     variant={availabilityStatus.variant}
                     className={`flex items-center gap-1 ${availabilityStatus.color}`}
                   >
                     <availabilityStatus.icon className="h-3 w-3" />
                     {availabilityStatus.text}
                   </Badge>
-                  
+
                   {mentor.mentor_skills.slice(0, 3).map((skill) => (
                     <Badge key={skill} variant="secondary">
                       {skill}
                     </Badge>
                   ))}
-                  
+
                   {mentor.mentor_skills.length > 3 && (
                     <Badge variant="outline">
                       +{mentor.mentor_skills.length - 3} mais
@@ -387,7 +387,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                       <span className="font-medium text-foreground">
                         {mentor.mentor_skills.slice(0, 3).join(", ")}
                       </span>
-                      {mentor.mentor_skills.length > 3 && " e mais"}. 
+                      {mentor.mentor_skills.length > 3 && " e mais"}.
                       {mentor.years_experience && (
                         <> Com {formatExperience()}, posso compartilhar experiências práticas e orientação personalizada.</>
                       )}
@@ -412,7 +412,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                           <availabilityStatus.icon className={`h-5 w-5 ${availabilityStatus.color}`} />
                           <span className="font-medium">Status: {availabilityStatus.text}</span>
                         </div>
-                        
+
                         {mentor.availability === 'available' ? (
                           <div className="space-y-4">
                             <p className="text-muted-foreground">
@@ -475,8 +475,8 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     {availabilityStatus.text}
                   </Badge>
                 </div>
-                <Button 
-                  onClick={handleScheduleSession} 
+                <Button
+                  onClick={handleScheduleSession}
                   disabled={mentor.availability !== 'available'}
                   className="w-full"
                 >
@@ -532,7 +532,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
         </div>
       </div>
 
-      <LoginRequiredModal 
+      <LoginRequiredModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         mentorName={`${mentor.first_name} ${mentor.last_name}`}
@@ -602,7 +602,7 @@ function MentorProfileSkeleton() {
               <Skeleton className="h-10 w-full" />
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <Skeleton className="h-6 w-40" />

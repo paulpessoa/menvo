@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Loader2 } from "lucide-react"
@@ -92,7 +92,7 @@ export default function EmailConfirmedPage() {
             Sua conta foi ativada com sucesso. Bem-vindo ao Menvo!
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-2">
@@ -112,15 +112,15 @@ export default function EmailConfirmedPage() {
           )}
 
           <div className="flex flex-col gap-2">
-            <Button 
+            <Button
               onClick={handleRedirect}
               className="w-full"
             >
               Continuar Agora
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               onClick={() => router.push("/")}
               className="w-full"
             >

@@ -17,7 +17,7 @@ import { Search, MapPin, Star, Users, Filter, X, Clock, CheckCircle, Briefcase, 
 import { useQuery } from "@tanstack/react-query"
 import { createClient } from "@/utils/supabase/client"
 import Link from "next/link"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { WaitingList } from "@/components/WaitingList"
 
 interface Mentor {
@@ -115,10 +115,10 @@ function MentorsContent() {
       if (filters.search) {
         query = query.or(
           `full_name.ilike.%${filters.search}%,` +
-            `bio.ilike.%${filters.search}%,` +
-            `current_position.ilike.%${filters.search}%,` +
-            `current_company.ilike.%${filters.search}%,` +
-            `mentor_skills.cs.{${filters.search}}`,
+          `bio.ilike.%${filters.search}%,` +
+          `current_position.ilike.%${filters.search}%,` +
+          `current_company.ilike.%${filters.search}%,` +
+          `mentor_skills.cs.{${filters.search}}`,
         )
       }
 

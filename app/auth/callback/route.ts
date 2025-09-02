@@ -3,133 +3,45 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
+  const supabase = await createClient()
 
-  // Tentar pegar code dos query params primeiro
-  let code = requestUrl.searchParams.get("code")
-  let type = requestUrl.searchParams.get("type")
-
-  // Se não encontrar, tentar pegar do hash (fallback para links antigos)
-  if (!code) {
-    const hash = requestUrl.hash
-    if (hash) {
-      const hashParams = new URLSearchParams(hash.substring(1))
-      code = hashParams.get("access_token") // Para formato antigo
-      type = hashParams.get("type")
-    }
-  }
-
-  console.log("🔍 AUTH CALLBACK - Start:", {
-    code: code ? "present" : "missing",
-    type,
-    url: request.url
-  })
-
+  // Handle OAuth callback (code exchange)
+  const code = requestUrl.searchParams.get("code")
   if (code) {
-    const supabase = await createClient()
-
     try {
-      console.log("🔄 Exchanging code for session...")
+      console.log("🔄 OAuth callback - exchanging code for session...")
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
         console.error("❌ Error exchanging code for session:", error)
         return NextResponse.redirect(
-          new URL("/auth/error?error=auth_error", request.url)
+          new URL("/auth/error?error=oauth_error", request.url)
         )
       }
 
-      console.log("✅ Session exchange successful, user:", data.user?.id)
+      console.log("✅ OAuth session exchange successful, user:", data.user?.id)
 
       if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
+        // Wait a moment for profile creation trigger
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
+        // Check if user has a role
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select(`
+            roles (
+              name
+            )
+          `)
+          .eq('user_id', data.user.id)
           .single()
 
-        if (profileError || !profile) {
-          // Profile will be created automatically by trigger
-          // Wait a moment for trigger to execute
-          await new Promise((resolve) => setTimeout(resolve, 1000))
+        const redirectTo = requestUrl.searchParams.get("redirectTo")
 
-          // Try to fetch profile again
-          const { data: newProfile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", data.user.id)
-            .single()
-
-          if (!newProfile) {
-            console.error("Profile not created by trigger")
-            return NextResponse.redirect(
-              new URL("/auth/error?error=profile_creation_failed", request.url)
-            )
-          }
-
-          // Redirect to role selection for new OAuth users without role
-          if (!newProfile.role || newProfile.role === "pending") {
-            return NextResponse.redirect(
-              new URL("/onboarding/role-selection", request.url)
-            )
-          }
-        } else {
-          const oauthAvatar =
-            data.user.user_metadata?.avatar_url ||
-            data.user.user_metadata?.picture
-
-          if (oauthAvatar && !profile.avatar_url) {
-            await supabase
-              .from("profiles")
-              .update({ avatar_url: oauthAvatar })
-              .eq("id", data.user.id)
-          }
-        }
-      }
-
-      const redirectTo = requestUrl.searchParams.get("redirectTo")
-
-      if (data.user) {
-        const { data: userProfile } = await supabase
-          .from("profiles")
-          .select("role, status, created_at")
-          .eq("id", data.user.id)
-          .single()
-
-        // Check if this is an email confirmation (user just registered)
-        const isEmailConfirmation =
-          type === "signup" ||
-          (userProfile &&
-            new Date(userProfile.created_at) >
-              new Date(Date.now() - 5 * 60 * 1000)) // Created in last 5 minutes
-
-        console.log("📧 Email confirmation check:", {
-          type,
-          isEmailConfirmation,
-          redirectTo,
-          userProfile_created_at: userProfile?.created_at,
-          minutes_ago: userProfile
-            ? (Date.now() - new Date(userProfile.created_at).getTime()) /
-              (1000 * 60)
-            : null
-        })
-
-        // If this is an email confirmation, show confirmation page
-        if (isEmailConfirmation && !redirectTo) {
-          console.log("🎉 Redirecting to confirmation page")
-          return NextResponse.redirect(new URL("/auth/confirmed", request.url))
-        }
-
-        // If user needs role selection, redirect to onboarding
-        if (!userProfile?.role || userProfile.role === "pending") {
+        // If no role, redirect to role selection
+        if (!(roleData?.roles as any)?.name) {
           return NextResponse.redirect(
-            new URL("/onboarding/role-selection", request.url)
-          )
-        }
-
-        // If user needs profile completion, redirect to profile
-        if (userProfile.status === "pending") {
-          return NextResponse.redirect(
-            new URL("/profile?complete=true", request.url)
+            new URL("/auth/select-role", request.url)
           )
         }
 
@@ -139,17 +51,119 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      return NextResponse.redirect(
-        new URL(redirectTo || "/dashboard", request.url)
-      )
+      return NextResponse.redirect(new URL("/dashboard", request.url))
     } catch (error) {
-      console.error("Auth callback error:", error)
+      console.error("OAuth callback error:", error)
       return NextResponse.redirect(
         new URL("/auth/error?error=callback_error", request.url)
       )
     }
   }
 
-  // No code provided, redirect to login
-  return NextResponse.redirect(new URL("/login", request.url))
+  // Handle email callback (token_hash verification)
+  const tokenHash = requestUrl.searchParams.get("token_hash")
+  const type = requestUrl.searchParams.get("type")
+
+  if (tokenHash && type) {
+    try {
+      console.log(`🔄 Email callback - verifying ${type} token...`)
+      
+      let verifyResult
+      let redirectPath = '/dashboard'
+
+      switch (type) {
+        case 'signup':
+          // Email confirmation after registration
+          verifyResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'signup'
+          })
+          redirectPath = '/auth/select-role'
+          break
+
+        case 'recovery':
+          // Password recovery
+          verifyResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'recovery'
+          })
+          redirectPath = '/auth/reset-password'
+          break
+
+        case 'invite':
+          // Admin invitation
+          verifyResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'invite'
+          })
+          redirectPath = '/auth/set-password'
+          break
+
+        case 'magiclink':
+          // Magic link login
+          verifyResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'magiclink'
+          })
+          redirectPath = '/auth/select-role'
+          break
+
+        case 'email_change':
+          // Email change confirmation
+          verifyResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'email_change'
+          })
+          redirectPath = '/dashboard'
+          break
+
+        case 'reauthentication':
+          // Reauthentication for sensitive operations
+          verifyResult = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: 'reauthentication'
+          })
+          const next = requestUrl.searchParams.get("next")
+          redirectPath = next || '/dashboard'
+          break
+
+        default:
+          console.error(`❌ Unknown callback type: ${type}`)
+          return NextResponse.redirect(
+            new URL("/auth/error?error=unknown_callback_type", request.url)
+          )
+      }
+
+      if (verifyResult.error) {
+        console.error(`❌ Error verifying ${type} token:`, verifyResult.error)
+        
+        let errorParam = 'verification_error'
+        if (verifyResult.error.message?.includes('expired')) {
+          errorParam = 'token_expired'
+        } else if (verifyResult.error.message?.includes('invalid')) {
+          errorParam = 'token_invalid'
+        } else if (verifyResult.error.message?.includes('already_confirmed')) {
+          // For already confirmed, redirect to login
+          return NextResponse.redirect(new URL("/auth/login?message=already_confirmed", request.url))
+        }
+
+        return NextResponse.redirect(
+          new URL(`/auth/error?error=${errorParam}&type=${type}`, request.url)
+        )
+      }
+
+      console.log(`✅ ${type} verification successful`)
+      return NextResponse.redirect(new URL(redirectPath, request.url))
+
+    } catch (error) {
+      console.error(`Email callback error for ${type}:`, error)
+      return NextResponse.redirect(
+        new URL(`/auth/error?error=callback_error&type=${type}`, request.url)
+      )
+    }
+  }
+
+  // No valid callback parameters, redirect to login
+  console.log("❌ No valid callback parameters found")
+  return NextResponse.redirect(new URL("/auth/login", request.url))
 }

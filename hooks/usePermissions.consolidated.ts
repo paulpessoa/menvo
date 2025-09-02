@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth } from "./useAuth"
+import { useAuth } from "@/lib/auth"
 
 // Permission types based on the RBAC system
 export type Permission =
