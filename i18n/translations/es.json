@@ -270,7 +270,6 @@
     "continueWith": "Continuar con",
     "google": "Google",
     "linkedin": "LinkedIn",
-    "github": "GitHub",
     "connecting": "Conectando...",
     "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
     "dontHaveAccount": "¿No tienes una cuenta?",
@@ -455,7 +454,7 @@
     "intro": "Tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tus datos en Menvo.",
     "dataCollection": {
       "title": "Recopilación de Datos",
-      "text": "Recopilamos la información que proporcionas al crear una cuenta, como nombre, correo electrónico, foto de perfil y datos profesionales. También recopilamos datos de inicio de sesión social (Google, GitHub, LinkedIn) si eliges autenticarte con estas plataformas."
+      "text": "Recopilamos la información que proporcionas al crear una cuenta, como nombre, correo electrónico, foto de perfil y datos profesionales. También recopilamos datos de inicio de sesión social (Google, LinkedIn) si eliges autenticarte con estas plataformas."
     },
     "email": {
       "title": "Correos y Comunicación",
@@ -475,7 +474,7 @@
     },
     "thirdParty": {
       "title": "Servicios de Terceros",
-      "text": "Utilizamos servicios de terceros como Google, GitHub, LinkedIn (inicio de sesión), Supabase (almacenamiento) y Brevo (correos). Cada servicio tiene su propia política de privacidad."
+      "text": "Utilizamos servicios de terceros como Google, LinkedIn (inicio de sesión), Supabase (almacenamiento) y Brevo (correos). Cada servicio tiene su propia política de privacidad."
     },
     "rights": {
       "title": "Tus Derechos",
@@ -500,7 +499,7 @@
     },
     "social": {
       "title": "Inicio de Sesión Social",
-      "text": "Se pueden usar cookies para autenticación vía Google, GitHub y LinkedIn, facilitando el inicio de sesión seguro."
+      "text": "Se pueden usar cookies para autenticación vía Google y LinkedIn, facilitando el inicio de sesión seguro."
     },
     "preferences": {
       "title": "Preferencias",
@@ -525,7 +524,7 @@
     },
     "account": {
       "title": "Cuenta e Inicio de Sesión Social",
-      "text": "Puedes crear una cuenta por correo o inicio de sesión social (Google, GitHub, LinkedIn). Mantén tus credenciales seguras y no compartas tu cuenta."
+      "text": "Puedes crear una cuenta por correo o inicio de sesión social (Google, LinkedIn). Mantén tus credenciales seguras y no compartas tu cuenta."
     },
     "security": {
       "title": "Seguridad",
