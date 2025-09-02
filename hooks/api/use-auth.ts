@@ -21,9 +21,9 @@ export const useSignUp = () => {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       })
 
       const result = await response.json()
@@ -36,7 +36,7 @@ export const useSignUp = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["current-user"] })
-    },
+    }
   })
 }
 
@@ -48,7 +48,7 @@ export const useSignIn = () => {
     mutationFn: async (data: SignInData) => {
       const { data: result, error } = await supabase.auth.signInWithPassword({
         email: data.email.toLowerCase().trim(),
-        password: data.password,
+        password: data.password
       })
 
       if (error) {
@@ -59,7 +59,7 @@ export const useSignIn = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["current-user"] })
-    },
+    }
   })
 }
 
@@ -76,7 +76,7 @@ export const useSignOut = () => {
     },
     onSuccess: () => {
       queryClient.clear()
-    },
+    }
   })
 }
 
@@ -88,7 +88,7 @@ export const useCurrentUser = () => {
     queryFn: async () => {
       const {
         data: { user },
-        error,
+        error
       } = await supabase.auth.getUser()
 
       if (error || !user) {
@@ -96,15 +96,19 @@ export const useCurrentUser = () => {
       }
 
       // Buscar perfil
-      const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
 
       return {
         user,
-        profile,
+        profile
       }
     },
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000 // 5 minutes
   })
 }
 
@@ -118,9 +122,9 @@ export const useOAuth = () => {
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: "offline",
-          prompt: "consent",
-        },
-      },
+          prompt: "consent"
+        }
+      }
     })
 
     if (error) {
@@ -136,27 +140,9 @@ export const useOAuth = () => {
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
-          prompt: "consent",
-        },
-      },
-    })
-
-    if (error) {
-      throw new Error(error.message)
-    }
-
-    return data
-  }
-
-  const signInWithGitHub = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: {
-          prompt: "consent",
-        },
-      },
+          prompt: "consent"
+        }
+      }
     })
 
     if (error) {
@@ -168,7 +154,6 @@ export const useOAuth = () => {
 
   return {
     signInWithGoogle,
-    signInWithLinkedIn,
-    signInWithGitHub,
+    signInWithLinkedIn
   }
 }

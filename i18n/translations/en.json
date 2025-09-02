@@ -270,7 +270,6 @@
     "continueWith": "Continue with",
     "google": "Google",
     "linkedin": "LinkedIn",
-    "github": "GitHub",
     "connecting": "Connecting...",
     "emailNotConfirmedInfo": "Check your inbox to verify your email.",
     "dontHaveAccount": "Don't have an account?",
@@ -455,7 +454,7 @@
     "intro": "Your privacy is important to us. This policy explains how we collect, use, and protect your data at Menvo.",
     "dataCollection": {
       "title": "Data Collection",
-      "text": "We collect information you provide when creating an account, such as name, email, profile photo, and professional details. We also collect social login data (Google, GitHub, LinkedIn) if you choose to authenticate with these platforms."
+      "text": "We collect information you provide when creating an account, such as name, email, profile photo, and professional details. We also collect social login data (Google, LinkedIn) if you choose to authenticate with these platforms."
     },
     "email": {
       "title": "Emails & Communication",
@@ -475,7 +474,7 @@
     },
     "thirdParty": {
       "title": "Third-Party Services",
-      "text": "We use third-party services such as Google, GitHub, LinkedIn (login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy."
+      "text": "We use third-party services such as Google, LinkedIn (login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy."
     },
     "rights": {
       "title": "Your Rights",
@@ -500,7 +499,7 @@
     },
     "social": {
       "title": "Social Login",
-      "text": "Cookies may be used for authentication via Google, GitHub, and LinkedIn, enabling secure login."
+      "text": "Cookies may be used for authentication via Google, and LinkedIn, enabling secure login."
     },
     "preferences": {
       "title": "Preferences",
@@ -525,7 +524,7 @@
     },
     "account": {
       "title": "Account & Social Login",
-      "text": "You may create an account via email or social login (Google, GitHub, LinkedIn). Keep your credentials secure and do not share your account."
+      "text": "You may create an account via email or social login (Google, LinkedIn). Keep your credentials secure and do not share your account."
     },
     "security": {
       "title": "Security",

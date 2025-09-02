@@ -19,7 +19,9 @@ function getSupabaseClient() {
       console.error("❌ Supabase environment variables are missing:")
       console.error("- NEXT_PUBLIC_SUPABASE_URL:", !!supabaseUrl)
       console.error("- NEXT_PUBLIC_SUPABASE_ANON_KEY:", !!supabaseAnonKey)
-      throw new Error("Supabase URL and Anon Key are required. Please check your environment variables.")
+      throw new Error(
+        "Supabase URL and Anon Key are required. Please check your environment variables."
+      )
     }
     _supabase = createClient(supabaseUrl, supabaseAnonKey)
   }
@@ -30,7 +32,7 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
   get(target, prop) {
     const client = getSupabaseClient()
     return client[prop as keyof typeof client]
-  },
+  }
 })
 
 export const auth = {
@@ -42,8 +44,8 @@ export const auth = {
       password,
       options: {
         emailRedirectTo: `${getSiteUrl()}/auth/callback`,
-        data: metadata || {},
-      },
+        data: metadata || {}
+      }
     })
 
     if (error) {
@@ -60,7 +62,7 @@ export const auth = {
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
-      password,
+      password
     })
 
     if (error) {
@@ -81,9 +83,9 @@ export const auth = {
         redirectTo: `${getSiteUrl()}/auth/callback`,
         queryParams: {
           access_type: "offline",
-          prompt: "consent",
-        },
-      },
+          prompt: "consent"
+        }
+      }
     })
 
     if (error) {
@@ -103,9 +105,9 @@ export const auth = {
       options: {
         redirectTo: `${getSiteUrl()}/auth/callback`,
         queryParams: {
-          prompt: "consent",
-        },
-      },
+          prompt: "consent"
+        }
+      }
     })
 
     if (error) {
@@ -114,28 +116,6 @@ export const auth = {
     }
 
     console.log("✅ LinkedIn OAuth iniciado com sucesso")
-    return data
-  },
-
-  signInWithGitHub: async () => {
-    console.log("🔄 GitHub OAuth iniciado")
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${getSiteUrl()}/auth/callback`,
-        queryParams: {
-          prompt: "consent",
-        },
-      },
-    })
-
-    if (error) {
-      console.error("❌ Erro no GitHub OAuth:", error)
-      throw error
-    }
-
-    console.log("✅ GitHub OAuth iniciado com sucesso")
     return data
   },
 
@@ -155,7 +135,7 @@ export const auth = {
   getUser: async () => {
     const {
       data: { user },
-      error,
+      error
     } = await supabase.auth.getUser()
 
     if (error) {
@@ -173,8 +153,8 @@ export const auth = {
       type: "signup",
       email: email.toLowerCase().trim(),
       options: {
-        emailRedirectTo: `${getSiteUrl()}/auth/callback`,
-      },
+        emailRedirectTo: `${getSiteUrl()}/auth/callback`
+      }
     })
 
     if (error) {
@@ -188,9 +168,12 @@ export const auth = {
   resetPassword: async (email: string) => {
     console.log("🔄 Iniciando reset de senha:", { email })
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email.toLowerCase().trim(), {
-      redirectTo: `${getSiteUrl()}/reset-password`,
-    })
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email.toLowerCase().trim(),
+      {
+        redirectTo: `${getSiteUrl()}/reset-password`
+      }
+    )
 
     if (error) {
       console.error("❌ Erro no reset de senha:", error)
@@ -204,7 +187,7 @@ export const auth = {
     console.log("🔄 Atualizando senha")
 
     const { error } = await supabase.auth.updateUser({
-      password: newPassword,
+      password: newPassword
     })
 
     if (error) {
@@ -213,5 +196,5 @@ export const auth = {
     }
 
     console.log("✅ Senha atualizada")
-  },
+  }
 }

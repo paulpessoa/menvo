@@ -15,9 +15,9 @@ export interface UserProfile {
   avatar_url: string | null
   bio: string | null
   location: string | null
-  role: 'pending' | 'mentee' | 'mentor' | 'admin' | 'volunteer' | 'moderator'
-  status: 'pending' | 'active' | 'suspended' | 'rejected'
-  verification_status: 'pending' | 'pending_validation' | 'active' | 'rejected'
+  role: "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
+  status: "pending" | "active" | "suspended" | "rejected"
+  verification_status: "pending" | "pending_validation" | "active" | "rejected"
   expertise_areas: string[] | null
   linkedin_url: string | null
   github_url: string | null
@@ -52,7 +52,6 @@ export interface AuthOperations {
   signIn: (email: string, password: string) => Promise<AuthResult>
   signInWithGoogle: () => Promise<AuthResult>
   signInWithLinkedIn: () => Promise<AuthResult>
-  signInWithGitHub: () => Promise<AuthResult>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<AuthResult>
   refreshProfile: () => Promise<void>
@@ -64,7 +63,7 @@ export interface SignUpData {
   password: string
   firstName: string
   lastName: string
-  userType: 'mentor' | 'mentee'
+  userType: "mentor" | "mentee"
 }
 
 export interface AuthResult {
@@ -79,7 +78,7 @@ export interface UseAuthReturn extends AuthState, AuthOperations {
   hasRole: (role: string) => boolean
   hasPermission: (permission: string) => boolean
   hasAnyPermission: (permissions: string[]) => boolean
-  
+
   // Convenience getters
   isAdmin: boolean
   isMentor: boolean
@@ -103,7 +102,9 @@ export const useAuth = (): UseAuthReturn => {
   // Supabase client getter
   const getSupabaseClient = useCallback(() => {
     if (!isSupabaseConfigured()) {
-      throw new Error("Supabase não está configurado. Verifique as variáveis de ambiente.")
+      throw new Error(
+        "Supabase não está configurado. Verifique as variáveis de ambiente."
+      )
     }
 
     const client = createClient()
@@ -120,11 +121,11 @@ export const useAuth = (): UseAuthReturn => {
 
     try {
       // Decode JWT payload (base64 decode the middle part)
-      const payload = JSON.parse(atob(session.access_token.split('.')[1]))
-      
+      const payload = JSON.parse(atob(session.access_token.split(".")[1]))
+
       return {
-        role: payload.role || 'pending',
-        status: payload.status || 'pending',
+        role: payload.role || "pending",
+        status: payload.status || "pending",
         permissions: payload.permissions || [],
         user_id: payload.user_id || payload.sub
       }
@@ -135,40 +136,43 @@ export const useAuth = (): UseAuthReturn => {
   }, [])
 
   // Fetch user profile
-  const fetchUserProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
-    if (!isSupabaseConfigured()) {
-      console.warn("Supabase não configurado, pulando busca de perfil")
-      return null
-    }
-
-    try {
-      setProfileLoading(true)
-      const supabase = getSupabaseClient()
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single()
-
-      if (error) {
-        console.error("Erro ao buscar perfil:", error)
+  const fetchUserProfile = useCallback(
+    async (userId: string): Promise<UserProfile | null> => {
+      if (!isSupabaseConfigured()) {
+        console.warn("Supabase não configurado, pulando busca de perfil")
         return null
       }
 
-      return data as UserProfile
-    } catch (error) {
-      console.error("Erro ao buscar perfil:", error)
-      return null
-    } finally {
-      setProfileLoading(false)
-    }
-  }, [getSupabaseClient])
+      try {
+        setProfileLoading(true)
+        const supabase = getSupabaseClient()
+
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single()
+
+        if (error) {
+          console.error("Erro ao buscar perfil:", error)
+          return null
+        }
+
+        return data as UserProfile
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error)
+        return null
+      } finally {
+        setProfileLoading(false)
+      }
+    },
+    [getSupabaseClient]
+  )
 
   // Refresh profile data
   const refreshProfile = useCallback(async () => {
     if (!user?.id) return
-    
+
     const updatedProfile = await fetchUserProfile(user.id)
     if (updatedProfile) {
       setProfile(updatedProfile)
@@ -176,44 +180,52 @@ export const useAuth = (): UseAuthReturn => {
   }, [user?.id, fetchUserProfile])
 
   // Update profile
-  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
-    if (!user?.id) throw new Error("Usuário não autenticado")
+  const updateProfile = useCallback(
+    async (updates: Partial<UserProfile>) => {
+      if (!user?.id) throw new Error("Usuário não autenticado")
 
-    try {
-      const supabase = getSupabaseClient()
-      
-      const { error } = await supabase
-        .from("profiles")
-        .update(updates)
-        .eq("id", user.id)
+      try {
+        const supabase = getSupabaseClient()
 
-      if (error) throw error
+        const { error } = await supabase
+          .from("profiles")
+          .update(updates)
+          .eq("id", user.id)
 
-      // Refresh profile after update
-      await refreshProfile()
-    } catch (error) {
-      console.error("Erro ao atualizar perfil:", error)
-      throw error
-    }
-  }, [user?.id, getSupabaseClient, refreshProfile])
+        if (error) throw error
+
+        // Refresh profile after update
+        await refreshProfile()
+      } catch (error) {
+        console.error("Erro ao atualizar perfil:", error)
+        throw error
+      }
+    },
+    [user?.id, getSupabaseClient, refreshProfile]
+  )
 
   // Authentication operations
   const signUp = useCallback(async (data: SignUpData): Promise<AuthResult> => {
     try {
-      console.log("🔄 Iniciando signUp:", { email: data.email, firstName: data.firstName, lastName: data.lastName, userType: data.userType })
+      console.log("🔄 Iniciando signUp:", {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        userType: data.userType
+      })
 
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           email: data.email.toLowerCase().trim(),
           password: data.password,
           firstName: data.firstName,
           lastName: data.lastName,
-          userType: data.userType,
-        }),
+          userType: data.userType
+        })
       })
 
       const result = await response.json()
@@ -231,28 +243,31 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [])
 
-  const signIn = useCallback(async (email: string, password: string): Promise<AuthResult> => {
-    try {
-      console.log("🔄 Iniciando signIn:", { email })
+  const signIn = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      try {
+        console.log("🔄 Iniciando signIn:", { email })
 
-      const supabase = getSupabaseClient()
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.toLowerCase().trim(),
-        password,
-      })
+        const supabase = getSupabaseClient()
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.toLowerCase().trim(),
+          password
+        })
 
-      if (error) {
-        console.error("❌ Erro no signIn:", error)
-        throw error
+        if (error) {
+          console.error("❌ Erro no signIn:", error)
+          throw error
+        }
+
+        console.log("✅ SignIn bem-sucedido:", data.user?.id)
+        return { error: null, data }
+      } catch (error) {
+        console.error("❌ Erro inesperado no signIn:", error)
+        return { error: error as Error }
       }
-
-      console.log("✅ SignIn bem-sucedido:", data.user?.id)
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no signIn:", error)
-      return { error: error as Error }
-    }
-  }, [getSupabaseClient])
+    },
+    [getSupabaseClient]
+  )
 
   const signInWithGoogle = useCallback(async (): Promise<AuthResult> => {
     try {
@@ -265,9 +280,9 @@ export const useAuth = (): UseAuthReturn => {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: "offline",
-            prompt: "consent",
-          },
-        },
+            prompt: "consent"
+          }
+        }
       })
 
       if (error) {
@@ -293,9 +308,9 @@ export const useAuth = (): UseAuthReturn => {
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
-            prompt: "consent",
-          },
-        },
+            prompt: "consent"
+          }
+        }
       })
 
       if (error) {
@@ -307,34 +322,6 @@ export const useAuth = (): UseAuthReturn => {
       return { error: null, data }
     } catch (error) {
       console.error("❌ Erro inesperado no LinkedIn OAuth:", error)
-      return { error: error as Error }
-    }
-  }, [getSupabaseClient])
-
-  const signInWithGitHub = useCallback(async (): Promise<AuthResult> => {
-    try {
-      console.log("🔄 Iniciando GitHub OAuth")
-
-      const supabase = getSupabaseClient()
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            prompt: "consent",
-          },
-        },
-      })
-
-      if (error) {
-        console.error("❌ Erro no GitHub OAuth:", error)
-        throw error
-      }
-
-      console.log("✅ GitHub OAuth iniciado")
-      return { error: null, data }
-    } catch (error) {
-      console.error("❌ Erro inesperado no GitHub OAuth:", error)
       return { error: error as Error }
     }
   }, [getSupabaseClient])
@@ -364,50 +351,68 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [getSupabaseClient])
 
-  const resetPassword = useCallback(async (email: string): Promise<AuthResult> => {
-    try {
-      console.log("🔄 Iniciando resetPassword:", { email });
+  const resetPassword = useCallback(
+    async (email: string): Promise<AuthResult> => {
+      try {
+        console.log("🔄 Iniciando resetPassword:", { email })
 
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
-      });
+        const supabase = getSupabaseClient()
+        const { data, error } = await supabase.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: `${window.location.origin}/update-password`
+          }
+        )
 
-      if (error) {
-        console.error("❌ Erro no resetPassword:", error);
-        throw error;
+        if (error) {
+          console.error("❌ Erro no resetPassword:", error)
+          throw error
+        }
+
+        console.log("✅ Email de reset enviado com sucesso")
+        return { error: null, data }
+      } catch (error) {
+        console.error("❌ Erro inesperado no resetPassword:", error)
+        return { error: error as Error }
       }
-
-      console.log("✅ Email de reset enviado com sucesso");
-      return { error: null, data };
-    } catch (error) {
-      console.error("❌ Erro inesperado no resetPassword:", error);
-      return { error: error as Error };
-    }
-  }, [getSupabaseClient]);
+    },
+    [getSupabaseClient]
+  )
 
   // Helper methods
   const needsRoleSelection = useCallback((): boolean => {
     if (!user || !profile) return false
-    return !profile.role || profile.role === 'pending'
+    return !profile.role || profile.role === "pending"
   }, [user, profile])
 
   const needsVerification = useCallback((): boolean => {
     if (!user || !profile) return false
-    return profile.role === 'mentor' && profile.verification_status === 'pending_validation'
+    return (
+      profile.role === "mentor" &&
+      profile.verification_status === "pending_validation"
+    )
   }, [user, profile])
 
-  const hasRole = useCallback((role: string): boolean => {
-    return claims?.role === role || profile?.role === role
-  }, [claims?.role, profile?.role])
+  const hasRole = useCallback(
+    (role: string): boolean => {
+      return claims?.role === role || profile?.role === role
+    },
+    [claims?.role, profile?.role]
+  )
 
-  const hasPermission = useCallback((permission: string): boolean => {
-    return claims?.permissions?.includes(permission) || false
-  }, [claims?.permissions])
+  const hasPermission = useCallback(
+    (permission: string): boolean => {
+      return claims?.permissions?.includes(permission) || false
+    },
+    [claims?.permissions]
+  )
 
-  const hasAnyPermission = useCallback((permissions: string[]): boolean => {
-    return permissions.some(p => hasPermission(p))
-  }, [hasPermission])
+  const hasAnyPermission = useCallback(
+    (permissions: string[]): boolean => {
+      return permissions.some((p) => hasPermission(p))
+    },
+    [hasPermission]
+  )
 
   // Initialize authentication
   useEffect(() => {
@@ -427,7 +432,10 @@ export const useAuth = (): UseAuthReturn => {
         setSupabaseReady(true)
 
         // Get current session
-        const { data: { session }, error } = await supabase.auth.getSession()
+        const {
+          data: { session },
+          error
+        } = await supabase.auth.getSession()
 
         if (error) {
           console.error("Erro ao obter sessão:", error)
@@ -437,7 +445,7 @@ export const useAuth = (): UseAuthReturn => {
           if (session?.user) {
             setUser(session.user)
             setIsAuthenticated(true)
-            
+
             // Extract JWT claims
             const jwtClaims = extractJWTClaims(session)
             setClaims(jwtClaims)
@@ -456,7 +464,9 @@ export const useAuth = (): UseAuthReturn => {
         }
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const {
+          data: { subscription }
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log("Auth state changed:", event, session?.user?.id)
 
           if (mounted) {
@@ -503,12 +513,12 @@ export const useAuth = (): UseAuthReturn => {
   }, [getSupabaseClient, extractJWTClaims, fetchUserProfile])
 
   // Convenience getters
-  const isAdmin = hasRole('admin')
-  const isMentor = hasRole('mentor')
-  const isMentee = hasRole('mentee')
-  const isVolunteer = hasRole('volunteer')
-  const isModerator = hasRole('moderator')
-  const isPending = hasRole('pending')
+  const isAdmin = hasRole("admin")
+  const isMentor = hasRole("mentor")
+  const isMentee = hasRole("mentee")
+  const isVolunteer = hasRole("volunteer")
+  const isModerator = hasRole("moderator")
+  const isPending = hasRole("pending")
 
   return {
     // State
@@ -525,7 +535,6 @@ export const useAuth = (): UseAuthReturn => {
     signIn,
     signInWithGoogle,
     signInWithLinkedIn,
-    signInWithGitHub,
     signOut,
     resetPassword,
     refreshProfile,
@@ -544,6 +553,6 @@ export const useAuth = (): UseAuthReturn => {
     isMentee,
     isVolunteer,
     isModerator,
-    isPending,
+    isPending
   }
 }
