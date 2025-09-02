@@ -22,7 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 
 export function FeedbackBanner() {
   const { t } = useTranslation()

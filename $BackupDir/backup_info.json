@@ -1,0 +1,17 @@
+{
+    "timestamp": "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')",
+    "environment": "production",
+    "project_ref": "evxrzmzkghshjmmyegxu",
+    "supabase_url": "https://evxrzmzkghshjmmyegxu.supabase.co",
+    "backup_type": "full",
+    "include_auth": true,
+    "cli_version": "2.34.3",
+    "files": [
+        "schema.sql - Complete database schema",
+        "data.sql - All table data",
+        "auth_schema.sql - Auth schema and users",
+        "backup_info.json - This metadata file",
+        "restore_instructions.md - Restoration guide"
+    ],
+    "notes": "Backup created before auth refactor process. Includes all custom tables and auth.users data."
+}

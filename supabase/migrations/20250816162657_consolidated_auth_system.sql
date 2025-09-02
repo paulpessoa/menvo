@@ -33,7 +33,7 @@ DROP TYPE IF EXISTS public.verification_status CASCADE;
 -- 2. CREATE ENUM TYPES
 -- =================================================================
 
-user_role AS ENUM (
+CREATE TYPE public.user_role AS ENUM (
     'mentee',       -- User seeking mentorship
     'mentor',       -- User providing mentorship
     'admin',        -- System administrator
@@ -41,14 +41,14 @@ user_role AS ENUM (
     'moderator'     -- Content moderator
 );
 
-ENUM status (
+CREATE TYPE public.user_status AS ENUM (
     'pending',      -- Account pending activation
     'active',       -- Active account
     'suspended',    -- Temporarily suspended
     'rejected'      -- Account rejected/banned
 );
 
-verification AS ENUM (
+CREATE TYPE public.verification_status AS ENUM (
     'pending',              -- Initial state
     'pending_validation',   -- Mentor awaiting validation
     'active',              -- Verified and active
@@ -106,14 +106,14 @@ CREATE TABLE public.profiles (
     location TEXT,
     
     -- Role and status
-    role public.user_role DEFAULT '' NOT NULL,
-    status public.user_status DEFAULT 'pending' NOT NULL, ativo apos confirmar e-mail, talvez nao precise disso.
+    role public.user_role DEFAULT 'mentee' NOT NULL,
+    status public.user_status DEFAULT 'pending' NOT NULL, -- Active after email confirmation
     verification_status public.verification_status DEFAULT 'pending' NOT NULL,
     
     -- Professional information (mainly for mentors)
     expertise_areas TEXT[],
-    school
-    current_work
+    school TEXT,
+    current_work TEXT,
     
     linkedin_url TEXT,
     portifolio_url TEXT,

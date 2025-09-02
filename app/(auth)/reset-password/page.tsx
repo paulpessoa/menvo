@@ -9,11 +9,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, AlertTriangle, CheckCircle } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
+import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
 
 function ResetPasswordForm() {
-  const { updatePassword } = useAuth()
+  const auth = useAuth()
+
+  const updatePassword = async (password: string) => {
+    const supabase = createClient()
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+  }
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)

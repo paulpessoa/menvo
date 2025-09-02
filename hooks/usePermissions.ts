@@ -1,6 +1,6 @@
 "use client"
 
-import { useAuth } from "@/app/context/auth-context"
+import { useAuth } from "@/lib/auth"
 
 export type UserRoleType = "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
 
@@ -16,11 +16,22 @@ export type Permission =
   | "moderate_content"
 
 export function usePermissions() {
-  const { role, permissions, loading } = useAuth()
+  const { role, loading } = useAuth()
 
   const hasPermission = (permission: Permission): boolean => {
     if (loading) return false
-    return permissions?.includes(permission) || false
+    
+    // Simple role-based permissions for MVP
+    switch (role) {
+      case 'admin':
+        return true // Admin has all permissions
+      case 'mentor':
+        return ['view_mentors', 'provide_mentorship', 'manage_availability'].includes(permission)
+      case 'mentee':
+        return ['view_mentors', 'book_sessions'].includes(permission)
+      default:
+        return false
+    }
   }
 
   const hasRole = (roleToCheck: UserRoleType): boolean => {
@@ -30,18 +41,33 @@ export function usePermissions() {
 
   const hasAnyPermission = (perms: Permission[]): boolean => {
     if (loading) return false
-    return perms.some((p) => permissions?.includes(p))
+    return perms.some((p) => hasPermission(p))
   }
+
+  // Helper functions for common permission checks
+  const isAdmin = hasRole("admin")
+  const isMentor = hasRole("mentor")
+  const isMentee = hasRole("mentee")
+  
+  const canAdminSystem = isAdmin
+  const canAdminUsers = isAdmin
+  const canAdminVerifications = isAdmin
+  const canValidateActivities = isAdmin
+  const canViewReports = isAdmin
 
   return {
     role,
-    permissions,
     loading,
     hasPermission,
     hasRole,
     hasAnyPermission,
-    isAdmin: hasRole("admin"),
-    isMentor: hasRole("mentor"),
-    isMentee: hasRole("mentee"),
+    isAdmin,
+    isMentor,
+    isMentee,
+    canAdminSystem,
+    canAdminUsers,
+    canAdminVerifications,
+    canValidateActivities,
+    canViewReports,
   }
 }

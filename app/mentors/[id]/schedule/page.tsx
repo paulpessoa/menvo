@@ -32,7 +32,7 @@ import {
   Info
 } from "lucide-react"
 import { useMentor } from "@/hooks/useMentors"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -64,13 +64,13 @@ export default function SchedulePage({ params }: SchedulePageProps) {
   const { user } = useAuth()
   const router = useRouter()
   const { data: mentor, isLoading, error } = useMentor(params.id)
-  
+
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   // Form fields
   const [topic, setTopic] = useState("")
   const [description, setDescription] = useState("")
@@ -82,7 +82,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
     const baseSlots = [
       "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
     ]
-    
+
     // Mock different availability based on day of week
     const availability = {
       1: ["09:00", "10:00", "11:00", "14:00"], // Monday
@@ -95,7 +95,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
     }
 
     const availableTimes = availability[dayOfWeek as keyof typeof availability] || []
-    
+
     return baseSlots.map(time => ({
       time,
       available: availableTimes.includes(time),
@@ -120,10 +120,10 @@ export default function SchedulePage({ params }: SchedulePageProps) {
     if (!selectedDate || !selectedTimeSlot || !user) return
 
     setIsSubmitting(true)
-    
+
     try {
       const endTime = `${parseInt(selectedTimeSlot.split(':')[0]) + 1}:${selectedTimeSlot.split(':')[1]}`
-      
+
       const sessionRequest: SessionRequest = {
         mentorId: params.id,
         date: selectedDate,
@@ -136,17 +136,17 @@ export default function SchedulePage({ params }: SchedulePageProps) {
 
       // TODO: Replace with actual API call
       console.log('Session request:', sessionRequest)
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))
-      
+
       toast.success("Solicitação enviada com sucesso!", {
         description: "O mentor receberá sua solicitação e responderá em breve."
       })
-      
+
       // Redirect to sessions page or profile
       router.push(`/mentors/${params.id}`)
-      
+
     } catch (error) {
       toast.error("Erro ao enviar solicitação", {
         description: "Tente novamente mais tarde."
@@ -270,8 +270,8 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                     mode="single"
                     selected={selectedDate}
                     onSelect={handleDateSelect}
-                    disabled={(date) => 
-                      isBefore(date, new Date()) || 
+                    disabled={(date) =>
+                      isBefore(date, new Date()) ||
                       isAfter(date, addDays(new Date(), 30)) ||
                       date.getDay() === 0 // Disable Sundays
                     }
@@ -408,26 +408,26 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                         {mentor.first_name} {mentor.last_name}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Data:</span>
                       <span className="font-medium">
                         {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "-"}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Horário:</span>
                       <span className="font-medium">
                         {selectedTimeSlot ? `${selectedTimeSlot} - ${parseInt(selectedTimeSlot.split(':')[0]) + 1}:${selectedTimeSlot.split(':')[1]}` : "-"}
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Duração:</span>
                       <span className="font-medium">45 minutos</span>
                     </div>
-                    
+
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Preço:</span>
                       <span className="font-medium text-green-600">Gratuito</span>
@@ -436,14 +436,14 @@ export default function SchedulePage({ params }: SchedulePageProps) {
 
                   <Separator />
 
-                  <Button 
+                  <Button
                     onClick={() => setShowConfirmDialog(true)}
                     disabled={!canSchedule()}
                     className="w-full"
                   >
                     Solicitar Agendamento
                   </Button>
-                  
+
                   {!user && (
                     <p className="text-xs text-muted-foreground text-center">
                       Faça login para agendar
@@ -469,7 +469,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-medium text-blue-600">
                       2
@@ -481,7 +481,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-medium text-blue-600">
                       3
@@ -509,7 +509,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
               Revise os detalhes da sua sessão antes de enviar a solicitação
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="bg-muted p-4 rounded-lg space-y-2">
               <p><strong>Mentor:</strong> {mentor.first_name} {mentor.last_name}</p>
@@ -517,7 +517,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
               <p><strong>Horário:</strong> {selectedTimeSlot} - {selectedTimeSlot && `${parseInt(selectedTimeSlot.split(':')[0]) + 1}:${selectedTimeSlot.split(':')[1]}`}</p>
               <p><strong>Tópico:</strong> {topic}</p>
             </div>
-            
+
             <div className="text-sm text-muted-foreground">
               <p>
                 <CheckCircle className="h-4 w-4 inline mr-2 text-green-600" />
@@ -535,14 +535,14 @@ export default function SchedulePage({ params }: SchedulePageProps) {
           </div>
 
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setShowConfirmDialog(false)}
               disabled={isSubmitting}
             >
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={handleSubmitRequest}
               disabled={isSubmitting}
             >
@@ -553,7 +553,7 @@ export default function SchedulePage({ params }: SchedulePageProps) {
       </Dialog>
 
       {/* Login Required Modal */}
-      <LoginRequiredModal 
+      <LoginRequiredModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         mentorName={`${mentor.first_name} ${mentor.last_name}`}

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from './useAuth'
+import { useAuth } from '@/lib/auth'
 import { useToast } from './useToast'
 import { UserType } from '@/hooks/useSignupForm'
 

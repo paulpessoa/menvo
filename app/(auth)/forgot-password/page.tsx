@@ -9,13 +9,22 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Mail, Loader2, AlertTriangle } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
+import { createClient } from "@/utils/supabase/client"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 function ForgotPasswordForm() {
   const { t } = useTranslation()
-  const { resetPassword } = useAuth()
+  const auth = useAuth()
+
+  const resetPassword = async (email: string) => {
+    const supabase = createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`
+    })
+    if (error) throw error
+  }
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback } from "react"
-import { useAuth } from "@/app/context/auth-context"
+import { useAuth } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 

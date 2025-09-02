@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Users, UserCheck, Clock, Shield, TrendingUp, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { RequireAdmin } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <ProtectedRoute requiredPermissions={["admin_system"]}>
+    <RequireAdmin>
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           {/* Header */}
@@ -219,6 +219,6 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
+    </RequireAdmin>
   )
 }

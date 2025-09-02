@@ -31,7 +31,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { usePermissions } from "@/hooks/usePermissions"
 import { useTranslation } from "react-i18next"
 
@@ -39,7 +39,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation()
 
-  const { isAuthenticated, user, profile, signOut } = useAuth()
+  const { isAuthenticated, user, profile, role, signOut } = useAuth()
   const { canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } =
     usePermissions()
 
@@ -56,25 +56,25 @@ export default function Header() {
 
   const userNavigation = isAuthenticated
     ? [
-        { name: "Dashboard", href: "/dashboard", icon: User },
-        { name: "Perfil", href: "/profile", icon: Settings },
-        { name: "Mensagens", href: "/messages", icon: MessageSquare },
-        { name: "Calendário", href: "/calendar", icon: Calendar },
-      ]
+      { name: "Dashboard", href: "/dashboard", icon: User },
+      { name: "Perfil", href: "/profile", icon: Settings },
+      { name: "Mensagens", href: "/messages", icon: MessageSquare },
+      { name: "Calendário", href: "/calendar", icon: Calendar },
+    ]
     : []
 
   const adminNavigation =
     isAuthenticated && (canAdminSystem || canAdminUsers || canAdminVerifications)
       ? [
-          ...(canAdminSystem ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
-          ...(canAdminUsers ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
-          ...(canAdminVerifications ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }] : []),
-          ...(canValidateActivities
-            ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
-            : []),
-          ...(canViewReports ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
-          ...(canAdminSystem ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }] : []),
-        ]
+        ...(canAdminSystem ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
+        ...(canAdminUsers ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
+        ...(canAdminVerifications ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }] : []),
+        ...(canValidateActivities
+          ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
+          : []),
+        ...(canViewReports ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
+        ...(canAdminSystem ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }] : []),
+      ]
       : []
 
   const handleSignOut = async () => {
@@ -97,9 +97,8 @@ export default function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary-600 ${
-                pathname === item.href ? "text-primary-600" : "text-foreground/60"
-              }`}
+              className={`text-sm font-medium transition-colors hover:text-primary-600 ${pathname === item.href ? "text-primary-600" : "text-foreground/60"
+                }`}
             >
               {item.name}
             </Link>
@@ -144,7 +143,7 @@ export default function Header() {
                   <div className="flex flex-col space-y-1 leading-none">
                     <p className="font-medium">{profile?.full_name || user?.user_metadata?.full_name || "Usuário"}</p>
                     <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email}</p>
-                    {profile?.role && <p className="text-xs text-muted-foreground capitalize">{profile.role}</p>}
+                    {role && <p className="text-xs text-muted-foreground capitalize">{role}</p>}
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -185,10 +184,10 @@ export default function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/login">Entrar</Link>
+                <Link href="/auth/login">Entrar</Link>
               </Button>
               <Button asChild>
-                <Link href="/signup">Cadastrar</Link>
+                <Link href="/auth/register">Cadastrar</Link>
               </Button>
             </div>
           )}
@@ -259,12 +258,12 @@ export default function Header() {
                 ) : (
                   <div className="border-t pt-4 space-y-2">
                     <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                         {t("common.login")}
                       </Link>
                     </Button>
                     <Button asChild className="w-full">
-                      <Link href="/signup" onClick={() => setIsOpen(false)}>
+                      <Link href="/auth/register" onClick={() => setIsOpen(false)}>
                         {t("common.register")}
                       </Link>
                     </Button>
