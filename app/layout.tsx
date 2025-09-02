@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "mentoria gratuita",
     "mentoria online",
     "mentoria em tecnologia",
-    "mentoria de carreira",
+    "mentoria de carreira"
   ],
   openGraph: {
     type: "website",
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
         url: "https://menvo.com.br/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "MENVO -  Mentores Voluntários",
-      },
-    ],
+        alt: "MENVO -  Mentores Voluntários"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     description:
       "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
     creator: "@paulpessoa",
-    images: ["https://menvo.com.br/twitter-image.jpg"],
+    images: ["https://menvo.com.br/twitter-image.jpg"]
   },
   robots: {
     index: true,
@@ -70,14 +70,14 @@ export const metadata: Metadata = {
       follow: true,
       "max-video-preview": -1,
       "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+      "max-snippet": -1
+    }
   },
   verification: {
-    google: "QOvwcJxdEYfhUUNK-q-E5kcE-JMgWcUTTOUaZIf2M8k",
+    google: "QOvwcJxdEYfhUUNK-q-E5kcE-JMgWcUTTOUaZIf2M8k"
   },
   alternates: {
-    canonical: "https://menvo.com.br",
+    canonical: "https://menvo.com.br"
   },
   category: "education",
   classification: "Platform",
@@ -91,13 +91,13 @@ export const metadata: Metadata = {
     "application-name": "MENVO",
     "format-detection": "telephone=no",
     "mobile-web-app-capable": "yes",
-    "theme-color": "#ffffff",
+    "theme-color": "#ffffff"
   },
-  generator: "v0.dev",
+  generator: "v0.dev"
 }
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode
 }>) {
@@ -105,9 +105,23 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
@@ -119,10 +133,10 @@ export default function RootLayout({
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
               t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
               y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "rz28fusa38");`,
+            })(window, document, "clarity", "script", "rz28fusa38");`
           }}
-          />
-          <Script
+        />
+        <Script
           id="hotjar-script"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -135,7 +149,7 @@ export default function RootLayout({
                   r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
                   a.appendChild(r);
               })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-            `,
+            `
           }}
         />
       </head>
@@ -164,7 +178,7 @@ export function generateViewport() {
     userScalable: false,
     themeColor: [
       { media: "(prefers-color-scheme: light)", color: "white" },
-      { media: "(prefers-color-scheme: dark)", color: "black" },
-    ],
+      { media: "(prefers-color-scheme: dark)", color: "black" }
+    ]
   }
 }
