@@ -200,14 +200,20 @@
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
 - [ ] 7. Criar listagem pública de mentores
-- [ ] 7.1 Implementar página de mentores públicos
+- [x] 7.1 Implementar página de mentores públicos
+
+
+
+
   - Criar página que lista apenas mentores verificados
   - Implementar cards de mentor com informações básicas
   - Adicionar filtros por especialidade ou disponibilidade
   - Implementar busca por nome ou especialidade
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-- [ ] 7.2 Criar página individual do mentor
+- [x] 7.2 Criar página individual do mentor
+
+
   - Implementar página detalhada de cada mentor usando slug
   - Mostrar perfil completo, especialidades e disponibilidade
   - Adicionar botão para solicitar agendamento
@@ -215,14 +221,19 @@
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
 - [ ] 8. Implementar sistema básico de disponibilidade
-- [ ] 8.1 Criar formulário de disponibilidade para mentores
+- [x] 8.1 Criar formulário de disponibilidade para mentores
+
+
   - Implementar interface para definir dias da semana disponíveis
   - Adicionar seleção de horários por dia
   - Implementar validação de horários (início < fim)
   - Adicionar preview da disponibilidade configurada
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 8.2 Implementar visualização de disponibilidade
+- [x] 8.2 Implementar visualização de disponibilidade
+
+
+
   - Criar componente para mostrar disponibilidade na página do mentor
   - Implementar formatação amigável de dias e horários
   - Adicionar indicadores visuais para horários ocupados
