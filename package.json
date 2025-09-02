@@ -18,6 +18,7 @@
     }
   },
   "dependencies": {
+    "@google-cloud/local-auth": "^3.0.1",
     "@googlemaps/js-api-loader": "latest",
     "@hookform/resolvers": "latest",
     "@next/third-parties": "latest",
@@ -62,6 +63,7 @@
     "cmdk": "latest",
     "date-fns": "latest",
     "embla-carousel-react": "latest",
+    "googleapis": "^159.0.0",
     "googlemaps": "latest",
     "i18next": "latest",
     "input-otp": "latest",
