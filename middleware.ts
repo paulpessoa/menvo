@@ -67,10 +67,8 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Handle logout cleanup
-  if (pathname === '/api/auth/logout') {
-    return response
-  }
+  // Logout is now handled client-side with supabase.auth.signOut()
+  // No special middleware handling needed
 
   const isProtectedRoute = protectedRoutes.some((route) => {
     if (route.includes("[id]")) {

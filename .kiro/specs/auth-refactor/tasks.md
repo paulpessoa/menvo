@@ -264,15 +264,22 @@
   - Implementar criação automática de evento no Google Calendar com Meet link
   - _Requirements: 11.4, 11.5_
 
-- [ ] 10. Limpar e otimizar endpoints da API
-- [ ] 10.1 Auditar endpoints existentes do Next.js
+- [x] 10. Limpar e otimizar endpoints da API
+
+
+
+- [x] 10.1 Auditar endpoints existentes do Next.js
+
+
   - Identificar endpoints que usam ROLE_KEY e devem ser mantidos
   - Listar endpoints duplicados ou desnecessários
   - Identificar endpoints que podem migrar para client-side do Supabase
   - Documentar decisões de manter ou remover cada endpoint
   - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ] 10.2 Remover endpoints desnecessários
+- [x] 10.2 Remover endpoints desnecessários
+
+
   - Remover endpoints duplicados de autenticação
   - Migrar endpoints simples para client-side do Supabase quando possível
   - Manter apenas endpoints que realmente precisam ser server-side
