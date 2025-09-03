@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
-        profile_photo_url: publicUrl,
+        avatar_url: publicUrl,
         updated_at: new Date().toISOString(),
       })
       .eq("id", user.id)
