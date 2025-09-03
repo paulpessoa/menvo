@@ -3,7 +3,8 @@
  * Run with: node scripts/test-google-calendar.js
  */
 
-const { createCalendarEvent } = require('../lib/google-calendar');
+// Test script for Google Calendar integration
+// This script checks environment variables and provides setup instructions
 
 async function testCalendarIntegration() {
   console.log('🧪 Testing Google Calendar integration...');
@@ -30,50 +31,28 @@ async function testCalendarIntegration() {
   
   console.log('✅ All required environment variables are set');
   
+  console.log('📝 To test the Google Calendar integration:');
+  console.log('   1. Make sure you have the required environment variables set');
+  console.log('   2. Start your Next.js development server: npm run dev');
+  console.log('   3. Visit: http://localhost:3000/test/calendar');
+  console.log('   4. Follow the instructions on that page');
+  
   try {
-    // Create a test event
-    const testEvent = {
-      summary: 'Test Mentorship Session - API Test',
-      description: 'This is a test event created by the Google Calendar integration test script.',
-      start: {
-        dateTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
-        timeZone: 'America/Sao_Paulo',
-      },
-      end: {
-        dateTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(), // 3 hours from now
-        timeZone: 'America/Sao_Paulo',
-      },
-      attendees: [
-        {
-          email: 'test-mentor@example.com',
-          displayName: 'Test Mentor',
-        },
-        {
-          email: 'test-mentee@example.com',
-          displayName: 'Test Mentee',
-        },
-      ],
-    };
+    // Test by making HTTP request to the test endpoint
+    console.log('\n🔄 Testing API endpoint...');
     
-    console.log('📅 Creating test calendar event...');
-    const result = await createCalendarEvent(testEvent);
+    const response = await fetch('http://localhost:3000/api/calendar/test', {
+      method: 'POST',
+    });
     
-    console.log('✅ Test event created successfully!');
-    console.log('📋 Event details:');
-    console.log(`   - Event ID: ${result.id}`);
-    console.log(`   - HTML Link: ${result.htmlLink}`);
-    console.log(`   - Meet Link: ${result.hangoutLink || 'Not available'}`);
-    
-    if (result.conferenceData?.entryPoints) {
-      const meetEntry = result.conferenceData.entryPoints.find(
-        entry => entry.entryPointType === 'video'
-      );
-      if (meetEntry) {
-        console.log(`   - Google Meet: ${meetEntry.uri}`);
-      }
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ API endpoint is working!');
+      console.log('📋 Response:', result);
+    } else {
+      const error = await response.json();
+      console.log('❌ API endpoint error:', error);
     }
-    
-    console.log('\n🎉 Google Calendar integration is working correctly!');
     
   } catch (error) {
     console.error('❌ Error testing Google Calendar integration:');

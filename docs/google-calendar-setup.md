@@ -1,149 +1,214 @@
-# Google Calendar Integration Setup
+# Configuração do Google Calendar API
 
-This document explains how to set up Google Calendar integration for the mentorship platform.
+Este guia explica como configurar a integração com Google Calendar para criar eventos automaticamente quando mentorias são confirmadas.
 
-## Prerequisites
+## Pré-requisitos
 
-1. A Google Cloud Project with Calendar API enabled
-2. OAuth 2.0 credentials configured
-3. Environment variables properly set
+- Conta Google
+- Projeto no Google Cloud Console
+- Acesso ao painel de administração da aplicação
 
-## Step 1: Google Cloud Console Setup
+## Passo 1: Configurar Google Cloud Console
 
-### 1.1 Create or Select a Project
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
+### 1.1 Criar/Selecionar Projeto
+1. Acesse [Google Cloud Console](https://console.cloud.google.com/)
+2. Crie um novo projeto ou selecione um existente
+3. Anote o ID do projeto
 
-### 1.2 Enable Google Calendar API
-1. Navigate to "APIs & Services" > "Library"
-2. Search for "Google Calendar API"
-3. Click on it and press "Enable"
+### 1.2 Habilitar Calendar API
+1. No menu lateral, vá em **APIs & Services** > **Library**
+2. Procure por "Google Calendar API"
+3. Clique em **Enable**
 
-### 1.3 Create OAuth 2.0 Credentials
-1. Go to "APIs & Services" > "Credentials"
-2. Click "Create Credentials" > "OAuth 2.0 Client IDs"
-3. Choose "Web application" as the application type
-4. Add authorized redirect URIs:
-   - For development: `http://localhost:3000/api/auth/google-calendar/callback`
-   - For production: `https://yourdomain.com/api/auth/google-calendar/callback`
-5. Save the Client ID and Client Secret
+### 1.3 Criar Credenciais OAuth 2.0
+1. Vá em **APIs & Services** > **Credentials**
+2. Clique em **+ CREATE CREDENTIALS** > **OAuth client ID**
+3. Se solicitado, configure a tela de consentimento OAuth:
+   - Escolha **External** (para uso público)
+   - Preencha as informações obrigatórias
+   - Adicione os escopos: `calendar` e `calendar.events`
+4. Selecione **Web application**
+5. Configure:
+   - **Name**: MENVO Calendar Integration
+   - **Authorized redirect URIs**: 
+     - `https://seu-dominio.vercel.app/api/auth/google-calendar/callback`
+     - `http://localhost:3000/api/auth/google-calendar/callback` (para desenvolvimento)
 
-### 1.4 Configure OAuth Consent Screen
-1. Go to "APIs & Services" > "OAuth consent screen"
-2. Fill in the required information
-3. Add the following scopes:
-   - `https://www.googleapis.com/auth/calendar`
-   - `https://www.googleapis.com/auth/calendar.events`
-4. Add test users if your app is in testing mode
+### 1.4 Obter Credenciais
+1. Após criar, copie:
+   - **Client ID**
+   - **Client Secret**
 
-## Step 2: Environment Variables
+## Passo 2: Configurar Variáveis de Ambiente
 
-Add the following variables to your `.env.local` file:
+### 2.1 Adicionar no Vercel (Produção)
+```bash
+GOOGLE_CALENDAR_CLIENT_ID=seu_client_id_aqui
+GOOGLE_CALENDAR_CLIENT_SECRET=seu_client_secret_aqui
+GOOGLE_CALENDAR_REDIRECT_URI=https://seu-dominio.vercel.app/api/auth/google-calendar/callback
+```
 
-```env
-# Google Calendar API
-GOOGLE_CALENDAR_CLIENT_ID=your_client_id_here
-GOOGLE_CALENDAR_CLIENT_SECRET=your_client_secret_here
-GOOGLE_CALENDAR_REFRESH_TOKEN=your_refresh_token_here
+### 2.2 Adicionar no .env.local (Desenvolvimento)
+```bash
+GOOGLE_CALENDAR_CLIENT_ID=seu_client_id_aqui
+GOOGLE_CALENDAR_CLIENT_SECRET=seu_client_secret_aqui
 GOOGLE_CALENDAR_REDIRECT_URI=http://localhost:3000/api/auth/google-calendar/callback
 ```
 
-## Step 3: Get Refresh Token
+## Passo 3: Obter Refresh Token
 
-### 3.1 Start the Development Server
+### 3.1 Gerar URL de Autorização
 ```bash
-npm run dev
+GET /api/auth/google-calendar?action=auth
 ```
 
-### 3.2 Get Authorization URL
-Make a GET request to `/api/auth/google-calendar/authorize`:
+Ou acesse: `https://seu-dominio.vercel.app/api/auth/google-calendar?action=auth`
 
+### 3.2 Autorizar Aplicação
+1. Acesse a URL retornada
+2. Faça login com a conta Google que será usada para criar eventos
+3. Autorize os escopos solicitados
+4. Copie o código de autorização da URL de callback
+
+### 3.3 Trocar Código por Tokens
 ```bash
-curl http://localhost:3000/api/auth/google-calendar/authorize
+POST /api/auth/google-calendar
+Content-Type: application/json
+
+{
+  "code": "codigo_de_autorizacao_aqui"
+}
 ```
 
-This will return an authorization URL.
-
-### 3.3 Complete OAuth Flow
-1. Visit the authorization URL in your browser
-2. Sign in with your Google account
-3. Grant the requested permissions
-4. You'll be redirected to the callback URL
-5. Check the server logs for the refresh token
-
-### 3.4 Update Environment Variables
-Copy the refresh token from the logs and add it to your `.env.local` file.
-
-## Step 4: Test the Integration
-
-Run the test script to verify everything is working:
+### 3.4 Adicionar Refresh Token
+Copie o `refresh_token` da resposta e adicione às variáveis de ambiente:
 
 ```bash
-node scripts/test-google-calendar.js
+GOOGLE_CALENDAR_REFRESH_TOKEN=seu_refresh_token_aqui
 ```
 
-If successful, you should see:
-- ✅ All required environment variables are set
-- 📅 Creating test calendar event...
-- ✅ Test event created successfully!
-- Event details with ID, HTML link, and Meet link
+## Passo 4: Testar Configuração
 
-## Step 5: Production Setup
+### 4.1 Verificar Configuração
+```bash
+GET /api/calendar/test-config
+```
 
-For production deployment:
+### 4.2 Testar Criação de Evento
+```bash
+POST /api/calendar/test
+```
 
-1. Update the redirect URI in Google Cloud Console to your production domain
-2. Set the environment variables in your hosting platform (Vercel, etc.)
-3. Ensure your OAuth consent screen is published (not in testing mode)
+## Fluxo de Funcionamento
+
+1. **Mentee solicita mentoria** → Agendamento criado com status "pending"
+2. **Mentor confirma mentoria** → Chama `/api/appointments/confirm`
+3. **Sistema cria evento no Google Calendar** com:
+   - Título: "Mentoria: [Nome Mentor] & [Nome Mentee]"
+   - Descrição: Detalhes da mentoria e observações
+   - Participantes: Emails do mentor e mentee
+   - Google Meet: Link gerado automaticamente
+   - Lembretes: 1 dia antes (email) e 30 min antes (popup)
+4. **Agendamento atualizado** → Status muda para "confirmed"
+
+## Endpoints Disponíveis
+
+### Confirmar Agendamento
+```bash
+POST /api/appointments/confirm
+{
+  "appointmentId": "uuid"
+}
+```
+
+### Cancelar Agendamento
+```bash
+POST /api/appointments/cancel
+{
+  "appointmentId": "uuid",
+  "reason": "Motivo do cancelamento"
+}
+```
+
+### Configuração OAuth
+```bash
+GET /api/auth/google-calendar?action=auth  # Obter URL de autorização
+POST /api/auth/google-calendar             # Trocar código por tokens
+```
+
+### Testes
+```bash
+GET /api/calendar/test-config              # Verificar configuração
+POST /api/calendar/test                    # Criar evento de teste
+```
+
+## Componentes React
+
+### ConfirmAppointmentButton
+```tsx
+import { ConfirmAppointmentButton } from '@/components/appointments/confirm-appointment-button'
+
+<ConfirmAppointmentButton
+  appointment={appointment}
+  onConfirmed={(updatedAppointment) => {
+    // Atualizar estado local
+  }}
+/>
+```
+
+### CancelAppointmentButton
+```tsx
+import { CancelAppointmentButton } from '@/components/appointments/cancel-appointment-button'
+
+<CancelAppointmentButton
+  appointment={appointment}
+  onCancelled={(updatedAppointment) => {
+    // Atualizar estado local
+  }}
+/>
+```
+
+### AppointmentCard
+```tsx
+import { AppointmentCard } from '@/components/appointments/appointment-card'
+
+<AppointmentCard
+  appointment={appointment}
+  currentUserId={user.id}
+  onAppointmentUpdate={(updatedAppointment) => {
+    // Atualizar lista de agendamentos
+  }}
+/>
+```
 
 ## Troubleshooting
 
-### Common Errors
+### Erro: "Missing environment variables"
+- Verifique se todas as variáveis estão configuradas
+- Reinicie a aplicação após adicionar variáveis
 
-#### `invalid_grant` Error
-This usually means:
-- The refresh token has expired
-- The OAuth consent screen needs re-authorization
-- The client credentials are incorrect
+### Erro: "Failed to connect to Google Calendar API"
+- Verifique se o refresh token é válido
+- Reautorize a aplicação se necessário
 
-**Solution:** Re-run the OAuth flow to get a new refresh token.
+### Erro: "Calendar API not enabled"
+- Habilite a Calendar API no Google Cloud Console
+- Aguarde alguns minutos para propagação
 
-#### `insufficient_permissions` Error
-This means the OAuth scopes are not properly configured.
+### Erro: "Invalid redirect URI"
+- Verifique se a URI de redirecionamento está correta
+- Adicione todas as URIs necessárias (produção e desenvolvimento)
 
-**Solution:** 
-1. Check that the required scopes are added in Google Cloud Console
-2. Re-authorize the application with the correct scopes
+## Segurança
 
-#### `API not enabled` Error
-The Google Calendar API is not enabled for your project.
+- **Nunca** exponha as credenciais no frontend
+- Use apenas endpoints de API para operações do Calendar
+- O refresh token permite acesso contínuo - mantenha seguro
+- Considere rotacionar tokens periodicamente
 
-**Solution:** Enable the Google Calendar API in Google Cloud Console.
+## Limitações
 
-## API Endpoints
-
-### Authorization
-- `GET /api/auth/google-calendar/authorize` - Get authorization URL
-- `GET /api/auth/google-calendar/callback` - OAuth callback handler
-
-### Testing
-- `POST /api/calendar/test` - Create a test calendar event
-- `GET /api/calendar/test` - Get test endpoint information
-
-## Security Notes
-
-1. Never commit your `.env.local` file to version control
-2. Use different OAuth credentials for development and production
-3. Regularly rotate your client secrets
-4. Monitor API usage in Google Cloud Console
-5. Implement proper error handling and logging
-
-## Next Steps
-
-After setting up the Google Calendar integration:
-
-1. Implement the appointment booking flow
-2. Add calendar event management (update, delete)
-3. Set up webhook notifications for calendar changes
-4. Add timezone handling for international users
-5. Implement recurring appointment support
+- A conta Google usada para autorização será a "proprietária" dos eventos
+- Todos os eventos serão criados no calendário principal desta conta
+- Rate limits da Google Calendar API se aplicam
+- Eventos são criados no fuso horário America/Sao_Paulo
