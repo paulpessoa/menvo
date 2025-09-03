@@ -336,7 +336,12 @@
   - Criar testes para funções helper de agendamento
   - _Requirements: 3.5, 6.5_
 
-- [ ] 12.2 Realizar testes de integração
+- [x] 12.2 Realizar testes de integração
+
+
+
+
+
   - Testar fluxo completo de cadastro → confirmação → seleção → dashboard
   - Validar login com diferentes providers (email, Google, LinkedIn)
   - Testar fluxo de verificação de mentor
