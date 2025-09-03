@@ -1,41 +1,80 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createCalendarEvent, CalendarEvent } from '@/lib/google-calendar';
+import { NextResponse } from 'next/server';
+import { createUserGoogleCalendarClient } from '@/lib/google-calendar-db';
+import { supabase } from '@/lib/supabase';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    // Test event data
-    const testEvent: CalendarEvent = {
-      summary: 'Test Mentorship Session',
-      description: 'This is a test mentorship session created via API',
+    // Verificar autenticação
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Obter cliente do Google Calendar do usuário
+    const { calendar } = await createUserGoogleCalendarClient(user.id);
+
+    // Criar evento de teste
+    const testEvent = {
+      summary: 'Teste de Integração - Google Calendar',
+      description: 'Este é um evento de teste criado pela integração do MENVO com Google Calendar.',
       start: {
-        dateTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+        dateTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
         timeZone: 'America/Sao_Paulo',
       },
       end: {
-        dateTime: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000).toISOString(), // Tomorrow + 1 hour
+        dateTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
         timeZone: 'America/Sao_Paulo',
       },
       attendees: [
         {
-          email: 'test@example.com',
-          displayName: 'Test User',
+          email: user.email || 'test@example.com',
+          displayName: user.user_metadata?.full_name || 'Usuário Teste',
         },
       ],
+      conferenceData: {
+        createRequest: {
+          requestId: `meet-${Date.now()}`,
+          conferenceSolutionKey: {
+            type: 'hangoutsMeet',
+          },
+        },
+      },
     };
 
-    const result = await createCalendarEvent(testEvent);
+    const response = await calendar.events.insert({
+      calendarId: 'primary',
+      conferenceDataVersion: 1,
+      requestBody: testEvent,
+    });
+
+    const event = response.data;
 
     return NextResponse.json({
       success: true,
-      event: result,
-      message: 'Test event created successfully',
+      message: 'Evento de teste criado com sucesso!',
+      event: {
+        id: event.id,
+        htmlLink: event.htmlLink,
+        hangoutLink: event.hangoutLink,
+        conferenceData: event.conferenceData,
+      },
     });
   } catch (error) {
     console.error('Error creating test event:', error);
+    
+    let errorMessage = 'Erro desconhecido';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
       },
       { status: 500 }
     );

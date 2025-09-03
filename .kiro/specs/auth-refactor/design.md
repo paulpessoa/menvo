@@ -410,9 +410,10 @@ export default function AuthCallback() {
 ### Configuração Necessária
 
 ```env
-GOOGLE_CALENDAR_CLIENT_ID=
-GOOGLE_CALENDAR_CLIENT_SECRET=
-GOOGLE_CALENDAR_REFRESH_TOKEN=
+# Configure na Vercel:
+# GOOGLE_CALENDAR_CLIENT_ID=your_client_id
+# GOOGLE_CALENDAR_CLIENT_SECRET=your_client_secret
+# GOOGLE_CALENDAR_REDIRECT_URI=https://your-domain.vercel.app/api/auth/google-calendar/callback
 ```
 
 ## Security Considerations

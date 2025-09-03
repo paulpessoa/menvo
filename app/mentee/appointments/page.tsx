@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppointmentsList from '@/components/appointments/AppointmentsList';
-import { Calendar, Clock, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function MenteeAppointmentsPage() {
@@ -18,13 +18,13 @@ export default function MenteeAppointmentsPage() {
                 <div>
                     <h1 className="text-2xl font-bold mb-2">Meus Agendamentos</h1>
                     <p className="text-muted-foreground">
-                        Gerencie suas sessões de mentoria agendadas
+                        Gerencie suas sessões de mentoria
                     </p>
                 </div>
 
                 <Button onClick={() => router.push('/mentors')}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Novo Agendamento
+                    <Search className="h-4 w-4 mr-2" />
+                    Encontrar Mentores
                 </Button>
             </div>
 
@@ -36,7 +36,7 @@ export default function MenteeAppointmentsPage() {
                         Próximos
                     </TabsTrigger>
                     <TabsTrigger value="pending" className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
+                        <AlertCircle className="h-4 w-4" />
                         Pendentes
                     </TabsTrigger>
                     <TabsTrigger value="completed" className="flex items-center gap-2">
@@ -52,9 +52,9 @@ export default function MenteeAppointmentsPage() {
                 <TabsContent value="upcoming">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Próximos Agendamentos</CardTitle>
+                            <CardTitle>Próximas Sessões</CardTitle>
                             <CardDescription>
-                                Suas sessões de mentoria confirmadas
+                                Suas mentorias confirmadas
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -70,9 +70,9 @@ export default function MenteeAppointmentsPage() {
                 <TabsContent value="pending">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Agendamentos Pendentes</CardTitle>
+                            <CardTitle>Aguardando Confirmação</CardTitle>
                             <CardDescription>
-                                Aguardando confirmação do mentor
+                                Agendamentos aguardando confirmação do mentor
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

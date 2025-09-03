@@ -220,8 +220,11 @@
   - Implementar breadcrumbs e navegação
   - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
 
-- [ ] 8. Implementar sistema básico de disponibilidade
+- [x] 8. Implementar sistema básico de disponibilidade
+
+
 - [x] 8.1 Criar formulário de disponibilidade para mentores
+
 
 
   - Implementar interface para definir dias da semana disponíveis
@@ -231,6 +234,7 @@
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
 - [x] 8.2 Implementar visualização de disponibilidade
+
 
 
 
@@ -286,22 +290,30 @@
   - Atualizar componentes que usavam endpoints removidos
   - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ] 11. Implementar dashboards específicos por papel
-- [ ] 11.1 Criar dashboard do mentor
+- [x] 11. Implementar dashboards específicos por papel
+
+
+- [x] 11.1 Criar dashboard do mentor
+
+
   - Implementar dashboard com estatísticas básicas do mentor
   - Mostrar status de verificação e próximos agendamentos
   - Adicionar links para configurar disponibilidade e perfil
   - Implementar seção de agendamentos pendentes e confirmados
   - _Requirements: 6.5, 9.4, 11.1_
 
-- [ ] 11.2 Criar dashboard do mentee
+- [x] 11.2 Criar dashboard do mentee
+
+
   - Implementar dashboard com agendamentos do mentee
   - Adicionar seção de mentores favoritos ou recentes
   - Mostrar histórico de mentorias
   - Adicionar link para buscar novos mentores
   - _Requirements: 6.5, 10.5_
 
-- [ ] 11.3 Criar dashboard administrativo
+- [x] 11.3 Criar dashboard administrativo
+
+
   - Implementar dashboard com estatísticas da plataforma
   - Adicionar seção de mentores pendentes de verificação
   - Mostrar métricas de usuários e agendamentos
@@ -309,7 +321,15 @@
   - _Requirements: 9.1, 9.2, 9.3_
 
 - [ ] 12. Testes e validação final
-- [ ] 12.1 Implementar testes unitários críticos
+- [x] 12.1 Implementar testes unitários críticos
+
+
+
+
+
+
+
+
   - Criar testes para auth context e hooks
   - Implementar testes para AuthGuard com diferentes cenários
   - Testar validações de formulários de auth

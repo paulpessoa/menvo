@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokensFromCode } from '@/lib/google-calendar';
+import { saveGoogleCalendarTokens } from '@/lib/google-calendar-db';
+import { supabase } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -19,14 +21,41 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Verificar se o usuário está autenticado
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.redirect(
+        new URL('/auth/login?error=authentication_required', request.url)
+      );
+    }
+
     const tokens = await getTokensFromCode(code);
     
-    // In a real implementation, you would save these tokens to the database
-    // associated with the user's profile
-    console.log('Google Calendar tokens received:', {
-      access_token: tokens.access_token ? 'present' : 'missing',
-      refresh_token: tokens.refresh_token ? 'present' : 'missing',
-    });
+    console.log('🔑 Google Calendar tokens received:');
+    console.log('   Access Token:', tokens.access_token ? 'present' : 'missing');
+    console.log('   Refresh Token:', tokens.refresh_token ? 'present' : 'missing');
+    
+    // Salvar tokens no Supabase
+    if (tokens.access_token && tokens.refresh_token && tokens.expiry_date) {
+      const expiresIn = Math.floor((tokens.expiry_date - Date.now()) / 1000);
+      
+      await saveGoogleCalendarTokens(user.id, {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expires_in: expiresIn,
+        scope: tokens.scope
+      });
+
+      console.log('✅ Tokens saved to database for user:', user.id);
+    }
+
+    // Para desenvolvimento, ainda mostrar o refresh token no console
+    if (tokens.refresh_token && process.env.NODE_ENV === 'development') {
+      console.log('📋 COPY THIS REFRESH TOKEN TO YOUR .env.local:');
+      console.log(`GOOGLE_CALENDAR_REFRESH_TOKEN=${tokens.refresh_token}`);
+      console.log('');
+    }
 
     return NextResponse.redirect(
       new URL('/dashboard/mentor?calendar_connected=true', request.url)

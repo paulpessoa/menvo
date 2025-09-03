@@ -8,6 +8,17 @@ const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_CALENDAR_REDIRECT_URI
 );
 
+// Debug: Check if environment variables are loaded
+if (!process.env.GOOGLE_CALENDAR_CLIENT_ID) {
+  console.error('❌ GOOGLE_CALENDAR_CLIENT_ID not found in environment variables');
+}
+if (!process.env.GOOGLE_CALENDAR_CLIENT_SECRET) {
+  console.error('❌ GOOGLE_CALENDAR_CLIENT_SECRET not found in environment variables');
+}
+if (!process.env.GOOGLE_CALENDAR_REFRESH_TOKEN) {
+  console.warn('⚠️ GOOGLE_CALENDAR_REFRESH_TOKEN not found - authorization needed');
+}
+
 // Set refresh token
 if (process.env.GOOGLE_CALENDAR_REFRESH_TOKEN) {
   oauth2Client.setCredentials({
