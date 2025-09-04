@@ -78,7 +78,9 @@
   - Criar sistema de notificação para usuários migrados
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
-- [-] 8. Implementar Sistema Completo de Administração de Usuários
+- [x] 8. Implementar Sistema Completo de Administração de Usuários
+
+
 
 
 
