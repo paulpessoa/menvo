@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import { logAdminAction } from "@/lib/audit-logger"
 
 // This endpoint uses service role for full admin access
 async function createServiceClient() {
@@ -63,14 +64,14 @@ export async function GET(request: NextRequest) {
     let query = serviceSupabase
       .from("profiles")
       .select(`
-        *,
-        auth_users:auth.users!inner(
-          id,
-          email,
-          created_at,
-          last_sign_in_at,
-          email_confirmed_at
-        )
+        id,
+        email,
+        full_name,
+        user_role,
+        verification_status,
+        is_volunteer,
+        created_at,
+        updated_at
       `)
       .order("created_at", { ascending: false })
 
@@ -93,10 +94,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
     }
 
-    // Get total count
+    // Get total count for pagination
     let countQuery = serviceSupabase
       .from("profiles")
-      .select("*", { count: "exact", head: true })
+      .select("id", { count: "exact", head: true })
 
     if (search) {
       countQuery = countQuery.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)

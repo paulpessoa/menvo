@@ -65,7 +65,8 @@
   - Testar fluxo completo de login e redirecionamento
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 7. Implementar Sistema de Migração de Usuários
+- [-] 7. Implementar Sistema de Migração de Usuários
+
   - Criar script para identificar usuários da plataforma antiga
   - Implementar lógica de mapeamento de dados entre sistemas
   - Criar interface administrativa para resolver conflitos de migração
@@ -74,6 +75,8 @@
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7_
 
 - [ ] 8. Implementar Sistema Completo de Administração de Usuários
+
+
   - Criar endpoint /api/admin/users com service role para CRUD completo
   - Implementar página /admin/users com tabela de todos os usuários
   - Adicionar funcionalidades: criar, editar, deletar, alterar roles
@@ -90,7 +93,10 @@
   - Focar no MVP sem integrações complexas
   - _Requirements: Sistema de agendamento funcional e simples_
 
-- [ ] 10. Corrigir e Aplicar Migração de Volunteer Activities
+
+- [x] 10. Corrigir e Aplicar Migração de Volunteer Activities
+
+
   - Verificar se tabela volunteer_activities existe no Supabase
   - Aplicar migração manualmente se necessário
   - Testar endpoints de volunteer activities
