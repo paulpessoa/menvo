@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env node
 
 /**
  * Script de Migração de Usuários da Plataforma Antiga
@@ -7,13 +7,13 @@
  * para a nova estrutura, resolvendo conflitos quando necessário.
  */
 
-import { createClient } from '@supabase/supabase-js'
-import * as fs from 'fs'
-import * as path from 'path'
+const { createClient } = require('@supabase/supabase-js')
+const fs = require('fs')
+const path = require('path')
 
 // Configuração do Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('❌ Variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são obrigatórias')
@@ -27,34 +27,10 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   }
 })
 
-interface OldUserData {
-  id: string
-  email: string
-  name?: string
-  first_name?: string
-  last_name?: string
-  role?: string
-  created_at?: string
-  profile_data?: any
-  // Adicione outros campos conforme necessário
-}
-
-interface MigrationResult {
-  total: number
-  successful: number
-  failed: number
-  conflicts: number
-  errors: string[]
-}
-
 /**
  * Carrega dados de usuários da plataforma antiga
- * Substitua esta função pela lógica específica da sua fonte de dados
  */
-async function loadOldUserData(): Promise<OldUserData[]> {
-  // EXEMPLO: Carregando de um arquivo JSON
-  // Na prática, isso pode vir de uma API, banco de dados antigo, etc.
-  
+async function loadOldUserData() {
   const dataPath = path.join(process.cwd(), 'data', 'old-users.json')
   
   if (!fs.existsSync(dataPath)) {
@@ -68,7 +44,7 @@ async function loadOldUserData(): Promise<OldUserData[]> {
     }
     
     // Criar arquivo de exemplo
-    const exampleData: OldUserData[] = [
+    const exampleData = [
       {
         id: 'old_user_1',
         email: 'mentor1@example.com',
@@ -102,7 +78,7 @@ async function loadOldUserData(): Promise<OldUserData[]> {
   
   try {
     const fileContent = fs.readFileSync(dataPath, 'utf-8')
-    const data = JSON.parse(fileContent) as OldUserData[]
+    const data = JSON.parse(fileContent)
     console.log(`📊 Carregados ${data.length} usuários da plataforma antiga`)
     return data
   } catch (error) {
@@ -114,7 +90,7 @@ async function loadOldUserData(): Promise<OldUserData[]> {
 /**
  * Verifica se um usuário já existe na nova plataforma
  */
-async function checkExistingUser(email: string): Promise<{ exists: boolean; userId?: string }> {
+async function checkExistingUser(email) {
   const { data, error } = await supabase
     .from('profiles')
     .select('id')
@@ -135,8 +111,8 @@ async function checkExistingUser(email: string): Promise<{ exists: boolean; user
 /**
  * Mapeia role da plataforma antiga para a nova
  */
-function mapUserRole(oldRole?: string): string {
-  const roleMap: Record<string, string> = {
+function mapUserRole(oldRole) {
+  const roleMap = {
     'mentor': 'mentor',
     'mentee': 'mentee', 
     'mentorado': 'mentee',
@@ -150,7 +126,7 @@ function mapUserRole(oldRole?: string): string {
 /**
  * Cria registro de migração no banco
  */
-async function createMigrationRecord(oldUser: OldUserData, status: string = 'pending', conflictReason?: string) {
+async function createMigrationRecord(oldUser, status = 'pending', conflictReason) {
   const { data, error } = await supabase
     .from('user_migrations')
     .insert({
@@ -174,7 +150,7 @@ async function createMigrationRecord(oldUser: OldUserData, status: string = 'pen
 /**
  * Migra um usuário individual
  */
-async function migrateUser(oldUser: OldUserData): Promise<{ success: boolean; error?: string; conflict?: boolean }> {
+async function migrateUser(oldUser) {
   try {
     // Verificar se usuário já existe
     const existing = await checkExistingUser(oldUser.email)
@@ -291,21 +267,21 @@ async function migrateUser(oldUser: OldUserData): Promise<{ success: boolean; er
     
   } catch (error) {
     console.error('❌ Erro inesperado na migração:', error)
-    return { success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' }
+    return { success: false, error: error.message || 'Erro desconhecido' }
   }
 }
 
 /**
  * Gera senha temporária para usuários migrados
  */
-function generateTemporaryPassword(): string {
+function generateTemporaryPassword() {
   return Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12)
 }
 
 /**
  * Executa migração em lotes
  */
-async function runMigration(batchSize: number = 10): Promise<MigrationResult> {
+async function runMigration(batchSize = 10) {
   console.log('🚀 Iniciando migração de usuários...')
   
   const oldUsers = await loadOldUserData()
@@ -314,7 +290,7 @@ async function runMigration(batchSize: number = 10): Promise<MigrationResult> {
     return { total: 0, successful: 0, failed: 0, conflicts: 0, errors: [] }
   }
   
-  const result: MigrationResult = {
+  const result = {
     total: oldUsers.length,
     successful: 0,
     failed: 0,
@@ -386,4 +362,4 @@ if (require.main === module) {
   main()
 }
 
-export { runMigration, migrateUser, loadOldUserData }
+module.exports = { runMigration, migrateUser, loadOldUserData }
