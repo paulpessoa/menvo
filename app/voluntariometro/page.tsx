@@ -1,17 +1,23 @@
 "use client"
 
 import { useMemo } from "react"
-import { Activity, TrendingUp, Users, Clock, BarChart3 } from "lucide-react"
+import { Activity, TrendingUp, Users, Clock, BarChart3, Plus, Lock } from "lucide-react"
+import Link from "next/link"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { Button } from "@/components/ui/button"
 import { useVolunteerStats } from "@/hooks/api/use-volunteer-activities"
+import { useIsVolunteer } from "@/hooks/useVolunteerAccess"
+import { useAuth } from "@/lib/auth"
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82ca9d", "#ffc658"]
 
 export default function VoluntariometroPage() {
+  const { user } = useAuth()
   const { data: stats, isLoading } = useVolunteerStats()
+  const { data: isVolunteer, isLoading: isVolunteerLoading } = useIsVolunteer()
 
   const chartData = useMemo(() => {
     if (!stats) return { monthlyData: [], typeData: [] }
@@ -28,7 +34,7 @@ export default function VoluntariometroPage() {
     return { monthlyData, typeData }
   }, [stats])
 
-  if (isLoading) {
+  if (isLoading || isVolunteerLoading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-center h-64">
@@ -59,6 +65,30 @@ export default function VoluntariometroPage() {
           <p className="text-muted-foreground text-lg">
             Acompanhe o impacto das atividades de voluntariado em nossa comunidade
           </p>
+
+          {/* Volunteer Actions */}
+          {user && isVolunteer && (
+            <div className="mt-6 flex justify-center gap-4">
+              <Button asChild>
+                <Link href="/checkin">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Registrar Atividade
+                </Link>
+              </Button>
+            </div>
+          )}
+
+          {/* Non-volunteer message */}
+          {user && !isVolunteer && (
+            <div className="mt-6 p-4 bg-muted rounded-lg max-w-md mx-auto">
+              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                <Lock className="h-4 w-4" />
+                <span className="text-sm">
+                  Apenas voluntários podem registrar atividades
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Cards */}

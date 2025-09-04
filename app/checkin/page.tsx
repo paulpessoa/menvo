@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { CalendarIcon, Clock, Activity, CheckCircle, Plus } from "lucide-react"
+import { CalendarIcon, Clock, Activity, CheckCircle, Plus, Lock, AlertTriangle } from "lucide-react"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth"
 import { useCreateVolunteerActivity, useVolunteerActivities } from "@/hooks/api/use-volunteer-activities"
+import { useIsVolunteer } from "@/hooks/useVolunteerAccess"
 
 const volunteerActivitySchema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
@@ -34,23 +36,23 @@ const volunteerActivitySchema = z.object({
 type VolunteerActivityForm = z.infer<typeof volunteerActivitySchema>
 
 const ACTIVITY_TYPES = [
-  "Mentoria",
-  "Ensino/Educação",
-  "Desenvolvimento de Software",
-  "Design/UX",
-  "Marketing/Comunicação",
-  "Gestão de Projetos",
-  "Consultoria",
-  "Evento/Workshop",
-  "Revisão de Conteúdo",
-  "Suporte Técnico",
-  "Outro",
+  { value: "mentoria", label: "Mentoria" },
+  { value: "workshop", label: "Workshop/Evento" },
+  { value: "palestra", label: "Palestra" },
+  { value: "codigo", label: "Desenvolvimento de Software" },
+  { value: "design", label: "Design/UX" },
+  { value: "marketing", label: "Marketing/Comunicação" },
+  { value: "administracao", label: "Administração/Gestão" },
+  { value: "suporte", label: "Suporte Técnico" },
+  { value: "traducao", label: "Tradução" },
+  { value: "outro", label: "Outro" },
 ]
 
 export default function CheckinPage() {
   const { user } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const createActivity = useCreateVolunteerActivity()
+  const { data: isVolunteer, isLoading: isVolunteerLoading } = useIsVolunteer()
 
   // Fetch user's own activities
   const { data: activities, isLoading } = useVolunteerActivities({ user_only: true })
@@ -72,6 +74,17 @@ export default function CheckinPage() {
 
   const selectedDate = watch("date")
 
+  // Loading state
+  if (isVolunteerLoading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    )
+  }
+
   // Check if user can access volunteer area
   if (!user) {
     return (
@@ -82,6 +95,36 @@ export default function CheckinPage() {
               <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Login Necessário</h3>
               <p className="text-muted-foreground">Faça login para registrar suas atividades de voluntariado.</p>
+              <Button asChild className="mt-4">
+                <Link href="/auth/login">Fazer Login</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // Check if user is a volunteer
+  if (!isVolunteer) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Card>
+          <CardContent className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <Lock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
+              <p className="text-muted-foreground mb-4">
+                Esta página é exclusiva para voluntários da plataforma.
+              </p>
+              <div className="flex gap-2 justify-center">
+                <Button asChild variant="outline">
+                  <Link href="/voluntariometro">Ver Estatísticas Públicas</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/dashboard">Voltar ao Dashboard</Link>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -165,8 +208,8 @@ export default function CheckinPage() {
                     >
                       <option value="">Selecione um tipo</option>
                       {ACTIVITY_TYPES.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
+                        <option key={type.value} value={type.value}>
+                          {type.label}
                         </option>
                       ))}
                     </select>
