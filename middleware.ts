@@ -6,6 +6,12 @@ import {
   onboardingRequiredRoutes,
   authRoutes,
 } from "@/config/routes"
+import { 
+  determineRedirect, 
+  isProfileComplete, 
+  shouldSkipRoleSelection,
+  isAuthorizedForPath 
+} from "@/lib/auth-redirect"
 
 // Consolidated Supabase client creation for middleware
 function createClient(request: NextRequest) {
@@ -90,8 +96,27 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (user && isAuthRoute) {
-    const redirectUrl = new URL("/dashboard", request.url)
-    return NextResponse.redirect(redirectUrl)
+    // Get user profile to determine proper redirect
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_role, verification_status, full_name, bio, current_position, mentor_skills")
+        .eq("id", user.id)
+        .single()
+
+      const redirectPath = determineRedirect(
+        profile?.user_role || null,
+        profile?.verification_status,
+        isProfileComplete(profile, profile?.user_role || "mentee")
+      )
+      
+      const redirectUrl = new URL(redirectPath, request.url)
+      return NextResponse.redirect(redirectUrl)
+    } catch (error) {
+      // Fallback to dashboard if profile fetch fails
+      const redirectUrl = new URL("/dashboard", request.url)
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   // Redirect unauthenticated users to login for protected routes
@@ -103,10 +128,21 @@ export async function middleware(request: NextRequest) {
 
   // Check admin access for admin routes
   if (isAdminRoute && user) {
-    const userRole = user.user_metadata?.role
-    const hasAdminAccess = userRole === "admin" || user.user_metadata?.permissions?.includes("admin_system")
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_role")
+        .eq("id", user.id)
+        .single()
 
-    if (!hasAdminAccess) {
+      const hasAdminAccess = profile?.user_role === "admin" || profile?.user_role === "moderator"
+
+      if (!hasAdminAccess) {
+        const redirectUrl = new URL("/unauthorized", request.url)
+        return NextResponse.redirect(redirectUrl)
+      }
+    } catch (error) {
+      // If we can't verify admin status, deny access
       const redirectUrl = new URL("/unauthorized", request.url)
       return NextResponse.redirect(redirectUrl)
     }
@@ -114,34 +150,51 @@ export async function middleware(request: NextRequest) {
 
   // Handle onboarding flow for authenticated users
   if (requiresOnboarding && user) {
-    // Check if user needs role selection or profile completion
     try {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role, status, verification_status")
+        .select("user_role, verification_status, full_name, bio, current_position, mentor_skills")
         .eq("id", user.id)
         .single()
 
       if (profile) {
-        // If user has pending role, redirect to role selection
-        if (!profile.role || profile.role === "pending") {
-          const redirectUrl = new URL("/onboarding/role-selection", request.url)
+        const userRole = profile.user_role
+        
+        // Check if user should skip role selection (already has a role)
+        if (pathname === "/auth/select-role" && shouldSkipRoleSelection(userRole, profile.verification_status)) {
+          const redirectPath = determineRedirect(
+            userRole,
+            profile.verification_status,
+            isProfileComplete(profile, userRole || "mentee")
+          )
+          const redirectUrl = new URL(redirectPath, request.url)
           return NextResponse.redirect(redirectUrl)
         }
 
-        // If mentor needs profile completion
-        if (profile.role === "mentor" && profile.verification_status === "pending") {
-          const redirectUrl = new URL("/onboarding/profile", request.url)
-          redirectUrl.searchParams.set("role", profile.role)
-          return NextResponse.redirect(redirectUrl)
+        // If user has pending role, redirect to role selection
+        if (!userRole || userRole === "pending") {
+          if (pathname !== "/auth/select-role") {
+            const redirectUrl = new URL("/auth/select-role", request.url)
+            return NextResponse.redirect(redirectUrl)
+          }
+        } else {
+          // User has a role, check if they're authorized for current path
+          if (!isAuthorizedForPath(pathname, userRole, profile.verification_status)) {
+            const redirectPath = determineRedirect(
+              userRole,
+              profile.verification_status,
+              isProfileComplete(profile, userRole)
+            )
+            const redirectUrl = new URL(redirectPath, request.url)
+            return NextResponse.redirect(redirectUrl)
+          }
         }
       }
     } catch (error) {
       console.warn("[middleware] Failed to fetch user profile:", error)
-      // Fallback to user metadata if database query fails
-      const hasRole = user.user_metadata?.role
-      if (!hasRole || hasRole === "pending") {
-        const redirectUrl = new URL("/onboarding/role-selection", request.url)
+      // Fallback: redirect to role selection if no profile found
+      if (pathname !== "/auth/select-role") {
+        const redirectUrl = new URL("/auth/select-role", request.url)
         return NextResponse.redirect(redirectUrl)
       }
     }
