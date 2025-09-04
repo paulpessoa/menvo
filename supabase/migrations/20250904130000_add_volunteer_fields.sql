@@ -60,7 +60,7 @@ CREATE POLICY "Volunteers and admins can view all activities" ON volunteer_activ
     ) OR
     EXISTS (
       SELECT 1 FROM public.profiles p
-      WHERE p.user_id = auth.uid() 
+      WHERE p.id = auth.uid() 
       AND p.is_volunteer = true
     )
   );
@@ -94,7 +94,7 @@ CREATE TRIGGER volunteer_activities_updated_at
 -- Update existing mentors to be volunteers
 UPDATE profiles 
 SET is_volunteer = true 
-WHERE user_id IN (
+WHERE id IN (
   SELECT ur.user_id 
   FROM user_roles ur
   JOIN roles r ON ur.role_id = r.id
