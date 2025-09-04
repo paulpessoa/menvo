@@ -610,5 +610,17 @@
     "reasonPlaceholder": "Tell us why you want to join",
     "successMessage": "Thank you for your interest!",
     "errorMessage": "Error submitting form"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "description": "Your opinion is very important to us. How can we improve?",
+    "helpUsImprove": "Help us improve",
+    "ratingRequired": "Please select a rating",
+    "commentPlaceholder": "Tell us about your experience... (optional)",
+    "emailPlaceholder": "Your email (for anonymous feedback)",
+    "submit": "Submit Feedback",
+    "thankYou": "Thank you for your feedback!",
+    "error": "Error submitting feedback. Please try again.",
+    "rateStars": "Rate with {{count}} stars"
   }
 }

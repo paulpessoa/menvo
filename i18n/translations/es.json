@@ -610,5 +610,17 @@
     "reasonPlaceholder": "Cuéntanos por qué quieres unirte",
     "successMessage": "¡Gracias por tu interés!",
     "errorMessage": "Error al enviar el formulario"
+  },
+  "feedback": {
+    "title": "Comentarios",
+    "description": "Tu opinión es muy importante para nosotros. ¿Cómo podemos mejorar?",
+    "helpUsImprove": "Ayúdanos a mejorar",
+    "ratingRequired": "Por favor, selecciona una calificación",
+    "commentPlaceholder": "Cuéntanos sobre tu experiencia... (opcional)",
+    "emailPlaceholder": "Tu correo electrónico (para comentarios anónimos)",
+    "submit": "Enviar Comentarios",
+    "thankYou": "¡Gracias por tus comentarios!",
+    "error": "Error al enviar comentarios. Inténtalo de nuevo.",
+    "rateStars": "Calificar con {{count}} estrellas"
   }
 }

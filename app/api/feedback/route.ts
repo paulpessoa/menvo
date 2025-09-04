@@ -15,12 +15,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get user profile to check role
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user?.id).single()
+    // Check if user is admin
+    const { data: userRoles } = await supabase
+      .from("user_roles")
+      .select(`
+        role_id,
+        roles!inner(name)
+      `)
+      .eq("user_id", user?.id)
+
+    const isAdmin = userRoles?.some((ur: any) => ur.roles?.name === "admin")
 
     // Parse query parameters
-    const type = searchParams.get("type")
-    const status = searchParams.get("status")
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const offset = (page - 1) * limit
@@ -29,17 +35,12 @@ export async function GET(request: NextRequest) {
       .from("feedback")
       .select(`
         *,
-        user:profiles(full_name, avatar_url),
-        responder:profiles!feedback_responded_by_fkey(full_name)
+        user:profiles(full_name, avatar_url)
       `)
       .order("created_at", { ascending: false })
 
     // Apply filters based on user role
-    if (profile?.role === "admin") {
-      // Admins can see all feedback
-      if (type) query = query.eq("type", type)
-      if (status) query = query.eq("status", status)
-    } else {
+    if (!isAdmin) {
       // Regular users can only see their own feedback
       query = query.eq("user_id", user?.id)
     }
@@ -57,11 +58,8 @@ export async function GET(request: NextRequest) {
     // Get total count for pagination
     let countQuery = supabase.from("feedback").select("*", { count: "exact", head: true })
 
-    if (profile?.role !== "admin") {
+    if (!isAdmin) {
       countQuery = countQuery.eq("user_id", user?.id)
-    } else {
-      if (type) countQuery = countQuery.eq("type", type)
-      if (status) countQuery = countQuery.eq("status", status)
     }
 
     const { count } = await countQuery
@@ -91,34 +89,33 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     const body = await request.json()
-    const { type, rating, title, message, page_url, is_anonymous = false } = body
+    const { rating, comment, email } = body
 
     // Validate required fields
-    if (!type || !title || !message) {
+    if (!rating) {
       return NextResponse.json(
         {
-          error: "Missing required fields: type, title, message",
+          error: "Rating is required",
         },
         { status: 400 },
       )
     }
 
-    // Validate type
-    const validTypes = ["general", "bug", "feature", "mentor", "platform"]
-    if (!validTypes.includes(type)) {
+    // Validate rating
+    if (rating < 1 || rating > 5) {
       return NextResponse.json(
         {
-          error: "Invalid type. Must be one of: " + validTypes.join(", "),
+          error: "Rating must be between 1 and 5",
         },
         { status: 400 },
       )
     }
 
-    // Validate rating if provided
-    if (rating && (rating < 1 || rating > 10)) {
+    // For non-authenticated users, email is required
+    if (!user && !email) {
       return NextResponse.json(
         {
-          error: "Rating must be between 1 and 10",
+          error: "Email is required for anonymous feedback",
         },
         { status: 400 },
       )
@@ -128,15 +125,10 @@ export async function POST(request: NextRequest) {
     const { data: feedback, error } = await supabase
       .from("feedback")
       .insert({
-        user_id: is_anonymous ? null : user?.id,
-        type,
-        rating: rating ? Number.parseInt(rating) : null,
-        title,
-        message,
-        page_url,
-        user_agent: request.headers.get("user-agent"),
-        is_anonymous,
-        status: "open",
+        user_id: user?.id || null,
+        rating: Number.parseInt(rating),
+        comment: comment || null,
+        email: user ? null : email, // Only store email for non-authenticated users
       })
       .select(`
         *,

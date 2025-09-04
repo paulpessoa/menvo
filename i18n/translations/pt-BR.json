@@ -463,5 +463,17 @@
     "reasonPlaceholder": "Conte-nos por que você quer participar",
     "successMessage": "Obrigado pelo seu interesse!",
     "errorMessage": "Erro ao enviar o formulário"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "description": "Sua opinião é muito importante para nós. Como podemos melhorar?",
+    "helpUsImprove": "Ajude-nos a melhorar",
+    "ratingRequired": "Por favor, selecione uma avaliação",
+    "commentPlaceholder": "Conte-nos sobre sua experiência... (opcional)",
+    "emailPlaceholder": "Seu e-mail (para feedback anônimo)",
+    "submit": "Enviar Feedback",
+    "thankYou": "Obrigado pelo seu feedback!",
+    "error": "Erro ao enviar feedback. Tente novamente.",
+    "rateStars": "Avaliar com {{count}} estrelas"
   }
 }
