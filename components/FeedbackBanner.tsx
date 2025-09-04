@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useTranslation } from "react-i18next"
 import { useToast } from "@/hooks/useToast"
-import { createClient, isSupabaseConfigured } from "@/utils/supabase/client"
 import {
   Dialog,
   DialogContent,
@@ -42,15 +41,6 @@ export function FeedbackBanner() {
   }, [])
 
   const handleSubmit = async () => {
-    if (!isSupabaseConfigured()) {
-      toast({
-        title: "Feedback não disponível",
-        description: "Sistema de feedback temporariamente indisponível.",
-        variant: "destructive"
-      })
-      return
-    }
-
     if (!rating) {
       toast({
         title: t("feedback.ratingRequired"),
@@ -62,25 +52,22 @@ export function FeedbackBanner() {
     setIsSubmitting(true)
 
     try {
-      const supabase = createClient()
-      if (!supabase) {
-        throw new Error("Supabase client not available")
-      }
-
-      const { error } = await supabase.from("feedback").insert([
-        {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           rating,
           comment,
           email: isAuthenticated ? undefined : email,
-          user_id: isAuthenticated
-            ? (
-              await supabase.auth.getUser()
-            ).data.user?.id
-            : undefined
-        }
-      ])
+        }),
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao enviar feedback")
+      }
 
       setShowThankYou(true)
       setRating(null)
@@ -102,7 +89,7 @@ export function FeedbackBanner() {
   }
 
   // Não renderizar até estar montado no cliente para evitar hydration mismatch
-  if (!mounted || !isSupabaseConfigured()) {
+  if (!mounted) {
     return null
   }
 
