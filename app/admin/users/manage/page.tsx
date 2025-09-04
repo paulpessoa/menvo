@@ -41,8 +41,20 @@ import {
     AlertTriangle,
     CheckCircle,
     XCircle,
-    Filter
+    Filter,
+    Key,
+    Shield,
+    Mail,
+    MoreHorizontal
 } from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 
 interface User {
@@ -207,6 +219,101 @@ export default function ManageUsersPage() {
         }
     }
 
+    const resetPassword = async (user: User) => {
+        try {
+            const response = await fetch("/api/admin/users/actions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "reset_password",
+                    userId: user.id
+                })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erro ao resetar senha")
+            }
+
+            toast.success(`Senha resetada! Nova senha: ${data.temporaryPassword}`)
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao resetar senha")
+        }
+    }
+
+    const toggleVerification = async (user: User) => {
+        try {
+            const response = await fetch("/api/admin/users/actions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "toggle_verification",
+                    userId: user.id
+                })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erro ao alterar verificação")
+            }
+
+            toast.success(`Status alterado para: ${data.newStatus === 'verified' ? 'Verificado' : 'Pendente'}`)
+            fetchUsers()
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao alterar verificação")
+        }
+    }
+
+    const toggleVolunteer = async (user: User) => {
+        try {
+            const response = await fetch("/api/admin/users/actions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "toggle_volunteer",
+                    userId: user.id,
+                    data: { currentStatus: user.is_volunteer }
+                })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erro ao alterar status de voluntário")
+            }
+
+            toast.success(`Status de voluntário alterado para: ${data.newVolunteerStatus ? 'Sim' : 'Não'}`)
+            fetchUsers()
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao alterar status de voluntário")
+        }
+    }
+
+    const sendWelcomeEmail = async (user: User) => {
+        try {
+            const response = await fetch("/api/admin/users/actions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    action: "send_welcome_email",
+                    userId: user.id
+                })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || "Erro ao enviar email")
+            }
+
+            toast.success("Email de boas-vindas enviado!")
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Erro ao enviar email")
+        }
+    }
+
     const openEditDialog = (user: User) => {
         setSelectedUser(user)
         setFormData({
@@ -263,6 +370,13 @@ export default function ManageUsersPage() {
                         </p>
                     </div>
                     <div className="flex gap-2">
+                        <Button
+                            onClick={() => window.open('/admin/audit-logs', '_blank')}
+                            variant="outline"
+                        >
+                            <Shield className="mr-2 h-4 w-4" />
+                            Logs de Auditoria
+                        </Button>
                         <Button onClick={fetchUsers} variant="outline" disabled={loading}>
                             <RefreshCw className="mr-2 h-4 w-4" />
                             Atualizar
@@ -469,13 +583,48 @@ export default function ManageUsersPage() {
                                                         >
                                                             <Edit className="h-3 w-3" />
                                                         </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => openDeleteDialog(user)}
-                                                        >
-                                                            <Trash2 className="h-3 w-3" />
-                                                        </Button>
+
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="outline" size="sm">
+                                                                    <MoreHorizontal className="h-3 w-3" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                                                <DropdownMenuSeparator />
+
+                                                                <DropdownMenuItem onClick={() => resetPassword(user)}>
+                                                                    <Key className="mr-2 h-4 w-4" />
+                                                                    Resetar Senha
+                                                                </DropdownMenuItem>
+
+                                                                <DropdownMenuItem onClick={() => toggleVerification(user)}>
+                                                                    <Shield className="mr-2 h-4 w-4" />
+                                                                    {user.verification_status === 'verified' ? 'Remover Verificação' : 'Verificar Usuário'}
+                                                                </DropdownMenuItem>
+
+                                                                <DropdownMenuItem onClick={() => toggleVolunteer(user)}>
+                                                                    <Users className="mr-2 h-4 w-4" />
+                                                                    {user.is_volunteer ? 'Remover Voluntário' : 'Tornar Voluntário'}
+                                                                </DropdownMenuItem>
+
+                                                                <DropdownMenuItem onClick={() => sendWelcomeEmail(user)}>
+                                                                    <Mail className="mr-2 h-4 w-4" />
+                                                                    Enviar Email de Boas-vindas
+                                                                </DropdownMenuItem>
+
+                                                                <DropdownMenuSeparator />
+
+                                                                <DropdownMenuItem
+                                                                    onClick={() => openDeleteDialog(user)}
+                                                                    className="text-red-600"
+                                                                >
+                                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                                    Deletar Usuário
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
