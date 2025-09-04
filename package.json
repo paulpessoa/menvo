@@ -10,7 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "migrate-users": "node scripts/migrate-users.js"
+    "migrate-users": "node scripts/migrate-users.js",
+    "setup-admin": "node scripts/setup-admin-and-mentors.js"
   },
   "overrides": {
     "@testing-library/react": {
