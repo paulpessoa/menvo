@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Mail, Lock, User, ArrowRight, AlertTriangle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
+import { useFeatureFlag } from "@/lib/feature-flags"
+import { WaitingListForm } from "@/components/WaitingListForm"
 
 interface RegisterFormProps {
     onSuccess?: () => void
@@ -27,6 +29,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     const [success, setSuccess] = useState(false)
 
     const { signUp, signInWithProvider } = useAuth()
+    const waitingListEnabled = useFeatureFlag("waitingListEnabled")
+    const newUserRegistration = useFeatureFlag("newUserRegistration")
+
+    // If waiting list is enabled and new user registration is disabled, show waiting list form
+    if (waitingListEnabled && !newUserRegistration) {
+        return <WaitingListForm onSuccess={onSuccess} />
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()

@@ -11,7 +11,10 @@
   - Testar FeedbackBanner.tsx com nova tabela
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 2. Configurar Sistema de Feature Flags com Vercel Edge Config
+- [x] 2. Configurar Sistema de Feature Flags com Vercel Edge Config
+
+
+
 
 
   - Configurar Vercel Edge Config no projeto
@@ -20,7 +23,9 @@
   - Adicionar fallbacks seguros para quando flags não estão disponíveis
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 3. Implementar Controle de Lista de Espera via Feature Flag
+- [x] 3. Implementar Controle de Lista de Espera via Feature Flag
+
+
   - Criar migração SQL para tabela waiting_list
   - Implementar endpoint /api/waiting-list para gerenciar inscrições
   - Modificar componentes de cadastro para usar WaitingList quando flag ativa
