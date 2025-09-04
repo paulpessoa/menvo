@@ -9,7 +9,8 @@
     "start": "next start",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "migrate-users": "node scripts/migrate-users.js"
   },
   "overrides": {
     "@testing-library/react": {
@@ -78,6 +79,7 @@
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
+    "nodemailer": "^6.9.0",
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",
@@ -97,6 +99,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^22",
+    "@types/nodemailer": "^6.4.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "jest": "^30.1.3",
