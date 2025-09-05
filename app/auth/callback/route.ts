@@ -37,17 +37,37 @@ export async function GET(request: NextRequest) {
           .single()
 
         const redirectTo = requestUrl.searchParams.get("redirectTo")
+        const roleName = (roleData?.roles as any)?.name
 
         // If no role, redirect to role selection
-        if (!(roleData?.roles as any)?.name) {
+        if (!roleName) {
           return NextResponse.redirect(
             new URL("/auth/select-role", request.url)
           )
         }
 
-        // Otherwise redirect to intended destination or dashboard
+        // Role-based redirection logic
+        let dashboardPath = "/dashboard"
+        
+        switch (roleName) {
+          case 'admin':
+            dashboardPath = "/dashboard/admin"
+            break
+          case 'mentor':
+            dashboardPath = "/dashboard/mentor"
+            break
+          case 'mentee':
+            dashboardPath = "/dashboard/mentee"
+            break
+          default:
+            dashboardPath = "/dashboard"
+        }
+
+        // Use redirectTo if provided and valid, otherwise use role-based dashboard
+        const finalRedirect = redirectTo || dashboardPath
+        
         return NextResponse.redirect(
-          new URL(redirectTo || "/dashboard", request.url)
+          new URL(finalRedirect, request.url)
         )
       }
 
@@ -78,7 +98,37 @@ export async function GET(request: NextRequest) {
             token_hash: tokenHash,
             type: 'signup'
           })
-          redirectPath = '/auth/select-role'
+          
+          // Check if user already has a role after email confirmation
+          if (verifyResult.data?.user) {
+            const { data: roleData } = await supabase
+              .from('user_roles')
+              .select(`roles (name)`)
+              .eq('user_id', verifyResult.data.user.id)
+              .single()
+            
+            const roleName = (roleData?.roles as any)?.name
+            if (roleName) {
+              // User has role, redirect to appropriate dashboard
+              switch (roleName) {
+                case 'admin':
+                  redirectPath = '/dashboard/admin'
+                  break
+                case 'mentor':
+                  redirectPath = '/dashboard/mentor'
+                  break
+                case 'mentee':
+                  redirectPath = '/dashboard/mentee'
+                  break
+                default:
+                  redirectPath = '/dashboard'
+              }
+            } else {
+              redirectPath = '/auth/select-role'
+            }
+          } else {
+            redirectPath = '/auth/select-role'
+          }
           break
 
         case 'recovery':
@@ -105,7 +155,37 @@ export async function GET(request: NextRequest) {
             token_hash: tokenHash,
             type: 'magiclink'
           })
-          redirectPath = '/auth/select-role'
+          
+          // Check if user has a role for magic link login
+          if (verifyResult.data?.user) {
+            const { data: roleData } = await supabase
+              .from('user_roles')
+              .select(`roles (name)`)
+              .eq('user_id', verifyResult.data.user.id)
+              .single()
+            
+            const roleName = (roleData?.roles as any)?.name
+            if (roleName) {
+              // User has role, redirect to appropriate dashboard
+              switch (roleName) {
+                case 'admin':
+                  redirectPath = '/dashboard/admin'
+                  break
+                case 'mentor':
+                  redirectPath = '/dashboard/mentor'
+                  break
+                case 'mentee':
+                  redirectPath = '/dashboard/mentee'
+                  break
+                default:
+                  redirectPath = '/dashboard'
+              }
+            } else {
+              redirectPath = '/auth/select-role'
+            }
+          } else {
+            redirectPath = '/auth/select-role'
+          }
           break
 
         case 'email_change':

@@ -56,6 +56,11 @@ export function useAuth() {
   const isAuthenticated = !!auth.user && !auth.loading
   const isReady = !auth.loading
 
+  // Role-based navigation helper
+  const getDefaultRedirectPath = () => {
+    return auth.getRoleDashboardPath(auth.role)
+  }
+
   return {
     // Original auth context
     ...auth,
@@ -73,7 +78,8 @@ export function useAuth() {
     handleAuthError,
     isInitializing,
     isAuthenticated,
-    isReady
+    isReady,
+    getDefaultRedirectPath
   }
 }
 

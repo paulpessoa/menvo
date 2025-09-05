@@ -96,25 +96,36 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (user && isAuthRoute) {
-    // Get user profile to determine proper redirect
+    // Get user profile and role to determine proper redirect
     try {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("user_role, verification_status, full_name, bio, current_position, mentor_skills")
+        .select(`
+          verification_status, 
+          full_name, 
+          bio, 
+          current_position, 
+          mentor_skills,
+          user_roles(
+            roles(name)
+          )
+        `)
         .eq("id", user.id)
         .single()
 
+      const userRole = profile?.user_roles?.[0]?.roles?.name || null
+
       const redirectPath = determineRedirect(
-        profile?.user_role || null,
+        userRole,
         profile?.verification_status,
-        isProfileComplete(profile, profile?.user_role || "mentee")
+        isProfileComplete(profile, userRole || "mentee")
       )
       
       const redirectUrl = new URL(redirectPath, request.url)
       return NextResponse.redirect(redirectUrl)
     } catch (error) {
-      // Fallback to dashboard if profile fetch fails
-      const redirectUrl = new URL("/dashboard", request.url)
+      // If no role found, redirect to role selection
+      const redirectUrl = new URL("/auth/select-role", request.url)
       return NextResponse.redirect(redirectUrl)
     }
   }
@@ -131,11 +142,16 @@ export async function middleware(request: NextRequest) {
     try {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("user_role")
+        .select(`
+          user_roles(
+            roles(name)
+          )
+        `)
         .eq("id", user.id)
         .single()
 
-      const hasAdminAccess = profile?.user_role === "admin" || profile?.user_role === "moderator"
+      const userRole = profile?.user_roles?.[0]?.roles?.name
+      const hasAdminAccess = userRole === "admin" || userRole === "moderator"
 
       if (!hasAdminAccess) {
         const redirectUrl = new URL("/unauthorized", request.url)

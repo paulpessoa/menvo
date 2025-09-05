@@ -33,6 +33,7 @@ export interface AuthContextType {
     signOut: () => Promise<void>
     selectRole: (role: 'mentor' | 'mentee') => Promise<void>
     refreshProfile: () => Promise<void>
+    getRoleDashboardPath: (userRole: string | null) => string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -48,6 +49,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Fetch user profile and role
     const fetchUserProfile = useCallback(async (userId: string) => {
         try {
+            console.log('🔄 Fetching profile for user:', userId)
+
             // Get profile
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
@@ -56,10 +59,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .single()
 
             if (profileError) {
-                console.error('Error fetching profile:', profileError)
+                console.error('❌ Error fetching profile:', profileError)
                 return
             }
 
+            console.log('✅ Profile fetched:', profileData)
             setProfile(profileData)
 
             // Get user role
@@ -75,16 +79,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (roleError) {
                 // User might not have a role yet (null is expected for new users)
-                console.log('No role found for user:', roleError)
+                console.log('ℹ️  No role found for user (expected for new users):', roleError.message)
                 setRole(null)
                 return
             }
 
             const roleName = roleData?.roles?.name as 'mentor' | 'mentee' | 'admin' | null
+            console.log('✅ User role found:', roleName)
             setRole(roleName)
 
         } catch (error) {
-            console.error('Error in fetchUserProfile:', error)
+            console.error('❌ Error in fetchUserProfile:', error)
         }
     }, [supabase])
 
@@ -132,32 +137,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Sign in with OAuth provider
     const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
-        const providerName = provider === 'linkedin' ? 'linkedin_oidc' : provider
+        // Import the fixed OAuth function
+        const { signInWithOAuthProvider } = await import('./oauth-provider-fixes')
 
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: providerName as any,
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`
-            }
+        const result = await signInWithOAuthProvider(supabase, provider, {
+            redirectTo: `${window.location.origin}/auth/callback`
         })
 
-        if (error) {
-            throw error
+        if (result.error) {
+            throw result.error
         }
     }, [supabase])
 
     // Sign out
     const signOut = useCallback(async () => {
-        const { error } = await supabase.auth.signOut()
+        try {
+            console.log('🔄 Iniciando logout...')
 
-        if (error) {
+            // Clear local state first
+            setUser(null)
+            setProfile(null)
+            setRole(null)
+
+            // Sign out from Supabase
+            const { error } = await supabase.auth.signOut()
+
+            if (error) {
+                console.error('❌ Erro no logout:', error)
+                throw error
+            }
+
+            console.log('✅ Logout realizado com sucesso')
+
+            // Force redirect to home page
+            if (typeof window !== 'undefined') {
+                window.location.href = '/'
+            }
+        } catch (error) {
+            console.error('❌ Erro durante logout:', error)
+            // Even if there's an error, clear local state and redirect
+            setUser(null)
+            setProfile(null)
+            setRole(null)
+
+            if (typeof window !== 'undefined') {
+                window.location.href = '/'
+            }
+
             throw error
         }
-
-        // Clear state
-        setUser(null)
-        setProfile(null)
-        setRole(null)
     }, [supabase])
 
     // Select role (mentor or mentee)
@@ -166,29 +194,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error('User not authenticated')
         }
 
-        // Use API endpoint to avoid RLS issues
-        const response = await fetch('/api/auth/select-role', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                userId: user.id,
-                role: selectedRole
+        console.log('🔄 Selecting role:', selectedRole, 'for user:', user.id)
+
+        try {
+            // Use API endpoint to avoid RLS issues
+            const response = await fetch('/api/auth/select-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: user.id,
+                    role: selectedRole
+                })
             })
-        })
 
-        if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Failed to select role')
+            if (!response.ok) {
+                const errorData = await response.json()
+                console.error('❌ API error selecting role:', errorData)
+                throw new Error(errorData.error || 'Failed to select role')
+            }
+
+            const responseData = await response.json()
+            console.log('✅ Role selection API response:', responseData)
+
+            // Update local state immediately
+            setRole(selectedRole)
+
+            // Refresh profile to get updated data
+            await fetchUserProfile(user.id)
+
+            console.log('✅ Role selection completed successfully')
+        } catch (error) {
+            console.error('❌ Error in selectRole:', error)
+            throw error
         }
-
-        // Update local state
-        setRole(selectedRole)
-
-        // Refresh profile to get updated data
-        await fetchUserProfile(user.id)
     }, [user?.id, fetchUserProfile])
+
+    // Get role-based dashboard path
+    const getRoleDashboardPath = useCallback((userRole: string | null) => {
+        switch (userRole) {
+            case 'admin':
+                return '/dashboard/admin'
+            case 'mentor':
+                return '/dashboard/mentor'
+            case 'mentee':
+                return '/dashboard/mentee'
+            default:
+                return '/dashboard'
+        }
+    }, [])
 
     // Initialize auth state
     useEffect(() => {
@@ -258,7 +313,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithProvider,
         signOut,
         selectRole,
-        refreshProfile
+        refreshProfile,
+        getRoleDashboardPath
     }
 
     return (

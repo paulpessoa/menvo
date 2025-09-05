@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-const { runMigration } = require('@/scripts/migrate-users')
+const { runMigration } = require('@/scripts/database/migrate-users')
 
 export async function POST(request: NextRequest) {
   try {

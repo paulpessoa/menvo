@@ -1,12 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, GraduationCap, CheckCircle, ArrowRight, Loader2 } from "lucide-react"
+import { Users, GraduationCap, CheckCircle, ArrowRight, Loader2, TestTube } from "lucide-react"
 import { toast } from "sonner"
-import { useAuth } from "@/lib/auth"
+
+/**
+ * Test component for role selection functionality
+ * This component can be used to test the role selection UI without authentication
+ */
 
 type UserRole = "mentee" | "mentor"
 
@@ -39,11 +42,9 @@ const roles = [
     },
 ]
 
-export default function SelectRolePage() {
+export default function RoleSelectionTest() {
     const [selectedRole, setSelectedRole] = useState<UserRole | "">("")
     const [isLoading, setIsLoading] = useState(false)
-    const router = useRouter()
-    const { user, selectRole, handleAuthError, getRoleDashboardPath } = useAuth()
 
     const handleRoleSelection = async () => {
         if (!selectedRole) {
@@ -51,94 +52,67 @@ export default function SelectRolePage() {
             return
         }
 
-        if (!user) {
-            toast.error("Usuário não autenticado")
-            router.push('/auth/login')
-            return
-        }
-
         setIsLoading(true)
         try {
-            console.log("🔄 Iniciando seleção de role:", selectedRole, "para usuário:", user.id)
+            console.log("🧪 Teste: Selecionando role:", selectedRole)
 
             // Show loading toast
             const loadingToast = toast.loading("Salvando seu perfil...")
 
-            // Use the selectRole method from auth context
-            await selectRole(selectedRole)
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 2000))
 
             // Dismiss loading toast
             toast.dismiss(loadingToast)
 
-            console.log("✅ Role atualizada com sucesso")
+            console.log("✅ Teste: Role selecionada com sucesso")
             toast.success(`Perfil ${selectedRole === 'mentor' ? 'Mentor' : 'Mentorado'} selecionado com sucesso!`)
 
-            // Small delay to show success message
+            // Simulate redirect
             await new Promise(resolve => setTimeout(resolve, 1000))
 
-            // Use role-based redirection from auth context
-            const dashboardPath = getRoleDashboardPath(selectedRole)
-            console.log("🔄 Redirecionando para:", dashboardPath)
+            const dashboardPath = selectedRole === 'mentor' ? '/dashboard/mentor' : '/dashboard/mentee'
+            console.log("🔄 Teste: Redirecionaria para:", dashboardPath)
+            toast.info(`Redirecionaria para: ${dashboardPath}`)
 
-            router.push(dashboardPath)
         } catch (error: any) {
-            console.error("❌ Erro ao selecionar role:", error)
-
-            // Show specific error messages
-            let errorMessage = "Erro inesperado. Tente novamente."
-
-            if (error.message?.includes('Failed to select role')) {
-                errorMessage = "Erro ao salvar perfil. Verifique sua conexão e tente novamente."
-            } else if (error.message?.includes('User not authenticated')) {
-                errorMessage = "Sessão expirada. Faça login novamente."
-                router.push('/auth/login')
-                return
-            } else if (error.message?.includes('Network')) {
-                errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
-            }
-
-            toast.error(errorMessage)
+            console.error("❌ Teste: Erro ao selecionar role:", error)
+            toast.error("Erro no teste de seleção de role")
         } finally {
             setIsLoading(false)
         }
     }
 
-    // Redirect if user already has a role
-    const { role, loading } = useAuth()
-    if (!loading && role) {
-        const dashboardPath = getRoleDashboardPath(role)
-        router.push(dashboardPath)
-        return null
-    }
+    const testErrorScenarios = () => {
+        const scenarios = [
+            { name: "Nenhuma role selecionada", action: () => handleRoleSelection() },
+            { name: "Erro de rede simulado", action: () => toast.error("Erro de conexão simulado") },
+            { name: "Sessão expirada simulada", action: () => toast.error("Sessão expirada simulada") }
+        ]
 
-    // Show loading while checking auth state
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            </div>
-        )
-    }
-
-    // Redirect to login if not authenticated
-    if (!user) {
-        router.push('/auth/login')
-        return null
+        scenarios.forEach((scenario, index) => {
+            setTimeout(() => {
+                console.log(`🧪 Testando: ${scenario.name}`)
+                scenario.action()
+            }, index * 1000)
+        })
     }
 
     return (
         <div className="container max-w-4xl py-16">
             <Card>
                 <CardHeader className="text-center">
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                        <TestTube className="h-6 w-6 text-primary" />
+                        <span className="text-sm font-medium text-primary">MODO TESTE</span>
+                    </div>
                     <CardTitle className="text-2xl">Escolha seu perfil</CardTitle>
                     <CardDescription>
                         Selecione como você gostaria de participar da nossa plataforma. Você poderá alterar isso depois nas configurações.
                     </CardDescription>
-                    {user?.email && (
-                        <div className="text-sm text-muted-foreground mt-2">
-                            Configurando perfil para: <span className="font-medium">{user.email}</span>
-                        </div>
-                    )}
+                    <div className="text-sm text-muted-foreground mt-2">
+                        Configurando perfil para: <span className="font-medium">test@example.com</span>
+                    </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,24 +152,40 @@ export default function SelectRolePage() {
                         ))}
                     </div>
 
-                    <Button
-                        onClick={handleRoleSelection}
-                        disabled={!selectedRole || isLoading}
-                        className="w-full"
-                        size="lg"
-                    >
-                        {isLoading ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Salvando...
-                            </>
-                        ) : (
-                            <>
-                                Confirmar Seleção
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                            </>
-                        )}
-                    </Button>
+                    <div className="space-y-3">
+                        <Button
+                            onClick={handleRoleSelection}
+                            disabled={!selectedRole || isLoading}
+                            className="w-full"
+                            size="lg"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Salvando...
+                                </>
+                            ) : (
+                                <>
+                                    Confirmar Seleção
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                            )}
+                        </Button>
+
+                        <Button
+                            onClick={testErrorScenarios}
+                            variant="outline"
+                            className="w-full"
+                            disabled={isLoading}
+                        >
+                            <TestTube className="mr-2 h-4 w-4" />
+                            Testar Cenários de Erro
+                        </Button>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground text-center">
+                        Este é um componente de teste. Não fará alterações reais no banco de dados.
+                    </div>
                 </CardContent>
             </Card>
         </div>
