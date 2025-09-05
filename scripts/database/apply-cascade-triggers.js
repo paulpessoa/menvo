@@ -32,7 +32,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 })
 
 async function readSQLFile() {
-  const sqlFilePath = path.join(__dirname, '..', 'database', 'triggers', 'cascade-delete-triggers.sql')
+  const sqlFilePath = path.join(__dirname, '..', '..', 'database', 'triggers', 'cascade-delete-triggers.sql')
   
   try {
     const sqlContent = fs.readFileSync(sqlFilePath, 'utf8')
