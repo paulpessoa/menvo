@@ -32,16 +32,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth"
-import { usePermissions } from "@/hooks/usePermissions"
 import { useTranslation } from "react-i18next"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation()
 
-  const { isAuthenticated, user, profile, role, signOut } = useAuth()
-  const { canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } =
-    usePermissions()
+  const { isAuthenticated, user, profile, role, signOut, canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } = useAuth()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()

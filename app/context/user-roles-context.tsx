@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 import { useUserProfile } from '@/hooks/useUserProfile'
-import { UserRoleType } from '@/hooks/usePermissions'
+import { UserRoleType } from '@/lib/auth/auth-context'
 
 type UserRolesContextType = {
   roles: UserRoleType[]

@@ -18,12 +18,26 @@ export interface Profile {
     updated_at: string
 }
 
+export type UserRoleType = "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
+
+export type Permission =
+    | "view_mentors"
+    | "book_sessions"
+    | "provide_mentorship"
+    | "manage_availability"
+    | "admin_users"
+    | "admin_verifications"
+    | "admin_system"
+    | "validate_activities"
+    | "moderate_content"
+
 export interface AuthContextType {
     // State
     user: User | null
     profile: Profile | null
     role: 'mentor' | 'mentee' | 'admin' | null
     isVerified: boolean
+    isAuthenticated: boolean
     loading: boolean
 
     // Auth operations
@@ -34,6 +48,30 @@ export interface AuthContextType {
     selectRole: (role: 'mentor' | 'mentee') => Promise<void>
     refreshProfile: () => Promise<void>
     getRoleDashboardPath: (userRole: string | null) => string
+
+    // Permission helpers
+    hasPermission: (permission: Permission) => boolean
+    hasRole: (roleToCheck: UserRoleType) => boolean
+    hasAnyPermission: (perms: Permission[]) => boolean
+    isAdmin: boolean
+    isMentor: boolean
+    isMentee: boolean
+    canAdminSystem: boolean
+    canAdminUsers: boolean
+    canAdminVerifications: boolean
+    canValidateActivities: boolean
+    canViewReports: boolean
+
+    // Additional helpers
+    hasAnyRole: (roles: string[]) => boolean
+    needsRoleSelection: () => boolean
+    needsVerification: () => boolean
+    canAccessMentorFeatures: () => boolean
+    canAccessAdminFeatures: () => boolean
+    handleAuthError: (error: any) => string
+    isInitializing: boolean
+    isReady: boolean
+    getDefaultRedirectPath: () => string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -245,6 +283,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, [])
 
+    // Permission checking functions
+    const hasPermission = useCallback((permission: Permission): boolean => {
+        if (loading) return false
+
+        // Simple role-based permissions for MVP
+        switch (role) {
+            case 'admin':
+                return true // Admin has all permissions
+            case 'mentor':
+                return ['view_mentors', 'provide_mentorship', 'manage_availability'].includes(permission)
+            case 'mentee':
+                return ['view_mentors', 'book_sessions'].includes(permission)
+            default:
+                return false
+        }
+    }, [role, loading])
+
+    const hasRole = useCallback((roleToCheck: UserRoleType): boolean => {
+        if (loading) return false
+        return role === roleToCheck
+    }, [role, loading])
+
+    const hasAnyPermission = useCallback((perms: Permission[]): boolean => {
+        if (loading) return false
+        return perms.some((p) => hasPermission(p))
+    }, [hasPermission, loading])
+
+    // Helper computed values
+    const isAdmin = hasRole("admin")
+    const isMentor = hasRole("mentor")
+    const isMentee = hasRole("mentee")
+
+    const canAdminSystem = isAdmin
+    const canAdminUsers = isAdmin
+    const canAdminVerifications = isAdmin
+    const canValidateActivities = isAdmin
+    const canViewReports = isAdmin
+
+    // Additional helper functions
+    const hasAnyRole = useCallback((roles: string[]): boolean => {
+        return roles.includes(role || '')
+    }, [role])
+
+    const needsRoleSelection = useCallback((): boolean => {
+        return !!user && !role
+    }, [user, role])
+
+    const needsVerification = useCallback((): boolean => {
+        return role === 'mentor' && !profile?.verified
+    }, [role, profile?.verified])
+
+    const canAccessMentorFeatures = useCallback((): boolean => {
+        return role === 'mentor' && !!profile?.verified
+    }, [role, profile?.verified])
+
+    const canAccessAdminFeatures = useCallback((): boolean => {
+        return role === 'admin'
+    }, [role])
+
+    const handleAuthError = useCallback((error: any): string => {
+        console.error('Auth error:', error)
+
+        // Common error messages mapping
+        const errorMessages: Record<string, string> = {
+            'Email not confirmed': 'Por favor, confirme seu email antes de fazer login.',
+            'Invalid login credentials': 'Email ou senha incorretos.',
+            'Email link is invalid or has expired': 'Link expirado. Solicite um novo email.',
+            'Email address already confirmed': 'Email já confirmado. Faça login normalmente.',
+            'Password recovery requires email confirmation': 'Confirme seu email antes de recuperar a senha.',
+            'Email change requires confirmation': 'Verifique seu email para confirmar a alteração.'
+        }
+
+        return errorMessages[error.message] || 'Erro inesperado. Tente novamente.'
+    }, [])
+
+    const isInitializing = loading
+    const isReady = !loading
+    const getDefaultRedirectPath = useCallback(() => {
+        return getRoleDashboardPath(role)
+    }, [role, getRoleDashboardPath])
+
     // Initialize auth state
     useEffect(() => {
         let mounted = true
@@ -305,6 +424,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         role,
         isVerified: profile?.verified || false,
+        isAuthenticated: !!user && !loading,
         loading,
 
         // Operations
@@ -314,7 +434,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signOut,
         selectRole,
         refreshProfile,
-        getRoleDashboardPath
+        getRoleDashboardPath,
+
+        // Permissions
+        hasPermission,
+        hasRole,
+        hasAnyPermission,
+        isAdmin,
+        isMentor,
+        isMentee,
+        canAdminSystem,
+        canAdminUsers,
+        canAdminVerifications,
+        canValidateActivities,
+        canViewReports,
+
+        // Additional helpers
+        hasAnyRole,
+        needsRoleSelection,
+        needsVerification,
+        canAccessMentorFeatures,
+        canAccessAdminFeatures,
+        handleAuthError,
+        isInitializing,
+        isReady,
+        getDefaultRedirectPath,
     }
 
     return (
