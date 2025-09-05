@@ -6,16 +6,50 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Configuração do Brevo SMTP
-const transporter = nodemailer.createTransporter({
-  host: 'smtp-relay.brevo.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_SMTP_USER!,
-    pass: process.env.BREVO_SMTP_PASSWORD!
+/**
+ * Validates required environment variables for email configuration
+ */
+function validateEmailConfig() {
+  const required = ['BREVO_SMTP_USER', 'BREVO_SMTP_PASSWORD']
+  const missing = required.filter(key => !process.env[key])
+  
+  if (missing.length > 0) {
+    console.warn(`Missing email configuration: ${missing.join(', ')}`)
+    return false
   }
-})
+  return true
+}
+
+/**
+ * Creates email transporter with error handling
+ */
+function createEmailTransporter() {
+  try {
+    if (!validateEmailConfig()) {
+      console.warn('Email transporter not configured - emails will not be sent')
+      return null
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.BREVO_SMTP_USER!,
+        pass: process.env.BREVO_SMTP_PASSWORD!
+      }
+    })
+
+    console.log('Email transporter configured successfully')
+    return transporter
+  } catch (error) {
+    console.error('Failed to create email transporter:', error)
+    return null
+  }
+}
+
+// Configuração do Brevo SMTP
+const transporter = createEmailTransporter()
 
 interface MigrationNotificationData {
   email: string
@@ -27,9 +61,17 @@ interface MigrationNotificationData {
 
 /**
  * Envia notificação por email para usuário migrado
+ * @param data - Dados da notificação incluindo email, nome e credenciais
+ * @returns Promise com resultado do envio
  */
 export async function sendMigrationNotification(data: MigrationNotificationData) {
   try {
+    // Verificar se o transporter está configurado
+    if (!transporter) {
+      console.error('Email transporter not configured - cannot send notification')
+      return { success: false, error: 'Email service not configured' }
+    }
+
     const { email, firstName, lastName, temporaryPassword, loginUrl } = data
     const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Usuário'
 
