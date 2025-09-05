@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { useAuth } from '@/lib/auth/use-auth'
+import { useAuth } from '@/lib/auth/auth-context'
 import { AuthProvider } from '@/lib/auth/auth-context'
 import { createClient } from '@/utils/supabase/client'
 

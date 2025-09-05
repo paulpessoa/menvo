@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from './use-auth'
+import { useAuth } from './auth-context'
 
 interface AuthGuardProps {
     children: React.ReactNode
@@ -69,28 +69,24 @@ export function AuthGuard({
         )
     }
 
-    // Check if mentor verification is required
+    // Check if mentor verification is required (simplified for MVP)
     if (requireVerified && auth.isMentor() && !auth.isVerified) {
         if (fallback) {
             return <>{fallback}</>
         }
 
+        // For MVP, just show a simple message but allow access
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                        Verificação Pendente
-                    </h1>
-                    <p className="text-gray-600 mb-6">
-                        Seu perfil de mentor está aguardando verificação.
-                        Você receberá um email quando for aprovado.
-                    </p>
-                    <button
-                        onClick={() => router.push('/dashboard')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                    >
-                        Ir para Dashboard
-                    </button>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                <div className="flex">
+                    <div className="ml-3">
+                        <h3 className="text-sm font-medium text-yellow-800">
+                            Verificação Pendente
+                        </h3>
+                        <div className="mt-2 text-sm text-yellow-700">
+                            <p>Seu perfil está aguardando verificação, mas você já pode usar a plataforma.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         )

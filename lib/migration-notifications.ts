@@ -244,6 +244,16 @@ async function hashPassword(password: string): Promise<string> {
 
 /**
  * Agenda envio de notificações (para usar com cron job)
+ * @returns Promise com resultado do processamento em lote
+ * 
+ * @example
+ * ```typescript
+ * // Usar em cron job ou API endpoint
+ * const result = await scheduleNotifications()
+ * if (result.success) {
+ *   console.log(`Enviadas: ${result.sent} notificações`)
+ * }
+ * ```
  */
 export async function scheduleNotifications() {
   console.log('Iniciando envio programado de notificações de migração...')
