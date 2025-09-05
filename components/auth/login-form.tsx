@@ -10,7 +10,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Mail, Lock, AlertTriangle } from "lucide-react"
 import { useAuth } from "@/hooks/useAuth"
-import { useSearchParams } from "next/navigation"
 
 interface LoginFormProps {
     onSuccess?: () => void
@@ -19,33 +18,24 @@ interface LoginFormProps {
 export function LoginForm({ onSuccess }: LoginFormProps) {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
     const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
     const [error, setError] = useState("")
 
-    const searchParams = useSearchParams()
-    const intendedDestination = searchParams.get("redirect")
 
-    const { signIn, loading } = useAuth()
+
+    const { signIn, signInWithProvider, handleAuthError, loading } = useAuth()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError("")
 
-        const result = await signIn(email, password, intendedDestination || undefined)
-
-        if (result.success) {
+        try {
+            await signIn(email, password)
+            // Success handling is done by AuthContext
             onSuccess?.()
-            // Redirect is handled by the signIn function
-        } else {
-            // Handle specific Supabase auth errors
-            if (result.error?.message?.includes("Email not confirmed")) {
-                setError("Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.")
-            } else if (result.error?.message?.includes("Invalid login credentials")) {
-                setError("Email ou senha incorretos. Verifique suas credenciais.")
-            } else {
-                setError(result.error?.message || "Erro inesperado. Tente novamente.")
-            }
+        } catch (error: any) {
+            const errorMessage = handleAuthError(error)
+            setError(errorMessage)
         }
     }
 
@@ -53,9 +43,16 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         setIsSocialLoading(provider)
         setError("")
 
-        // TODO: Implement social login with new auth flow
-        setError("Login social temporariamente indisponível")
-        setIsSocialLoading(null)
+        try {
+            await signInWithProvider(provider)
+            // Success handling is done by AuthContext
+            onSuccess?.()
+        } catch (error: any) {
+            const errorMessage = handleAuthError(error)
+            setError(errorMessage)
+        } finally {
+            setIsSocialLoading(null)
+        }
     }
 
     return (
@@ -73,7 +70,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                         variant="outline"
                         className="w-full flex items-center justify-center gap-3 py-2.5"
                         onClick={() => handleSocialLogin("google")}
-                        disabled={isSocialLoading === "google" || isLoading}
+                        disabled={isSocialLoading === "google" || loading}
                     >
                         {isSocialLoading === "google" ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -105,7 +102,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                         variant="outline"
                         className="w-full flex items-center justify-center gap-3 py-2.5"
                         onClick={() => handleSocialLogin("linkedin")}
-                        disabled={isSocialLoading === "linkedin" || isLoading}
+                        disabled={isSocialLoading === "linkedin" || loading}
                     >
                         {isSocialLoading === "linkedin" ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
