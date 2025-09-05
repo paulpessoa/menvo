@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-09-05T03:08:47.592Z",
+  "issues": [
+    {
+      "category": "Role Redirection",
+      "severity": "medium",
+      "description": "Users without roles may not be redirected to select-role page",
+      "details": "Middleware needs to check user role status and redirect appropriately"
+    },
+    {
+      "category": "Password Recovery",
+      "severity": "medium",
+      "description": "Password recovery redirects to login instead of reset form",
+      "details": "Email callback handling needs to be fixed"
+    }
+  ],
+  "recommendations": [
+    "Implement middleware to check user roles and redirect to /auth/select-role",
+    "Fix password recovery callback to redirect to reset form"
+  ]
+}
