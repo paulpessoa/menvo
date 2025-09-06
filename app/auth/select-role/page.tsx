@@ -58,11 +58,9 @@ export default function SelectRolePage() {
         }
 
         setIsLoading(true)
+        const loadingToast = toast.loading("Salvando seu perfil...")
         try {
             console.log("🔄 Iniciando seleção de role:", selectedRole, "para usuário:", user.id)
-
-            // Show loading toast
-            const loadingToast = toast.loading("Salvando seu perfil...")
 
             // Use the selectRole method from auth context
             await selectRole(selectedRole)
@@ -83,6 +81,7 @@ export default function SelectRolePage() {
             router.push(dashboardPath)
         } catch (error: any) {
             console.error("❌ Erro ao selecionar role:", error)
+            toast.dismiss(loadingToast)
 
             // Show specific error messages
             let errorMessage = "Erro inesperado. Tente novamente."
