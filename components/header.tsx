@@ -16,6 +16,7 @@ import {
   UserCheck,
   BarChart3,
   Cog,
+  HeartHandshake,
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 
@@ -38,7 +39,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation()
 
-  const { isAuthenticated, user, profile, role, signOut, canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } = useAuth()
+  const { isAuthenticated, user, profile, role, signOut, canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin, isVolunteer } = useAuth()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
@@ -59,6 +60,14 @@ export default function Header() {
       { name: "Calendário", href: "/calendar", icon: Calendar },
     ]
     : []
+
+  const volunteerNavigation =
+    isAuthenticated && isVolunteer
+      ? [
+        { name: "Check-in", href: "/checkin", icon: UserCheck },
+        { name: "Voluntariômetro", href: "/voluntariometro", icon: HeartHandshake },
+      ]
+      : []
 
   const adminNavigation =
     isAuthenticated && (canAdminSystem || canAdminUsers || canAdminVerifications)
@@ -155,6 +164,22 @@ export default function Header() {
                   </DropdownMenuItem>
                 ))}
 
+                {/* Volunteer Navigation */}
+                {volunteerNavigation.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Voluntário</DropdownMenuLabel>
+                    {volunteerNavigation.map((item) => (
+                      <DropdownMenuItem key={item.name} asChild>
+                        <Link href={item.href} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          {item.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </>
+                )}
+
                 {/* Admin Navigation */}
                 {adminNavigation.length > 0 && (
                   <>
@@ -222,6 +247,25 @@ export default function Header() {
                           {item.name}
                         </Link>
                       ))}
+
+                      {volunteerNavigation.length > 0 && (
+                        <>
+                          <div className="border-t pt-2 mt-2">
+                            <p className="px-2 py-1 text-sm font-medium text-muted-foreground">Voluntário</p>
+                            {volunteerNavigation.map((item) => (
+                              <Link
+                                key={item.name}
+                                href={item.href}
+                                className="flex items-center gap-2 px-2 py-1 text-lg"
+                                onClick={() => setIsOpen(false)}
+                              >
+                                <item.icon className="h-4 w-4" />
+                                {item.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </>
+                      )}
 
                       {adminNavigation.length > 0 && (
                         <>

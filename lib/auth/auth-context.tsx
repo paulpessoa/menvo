@@ -14,6 +14,7 @@ export interface Profile {
     avatar_url: string | null
     slug: string | null
     verified: boolean
+    is_volunteer: boolean | null
     created_at: string
     updated_at: string
 }
@@ -39,6 +40,7 @@ export interface AuthContextType {
     isVerified: boolean
     isAuthenticated: boolean
     loading: boolean
+    isVolunteer: boolean
 
     // Auth operations
     signIn: (email: string, password: string) => Promise<void>
@@ -426,6 +428,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isVerified: profile?.verified || false,
         isAuthenticated: !!user && !loading,
         loading,
+        isVolunteer: profile?.is_volunteer || false,
 
         // Operations
         signIn,
