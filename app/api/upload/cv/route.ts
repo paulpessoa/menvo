@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { analyzeCV, mapAnalysisToProfileFields, storeCVMetadata } from "@/lib/cv-analysis"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -168,38 +167,8 @@ export async function POST(request: NextRequest) {
     const publicUrl = urlData.publicUrl
     console.log("✅ Public URL generated:", publicUrl)
 
-    // Analyze CV if requested
-    let analysisResult = null;
-    let profileSuggestions = null;
-    
-    if (enableAnalysis) {
-      console.log("🤖 Starting CV analysis...");
-      try {
-        analysisResult = await analyzeCV(arrayBuffer, file.name, {
-          provider: 'mock', // Change to 'openai' or other when implemented
-          language: 'pt'
-        });
-        
-        if (analysisResult.success) {
-          profileSuggestions = mapAnalysisToProfileFields(analysisResult);
-          console.log("✅ CV analysis completed successfully");
-        } else {
-          console.warn("⚠️ CV analysis failed:", analysisResult.error);
-        }
-      } catch (error) {
-        console.error("❌ CV analysis error:", error);
-        // Don't fail the upload if analysis fails
-      }
-    }
-
-    // Store CV metadata
-    try {
-      await storeCVMetadata(user.id, filePath, file.name, file.size, analysisResult || undefined);
-      console.log("✅ CV metadata stored");
-    } catch (error) {
-      console.error("⚠️ Failed to store CV metadata:", error);
-      // Don't fail the upload if metadata storage fails
-    }
+    // Skip analysis for MVP - just store the file
+    console.log("📝 Skipping CV analysis for MVP version");
 
     // Update user profile with new CV URL
     console.log("💾 Updating profile with new CV URL...");
@@ -232,12 +201,6 @@ export async function POST(request: NextRequest) {
       path: uploadData.path,
       fileName: file.name,
       fileSize: file.size,
-      analysisEnabled: enableAnalysis,
-      analysisResult: analysisResult?.success ? {
-        confidence: analysisResult.confidence,
-        extractedFieldsCount: Object.keys(analysisResult.extractedData).length
-      } : null,
-      profileSuggestions: profileSuggestions || null,
       profile: profileData,
     })
 

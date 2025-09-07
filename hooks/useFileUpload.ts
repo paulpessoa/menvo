@@ -95,12 +95,34 @@ export function useFileUpload(options: FileUploadOptions): UseFileUploadReturn {
 
     const result = await handleAsyncOperation(
       async () => {
-        // Get auth token
+        // Get auth token with refresh attempt
         const { supabase } = await import('@/lib/supabase');
-        const { data: { session } } = await supabase.auth.getSession();
+        
+        // Try to get current session first
+        let { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        logger.info('Checking session', 'FileUpload', { 
+          hasSession: !!session,
+          hasToken: !!session?.access_token,
+          sessionError: sessionError?.message
+        });
         
         if (!session?.access_token) {
-          throw new Error('UNAUTHORIZED');
+          logger.info('No valid session, attempting refresh', 'FileUpload');
+          
+          // Try to refresh the session
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          
+          if (refreshError || !refreshData.session?.access_token) {
+            logger.error('Session refresh failed', 'FileUpload', { 
+              refreshError: refreshError?.message 
+            });
+            throw new Error('Sessão expirada. Faça login novamente.');
+          }
+          
+          logger.info('Session refreshed successfully', 'FileUpload');
+          // Use refreshed session
+          session = refreshData.session;
         }
 
         // Prepare form data
