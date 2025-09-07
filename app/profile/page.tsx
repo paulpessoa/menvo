@@ -18,7 +18,7 @@ import { Separator } from "@/components/ui/separator"
 import { Camera, MapPin, Globe, Linkedin, FileText, Upload, X, Loader2, AlertCircle, Eye } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useProfile } from "@/hooks/useProfile"
-import { useImageUpload, usePDFUpload } from "@/hooks/useFileUpload"
+import { useSimpleImageUpload, useSimplePDFUpload } from "@/hooks/useSimpleUpload"
 import { useFormValidation, PROFILE_VALIDATION_RULES, getFieldErrorClass, getFieldErrorMessage } from "@/hooks/useFormValidation"
 import { GoogleMapsService } from "@/services/maps/googleMaps"
 import { ErrorBoundary } from "@/components/error-boundary"
@@ -111,56 +111,11 @@ export default function ProfilePage() {
   const cvInputRef = useRef<HTMLInputElement>(null)
 
   // Image upload hook
-  const imageUpload = useImageUpload('/api/upload/profile-photo', {
-    onSuccess: (result) => {
-      setFormData(prev => ({ ...prev, avatar_url: result.url }))
-      notifications.success("Foto de perfil atualizada com sucesso!", {
-        title: "Upload concluído",
-        duration: 3000
-      })
-    },
-    onError: (error) => {
-      notifications.error(error, {
-        title: "Erro no upload da imagem",
-        action: {
-          label: "Tentar novamente",
-          onClick: () => fileInputRef.current?.click()
-        }
-      })
-    }
-  })
+  const imageUpload = useSimpleImageUpload('/api/upload/profile-photo')
+
 
   // CV upload hook
-  const cvUpload = usePDFUpload('/api/upload/cv', {
-    onSuccess: (result) => {
-      setFormData(prev => ({ ...prev, cv_url: result.url }))
-
-      // If analysis was enabled and suggestions are available
-      if (result.profileSuggestions) {
-        notifications.success("CV enviado e analisado com sucesso! Verifique os campos preenchidos automaticamente.", {
-          title: "Upload e análise concluídos",
-          duration: 5000
-        })
-        // Apply suggestions to form data
-        setFormData(prev => ({ ...prev, ...result.profileSuggestions }))
-        unsavedChanges.markAsChanged()
-      } else {
-        notifications.success("CV enviado com sucesso!", {
-          title: "Upload concluído",
-          duration: 3000
-        })
-      }
-    },
-    onError: (error) => {
-      notifications.error(error, {
-        title: "Erro no upload do CV",
-        action: {
-          label: "Tentar novamente",
-          onClick: () => cvInputRef.current?.click()
-        }
-      })
-    }
-  })
+  const cvUpload = useSimplePDFUpload('/api/upload/cv')
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -331,9 +286,28 @@ export default function ProfilePage() {
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (!file || !user) return
+    if (!file) return
+
+    notifications.clearAll()
 
     const result = await imageUpload.upload(file)
+
+    if (result.success) {
+      setFormData(prev => ({ ...prev, avatar_url: result.data.url }))
+      unsavedChanges.markAsChanged()
+      notifications.success("Foto de perfil atualizada com sucesso!", {
+        title: "Upload concluído",
+        duration: 3000
+      })
+    } else {
+      notifications.error(result.error || "Erro no upload da imagem", {
+        title: "Erro no upload",
+        action: {
+          label: "Tentar novamente",
+          onClick: () => fileInputRef.current?.click()
+        }
+      })
+    }
 
     // Clear the file input
     if (fileInputRef.current) {
@@ -343,7 +317,7 @@ export default function ProfilePage() {
 
   const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (!file || !user) return
+    if (!file) return
 
     // Validate file type
     if (file.type !== 'application/pdf') {
@@ -363,7 +337,25 @@ export default function ProfilePage() {
     }
 
     notifications.clearAll()
-    await cvUpload.upload(file)
+
+    const result = await cvUpload.upload(file)
+
+    if (result.success) {
+      setFormData(prev => ({ ...prev, cv_url: result.data.url }))
+      unsavedChanges.markAsChanged()
+      notifications.success("CV enviado com sucesso!", {
+        title: "Upload concluído",
+        duration: 3000
+      })
+    } else {
+      notifications.error(result.error || "Erro no upload do CV", {
+        title: "Erro no upload",
+        action: {
+          label: "Tentar novamente",
+          onClick: () => cvInputRef.current?.click()
+        }
+      })
+    }
 
     // Clear the file input
     if (cvInputRef.current) {
@@ -372,7 +364,7 @@ export default function ProfilePage() {
   }
 
   const handleCVRemove = async () => {
-    if (!user || !formData.cv_url) return
+    if (!formData.cv_url) return
 
     confirmation.showConfirmation({
       title: "Remover CV",
