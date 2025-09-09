@@ -142,27 +142,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Create waiting list entry
-    const { data: waitingListEntry, error } = await supabase
-      .from("waiting_list")
-      .insert({
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        whatsapp: whatsapp?.trim() || null,
-        reason: reason?.trim() || null,
-        status: "pending",
-      })
-      .select()
-      .single()
+    const { error } = await supabase.from("waiting_list").insert({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      whatsapp: whatsapp?.trim() || null,
+      reason: reason?.trim() || null,
+      status: "pending",
+    })
 
     if (error) {
       console.error("Error creating waiting list entry:", error)
-      return NextResponse.json({ error: "Failed to join waiting list" }, { status: 500 })
+      return NextResponse.json(
+        { error: "Failed to join waiting list" },
+        { status: 500 },
+      )
     }
 
-    return NextResponse.json({ 
-      entry: waitingListEntry,
-      message: "Successfully joined waiting list"
-    }, { status: 201 })
+    return NextResponse.json(
+      { message: "Successfully joined waiting list" },
+      { status: 201 },
+    )
   } catch (error) {
     console.error("Error in waiting list POST:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
