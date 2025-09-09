@@ -36,7 +36,7 @@
 
 ## Rollback Instructions
 If needed, the removed scripts can be restored from git history:
-```bash
+\`\`\`bash
 git checkout HEAD~1 -- scripts/setup-users-direct.js
 git checkout HEAD~1 -- scripts/setup-users-simple.js
-```
+\`\`\`

@@ -11,13 +11,13 @@ Incorrect Nodemailer API method name in `lib/migration-notifications.ts`:
 ## Changes Made
 
 ### 1. Fixed Method Name
-```typescript
+\`\`\`typescript
 // Before (incorrect)
 const transporter = nodemailer.createTransporter({...})
 
 // After (correct)  
 const transporter = nodemailer.createTransport({...})
-```
+\`\`\`
 
 ### 2. Added Environment Validation
 - Added `validateEmailConfig()` function
@@ -35,11 +35,11 @@ const transporter = nodemailer.createTransport({...})
 - Added usage instructions
 
 ## Environment Variables Required
-```env
+\`\`\`env
 BREVO_SMTP_USER=your_smtp_user
 BREVO_SMTP_PASSWORD=your_smtp_password
 BREVO_FROM_EMAIL=noreply@yourdomain.com (optional)
-```
+\`\`\`
 
 ## Result
 ✅ Build now completes successfully

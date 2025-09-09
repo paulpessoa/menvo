@@ -104,7 +104,7 @@
 
 After role selection, the database should have:
 
-```sql
+\`\`\`sql
 -- User in auth.users (created by Supabase)
 -- Profile in profiles table (created by trigger)
 -- Role assignment in user_roles table
@@ -118,7 +118,7 @@ FROM profiles p
 LEFT JOIN user_roles ur ON p.id = ur.user_id
 LEFT JOIN roles r ON ur.role_id = r.id
 WHERE p.id = 'user-id';
-```
+\`\`\`
 
 ## Error Scenarios to Test
 

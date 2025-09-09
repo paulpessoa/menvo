@@ -6,7 +6,7 @@ Vamos usar o **fluxo de login** como exemplo para mostrar a diferença entre os 
 
 ### 🧪 Teste Unitário - `useAuth` Hook
 
-```javascript
+\`\`\`javascript
 // __tests__/lib/auth/use-auth.test.ts
 describe('useAuth hook', () => {
   it('should handle sign in', async () => {
@@ -29,7 +29,7 @@ describe('useAuth hook', () => {
     expect(result.current.user).toEqual(mockUser)
   })
 })
-```
+\`\`\`
 
 **Características:**
 - ✅ Rápido (milissegundos)
@@ -39,7 +39,7 @@ describe('useAuth hook', () => {
 
 ### 🔗 Teste de Integração - Fluxo Completo
 
-```javascript
+\`\`\`javascript
 // __tests__/integration/auth-integration.test.ts
 describe('Login Integration', () => {
   it('should complete login flow with API integration', async () => {
@@ -91,7 +91,7 @@ describe('Login Integration', () => {
     })
   })
 })
-```
+\`\`\`
 
 **Características:**
 - ✅ Testa integração real entre componentes
@@ -101,7 +101,7 @@ describe('Login Integration', () => {
 
 ### 🌐 Teste E2E - Jornada Completa
 
-```javascript
+\`\`\`javascript
 // e2e/auth.spec.ts (Playwright)
 test('User can complete full signup and booking journey', async ({ page }) => {
   // FOCO: Usuário real, navegador real, sistemas reais
@@ -138,7 +138,7 @@ test('User can complete full signup and booking journey', async ({ page }) => {
   await page.click('text=Meus Agendamentos')
   await expect(page.locator('[data-testid="appointments-list"]')).toBeVisible()
 })
-```
+\`\`\`
 
 **Características:**
 - ✅ Testa experiência real do usuário
@@ -151,7 +151,7 @@ test('User can complete full signup and booking journey', async ({ page }) => {
 ## 📊 Quando Usar Cada Um
 
 ### 🧪 Use Testes Unitários Para:
-```javascript
+\`\`\`javascript
 // ✅ Validação de dados
 function validateEmail(email: string): boolean
 function formatCurrency(amount: number): string
@@ -164,10 +164,10 @@ function calculateMentorRating(feedbacks: Feedback[]): number
 // ✅ Hooks isolados
 function useLocalStorage(key: string)
 function useDebounce(value: string, delay: number)
-```
+\`\`\`
 
 ### 🔗 Use Testes de Integração Para:
-```javascript
+\`\`\`javascript
 // ✅ Fluxos de autenticação
 "signup → confirmation → role selection → dashboard"
 
@@ -179,10 +179,10 @@ function useDebounce(value: string, delay: number)
 
 // ✅ Validação de contratos
 "API endpoints structure and error handling"
-```
+\`\`\`
 
 ### 🌐 Use Testes E2E Para:
-```javascript
+\`\`\`javascript
 // ✅ Jornadas críticas do usuário
 "New user signs up and books first appointment"
 
@@ -194,7 +194,7 @@ function useDebounce(value: string, delay: number)
 
 // ✅ Performance crítica
 "Page loads under 3 seconds on mobile"
-```
+\`\`\`
 
 ## 🎯 Estratégia Para Este Projeto
 
@@ -205,15 +205,15 @@ function useDebounce(value: string, delay: number)
 ### Próximos Passos 🚀
 
 #### 1. Completar Testes Unitários
-```bash
+\`\`\`bash
 # Adicionar testes para:
 __tests__/lib/utils/validation.test.ts
 __tests__/lib/hooks/useLocalStorage.test.ts
 __tests__/components/ui/Button.test.tsx
-```
+\`\`\`
 
 #### 2. Implementar Testes E2E Críticos
-```bash
+\`\`\`bash
 # Instalar Playwright
 npm install @playwright/test
 
@@ -221,10 +221,10 @@ npm install @playwright/test
 e2e/critical-user-journeys.spec.ts
 e2e/payment-flow.spec.ts
 e2e/mentor-onboarding.spec.ts
-```
+\`\`\`
 
 #### 3. Configurar CI/CD Pipeline
-```yaml
+\`\`\`yaml
 # .github/workflows/test.yml
 - name: Unit Tests
   run: npm test -- --testPathIgnorePatterns=integration,e2e
@@ -235,7 +235,7 @@ e2e/mentor-onboarding.spec.ts
 - name: E2E Tests
   run: npx playwright test
   if: github.event_name == 'pull_request'
-```
+\`\`\`
 
 ## 📈 Métricas de Qualidade
 

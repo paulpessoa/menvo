@@ -23,7 +23,7 @@ Este design visa restaurar a funcionalidade de login social (Google e LinkedIn) 
 ### Modified Components
 
 #### LoginForm Component (`components/auth/login-form.tsx`)
-```typescript
+\`\`\`typescript
 // Current problematic function
 const handleSocialLogin = async (provider: "google" | "linkedin") => {
     setIsSocialLoading(provider)
@@ -49,7 +49,7 @@ const handleSocialLogin = async (provider: "google" | "linkedin") => {
         setIsSocialLoading(null)
     }
 }
-```
+\`\`\`
 
 ### Existing Components (No Changes Required)
 
@@ -66,7 +66,7 @@ const handleSocialLogin = async (provider: "google" | "linkedin") => {
 ## Data Models
 
 ### Error Handling Flow
-```typescript
+\`\`\`typescript
 interface OAuthError {
     message: string
     provider: 'google' | 'linkedin'
@@ -78,10 +78,10 @@ interface OAuthResult {
     error?: OAuthError
     redirectUrl?: string
 }
-```
+\`\`\`
 
 ### State Management
-```typescript
+\`\`\`typescript
 interface LoginFormState {
     email: string
     password: string
@@ -89,7 +89,7 @@ interface LoginFormState {
     isSocialLoading: 'google' | 'linkedin' | null
     error: string
 }
-```
+\`\`\`
 
 ## Error Handling
 
@@ -115,7 +115,7 @@ interface LoginFormState {
    - LinkedIn: Scope permissions, profile access
 
 ### Error Message Mapping
-```typescript
+\`\`\`typescript
 const errorMessages = {
     'Invalid login credentials': 'Falha na autenticação. Verifique suas credenciais.',
     'Email not confirmed': 'Email não confirmado. Verifique sua caixa de entrada.',
@@ -124,7 +124,7 @@ const errorMessages = {
     'Network error': 'Erro de conexão. Tente novamente.',
     'Provider unavailable': 'Serviço temporariamente indisponível.'
 }
-```
+\`\`\`
 
 ## Testing Strategy
 

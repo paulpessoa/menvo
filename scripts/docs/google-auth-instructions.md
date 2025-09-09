@@ -46,10 +46,10 @@ Erro 403: access_denied - "Menvo não concluiu o processo de verificação do Go
 ## Atualizando o .env.stage:
 Após obter o refresh_token, adicione-o ao arquivo .env.stage:
 
-```
+\`\`\`
 # Não é mais necessário configurar GOOGLE_CALENDAR_REFRESH_TOKEN
 # Os tokens são salvos automaticamente no Supabase por usuário
-```
+\`\`\`
 
 ## Testando:
 1. Reinicie o servidor: `npm run dev`

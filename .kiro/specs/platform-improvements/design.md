@@ -31,26 +31,26 @@ Este documento detalha o design técnico para as melhorias da plataforma, inclui
 ### 1. Sistema de Voluntários
 
 #### Volunteer Role Detection
-```typescript
+\`\`\`typescript
 interface VolunteerAccess {
   isVolunteer: (user: User) => boolean
   canAccessVolunteerPages: (user: User) => boolean
 }
-```
+\`\`\`
 
 #### Voluntariômetro Enhancement
-```typescript
+\`\`\`typescript
 interface VoluntariometroProps {
   showVolunteerForms: boolean // baseado no role do usuário
   publicData: VolunteerStats
   volunteerData?: VolunteerActivity[] // apenas para voluntários
 }
-```
+\`\`\`
 
 ### 2. Sistema de Feedback
 
 #### Database Schema
-```sql
+\`\`\`sql
 CREATE TABLE feedback (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id),
@@ -60,12 +60,12 @@ CREATE TABLE feedback (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-```
+\`\`\`
 
 ### 3. Feature Flags System
 
 #### Vercel Edge Config Implementation
-```typescript
+\`\`\`typescript
 interface FeatureFlags {
   showWaitingList: boolean
   enableFeedback: boolean
@@ -77,10 +77,10 @@ interface FeatureFlagProvider {
   isLoading: boolean
   refresh: () => Promise<void>
 }
-```
+\`\`\`
 
 #### Configuration
-```typescript
+\`\`\`typescript
 // lib/feature-flags.ts
 export const getFeatureFlags = async (): Promise<FeatureFlags> => {
   try {
@@ -90,12 +90,12 @@ export const getFeatureFlags = async (): Promise<FeatureFlags> => {
     return DEFAULT_FLAGS // fallback seguro
   }
 }
-```
+\`\`\`
 
 ### 4. Lista de Espera
 
 #### Database Schema
-```sql
+\`\`\`sql
 CREATE TABLE waiting_list (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -106,12 +106,12 @@ CREATE TABLE waiting_list (
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-```
+\`\`\`
 
 ### 5. Otimização do Fluxo de Autenticação
 
 #### Auth Flow Logic
-```typescript
+\`\`\`typescript
 interface AuthRedirect {
   determineRedirect: (user: User) => string
   shouldShowRoleSelection: (user: User) => boolean
@@ -131,22 +131,22 @@ const determineRedirect = (user: User): string => {
     default: return '/dashboard'
   }
 }
-```
+\`\`\`
 
 ## Data Models
 
 ### Enhanced User Profile
-```typescript
+\`\`\`typescript
 interface UserProfile {
   id: string
   user_role: 'pending' | 'mentee' | 'mentor' | 'admin' | 'volunteer'
   is_volunteer?: boolean // campo adicional opcional
   // ... outros campos existentes
 }
-```
+\`\`\`
 
 ### Feedback Model
-```typescript
+\`\`\`typescript
 interface Feedback {
   id: string
   user_id?: string
@@ -156,10 +156,10 @@ interface Feedback {
   created_at: string
   updated_at: string
 }
-```
+\`\`\`
 
 ### Waiting List Model
-```typescript
+\`\`\`typescript
 interface WaitingListEntry {
   id: string
   name: string
@@ -170,10 +170,10 @@ interface WaitingListEntry {
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
 }
-```
+\`\`\`
 
 ### Migration Data Model
-```typescript
+\`\`\`typescript
 interface UserMigration {
   oldUserId: string
   newUserId?: string
@@ -182,12 +182,12 @@ interface UserMigration {
   migrationStatus: 'pending' | 'completed' | 'failed'
   migrationNotes?: string
 }
-```
+\`\`\`
 
 ## Error Handling
 
 ### API Error Responses
-```typescript
+\`\`\`typescript
 interface APIError {
   error: string
   code: string
@@ -201,7 +201,7 @@ enum ErrorCodes {
   FEATURE_FLAG_UNAVAILABLE = 'FEATURE_FLAG_UNAVAILABLE',
   MIGRATION_CONFLICT = 'MIGRATION_CONFLICT'
 }
-```
+\`\`\`
 
 ### Fallback Strategies
 - **Feature Flags**: Usar valores padrão quando serviço indisponível

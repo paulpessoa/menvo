@@ -3,7 +3,7 @@
 ## 1. Backup dos Dados de Produção
 
 ### Backup da tabela auth.users (CRÍTICO)
-```bash
+\`\`\`bash
 # Conectar ao projeto de produção
 supabase login
 
@@ -15,7 +15,7 @@ supabase db dump --db-url "postgresql://postgres:[SUA_SENHA]@db.[SEU_PROJECT_ID]
 
 # Backup do schema completo (estrutura)
 supabase db dump --db-url "postgresql://postgres:[SUA_SENHA]@db.[SEU_PROJECT_ID].supabase.co:5432/postgres" --schema-only > backup_schema.sql
-```
+\`\`\`
 
 ### Backup via Dashboard (alternativa)
 1. Acesse o Supabase Dashboard
@@ -26,7 +26,7 @@ supabase db dump --db-url "postgresql://postgres:[SUA_SENHA]@db.[SEU_PROJECT_ID]
 ## 2. Configuração do Ambiente Local
 
 ### Inicializar Supabase Local
-```bash
+\`\`\`bash
 # No diretório do projeto
 supabase init
 
@@ -35,25 +35,25 @@ supabase start
 
 # Verificar status
 supabase status
-```
+\`\`\`
 
 ### Aplicar Schema Atual
-```bash
+\`\`\`bash
 # Gerar migrações baseadas no schema remoto
 supabase db diff --use-migra -f initial_schema
 
 # Aplicar migrações localmente
 supabase db reset
-```
+\`\`\`
 
 ### Restaurar Dados de Usuários
-```bash
+\`\`\`bash
 # Restaurar usuários (IMPORTANTE: fazer primeiro)
 psql -h localhost -p 54322 -U postgres -d postgres -f backup_auth_users.sql
 
 # Restaurar dados customizados (se necessário)
 psql -h localhost -p 54322 -U postgres -d postgres -f backup_custom_tables.sql
-```
+\`\`\`
 
 ## 3. Desenvolvimento Local
 
@@ -64,14 +64,14 @@ psql -h localhost -p 54322 -U postgres -d postgres -f backup_custom_tables.sql
 - **Inbucket URL**: http://localhost:54324
 
 ### Configurar .env.local
-```env
+\`\`\`env
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=[ANON_KEY_LOCAL]
 SUPABASE_SERVICE_ROLE_KEY=[SERVICE_ROLE_KEY_LOCAL]
-```
+\`\`\`
 
 ### Comandos Úteis Durante Desenvolvimento
-```bash
+\`\`\`bash
 # Ver logs em tempo real
 supabase logs
 
@@ -84,7 +84,7 @@ supabase db reset
 
 # Parar ambiente local
 supabase stop
-```
+\`\`\`
 
 ## 4. Testando as Alterações
 
@@ -104,16 +104,16 @@ supabase stop
 ## 5. Deploy para Produção
 
 ### Gerar Migrações Finais
-```bash
+\`\`\`bash
 # Comparar local com produção
 supabase db diff --use-migra -f final_refactor
 
 # Revisar migração gerada
 cat supabase/migrations/[timestamp]_final_refactor.sql
-```
+\`\`\`
 
 ### Aplicar em Produção
-```bash
+\`\`\`bash
 # Fazer backup final antes do deploy
 supabase db dump --db-url "postgresql://postgres:[SUA_SENHA]@db.[SEU_PROJECT_ID].supabase.co:5432/postgres" > backup_pre_refactor.sql
 
@@ -122,31 +122,31 @@ supabase db push
 
 # Verificar se tudo funcionou
 supabase db diff --use-migra
-```
+\`\`\`
 
 ### Deploy do Frontend
-```bash
+\`\`\`bash
 # Atualizar variáveis de ambiente de produção
 # NEXT_PUBLIC_SUPABASE_URL=[URL_PRODUCAO]
 # NEXT_PUBLIC_SUPABASE_ANON_KEY=[ANON_KEY_PRODUCAO]
 
 # Deploy via Vercel
 vercel --prod
-```
+\`\`\`
 
 ## 6. Rollback (Se Necessário)
 
 ### Rollback do Banco
-```bash
+\`\`\`bash
 # Restaurar backup completo
 psql -h db.[SEU_PROJECT_ID].supabase.co -p 5432 -U postgres -d postgres -f backup_pre_refactor.sql
-```
+\`\`\`
 
 ### Rollback do Frontend
-```bash
+\`\`\`bash
 # Via Vercel Dashboard ou CLI
 vercel rollback [DEPLOYMENT_URL]
-```
+\`\`\`
 
 ## 7. Monitoramento Pós-Deploy
 
@@ -159,13 +159,13 @@ vercel rollback [DEPLOYMENT_URL]
 - [ ] Todos os fluxos de auth funcionam
 
 ### Comandos de Monitoramento
-```bash
+\`\`\`bash
 # Ver logs de produção
 supabase logs --project-ref [SEU_PROJECT_ID]
 
 # Verificar saúde do banco
 supabase db inspect --project-ref [SEU_PROJECT_ID]
-```
+\`\`\`
 
 ## Notas Importantes
 

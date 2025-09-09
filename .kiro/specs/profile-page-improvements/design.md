@@ -17,7 +17,7 @@ A página de perfil atual tem os seguintes componentes:
 
 ### Proposed Architecture
 
-```mermaid
+\`\`\`mermaid
 graph TB
     A[Profile Page Component] --> B[useProfile Hook]
     A --> C[useFileUpload Hook]
@@ -42,7 +42,7 @@ graph TB
     subgraph "Database"
         K
     end
-```
+\`\`\`
 
 ## Components and Interfaces
 
@@ -73,7 +73,7 @@ graph TB
 - Limited validation
 
 **Enhancements**:
-```typescript
+\`\`\`typescript
 interface ProfileUpdateResult {
   success: boolean;
   data?: Profile;
@@ -90,7 +90,7 @@ interface UseProfileReturn {
   removeCV: () => Promise<ProfileUpdateResult>;
   refetch: () => Promise<void>;
 }
-```
+\`\`\`
 
 ### 3. New useFileUpload Hook
 
@@ -102,7 +102,7 @@ interface UseProfileReturn {
 - Provide reusable upload logic
 - Handle upload cancellation
 
-```typescript
+\`\`\`typescript
 interface FileUploadOptions {
   maxSize: number;
   allowedTypes: string[];
@@ -115,7 +115,7 @@ interface UseFileUploadReturn {
   isUploading: boolean;
   cancel: () => void;
 }
-```
+\`\`\`
 
 ### 4. New CV Upload API
 
@@ -189,17 +189,17 @@ No schema changes required. Existing fields are sufficient:
 
 ### Error Response Format
 
-```typescript
+\`\`\`typescript
 interface ErrorResponse {
   error: string;
   code?: string;
   details?: Record<string, any>;
 }
-```
+\`\`\`
 
 ### User-Friendly Error Messages
 
-```typescript
+\`\`\`typescript
 const ERROR_MESSAGES = {
   'FILE_TOO_LARGE': 'Arquivo muito grande. Máximo permitido: 5MB',
   'INVALID_FILE_TYPE': 'Tipo de arquivo não suportado',
@@ -208,7 +208,7 @@ const ERROR_MESSAGES = {
   'UPLOAD_FAILED': 'Falha no upload. Tente novamente',
   'PROFILE_UPDATE_FAILED': 'Erro ao salvar perfil. Tente novamente'
 };
-```
+\`\`\`
 
 ## Testing Strategy
 

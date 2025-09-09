@@ -18,12 +18,12 @@
 - ✅ **Lógica simplificada**: Apenas 3 roles (mentor, mentee, admin)
 
 ### 3. **Permissões Simplificadas**
-```typescript
+\`\`\`typescript
 // Sistema super simples de permissões
 mentor: ['view_mentors', 'provide_mentorship', 'manage_availability']
 mentee: ['view_mentors', 'book_sessions']  
 admin: [ALL_PERMISSIONS] // Admin pode tudo
-```
+\`\`\`
 
 ### 4. **Redirecionamentos Simplificados**
 - ✅ Sem role → `/auth/select-role`
@@ -32,7 +32,7 @@ admin: [ALL_PERMISSIONS] // Admin pode tudo
 - ✅ Removidas verificações de status de verificação desnecessárias
 
 ### 5. **Banco de Dados Limpo**
-```sql
+\`\`\`sql
 profiles (essencial)
 ├── id, email, first_name, last_name
 ├── avatar_url, bio, verified
@@ -43,7 +43,7 @@ roles (simples)
 
 user_roles (relacionamento)
 ├── user_id → role_id
-```
+\`\`\`
 
 ## 🧪 Testes Realizados
 
@@ -57,13 +57,13 @@ Todos os testes passaram com sucesso:
 ## 🚀 Sistema Final
 
 ### Fluxo de Autenticação Simplificado:
-```
+\`\`\`
 1. Usuário faz login → AuthContext carrega dados
 2. Se não tem role → Redireciona para seleção de role
 3. Se tem role → Redireciona para dashboard específico
 4. Permissões verificadas baseadas apenas na role
 5. Logout limpa tudo e redireciona para home
-```
+\`\`\`
 
 ### Arquivos Principais:
 - **`lib/auth/auth-context.tsx`** - Contexto principal com tudo

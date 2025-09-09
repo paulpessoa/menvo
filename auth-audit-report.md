@@ -36,9 +36,9 @@
 ## Data Flow Analysis
 
 ### Current Problematic Flow:
-```
+\`\`\`
 User Login → Multiple Auth Contexts → Conflicting State → Role Confusion → Redirect Issues
-```
+\`\`\`
 
 ### Issues Identified:
 1. **State Conflicts**: Multiple sources of truth for user state
@@ -48,7 +48,7 @@ User Login → Multiple Auth Contexts → Conflicting State → Role Confusion �
 5. **API Duplication**: Multiple endpoints doing same thing
 
 ## Database Schema (Current - Simplified)
-```sql
+\`\`\`sql
 profiles (✓ Good - Keep)
 ├── id, email, first_name, last_name, full_name
 ├── avatar_url, bio, verified
@@ -59,7 +59,7 @@ roles (✓ Good - Keep)
 
 user_roles (✓ Good - Keep)
 ├── user_id, role_id, assigned_at
-```
+\`\`\`
 
 ## Redundancies to Remove
 
@@ -82,23 +82,23 @@ user_roles (✓ Good - Keep)
 ## Recommended Consolidation Strategy
 
 ### Single Source of Truth:
-```
+\`\`\`
 AuthProvider (Context) 
 └── useAuth (Single Hook)
     ├── User State Management
     ├── Role Management  
     ├── Simple Permissions
     └── Basic Redirects
-```
+\`\`\`
 
 ### Simplified Permission Matrix:
-```
+\`\`\`
 Role    | Actions
 --------|------------------
 mentee  | view_mentors, book_sessions
 mentor  | view_mentors, book_sessions, provide_mentorship
 admin   | ALL permissions
-```
+\`\`\`
 
 ## Files to Delete/Modify
 

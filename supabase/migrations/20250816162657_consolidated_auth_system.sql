@@ -196,4 +196,3 @@ INSERT INTO public.permissions (name, description, resource, action) VALUES
     -- Moderation permissions
     ('moderate_content', 'Moderate platform content', 'moderation', 'content'),
     ('moderate_verifications', 'Moderate verification requests', 'moderation', 'verifications');
-

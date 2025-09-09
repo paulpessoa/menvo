@@ -42,25 +42,25 @@ Este guia explica como configurar a integração com Google Calendar para criar 
 ## Passo 2: Configurar Variáveis de Ambiente
 
 ### 2.1 Adicionar no Vercel (Produção)
-```bash
+\`\`\`bash
 GOOGLE_CALENDAR_CLIENT_ID=seu_client_id_aqui
 GOOGLE_CALENDAR_CLIENT_SECRET=seu_client_secret_aqui
 GOOGLE_CALENDAR_REDIRECT_URI=https://seu-dominio.vercel.app/api/auth/google-calendar/callback
-```
+\`\`\`
 
 ### 2.2 Adicionar no .env.local (Desenvolvimento)
-```bash
+\`\`\`bash
 GOOGLE_CALENDAR_CLIENT_ID=seu_client_id_aqui
 GOOGLE_CALENDAR_CLIENT_SECRET=seu_client_secret_aqui
 GOOGLE_CALENDAR_REDIRECT_URI=http://localhost:3000/api/auth/google-calendar/callback
-```
+\`\`\`
 
 ## Passo 3: Obter Refresh Token
 
 ### 3.1 Gerar URL de Autorização
-```bash
+\`\`\`bash
 GET /api/auth/google-calendar?action=auth
-```
+\`\`\`
 
 Ou acesse: `https://seu-dominio.vercel.app/api/auth/google-calendar?action=auth`
 
@@ -71,33 +71,33 @@ Ou acesse: `https://seu-dominio.vercel.app/api/auth/google-calendar?action=auth`
 4. Copie o código de autorização da URL de callback
 
 ### 3.3 Trocar Código por Tokens
-```bash
+\`\`\`bash
 POST /api/auth/google-calendar
 Content-Type: application/json
 
 {
   "code": "codigo_de_autorizacao_aqui"
 }
-```
+\`\`\`
 
 ### 3.4 Adicionar Refresh Token
 Copie o `refresh_token` da resposta e adicione às variáveis de ambiente:
 
-```bash
+\`\`\`bash
 GOOGLE_CALENDAR_REFRESH_TOKEN=seu_refresh_token_aqui
-```
+\`\`\`
 
 ## Passo 4: Testar Configuração
 
 ### 4.1 Verificar Configuração
-```bash
+\`\`\`bash
 GET /api/calendar/test-config
-```
+\`\`\`
 
 ### 4.2 Testar Criação de Evento
-```bash
+\`\`\`bash
 POST /api/calendar/test
-```
+\`\`\`
 
 ## Fluxo de Funcionamento
 
@@ -114,38 +114,38 @@ POST /api/calendar/test
 ## Endpoints Disponíveis
 
 ### Confirmar Agendamento
-```bash
+\`\`\`bash
 POST /api/appointments/confirm
 {
   "appointmentId": "uuid"
 }
-```
+\`\`\`
 
 ### Cancelar Agendamento
-```bash
+\`\`\`bash
 POST /api/appointments/cancel
 {
   "appointmentId": "uuid",
   "reason": "Motivo do cancelamento"
 }
-```
+\`\`\`
 
 ### Configuração OAuth
-```bash
+\`\`\`bash
 GET /api/auth/google-calendar?action=auth  # Obter URL de autorização
 POST /api/auth/google-calendar             # Trocar código por tokens
-```
+\`\`\`
 
 ### Testes
-```bash
+\`\`\`bash
 GET /api/calendar/test-config              # Verificar configuração
 POST /api/calendar/test                    # Criar evento de teste
-```
+\`\`\`
 
 ## Componentes React
 
 ### ConfirmAppointmentButton
-```tsx
+\`\`\`tsx
 import { ConfirmAppointmentButton } from '@/components/appointments/confirm-appointment-button'
 
 <ConfirmAppointmentButton
@@ -154,10 +154,10 @@ import { ConfirmAppointmentButton } from '@/components/appointments/confirm-appo
     // Atualizar estado local
   }}
 />
-```
+\`\`\`
 
 ### CancelAppointmentButton
-```tsx
+\`\`\`tsx
 import { CancelAppointmentButton } from '@/components/appointments/cancel-appointment-button'
 
 <CancelAppointmentButton
@@ -166,10 +166,10 @@ import { CancelAppointmentButton } from '@/components/appointments/cancel-appoin
     // Atualizar estado local
   }}
 />
-```
+\`\`\`
 
 ### AppointmentCard
-```tsx
+\`\`\`tsx
 import { AppointmentCard } from '@/components/appointments/appointment-card'
 
 <AppointmentCard
@@ -179,7 +179,7 @@ import { AppointmentCard } from '@/components/appointments/appointment-card'
     // Atualizar lista de agendamentos
   }}
 />
-```
+\`\`\`
 
 ## Troubleshooting
 

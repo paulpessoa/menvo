@@ -17,7 +17,7 @@ Environment: Production (evxrzmzkghshjmmyegxu)
 ## Restoration Steps
 
 ### 1. For Local Development
-```bash
+\`\`\`bash
 # Start Supabase locally
 supabase start
 
@@ -32,10 +32,10 @@ psql -h localhost -p 54322 -U postgres -d postgres -f data.sql
 
 # Apply auth schema (if needed)
 psql -h localhost -p 54322 -U postgres -d postgres -f auth_schema.sql
-```
+\`\`\`
 
 ### 2. For Remote Project
-```bash
+\`\`\`bash
 # Link to your project
 supabase link --project-ref YOUR_PROJECT_REF
 
@@ -44,7 +44,7 @@ supabase db push
 
 # For data restoration, use Supabase Studio SQL editor
 # Copy and paste the contents of data.sql
-```
+\`\`\`
 
 ### 3. Verification Steps
 - Check that all tables exist: `\dt` in psql

@@ -43,13 +43,13 @@ Registra todas as ações realizadas durante a migração:
 - Trata conflitos automaticamente
 
 #### Uso:
-```bash
+\`\`\`bash
 # Executar migração
 npm run migrate-users
 
 # Ou via API administrativa
 POST /api/admin/run-migration
-```
+\`\`\`
 
 ### 3. Interface Administrativa (`/admin/users/migrations`)
 
@@ -73,16 +73,16 @@ Apenas usuários com role `admin` podem acessar.
 
 #### Configuração:
 Requer configuração do Brevo SMTP:
-```env
+\`\`\`env
 BREVO_SMTP_USER=your_brevo_smtp_user
 BREVO_SMTP_PASSWORD=your_brevo_smtp_password
 BREVO_FROM_EMAIL=noreply@yourdomain.com
-```
+\`\`\`
 
 ## Fluxo de Migração
 
 ### 1. Preparação dos Dados
-```json
+\`\`\`json
 // Exemplo de estrutura de dados antigos
 {
   "id": "old_user_1",
@@ -95,7 +95,7 @@ BREVO_FROM_EMAIL=noreply@yourdomain.com
     "expertise": ["JavaScript", "React"]
   }
 }
-```
+\`\`\`
 
 ### 2. Processo de Migração
 
@@ -128,7 +128,7 @@ Após migração bem-sucedida:
 ## Mapeamento de Dados
 
 ### Roles
-```typescript
+\`\`\`typescript
 const roleMap = {
   'mentor': 'mentor',
   'mentee': 'mentee',
@@ -136,7 +136,7 @@ const roleMap = {
   'admin': 'admin',
   'administrator': 'admin'
 }
-```
+\`\`\`
 
 ### Campos do Perfil
 - `first_name` → `first_name`
@@ -177,33 +177,33 @@ Todas as ações são registradas:
 ### Problemas Comuns
 
 #### 1. Erro de Email Duplicado
-```
+\`\`\`
 Solução: Resolver via interface administrativa
 - Opção 1: Mesclar dados com usuário existente
 - Opção 2: Pular migração
-```
+\`\`\`
 
 #### 2. Falha na Criação de Usuário
-```
+\`\`\`
 Possíveis causas:
 - Email inválido
 - Problemas de conectividade
 - Limites de rate do Supabase
 
 Solução: Verificar logs e tentar novamente
-```
+\`\`\`
 
 #### 3. Notificações Não Enviadas
-```
+\`\`\`
 Verificar:
 - Configuração do Resend API
 - Domínio de email configurado
 - Limites de envio
-```
+\`\`\`
 
 ## Comandos Úteis
 
-```bash
+\`\`\`bash
 # Verificar status das migrações
 supabase db status
 
@@ -215,11 +215,11 @@ npm run migrate-users
 
 # Enviar notificações pendentes
 curl -X POST /api/admin/send-migration-notifications
-```
+\`\`\`
 
 ## Configuração de Ambiente
 
-```env
+\`\`\`env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
@@ -231,7 +231,7 @@ BREVO_FROM_EMAIL=noreply@yourdomain.com
 
 # App
 NEXT_PUBLIC_APP_URL=https://yourapp.com
-```
+\`\`\`
 
 ## Backup e Rollback
 

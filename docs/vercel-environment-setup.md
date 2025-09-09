@@ -8,11 +8,11 @@
 3. Vá para "Settings" > "Environment Variables"
 4. Adicione as seguintes variáveis:
 
-```
+\`\`\`
 GOOGLE_CALENDAR_CLIENT_ID=your_google_calendar_client_id
 GOOGLE_CALENDAR_CLIENT_SECRET=your_google_calendar_client_secret
 GOOGLE_CALENDAR_REDIRECT_URI=https://seu-dominio.vercel.app/api/auth/google-calendar/callback
-```
+\`\`\`
 
 > **Nota:** O `GOOGLE_CALENDAR_REFRESH_TOKEN` não é mais necessário pois os tokens são salvos no Supabase por usuário.
 

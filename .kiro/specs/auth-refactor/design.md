@@ -8,7 +8,7 @@ Esta refatoração simplifica o sistema de autenticação da plataforma de mento
 
 ### Fluxo de Emails do Supabase
 
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Usuário] --> B{Ação de Email}
     
@@ -35,11 +35,11 @@ graph TD
     N --> R[Mantém sessão atual]
     O --> Q
     P --> R
-```
+\`\`\`
 
 ### Configuração de Email Templates
 
-```toml
+\`\`\`toml
 # supabase/config.toml
 [auth.email]
 enable_confirmations = true
@@ -66,11 +66,11 @@ content_path = "./supabase/templates/magic_link.html"
 [auth.email.template.email_change]
 subject = "Confirme seu novo email - Plataforma de Mentores"
 content_path = "./supabase/templates/email_change.html"
-```
+\`\`\`
 
 ### Fluxo de Autenticação Simplificado
 
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Usuário acessa app] --> B{Está logado?}
     B -->|Não| C[Página Login/Cadastro]
@@ -92,11 +92,11 @@ graph TD
     I -->|Mentor verificado| M[Dashboard Mentor - Perfil público]
     I -->|Mentee| N[Dashboard Mentee - Pode agendar]
     I -->|Admin| O[Dashboard Admin - Pode verificar mentores]
-```
+\`\`\`
 
 ### Estrutura de Arquivos Consolidada
 
-```
+\`\`\`
 src/
 ├── lib/
 │   ├── supabase/
@@ -137,13 +137,13 @@ src/
 │       ├── mentor.tsx
 │       ├── mentee.tsx
 │       └── admin.tsx
-```
+\`\`\`
 
 ## Components and Interfaces
 
 ### Auth Context (Consolidado)
 
-```typescript
+\`\`\`typescript
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
@@ -157,24 +157,24 @@ interface AuthContextType {
   selectRole: (role: 'mentor' | 'mentee') => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
-```
+\`\`\`
 
 ### Auth Guard (Simplificado)
 
-```typescript
+\`\`\`typescript
 interface AuthGuardProps {
   children: React.ReactNode;
   requireRole?: boolean;
   allowedRoles?: ('mentor' | 'mentee' | 'admin')[];
   requireVerified?: boolean;
 }
-```
+\`\`\`
 
 ## Data Models
 
 ### Estrutura do Banco Simplificada
 
-```sql
+\`\`\`sql
 -- Tabela profiles (simplificada)
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
@@ -229,11 +229,11 @@ CREATE TABLE appointments (
 
 -- Storage bucket para avatars
 INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
-```
+\`\`\`
 
 ### Custom Claims Function
 
-```sql
+\`\`\`sql
 CREATE OR REPLACE FUNCTION auth.get_custom_claims(user_id UUID)
 RETURNS JSON AS $$
 DECLARE
@@ -253,7 +253,7 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-```
+\`\`\`
 
 ## Error Handling
 
@@ -269,7 +269,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 ### Tratamento de Erros no Auth Context
 
-```typescript
+\`\`\`typescript
 const handleAuthError = (error: AuthError) => {
   switch (error.message) {
     case 'Email not confirmed':
@@ -294,11 +294,11 @@ const handleAuthError = (error: AuthError) => {
       setError('Erro inesperado. Tente novamente.');
   }
 };
-```
+\`\`\`
 
 ### Páginas de Callback para Emails
 
-```typescript
+\`\`\`typescript
 // pages/auth/callback.tsx - Processa todos os tipos de email
 export default function AuthCallback() {
   const router = useRouter();
@@ -349,7 +349,7 @@ export default function AuthCallback() {
   
   return <div>Processando...</div>;
 }
-```
+\`\`\`
 
 ## Testing Strategy
 
@@ -375,7 +375,7 @@ export default function AuthCallback() {
 
 ### Endpoints que usam ROLE_KEY (manter)
 
-```typescript
+\`\`\`typescript
 // /api/auth/custom-claims.ts
 // Atualiza custom claims no JWT
 // MANTÉM: Precisa do ROLE_KEY para atualizar JWT
@@ -387,7 +387,7 @@ export default function AuthCallback() {
 // /api/appointments/create.ts
 // Cria agendamento e evento no Google Calendar
 // MANTÉM: Precisa do ROLE_KEY para Google Calendar API
-```
+\`\`\`
 
 ### Endpoints para remover/simplificar
 
@@ -409,18 +409,18 @@ export default function AuthCallback() {
 
 ### Configuração Necessária
 
-```env
+\`\`\`env
 # Configure na Vercel:
 # GOOGLE_CALENDAR_CLIENT_ID=your_client_id
 # GOOGLE_CALENDAR_CLIENT_SECRET=your_client_secret
 # GOOGLE_CALENDAR_REDIRECT_URI=https://your-domain.vercel.app/api/auth/google-calendar/callback
-```
+\`\`\`
 
 ## Security Considerations
 
 ### Row Level Security (RLS)
 
-```sql
+\`\`\`sql
 -- Profiles: usuários só veem próprio perfil, exceto mentores verificados
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
@@ -437,7 +437,7 @@ CREATE POLICY "Public can view verified mentors" ON profiles
 -- User_roles: usuários só veem próprias roles
 CREATE POLICY "Users can view own roles" ON user_roles
   FOR SELECT USING (auth.uid() = user_id);
-```
+\`\`\`
 
 ### Validações Server-side
 
@@ -450,12 +450,12 @@ CREATE POLICY "Users can view own roles" ON user_roles
 
 ### Database Indexes
 
-```sql
+\`\`\`sql
 CREATE INDEX idx_profiles_slug ON profiles(slug);
 CREATE INDEX idx_profiles_verified ON profiles(verified) WHERE verified = true;
 CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
 CREATE INDEX idx_mentor_availability_mentor_day ON mentor_availability(mentor_id, day_of_week);
-```
+\`\`\`
 
 ### Caching Strategy
 

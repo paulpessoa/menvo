@@ -28,7 +28,7 @@ Após análise detalhada do código atual, identifiquei múltiplas implementaç�
 
 ### Arquitetura Simplificada Proposta
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────┐
 │                    Frontend Auth Layer                      │
 ├─────────────────────────────────────────────────────────────┤
@@ -47,7 +47,7 @@ Após análise detalhada do código atual, identifiquei múltiplas implementaç�
 │  ├── roles (mentor, mentee, admin)                         │
 │  └── user_roles (User-role relationship)                   │
 └─────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ## Components and Interfaces
 
@@ -55,7 +55,7 @@ Após análise detalhada do código atual, identifiquei múltiplas implementaç�
 
 **File:** `lib/auth/auth-context.tsx` (Consolidado)
 
-```typescript
+\`\`\`typescript
 interface AuthContextType {
   // State
   user: User | null
@@ -72,18 +72,18 @@ interface AuthContextType {
   hasRole: (role: string) => boolean
   canAccess: (permission: string) => boolean
 }
-```
+\`\`\`
 
 ### 2. Simplified Permissions
 
 **Permissions Matrix:**
-```
+\`\`\`
 Role    | View Mentors | Book Sessions | Provide Mentorship | Admin Access
 --------|--------------|---------------|-------------------|-------------
 mentee  | ✓            | ✓             | ✗                 | ✗
 mentor  | ✓            | ✓             | ✓                 | ✗
 admin   | ✓            | ✓             | ✓                 | ✓
-```
+\`\`\`
 
 ### 3. Streamlined API Endpoints
 
@@ -101,7 +101,7 @@ admin   | ✓            | ✓             | ✓                 | ✓
 
 ### Database Schema (Simplified)
 
-```sql
+\`\`\`sql
 -- Main profiles table (keep as is)
 profiles {
   id: UUID (PK)
@@ -129,11 +129,11 @@ user_roles {
   role_id: INTEGER (FK to roles)
   assigned_at: TIMESTAMPTZ
 }
-```
+\`\`\`
 
 ### Frontend State Management
 
-```typescript
+\`\`\`typescript
 // Single source of truth for auth state
 interface AuthState {
   user: User | null
@@ -142,7 +142,7 @@ interface AuthState {
   loading: boolean
   initialized: boolean
 }
-```
+\`\`\`
 
 ## Error Handling
 
@@ -155,12 +155,12 @@ interface AuthState {
 
 ### Error Recovery Flows
 
-```
+\`\`\`
 Login Error → Show message → Allow retry
 Role Selection Error → Show message → Allow retry
 Permission Denied → Redirect to dashboard
 Session Expired → Clear state → Redirect to login
-```
+\`\`\`
 
 ## Testing Strategy
 

@@ -37,4 +37,3 @@ export async function isUserVolunteer(userId: string): Promise<boolean> {
     return false
   }
 }
-

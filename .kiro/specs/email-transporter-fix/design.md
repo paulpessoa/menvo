@@ -15,7 +15,7 @@ The email system follows a simple architecture:
 ## Components and Interfaces
 
 ### Email Configuration
-```typescript
+\`\`\`typescript
 interface EmailConfig {
   host: string
   port: number
@@ -25,16 +25,16 @@ interface EmailConfig {
     pass: string
   }
 }
-```
+\`\`\`
 
 ### Transporter Instance
-```typescript
+\`\`\`typescript
 // Current (incorrect)
 const transporter = nodemailer.createTransporter(config)
 
 // Fixed (correct)
 const transporter = nodemailer.createTransport(config)
-```
+\`\`\`
 
 ### Migration Notification Service
 - `sendMigrationNotification()` - Send single notification
@@ -44,15 +44,15 @@ const transporter = nodemailer.createTransport(config)
 ## Data Models
 
 ### Environment Variables Required
-```env
+\`\`\`env
 BREVO_SMTP_USER=your_smtp_user
 BREVO_SMTP_PASSWORD=your_smtp_password
 BREVO_FROM_EMAIL=noreply@yourdomain.com
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
-```
+\`\`\`
 
 ### Email Template Data
-```typescript
+\`\`\`typescript
 interface MigrationNotificationData {
   email: string
   firstName?: string
@@ -60,7 +60,7 @@ interface MigrationNotificationData {
   temporaryPassword: string
   loginUrl: string
 }
-```
+\`\`\`
 
 ## Error Handling
 

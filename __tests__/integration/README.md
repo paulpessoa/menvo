@@ -141,16 +141,16 @@ Comprehensive end-to-end test scenarios combining multiple workflows.
 ## Executando os Testes
 
 ### 🚀 Executar Todos os Testes de Integração
-```bash
+\`\`\`bash
 # Executa todos os testes do diretório integration
 npm test -- --testPathPattern=integration
 
 # Alternativa mais específica
 npm test -- __tests__/integration/
-```
+\`\`\`
 
 ### 📁 Executar Teste Específico
-```bash
+\`\`\`bash
 # Teste principal (recomendado - mais estável)
 npm test -- __tests__/integration/auth-integration.test.ts
 
@@ -159,10 +159,10 @@ npm test -- __tests__/integration/auth-flow.integration.test.tsx
 npm test -- __tests__/integration/mentor-verification.integration.test.tsx
 npm test -- __tests__/integration/appointment-calendar.integration.test.tsx
 npm test -- __tests__/integration/test-runner.integration.test.tsx
-```
+\`\`\`
 
 ### 🔍 Executar com Opções Avançadas
-```bash
+\`\`\`bash
 # Com coverage detalhado
 npm test -- --testPathPattern=integration --coverage
 
@@ -174,10 +174,10 @@ npm test -- --testPathPattern=integration --verbose
 
 # Apenas testes que falharam
 npm test -- --testPathPattern=integration --onlyFailures
-```
+\`\`\`
 
 ### 🎯 Executar Testes por Categoria
-```bash
+\`\`\`bash
 # Apenas testes de API
 npm test -- --testNamePattern="API Endpoint"
 
@@ -189,10 +189,10 @@ npm test -- --testNamePattern="Authentication Flow"
 
 # Apenas testes de Google Calendar
 npm test -- --testNamePattern="Google Calendar"
-```
+\`\`\`
 
 ### 📊 Executar Todos os Tipos de Teste
-```bash
+\`\`\`bash
 # Todos os testes (unitários + integração)
 npm test
 
@@ -201,21 +201,21 @@ npm test -- --testPathIgnorePatterns=integration
 
 # Com coverage completo
 npm test -- --coverage --coverageDirectory=coverage
-```
+\`\`\`
 
 ### 🐛 Debug e Desenvolvimento
-```bash
+\`\`\`bash
 # Executa um teste específico em modo debug
 npm test -- __tests__/integration/auth-integration.test.ts --verbose --no-cache
 
 # Para debuggar com breakpoints (VS Code)
 npm test -- --runInBand --no-cache __tests__/integration/auth-integration.test.ts
-```
+\`\`\`
 
 ## 🚀 Comandos Rápidos de Execução
 
 ### Executar Todos os Testes
-```bash
+\`\`\`bash
 # Todos os testes de integração
 npm test -- --testPathPattern=integration
 
@@ -224,10 +224,10 @@ npm test -- __tests__/integration/auth-integration.test.ts
 
 # Com coverage
 npm test -- --testPathPattern=integration --coverage
-```
+\`\`\`
 
 ### Executar Testes Específicos
-```bash
+\`\`\`bash
 # Por funcionalidade
 npm test -- __tests__/integration/auth-flow.integration.test.tsx
 npm test -- __tests__/integration/mentor-verification.integration.test.tsx
@@ -237,10 +237,10 @@ npm test -- __tests__/integration/appointment-calendar.integration.test.tsx
 npm test -- --testNamePattern="API Endpoint"
 npm test -- --testNamePattern="Error Handling"
 npm test -- --testNamePattern="Google Calendar"
-```
+\`\`\`
 
 ### Modo Desenvolvimento
-```bash
+\`\`\`bash
 # Watch mode (re-executa ao salvar)
 npm test -- --testPathPattern=integration --watch
 
@@ -249,7 +249,7 @@ npm test -- --testPathPattern=integration --verbose
 
 # Debug específico
 npm test -- __tests__/integration/auth-integration.test.ts --verbose --no-cache
-```
+\`\`\`
 
 ## Test Requirements Validation
 
@@ -311,13 +311,13 @@ These tests are designed to run in CI/CD environments and validate:
 - Testar componentes sem dependências externas
 
 **Exemplo:**
-```javascript
+\`\`\`javascript
 // Testa apenas a função de validação
 test('should validate email format', () => {
   expect(validateEmail('test@example.com')).toBe(true)
   expect(validateEmail('invalid')).toBe(false)
 })
-```
+\`\`\`
 
 ### 🔗 Testes de Integração (Jest + Testing Library)
 **Use quando:**
@@ -327,12 +327,12 @@ test('should validate email format', () => {
 - Validar contratos entre serviços
 
 **Exemplo:**
-```javascript
+\`\`\`javascript
 // Testa signup + confirmação + role selection
 test('should complete user onboarding flow', async () => {
   // Testa múltiplas etapas trabalhando juntas
 })
-```
+\`\`\`
 
 ### 🌐 Testes E2E (Cypress/Playwright)
 **Use quando:**
@@ -342,18 +342,18 @@ test('should complete user onboarding flow', async () => {
 - Validar performance e acessibilidade
 
 **Exemplo:**
-```javascript
+\`\`\`javascript
 // Cypress - testa no navegador real
 cy.visit('/signup')
 cy.get('[data-testid="email"]').type('user@example.com')
 cy.get('[data-testid="submit"]').click()
 cy.url().should('include', '/dashboard')
-```
+\`\`\`
 
 ## Estratégia de Teste Recomendada
 
 ### 🏗️ Pirâmide de Testes
-```
+\`\`\`
         /\
        /E2E\     ← Poucos, críticos, lentos
       /____\
@@ -363,7 +363,7 @@ cy.url().should('include', '/dashboard')
   /          \
  /  Unitários \ ← Muitos, rápidos, isolados
 /______________\
-```
+\`\`\`
 
 ### 📋 Para Este Projeto:
 - **70% Unitários**: Funções, hooks, componentes isolados
@@ -375,31 +375,31 @@ cy.url().should('include', '/dashboard')
 ### 🚀 Próximos Passos Recomendados:
 
 1. **Testes E2E com Playwright**
-   ```bash
+   \`\`\`bash
    npm install @playwright/test
    # Criar testes para jornadas críticas
-   ```
+   \`\`\`
 
 2. **Testes de Performance**
-   ```bash
+   \`\`\`bash
    npm install @jest/test-utils
    # Testes de load para APIs críticas
-   ```
+   \`\`\`
 
 3. **Testes Visuais**
-   ```bash
+   \`\`\`bash
    npm install @storybook/test-runner
    # Screenshot testing para componentes
-   ```
+   \`\`\`
 
 4. **Testes de Acessibilidade**
-   ```bash
+   \`\`\`bash
    npm install @axe-core/playwright
    # Validação automática de a11y
-   ```
+   \`\`\`
 
 5. **Testes de Banco Real**
-   ```bash
+   \`\`\`bash
    # Docker + PostgreSQL para testes de integração
    # Migrations automáticas para ambiente de teste
-   ```
+   \`\`\`

@@ -21,7 +21,7 @@
 
 ### 1. **Atualizar perfil via API:**
 
-```javascript
+\`\`\`javascript
 // GET - Buscar perfil do usuário logado
 const response = await fetch('/api/profile/update', {
   method: 'GET',
@@ -47,11 +47,11 @@ const response = await fetch('/api/profile/update', {
     // ... outros campos
   }),
 });
-```
+\`\`\`
 
 ### 2. **Upload de foto de perfil:**
 
-```javascript
+\`\`\`javascript
 const formData = new FormData();
 formData.append('file', fileInput.files[0]);
 
@@ -62,11 +62,11 @@ const response = await fetch('/api/upload/profile-photo', {
   },
   body: formData,
 });
-```
+\`\`\`
 
 ### 3. **Campos disponíveis para atualização:**
 
-```javascript
+\`\`\`javascript
 const allowedFields = [
   'first_name',           // Nome
   'last_name',            // Sobrenome  
@@ -92,18 +92,18 @@ const allowedFields = [
   'phone',                // Telefone
   'expertise_areas'       // Áreas de expertise (array)
 ];
-```
+\`\`\`
 
 ## 🧪 **Testar localmente:**
 
 ### 1. **Verificar se está funcionando:**
-```bash
+\`\`\`bash
 # Verificar buckets de storage
 docker exec supabase_db_menvo psql -U postgres -d postgres -c "SELECT id, name, public FROM storage.buckets;"
 
 # Verificar políticas RLS
 docker exec supabase_db_menvo psql -U postgres -d postgres -c "SELECT schemaname, tablename, policyname FROM pg_policies WHERE tablename = 'profiles';"
-```
+\`\`\`
 
 ### 2. **Testar via frontend:**
 - Faça login no sistema
@@ -131,22 +131,22 @@ docker exec supabase_db_menvo psql -U postgres -d postgres -c "SELECT schemaname
 ## 🔍 **Debugging:**
 
 ### Se ainda houver erro de RLS:
-```sql
+\`\`\`sql
 -- Verificar se o usuário tem permissão
 SELECT auth.uid(), id FROM public.profiles WHERE id = auth.uid();
 
 -- Verificar políticas ativas
 SELECT * FROM pg_policies WHERE tablename = 'profiles';
-```
+\`\`\`
 
 ### Se upload falhar:
-```sql
+\`\`\`sql
 -- Verificar buckets
 SELECT * FROM storage.buckets;
 
 -- Verificar políticas de storage
 SELECT * FROM storage.policies WHERE bucket_id = 'profile-photos';
-```
+\`\`\`
 
 ## 📝 **Logs úteis:**
 

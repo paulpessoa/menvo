@@ -20,7 +20,7 @@
 
 Execute no SQL Editor do Supabase:
 
-```sql
+\`\`\`sql
 -- Criar tabela para tokens
 CREATE TABLE google_calendar_tokens (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -90,17 +90,17 @@ BEGIN
     WHERE gct.user_id = p_user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-```
+\`\`\`
 
 ### 2. Configurar Vercel
 
 No dashboard da Vercel, adicione apenas estas variáveis:
 
-```
+\`\`\`
 GOOGLE_CALENDAR_CLIENT_ID=your_google_calendar_client_id
 GOOGLE_CALENDAR_CLIENT_SECRET=your_google_calendar_client_secret
 GOOGLE_CALENDAR_REDIRECT_URI=https://seu-dominio.vercel.app/api/auth/google-calendar/callback
-```
+\`\`\`
 
 **Importante:** Configure essas variáveis diretamente na Vercel. O `GOOGLE_CALENDAR_REFRESH_TOKEN` não é mais necessário pois os tokens são salvos no Supabase por usuário.
 
@@ -144,7 +144,7 @@ GOOGLE_CALENDAR_REDIRECT_URI=https://seu-dominio.vercel.app/api/auth/google-cale
 
 Para monitorar o uso:
 
-```sql
+\`\`\`sql
 -- Ver usuários com Google Calendar conectado
 SELECT 
     u.email,
@@ -159,7 +159,7 @@ ORDER BY gct.created_at DESC;
 SELECT COUNT(*) as active_connections
 FROM google_calendar_tokens
 WHERE expires_at > NOW();
-```
+\`\`\`
 
 ## Migração de Desenvolvimento para Produção
 

@@ -85,11 +85,11 @@ This is the primary integration test file that validates all requirements withou
 - **Error handling validation** for security and robustness
 
 ### Test Execution Results
-```
+\`\`\`
 Test Suites: 1 passed, 1 total
 Tests: 13 passed, 13 total
 Time: 6.041 s
-```
+\`\`\`
 
 ### Key Test Categories
 1. **API Endpoint Integration** (3 tests)

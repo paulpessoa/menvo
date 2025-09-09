@@ -252,32 +252,32 @@ Environment: $Environment
 ## Restoration Steps
 
 ### 1. Prepare Target Environment
-```bash
+\`\`\`bash
 # For local development
 supabase start
 
 # For remote project
 supabase link --project-ref YOUR_NEW_PROJECT_REF
-```
+\`\`\`
 
 ### 2. Restore Schema
-```bash
+\`\`\`bash
 # Apply the schema backup
 supabase db reset --linked
 psql -h localhost -p 54322 -U postgres -d postgres -f schema.sql
-```
+\`\`\`
 
 ### 3. Restore Data
-```bash
+\`\`\`bash
 # Apply the data backup
 psql -h localhost -p 54322 -U postgres -d postgres -f data.sql
-```
+\`\`\`
 
 ### 4. Restore Auth Users (if backed up)
-```bash
+\`\`\`bash
 # Apply auth users backup
 psql -h localhost -p 54322 -U postgres -d postgres -f auth_users.sql
-```
+\`\`\`
 
 ### 5. Verify Restoration
 - Check that all tables exist

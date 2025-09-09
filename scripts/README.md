@@ -4,7 +4,7 @@ This directory contains development, testing, and maintenance scripts for the Me
 
 ## Directory Structure
 
-```
+\`\`\`
 scripts/
 ├── README.md                    # This file
 ├── setup/                      # User and system setup scripts
@@ -14,7 +14,7 @@ scripts/
 ├── validation/                 # Configuration validation and diagnostics
 ├── maintenance/                # Backup and maintenance scripts
 └── docs/                      # Documentation and setup guides
-```
+\`\`\`
 
 ## Categories
 
@@ -27,10 +27,10 @@ Scripts for creating users, initializing the system, and development setup.
 - **create-mentors-via-api.js** - Creates mentors via API endpoints
 
 **Usage:**
-```bash
+\`\`\`bash
 npm run setup-admin                    # Setup admin and mentors
 node scripts/setup/create-test-users.js    # Create test users
-```
+\`\`\`
 
 ### 💾 Database Scripts (`database/`)
 Scripts for database operations, migrations, and schema management.
@@ -50,11 +50,11 @@ Scripts for database operations, migrations, and schema management.
 - **verify-mentors.sql** - Verify mentor data integrity
 
 **Usage:**
-```bash
+\`\`\`bash
 npm run migrate-users                           # Run user migration
 node scripts/database/check-database-schema.js  # Check schema
 node scripts/database/apply-cascade-triggers.js # Apply triggers
-```
+\`\`\`
 
 ### 🧪 Testing Scripts (`testing/`)
 Scripts for development testing, integration tests, and validation.
@@ -69,11 +69,11 @@ Scripts for development testing, integration tests, and validation.
 - **test-volunteer-endpoints.ts** - Volunteer endpoints testing
 
 **Usage:**
-```bash
+\`\`\`bash
 node scripts/testing/test-oauth-fixes.js        # Test OAuth providers
 node scripts/testing/test-auth-flow.js          # Test auth flow
 node scripts/testing/test-supabase-connection.js # Test DB connection
-```
+\`\`\`
 
 ### ✅ Validation Scripts (`validation/`)
 Scripts for configuration validation and production readiness checks.
@@ -85,11 +85,11 @@ Scripts for configuration validation and production readiness checks.
 - **check-supabase-config.js** - Supabase configuration checking
 
 **Usage:**
-```bash
+\`\`\`bash
 node scripts/validation/validate-oauth-config.js status  # Check OAuth config
 node scripts/validation/diagnose-auth-issues.js         # Diagnose auth issues
 node scripts/validation/check-production-status.js      # Check prod status
-```
+\`\`\`
 
 ### 🔧 Maintenance Scripts (`maintenance/`)
 Scripts for backup, data sync, and environment management.
@@ -98,13 +98,13 @@ Scripts for backup, data sync, and environment management.
 - **get-refresh-token.js** - Token management utilities
 
 **Usage:**
-```bash
+\`\`\`bash
 # Windows PowerShell
 ./scripts/maintenance/backup-supabase.ps1
 
 # Token management
 node scripts/maintenance/get-refresh-token.js
-```
+\`\`\`
 
 ### 📚 Documentation (`docs/`)
 Setup guides and usage documentation.
@@ -118,16 +118,16 @@ Setup guides and usage documentation.
 
 The following scripts are available via npm/yarn:
 
-```bash
+\`\`\`bash
 npm run migrate-users    # Run user migration system
 npm run setup-admin      # Setup admin user and initial mentors
-```
+\`\`\`
 
 ## Environment Requirements
 
 Most scripts require environment variables to be configured:
 
-```env
+\`\`\`env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
@@ -140,7 +140,7 @@ LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
 
 # Site Configuration
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
-```
+\`\`\`
 
 ## Development Workflow
 

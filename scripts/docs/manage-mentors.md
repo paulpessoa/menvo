@@ -3,47 +3,47 @@
 ## 🔍 Verificar Status Atual
 
 ### Ver todos os perfis:
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "SELECT email, first_name, last_name, verified FROM public.profiles ORDER BY created_at DESC;"
-```
+\`\`\`
 
 ### Ver apenas mentores não verificados:
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "SELECT p.email, p.first_name, p.last_name, p.verified, r.name as role FROM public.profiles p LEFT JOIN public.user_roles ur ON p.id = ur.user_id LEFT JOIN public.roles r ON ur.role_id = r.id WHERE r.name = 'mentor' AND p.verified = false;"
-```
+\`\`\`
 
 ### Ver mentores já verificados:
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "SELECT p.email, p.first_name, p.last_name, p.verified, r.name as role FROM public.profiles p LEFT JOIN public.user_roles ur ON p.id = ur.user_id LEFT JOIN public.roles r ON ur.role_id = r.id WHERE r.name = 'mentor' AND p.verified = true;"
-```
+\`\`\`
 
 ## ✅ Aprovar Mentores
 
 ### Aprovar um mentor específico (substitua o email):
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "UPDATE public.profiles SET verified = true, updated_at = NOW() WHERE email = 'email@exemplo.com';"
-```
+\`\`\`
 
 ### Aprovar TODOS os mentores pendentes (CUIDADO!):
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "UPDATE public.profiles SET verified = true, updated_at = NOW() WHERE id IN (SELECT p.id FROM public.profiles p JOIN public.user_roles ur ON p.id = ur.user_id JOIN public.roles r ON ur.role_id = r.id WHERE r.name = 'mentor' AND p.verified = false);"
-```
+\`\`\`
 
 ## 🚫 Desaprovar Mentores
 
 ### Desaprovar um mentor específico:
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "UPDATE public.profiles SET verified = false, updated_at = NOW() WHERE email = 'email@exemplo.com';"
-```
+\`\`\`
 
 ## 👤 Criar Usuário Admin
 
 ### Para usar a API de verificação, você precisa de um admin:
-```bash
+\`\`\`bash
 # 1. Primeiro registre um usuário normal via frontend
 # 2. Depois execute este comando para torná-lo admin:
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "INSERT INTO public.user_roles (user_id, role_id) SELECT p.id, r.id FROM public.profiles p, public.roles r WHERE p.email = 'seu-admin@email.com' AND r.name = 'admin';"
-```
+\`\`\`
 
 ## 🧪 Testar Registro
 
@@ -55,11 +55,11 @@ docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "INSERT INTO p
 ## 📊 Estatísticas Rápidas
 
 ### Contar usuários por tipo:
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "SELECT r.name as role, COUNT(*) as total, COUNT(CASE WHEN p.verified THEN 1 END) as verified FROM public.profiles p LEFT JOIN public.user_roles ur ON p.id = ur.user_id LEFT JOIN public.roles r ON ur.role_id = r.id GROUP BY r.name;"
-```
+\`\`\`
 
 ### Ver últimos registros:
-```bash
+\`\`\`bash
 docker exec -it supabase_db_menvo psql -U postgres -d postgres -c "SELECT email, first_name, last_name, verified, created_at FROM public.profiles ORDER BY created_at DESC LIMIT 10;"
-```
+\`\`\`

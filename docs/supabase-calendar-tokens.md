@@ -4,7 +4,7 @@
 
 Execute no SQL Editor do Supabase:
 
-```sql
+\`\`\`sql
 -- Tabela para armazenar tokens do Google Calendar por usuário
 CREATE TABLE google_calendar_tokens (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -44,11 +44,11 @@ CREATE TRIGGER update_google_calendar_tokens_updated_at
     BEFORE UPDATE ON google_calendar_tokens
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
-```
+\`\`\`
 
 ## 2. Funções para Gerenciar Tokens
 
-```sql
+\`\`\`sql
 -- Função para salvar/atualizar tokens
 CREATE OR REPLACE FUNCTION save_google_calendar_tokens(
     p_user_id UUID,
@@ -101,4 +101,4 @@ BEGIN
     WHERE gct.user_id = p_user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-```
+\`\`\`
