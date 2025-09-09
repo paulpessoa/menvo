@@ -29,7 +29,7 @@ export default function Home() {
     "/images/e.jpg",
     "/images/d.jpg",
     "/images/c.jpg",
-    "/images/a.jpg"
+    "/images/b.jpg"
   ]
   const [currentIndex, setCurrentIndex] = useState(0)
 
