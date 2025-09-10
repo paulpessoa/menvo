@@ -11,8 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Calendar, User, CheckCircle, XCircle, Eye, ExternalLink, Play } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
-import { supabase } from "@/services/auth/supabase"
+import { useAuth } from "@/lib/auth"
+import { createClient } from "@/utils/supabase/client"
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,7 @@ export default function ValidationsPage() {
   const [validations, setValidations] = useState<Validation[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedValidation, setSelectedValidation] = useState<Validation | null>(null)
+  const supabase = createClient()
 
   useEffect(() => {
     loadValidations()

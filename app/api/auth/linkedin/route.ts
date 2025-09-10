@@ -1,32 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/api-utils'
+import { signInWithOAuthProvider } from '@/lib/auth/oauth-provider-fixes'
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient()
+    const origin = request.headers.get('origin') || 'http://localhost:3000'
     
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'linkedin',
-      options: {
-        redirectTo: `${request.headers.get('origin')}/auth/callback`,
-        scopes: 'r_liteprofile r_emailaddress',
-      },
+    const result = await signInWithOAuthProvider(supabase, 'linkedin', {
+      redirectTo: `${origin}/auth/callback`
     })
 
-    if (error) {
+    if (result.error) {
+      console.error('LinkedIn OAuth API error:', result.error)
       return NextResponse.json(
-        { error: error.message },
+        { 
+          error: result.error.message || 'Erro na autenticação com LinkedIn',
+          details: result.error.details 
+        },
         { status: 400 }
       )
     }
 
     return NextResponse.json({
-      url: data.url
+      url: result.data.url,
+      provider: 'linkedin'
     })
 
-  } catch (error) {
+  } catch (error: any) {
+    console.error('LinkedIn OAuth API unexpected error:', error)
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { 
+        error: 'Erro interno do servidor',
+        details: error.message 
+      },
       { status: 500 }
     )
   }

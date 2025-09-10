@@ -5,24 +5,35 @@ import type React from "react"
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, Linkedin, AlertTriangle, Mail } from "lucide-react"
+import { ArrowRight, Loader2, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { WaitingList } from "@/components/WaitingList"
 
 function SignupForm() {
   const { t } = useTranslation()
-  const { isAuthenticated, signUp, signInWithGoogle, signInWithLinkedIn } = useAuth()
+  const { user, role, loading, signUp, signInWithProvider } = useAuth()
+
+  const isAuthenticated = !!user && !loading
+  const needsRoleSelection = () => user && !role
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [fullName, setFullName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLinkedInLoading, setIsLinkedInLoading] = useState(false)
@@ -32,35 +43,39 @@ function SignupForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard")
+      if (needsRoleSelection()) {
+        router.push("/onboarding/role-selection")
+      } else {
+        router.push("/dashboard")
+      }
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, needsRoleSelection, router])
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
     if (password !== confirmPassword) {
-      setError(t("register.passwordValidation.passwordsDontMatch") || "As senhas não coincidem")
+      setError(t("register.passwordValidation.passwordsDontMatch"))
       return
     }
 
     if (password.length < 6) {
-      setError(t("register.passwordValidation.passwordTooShort") || "A senha deve ter pelo menos 6 caracteres")
+      setError(t("register.passwordValidation.passwordTooShort"))
+      return
+    }
+
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("Nome e sobrenome são obrigatórios")
       return
     }
 
     setIsLoading(true)
 
     try {
-      await signUp({
-        email,
-        password,
-        fullName,
-      })
-
+      await signUp(email, password, firstName.trim(), lastName.trim())
       setSuccess(true)
-      toast.success(t("register.success") || "Conta criada! Verifique seu email.")
+      toast.success(t("register.success"))
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -73,7 +88,7 @@ function SignupForm() {
     setError("")
     setIsGoogleLoading(true)
     try {
-      await signInWithGoogle()
+      await signInWithProvider('google')
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -85,7 +100,7 @@ function SignupForm() {
     setError("")
     setIsLinkedInLoading(true)
     try {
-      await signInWithLinkedIn()
+      await signInWithProvider('linkedin')
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -101,32 +116,33 @@ function SignupForm() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Mail className="h-6 w-6 text-blue-600" />
             </div>
-            <CardTitle>{t("register.confirmEmail") || "Confirme seu email"}</CardTitle>
+            <CardTitle>{t("register.confirmEmail")}</CardTitle>
             <CardDescription>
-              {t("register.confirmEmailDescription", { email }) || `Enviamos um link de confirmação para ${email}`}
+              {t("register.confirmEmailDescription", { email }) ||
+                `Enviamos um link de confirmação para ${email}`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground text-sm">
-              {t("register.afterConfirmation") || "Após confirmar seu email, você poderá fazer login na plataforma."}
+              {t("register.afterConfirmation")}
             </p>
 
             <div className="rounded-lg bg-yellow-50 p-3">
               <p className="text-xs text-yellow-800">
-                <strong>{t("register.didntReceiveEmail") || "Não recebeu o email?"}</strong>{" "}
-                {t("register.checkSpam") || "Verifique sua caixa de spam."}
+                <strong>{t("register.didntReceiveEmail")}</strong>{" "}
+                {t("register.checkSpam")}
               </p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-2">
             <Button asChild className="w-full">
               <Link href="/login">
-                {t("register.goToLogin") || "Ir para Login"}
+                {t("register.goToLogin")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full bg-transparent">
-              <Link href="/">{t("register.goToHome") || "Voltar ao Início"}</Link>
+              <Link href="/">{t("register.goToHome")}</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -138,8 +154,8 @@ function SignupForm() {
     <div className="container max-w-5xl py-10 md:py-16">
       <Card className="mx-auto max-w-md">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle>{t("register.signupTitle") || "Criar Conta"}</CardTitle>
-          <CardDescription>{t("register.description") || "Junte-se à nossa comunidade de mentoria"}</CardDescription>
+          <CardTitle>{t("register.signupTitle")}</CardTitle>
+          <CardDescription>{t("register.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-2">
@@ -168,8 +184,8 @@ function SignupForm() {
                 />
               </svg>
               {isGoogleLoading
-                ? t("login.connecting") || "Conectando..."
-                : `${t("login.continueWith") || "Continuar com"} Google`}
+                ? t("login.connecting")
+                : `${t("login.continueWith")} Google`}
             </Button>
 
             <Button
@@ -178,10 +194,16 @@ function SignupForm() {
               onClick={handleLinkedInSignup}
               disabled={isGoogleLoading || isLinkedInLoading || isLoading}
             >
-              <Linkedin className="mr-2 h-4 w-4 text-[#0077B5]" />
+              {isLinkedInLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <svg className="h-5 w-5" fill="#0A66C2" viewBox="0 0 24 24">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+              )}
               {isLinkedInLoading
-                ? t("login.connecting") || "Conectando..."
-                : `${t("login.continueWith") || "Continuar com"} LinkedIn`}
+                ? t("login.connecting")
+                : `${t("login.continueWith")} LinkedIn`}
             </Button>
           </div>
 
@@ -191,7 +213,7 @@ function SignupForm() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                {t("register.orContinueWith") || "Ou continue com email"}
+                {t("register.orContinueWith")}
               </span>
             </div>
           </div>
@@ -206,24 +228,37 @@ function SignupForm() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName">{t("register.firstName") || "Nome Completo"}</Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder={t("register.firstNamePlaceholder") || "Digite seu nome completo"}
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">{t("register.firstName")}</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder={t("register.firstNamePlaceholder")}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">{t("register.lastName")}</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder={t("register.lastNamePlaceholder")}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">{t("register.email") || "Email"}</Label>
+              <Label htmlFor="email">{t("register.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t("register.emailPlaceholder") || "seu@email.com"}
+                placeholder={t("register.emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -231,11 +266,11 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t("register.password") || "Senha"}</Label>
+              <Label htmlFor="password">{t("register.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder={t("register.passwordPlaceholder") || "Mínimo 6 caracteres"}
+                placeholder={t("register.passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -243,11 +278,13 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t("register.confirmPassword") || "Confirmar Senha"}</Label>
+              <Label htmlFor="confirmPassword">
+                {t("register.confirmPassword")}
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder={t("register.confirmPasswordPlaceholder") || "Confirme sua senha"}
+                placeholder={t("register.confirmPasswordPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -258,11 +295,11 @@ function SignupForm() {
               {isLoading ? (
                 <span className="flex items-center justify-center">
                   <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  {t("register.creatingAccount") || "Criando conta..."}
+                  {t("register.creatingAccount")}
                 </span>
               ) : (
                 <>
-                  <span>{t("register.registerButton") || "Criar Conta"}</span>
+                  <span>{t("register.registerButton")}</span>
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -271,9 +308,9 @@ function SignupForm() {
         </CardContent>
         <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
-            {t("register.alreadyHaveAccount") || "Já tem uma conta?"}{" "}
+            {t("register.alreadyHaveAccount")}{" "}
             <Link href="/login" className="text-primary hover:underline">
-              {t("register.signIn") || "Fazer login"}
+              {t("register.signIn")}
             </Link>
           </div>
         </CardFooter>
@@ -283,22 +320,12 @@ function SignupForm() {
 }
 
 export default function SignupPage() {
-  const router = useRouter()
-
-  const estamosLotados = false
-
   return (
     <div className="relative">
-      <div className={estamosLotados ? "blur-sm pointer-events-none" : ""}>
-        <Suspense fallback={<div>Carregando...</div>}>
-          <SignupForm />
-        </Suspense>
-      </div>
-      {estamosLotados && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center">
-          <WaitingList isOpen onClose={() => router.push("/")} />
-        </div>
-      )}
+      {/* TODO: Adicionar tradução */}
+      <Suspense fallback={<div>Carregando...</div>}>
+        <SignupForm />
+      </Suspense>
     </div>
   )
 }

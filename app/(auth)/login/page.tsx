@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Mail, Lock } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { Separator } from "@radix-ui/react-separator"
 
 export default function LoginPage() {
@@ -20,7 +20,20 @@ export default function LoginPage() {
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { signIn, signInWithGoogle, signInWithLinkedIn } = useAuth()
+  const { signIn, signInWithProvider, user, role, loading } = useAuth()
+
+  const isAuthenticated = !!user && !loading
+  const needsRoleSelection = () => user && !role
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (needsRoleSelection()) {
+        router.push("/onboarding/role-selection")
+      } else {
+        router.push("/dashboard")
+      }
+    }
+  }, [isAuthenticated, needsRoleSelection, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,15 +41,10 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const { error } = await signIn(email, password)
-
-      if (error) {
-        setError(error.message)
-      } else {
-        router.push("/dashboard")
-      }
-    } catch (err) {
-      setError("Erro inesperado. Tente novamente.")
+      await signIn(email, password)
+      // Will be handled by useEffect when isAuthenticated changes
+    } catch (err: any) {
+      setError(err.message || "Erro inesperado. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -47,19 +55,8 @@ export default function LoginPage() {
     setError("")
 
     try {
-      let result
-      switch (provider) {
-        case "google":
-          result = await signInWithGoogle()
-          break
-        case "linkedin":
-          result = await signInWithLinkedIn()
-          break
-      }
-
-      if (result?.error) {
-        setError(result.error.message)
-      }
+      await signInWithProvider(provider)
+      // OAuth redirects are handled by the callback route
     } catch (err: any) {
       setError(err.message || "Erro ao fazer login. Tente novamente.")
     } finally {
@@ -75,7 +72,6 @@ export default function LoginPage() {
           <CardDescription className="text-center">Entre na sua conta para continuar</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-
           <div className="space-y-3">
             <Button
               type="button"
@@ -127,7 +123,7 @@ export default function LoginPage() {
             </Button>
           </div>
 
-           <div className="relative">
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full" />
             </div>
@@ -136,8 +132,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          
-          <form onSubmit={handleSubmit} className="space-y-4">            
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <div className="relative">
@@ -175,7 +170,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -192,9 +187,8 @@ export default function LoginPage() {
               </Alert>
             )}
           </form>
-      
         </CardContent>
-           <CardFooter>
+        <CardFooter>
           <div className="text-center text-sm text-muted-foreground w-full">
             Não tem uma conta?{" "}
             <Link href="/signup" className="text-primary-600 hover:underline">

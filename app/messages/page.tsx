@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Search, MessageCircle, Clock, User } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Message {
@@ -190,9 +190,8 @@ function MessagesContent() {
             {filteredMessages.map((message) => (
               <Card
                 key={message.id}
-                className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                  !message.isRead ? "border-l-4 border-l-primary" : ""
-                }`}
+                className={`cursor-pointer transition-colors hover:bg-muted/50 ${!message.isRead ? "border-l-4 border-l-primary" : ""
+                  }`}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">

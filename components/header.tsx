@@ -16,6 +16,7 @@ import {
   UserCheck,
   BarChart3,
   Cog,
+  HeartHandshake,
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 
@@ -31,17 +32,14 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
-import { useAuth } from "@/hooks/useAuth"
-import { usePermissions } from "@/hooks/usePermissions"
+import { useAuth } from "@/lib/auth"
 import { useTranslation } from "react-i18next"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const { t } = useTranslation()
 
-  const { isAuthenticated, user, profile, signOut } = useAuth()
-  const { canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } =
-    usePermissions()
+  const { isAuthenticated, user, profile, role, signOut, canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin, isVolunteer } = useAuth()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
@@ -56,25 +54,33 @@ export default function Header() {
 
   const userNavigation = isAuthenticated
     ? [
-        { name: "Dashboard", href: "/dashboard", icon: User },
-        { name: "Perfil", href: "/profile", icon: Settings },
-        { name: "Mensagens", href: "/messages", icon: MessageSquare },
-        { name: "Calendário", href: "/calendar", icon: Calendar },
-      ]
+      { name: "Dashboard", href: "/dashboard", icon: User },
+      { name: "Perfil", href: "/profile", icon: Settings },
+      { name: "Mensagens", href: "/messages", icon: MessageSquare },
+      { name: "Calendário", href: "/calendar", icon: Calendar },
+    ]
     : []
+
+  const volunteerNavigation =
+    isAuthenticated && isVolunteer
+      ? [
+        { name: "Check-in", href: "/checkin", icon: UserCheck },
+        { name: "Voluntariômetro", href: "/voluntariometro", icon: HeartHandshake },
+      ]
+      : []
 
   const adminNavigation =
     isAuthenticated && (canAdminSystem || canAdminUsers || canAdminVerifications)
       ? [
-          ...(canAdminSystem ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
-          ...(canAdminUsers ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
-          ...(canAdminVerifications ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }] : []),
-          ...(canValidateActivities
-            ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
-            : []),
-          ...(canViewReports ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
-          ...(canAdminSystem ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }] : []),
-        ]
+        ...(canAdminSystem ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
+        ...(canAdminUsers ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
+        ...(canAdminVerifications ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }] : []),
+        ...(canValidateActivities
+          ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
+          : []),
+        ...(canViewReports ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
+        ...(canAdminSystem ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }] : []),
+      ]
       : []
 
   const handleSignOut = async () => {
@@ -97,9 +103,8 @@ export default function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary-600 ${
-                pathname === item.href ? "text-primary-600" : "text-foreground/60"
-              }`}
+              className={`text-sm font-medium transition-colors hover:text-primary-600 ${pathname === item.href ? "text-primary-600" : "text-foreground/60"
+                }`}
             >
               {item.name}
             </Link>
@@ -144,7 +149,7 @@ export default function Header() {
                   <div className="flex flex-col space-y-1 leading-none">
                     <p className="font-medium">{profile?.full_name || user?.user_metadata?.full_name || "Usuário"}</p>
                     <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email}</p>
-                    {profile?.role && <p className="text-xs text-muted-foreground capitalize">{profile.role}</p>}
+                    {role && <p className="text-xs text-muted-foreground capitalize">{role}</p>}
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -158,6 +163,22 @@ export default function Header() {
                     </Link>
                   </DropdownMenuItem>
                 ))}
+
+                {/* Volunteer Navigation */}
+                {volunteerNavigation.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Voluntário</DropdownMenuLabel>
+                    {volunteerNavigation.map((item) => (
+                      <DropdownMenuItem key={item.name} asChild>
+                        <Link href={item.href} className="flex items-center gap-2">
+                          <item.icon className="h-4 w-4" />
+                          {item.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </>
+                )}
 
                 {/* Admin Navigation */}
                 {adminNavigation.length > 0 && (
@@ -185,10 +206,10 @@ export default function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/login">Entrar</Link>
+                <Link href="/auth/login">Entrar</Link>
               </Button>
               <Button asChild>
-                <Link href="/signup">Cadastrar</Link>
+                <Link href="/auth/register">Cadastrar</Link>
               </Button>
             </div>
           )}
@@ -227,6 +248,25 @@ export default function Header() {
                         </Link>
                       ))}
 
+                      {volunteerNavigation.length > 0 && (
+                        <>
+                          <div className="border-t pt-2 mt-2">
+                            <p className="px-2 py-1 text-sm font-medium text-muted-foreground">Voluntário</p>
+                            {volunteerNavigation.map((item) => (
+                              <Link
+                                key={item.name}
+                                href={item.href}
+                                className="flex items-center gap-2 px-2 py-1 text-lg"
+                                onClick={() => setIsOpen(false)}
+                              >
+                                <item.icon className="h-4 w-4" />
+                                {item.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </>
+                      )}
+
                       {adminNavigation.length > 0 && (
                         <>
                           <div className="border-t pt-2 mt-2">
@@ -259,12 +299,12 @@ export default function Header() {
                 ) : (
                   <div className="border-t pt-4 space-y-2">
                     <Button variant="ghost" asChild className="w-full justify-start">
-                      <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                         {t("common.login")}
                       </Link>
                     </Button>
                     <Button asChild className="w-full">
-                      <Link href="/signup" onClick={() => setIsOpen(false)}>
+                      <Link href="/auth/register" onClick={() => setIsOpen(false)}>
                         {t("common.register")}
                       </Link>
                     </Button>

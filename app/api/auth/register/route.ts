@@ -12,14 +12,19 @@ const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, proces
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, firstName, lastName } = body
+    const { email, password, firstName, lastName, userType } = body
 
-    console.log("📝 Dados recebidos:", { email, firstName, lastName })
+    console.log("📝 Dados recebidos:", { email, firstName, lastName, userType })
 
     // Validar entrada
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !userType) {
       console.error("❌ Campos obrigatórios faltando")
       return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 })
+    }
+
+    // Validar userType
+    if (!["mentor", "mentee"].includes(userType)) {
+      return NextResponse.json({ error: "Tipo de usuário inválido" }, { status: 400 })
     }
 
     // Validar formato do email
@@ -36,19 +41,22 @@ export async function POST(request: NextRequest) {
     const emailLower = email.toLowerCase().trim()
     const firstNameTrim = firstName.trim()
     const lastNameTrim = lastName.trim()
-    const fullName = `${firstNameTrim} ${lastNameTrim}`
+    const displayName = `${firstNameTrim} ${lastNameTrim}`
 
     console.log("🔄 Tentando registrar usuário no Supabase Auth...")
 
-    // Registrar usuário no Supabase Auth usando admin client
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    // Usar signUp normal que envia automaticamente o email de confirmação
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
       email: emailLower,
       password,
-      email_confirm: false, // Requer confirmação por email
-      user_metadata: {
-        first_name: firstNameTrim,
-        last_name: lastNameTrim,
-        full_name: fullName,
+      options: {
+        data: {
+          first_name: firstNameTrim,
+          last_name: lastNameTrim,
+          full_name: displayName,
+          user_type: userType,
+        },
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback?type=signup`,
       },
     })
 
@@ -78,57 +86,10 @@ export async function POST(request: NextRequest) {
 
     console.log("✅ Usuário criado no Auth:", authData.user.id)
 
-    // Criar perfil na tabela profiles
-    console.log("🔧 Criando perfil básico na tabela profiles...")
+    console.log("✅ Perfil será criado automaticamente pelo trigger")
 
-    const { error: profileError } = await supabaseAdmin.from("profiles").insert({
-      id: authData.user.id,
-      email: emailLower,
-      first_name: firstNameTrim,
-      last_name: lastNameTrim,
-      full_name: fullName,
-      user_role: "pending",
-      verification_status: "pending",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-
-    if (profileError) {
-      console.error("❌ Erro ao criar perfil:", profileError)
-
-      // Se falhar ao criar perfil, deletar usuário do auth
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id)
-
-      return NextResponse.json(
-        {
-          error: "Erro ao criar perfil do usuário",
-          details: profileError.message,
-        },
-        { status: 500 },
-      )
-    }
-
-    console.log("✅ Perfil criado com sucesso")
-
-    // Enviar email de confirmação
-    try {
-      const { error: emailError } = await supabaseAdmin.auth.admin.generateLink({
-        type: "signup",
-        email: emailLower,
-        options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`,
-        },
-      })
-
-      if (emailError) {
-        console.error("⚠️ Erro ao enviar email de confirmação:", emailError)
-        // Não falhar aqui, pois o usuário já foi criado
-      } else {
-        console.log("✅ Email de confirmação enviado")
-      }
-    } catch (emailError) {
-      console.error("⚠️ Erro ao processar email de confirmação:", emailError)
-    }
+    console.log("✅ Validation request será criada automaticamente pelo trigger se necessário")
+    console.log("✅ Email de confirmação será enviado automaticamente pelo Supabase")
 
     console.log("🎉 Registro concluído com sucesso")
 
@@ -139,6 +100,7 @@ export async function POST(request: NextRequest) {
         id: authData.user.id,
         email: authData.user.email,
         emailConfirmed: false,
+        role: userType,
       },
     })
   } catch (error) {

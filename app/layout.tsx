@@ -2,27 +2,28 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { Providers } from './providers'
+import { Providers } from "./providers"
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer"
-import { FeedbackBanner } from '@/components/FeedbackBanner'
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { FeedbackBanner } from "@/components/FeedbackBanner"
+import { GoogleAnalytics } from "@next/third-parties/google"
 import Script from "next/script"
-// import { AuthGuard } from "@/components/auth/AuthGuard"
+import { RequireAuth } from "@/lib/auth"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://menvo.com.br'),
-  title: "MENVO - Plataforma de Mentoria Voluntária",
-  description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+  metadataBase: new URL("https://menvo.com.br"),
+  title: "MENVO -  Mentores Voluntários",
+  description:
+    "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
   authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
   creator: "Paul Pessoa",
   publisher: "MENVO",
   keywords: [
     "mentoria",
-    "mentoria voluntária",
+    "mentores voluntários",
     "desenvolvimento profissional",
     "carreira",
     "aprendizado",
@@ -39,22 +40,24 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     url: "https://menvo.com.br",
-    title: "MENVO - Plataforma de Mentoria Voluntária",
-    description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+    title: "MENVO -  Mentores Voluntários",
+    description:
+      "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
     siteName: "MENVO",
     images: [
       {
         url: "https://menvo.com.br/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "MENVO - Plataforma de Mentoria Voluntária"
+        alt: "MENVO -  Mentores Voluntários"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "MENVO - Plataforma de Mentoria Voluntária",
-    description: "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
+    title: "MENVO -  Mentores Voluntários",
+    description:
+      "Conectando mentores e mentees para sessões gratuitas de mentoria. Encontre mentores voluntários em tecnologia, carreira e desenvolvimento pessoal.",
     creator: "@paulpessoa",
     images: ["https://menvo.com.br/twitter-image.jpg"]
   },
@@ -64,30 +67,20 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1
+    }
   },
   verification: {
-    google: "QOvwcJxdEYfhUUNK-q-E5kcE-JMgWcUTTOUaZIf2M8k",
+    google: "QOvwcJxdEYfhUUNK-q-E5kcE-JMgWcUTTOUaZIf2M8k"
   },
   alternates: {
-    canonical: "https://menvo.com.br",
+    canonical: "https://menvo.com.br"
   },
   category: "education",
   classification: "Platform",
   referrer: "origin-when-cross-origin",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" }
-  ],
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   other: {
     "msapplication-TileColor": "#ffffff",
     "msapplication-TileImage": "/mstile-144x144.png",
@@ -97,9 +90,9 @@ export const metadata: Metadata = {
     "application-name": "MENVO",
     "format-detection": "telephone=no",
     "mobile-web-app-capable": "yes",
-    "theme-color": "#ffffff",
+    "theme-color": "#ffffff"
   },
-    generator: 'v0.dev'
+  generator: "v0.dev"
 }
 
 export default function RootLayout({
@@ -108,20 +101,30 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="pt-BR"
-      suppressHydrationWarning
-    >
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
-        <meta name="theme-color" content="#ffffff" />
-          <Script
+        <Script
           id="clarity-script"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -129,25 +132,50 @@ export default function RootLayout({
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
               t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
               y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "rz28fusa38");`,
+            })(window, document, "clarity", "script", "rz28fusa38");`
+          }}
+        />
+        <Script
+          id="hotjar-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(h,o,t,j,a,r){
+                  h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                  h._hjSettings={hjid:6496770,hjsv:6};
+                  a=o.getElementsByTagName('head')[0];
+                  r=o.createElement('script');r.async=1;
+                  r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                  a.appendChild(r);
+              })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+            `
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <Providers>
-          {/* <AuthGuard> */}
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
             <FeedbackBanner />
             <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-          </div> 
-          {/* </AuthGuard> */}
+          </div>
           <Toaster />
         </Providers>
-        <Toaster />
       </body>
     </html>
   )
+}
+export function generateViewport() {
+  return {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor: [
+      { media: "(prefers-color-scheme: light)", color: "white" },
+      { media: "(prefers-color-scheme: dark)", color: "black" }
+    ]
+  }
 }

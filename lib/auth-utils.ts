@@ -1,125 +1,106 @@
-import { createClient } from "@/utils/supabase/client"
-import type { Database } from "@/types/database"
+/**
+ * Authentication utilities for API calls
+ */
 
-type UserRole = Database["public"]["Enums"]["user_role"]
-type AppPermission = Database["public"]["Enums"]["app_permission"]
+import { logger } from '@/lib/logger';
+
+export interface AuthResult {
+  success: boolean;
+  token?: string;
+  error?: string;
+}
 
 /**
- * Verifica se o usuário atual tem uma permissão específica
+ * Gets a valid authentication token, attempting refresh if needed
  */
-export async function hasPermission(permission: AppPermission): Promise<boolean> {
-  const supabase = createClient()
-
+export async function getValidAuthToken(): Promise<AuthResult> {
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return false
-
-    const userRole = user.app_metadata?.user_role as UserRole
-    if (!userRole) return false
-
-    const { data } = await supabase
-      .from("role_permissions")
-      .select("permission")
-      .eq("role", userRole)
-      .eq("permission", permission)
-      .single()
-
-    return !!data
+    const { supabase } = await import('@/lib/supabase');
+    
+    // First, try to get current session
+    let { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    logger.info('Getting auth token', 'AuthUtils', { 
+      hasSession: !!session,
+      hasToken: !!session?.access_token,
+      sessionError: sessionError?.message
+    });
+    
+    // If we have a valid session, return it
+    if (session?.access_token) {
+      // Check if token is not expired (with 5 minute buffer)
+      const expiresAt = session.expires_at * 1000;
+      const now = Date.now();
+      const buffer = 5 * 60 * 1000; // 5 minutes
+      
+      if (expiresAt > now + buffer) {
+        logger.info('Using existing valid token', 'AuthUtils');
+        return { success: true, token: session.access_token };
+      }
+      
+      logger.info('Token expires soon, refreshing', 'AuthUtils', {
+        expiresAt: new Date(expiresAt),
+        now: new Date(now)
+      });
+    }
+    
+    // Try to refresh the session
+    logger.info('Attempting to refresh session', 'AuthUtils');
+    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+    
+    if (refreshError) {
+      logger.error('Session refresh failed', 'AuthUtils', { 
+        error: refreshError.message 
+      });
+      return { 
+        success: false, 
+        error: 'Não foi possível renovar a sessão. Faça login novamente.' 
+      };
+    }
+    
+    if (!refreshData.session?.access_token) {
+      logger.error('No token after refresh', 'AuthUtils');
+      return { 
+        success: false, 
+        error: 'Sessão inválida. Faça login novamente.' 
+      };
+    }
+    
+    logger.info('Session refreshed successfully', 'AuthUtils');
+    return { 
+      success: true, 
+      token: refreshData.session.access_token 
+    };
+    
   } catch (error) {
-    console.error("Erro ao verificar permissão:", error)
-    return false
+    logger.error('Auth token error', 'AuthUtils', { error });
+    return { 
+      success: false, 
+      error: 'Erro de autenticação. Tente novamente.' 
+    };
   }
 }
 
 /**
- * Verifica se o usuário atual tem pelo menos uma das permissões
+ * Makes an authenticated API request with automatic token refresh
  */
-export async function hasAnyPermission(permissions: AppPermission[]): Promise<boolean> {
-  const supabase = createClient()
-
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return false
-
-    const userRole = user.app_metadata?.user_role as UserRole
-    if (!userRole) return false
-
-    const { data } = await supabase
-      .from("role_permissions")
-      .select("permission")
-      .eq("role", userRole)
-      .in("permission", permissions)
-
-    return (data?.length || 0) > 0
-  } catch (error) {
-    console.error("Erro ao verificar permissões:", error)
-    return false
+export async function makeAuthenticatedRequest(
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> {
+  const authResult = await getValidAuthToken();
+  
+  if (!authResult.success) {
+    throw new Error(authResult.error || 'Falha na autenticação');
   }
-}
-
-/**
- * Verifica se o usuário atual tem uma role específica
- */
-export async function hasRole(role: UserRole): Promise<boolean> {
-  const supabase = createClient()
-
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return false
-
-    const userRole = user.app_metadata?.user_role as UserRole
-    return userRole === role
-  } catch (error) {
-    console.error("Erro ao verificar role:", error)
-    return false
-  }
-}
-
-/**
- * Obtém todas as permissões do usuário atual
- */
-export async function getUserPermissions(): Promise<AppPermission[]> {
-  const supabase = createClient()
-
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return []
-
-    const userRole = user.app_metadata?.user_role as UserRole
-    if (!userRole) return []
-
-    const { data } = await supabase.from("role_permissions").select("permission").eq("role", userRole)
-
-    return data?.map((p) => p.permission) || []
-  } catch (error) {
-    console.error("Erro ao obter permissões:", error)
-    return []
-  }
-}
-
-/**
- * Obtém a role do usuário atual
- */
-export async function getUserRole(): Promise<UserRole | null> {
-  const supabase = createClient()
-
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return null
-
-    return (user.app_metadata?.user_role as UserRole) || null
-  } catch (error) {
-    console.error("Erro ao obter role:", error)
-    return null
-  }
+  
+  const headers = {
+    ...options.headers,
+    'Authorization': `Bearer ${authResult.token}`
+  };
+  
+  return fetch(url, {
+    ...options,
+    headers
+  });
 }

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, CheckCircle, ArrowRight, AlertTriangle } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 import { UserType } from "@/hooks/useSignupForm"
 import { useToast } from "@/hooks/useToast"
@@ -29,7 +29,7 @@ export default function ConfirmationPage() {
     const error = searchParams.get('error')
     const errorCode = searchParams.get('error_code')
     const errorDescription = searchParams.get('error_description')
-    
+
     // Verificar se é um erro de OTP expirado
     if (error === 'access_denied' && errorCode === 'otp_expired') {
       setIsEmailExpired(true)
@@ -42,7 +42,7 @@ export default function ConfirmationPage() {
     setIsSubmitting(true)
     try {
       console.log("🎯 ConfirmationPage: Selecionando role:", selectedRole)
-      
+
       // Atualizar role no JWT
       const { error: jwtError } = await supabase.auth.updateUser({
         data: { role: selectedRole }
@@ -126,14 +126,14 @@ export default function ConfirmationPage() {
             {isEmailExpired ? t("register.emailExpired") : t("register.emailConfirmed")}
           </CardTitle>
           <CardDescription>
-            {isEmailExpired 
+            {isEmailExpired
               ? t("register.emailExpiredDescription")
               : t("register.emailConfirmedDescription")
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          
+
           {/* Conteúdo para email confirmado com sucesso - Seleção de Role */}
           {!isEmailExpired && (
             <>
@@ -141,16 +141,16 @@ export default function ConfirmationPage() {
                 <p className="text-sm text-muted-foreground">
                   {t("register.selectRoleDescription")}
                 </p>
-                
+
                 {/* Seleção de Role */}
-                <UserTypeSelector 
-                  userType={selectedRole} 
-                  setUserType={setSelectedRole} 
+                <UserTypeSelector
+                  userType={selectedRole}
+                  setUserType={setSelectedRole}
                 />
               </div>
             </>
           )}
-          
+
           {/* Conteúdo para email expirado */}
           {isEmailExpired && (
             <div className="rounded-lg bg-orange-50 p-3 border border-orange-200">
@@ -185,7 +185,7 @@ export default function ConfirmationPage() {
             </>
           ) : (
             <>
-              <Button 
+              <Button
                 onClick={handleRoleSelection}
                 disabled={!selectedRole || isSubmitting}
                 className="w-full"
