@@ -207,11 +207,18 @@ export default function AdminDashboard() {
 
     const quickActions = [
         {
+            title: "Gerenciar Mentores",
+            description: "Visualizar e verificar todos os mentores",
+            href: "/admin/mentors",
+            icon: CheckCircle,
+            color: "bg-green-500"
+        },
+        {
             title: "Verificar Mentores",
             description: "Revisar e aprovar mentores pendentes",
             href: "/admin/mentors/verify",
-            icon: CheckCircle,
-            color: "bg-green-500"
+            icon: Clock,
+            color: "bg-yellow-500"
         },
         {
             title: "Gerenciar Usuários",
@@ -219,13 +226,6 @@ export default function AdminDashboard() {
             href: "/admin/users",
             icon: Users,
             color: "bg-blue-500"
-        },
-        {
-            title: "Relatórios",
-            description: "Ver estatísticas e métricas da plataforma",
-            href: "/admin/reports",
-            icon: BarChart3,
-            color: "bg-purple-500"
         },
         {
             title: "Configurações",

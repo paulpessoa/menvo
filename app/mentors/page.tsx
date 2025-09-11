@@ -111,40 +111,48 @@ export default function MentorsPage() {
 
   const fetchMentors = async () => {
     try {
+      // Use mentors_view which shows only verified mentors and works for anonymous users
       const { data, error } = await supabase
-        .from('profiles')
+        .from('mentors_view')
         .select(`
           id,
           full_name,
           avatar_url,
           bio,
-          job_title,
-          company,
+          current_position,
+          current_company,
           city,
           state,
           country,
           languages,
           mentorship_topics,
-          inclusive_tags,
+          inclusion_tags,
           expertise_areas,
           session_price_usd,
           availability_status,
-          average_rating,
-          total_reviews,
-          total_sessions,
+          rating,
+          reviews,
+          sessions,
           experience_years,
-          slug,
-          user_roles!inner(
-            roles!inner(name)
-          )
+          slug
         `)
-        .eq('verified', true)
-        .eq('user_roles.roles.name', 'mentor')
-        .order('average_rating', { ascending: false })
-        .order('total_sessions', { ascending: false })
+        .order('rating', { ascending: false })
+        .order('sessions', { ascending: false })
 
       if (error) throw error
-      setMentors(data || [])
+
+      // Map the data to match the expected interface
+      const mappedData = (data || []).map(mentor => ({
+        ...mentor,
+        job_title: mentor.current_position,
+        company: mentor.current_company,
+        inclusive_tags: mentor.inclusion_tags,
+        average_rating: mentor.rating,
+        total_reviews: mentor.reviews,
+        total_sessions: mentor.sessions
+      }))
+
+      setMentors(mappedData)
     } catch (error) {
       console.error('Error fetching mentors:', error)
     } finally {
@@ -154,21 +162,17 @@ export default function MentorsPage() {
 
   const fetchFilterOptions = async () => {
     try {
+      // Use mentors_view for filter options as well
       const { data, error } = await supabase
-        .from('profiles')
+        .from('mentors_view')
         .select(`
           country,
           state,
           city,
           languages,
           mentorship_topics,
-          inclusive_tags,
-          user_roles!inner(
-            roles!inner(name)
-          )
+          inclusion_tags
         `)
-        .eq('verified', true)
-        .eq('user_roles.roles.name', 'mentor')
 
       if (error) throw error
 
@@ -186,7 +190,7 @@ export default function MentorsPage() {
 
         mentor.languages?.forEach(lang => languages.add(lang))
         mentor.mentorship_topics?.forEach(topic => topics.add(topic))
-        mentor.inclusive_tags?.forEach(tag => inclusiveTags.add(tag))
+        mentor.inclusion_tags?.forEach(tag => inclusiveTags.add(tag))
       })
 
       setAvailableFilters({

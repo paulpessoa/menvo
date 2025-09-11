@@ -84,42 +84,37 @@ export default function MentorProfilePage() {
         try {
             setLoading(true)
 
-            // Fetch mentor profile
+            // Fetch mentor profile using mentors_view
             const { data: mentorData, error: mentorError } = await supabase
-                .from('profiles')
+                .from('mentors_view')
                 .select(`
           id,
           full_name,
           avatar_url,
           bio,
-          job_title,
-          company,
+          current_position,
+          current_company,
           city,
           state,
           country,
           languages,
           mentorship_topics,
-          inclusive_tags,
+          inclusion_tags,
           expertise_areas,
           session_price_usd,
           availability_status,
-          average_rating,
-          total_reviews,
-          total_sessions,
+          rating,
+          reviews,
+          sessions,
           experience_years,
           linkedin_url,
           github_url,
           twitter_url,
           website_url,
           timezone,
-          slug,
-          user_roles!inner(
-            roles!inner(name)
-          )
+          slug
         `)
                 .eq('slug', slug)
-                .eq('verified', true)
-                .eq('user_roles.roles.name', 'mentor')
                 .single()
 
             if (mentorError) {
@@ -131,7 +126,18 @@ export default function MentorProfilePage() {
                 return
             }
 
-            setMentor(mentorData)
+            // Map the data to match the expected interface
+            const mappedMentor = {
+                ...mentorData,
+                job_title: mentorData.current_position,
+                company: mentorData.current_company,
+                inclusive_tags: mentorData.inclusion_tags,
+                average_rating: mentorData.rating,
+                total_reviews: mentorData.reviews,
+                total_sessions: mentorData.sessions
+            }
+
+            setMentor(mappedMentor)
 
             // Fetch availability
             const { data: availabilityData, error: availabilityError } = await supabase
