@@ -362,7 +362,7 @@ export default function MentorsPage() {
                   <MapPin className="h-4 w-4 mr-2" />
                   Localização
                 </h3>
-                <Select value={filters.country} onValueChange={(value) =>
+                <Select value={filters.country || ''} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, country: value, state: "", city: "" }))
                 }>
                   <SelectTrigger>
@@ -377,7 +377,7 @@ export default function MentorsPage() {
                 </Select>
 
                 {filters.country && (
-                  <Select value={filters.state} onValueChange={(value) =>
+                  <Select value={filters.state || ''} onValueChange={(value) =>
                     setFilters(prev => ({ ...prev, state: value, city: "" }))
                   }>
                     <SelectTrigger>
@@ -399,7 +399,7 @@ export default function MentorsPage() {
                   <Briefcase className="h-4 w-4 mr-2" />
                   Experiência
                 </h3>
-                <Select value={filters.experienceYears} onValueChange={(value) =>
+                <Select value={filters.experienceYears || ''} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, experienceYears: value }))
                 }>
                   <SelectTrigger>
@@ -421,7 +421,7 @@ export default function MentorsPage() {
                   <Clock className="h-4 w-4 mr-2" />
                   Disponibilidade
                 </h3>
-                <Select value={filters.availabilityStatus} onValueChange={(value) =>
+                <Select value={filters.availabilityStatus || ''} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, availabilityStatus: value }))
                 }>
                   <SelectTrigger>
