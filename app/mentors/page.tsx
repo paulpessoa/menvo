@@ -77,16 +77,16 @@ interface FilterState {
 
 const initialFilters: FilterState = {
   search: "",
-  country: "",
-  state: "",
+  country: "all",
+  state: "all",
   city: "",
   languages: [],
   topics: [],
   inclusiveTags: [],
   priceRange: [0, 500],
-  availabilityStatus: "",
+  availabilityStatus: "all",
   minRating: 0,
-  experienceYears: ""
+  experienceYears: "all"
 }
 
 export default function MentorsPage() {
@@ -224,8 +224,8 @@ export default function MentorsPage() {
       }
 
       // Location filters
-      if (filters.country && mentor.country !== filters.country) return false
-      if (filters.state && mentor.state !== filters.state) return false
+      if (filters.country !== 'all' && mentor.country !== filters.country) return false
+      if (filters.state !== 'all' && mentor.state !== filters.state) return false
       if (filters.city && mentor.city !== filters.city) return false
 
       // Language filter
@@ -253,13 +253,13 @@ export default function MentorsPage() {
       }
 
       // Availability status filter
-      if (filters.availabilityStatus && mentor.availability_status !== filters.availabilityStatus) return false
+      if (filters.availabilityStatus !== 'all' && mentor.availability_status !== filters.availabilityStatus) return false
 
       // Rating filter
       if (filters.minRating > 0 && mentor.average_rating < filters.minRating) return false
 
       // Experience years filter
-      if (filters.experienceYears && mentor.experience_years !== null) {
+      if (filters.experienceYears !== 'all' && mentor.experience_years !== null) {
         const [min, max] = filters.experienceYears.split('-').map(Number)
         if (max) {
           if (mentor.experience_years < min || mentor.experience_years > max) return false
@@ -278,7 +278,7 @@ export default function MentorsPage() {
 
   const activeFiltersCount = Object.values(filters).filter(value => {
     if (Array.isArray(value)) return value.length > 0
-    if (typeof value === 'string') return value !== ''
+    if (typeof value === 'string') return value !== '' && value !== 'all'
     if (typeof value === 'number') return value > 0
     return false
   }).length
@@ -362,29 +362,29 @@ export default function MentorsPage() {
                   <MapPin className="h-4 w-4 mr-2" />
                   Localização
                 </h3>
-                <Select value={filters.country || ''} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, country: value, state: "", city: "" }))
+                <Select value={filters.country} onValueChange={(value) =>
+                  setFilters(prev => ({ ...prev, country: value, state: "all", city: "" }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="País" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos os países</SelectItem>
+                    <SelectItem value="all">Todos os países</SelectItem>
                     {availableFilters.countries.map(country => (
                       <SelectItem key={country} value={country}>{country}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
 
-                {filters.country && (
-                  <Select value={filters.state || ''} onValueChange={(value) =>
+                {filters.country !== 'all' && (
+                  <Select value={filters.state} onValueChange={(value) =>
                     setFilters(prev => ({ ...prev, state: value, city: "" }))
                   }>
                     <SelectTrigger>
                       <SelectValue placeholder="Estado" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos os estados</SelectItem>
+                      <SelectItem value="all">Todos os estados</SelectItem>
                       {availableFilters.states.map(state => (
                         <SelectItem key={state} value={state}>{state}</SelectItem>
                       ))}
@@ -399,14 +399,14 @@ export default function MentorsPage() {
                   <Briefcase className="h-4 w-4 mr-2" />
                   Experiência
                 </h3>
-                <Select value={filters.experienceYears || ''} onValueChange={(value) =>
+                <Select value={filters.experienceYears} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, experienceYears: value }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="Anos de experiência" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Qualquer experiência</SelectItem>
+                    <SelectItem value="all">Qualquer experiência</SelectItem>
                     <SelectItem value="1-3">1-3 anos</SelectItem>
                     <SelectItem value="3-5">3-5 anos</SelectItem>
                     <SelectItem value="5-10">5-10 anos</SelectItem>
@@ -421,14 +421,14 @@ export default function MentorsPage() {
                   <Clock className="h-4 w-4 mr-2" />
                   Disponibilidade
                 </h3>
-                <Select value={filters.availabilityStatus || ''} onValueChange={(value) =>
+                <Select value={filters.availabilityStatus} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, availabilityStatus: value }))
                 }>
                   <SelectTrigger>
                     <SelectValue placeholder="Status de disponibilidade" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Qualquer status</SelectItem>
+                    <SelectItem value="all">Qualquer status</SelectItem>
                     <SelectItem value="available">Disponível</SelectItem>
                     <SelectItem value="busy">Ocupado</SelectItem>
                     <SelectItem value="unavailable">Indisponível</SelectItem>
