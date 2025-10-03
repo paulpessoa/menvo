@@ -20,37 +20,46 @@
 <h3 align="center">Menvo</h3>
 
 <p align="center">
- MENVO is a free mentoring plataform for students looking for their first professional opportunities. 
+ MENVO é uma plataforma de mentoria gratuita para estudantes em busca de suas primeiras oportunidades profissionais. 
   <br /> 
 </p>
 
 ## Índice
 
-- [Sobre o Projeto](#sobre-o-projeto)
-  - [Tecnologias](#feito-com)
-  - [Estrutura](#estrutura)
-- [Como Utilizar](#instalação)
-- [Como Contribuir](#contribuir)
-- [Autores](#autores)
-- [Comunidade](#comunidade)
-- [Redes sociais](#redes-sociais)
+- [MENVO - "Volunteer Mentoring"](#menvo---volunteer-mentoring)
+  - [Índice](#índice)
+  - [Sobre o Projeto](#sobre-o-projeto)
+    - [Feito com](#feito-com)
+    - [Estrutura](#estrutura)
+      - [Pages:](#pages)
+      - [Components:](#components)
+  - [Instalação](#instalação)
+  - [Contribuir](#contribuir)
+  - [Autores](#autores)
+  - [Comunidade](#comunidade)
+  - [Redes sociais](#redes-sociais)
+  - [Documentation:](#documentation)
 
 ## Sobre o Projeto
 
- We connect several professionals through video calls to young people who need references, follow-up or access to resources to help them in the search for and participation in selection processes.
+ Por meio de videochamadas, conectamos profissionais experientes a jovens em busca de orientação, acompanhamento e recursos para se destacarem em processos seletivos.
 
 ### Feito com
 
-- [x] [NextJs](https://nextjs.org/) - The React Framework for the Web
+- [x] [NextJs](https://nextjs.org/) - Framework React para a construção da aplicação web, responsável pela renderização das páginas no servidor e no cliente, oferecendo uma experiência de usuário rápida e otimizada.
+- [x] [ReactJs](https://react.dev/) - Biblioteca fundamental para a criação de componentes de interface de usuário reutilizáveis e interativos.
+- [x] [Supabase](https://supabase.com/) - Plataforma de código aberto que serve como backend do projeto, fornecendo banco de dados Postgres, autenticação de usuários e APIs instantâneas, simplificando o desenvolvimento do lado do servidor.
+- [x] [Typescript](https://www.typescriptlang.org/) - Linguagem que adiciona tipagem estática ao JavaScript, utilizada para aumentar a robustez e a manutenibilidade do código, prevenindo erros em tempo de desenvolvimento.
+- [x] [Tailwind CSS](https://tailwindcss.com/) - Framework CSS "utility-first" usado para a estilização rápida e consistente da interface do usuário, permitindo a criação de designs personalizados diretamente no HTML.
+- [x] [Radix UI](https://www.radix-ui.com/) - Biblioteca que fornece componentes de interface de usuário de baixo nível, acessíveis e sem estilos, servindo como base para a construção de componentes personalizados e complexos na aplicação.
+- [x] [NodeJs](https://nodejs.org/en) - Ambiente de execução que permite rodar código JavaScript no lado do servidor, essencial para o funcionamento do Next.js e para a execução de scripts de automação e migração de dados.
+- [x] [Google APIs](https://cloud.google.com/apis) - Conjunto de APIs para integração com serviços do Google, que podem ser utilizadas para funcionalidades como login social, integração com Google Agenda para agendamento de mentorias, ou uso de mapas.
+- [x] [i18next](https://www.i18next.com/) - Framework de internacionalização que permite que a plataforma Menvo seja traduzida para múltiplos idiomas, alcançando um público global.
 - [x] [Npm](https://npmjs.com/) - Gerenciador de pacotes e dependências
-- [x] [Supabase](https://supabase.com) - Supabase is an open source Firebase alternative.
-- [x] [NodeJs](https://nodejs.org/en) - https://nodejs.org/en
-- [x] [Sass](https://sass-lang.com/install) - Sass has features that don't exist in CSS yet like nesting, mixins, inheritance, and other nifty goodies that help you write robust, maintainable CSS.
+- [x] [Sass](https://sass-lang.com/install) - Pré-processador CSS com funcionalidades avançadas.
 - [x] [Axios](https://axios-http.com/ptbr/docs/intro) - Cliente HTTP baseado em promessas para o navegador e Node.js
-- [x] [ReactJs](https://react.dev/) - The library for web and native user interfaces
-- [x] [Typescript](https://www.typescriptlang.org/) - TypeScript is JavaScript with syntax for types.
 - [x] [Mui Material](https://mui.com/) - Move faster with intuitive React UI tools
-- [x] [React Icon](https://react-icons.github.io/react-icons/) - Include popular icons in your React projects easily 
+- [x] [React Icon](https://react-icons.github.io/react-icons/) - Pacote para inclusão de ícones populares em projetos React. 
 
 ### Estrutura
   #### Pages:

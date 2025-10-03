@@ -1,13 +1,15 @@
 # Contribuir
-Gostaria de nos ajudar a melhorar o projeto? Veja este guia contribuição para ajudar o Menvo a crescer.
+Gostaria de nos ajudar a melhorar o projeto? Veja este guia de contribuição para ajudar o Menvo a crescer.
 
 ## Tabela de conteúdos
-- [Para começar](#para-começar)
-  - [Clonando o repositório](#clonando-o-repositório)
-  - [Criando a nova branch](#criando-a-nova-branch)
-  - [Nomeando a mensagem de commit](#nomeando-a-mensagem-de-commit)
-- [Submetendo suas alterações](#submetendo-suas-alterações)
-- [Outras formas de contribuir](#outras-formas-de-contribuir)
+- [Contribuir](#contribuir)
+  - [Tabela de conteúdos](#tabela-de-conteúdos)
+  - [Para começar](#para-começar)
+    - [Clonando o repositório](#clonando-o-repositório)
+    - [Criando a nova branch](#criando-a-nova-branch)
+    - [Nomeando a mensagem de commit](#nomeando-a-mensagem-de-commit)
+  - [Submetendo suas alterações](#submetendo-suas-alterações)
+  - [Outras formas de contribuir](#outras-formas-de-contribuir)
 
 ## Para começar
 ### Clonando o repositório
