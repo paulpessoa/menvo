@@ -1,68 +1,66 @@
-# Contribuir
-Gostaria de nos ajudar a melhorar o projeto? Veja este guia de contribuição para ajudar o Menvo a crescer.
+> Read this guide in another language: [Português (Brasil)](CONTRIBUTING.pt-br.md)
 
-## Tabela de conteúdos
-- [Contribuir](#contribuir)
-  - [Tabela de conteúdos](#tabela-de-conteúdos)
-  - [Para começar](#para-começar)
-    - [Clonando o repositório](#clonando-o-repositório)
-    - [Criando a nova branch](#criando-a-nova-branch)
-    - [Nomeando a mensagem de commit](#nomeando-a-mensagem-de-commit)
-  - [Submetendo suas alterações](#submetendo-suas-alterações)
-  - [Outras formas de contribuir](#outras-formas-de-contribuir)
+# Contributing
+Would you like to help us improve the project? Check out this contribution guide to help Menvo grow.
 
-## Para começar
-### Clonando o repositório
-Faça um fork do repositório no GitHub e o clone em sua máquina.
+## Table of Contents
+- [Contributing](#contributing)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Cloning the repository](#cloning-the-repository)
+    - [Creating a new branch](#creating-a-new-branch)
+    - [Naming the commit message](#naming-the-commit-message)
+  - [Submitting your changes](#submitting-your-changes)
+  - [Other ways to contribute](#other-ways-to-contribute)
+
+## Getting Started
+### Cloning the repository
+Fork the repository on GitHub and clone it to your machine.
 \`\`\`bash
 $ git clone https://github.com/{Seu nome}/menvo.git
 
 $ cd menvo
 \`\`\`
 
-### Criando a nova branch
-Crie uma nova branch para a alteração que você deseja submeter. Por exemplo:
+### Creating a new branch
+Create a new branch for the change you want to submit. For example:
 \`\`\`bash
 $ git checkout -b fix-responsive
 \`\`\`
-Ao executar o comando acima, uma nova branch chamada `fix-responsive` será criada.
+Executing the command above the branch named `fix-responsive` will be created.
 
-**Nota:** O nome da branch deve ser significativo e deve indicar **apenas** a mudança a ser feita. Requisições que não seguirem esse padrão não serão aceitas.
+**Note:** The branch name must be meaningful and should **only** indicate the change to be made. Pull requests that do not follow this pattern will not be accepted.
 
-### Nomeando a mensagem de commit
-Para elaborar uma boa mensagem de commit, você pode imaginar a seguinte frase: "Se aplicado, este commit irá {sua mensagem de commit}". Por exemplo:
-
-*Se aplicado, este commit irá **Corrigir responsividade mal formada**
-
-Ou se preferir, você também pode submeter seus commits em inglês:
+### Naming the commit message
+To write a good commit message, you can imagine the following sentence: "If applied, this commit will {your commit message}". For example:
 
 *If applied, this commit will **Fix malformed responsiveness***
 
-Lembre-se de começar sua mensagem com uma palavra como: Adicionar, refatorar, deletar, etc..
+Remember to start your message with a verb like: Add, Refactor, Delete, Fix, etc.
 
-**Nota:** Tente manter suas mensagens com menos de 50 caractéres e detalhar as alterações na descrição do commit. Apesar de não ser obrigatório, esta é uma prática muito conhecida e utilizada na comunidade do Git.
+**Note:** Try to keep your messages under 50 characters and detail the changes in the commit description. While not mandatory, this is a well-known and widely used practice in the Git community.
 
-## Submetendo suas alterações
-Após ter realizado as mudanças, suba suas mudanças para o repositório remoto:
+## Submitting your changes
+After making your changes, push them to the remote repository:
 \`\`\`bash
 $ git push origin fix-responsive
 \`\`\`
 
-Após isso, vá ao seu repositório recém clonado no GitHub, selecione a branch criada e clique em Pull Request.
+After that, go to your newly forked repository on GitHub, select the created branch, and click on "Pull Request".
 
-**IMPORTANTE:** Faça o Pull Request da sua branch especificamente para a branch `dev`. Pull Requests enviados a branch `main` serão automaticamente recusados.
+**IMPORTANT:** Make the Pull Request from your branch specifically to the `dev` branch. Pull Requests sent to the `main` branch will be automatically rejected.
 
-Faça um comentário geral sobre as mudanças realizadas e, se necessário dê uma descrição sobre as alterações realizadas e sua justificativa (opcional). Por exemplo:
+Write a general comment about the changes made and, if necessary, provide a description of the changes and your reasoning (optional). For example:
 
-"**Corrigir #418**
+"**Fixes #418**
 
-Este PR corrige a issue submetida em relação a um erro de responsividade."
+This PR fixes the issue submitted regarding a responsiveness error."
 
-Após isso, seu Pull Request entrará em fase de revisão e, quem sabe, suas alterações sejam integradas ao Menvo!
+After that, your Pull Request will enter the review phase and, hopefully, your changes will be integrated into Menvo!
 
-## Outras formas de contribuir
-Você também pode ajudar o projeto crescer:
+## Other ways to contribute
+You can also help the project grow by:
 
-- Criando novos desafios
-- Sugerindo mudanças e melhorias
-- Fazendo parte de nossa [comunidade](https://discord.gg/5tWy7Zgm) no Discord
+- Creating new issues
+- Suggesting changes and improvements
+- Joining our [community](https://discord.gg/5tWy7Zgm) on Discord
