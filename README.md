@@ -1,4 +1,4 @@
-# MENVO - "Volunteer Mentoring"
+> Leia este documento em outro idioma: [Português (Brasil)](README.pt-br.md)
 
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -9,65 +9,72 @@
   <a href="https://www.menvo.com.br/">
     <img 
       src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/images/logo512.png"
-      alt="Menvo, a letra M na cor verde com dois pontos, assim fica similar a duas pessoas dando as mãos." 
+      alt="Menvo, a green letter M with two dots, resembling two people holding hands." 
       width="100" 
       height="100"
     />
   </a>
 </p>
-
   
 <h3 align="center">Menvo</h3>
 
 <p align="center">
- MENVO is a free mentoring plataform for students looking for their first professional opportunities. 
+ MENVO is a free mentoring platform for students looking for their first professional opportunities.
   <br /> 
 </p>
 
-## Índice
+## Table of Contents
 
-- [Sobre o Projeto](#sobre-o-projeto)
-  - [Tecnologias](#feito-com)
-  - [Estrutura](#estrutura)
-- [Como Utilizar](#instalação)
-- [Como Contribuir](#contribuir)
-- [Autores](#autores)
-- [Comunidade](#comunidade)
-- [Redes sociais](#redes-sociais)
+- [Table of Contents](#table-of-contents)
+- [About the Project](#about-the-project)
+  - [Built With](#built-with)
+  - [Structure](#structure)
+    - [Pages:](#pages)
+    - [Components:](#components)
+- [Installation](#installation)
+- [Contributing](#contributing)
+- [Authors](#authors)
+- [Community](#community)
+- [Social Media](#social-media)
+- [Documentation:](#documentation)
 
-## Sobre o Projeto
+## About the Project
 
- We connect several professionals through video calls to young people who need references, follow-up or access to resources to help them in the search for and participation in selection processes.
+Through video calls, we connect experienced professionals to young people seeking guidance, support, and resources to excel in selection processes.
 
-### Feito com
+### Built With
 
-- [x] [NextJs](https://nextjs.org/) - The React Framework for the Web
-- [x] [Npm](https://npmjs.com/) - Gerenciador de pacotes e dependências
-- [x] [Supabase](https://supabase.com) - Supabase is an open source Firebase alternative.
-- [x] [NodeJs](https://nodejs.org/en) - https://nodejs.org/en
-- [x] [Sass](https://sass-lang.com/install) - Sass has features that don't exist in CSS yet like nesting, mixins, inheritance, and other nifty goodies that help you write robust, maintainable CSS.
-- [x] [Axios](https://axios-http.com/ptbr/docs/intro) - Cliente HTTP baseado em promessas para o navegador e Node.js
-- [x] [ReactJs](https://react.dev/) - The library for web and native user interfaces
-- [x] [Typescript](https://www.typescriptlang.org/) - TypeScript is JavaScript with syntax for types.
-- [x] [Mui Material](https://mui.com/) - Move faster with intuitive React UI tools
-- [x] [React Icon](https://react-icons.github.io/react-icons/) - Include popular icons in your React projects easily 
+- [x] [Next.js](https://nextjs.org/) - A React framework for building the web application, handling both server-side and client-side rendering for a fast user experience.
+- [x] [React.js](https://react.dev/) - A fundamental library for creating reusable and interactive UI components.
+- [x] [Supabase](https://supabase.com/) - An open-source backend platform providing a Postgres database, user authentication, and instant APIs.
+- [x] [TypeScript](https://www.typescriptlang.org/) - A language that adds static typing to JavaScript, increasing code robustness and maintainability.
+- [x] [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework for rapid and consistent UI styling directly in the markup.
+- [x] [Radix UI](https://www.radix-ui.com/) - A library of low-level, unstyled, and accessible UI components for building custom and complex elements.
+- [x] [Node.js](https://nodejs.org/en) - A runtime environment for executing JavaScript on the server-side, essential for Next.js and automation scripts.
+- [x] [Google APIs](https://cloud.google.com/apis) - A set of APIs for integrating with Google services, used for features like social login or calendar integration.
+- [x] [i18next](https://www.i18next.com/) - An internationalization framework that allows the platform to be translated into multiple languages.
+- [x] [Npm](https://npmjs.com/) - A package and dependency manager.
+- [x] [Sass](https://sass-lang.com/install) - A CSS pre-processor with advanced features.
+- [x] [Axios](https://axios-http.com/docs/intro) - A promise-based HTTP client for the browser and Node.js.
+- [x] [MUI Material](https://mui.com/) - Intuitive React UI tools for faster development.
+- [x] [React Icons](https://react-icons.github.io/react-icons/) - A package for including popular icons in React projects.
 
-### Estrutura
+### Structure
   #### Pages:
   - [x] Home
   - [x] About
   - [x] Mentors Feed
   - [x] Single Mentor
   - [ ] Courses
-  - [ ] Oportunities
-  - [ ] MenvoCast (redirect to AudioPlataforms)
+  - [ ] Opportunities
+  - [ ] MenvoCast (redirect to Audio Platforms)
   - [ ] Store
   - [ ] Panel
 
 #### Components:
   - [x] Header
   - [x] Footer
-  - [ ] sibeBar
+  - [ ] sideBar
   - [x] sideBarMentor
   - [x] sideBarSearch
   - [x] cardMentor
@@ -78,24 +85,23 @@
   - [ ] slidePartners
   - [ ] newsLetters
 
+## Installation
+To clone and run this project on your machine, please see the instructions in [INSTALLING.md](INSTALLING.md).
 
-## Instalação
-Para clonar o projeto e executá-lo em sua máquina, veja os detalhes em [INSTALLING.md](INSTALLING.md).
+## Contributing
+Would you like to contribute to the project? Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 
-## Contribuir
-Gostaria de contribuir com o projeto? Por favor acesse [CONTRIBUTING.md](CONTRIBUTING.md) para o manual completo de contribuição.
+## Authors
+- **Paul Pessoa** - _Initial work_ - [Paul Pessoa](https://github.com/paulpessoa)
 
-## Autores
-- **Paul Pessoa** - _Trabalho inicial_ - [Paul Pessoa](https://github.com/paulpessoa)
+See also the list of [contributors](https://www.menvo.com.br/volunteers) who participated in this project.
 
-Veja também a lista de [contribuidores](https://www.menvo.com.br/volunteers) que participaram do projeto.
+## Community
+We have an exclusive Menvo community on Discord. Interested? [Join us](https://discord.gg/xxxxxxxx)!
+Access our [platform](https://www.menvo.com.br/)!
 
-## Comunidade
-Temos uma comunidade exclusiva do Menvo no Discord. Interessado? [Participe](https://discord.gg/xxxxxxxx)!
-Acesse nossa [plataforma](https://www.menvo.com.br/)!
-
-## Redes sociais
-Nos siga nas redes sociais!
+## Social Media
+Follow us on social media!
 <th>
  <td>
     <a href="https://www.linkedin.com/company/menvo/"  target="_blank">
@@ -119,13 +125,6 @@ Nos siga nas redes sociais!
   </td>
 </th>
 
-[forks-shield]: https://img.shields.io/github/forks/paulpessoa/menvo.svg?style=flat-square
-[forks-url]: https://github.com/paulpessoa/menvo/network/members
-[stars-shield]: https://img.shields.io/github/stars/paulpessoa/menvo.svg?style=flat-square
-[stars-url]: https://github.com/paulpessoa/menvo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/paulpessoa/menvo.svg?style=flat-square
-[issues-url]: https://github.com/paulpessoa/menvo/issues
-
 ## Documentation:
 - [x] README
 - [ ] Contributing guidelines
@@ -133,4 +132,11 @@ Nos siga nas redes sociais!
 - [ ] Support Us
 - [ ] License
 
-<a href="https://opensource.guide/pt/starting-a-project/" target="_blank">Open Source Guide</a>
+<a href="https://opensource.guide/starting-a-project/" target="_blank">Open Source Guide</a>
+
+[forks-shield]: https://img.shields.io/github/forks/paulpessoa/menvo.svg?style=flat-square
+[forks-url]: https://github.com/paulpessoa/menvo/network/members
+[stars-shield]: https://img.shields.io/github/stars/paulpessoa/menvo.svg?style=flat-square
+[stars-url]: https://github.com/paulpessoa/menvo/stargazers
+[issues-shield]: https://img.shields.io/github/issues/paulpessoa/menvo.svg?style=flat-square
+[issues-url]: https://github.com/paulpessoa/menvo/issues
