@@ -1,28 +1,34 @@
-### 🎯 Qual o objetivo deste PR?
-*(Descreva de forma clara e concisa o principal objetivo das alterações. Qual problema está sendo resolvido? Qual funcionalidade está sendo adicionada? Por que essa mudança é importante?)*
+### Descrição
+
+Este Pull Request, se aplicado, irá: **[Descreva o principal impacto ou objetivo do PR em uma única frase em negrito. Ex: Adicionar a funcionalidade de busca de mentores por especialidade]**
+
+### O que foi feito?
+*(Forneça uma descrição detalhada das mudanças. Use categorias e uma lista para organizar as informações de forma clara.)*
+
+- **Nova Funcionalidade:**
+  - [ ] Implementa o endpoint X para a funcionalidade Y.
+  - [ ] Adiciona o componente Z na interface para interagir com o novo endpoint.
+
+- **Correção de Bug:**
+  - [ ] Corrige o problema com [descrever o bug] no arquivo W, que causava [descrever o impacto].
+
+- **Melhora na Documentação:**
+  - [ ] Atualiza o `README.md` com as novas instruções de setup.
+
+- **Refatoração:**
+  - [ ] O código do serviço X foi refatorado para melhorar a performance e a legibilidade.
 
 
-### 📝 O que foi feito?
-*(Use uma lista para detalhar as principais mudanças técnicas ou visuais que foram implementadas.)*
+### Como isso foi testado?
+*(Descreva como você validou suas alterações. Novos contribuidores e revisores precisam ter confiança de que suas mudanças funcionam e não quebram nada.)*
 
-- [ ] Nova funcionalidade A foi implementada.
-- [ ] O bug B foi corrigido no componente C.
-- [ ] A documentação do componente D foi atualizada.
-
-
-### ✅ Como isso foi testado?
-*(Descreva os testes que você realizou para garantir que suas alterações funcionam corretamente e não introduzem novos problemas. A confiança na sua alteração deve ser demonstrada aqui.)*
-
-- [ ] Teste manual na página X, seguindo os passos Y e Z.
-- [ ] Testes unitários foram adicionados/atualizados para cobrir o novo cenário.
-- [ ] O projeto roda sem erros após as alterações.
+- [ ] Testes unitários foram criados para a nova lógica no serviço X.
+- [ ] Testes de integração foram realizados para validar o fluxo de ponta a ponta da funcionalidade Y.
+- [ ] Teste manual realizado na página Z para validar a correção visual do componente W.
+- [ ] O projeto roda sem erros e todos os testes existentes continuam passando.
 
 
-### 🔗 Issues Relacionadas
-*(Se este PR resolve alguma issue aberta, link aqui usando palavras-chave como `Fecha`, `Resolve` ou `Corrige` para que o GitHub a feche automaticamente ao fazer o merge.)*
+### Issues Relacionadas
+*(Se este Pull Request resolve alguma issue que já foi aberta, link ela aqui. Usar palavras-chave como `Fecha`, `Resolve` ou `Corrige` fará com que o GitHub feche a issue automaticamente quando o PR for aceito.)*
 
-- Fecha a issue # (se houver alguma)
-
-
-### 📸 Informações Adicionais
-*(Adicione qualquer outra informação relevante aqui, como screenshots, GIFs de demonstração, ou dependências de outras alterações que precisam ser feitas.)*
+- Fecha a issue #[número_da_issue]
