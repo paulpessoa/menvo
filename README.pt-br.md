@@ -66,15 +66,15 @@
   - [x] Mentors Feed
   - [x] Single Mentor
   - [ ] Courses
-  - [ ] Oportunities
-  - [ ] MenvoCast (redirect to AudioPlataforms)
+  - [ ] Oportunidades
+  - [ ] MenvoCast (redireciona para Plataformas de Áudio)
   - [ ] Store
   - [ ] Panel
 
 #### Components:
   - [x] Header
   - [x] Footer
-  - [ ] sibeBar
+  - [ ] sideBar
   - [x] sideBarMentor
   - [x] sideBarSearch
   - [x] cardMentor
