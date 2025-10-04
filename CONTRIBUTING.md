@@ -27,7 +27,7 @@ Create a new branch for the change you want to submit. For example:
 \`\`\`bash
 $ git checkout -b fix-responsive
 \`\`\`
-Executing the command above the branch named `fix-responsive` will be created.
+Executing the command above will create a branch named `fix-responsive`.
 
 **Note:** The branch name must be meaningful and should **only** indicate the change to be made. Pull requests that do not follow this pattern will not be accepted.
 
