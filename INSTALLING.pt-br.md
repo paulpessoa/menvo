@@ -50,11 +50,9 @@ O projeto Menvo utiliza Supabase como backend. Para rodar o projeto localmente, 
 1.  **Crie uma Conta:** Se você não tiver uma, crie uma conta gratuita no [supabase.com](https://supabase.com) e crie um novo projeto.
 2.  **Obtenha suas Chaves:** No painel do seu projeto Supabase, vá para **Project Settings > API**. Lá você encontrará a **Project URL** e a **Project API Keys** (use a chave `anon`).
 3.  **Crie o arquivo .env:** Na raiz do projeto, crie uma cópia do arquivo `.env.example` e renomeie-a para `.env`.
-4.  **Preencha o arquivo .env:** Cole a sua URL e a sua chave `anon` no arquivo `.env` que você acabou de criar. 
-  
-Veja o exemplo abaixo.
+4.  **Preencha o arquivo .env:** Cole a sua URL e a sua chave `anon` no arquivo `.env` que você acabou de criar. Veja o exemplo abaixo:
 
-\`\`\`
+\`\`\`bash
 # Exemplo de conteúdo do arquivo .env
 NEXT_PUBLIC_SUPABASE_URL="URL_DO_SEU_PROJETO_SUPABASE"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_CHAVE_ANON"
@@ -66,7 +64,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_CHAVE_ANON"
 
 Com tudo configurado, inicie o servidor de desenvolvimento:
 
-\`\`\`
+\`\`\`bash
 $ npm run dev
 \`\`\`
 
