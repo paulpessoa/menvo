@@ -17,7 +17,7 @@ Would you like to help us improve the project? Check out this contribution guide
 ### Cloning the repository
 Fork the repository on GitHub and clone it to your machine.
 \`\`\`bash
-$ git clone https://github.com/{Seu nome}/menvo.git
+$ git clone https://github.com/{your-username}/menvo.git
 
 $ cd menvo
 \`\`\`
@@ -27,7 +27,7 @@ Create a new branch for the change you want to submit. For example:
 \`\`\`bash
 $ git checkout -b fix-responsive
 \`\`\`
-Executing the command above the branch named `fix-responsive` will be created.
+Executing the command above will create a branch named `fix-responsive`.
 
 **Note:** The branch name must be meaningful and should **only** indicate the change to be made. Pull requests that do not follow this pattern will not be accepted.
 

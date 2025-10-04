@@ -67,7 +67,7 @@
   - [x] Single Mentor
   - [ ] Courses
   - [ ] Oportunities
-  - [ ] MenvoCast (redirect to AudioPlataforms)
+  - [ ] MenvoCast (redireciona para Plataformas de Áudio)
   - [ ] Store
   - [ ] Panel
 

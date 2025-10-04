@@ -1,5 +1,3 @@
-
-
 # Contribuir
 Gostaria de nos ajudar a melhorar o projeto? Veja este guia de contribuição para ajudar o Menvo a crescer.
 
