@@ -1,4 +1,4 @@
-> Leia estas instruções em outro idioma: [Português (Brasil)](INSTALLING.pt-br.md)
+> Read these instructions in another language: [Português (Brasil)](INSTALLING.pt-br.md)
 
 # Menvo Installation Guide
 
