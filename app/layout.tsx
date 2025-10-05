@@ -151,11 +151,7 @@ export default function RootLayout({
             `
           }}
         />
-        <Script
-          id="zendesk-widget"
-          src="https://static.zdassets.com/ekr/snippet.js?key=a3906e97-a348-41e5-abdb-4cccbcfa87a8"
-          strategy="afterInteractive"
-        />
+
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
@@ -168,6 +164,14 @@ export default function RootLayout({
           </div>
           <Toaster />
         </Providers>
+
+        {/* Start of menvo Zendesk Widget script */}
+        <Script
+          id="ze-snippet"
+          src="https://static.zdassets.com/ekr/snippet.js?key=a3906e97-a348-41e5-abdb-4cccbcfa87a8"
+          strategy="beforeInteractive"
+        />
+        {/* End of menvo Zendesk Widget script */}
       </body>
     </html>
   )
