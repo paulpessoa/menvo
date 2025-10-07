@@ -66,7 +66,11 @@
   - [x] Mentors Feed
   - [x] Single Mentor
   - [ ] Courses
+<<<<<<< HEAD
   - [ ] Oportunities
+=======
+  - [ ] Oportunidades
+>>>>>>> c3e8226a0e6e0295faa1f194d85063340fe146d5
   - [ ] MenvoCast (redireciona para Plataformas de Áudio)
   - [ ] Store
   - [ ] Panel
@@ -74,7 +78,7 @@
 #### Components:
   - [x] Header
   - [x] Footer
-  - [ ] sibeBar
+  - [ ] sideBar
   - [x] sideBarMentor
   - [x] sideBarSearch
   - [x] cardMentor
