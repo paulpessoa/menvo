@@ -32,3 +32,4 @@ Este Pull Request, se aplicado, irá: **[Descreva o principal impacto ou objetiv
 *(Se este Pull Request resolve alguma issue que já foi aberta, link ela aqui. Usar palavras-chave como `Fecha`, `Resolve` ou `Corrige` fará com que o GitHub feche a issue automaticamente quando o PR for aceito.)*
 
 - Fecha a issue #[número_da_issue]
+- 
