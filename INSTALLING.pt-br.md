@@ -13,7 +13,7 @@ Este guia contém todas as instruções necessárias para instalar e executar o 
     - [1. Fork e Clone do Repositório](#1-fork-e-clone-do-repositório)
     - [2. Instalação das Dependências](#2-instalação-das-dependências)
     - [3. Configuração das Variáveis de Ambiente](#3-configuração-das-variáveis-de-ambiente)
-- [Exemplo de conteúdo do arquivo .env](#exemplo-de-conteúdo-do-arquivo-env)
+      - [Exemplo de conteúdo do arquivo .env](#exemplo-de-conteúdo-do-arquivo-env)
     - [4. Executando o Projeto](#4-executando-o-projeto)
   - [Scripts Adicionais](#scripts-adicionais)
 
@@ -54,8 +54,8 @@ O projeto Menvo utiliza Supabase como backend. Para rodar o projeto localmente, 
   
 Veja o exemplo abaixo.
 
-\`\`\`
-# Exemplo de conteúdo do arquivo .env
+#### Exemplo de conteúdo do arquivo .env
+\`\`\`bash
 NEXT_PUBLIC_SUPABASE_URL="URL_DO_SEU_PROJETO_SUPABASE"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_CHAVE_ANON"
 \`\`\`
