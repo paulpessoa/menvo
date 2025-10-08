@@ -14,8 +14,6 @@ Este guia contém todas as instruções necessárias para instalar e executar o 
     - [2. Instalação das Dependências](#2-instalação-das-dependências)
     - [3. Configuração das Variáveis de Ambiente](#3-configuração-das-variáveis-de-ambiente)
       - [Exemplo de conteúdo do arquivo .env](#exemplo-de-conteúdo-do-arquivo-env)
-- [\`\`\`bash](#bash)
-- [Exemplo de conteúdo do arquivo .env](#exemplo-de-conteúdo-do-arquivo-env-1)
     - [4. Executando o Projeto](#4-executando-o-projeto)
   - [Scripts Adicionais](#scripts-adicionais)
 
@@ -54,13 +52,8 @@ O projeto Menvo utiliza Supabase como backend. Para rodar o projeto localmente, 
 3.  **Crie o arquivo .env:** Na raiz do projeto, crie uma cópia do arquivo `.env.example` e renomeie-a para `.env`.
 4.  **Preencha o arquivo .env:** Cole a sua URL e a sua chave `anon` no arquivo `.env` que você acabou de criar. Veja o exemplo abaixo:
 
-<<<<<<< HEAD
 #### Exemplo de conteúdo do arquivo .env
 \`\`\`bash
-=======
-\`\`\`bash
-# Exemplo de conteúdo do arquivo .env
->>>>>>> 38daa4d486d948f8a2dea306b432cfb414f96b54
 NEXT_PUBLIC_SUPABASE_URL="URL_DO_SEU_PROJETO_SUPABASE"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_CHAVE_ANON"
 \`\`\`
