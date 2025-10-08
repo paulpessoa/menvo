@@ -66,6 +66,50 @@ Este documento define os requisitos para melhorar a funcionalidade da página de
 
 ### Requirement 5
 
+**User Story:** Como usuário, eu quero que meu currículo PDF seja recuperado corretamente após recarregar a página, para que eu não precise fazer upload novamente a cada sessão.
+
+#### Acceptance Criteria
+
+1. WHEN o usuário tem um CV salvo THEN o sistema SHALL exibir o status "CV enviado" ao carregar a página
+2. WHEN o usuário tem um CV salvo THEN o sistema SHALL exibir os botões "Ver" e "Remover" em vez do botão de upload
+3. WHEN o usuário clica em "Ver" THEN o sistema SHALL abrir o PDF em uma nova aba
+4. WHEN o usuário recarrega a página THEN o sistema SHALL manter o estado do CV salvo
+5. WHEN o perfil é carregado THEN o sistema SHALL verificar se cv_url existe e exibir a interface apropriada
+6. IF cv_url existe mas o arquivo não está acessível THEN o sistema SHALL exibir opção para fazer novo upload
+7. WHEN o usuário faz logout e login novamente THEN o sistema SHALL manter o CV salvo
+
+### Requirement 6
+
+**User Story:** Como mentor, eu quero ter acesso a todos os campos específicos de mentoria no meu perfil, para que eu possa configurar completamente minha oferta de mentoria.
+
+#### Acceptance Criteria
+
+1. WHEN o usuário é um mentor THEN o sistema SHALL exibir a seção "Idiomas" com opções para Português, English, Español
+2. WHEN o usuário é um mentor THEN o sistema SHALL exibir o campo "Áreas de Expertise" com sugestões relevantes
+3. WHEN o usuário é um mentor THEN o sistema SHALL exibir o campo "Tópicos de Mentoria" com sugestões
+4. WHEN o usuário é um mentor THEN o sistema SHALL exibir o campo "Tags Inclusivas" com opções apropriadas
+5. WHEN o usuário é um mentor THEN o sistema SHALL exibir o campo "Abordagem da Mentoria" como textarea
+6. WHEN o usuário é um mentor THEN o sistema SHALL exibir o campo "O que Esperar" como textarea
+7. WHEN o usuário é um mentor THEN o sistema SHALL exibir o campo "Mentee Ideal" como textarea
+8. WHEN o usuário é um mentor THEN o sistema SHALL exibir informação sobre "Mentorias Gratuitas"
+9. WHEN o usuário salva o perfil THEN o sistema SHALL persistir todos os campos de mentoria
+
+### Requirement 7
+
+**User Story:** Como usuário, eu quero ter acesso a todos os campos básicos e profissionais no meu perfil, para que eu possa manter minhas informações completas e atualizadas.
+
+#### Acceptance Criteria
+
+1. WHEN o usuário acessa o perfil THEN o sistema SHALL exibir o campo "Slug do Perfil" com preview da URL
+2. WHEN o usuário acessa o perfil THEN o sistema SHALL exibir todos os campos de "Informações Profissionais"
+3. WHEN o usuário acessa o perfil THEN o sistema SHALL exibir a seção "Localização" com campos de endereço
+4. WHEN o usuário preenche o endereço THEN o sistema SHALL mostrar aviso sobre privacidade
+5. WHEN o usuário salva o perfil THEN o sistema SHALL persistir todos os campos básicos e profissionais
+6. WHEN o usuário acessa o perfil THEN o sistema SHALL exibir a seção "Documentos e Integrações"
+7. WHEN o usuário faz upload do CV THEN o sistema SHALL analisar automaticamente para preencher campos
+
+### Requirement 8
+
 **User Story:** Como desenvolvedor, eu quero que o sistema tenha logs adequados e tratamento de erros, para que possamos diagnosticar e resolver problemas rapidamente.
 
 #### Acceptance Criteria

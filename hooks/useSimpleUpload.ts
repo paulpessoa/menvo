@@ -27,7 +27,8 @@ export function useSimpleUpload(endpoint: string): UseSimpleUploadReturn {
       console.log('🚀 Starting simple upload:', { file: file.name, size: file.size })
 
       // Get Supabase session
-      const { supabase } = await import('@/lib/supabase')
+      const { createClient } = await import('@/utils/supabase/client')
+      const supabase = createClient()
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
       if (sessionError || !session?.access_token) {

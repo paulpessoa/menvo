@@ -2,7 +2,13 @@
 
 ## Overview
 
-Este documento descreve o design técnico para melhorar a funcionalidade da página de perfil, corrigindo problemas críticos com upload de imagem, salvamento de dados e implementando upload de currículo em PDF. O design foca em robustez, experiência do usuário e manutenibilidade.
+Este documento descreve o design técnico para melhorar a funcionalidade da página de perfil, corrigindo problemas críticos com:
+1. **Persistência do CV** - Garantir que arquivos PDF salvos sejam recuperados corretamente após reload
+2. **Campos de mentoria** - Restaurar todos os campos específicos para mentores que foram removidos
+3. **Campos básicos e profissionais** - Garantir que todos os campos necessários estejam disponíveis
+4. **Upload de imagem e salvamento de dados** - Manter funcionalidades existentes
+
+O design foca em robustez, experiência do usuário e manutenibilidade.
 
 ## Architecture
 
@@ -11,9 +17,16 @@ Este documento descreve o design técnico para melhorar a funcionalidade da pág
 A página de perfil atual tem os seguintes componentes:
 - **Frontend**: React component em `app/profile/page.tsx` usando hooks personalizados
 - **State Management**: Hook `useProfile` para gerenciar estado do perfil
-- **Storage**: Supabase Storage com bucket `profile-photos` já configurado
-- **API**: Endpoint existente `/api/upload/profile-photo` para upload de imagens
-- **Database**: Tabela `profiles` com campos para avatar_url e cv_url
+- **Storage**: Supabase Storage com buckets `profile-photos` e `cvs` configurados
+- **API**: Endpoints `/api/upload/profile-photo` e `/api/upload/cv` para uploads
+- **Database**: Tabela `profiles` com todos os campos necessários
+
+### Problemas Identificados
+
+1. **CV não persiste após reload**: O CV é salvo no banco mas a interface não recupera o estado corretamente
+2. **Campos de mentoria ausentes**: Vários campos importantes para mentores foram removidos da interface
+3. **Campos básicos incompletos**: Alguns campos como slug do perfil e localização não estão sendo exibidos
+4. **Estado da interface inconsistente**: A interface não reflete corretamente o estado dos dados salvos
 
 ### Proposed Architecture
 
@@ -51,33 +64,45 @@ graph TB
 **File**: `app/profile/page.tsx`
 
 **Responsibilities**:
-- Render profile form with all sections
-- Handle form state and validation
-- Coordinate file uploads
+- Render profile form with all sections including missing mentor fields
+- Handle form state and validation for all fields
+- Coordinate file uploads and properly display CV state
 - Display loading states and error messages
 - Manage user feedback
 
 **Key Changes**:
-- Replace direct Supabase storage calls with API endpoints
-- Add proper error boundaries and loading states
-- Implement file validation on frontend
-- Add confirmation dialogs for destructive actions
+- **Fix CV state management**: Properly initialize CV state from profile data
+- **Add missing mentor fields**: Restore all mentor-specific fields (idiomas, expertise, etc.)
+- **Add missing basic fields**: Include slug do perfil, localização, etc.
+- **Improve state synchronization**: Ensure UI reflects actual database state
+- **Add proper form sections**: Organize fields in appropriate tabs/sections
 
 ### 2. Enhanced useProfile Hook
 
 **File**: `hooks/useProfile.ts`
 
 **Current Issues**:
-- Missing proper error handling for profile updates
-- No optimistic updates for better UX
-- Limited validation
+- Profile data loading correctly but UI state not syncing properly
+- Missing proper initialization of form state from profile data
+- CV state not being properly managed
 
 **Enhancements**:
 ```typescript
-interface ProfileUpdateResult {
-  success: boolean;
-  data?: Profile;
-  error?: string;
+interface Profile {
+  // ... existing fields ...
+  slug: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  languages: string[] | null;
+  expertise_areas: string[] | null;
+  topics: string[] | null;
+  inclusion_tags: string[] | null;
+  mentorship_approach: string | null;
+  what_to_expect: string | null;
+  ideal_mentee: string | null;
+  cv_url: string | null;
 }
 
 interface UseProfileReturn {
@@ -85,12 +110,15 @@ interface UseProfileReturn {
   loading: boolean;
   error: string | null;
   updateProfile: (updates: Partial<Profile>) => Promise<ProfileUpdateResult>;
-  uploadAvatar: (file: File) => Promise<ProfileUpdateResult>;
-  uploadCV: (file: File) => Promise<ProfileUpdateResult>;
-  removeCV: () => Promise<ProfileUpdateResult>;
   refetch: () => Promise<void>;
+  isUpdating: boolean;
 }
 ```
+
+**Key Fixes**:
+- Ensure all profile fields are properly typed and loaded
+- Fix form state initialization to properly reflect saved CV state
+- Add proper handling for all mentor-specific fields
 
 ### 3. New useFileUpload Hook
 
@@ -140,11 +168,33 @@ interface UseFileUploadReturn {
 
 ## Data Models
 
-### Profile Table Updates
+### Profile Table Schema
 
-No schema changes required. Existing fields are sufficient:
-- `avatar_url`: string (URL to profile photo)
-- `cv_url`: string (URL to CV PDF)
+The profiles table should include all necessary fields. Key fields for this update:
+
+**Basic Fields**:
+- `first_name`, `last_name`: string (required)
+- `slug`: string (profile URL slug)
+- `bio`: text (user biography)
+- `avatar_url`: string (profile photo URL)
+
+**Professional Fields**:
+- `current_position`, `current_company`: string
+- `linkedin_url`, `portfolio_url`, `personal_website_url`: string
+- `cv_url`: string (CV PDF URL)
+
+**Location Fields**:
+- `address`, `city`, `state`, `country`: string
+- `latitude`, `longitude`: number
+
+**Mentorship Fields**:
+- `languages`: string[] (supported languages)
+- `expertise_areas`: string[] (areas of expertise)
+- `topics`: string[] (mentorship topics)
+- `inclusion_tags`: string[] (inclusion/diversity tags)
+- `mentorship_approach`: text (mentorship approach description)
+- `what_to_expect`: text (what mentees can expect)
+- `ideal_mentee`: text (ideal mentee description)
 
 ### Storage Buckets
 
@@ -317,22 +367,60 @@ const ERROR_MESSAGES = {
 
 ## Implementation Phases
 
-### Phase 1: Fix Current Issues
-- Fix profile data saving
-- Improve error handling
-- Add proper loading states
+### Phase 1: Fix CV Persistence Issue
+- Debug and fix CV state initialization from profile data
+- Ensure CV upload state is properly reflected in UI
+- Fix form state synchronization with database state
 
-### Phase 2: Enhance Image Upload
-- Improve image upload reliability
-- Add image preview
-- Implement file replacement
+### Phase 2: Restore Missing Mentor Fields
+- Add all missing mentor-specific fields to the form
+- Implement proper form sections and organization
+- Add language selection, expertise areas, topics, etc.
 
-### Phase 3: Add CV Upload
-- Create CV upload API
-- Add CV bucket and policies
-- Implement CV management UI
+### Phase 3: Add Missing Basic Fields
+- Add slug do perfil field with URL preview
+- Add location fields (address, city, state, country)
+- Add privacy notices for location data
 
-### Phase 4: Polish and Optimize
-- Add advanced features
-- Optimize performance
-- Enhance user experience
+### Phase 4: Enhance User Experience
+- Improve form validation and feedback
+- Add proper loading states for all operations
+- Optimize form layout and usability
+
+## UI/UX Improvements
+
+### Form Organization
+The profile form should be organized in clear sections:
+
+1. **Informações Básicas**
+   - Photo upload
+   - Nome, Sobrenome
+   - Slug do Perfil (with preview)
+   - Biografia
+
+2. **Informações Profissionais**
+   - Cargo Atual, Empresa Atual
+   - LinkedIn, Portfólio, Site Pessoal
+   - CV Upload section
+
+3. **Localização**
+   - Endereço completo
+   - Cidade, Estado, País
+   - Privacy notice
+
+4. **Informações de Mentoria** (for mentors)
+   - Idiomas
+   - Áreas de Expertise
+   - Tópicos de Mentoria
+   - Tags Inclusivas
+   - Abordagem da Mentoria
+   - O que Esperar
+   - Mentee Ideal
+   - Mentorias Gratuitas notice
+
+### CV State Management
+The CV section should clearly show:
+- When no CV is uploaded: Upload button with instructions
+- When CV is uploaded: File info with View/Remove buttons
+- During upload: Progress indicator
+- Upload errors: Clear error messages
