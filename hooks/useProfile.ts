@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth"
-import { supabase } from "@/lib/supabase"
+import { createClient } from "@/utils/supabase/client"
 import { handleAsyncOperation, createAppError } from "@/lib/error-handler"
 import { logger } from "@/lib/logger"
 
@@ -15,28 +15,45 @@ interface Profile {
   slug: string | null
   bio: string | null
   avatar_url: string | null
-  current_position: string | null
-  current_company: string | null
+  
+  // Professional fields (mapped from database)
+  job_title: string | null // maps to current_position in form
+  company: string | null // maps to current_company in form
   linkedin_url: string | null
-  portfolio_url: string | null
-  personal_website_url: string | null
-  address: string | null
+  github_url: string | null
+  twitter_url: string | null
+  website_url: string | null // maps to personal_website_url in form
+  phone: string | null
+  
+  // Location fields
   city: string | null
   state: string | null
   country: string | null
-  latitude: number | null
-  longitude: number | null
+  timezone: string | null
+  age: number | null
+  
+  // Mentorship fields
   expertise_areas: string[] | null
-  topics: string[] | null
-  inclusion_tags: string[] | null
+  mentorship_topics: string[] | null // maps to topics in form
+  inclusive_tags: string[] | null // maps to inclusion_tags in form
   languages: string[] | null
-  mentorship_approach: string | null
-  what_to_expect: string | null
-  ideal_mentee: string | null
+  
+  // Additional fields that need to be added to database
+  address: string | null // needs migration
+  portfolio_url: string | null // needs migration  
+  mentorship_approach: string | null // needs migration
+  what_to_expect: string | null // needs migration
+  ideal_mentee: string | null // needs migration
   cv_url: string | null
-  role: string | null
-  status: string | null
-  verification_status: string | null
+  
+  // System fields
+  verified: boolean
+  experience_years: number | null
+  session_price_usd: number | null
+  availability_status: string | null
+  average_rating: number | null
+  total_reviews: number | null
+  total_sessions: number | null
   created_at: string
   updated_at: string
 }
@@ -66,6 +83,9 @@ export function useProfile() {
   const fetchProfile = async () => {
     if (!user) return
 
+    console.log('🔍 Starting fetchProfile for user:', user.id);
+    const supabase = createClient()
+    
     const result = await handleAsyncOperation(
       async () => {
         logger.debug('Fetching profile', 'useProfile', { userId: user.id });
@@ -93,11 +113,14 @@ export function useProfile() {
     );
 
     setLoading(false);
+    console.log('📋 fetchProfile result:', result);
 
     if (result.success) {
       setProfile(result.data!);
       setError(null);
+      console.log('✅ Profile loaded successfully');
     } else {
+      console.error('❌ Profile fetch failed:', result.error);
       setError(result.error?.message || 'Error fetching profile');
     }
   }
@@ -105,36 +128,32 @@ export function useProfile() {
   const createProfile = async (): Promise<Profile> => {
     if (!user) throw new Error('No user found');
 
-    logger.info('Creating new profile', 'useProfile', { userId: user.id });
+    logger.info('Creating new profile via API', 'useProfile', { userId: user.id });
 
-    const profileData = {
-      id: user.id,
-      email: user.email || "",
-      first_name: user.user_metadata?.first_name || "",
-      last_name: user.user_metadata?.last_name || "",
-      full_name: user.user_metadata?.full_name || "",
-      role: user.user_metadata?.user_type || "mentee",
-      status: "pending",
-      verification_status: "pending",
-    };
-
-    const { data, error: createError } = await supabase
-      .from("profiles")
-      .insert(profileData)
-      .select()
-      .single()
-
-    if (createError) {
-      logger.error('Failed to create profile', 'useProfile', { 
-        userId: user.id, 
-        error: createError,
-        profileData 
-      });
-      throw createError;
+    // Get session for API call
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session?.access_token) {
+      throw new Error('No session found for profile creation')
     }
 
-    logger.info('Profile created successfully', 'useProfile', { userId: user.id });
-    return data;
+    // Use the profile API to create the profile (it handles creation automatically)
+    const response = await fetch('/api/profile', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Profile creation failed' }))
+      throw new Error(errorData.error || `HTTP ${response.status}`)
+    }
+
+    const result = await response.json()
+    logger.info('Profile created successfully via API', 'useProfile', { userId: user.id });
+    return result.profile;
   }
 
   const updateProfile = async (updates: Partial<Profile>): Promise<ProfileUpdateResult> => {
@@ -171,34 +190,37 @@ export function useProfile() {
 
     const result = await handleAsyncOperation(
       async () => {
-        logger.info('Updating profile', 'useProfile', { 
+        logger.info('Updating profile via API', 'useProfile', { 
           userId: user.id, 
           fields: Object.keys(updates) 
         });
 
-        const updateData = {
-          ...updates,
-          updated_at: new Date().toISOString(),
-        };
-
-        const { data, error: updateError } = await supabase
-          .from("profiles")
-          .update(updateData)
-          .eq("id", user.id)
-          .select()
-          .single()
-
-        if (updateError) {
-          logger.error('Profile update failed', 'useProfile', { 
-            userId: user.id, 
-            error: updateError,
-            updateData 
-          });
-          throw updateError;
+        // Get session for API call
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!session?.access_token) {
+          throw new Error('Sessão expirada. Faça login novamente.')
         }
 
+        // Call the profile API endpoint
+        const response = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify(updates),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Profile update failed' }))
+          throw new Error(errorData.error || `HTTP ${response.status}`)
+        }
+
+        const result = await response.json()
         logger.profileUpdate(true, user.id, Object.keys(updates));
-        return data;
+        return result.profile;
       },
       'updateProfile'
     );

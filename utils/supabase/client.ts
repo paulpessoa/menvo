@@ -20,7 +20,14 @@ export function createClient() {
     return null as any
   }
 
-  _client = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
+  _client = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    },
+  })
   return _client
 }
 
