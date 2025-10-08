@@ -13,7 +13,7 @@ This guide contains all the necessary instructions to install and run the Menvo 
     - [1. Fork and Clone the Repository](#1-fork-and-clone-the-repository)
     - [2. Install Dependencies](#2-install-dependencies)
     - [3. Set Up Environment Variables](#3-set-up-environment-variables)
-      - [Example .env file content](#example-env-file-content)
+- [Example .env file content](#example-env-file-content)
     - [4. Run the Project](#4-run-the-project)
   - [Additional Scripts](#additional-scripts)
 
@@ -52,13 +52,8 @@ The Menvo project uses Supabase as its backend. To run the project locally, you 
 3.  **Create the .env file:** In the project's root directory, create a copy of the `.env.example` file and rename it to `.env`.
 4.  **Fill in the .env file:** Paste your URL and your `anon` key into the `.env` file you just created. See the example below.
 
-<<<<<<< HEAD
-#### Example .env file content
-\`\`\`bash
-=======
-\`\`\`bash
-#### Example .env file content
->>>>>>> 38daa4d486d948f8a2dea306b432cfb414f96b54
+\`\`\`
+# Example .env file content
 NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_PROJECT_URL"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
 \`\`\`
@@ -69,7 +64,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
 
 With everything set up, start the development server:
 
-\`\`\`bash
+\`\`\`
 $ npm run dev
 \`\`\`
 

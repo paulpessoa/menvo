@@ -107,14 +107,14 @@ export async function POST(request: NextRequest) {
     if (bucketError) {
       console.error("❌ Error checking buckets:", bucketError);
     } else {
-      const profilePhotosBucket = buckets.find(b => b.id === 'profile-photos');
+      const avatarsBucket = buckets.find(b => b.id === 'avatars');
       console.log("📋 Available buckets:", buckets.map(b => b.id));
-      console.log("✅ Profile photos bucket found:", !!profilePhotosBucket);
+      console.log("✅ Avatars bucket found:", !!avatarsBucket);
     }
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-      .from("profile-photos")
+      .from("avatars")
       .upload(fileName, fileBuffer, {
         contentType: file.type,
         upsert: true,
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     // Get public URL
     console.log("🔗 Generating public URL...");
     const { data: urlData } = supabaseAdmin.storage
-      .from("profile-photos")
+      .from("avatars")
       .getPublicUrl(fileName)
 
     const publicUrl = urlData.publicUrl
