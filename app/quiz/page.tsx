@@ -40,6 +40,14 @@ export default function QuizPage() {
                 throw error
             }
 
+            // Send invite email (fire and forget)
+            supabase.functions.invoke('send-invite-email', {
+                body: {
+                    name: data.name,
+                    email: data.email
+                }
+            }).catch(err => console.error('Error sending invite:', err))
+
             toast({
                 title: "Questionário enviado!",
                 description: "Processando sua análise com IA...",

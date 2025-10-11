@@ -167,20 +167,7 @@ serve(async (req) => {
       )
     }
 
-    // Trigger email sending (fire and forget - don't wait for response)
-    try {
-      fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-quiz-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
-        },
-        body: JSON.stringify({ responseId })
-      }).catch(err => console.error('Error triggering email:', err))
-    } catch (emailError) {
-      console.error('Error triggering email send:', emailError)
-      // Don't fail the request if email fails
-    }
+    // Email with analysis removed - user can request it from results page
 
     return new Response(
       JSON.stringify({

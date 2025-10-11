@@ -16,7 +16,9 @@ import {
     Loader2,
     CheckCircle,
     Heart,
-    Sparkles
+    Sparkles,
+    Mail,
+    Share2
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
@@ -54,10 +56,56 @@ export default function QuizResultsPage() {
     const [loading, setLoading] = useState(true)
     const [response, setResponse] = useState<QuizResponse | null>(null)
     const [selectedGift, setSelectedGift] = useState<'caneta' | 'botton' | null>(null)
+    const [sendingEmail, setSendingEmail] = useState(false)
 
     useEffect(() => {
         loadResults()
     }, [params.id])
+
+    const handleSendEmail = async () => {
+        if (!response) return
+
+        setSendingEmail(true)
+        try {
+            const { createClient } = await import('@/utils/supabase/client')
+            const supabase = createClient()
+
+            const { error } = await supabase.functions.invoke('send-quiz-email', {
+                body: { responseId: response.id }
+            })
+
+            if (error) throw error
+
+            toast({
+                title: "Email enviado!",
+                description: "Verifique sua caixa de entrada.",
+            })
+        } catch (error) {
+            console.error('Error sending email:', error)
+            toast({
+                title: "Erro ao enviar email",
+                description: "Tente novamente mais tarde.",
+                variant: "destructive",
+            })
+        } finally {
+            setSendingEmail(false)
+        }
+    }
+
+    const handleShareWhatsApp = () => {
+        if (!response) return
+
+        const text = `🎯 Minha Análise de Potencial - MENVO
+
+Pontuação: ${response.score}/1000
+
+Acabei de fazer uma análise personalizada no RecnPlay e descobri meu potencial de crescimento!
+
+Conheça o MENVO - plataforma gratuita de mentoria: https://menvo.com.br`
+
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
+        window.open(whatsappUrl, '_blank')
+    }
 
     const loadResults = async () => {
         try {
@@ -334,10 +382,47 @@ export default function QuizResultsPage() {
                         </CardContent>
                     </Card>
 
-                    {/* Email Notice */}
-                    <p className="text-center text-sm text-muted-foreground">
-                        📧 Enviamos uma cópia desta análise para <strong>{response.email}</strong>
-                    </p>
+                    {/* Share Actions */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-center">Compartilhar Resultados</CardTitle>
+                            <CardDescription className="text-center">
+                                Envie sua análise por email ou compartilhe com amigos
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    onClick={handleSendEmail}
+                                    disabled={sendingEmail}
+                                    className="flex-1 sm:flex-initial"
+                                >
+                                    {sendingEmail ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Enviando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Mail className="mr-2 h-4 w-4" />
+                                            Enviar por Email
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    onClick={handleShareWhatsApp}
+                                    className="flex-1 sm:flex-initial bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800"
+                                >
+                                    <Share2 className="mr-2 h-4 w-4" />
+                                    Compartilhar no WhatsApp
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>
