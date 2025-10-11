@@ -17,6 +17,7 @@ import {
   BarChart3,
   Cog,
   HeartHandshake,
+  FolderOpen,
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 
@@ -56,6 +57,7 @@ export default function Header() {
     ? [
       { name: "Dashboard", href: "/dashboard", icon: User },
       { name: "Perfil", href: "/profile", icon: Settings },
+      { name: "Meus Arquivos", href: "/meus-arquivos", icon: FolderOpen },
       { name: "Mensagens", href: "/messages", icon: MessageSquare },
       { name: "Calendário", href: "/calendar", icon: Calendar },
     ]

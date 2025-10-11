@@ -26,6 +26,8 @@ export type AppPermission =
   | "validate_activities"
   | "moderate_content"
 
+export type UploadStatus = "uploading" | "completed" | "failed"
+
 export type user_role = UserRole
 export type user_status = UserStatus
 
@@ -297,6 +299,44 @@ export interface Database {
           updated_at?: string
         }
       }
+      user_files: {
+        Row: {
+          id: string
+          user_id: string
+          original_name: string
+          file_name: string
+          file_size: number
+          mime_type: string
+          s3_key: string
+          s3_url: string | null
+          upload_status: UploadStatus
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          original_name: string
+          file_name: string
+          file_size: number
+          mime_type: string
+          s3_key: string
+          s3_url?: string | null
+          upload_status?: UploadStatus
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          original_name?: string
+          file_name?: string
+          file_size?: number
+          mime_type?: string
+          s3_key?: string
+          s3_url?: string | null
+          upload_status?: UploadStatus
+          updated_at?: string
+        }
+      }
     }
     Enums: {
       user_role: "pending" | "mentee" | "mentor" | "admin"
@@ -306,6 +346,7 @@ export interface Database {
       validation_status: ValidationStatus
       notification_type: NotificationType
       app_permission: AppPermission
+      upload_status: UploadStatus
     }
   }
 }
