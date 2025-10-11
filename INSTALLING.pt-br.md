@@ -29,19 +29,19 @@ Antes de começar, certifique-se de que você tem os seguintes softwares instala
 
 Primeiro, faça um "Fork" do projeto para a sua conta do GitHub e depois clone o seu fork para a sua máquina local.
 
-\`\`\`bash
+```bash
 $ git clone https://github.com/SEU-USUARIO/menvo.git
 
 $ cd menvo
-\`\`\`
+```
 
 ### 2. Instalação das Dependências
 
 Com o projeto clonado, instale todas as dependências necessárias executando o seguinte comando na raiz do projeto:
 
-\`\`\`bash
+```bash
 $ npm install
-\`\`\`
+```
 
 ### 3. Configuração das Variáveis de Ambiente
 
@@ -53,10 +53,10 @@ O projeto Menvo utiliza Supabase como backend. Para rodar o projeto localmente, 
 4.  **Preencha o arquivo .env:** Cole a sua URL e a sua chave `anon` no arquivo `.env` que você acabou de criar. Veja o exemplo abaixo:
 
 #### Exemplo de conteúdo do arquivo .env
-\`\`\`bash
+```bash
 NEXT_PUBLIC_SUPABASE_URL="URL_DO_SEU_PROJETO_SUPABASE"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_CHAVE_ANON"
-\`\`\`
+```
 
 **Importante:** O arquivo `.env` contém informações sensíveis e não deve ser enviado para o repositório. Ele já está incluído no `.gitignore` do projeto.
 
@@ -64,9 +64,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="SUA_CHAVE_ANON"
 
 Com tudo configurado, inicie o servidor de desenvolvimento:
 
-\`\`\`
+```bash
 $ npm run dev
-\`\`\`
+```
 
 Agora, abra seu navegador e acesse [http://localhost:3000](http://localhost:3000) para ver a aplicação rodando!
 
