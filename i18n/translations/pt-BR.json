@@ -451,6 +451,113 @@
     "cookiePolicy": "Política de Cookies",
     "allRightsReserved": "Todos os direitos reservados."
   },
+  "privacy": {
+    "badge": "Privacidade",
+    "title": "Política de Privacidade",
+    "intro": "Sua privacidade é importante para nós. Esta política explica como coletamos, usamos e protegemos seus dados no Menvo.",
+    "dataCollection": {
+      "title": "Coleta de Dados",
+      "text": "Coletamos as informações que você fornece ao criar uma conta, como nome, e-mail, foto de perfil e detalhes profissionais. Também coletamos dados de login social (Google, LinkedIn) se você optar por se autenticar com essas plataformas."
+    },
+    "email": {
+      "title": "E-mails e Comunicação",
+      "text": "Usamos seu e-mail para comunicações essenciais, notificações de mentoria e atualizações. Os e-mails são enviados via Brevo, respeitando sua privacidade e preferências de exclusão."
+    },
+    "photos": {
+      "title": "Fotos e Conteúdo Visual",
+      "text": "As fotos do perfil e as imagens enviadas são armazenadas de forma segura no Supabase e usadas apenas para identificação e personalização do perfil."
+    },
+    "storage": {
+      "title": "Armazenamento de Dados",
+      "text": "Todos os dados são armazenados de forma segura no Supabase, com acesso restrito à equipe Menvo e seguindo as melhores práticas de segurança."
+    },
+    "mentorship": {
+      "title": "Mentoria e Interações",
+      "text": "As informações sobre sessões de mentoria, avaliações e mensagens são usadas para melhorar a experiência e garantir a segurança da comunidade."
+    },
+    "thirdParty": {
+      "title": "Serviços de Terceiros",
+      "text": "Utilizamos serviços de terceiros como Google, LinkedIn (login), Supabase (armazenamento) e Brevo (e-mails). Cada serviço tem sua própria política de privacidade."
+    },
+    "rights": {
+      "title": "Seus Direitos",
+      "text": "Você pode solicitar acesso, correção ou exclusão de seus dados a qualquer momento. Entre em contato conosco para obter assistência."
+    },
+    "contact": {
+      "title": "Contato",
+      "text": "Dúvidas sobre privacidade? Entre em contato conosco em contato@menvo.com."
+    },
+    "links": {
+      "cookies": "Política de Cookies",
+      "terms": "Termos de Serviço"
+    }
+  },
+  "cookies": {
+    "badge": "Cookies",
+    "title": "Política de Cookies",
+    "intro": "Usamos cookies para aprimorar sua experiência, garantir recursos essenciais e analisar o uso da plataforma.",
+    "essential": {
+      "title": "Cookies Essenciais",
+      "text": "Necessários para a operação do site, autenticação e segurança. Não podem ser desativados."
+    },
+    "social": {
+      "title": "Login Social",
+      "text": "Os cookies podem ser usados para autenticação via Google e LinkedIn, permitindo um login seguro."
+    },
+    "preferences": {
+      "title": "Preferências",
+      "text": "Armazenamos suas preferências de idioma e configurações para personalizar sua experiência."
+    },
+    "analytics": {
+      "title": "Análise e Desempenho",
+      "text": "Usamos cookies para entender como a plataforma é usada e para melhorar nossos serviços."
+    },
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Serviço"
+    }
+  },
+  "terms": {
+    "badge": "Termos",
+    "title": "Termos de Serviço",
+    "intro": "Ao usar o Menvo, você concorda com estes termos. Por favor, leia com atenção para entender seus direitos e responsabilidades.",
+    "usage": {
+      "title": "Uso da Plataforma",
+      "text": "O Menvo conecta mentores e mentorados para sessões gratuitas. O uso deve ser respeitoso e de acordo com as leis aplicáveis."
+    },
+    "account": {
+      "title": "Conta e Login Social",
+      "text": "Você pode criar uma conta por e-mail ou login social (Google, LinkedIn). Mantenha suas credenciais seguras e não compartilhe sua conta."
+    },
+    "security": {
+      "title": "Segurança",
+      "text": "Tomamos medidas para proteger seus dados, mas você também é responsável por manter sua senha segura."
+    },
+    "content": {
+      "title": "Conteúdo e Fotos",
+      "text": "Você é responsável pelo conteúdo que carrega (fotos, texto). Não carregue conteúdo ofensivo ou protegido por direitos autorais sem permissão."
+    },
+    "communication": {
+      "title": "Comunicação e E-mails",
+      "text": "Enviaremos comunicações importantes sobre mentorias e atualizações. Você pode optar por não receber e-mails promocionais."
+    },
+    "storage": {
+      "title": "Armazenamento e Terceiros",
+      "text": "Os dados são armazenados no Supabase e os e-mails são enviados via Brevo. Usamos login social de terceiros."
+    },
+    "rights": {
+      "title": "Direitos e Responsabilidades",
+      "text": "Você pode acessar, corrigir ou excluir seus dados. O uso indevido da plataforma pode resultar na suspensão da conta."
+    },
+    "contact": {
+      "title": "Contato",
+      "text": "Dúvidas? Entre em contato conosco em contato@menvo.com."
+    },
+    "links": {
+      "privacy": "Política de Privacidade",
+      "cookies": "Política de Cookies"
+    }
+  },
   "waitingList": {
     "title": "Junte-se à Lista de Espera",
     "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",
