@@ -1,4 +1,4 @@
-> Read this document in another language: [English](README.md)
+> Read this document in [English](README.md)
 
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -40,7 +40,7 @@
 
 ## Sobre o Projeto
 
- Por meio de videochamadas, conectamos profissionais experientes a jovens em busca de orientação, acompanhamento e recursos para se destacarem em processos seletivos.
+Por meio de videochamadas, conectamos profissionais experientes a jovens em busca de orientação, acompanhamento e recursos para se destacarem em processos seletivos.
 
 ### Feito com
 
@@ -60,49 +60,57 @@
 - [x] [React Icon](https://react-icons.github.io/react-icons/) - Pacote para inclusão de ícones populares em projetos React.
 
 ### Estrutura
-  #### Pages:
-  - [x] Home
-  - [x] About
-  - [x] Mentors Feed
-  - [x] Single Mentor
-  - [ ] Courses
-  - [ ] Oportunidades
-  - [ ] MenvoCast (redireciona para Plataformas de Áudio)
-  - [ ] Store
-  - [ ] Panel
+
+#### Pages:
+
+- [x] Home
+- [x] About
+- [x] Mentors Feed
+- [x] Single Mentor
+- [ ] Courses
+- [ ] Oportunidades
+- [ ] MenvoCast (redireciona para Plataformas de Áudio)
+- [ ] Store
+- [ ] Panel
 
 #### Components:
-  - [x] Header
-  - [x] Footer
-  - [ ] sideBar
-  - [x] sideBarMentor
-  - [x] sideBarSearch
-  - [x] cardMentor
-  - [ ] sectionMentor
-  - [ ] formScheduleMentor
-  - [x] formLoginRegister (Modal)
-  - [ ] Guider
-  - [ ] slidePartners
-  - [ ] newsLetters
 
+- [x] Header
+- [x] Footer
+- [ ] sideBar
+- [x] sideBarMentor
+- [x] sideBarSearch
+- [x] cardMentor
+- [ ] sectionMentor
+- [ ] formScheduleMentor
+- [x] formLoginRegister (Modal)
+- [ ] Guider
+- [ ] slidePartners
+- [ ] newsLetters
 
 ## Instalação
+
 Para clonar o projeto e executá-lo em sua máquina, veja os detalhes em [INSTALLING.pt-br.md](INSTALLING.pt-br.md).
 
 ## Contribuir
+
 Gostaria de contribuir com o projeto? Por favor acesse [CONTRIBUTING.pt-br.md](CONTRIBUTING.pt-br.md) para o manual completo de contribuição.
 
 ## Autores
+
 - **Paul Pessoa** - _Trabalho inicial_ - [Paul Pessoa](https://github.com/paulpessoa)
 
 Veja também a lista de [contribuidores](https://www.menvo.com.br/volunteers) que participaram do projeto.
 
 ## Comunidade
+
 Temos uma comunidade exclusiva do Menvo no Discord. Interessado? [Participe](https://discord.gg/xxxxxxxx)!
 Acesse nossa [plataforma](https://www.menvo.com.br/)!
 
 ## Redes sociais
+
 Nos siga nas redes sociais!
+
 <th>
  <td>
     <a href="https://www.linkedin.com/company/menvo/"  target="_blank">
@@ -127,6 +135,7 @@ Nos siga nas redes sociais!
 </th>
 
 ## Documentation:
+
 - [x] README
 - [ ] Contributing guidelines
 - [ ] Code of Conduct

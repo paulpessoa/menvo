@@ -1,4 +1,4 @@
-> Leia este documento em outro idioma: [Português (Brasil)](README.pt-br.md)
+> Leia este documento em: [Português (Brasil)](README.pt-br.md)
 
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -60,48 +60,57 @@ Through video calls, we connect experienced professionals to young people seekin
 - [x] [React Icons](https://react-icons.github.io/react-icons/) - A package for including popular icons in React projects.
 
 ### Structure
-  #### Pages:
-  - [x] Home
-  - [x] About
-  - [x] Mentors Feed
-  - [x] Single Mentor
-  - [ ] Courses
-  - [ ] Opportunities
-  - [ ] MenvoCast (redirect to Audio Platforms)
-  - [ ] Store
-  - [ ] Panel
+
+#### Pages:
+
+- [x] Home
+- [x] About
+- [x] Mentors Feed
+- [x] Single Mentor
+- [ ] Courses
+- [ ] Opportunities
+- [ ] MenvoCast (redirect to Audio Platforms)
+- [ ] Store
+- [ ] Panel
 
 #### Components:
-  - [x] Header
-  - [x] Footer
-  - [ ] sideBar
-  - [x] sideBarMentor
-  - [x] sideBarSearch
-  - [x] cardMentor
-  - [ ] sectionMentor
-  - [ ] formScheduleMentor
-  - [x] formLoginRegister (Modal)
-  - [ ] Guider
-  - [ ] slidePartners
-  - [ ] newsLetters
+
+- [x] Header
+- [x] Footer
+- [ ] sideBar
+- [x] sideBarMentor
+- [x] sideBarSearch
+- [x] cardMentor
+- [ ] sectionMentor
+- [ ] formScheduleMentor
+- [x] formLoginRegister (Modal)
+- [ ] Guider
+- [ ] slidePartners
+- [ ] newsLetters
 
 ## Installation
+
 To clone and run this project on your machine, please see the instructions in [INSTALLING.md](INSTALLING.md).
 
 ## Contributing
+
 Would you like to contribute to the project? Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 
 ## Authors
+
 - **Paul Pessoa** - _Initial work_ - [Paul Pessoa](https://github.com/paulpessoa)
 
 See also the list of [contributors](https://www.menvo.com.br/volunteers) who participated in this project.
 
 ## Community
+
 We have an exclusive Menvo community on Discord. Interested? [Join us](https://discord.gg/xxxxxxxx)!
 Access our [platform](https://www.menvo.com.br/)!
 
 ## Social Media
+
 Follow us on social media!
+
 <th>
  <td>
     <a href="https://www.linkedin.com/company/menvo/"  target="_blank">
@@ -126,6 +135,7 @@ Follow us on social media!
 </th>
 
 ## Documentation:
+
 - [x] README
 - [ ] Contributing guidelines
 - [ ] Code of Conduct
