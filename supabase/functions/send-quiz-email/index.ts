@@ -112,7 +112,10 @@ serve(async (req) => {
     if (!brevoResponse.ok) {
       const errorData = await brevoResponse.text()
       console.error('Brevo API error:', errorData)
-      throw new Error('Failed to send email via Brevo')
+      console.error('Brevo status:', brevoResponse.status)
+      console.error('Sender email:', senderEmail)
+      console.error('Recipient email:', quizResponse.email)
+      throw new Error(`Failed to send email via Brevo: ${brevoResponse.status} - ${errorData}`)
     }
 
     // Update email sent status
