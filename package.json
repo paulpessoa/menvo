@@ -23,6 +23,8 @@
     }
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.901.0",
+    "@aws-sdk/s3-request-presigner": "^3.901.0",
     "@google-cloud/local-auth": "^3.0.1",
     "@googlemaps/js-api-loader": "latest",
     "@hookform/resolvers": "latest",
@@ -78,6 +80,7 @@
     "jwt-decode": "latest",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.454.0",
+    "mime-types": "^3.0.1",
     "next": "15.2.4",
     "next-themes": "latest",
     "nodemailer": "^6.9.0",
@@ -100,6 +103,7 @@
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^22",
     "@types/nodemailer": "^6.4.0",
     "@types/react": "^19",
