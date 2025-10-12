@@ -15,7 +15,7 @@ Gostaria de nos ajudar a melhorar o projeto? Veja este guia de contribuição pa
 ### Clonando o repositório
 Faça um fork do repositório no GitHub e o clone em sua máquina.
 ```bash
-$ git clone https://github.com/{Seu nome}/menvo.git
+$ git clone https://github.com/{seu-usuario}/menvo.git
 
 $ cd menvo
 ```

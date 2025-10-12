@@ -30,7 +30,7 @@ Before you begin, ensure you have the following software installed on your machi
 First, fork the project to your own GitHub account and then clone your fork to your local machine.
 
 ```bash
-$ git clone https://github.com/YOUR-USERNAME/menvo.git
+$ git clone https://github.com/your-username/menvo.git
 
 $ cd menvo
 ```
