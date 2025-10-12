@@ -622,5 +622,31 @@
     "thankYou": "Thank you for your feedback!",
     "error": "Error submitting feedback. Please try again.",
     "rateStars": "Rate with {{count}} stars"
+  },
+  "mentorSuggestion": {
+    "loginRequiredTitle": "Login Required",
+    "loginRequiredDescription": "You need to be logged in to suggest a topic or mentorship area.",
+    "title": "Suggest Topic or Area",
+    "description": "Didn't find what you were looking for? Suggest new topics or knowledge areas you would like to find on the platform.",
+    "observationLabel": "What are you looking for?",
+    "observationPlaceholder": "e.g., I would like to find mentors specialized in Product Design, especially with experience in UX Research and digital accessibility. It would also be interesting to have mentors who work with Design Systems...",
+    "freeTopicsLabel": "Topics or Areas (Optional)",
+    "freeTopicsDescription": "Add keywords related to your suggestion",
+    "freeTopicsPlaceholder": "e.g., Design Thinking, Rapid Prototyping...",
+    "addTopic": "Add",
+    "inclusionTagsLabel": "Inclusion Tags (Optional)",
+    "inclusionTagsDescription": "Select relevant diversity and inclusion tags"
+  },
+  "toast": {
+    "suggestion": {
+      "success": {
+        "title": "Suggestion sent!",
+        "description": "Thank you for your suggestion. Our team will review it and we will let you know about any news."
+      },
+      "error": {
+        "title": "Error sending suggestion",
+        "description": "Could not send your suggestion. Please try again later."
+      }
+    }
   }
 }
