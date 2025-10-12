@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { AnimatedBackground } from '@/components/ui/animated-background'
 
 export interface QuizFormData {
     careerMoment: string
@@ -308,7 +309,7 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <AnimatedBackground>
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-3xl mx-auto">
                     {/* Progress Header */}
@@ -398,6 +399,6 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                     </p>
                 </div>
             </div>
-        </div>
+        </AnimatedBackground>
     )
 }

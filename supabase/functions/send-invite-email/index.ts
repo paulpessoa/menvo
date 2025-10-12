@@ -22,6 +22,11 @@ serve(async (req) => {
       )
     }
 
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
     const brevoApiKey = Deno.env.get('BREVO_API_KEY')
     const senderEmail = Deno.env.get('BREVO_SENDER_EMAIL') || 'contato@menvo.com.br'
     const senderName = Deno.env.get('BREVO_SENDER_NAME') || 'MENVO'
@@ -29,6 +34,20 @@ serve(async (req) => {
 
     if (!brevoApiKey) {
       throw new Error('Brevo API key not configured')
+    }
+
+    // Send Supabase auth invitation
+    const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${siteUrl}/auth/set-password`,
+      data: {
+        name: name,
+        invited_from: 'quiz'
+      }
+    })
+
+    if (inviteError) {
+      console.error('Error sending Supabase invitation:', inviteError)
+      // Continue with email sending even if invitation fails
     }
 
     const firstName = name.split(' ')[0]
@@ -168,6 +187,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         message: 'Invite email sent successfully',
+        supabaseInvite: inviteData ? 'sent' : 'failed'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
