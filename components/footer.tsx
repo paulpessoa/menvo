@@ -236,8 +236,8 @@ export default function Footer() {
           </div>
           <div className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground">
             <p>
-              © {new Date().getFullYear()} Menvo.{" "}
-              {t("footer.allRightsReserved")} CNPJ: 62.841.734/0001-50
+              © {new Date().getFullYear()} MENVO. CNPJ: 62.841.734/0001-50{" "}
+              {t("footer.allRightsReserved")}
             </p>
             <div className="mt-2 flex justify-center space-x-4">
               <Link href="/privacy" className="hover:text-foreground">

@@ -1,11 +1,17 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 import {
     Trophy,
     Users,
@@ -19,13 +25,13 @@ import {
     Sparkles,
     Mail,
     Share2
-} from 'lucide-react'
-import Image from 'next/image'
-import { AnimatedBackground } from '@/components/ui/animated-background'
-import { useToast } from '@/hooks/use-toast'
+} from "lucide-react"
+import Image from "next/image"
+import { AnimatedBackground } from "@/components/ui/animated-background"
+import { useToast } from "@/hooks/use-toast"
 
 interface AnalysisResult {
-    pontuacao: number
+    precisa_refazer?: boolean
     titulo_personalizado: string
     resumo_motivador: string
     mentores_sugeridos: Array<{
@@ -57,7 +63,9 @@ export default function QuizResultsPage() {
     const { toast } = useToast()
     const [loading, setLoading] = useState(true)
     const [response, setResponse] = useState<QuizResponse | null>(null)
-    const [selectedGift, setSelectedGift] = useState<'caneta' | 'botton' | null>(null)
+    const [selectedGift, setSelectedGift] = useState<"caneta" | "botton" | null>(
+        null
+    )
     const [sendingEmail, setSendingEmail] = useState(false)
 
     useEffect(() => {
@@ -69,10 +77,10 @@ export default function QuizResultsPage() {
 
         setSendingEmail(true)
         try {
-            const { createClient } = await import('@/utils/supabase/client')
+            const { createClient } = await import("@/utils/supabase/client")
             const supabase = createClient()
 
-            const { error } = await supabase.functions.invoke('send-quiz-email', {
+            const { error } = await supabase.functions.invoke("send-quiz-email", {
                 body: { responseId: response.id }
             })
 
@@ -80,14 +88,14 @@ export default function QuizResultsPage() {
 
             toast({
                 title: "Email enviado!",
-                description: "Verifique sua caixa de entrada.",
+                description: "Verifique sua caixa de entrada."
             })
         } catch (error) {
-            console.error('Error sending email:', error)
+            console.error("Error sending email:", error)
             toast({
                 title: "Erro ao enviar email",
                 description: "Tente novamente mais tarde.",
-                variant: "destructive",
+                variant: "destructive"
             })
         } finally {
             setSendingEmail(false)
@@ -100,7 +108,6 @@ export default function QuizResultsPage() {
         const currentUrl = window.location.href
         const text = `🎯 Minha Análise de Potencial - MENVO
 
-Pontuação: ${response.score}/1000
 
 Acabei de fazer uma análise personalizada no RecnPlay e descobri meu potencial de crescimento!
 
@@ -109,7 +116,7 @@ Veja meu resultado: ${currentUrl}
 Conheça o MENVO - plataforma gratuita de mentoria: https://menvo.com.br`
 
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
-        window.open(whatsappUrl, '_blank')
+        window.open(whatsappUrl, "_blank")
     }
 
     const handleShareLinkedIn = () => {
@@ -124,19 +131,21 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
 
 #MENVO #Mentoria #DesenvolvimentoProfissional #RecnPlay2025`
 
-        const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`
-        window.open(linkedinUrl, '_blank')
+        const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(
+            text
+        )}`
+        window.open(linkedinUrl, "_blank")
     }
 
     const loadResults = async () => {
         try {
-            const { createClient } = await import('@/utils/supabase/client')
+            const { createClient } = await import("@/utils/supabase/client")
             const supabase = createClient()
 
             const { data, error } = await supabase
-                .from('quiz_responses')
-                .select('*')
-                .eq('id', params.id)
+                .from("quiz_responses")
+                .select("*")
+                .eq("id", params.id)
                 .single()
 
             if (error) throw error
@@ -149,11 +158,11 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
 
             setResponse(data)
         } catch (error) {
-            console.error('Error loading results:', error)
+            console.error("Error loading results:", error)
             toast({
                 title: "Erro",
                 description: "Não foi possível carregar os resultados.",
-                variant: "destructive",
+                variant: "destructive"
             })
         } finally {
             setLoading(false)
@@ -169,7 +178,9 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                             <div className="flex flex-col items-center space-y-4">
                                 <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
                                 <div className="text-center">
-                                    <h3 className="font-semibold text-lg">Processando sua análise...</h3>
+                                    <h3 className="font-semibold text-lg">
+                                        Processando sua análise...
+                                    </h3>
                                     <p className="text-sm text-muted-foreground mt-2">
                                         Nossa IA está analisando suas respostas
                                     </p>
@@ -185,6 +196,74 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
     const analysis = response.ai_analysis
     const hasGift = true // Sempre mostrar brinde
 
+    // Se precisa refazer, mostra interface especial
+    if (analysis.precisa_refazer) {
+        return (
+            <AnimatedBackground>
+                <div className="container mx-auto px-4 py-12">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="text-center space-y-6 mb-8">
+                            <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 px-4 py-2 rounded-full text-orange-700 dark:text-orange-300 text-sm font-medium">
+                                <Target className="h-4 w-4" />
+                                Análise Incompleta
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-bold" style={{ color: '#007585' }}>
+                                {analysis.titulo_personalizado}
+                            </h1>
+                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                                {analysis.resumo_motivador}
+                            </p>
+                        </div>
+
+                        <Card className="border-2 border-orange-300 dark:border-orange-700 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/30 dark:to-yellow-950/30">
+                            <CardContent className="pt-6">
+                                <div className="text-center space-y-4">
+                                    <Target className="h-16 w-16 text-orange-600 mx-auto" />
+                                    <h3 className="text-xl font-semibold text-orange-900 dark:text-orange-100">
+                                        Vamos tentar novamente?
+                                    </h3>
+                                    <p className="text-orange-800 dark:text-orange-200 max-w-md mx-auto">
+                                        {analysis.mensagem_final}
+                                    </p>
+                                    <div className="pt-4">
+                                        <Button
+                                            size="lg"
+                                            onClick={() => router.push('/quiz')}
+                                            className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-white"
+                                        >
+                                            Refazer Questionário
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Dicas para melhorar as respostas */}
+                        <Card className="mt-6">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Lightbulb className="h-5 w-5 text-yellow-600" />
+                                    Dicas para uma análise mais precisa
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="space-y-3">
+                                    {analysis.conselhos_praticos.map((conselho, index) => (
+                                        <li key={index} className="flex items-start gap-3">
+                                            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                            <span>{conselho}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </AnimatedBackground>
+        )
+    }
+
     return (
         <AnimatedBackground>
             <div className="container mx-auto px-4 py-12">
@@ -193,14 +272,12 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                     <div className="text-center space-y-4">
                         <div className="inline-flex items-center gap-2 bg-teal-100 dark:bg-teal-900/30 px-4 py-2 rounded-full text-teal-700 dark:text-teal-300 text-sm font-medium">
                             <CheckCircle className="h-4 w-4 text-green-600" />
-                            Sua Análise Personalizada
+                            Análise Personalizada
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl font-bold">
+                        <h1 className="text-3xl md:text-4xl font-bold">
                             {analysis.titulo_personalizado}
                         </h1>
-
-
 
                         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                             {analysis.resumo_motivador}
@@ -224,9 +301,9 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                             <CardContent>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <Button
-                                        variant={selectedGift === 'caneta' ? 'default' : 'outline'}
+                                        variant={selectedGift === "caneta" ? "default" : "outline"}
                                         className="h-32 text-lg flex-col p-4"
-                                        onClick={() => setSelectedGift('caneta')}
+                                        onClick={() => setSelectedGift("caneta")}
                                     >
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="relative w-24 h-24">
@@ -238,13 +315,15 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                                                 />
                                             </div>
                                             <span className="font-semibold">Caneta</span>
-                                            {selectedGift === 'caneta' && <CheckCircle className="h-5 w-5 text-green-600" />}
+                                            {selectedGift === "caneta" && (
+                                                <CheckCircle className="h-5 w-5 text-green-600" />
+                                            )}
                                         </div>
                                     </Button>
                                     <Button
-                                        variant={selectedGift === 'botton' ? 'default' : 'outline'}
+                                        variant={selectedGift === "botton" ? "default" : "outline"}
                                         className="h-32 text-lg flex-col p-4"
-                                        onClick={() => setSelectedGift('botton')}
+                                        onClick={() => setSelectedGift("botton")}
                                     >
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="relative w-24 h-24">
@@ -256,7 +335,9 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                                                 />
                                             </div>
                                             <span className="font-semibold">Botton</span>
-                                            {selectedGift === 'botton' && <CheckCircle className="h-5 w-5 text-green-600" />}
+                                            {selectedGift === "botton" && (
+                                                <CheckCircle className="h-5 w-5 text-green-600" />
+                                            )}
                                         </div>
                                     </Button>
                                 </div>
@@ -266,9 +347,13 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                                     </p>
                                     {selectedGift && (
                                         <p className="text-sm text-center mt-2 text-green-800 dark:text-green-200">
-                                            ✅ Você escolheu: <strong>{selectedGift === 'caneta' ? 'Caneta' : 'Botton'}</strong>
+                                            ✅ Você escolheu:{" "}
+                                            <strong>
+                                                {selectedGift === "caneta" ? "Caneta" : "Botton"}
+                                            </strong>
                                             <br />
-                                            Mostre este resultado no estande do MENVO para retirar seu brinde!
+                                            Mostre este resultado no estande do MENVO para retirar seu
+                                            brinde!
                                         </p>
                                     )}
                                 </div>
@@ -290,8 +375,10 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                         <CardContent className="space-y-4">
                             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                                    💡 <strong>Status dos Mentores:</strong> Mostramos mentores reais da plataforma baseados no seu perfil.
-                                    "Disponível" = aceita novos mentorados | "Agenda lotada" = temporariamente ocupado
+                                    💡 <strong>Status dos Mentores:</strong> Mostramos mentores
+                                    reais da plataforma baseados no seu perfil. "Disponível" =
+                                    aceita novos mentorados | "Agenda lotada" = temporariamente
+                                    ocupado
                                 </p>
                             </div>
                             {analysis.mentores_sugeridos.map((mentor, index) => (
@@ -305,12 +392,24 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                                                 </p>
                                             )}
                                         </div>
-                                        <Badge variant={mentor.disponivel ? 'default' : 'secondary'} className={mentor.disponivel ? 'bg-green-600 hover:bg-green-700' : 'bg-orange-500 text-white'}>
-                                            <CheckCircle className={`h-3 w-3 mr-1 ${mentor.disponivel ? 'text-white' : 'text-white'}`} />
-                                            {mentor.disponivel ? 'Disponível' : 'Agenda lotada'}
+                                        <Badge
+                                            variant={mentor.disponivel ? "default" : "secondary"}
+                                            className={
+                                                mentor.disponivel
+                                                    ? "bg-green-600 hover:bg-green-700"
+                                                    : "bg-orange-500 text-white"
+                                            }
+                                        >
+                                            <CheckCircle
+                                                className={`h-3 w-3 mr-1 ${mentor.disponivel ? "text-white" : "text-white"
+                                                    }`}
+                                            />
+                                            {mentor.disponivel ? "Disponível" : "Agenda lotada"}
                                         </Badge>
                                     </div>
-                                    <p className="text-sm text-muted-foreground">{mentor.razao}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {mentor.razao}
+                                    </p>
                                 </div>
                             ))}
                         </CardContent>
@@ -357,27 +456,31 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                     </Card>
 
                     {/* Development Areas */}
-                    {analysis.areas_desenvolvimento && analysis.areas_desenvolvimento.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Áreas de Desenvolvimento</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex flex-wrap gap-2">
-                                    {analysis.areas_desenvolvimento.map((area, index) => (
-                                        <Badge key={index} variant="outline" className="text-sm">
-                                            {area}
-                                        </Badge>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
+                    {analysis.areas_desenvolvimento &&
+                        analysis.areas_desenvolvimento.length > 0 && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Áreas de Desenvolvimento</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-wrap gap-2">
+                                        {analysis.areas_desenvolvimento.map((area, index) => (
+                                            <Badge key={index} variant="outline" className="text-sm">
+                                                {area}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
                     {/* Final Message */}
                     <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-700">
                         <CardContent className="pt-6">
-                            <p className="text-center text-lg font-medium mb-4" style={{ color: '#007585' }}>
+                            <p
+                                className="text-center text-lg font-medium mb-4"
+                                style={{ color: "#007585" }}
+                            >
                                 {analysis.mensagem_final}
                             </p>
 
@@ -391,7 +494,9 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                                                 Você tem potencial para ser mentor!
                                             </h4>
                                             <p className="text-sm text-teal-700 dark:text-teal-300 mt-1">
-                                                Identificamos que você tem interesse em compartilhar conhecimento. Considere se cadastrar como mentor voluntário na plataforma MENVO.
+                                                Identificamos que você tem interesse em compartilhar
+                                                conhecimento. Considere se cadastrar como mentor
+                                                voluntário na plataforma MENVO.
                                             </p>
                                         </div>
                                     </div>
@@ -403,7 +508,9 @@ Conheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores
                     {/* Share Actions */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-center">Compartilhar Resultados</CardTitle>
+                            <CardTitle className="text-center">
+                                Compartilhar Resultados
+                            </CardTitle>
                             <CardDescription className="text-center">
                                 Envie sua análise por email ou compartilhe com amigos
                             </CardDescription>
