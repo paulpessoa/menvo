@@ -39,6 +39,7 @@ interface Mentor {
 }
 
 interface AnalysisResult {
+  precisa_refazer?: boolean
   titulo_personalizado: string
   resumo_motivador: string
   mentores_sugeridos: Array<{
@@ -221,16 +222,32 @@ ${mentors.map(m => `- ${m.full_name} (${m.current_position} na ${m.current_compa
   Status: ${m.availability_status}`).join('\n\n')}
 
 INSTRUÇÕES:
-1. Crie uma análise calorosa, profissional e motivadora
-2. Sugira 2-3 tipos de mentores baseados nas áreas de interesse
+1. PRIMEIRO: Avalie a qualidade e coerência das respostas
+   - Se as respostas forem muito vagas, incoerentes, ou claramente não sérias (ex: "não sei", "talvez", respostas de uma palavra, textos sem sentido)
+   - Retorne uma mensagem educativa pedindo mais atenção e sugerindo refazer o questionário
+   - Use o campo "precisa_refazer" como true nestes casos
+
+2. Se as respostas forem adequadas, crie uma análise calorosa, profissional e motivadora
+3. Sugira 2-3 tipos de mentores baseados nas áreas de interesse
    - Se houver mentores disponíveis que combinam, mencione-os especificamente
    - Se não houver mentores para certas áreas, indique disponivel: false
-3. Dê 2-3 conselhos práticos e acionáveis
-4. Identifique se a pessoa tem potencial para ser mentora (baseado na resposta sobre compartilhar conhecimento)
-5. Sugira áreas de desenvolvimento na vida pessoal baseado nos desafios mencionados
+4. Dê 2-3 conselhos práticos e acionáveis
+5. Identifique se a pessoa tem potencial para ser mentora (baseado na resposta sobre compartilhar conhecimento)
+6. Sugira áreas de desenvolvimento na vida pessoal baseado nos desafios mencionados
 
 FORMATO DE RESPOSTA (JSON válido):
+
+Para respostas inadequadas:
 {
+  "precisa_refazer": true,
+  "titulo_personalizado": "Que tal tentar novamente?",
+  "resumo_motivador": "Notamos que suas respostas foram muito breves ou vagas. Para uma análise mais precisa e útil, recomendamos refazer o questionário com mais detalhes e reflexão sobre seus objetivos profissionais.",
+  "mensagem_final": "Uma boa análise precisa de respostas thoughtful. Tente novamente quando estiver pronto para compartilhar mais sobre seus desafios e objetivos!"
+}
+
+Para respostas adequadas:
+{
+  "precisa_refazer": false,
   "titulo_personalizado": "Seu Perfil de Crescimento",
   "resumo_motivador": "Mensagem inspiradora de 2-3 linhas",
   "mentores_sugeridos": [
@@ -257,6 +274,39 @@ FORMATO DE RESPOSTA (JSON válido):
 }
 
 function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): AnalysisResult {
+  // Check if responses are too vague or incoherent
+  const challengeLength = response.current_challenge?.trim().length || 0
+  const visionLength = response.future_vision?.trim().length || 0
+  const personalHelpLength = response.personal_life_help?.trim().length || 0
+  
+  const hasVagueResponses = challengeLength < 20 || visionLength < 20 || personalHelpLength < 20
+  const hasGenericResponses = 
+    response.current_challenge?.toLowerCase().includes('não sei') ||
+    response.future_vision?.toLowerCase().includes('não sei') ||
+    response.current_challenge?.toLowerCase().includes('nada') ||
+    response.future_vision?.toLowerCase().includes('nada')
+  
+  if (hasVagueResponses || hasGenericResponses) {
+    return {
+      precisa_refazer: true,
+      titulo_personalizado: "Que tal tentar novamente?",
+      resumo_motivador: "Notamos que suas respostas foram muito breves ou vagas. Para uma análise mais precisa e útil, recomendamos refazer o questionário com mais detalhes e reflexão sobre seus objetivos profissionais.",
+      mentores_sugeridos: [],
+      conselhos_praticos: [
+        "Reflita mais profundamente sobre seus desafios atuais",
+        "Pense em objetivos específicos para os próximos 2 anos",
+        "Considere áreas onde você gostaria de crescer profissionalmente"
+      ],
+      proximos_passos: [
+        "Refaça o questionário com respostas mais detalhadas",
+        "Dedique tempo para pensar sobre seus objetivos de carreira"
+      ],
+      areas_desenvolvimento: response.development_areas || [],
+      mensagem_final: "Uma boa análise precisa de respostas thoughtful. Tente novamente quando estiver pronto para compartilhar mais sobre seus desafios e objetivos!",
+      potencial_mentor: false,
+      areas_vida_pessoal: []
+    }
+  }
   
   // Match mentors with development areas using expertise_areas and mentorship_topics
   const matchedMentors = mentors.filter(mentor => {
@@ -304,6 +354,7 @@ function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): An
                           response.share_knowledge.includes('ja-faco')
 
   return {
+    precisa_refazer: false,
     titulo_personalizado: "Seu Perfil de Crescimento Profissional",
     resumo_motivador: "Você demonstra clareza sobre seus objetivos e está no caminho certo para alcançá-los. Continue investindo em seu desenvolvimento!",
     mentores_sugeridos: mentoresSugeridos,

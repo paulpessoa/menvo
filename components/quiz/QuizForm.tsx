@@ -112,8 +112,8 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                         className="space-y-3"
                     >
                         {[
-                            { value: 'estudante-inicio', label: 'Estudante universitário (início do curso)' },
-                            { value: 'estudante-meio-fim', label: 'Estudante universitário (meio/fim do curso)' },
+                            { value: 'ensino-medio', label: 'Estudante do ensino médio' },
+                            { value: 'estudante-universitario', label: 'Estudante universitário' },
                             { value: 'recem-formado', label: 'Recém-formado (até 1 ano)' },
                             { value: 'profissional-junior', label: 'Profissional júnior (1-3 anos de experiência)' },
                             { value: 'transicao', label: 'Em transição de carreira' },
@@ -297,7 +297,7 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
 
                         <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                             <p className="text-sm text-blue-900 dark:text-blue-100">
-                                Enviaremos sua análise personalizada para este email, junto com um convite para a plataforma MENVO.
+                                Você receberá sua análise personalizada por email e um convite especial para se juntar à comunidade MENVO.
                             </p>
                         </div>
                     </div>
