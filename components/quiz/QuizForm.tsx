@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { TextareaWithVoice } from '@/components/ui/textarea-with-voice'
 import { Label } from '@/components/ui/label'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { AnimatedBackground } from '@/components/ui/animated-background'
@@ -59,17 +59,17 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
             case 1:
                 return !!formData.careerMoment
             case 2:
-                return !!formData.mentorshipExperience
-            case 3:
-                return formData.developmentAreas && formData.developmentAreas.length > 0
-            case 4:
                 return !!formData.currentChallenge && formData.currentChallenge.trim().length > 10
-            case 5:
+            case 3:
+                return !!formData.mentorshipExperience
+            case 4:
                 return !!formData.futureVision && formData.futureVision.trim().length > 10
+            case 5:
+                return formData.developmentAreas && formData.developmentAreas.length > 0
             case 6:
-                return !!formData.shareKnowledge
-            case 7:
                 return !!formData.personalLifeHelp && formData.personalLifeHelp.trim().length > 10
+            case 7:
+                return !!formData.shareKnowledge
             case 8:
                 return !!formData.name && !!formData.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
             default:
@@ -131,6 +131,20 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
 
             case 2:
                 return (
+                    <div className="space-y-4">
+                        <TextareaWithVoice
+                            placeholder="Conte-nos sobre o que mais te preocupa ou desafia na sua carreira..."
+                            value={formData.currentChallenge || ''}
+                            onChange={(value) => updateFormData('currentChallenge', value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Mínimo de 10 caracteres • {formData.currentChallenge?.length || 0} caracteres
+                        </p>
+                    </div>
+                )
+
+            case 3:
+                return (
                     <RadioGroup
                         value={formData.mentorshipExperience}
                         onValueChange={(value) => updateFormData('mentorshipExperience', value)}
@@ -153,7 +167,21 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                     </RadioGroup>
                 )
 
-            case 3:
+            case 4:
+                return (
+                    <div className="space-y-4">
+                        <TextareaWithVoice
+                            placeholder="Compartilhe sua visão de futuro profissional..."
+                            value={formData.futureVision || ''}
+                            onChange={(value) => updateFormData('futureVision', value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Mínimo de 10 caracteres • {formData.futureVision?.length || 0} caracteres
+                        </p>
+                    </div>
+                )
+
+            case 5:
                 return (
                     <div className="space-y-4">
                         <p className="text-sm text-muted-foreground mb-4">Selecione todas que se aplicam:</p>
@@ -189,37 +217,21 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                     </div>
                 )
 
-            case 4:
-                return (
-                    <div className="space-y-4">
-                        <Textarea
-                            placeholder="Conte-nos sobre o que mais te preocupa ou desafia na sua carreira..."
-                            value={formData.currentChallenge || ''}
-                            onChange={(e) => updateFormData('currentChallenge', e.target.value)}
-                            className="min-h-[200px] resize-none"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Mínimo de 10 caracteres • {formData.currentChallenge?.length || 0} caracteres
-                        </p>
-                    </div>
-                )
-
-            case 5:
-                return (
-                    <div className="space-y-4">
-                        <Textarea
-                            placeholder="Compartilhe sua visão de futuro profissional..."
-                            value={formData.futureVision || ''}
-                            onChange={(e) => updateFormData('futureVision', e.target.value)}
-                            className="min-h-[200px] resize-none"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Mínimo de 10 caracteres • {formData.futureVision?.length || 0} caracteres
-                        </p>
-                    </div>
-                )
-
             case 6:
+                return (
+                    <div className="space-y-4">
+                        <TextareaWithVoice
+                            placeholder="Exemplo: Encontrar um novo hobby, desenvolver projetos pessoais, melhorar relacionamentos, cuidar da saúde mental..."
+                            value={formData.personalLifeHelp || ''}
+                            onChange={(value) => updateFormData('personalLifeHelp', value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Mínimo de 10 caracteres • {formData.personalLifeHelp?.length || 0} caracteres
+                        </p>
+                    </div>
+                )
+
+            case 7:
                 return (
                     <RadioGroup
                         value={formData.shareKnowledge}
@@ -241,21 +253,6 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                             </div>
                         ))}
                     </RadioGroup>
-                )
-
-            case 7:
-                return (
-                    <div className="space-y-4">
-                        <Textarea
-                            placeholder="Exemplo: Encontrar um novo hobby, desenvolver projetos pessoais, melhorar relacionamentos, cuidar da saúde mental..."
-                            value={formData.personalLifeHelp || ''}
-                            onChange={(e) => updateFormData('personalLifeHelp', e.target.value)}
-                            className="min-h-[200px] resize-none"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Mínimo de 10 caracteres • {formData.personalLifeHelp?.length || 0} caracteres
-                        </p>
-                    </div>
                 )
 
             case 8:
@@ -297,7 +294,7 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
 
                         <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                             <p className="text-sm text-blue-900 dark:text-blue-100">
-                                Você receberá sua análise personalizada por email e um convite especial para se juntar à comunidade MENVO.
+                                Você receberá sua análise por e-mail e um convite exclusivo de acesso a MENVO.
                             </p>
                         </div>
                     </div>
@@ -335,22 +332,22 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                         <CardHeader>
                             <CardTitle className="text-2xl">
                                 {currentStep === 1 && 'Qual é o seu momento de carreira atual?'}
-                                {currentStep === 2 && 'Você já teve alguma experiência com mentoria?'}
-                                {currentStep === 3 && 'Quais áreas você mais gostaria de desenvolver?'}
-                                {currentStep === 4 && 'Qual é o seu maior desafio profissional no momento?'}
-                                {currentStep === 5 && 'Onde você se vê daqui a 2 anos?'}
-                                {currentStep === 6 && 'Você já pensou em compartilhar seu conhecimento ou experiência com outros?'}
-                                {currentStep === 7 && 'Em quais desafios da vida pessoal uma conversa poderia te ajudar?'}
+                                {currentStep === 2 && 'Qual é o seu maior desafio profissional no momento?'}
+                                {currentStep === 3 && 'Você já teve alguma experiência com mentoria?'}
+                                {currentStep === 4 && 'Onde você se vê daqui a 2 anos?'}
+                                {currentStep === 5 && 'Quais áreas você mais gostaria de desenvolver?'}
+                                {currentStep === 6 && 'Em quais desafios da vida pessoal uma conversa poderia te ajudar?'}
+                                {currentStep === 7 && 'Você já pensou em compartilhar seu conhecimento ou experiência com outros?'}
                                 {currentStep === 8 && 'Informações de Contato'}
                             </CardTitle>
                             <CardDescription>
                                 {currentStep === 1 && 'Selecione a opção que melhor descreve seu momento atual'}
-                                {currentStep === 2 && 'Queremos entender sua experiência prévia com mentoria'}
-                                {currentStep === 3 && 'Você pode selecionar múltiplas opções'}
-                                {currentStep === 4 && 'Conte-nos sobre o que mais te preocupa ou desafia na sua carreira'}
-                                {currentStep === 5 && 'Compartilhe sua visão de futuro profissional'}
-                                {currentStep === 6 && 'Queremos saber se você também tem interesse em ajudar outras pessoas'}
-                                {currentStep === 7 && 'Como novos hobbies, projetos pessoais ou outros aspectos da vida'}
+                                {currentStep === 2 && 'Conte-nos sobre o que mais te preocupa ou desafia na sua carreira'}
+                                {currentStep === 3 && 'Queremos entender sua experiência prévia com mentoria'}
+                                {currentStep === 4 && 'Compartilhe sua visão de futuro profissional'}
+                                {currentStep === 5 && 'Você pode selecionar múltiplas opções'}
+                                {currentStep === 6 && 'Como novos hobbies, projetos pessoais ou outros aspectos da vida'}
+                                {currentStep === 7 && 'Queremos saber se você também tem interesse em ajudar outras pessoas'}
                                 {currentStep === 8 && 'Para enviarmos sua análise personalizada'}
                             </CardDescription>
                         </CardHeader>
