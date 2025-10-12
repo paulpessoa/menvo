@@ -162,6 +162,8 @@
     "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões de mentoria gratuitas.",
     "forMentees": "Para Mentorados",
     "forMentors": "Para Mentores",
+    "forNGOs": "Para ONGs",
+    "forCompanies": "Para Empresas",
     "mentees": {
       "step1": {
         "title": "Crie Seu Perfil",
@@ -224,8 +226,51 @@
       },
       "becomeMentor": "Torne-se um Mentor"
     },
+    "ngos": {
+      "step1": {
+        "title": "Cadastre sua ONG Gratuitamente",
+        "description": "ONGs e organizações sociais podem se cadastrar gratuitamente na plataforma para conectar os jovens atendidos com mentores voluntários.",
+        "feature1": "Cadastro 100% gratuito para ONGs",
+        "feature2": "Acesso ilimitado à plataforma",
+        "feature3": "Suporte dedicado para organizações"
+      },
+      "step2": {
+        "title": "Conecte Jovens com Mentores",
+        "description": "Cadastre os jovens atendidos pela sua organização e ajude-os a encontrar mentores que possam orientá-los em suas jornadas profissionais e pessoais.",
+        "feature1": "Cadastre múltiplos jovens da sua organização",
+        "feature2": "Acompanhe o progresso das mentorias",
+        "feature3": "Receba relatórios de impacto social"
+      },
+      "getStarted": "Cadastrar Minha ONG"
+    },
+    "companies": {
+      "step1": {
+        "title": "Voluntariado Corporativo através da Mentoria",
+        "description": "Desenvolva programas de voluntariado corporativo permitindo que seus colaboradores se tornem mentores voluntários, fortalecendo o propósito da empresa.",
+        "feature1": "Engaje colaboradores em ações sociais",
+        "feature2": "Desenvolva lideranças através da mentoria",
+        "feature3": "Fortaleça a cultura organizacional"
+      },
+      "step2": {
+        "title": "Relatórios ESG e Impacto Social",
+        "description": "Receba relatórios detalhados sobre o impacto social das mentorias realizadas pelos seus colaboradores, fortalecendo suas métricas ESG.",
+        "feature1": "Relatórios mensais de impacto social",
+        "feature2": "Métricas para relatórios ESG",
+        "feature3": "Certificados de voluntariado corporativo"
+      },
+      "step3": {
+        "title": "Políticas de Incentivo e Benefícios",
+        "description": "Crie políticas de incentivo para colaboradores mentores, como folgas remuneradas, reconhecimento interno e desenvolvimento de carreira.",
+        "feature1": "Banco de horas para mentoria voluntária",
+        "feature2": "Reconhecimento e gamificação interna",
+        "feature3": "Desenvolvimento de soft skills"
+      },
+      "getStarted": "Tornar-se Parceiro Corporativo"
+    },
     "faq": {
       "title": "Perguntas Frequentes",
+      "description": "Encontre respostas para as dúvidas mais comuns sobre a plataforma.",
+      "viewAll": "Ver Todas as Perguntas",
       "q1": {
         "question": "A mentoria é realmente gratuita?",
         "answer": "Sim, todas as sessões de mentoria na nossa plataforma são totalmente gratuitas. Nossos mentores dedicam seu tempo voluntariamente para ajudar outras pessoas a crescer."
@@ -254,6 +299,53 @@
       "supportDescription": "Nossa equipe de suporte está aqui para ajudar com qualquer pergunta que você tenha.",
       "contactSupport": "Fale com o Suporte"
     }
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "description": "Encontre respostas para as dúvidas mais comuns sobre a plataforma Menvo.",
+    "q1": {
+      "question": "A mentoria é realmente gratuita?",
+      "answer": "Sim, todas as sessões de mentoria na nossa plataforma são totalmente gratuitas. Nossos mentores dedicam seu tempo voluntariamente para ajudar outras pessoas a crescer."
+    },
+    "q2": {
+      "question": "Qual a duração das sessões de mentoria?",
+      "answer": "As sessões de mentoria padrão duram 45 minutos. Esse tempo é suficiente para uma conversa significativa, respeitando a agenda de todos."
+    },
+    "q3": {
+      "question": "Com que frequência posso me encontrar com um mentor?",
+      "answer": "Isso depende da disponibilidade e preferência do mentor. Alguns estão abertos a encontros regulares, enquanto outros preferem encontros pontuais."
+    },
+    "q4": {
+      "question": "O que acontece se eu precisar cancelar?",
+      "answer": "Pedimos que o cancelamento seja feito com pelo menos 24 horas de antecedência, em respeito ao tempo do mentor. Você pode reagendar facilmente pelo seu painel."
+    },
+    "q5": {
+      "question": "Como me torno um mentor verificado?",
+      "answer": "Após criar seu perfil de mentor, você precisará agendar uma breve chamada de verificação com nossa equipe. Isso garante a qualidade e segurança da comunidade."
+    },
+    "q6": {
+      "question": "Minhas informações estão seguras?",
+      "answer": "Sim, levamos privacidade e segurança muito a sério. Suas informações pessoais são protegidas e compartilhadas apenas com quem você decidir se conectar."
+    },
+    "q7": {
+      "question": "Como funciona para ONGs?",
+      "answer": "ONGs podem se cadastrar gratuitamente e conectar os jovens atendidos com mentores voluntários. É uma forma de ampliar o impacto social da organização sem custos."
+    },
+    "q8": {
+      "question": "Empresas podem participar?",
+      "answer": "Sim! Empresas podem desenvolver programas de voluntariado corporativo através da mentoria, receber relatórios ESG e criar políticas de incentivo para colaboradores mentores."
+    },
+    "q9": {
+      "question": "Como funciona o acesso de recrutadores?",
+      "answer": "Esta funcionalidade está em desenvolvimento. Em breve, recrutadores terão acesso a talentos qualificados que participam da plataforma, respeitando sempre a privacidade dos usuários."
+    },
+    "q10": {
+      "question": "Posso ser mentor e mentorado ao mesmo tempo?",
+      "answer": "Sim! Você pode ter ambos os perfis na plataforma. Muitos profissionais buscam mentoria em áreas específicas enquanto mentoram em suas áreas de expertise."
+    },
+    "stillHaveQuestions": "Ainda tem dúvidas?",
+    "supportDescription": "Nossa equipe de suporte está aqui para ajudar com qualquer pergunta que você tenha.",
+    "contactSupport": "Fale com o Suporte"
   },
   "login": {
     "title": "Bem-vindo de volta",

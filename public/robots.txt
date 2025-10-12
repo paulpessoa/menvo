@@ -1,4 +1,38 @@
+# Robots.txt for Menvo
+# https://menvo.com.br
+
 User-agent: *
 Allow: /
 
+# Disallow private areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /profile/edit
+Disallow: /messages/
+Disallow: /appointments/
+
+# Disallow auth pages
+Disallow: /login
+Disallow: /signup
+Disallow: /auth/
+Disallow: /update-password
+Disallow: /get-refresh-token
+
+# Allow public pages
+Allow: /mentors
+Allow: /how-it-works
+Allow: /about
+Allow: /events
+Allow: /faq
+
+# Sitemap
 Sitemap: https://menvo.com.br/sitemap.xml
+
+# Crawl-delay for specific bots (optional)
+User-agent: Googlebot
+Crawl-delay: 0
+
+User-agent: Bingbot
+Crawl-delay: 1
