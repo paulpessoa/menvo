@@ -118,6 +118,7 @@ export default function ProfilePage() {
     country: "",
     expertise_areas: [] as string[],
     topics: [] as string[],
+    free_topics: [] as string[],
     inclusion_tags: [] as string[],
     languages: ["Português"] as string[],
     mentorship_approach: "",
@@ -167,6 +168,7 @@ export default function ProfilePage() {
         country: profile.country || "",
         expertise_areas: profile.expertise_areas || [],
         topics: profile.topics || [],
+        free_topics: profile.free_topics || [],
         inclusion_tags: profile.inclusion_tags || [],
         languages: profile.languages || ["Português"],
         mentorship_approach: profile.mentorship_approach || "",
@@ -681,6 +683,22 @@ export default function ProfilePage() {
                       placeholder="Digite um tópico e pressione Enter"
                       suggestions={topicsSuggestions}
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Selecione da lista de sugestões ou adicione seus próprios tópicos
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label>Temas Livres</Label>
+                    <ChipInput
+                      value={formData.free_topics}
+                      onChange={(value) => setFormData(prev => ({ ...prev, free_topics: value }))}
+                      placeholder="Digite temas adicionais e pressione Enter"
+                      suggestions={[]}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Adicione temas específicos ou nichos que você domina
+                    </p>
                   </div>
 
                   <div>

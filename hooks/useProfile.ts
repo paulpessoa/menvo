@@ -35,6 +35,7 @@ interface Profile {
   // Mentorship fields
   expertise_areas: string[] | null
   mentorship_topics: string[] | null // maps to topics in form
+  free_topics: string[] | null // custom topics added by mentor
   inclusive_tags: string[] | null // maps to inclusion_tags in form
   languages: string[] | null
   
