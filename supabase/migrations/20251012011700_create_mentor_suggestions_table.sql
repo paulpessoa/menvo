@@ -63,9 +63,10 @@ CREATE POLICY "Admins can view all suggestions"
   FOR SELECT
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles
-      WHERE user_roles.user_id = auth.uid()
-      AND user_roles.role = 'admin'
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      WHERE ur.user_id = auth.uid()
+      AND r.name = 'admin'
     )
   );
 
@@ -75,9 +76,10 @@ CREATE POLICY "Admins can update all suggestions"
   FOR UPDATE
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles
-      WHERE user_roles.user_id = auth.uid()
-      AND user_roles.role = 'admin'
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      WHERE ur.user_id = auth.uid()
+      AND r.name = 'admin'
     )
   );
 
