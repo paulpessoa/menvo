@@ -57,3 +57,27 @@
     @apply bg-background text-foreground;
   }
 }
+/* Animações para o AnimatedBackground */
+@keyframes float {
+  0%, 100% { 
+    transform: translate(0, 0) rotate(0deg); 
+  }
+  25% { 
+    transform: translate(10px, -15px) rotate(1deg); 
+  }
+  50% { 
+    transform: translate(-5px, -10px) rotate(-1deg); 
+  }
+  75% { 
+    transform: translate(-10px, 5px) rotate(0.5deg); 
+  }
+}
+
+@keyframes wave {
+  0% { 
+    transform: translateX(-50%) translateY(-50%) rotate(0deg); 
+  }
+  100% { 
+    transform: translateX(-50%) translateY(-50%) rotate(360deg); 
+  }
+}
