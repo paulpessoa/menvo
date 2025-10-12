@@ -38,8 +38,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
-import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
+import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 
 interface MentorProfile {
   id: string
@@ -505,7 +505,7 @@ export default function MentorsPage() {
               Limpar Filtros
             </Button>
             <Button onClick={openModal}>
-              Sugerir temas ou mentores
+              Sugerir Tema ou Área
             </Button>
           </div>
         </div>
@@ -514,7 +514,7 @@ export default function MentorsPage() {
       <SuggestionModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        onSubmit={handleSubmit}
+        onSubmit={(suggestion) => handleSubmit(user?.id || "", suggestion)}
         userId={user?.id || null}
       />
     </div>
