@@ -582,5 +582,31 @@
     "thankYou": "Obrigado pelo seu feedback!",
     "error": "Erro ao enviar feedback. Tente novamente.",
     "rateStars": "Avaliar com {{count}} estrelas"
+  },
+  "mentorSuggestion": {
+    "loginRequiredTitle": "Login Necessário",
+    "loginRequiredDescription": "Você precisa estar logado para sugerir um tema ou área de mentoria.",
+    "title": "Sugerir Tema ou Área",
+    "description": "Não encontrou o que procurava? Sugira novos temas ou áreas de conhecimento que você gostaria de encontrar na plataforma.",
+    "observationLabel": "O que você está procurando?",
+    "observationPlaceholder": "Ex: Gostaria de encontrar mentores especializados em Design de Produto, especialmente com experiência em UX Research e acessibilidade digital. Também seria interessante ter mentores que trabalhem com Design Systems...",
+    "freeTopicsLabel": "Temas ou Áreas (Opcional)",
+    "freeTopicsDescription": "Adicione palavras-chave relacionadas à sua sugestão",
+    "freeTopicsPlaceholder": "Ex: Design Thinking, Prototipagem Rápida...",
+    "addTopic": "Adicionar",
+    "inclusionTagsLabel": "Tags de Inclusão (Opcional)",
+    "inclusionTagsDescription": "Selecione tags de diversidade e inclusão relevantes"
+  },
+  "toast": {
+    "suggestion": {
+      "success": {
+        "title": "Sugestão enviada!",
+        "description": "Obrigado por sua sugestão. Nossa equipe irá analisar e avisaremos sobre novidades."
+      },
+      "error": {
+        "title": "Erro ao enviar sugestão",
+        "description": "Não foi possível enviar sua sugestão. Por favor, tente novamente mais tarde."
+      }
+    }
   }
 }

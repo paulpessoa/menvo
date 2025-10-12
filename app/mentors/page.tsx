@@ -37,6 +37,9 @@ import {
   MessageCircle
 } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth"
+import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
+import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 
 interface MentorProfile {
   id: string
@@ -103,6 +106,8 @@ export default function MentorsPage() {
   })
 
   const supabase = createClient()
+  const { user } = useAuth()
+  const { isModalOpen, openModal, closeModal, handleSubmit } = useMentorSuggestion()
 
   useEffect(() => {
     fetchMentors()
@@ -493,13 +498,25 @@ export default function MentorsPage() {
             Nenhum mentor encontrado
           </h3>
           <p className="text-gray-600 mb-4">
-            Tente ajustar seus filtros para encontrar mais mentores
+            Tente ajustar seus filtros para encontrar mais mentores.
           </p>
-          <Button onClick={clearFilters} variant="outline">
-            Limpar Filtros
-          </Button>
+          <div className="flex justify-center gap-4">
+            <Button onClick={clearFilters} variant="outline">
+              Limpar Filtros
+            </Button>
+            <Button onClick={openModal}>
+              Sugerir temas ou mentores
+            </Button>
+          </div>
         </div>
       )}
+
+      <SuggestionModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSubmit={handleSubmit}
+        userId={user?.id || null}
+      />
     </div>
   )
 }
