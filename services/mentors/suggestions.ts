@@ -1,4 +1,4 @@
-import { supabase } from '@/services/auth/supabase'
+import { createClient } from '@/utils/supabase/client'
 import type {
   MentorSuggestionInsert,
   MentorSuggestionUpdate,
@@ -32,6 +32,8 @@ export interface MentorSuggestionWithUser extends MentorSuggestion {
 
 class MentorSuggestionService {
   async createSuggestion(suggestion: MentorSuggestion): Promise<MentorSuggestion> {
+    const supabase = createClient()
+    
     const insertData: MentorSuggestionInsert = {
       user_id: suggestion.user_id,
       suggestion_text: suggestion.suggestion_text,
@@ -55,6 +57,8 @@ class MentorSuggestionService {
   }
 
   async getUserSuggestions(userId: string): Promise<MentorSuggestionWithUser[]> {
+    const supabase = createClient()
+    
     const { data, error } = await supabase
       .from('mentor_suggestions_view')
       .select('*')
@@ -69,6 +73,8 @@ class MentorSuggestionService {
   }
 
   async getSuggestionById(id: string): Promise<MentorSuggestionWithUser | null> {
+    const supabase = createClient()
+    
     const { data, error } = await supabase
       .from('mentor_suggestions_view')
       .select('*')
@@ -89,6 +95,8 @@ class MentorSuggestionService {
     id: string,
     updates: Partial<MentorSuggestion>
   ): Promise<MentorSuggestion> {
+    const supabase = createClient()
+    
     const updateData: MentorSuggestionUpdate = {
       suggestion_text: updates.suggestion_text,
       linkedin_url: updates.linkedin_url,
@@ -108,7 +116,7 @@ class MentorSuggestionService {
       }
     })
 
-    const { data, error } = await supabase
+    const { data, error} = await supabase
       .from('mentor_suggestions')
       .update(updateData as any)
       .eq('id', id)
@@ -123,6 +131,8 @@ class MentorSuggestionService {
   }
 
   async deleteSuggestion(id: string): Promise<void> {
+    const supabase = createClient()
+    
     const { error } = await supabase
       .from('mentor_suggestions')
       .delete()
@@ -139,6 +149,8 @@ class MentorSuggestionService {
     limit: number = 50,
     offset: number = 0
   ): Promise<MentorSuggestionWithUser[]> {
+    const supabase = createClient()
+    
     let query = supabase
       .from('mentor_suggestions_view')
       .select('*')
