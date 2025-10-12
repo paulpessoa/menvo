@@ -203,13 +203,13 @@ export function useFileUpload(options: FileUploadOptions): UseFileUploadReturn {
     setIsUploading(false);
     abortControllerRef.current = null;
 
-    if (result.success) {
+    if (result.success && result.data) {
       setProgress(100);
       logger.fileUpload(true, file.name, file.size, file.type);
       if (onSuccess) onSuccess(result.data);
       return { success: true, data: result.data };
     } else {
-      const errorMessage = result.error?.message || 'Upload failed';
+      const errorMessage = result.error || 'Upload failed';
       setError(errorMessage);
       setProgress(0);
       logger.fileUpload(false, file.name, file.size, file.type);

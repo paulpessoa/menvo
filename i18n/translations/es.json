@@ -162,6 +162,8 @@
     "description": "Nuestra plataforma facilita la conexión con mentores y la programación de sesiones gratuitas de mentoría",
     "forMentees": "Para Mentees",
     "forMentors": "Para Mentores",
+    "forNGOs": "Para ONGs",
+    "forCompanies": "Para Empresas",
     "mentees": {
       "step1": {
         "title": "Crea Tu Perfil",
@@ -224,8 +226,51 @@
       },
       "becomeMentor": "Convertirse en Mentor"
     },
+    "ngos": {
+      "step1": {
+        "title": "Registra tu ONG Gratuitamente",
+        "description": "Las ONGs y organizaciones sociales pueden registrarse gratuitamente en la plataforma para conectar a los jóvenes atendidos con mentores voluntarios.",
+        "feature1": "Registro 100% gratuito para ONGs",
+        "feature2": "Acceso ilimitado a la plataforma",
+        "feature3": "Soporte dedicado para organizaciones"
+      },
+      "step2": {
+        "title": "Conecta Jóvenes con Mentores",
+        "description": "Registra a los jóvenes atendidos por tu organización y ayúdalos a encontrar mentores que puedan orientarlos en sus trayectorias profesionales y personales.",
+        "feature1": "Registra múltiples jóvenes de tu organización",
+        "feature2": "Monitorea el progreso de las mentorías",
+        "feature3": "Recibe informes de impacto social"
+      },
+      "getStarted": "Registrar Mi ONG"
+    },
+    "companies": {
+      "step1": {
+        "title": "Voluntariado Corporativo a través de la Mentoría",
+        "description": "Desarrolla programas de voluntariado corporativo permitiendo que tus colaboradores se conviertan en mentores voluntarios, fortaleciendo el propósito de la empresa.",
+        "feature1": "Involucra colaboradores en acciones sociales",
+        "feature2": "Desarrolla liderazgos a través de la mentoría",
+        "feature3": "Fortalece la cultura organizacional"
+      },
+      "step2": {
+        "title": "Informes ESG e Impacto Social",
+        "description": "Recibe informes detallados sobre el impacto social de las mentorías realizadas por tus colaboradores, fortaleciendo tus métricas ESG.",
+        "feature1": "Informes mensuales de impacto social",
+        "feature2": "Métricas para informes ESG",
+        "feature3": "Certificados de voluntariado corporativo"
+      },
+      "step3": {
+        "title": "Políticas de Incentivo y Beneficios",
+        "description": "Crea políticas de incentivo para colaboradores mentores, como días libres remunerados, reconocimiento interno y desarrollo de carrera.",
+        "feature1": "Banco de horas para mentoría voluntaria",
+        "feature2": "Reconocimiento y gamificación interna",
+        "feature3": "Desarrollo de habilidades blandas"
+      },
+      "getStarted": "Convertirse en Socio Corporativo"
+    },
     "faq": {
       "title": "Preguntas Frecuentes",
+      "description": "Encuentra respuestas a las preguntas más comunes sobre la plataforma.",
+      "viewAll": "Ver Todas las Preguntas",
       "q1": {
         "question": "¿La mentoría es realmente gratuita?",
         "answer": "Sí, todas las sesiones de mentoría en nuestra plataforma son completamente gratuitas. Nuestros mentores ofrecen voluntariamente su tiempo para ayudar a otros a crecer y desarrollarse."
@@ -254,6 +299,53 @@
       "supportDescription": "Nuestro equipo de soporte está aquí para ayudarte con cualquier pregunta que puedas tener.",
       "contactSupport": "Contactar Soporte"
     }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "description": "Encuentra respuestas a las preguntas más comunes sobre la plataforma Menvo.",
+    "q1": {
+      "question": "¿La mentoría es realmente gratuita?",
+      "answer": "Sí, todas las sesiones de mentoría en nuestra plataforma son completamente gratuitas. Nuestros mentores ofrecen voluntariamente su tiempo para ayudar a otros a crecer."
+    },
+    "q2": {
+      "question": "¿Cuánto duran las sesiones de mentoría?",
+      "answer": "Las sesiones estándar de mentoría duran 45 minutos. Esto proporciona tiempo suficiente para una conversación significativa mientras se respeta el horario de todos."
+    },
+    "q3": {
+      "question": "¿Con qué frecuencia puedo reunirme con un mentor?",
+      "answer": "Esto depende de la disponibilidad y preferencias del mentor. Algunos están abiertos a sesiones regulares, mientras que otros prefieren reuniones únicas."
+    },
+    "q4": {
+      "question": "¿Qué pasa si necesito cancelar?",
+      "answer": "Pedimos que canceles con al menos 24 horas de anticipación por respeto al tiempo del mentor. Puedes reprogramar fácilmente a través de tu panel de control."
+    },
+    "q5": {
+      "question": "¿Cómo me convierto en un mentor verificado?",
+      "answer": "Después de crear tu perfil de mentor, necesitarás programar una breve llamada de verificación con nuestro equipo. Esto ayuda a asegurar la calidad y seguridad de nuestra comunidad."
+    },
+    "q6": {
+      "question": "¿Mi información está segura?",
+      "answer": "Sí, tomamos la privacidad y seguridad muy en serio. Tu información personal está protegida y solo se comparte con aquellos con quienes elijas conectarte."
+    },
+    "q7": {
+      "question": "¿Cómo funciona para ONGs?",
+      "answer": "Las ONGs pueden registrarse gratuitamente y conectar a los jóvenes atendidos con mentores voluntarios. Es una forma de ampliar el impacto social de la organización sin costos."
+    },
+    "q8": {
+      "question": "¿Las empresas pueden participar?",
+      "answer": "¡Sí! Las empresas pueden desarrollar programas de voluntariado corporativo a través de la mentoría, recibir informes ESG y crear políticas de incentivo para colaboradores mentores."
+    },
+    "q9": {
+      "question": "¿Cómo funciona el acceso de reclutadores?",
+      "answer": "Esta funcionalidad está en desarrollo. Pronto, los reclutadores tendrán acceso a talentos calificados que participan en la plataforma, respetando siempre la privacidad de los usuarios."
+    },
+    "q10": {
+      "question": "¿Puedo ser mentor y mentee al mismo tiempo?",
+      "answer": "¡Sí! Puedes tener ambos perfiles en la plataforma. Muchos profesionales buscan mentoría en áreas específicas mientras mentorean en sus áreas de experiencia."
+    },
+    "stillHaveQuestions": "¿Aún tienes preguntas?",
+    "supportDescription": "Nuestro equipo de soporte está aquí para ayudarte con cualquier pregunta que puedas tener.",
+    "contactSupport": "Contactar Soporte"
   },
   "login": {
     "title": "Bienvenido de vuelta",

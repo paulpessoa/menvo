@@ -46,13 +46,14 @@ export function validateFile(file: File, options?: {
 export async function handleAsyncOperation<T>(
   operation: () => Promise<T>,
   errorMessage?: string
-): Promise<{ data?: T; error?: string }> {
+): Promise<{ success: boolean; data?: T; error?: string }> {
   try {
     const data = await operation()
-    return { data }
+    return { success: true, data }
   } catch (error) {
     console.error(errorMessage || 'Async operation failed:', error)
     return {
+      success: false,
       error: errorMessage || (error instanceof Error ? error.message : 'Operação falhou')
     }
   }

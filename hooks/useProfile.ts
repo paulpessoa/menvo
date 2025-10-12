@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
-import { handleAsyncOperation, createAppError } from "@/lib/error-handler"
+import { handleAsyncOperation } from "@/lib/error-handler"
 import { logger } from "@/lib/logger"
 
 interface Profile {
@@ -115,13 +115,13 @@ export function useProfile() {
     setLoading(false);
     console.log('📋 fetchProfile result:', result);
 
-    if (result.success) {
-      setProfile(result.data!);
+    if (result.data) {
+      setProfile(result.data);
       setError(null);
       console.log('✅ Profile loaded successfully');
     } else {
       console.error('❌ Profile fetch failed:', result.error);
-      setError(result.error?.message || 'Error fetching profile');
+      setError(result.error || 'Error fetching profile');
     }
   }
 
@@ -227,14 +227,14 @@ export function useProfile() {
 
     setIsUpdating(false);
 
-    if (result.success) {
-      setProfile(result.data!);
+    if (result.success && result.data) {
+      setProfile(result.data);
       setError(null);
       return { success: true, data: result.data };
     } else {
       // Revert optimistic update
       setProfile(previousProfile);
-      const errorMessage = result.error?.message || 'Error updating profile';
+      const errorMessage = result.error || 'Error updating profile';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     }

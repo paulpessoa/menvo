@@ -162,6 +162,8 @@
     "description": "Our platform makes it easy to connect with mentors and schedule free mentorship sessions",
     "forMentees": "For Mentees",
     "forMentors": "For Mentors",
+    "forNGOs": "For NGOs",
+    "forCompanies": "For Companies",
     "mentees": {
       "step1": {
         "title": "Create Your Profile",
@@ -224,8 +226,51 @@
       },
       "becomeMentor": "Become a Mentor"
     },
+    "ngos": {
+      "step1": {
+        "title": "Register Your NGO for Free",
+        "description": "NGOs and social organizations can register for free on the platform to connect the youth they serve with volunteer mentors.",
+        "feature1": "100% free registration for NGOs",
+        "feature2": "Unlimited access to the platform",
+        "feature3": "Dedicated support for organizations"
+      },
+      "step2": {
+        "title": "Connect Youth with Mentors",
+        "description": "Register the young people served by your organization and help them find mentors who can guide them in their professional and personal journeys.",
+        "feature1": "Register multiple youth from your organization",
+        "feature2": "Track mentorship progress",
+        "feature3": "Receive social impact reports"
+      },
+      "getStarted": "Register My NGO"
+    },
+    "companies": {
+      "step1": {
+        "title": "Corporate Volunteering through Mentorship",
+        "description": "Develop corporate volunteering programs by allowing your employees to become volunteer mentors, strengthening the company's purpose.",
+        "feature1": "Engage employees in social actions",
+        "feature2": "Develop leadership through mentorship",
+        "feature3": "Strengthen organizational culture"
+      },
+      "step2": {
+        "title": "ESG Reports and Social Impact",
+        "description": "Receive detailed reports on the social impact of mentorships conducted by your employees, strengthening your ESG metrics.",
+        "feature1": "Monthly social impact reports",
+        "feature2": "Metrics for ESG reporting",
+        "feature3": "Corporate volunteering certificates"
+      },
+      "step3": {
+        "title": "Incentive Policies and Benefits",
+        "description": "Create incentive policies for mentor employees, such as paid time off, internal recognition, and career development.",
+        "feature1": "Time bank for volunteer mentoring",
+        "feature2": "Recognition and internal gamification",
+        "feature3": "Soft skills development"
+      },
+      "getStarted": "Become a Corporate Partner"
+    },
     "faq": {
       "title": "Frequently Asked Questions",
+      "description": "Find answers to the most common questions about the platform.",
+      "viewAll": "View All Questions",
       "q1": {
         "question": "Is mentorship really free?",
         "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow and develop."
@@ -254,6 +299,53 @@
       "supportDescription": "Our support team is here to help you with any questions you may have.",
       "contactSupport": "Contact Support"
     }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Find answers to the most common questions about the Menvo platform.",
+    "q1": {
+      "question": "Is mentorship really free?",
+      "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow."
+    },
+    "q2": {
+      "question": "How long are mentorship sessions?",
+      "answer": "Standard mentorship sessions last 45 minutes. This provides enough time for a meaningful conversation while respecting everyone's schedule."
+    },
+    "q3": {
+      "question": "How often can I meet with a mentor?",
+      "answer": "This depends on the mentor's availability and preferences. Some mentors are open to regular sessions, while others prefer one-time meetings."
+    },
+    "q4": {
+      "question": "What happens if I need to cancel?",
+      "answer": "We ask that you cancel at least 24 hours in advance out of respect for the mentor's time. You can easily reschedule through your dashboard."
+    },
+    "q5": {
+      "question": "How do I become a verified mentor?",
+      "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
+    },
+    "q6": {
+      "question": "Is my information safe?",
+      "answer": "Yes, we take privacy and security very seriously. Your personal information is protected and only shared with those you choose to connect with."
+    },
+    "q7": {
+      "question": "How does it work for NGOs?",
+      "answer": "NGOs can register for free and connect the youth they serve with volunteer mentors. It's a way to expand the organization's social impact at no cost."
+    },
+    "q8": {
+      "question": "Can companies participate?",
+      "answer": "Yes! Companies can develop corporate volunteering programs through mentorship, receive ESG reports, and create incentive policies for mentor employees."
+    },
+    "q9": {
+      "question": "How does recruiter access work?",
+      "answer": "This feature is under development. Soon, recruiters will have access to qualified talent participating on the platform, always respecting user privacy."
+    },
+    "q10": {
+      "question": "Can I be both a mentor and mentee?",
+      "answer": "Yes! You can have both profiles on the platform. Many professionals seek mentorship in specific areas while mentoring in their areas of expertise."
+    },
+    "stillHaveQuestions": "Still have questions?",
+    "supportDescription": "Our support team is here to help you with any questions you may have.",
+    "contactSupport": "Contact Support"
   },
   "login": {
     "title": "Welcome back",

@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, CheckCircle2, Clock, Mail, MessageSquare, Search, Shield, User, Video } from "lucide-react"
+import { Building2, Calendar, CheckCircle2, Clock, FileText, HandHeart, Mail, MessageSquare, Search, Shield, TrendingUp, User, Users, Video } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 export default function HowItWorksPage() {
@@ -21,9 +21,11 @@ export default function HowItWorksPage() {
 
       <Tabs defaultValue="mentees" className="w-full max-w-4xl mx-auto">
         <div className="flex justify-center mb-8">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-4xl grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="mentees">{t("howItWorks.forMentees")}</TabsTrigger>
             <TabsTrigger value="mentors">{t("howItWorks.forMentors")}</TabsTrigger>
+            <TabsTrigger value="ngos">{t("howItWorks.forNGOs")}</TabsTrigger>
+            <TabsTrigger value="companies">{t("howItWorks.forCompanies")}</TabsTrigger>
           </TabsList>
         </div>
 
@@ -322,96 +324,210 @@ export default function HowItWorksPage() {
             </Button>
           </div>
         </TabsContent>
+
+        <TabsContent value="ngos" className="space-y-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <HandHeart className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold">{t("howItWorks.ngos.step1.title")}</h2>
+              <p className="text-muted-foreground">
+                {t("howItWorks.ngos.step1.description")}
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.ngos.step1.feature1")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.ngos.step1.feature2")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.ngos.step1.feature3")}</span>
+                </li>
+              </ul>
+            </div>
+            <div className="flex justify-center">
+              <Image
+                src="/images/how-it-works/ngo-register.jpg"
+                width={400}
+                height={300}
+                alt="NGO registration illustration"
+                className="rounded-lg object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:order-last">
+            <div className="flex justify-center md:order-last">
+              <Image
+                src="/images/how-it-works/ngo-connect.jpg"
+                width={400}
+                height={300}
+                alt="Connect youth with mentors illustration"
+                className="rounded-lg object-cover"
+              />
+            </div>
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Users className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold">{t("howItWorks.ngos.step2.title")}</h2>
+              <p className="text-muted-foreground">
+                {t("howItWorks.ngos.step2.description")}
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.ngos.step2.feature1")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.ngos.step2.feature2")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.ngos.step2.feature3")}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <Button size="lg" asChild>
+              <Link href="/signup">{t("howItWorks.ngos.getStarted")}</Link>
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="companies" className="space-y-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Building2 className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold">{t("howItWorks.companies.step1.title")}</h2>
+              <p className="text-muted-foreground">
+                {t("howItWorks.companies.step1.description")}
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step1.feature1")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step1.feature2")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step1.feature3")}</span>
+                </li>
+              </ul>
+            </div>
+            <div className="flex justify-center">
+              <Image
+                src="/images/how-it-works/company-volunteer.jpg"
+                width={400}
+                height={300}
+                alt="Corporate volunteering illustration"
+                className="rounded-lg object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:order-last">
+            <div className="flex justify-center md:order-last">
+              <Image
+                src="/images/how-it-works/company-esg.jpg"
+                width={400}
+                height={300}
+                alt="ESG reports illustration"
+                className="rounded-lg object-cover"
+              />
+            </div>
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <FileText className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold">{t("howItWorks.companies.step2.title")}</h2>
+              <p className="text-muted-foreground">
+                {t("howItWorks.companies.step2.description")}
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step2.feature1")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step2.feature2")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step2.feature3")}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <h2 className="text-2xl font-bold">{t("howItWorks.companies.step3.title")}</h2>
+              <p className="text-muted-foreground">
+                {t("howItWorks.companies.step3.description")}
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step3.feature1")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step3.feature2")}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span>{t("howItWorks.companies.step3.feature3")}</span>
+                </li>
+              </ul>
+            </div>
+            <div className="flex justify-center">
+              <Image
+                src="/images/how-it-works/company-benefits.jpg"
+                width={400}
+                height={300}
+                alt="Company benefits illustration"
+                className="rounded-lg object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <Button size="lg" asChild>
+              <Link href="/signup">{t("howItWorks.companies.getStarted")}</Link>
+            </Button>
+          </div>
+        </TabsContent>
       </Tabs>
 
-      <div className="mt-20 max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-8">{t("howItWorks.faq.title")}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("howItWorks.faq.q1.question")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("howItWorks.faq.q1.answer")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("howItWorks.faq.q2.question")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("howItWorks.faq.q2.answer")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("howItWorks.faq.q3.question")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("howItWorks.faq.q3.answer")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("howItWorks.faq.q4.question")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("howItWorks.faq.q4.answer")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("howItWorks.faq.q5.question")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("howItWorks.faq.q5.answer")}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("howItWorks.faq.q6.question")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {t("howItWorks.faq.q6.answer")}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="mt-12 text-center">
-          <h2 className="text-2xl font-bold mb-4">{t("howItWorks.faq.stillHaveQuestions")}</h2>
-          <p className="text-muted-foreground mb-6">
-            {t("howItWorks.faq.supportDescription")}
-          </p>
-          <Button asChild>
-            <Link
-              href="https://wa.me/5581995097377?text=Olá!%20Gostaria%20de%20mais%20informações%20sobre%20o%20suporte."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              <Mail className="h-4 w-4" />
-              <span>{t("howItWorks.faq.contactSupport")}</span>
-            </Link>
-          </Button>
-        </div>
+      <div className="mt-20 max-w-4xl mx-auto text-center">
+        <h2 className="text-2xl font-bold mb-4">{t("howItWorks.faq.title")}</h2>
+        <p className="text-muted-foreground mb-6">
+          {t("howItWorks.faq.description")}
+        </p>
+        <Button size="lg" asChild>
+          <Link href="/faq">{t("howItWorks.faq.viewAll")}</Link>
+        </Button>
       </div>
+
+
     </div>
   )
 }
