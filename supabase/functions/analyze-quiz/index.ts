@@ -22,11 +22,20 @@ interface QuizResponse {
 
 interface Mentor {
   id: string
-  name: string
-  specialties: string[]
-  areas: string[]
+  full_name: string
   bio: string
+  current_position: string
+  current_company: string
+  expertise_areas: string[]
+  mentor_skills: string[]
+  mentorship_topics: string[]
+  inclusive_tags: string[]
+  inclusion_tags: string[]
+  availability_status: string
   is_available: boolean
+  rating: number
+  reviews: number
+  sessions: number
 }
 
 interface AnalysisResult {
@@ -82,10 +91,15 @@ serve(async (req) => {
       )
     }
 
-    // Get available mentors
+    // Get available mentors from mentors_view
     const { data: mentors, error: mentorsError } = await supabaseClient
-      .from('quiz_mentors')
-      .select('*')
+      .from('mentors_view')
+      .select(`
+        id, full_name, bio, current_position, current_company,
+        expertise_areas, mentor_skills, mentorship_topics,
+        inclusive_tags, inclusion_tags, availability_status,
+        is_available, rating, reviews, sessions
+      `)
       .eq('is_available', true)
 
     const availableMentors = mentors || []
@@ -202,7 +216,11 @@ RESPOSTAS DO PARTICIPANTE:
 - Desafios na vida pessoal: ${response.personal_life_help}
 
 MENTORES DISPONÍVEIS NA PLATAFORMA:
-${mentors.map(m => `- ${m.name}: ${m.specialties.join(', ')} (Áreas: ${m.areas.join(', ')})`).join('\n')}
+${mentors.map(m => `- ${m.full_name} (${m.current_position} na ${m.current_company}): 
+  Expertise: ${m.expertise_areas?.join(', ') || 'N/A'}
+  Tópicos de Mentoria: ${m.mentorship_topics?.join(', ') || 'N/A'}
+  Rating: ${m.rating}/5 (${m.reviews} avaliações, ${m.sessions} sessões)
+  Status: ${m.availability_status}`).join('\n\n')}
 
 INSTRUÇÕES:
 1. Crie uma análise calorosa, profissional e motivadora
@@ -253,32 +271,44 @@ function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): An
   if (response.development_areas.length >= 3) score += 50
   if (response.share_knowledge.includes('sim') || response.share_knowledge.includes('ja-faco')) score += 50
   
-  // Match mentors with development areas
-  const matchedMentors = mentors.filter(mentor => 
-    mentor.areas.some(area => 
-      response.development_areas.some(devArea => 
-        area.toLowerCase().includes(devArea.toLowerCase()) || 
-        devArea.toLowerCase().includes(area.toLowerCase())
+  // Match mentors with development areas using expertise_areas and mentorship_topics
+  const matchedMentors = mentors.filter(mentor => {
+    const mentorAreas = [
+      ...(mentor.expertise_areas || []),
+      ...(mentor.mentorship_topics || []),
+      ...(mentor.mentor_skills || [])
+    ].map(area => area.toLowerCase())
+    
+    return response.development_areas.some(devArea => 
+      mentorAreas.some(mentorArea => 
+        mentorArea.includes(devArea.toLowerCase()) || 
+        devArea.toLowerCase().includes(mentorArea)
       )
     )
-  ).slice(0, 3)
+  }).slice(0, 3)
 
+  // Use real mentors if available, otherwise show generic unavailable mentors
   const mentoresSugeridos = matchedMentors.length > 0
     ? matchedMentors.map(mentor => ({
-        tipo: mentor.name,
-        razao: `Especialista em ${mentor.specialties.join(', ')}`,
-        disponivel: true,
-        mentor_nome: mentor.name
+        tipo: `${mentor.full_name} - ${mentor.current_position}`,
+        razao: `${mentor.bio?.substring(0, 100)}... | Expertise: ${mentor.expertise_areas?.slice(0, 2).join(', ')} | Rating: ${mentor.rating}/5`,
+        disponivel: mentor.availability_status === 'available',
+        mentor_nome: mentor.full_name
       }))
     : [
         {
           tipo: "Mentor de Carreira",
-          razao: "Para te ajudar a planejar seus próximos passos profissionais",
+          razao: "Para te ajudar a planejar seus próximos passos profissionais e definir objetivos claros",
           disponivel: false
         },
         {
-          tipo: "Mentor de Desenvolvimento Pessoal",
-          razao: "Para trabalhar seu crescimento pessoal e profissional",
+          tipo: "Mentor de Desenvolvimento Técnico", 
+          razao: "Para desenvolver suas habilidades técnicas e se manter atualizado no mercado",
+          disponivel: false
+        },
+        {
+          tipo: "Mentor de Liderança",
+          razao: "Para desenvolver suas soft skills e capacidades de liderança",
           disponivel: false
         }
       ]
