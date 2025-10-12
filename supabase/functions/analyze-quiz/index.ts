@@ -39,7 +39,6 @@ interface Mentor {
 }
 
 interface AnalysisResult {
-  pontuacao: number
   titulo_personalizado: string
   resumo_motivador: string
   mentores_sugeridos: Array<{
@@ -168,7 +167,6 @@ serve(async (req) => {
       .from('quiz_responses')
       .update({
         ai_analysis: analysisResult,
-        score: analysisResult.pontuacao,
         processed_at: new Date().toISOString()
       })
       .eq('id', responseId)
@@ -224,19 +222,15 @@ ${mentors.map(m => `- ${m.full_name} (${m.current_position} na ${m.current_compa
 
 INSTRUÇÕES:
 1. Crie uma análise calorosa, profissional e motivadora
-2. Calcule uma pontuação de "Potencial de Crescimento" (0-1000)
-   - A maioria deve ficar entre 700-900 pontos (seja generoso e motivador)
-   - Considere: clareza de objetivos, autoconhecimento, disposição para aprender
-3. Sugira 2-3 tipos de mentores baseados nas áreas de interesse
+2. Sugira 2-3 tipos de mentores baseados nas áreas de interesse
    - Se houver mentores disponíveis que combinam, mencione-os especificamente
    - Se não houver mentores para certas áreas, indique disponivel: false
-4. Dê 2-3 conselhos práticos e acionáveis
-5. Identifique se a pessoa tem potencial para ser mentora (baseado na resposta sobre compartilhar conhecimento)
-6. Sugira áreas de desenvolvimento na vida pessoal baseado nos desafios mencionados
+3. Dê 2-3 conselhos práticos e acionáveis
+4. Identifique se a pessoa tem potencial para ser mentora (baseado na resposta sobre compartilhar conhecimento)
+5. Sugira áreas de desenvolvimento na vida pessoal baseado nos desafios mencionados
 
 FORMATO DE RESPOSTA (JSON válido):
 {
-  "pontuacao": 850,
   "titulo_personalizado": "Seu Perfil de Crescimento",
   "resumo_motivador": "Mensagem inspiradora de 2-3 linhas",
   "mentores_sugeridos": [
@@ -263,13 +257,6 @@ FORMATO DE RESPOSTA (JSON válido):
 }
 
 function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): AnalysisResult {
-  // Calculate score based on response completeness and engagement
-  let score = 700 // Base score
-  
-  if (response.current_challenge.length > 50) score += 50
-  if (response.future_vision.length > 50) score += 50
-  if (response.development_areas.length >= 3) score += 50
-  if (response.share_knowledge.includes('sim') || response.share_knowledge.includes('ja-faco')) score += 50
   
   // Match mentors with development areas using expertise_areas and mentorship_topics
   const matchedMentors = mentors.filter(mentor => {
@@ -317,7 +304,6 @@ function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): An
                           response.share_knowledge.includes('ja-faco')
 
   return {
-    pontuacao: Math.min(score, 950),
     titulo_personalizado: "Seu Perfil de Crescimento Profissional",
     resumo_motivador: "Você demonstra clareza sobre seus objetivos e está no caminho certo para alcançá-los. Continue investindo em seu desenvolvimento!",
     mentores_sugeridos: mentoresSugeridos,
