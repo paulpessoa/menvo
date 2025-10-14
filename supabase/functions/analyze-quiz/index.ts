@@ -124,11 +124,11 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
-              content: 'Você é um especialista em desenvolvimento de carreira e mentoria. Forneça análises objetivas, motivadoras e construtivas em português brasileiro. Sempre retorne JSON válido.'
+              content: 'Você é um especialista e consultor pessoal, em desenvolvimento de carreira e mentoria da Startup Menvo. Forneça análises objetivas, motivadoras e construtivas em português brasileiro. Sempre retorne JSON válido.'
             },
             {
               role: 'user',

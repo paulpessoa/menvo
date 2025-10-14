@@ -14,11 +14,13 @@ import { Gift, Sparkles, Users, Target, Clock } from "lucide-react"
 import { QuizForm, QuizFormData } from "@/components/quiz/QuizForm"
 import { useToast } from "@/hooks/use-toast"
 import { AnimatedBackground } from "@/components/ui/animated-background"
+import { useTranslation } from 'react-i18next';
 
 export default function QuizPage() {
   const [showQuiz, setShowQuiz] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+  const { t } = useTranslation('quiz');
 
   const handleQuizSubmit = async (data: QuizFormData) => {
     try {
@@ -58,8 +60,8 @@ export default function QuizPage() {
         .catch((err) => console.error("Error sending invite:", err))
 
       toast({
-        title: "Questionário enviado!",
-        description: "Processando sua análise com IA..."
+        title: t('quiz_form.submit_success_title'),
+        description: t('quiz_form.submit_success_description')
       })
 
       // Call Edge Function to process with AI
@@ -78,9 +80,8 @@ export default function QuizPage() {
     } catch (error) {
       console.error("Error submitting quiz:", error)
       toast({
-        title: "Erro",
-        description:
-          "Não foi possível processar o questionário. Tente novamente.",
+        title: t('quiz_form.submit_error_title'),
+        description: t('quiz_form.submit_error_description'),
         variant: "destructive"
       })
     }
@@ -102,12 +103,11 @@ export default function QuizPage() {
               className="text-3xl md:text-4xl font-bold"
               style={{ color: "#007585" }}
             >
-              Descubra Seu Potencial de Crescimento
+              {t('quiz_page.title')}
             </h1>
 
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Responda nosso questionário rápido e receba uma análise
-              personalizada com sugestões de mentores ideais para sua jornada.
+              {t('quiz_page.subtitle')}
             </p>
           </div>
 
@@ -116,12 +116,11 @@ export default function QuizPage() {
             <Card className="border-2 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
               <CardHeader>
                 <Target className="h-8 w-8 text-purple-600 mb-2" />
-                <CardTitle className="text-lg">Análise Personalizada</CardTitle>
+                <CardTitle className="text-lg">{t('quiz_page.personalized_analysis')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Receba insights sobre seu momento de carreira e áreas de
-                  desenvolvimento
+                  {t('quiz_page.personalized_analysis_description')}
                 </p>
               </CardContent>
             </Card>
@@ -129,12 +128,11 @@ export default function QuizPage() {
             <Card className="border-2 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
               <CardHeader>
                 <Users className="h-8 w-8 text-blue-600 mb-2" />
-                <CardTitle className="text-lg">Mentores Ideais</CardTitle>
+                <CardTitle className="text-lg">{t('quiz_page.ideal_mentors')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Descubra quais tipos de mentores podem te ajudar a alcançar
-                  seus objetivos
+                  {t('quiz_page.ideal_mentors_description')}
                 </p>
               </CardContent>
             </Card>
@@ -142,12 +140,11 @@ export default function QuizPage() {
             <Card className="border-2 hover:border-green-300 dark:hover:border-green-700 transition-colors">
               <CardHeader>
                 <Gift className="h-8 w-8 text-green-600 mb-2" />
-                <CardTitle className="text-lg">Ganhe um Brinde!</CardTitle>
+                <CardTitle className="text-lg">{t('quiz_page.get_a_gift')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Pontuação acima de 700? Escolha entre caneta ou botton
-                  exclusivo!
+                  {t('quiz_page.get_a_gift_description')}
                 </p>
               </CardContent>
             </Card>
@@ -161,15 +158,12 @@ export default function QuizPage() {
                 className="w-full text-lg mt-8 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 onClick={() => setShowQuiz(true)}
               >
-                Começar Questionário
+                {t('quiz_page.start_quiz')}
                 <Sparkles className="ml-2 h-5 w-5" />
               </Button>
 
               <p className="text-xs text-center text-muted-foreground">
-                Suas respostas nos ajudarão a entender melhor as necessidades
-                dos participantes e a recrutar mentores voluntários nas áreas
-                mais procuradas. Além de contribuir para construir uma
-                comunidade de mentoria mais forte e acessível.
+                {t('quiz_page.responses_confidential')}
               </p>
             </CardContent>
           </Card>

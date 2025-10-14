@@ -11,6 +11,7 @@ import { TextareaWithVoice } from '@/components/ui/textarea-with-voice'
 import { Label } from '@/components/ui/label'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { AnimatedBackground } from '@/components/ui/animated-background'
+import { useTranslation } from 'react-i18next';
 
 export interface QuizFormData {
     careerMoment: string
@@ -32,6 +33,7 @@ interface QuizFormProps {
 }
 
 export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
+    const { t } = useTranslation('quiz');
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formData, setFormData] = useState<Partial<QuizFormData>>({
@@ -112,12 +114,12 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                         className="space-y-3"
                     >
                         {[
-                            { value: 'ensino-medio', label: 'Estudante do ensino médio' },
-                            { value: 'estudante-universitario', label: 'Estudante universitário' },
-                            { value: 'recem-formado', label: 'Recém-formado (até 1 ano)' },
-                            { value: 'profissional-junior', label: 'Profissional júnior (1-3 anos de experiência)' },
-                            { value: 'transicao', label: 'Em transição de carreira' },
-                            { value: 'outro', label: 'Outro' },
+                            { value: 'ensino-medio', label: t('quiz_form.high_school_student') },
+                            { value: 'estudante-universitario', label: t('quiz_form.university_student') },
+                            { value: 'recem-formado', label: t('quiz_form.recent_graduate') },
+                            { value: 'profissional-junior', label: t('quiz_form.junior_professional') },
+                            { value: 'transicao', label: t('quiz_form.career_transition') },
+                            { value: 'outro', label: t('quiz_form.other') },
                         ].map((option) => (
                             <div key={option.value} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                                 <RadioGroupItem value={option.value} id={option.value} />
@@ -133,12 +135,12 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                 return (
                     <div className="space-y-4">
                         <TextareaWithVoice
-                            placeholder="Conte-nos sobre o que mais te preocupa ou desafia na sua carreira..."
+                            placeholder={t('quiz_form.challenge_placeholder')}
                             value={formData.currentChallenge || ''}
                             onChange={(value) => updateFormData('currentChallenge', value)}
                         />
                         <p className="text-xs text-muted-foreground">
-                            Mínimo de 10 caracteres • {formData.currentChallenge?.length || 0} caracteres
+                            {t('quiz_form.min_chars')} • {formData.currentChallenge?.length || 0} {t('quiz_form.chars')}
                         </p>
                     </div>
                 )
@@ -151,11 +153,11 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                         className="space-y-3"
                     >
                         {[
-                            { value: 'sim-util', label: 'Sim, já fui mentorado e foi muito útil' },
-                            { value: 'sim-nao-boa', label: 'Sim, mas não foi uma boa experiência' },
-                            { value: 'nao-interesse', label: 'Não, mas tenho muito interesse' },
-                            { value: 'nao-sei', label: 'Não, e ainda não sei se preciso' },
-                            { value: 'ouvi-falar', label: 'Já ouvi falar, mas nunca participei' },
+                            { value: 'sim-util', label: t('quiz_form.mentorship_yes_useful') },
+                            { value: 'sim-nao-boa', label: t('quiz_form.mentorship_yes_not_good') },
+                            { value: 'nao-interesse', label: t('quiz_form.mentorship_no_interest') },
+                            { value: 'nao-sei', label: t('quiz_form.mentorship_no_dont_know') },
+                            { value: 'ouvi-falar', label: t('quiz_form.mentorship_heard_about_it') },
                         ].map((option) => (
                             <div key={option.value} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                                 <RadioGroupItem value={option.value} id={option.value} />
@@ -171,12 +173,12 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                 return (
                     <div className="space-y-4">
                         <TextareaWithVoice
-                            placeholder="Compartilhe sua visão de futuro profissional..."
+                            placeholder={t('quiz_form.future_vision_placeholder')}
                             value={formData.futureVision || ''}
                             onChange={(value) => updateFormData('futureVision', value)}
                         />
                         <p className="text-xs text-muted-foreground">
-                            Mínimo de 10 caracteres • {formData.futureVision?.length || 0} caracteres
+                            {t('quiz_form.min_chars')} • {formData.futureVision?.length || 0} {t('quiz_form.chars')}
                         </p>
                     </div>
                 )
@@ -184,14 +186,14 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
             case 5:
                 return (
                     <div className="space-y-4">
-                        <p className="text-sm text-muted-foreground mb-4">Selecione todas que se aplicam:</p>
+                        <p className="text-sm text-muted-foreground mb-4">{t('quiz_form.select_all_that_apply')}</p>
                         {[
-                            { value: 'Desenvolvimento técnico', label: 'Desenvolvimento técnico (hard skills)' },
-                            { value: 'Comunicação e networking', label: 'Comunicação e networking' },
-                            { value: 'Liderança e gestão', label: 'Liderança e gestão' },
-                            { value: 'Planejamento de carreira', label: 'Planejamento de carreira' },
-                            { value: 'Empreendedorismo', label: 'Empreendedorismo' },
-                            { value: 'Equilíbrio vida pessoal/profissional', label: 'Equilíbrio vida pessoal/profissional' },
+                            { value: 'Desenvolvimento técnico', label: t('quiz_form.technical_development') },
+                            { value: 'Comunicação e networking', label: t('quiz_form.communication_networking') },
+                            { value: 'Liderança e gestão', label: t('quiz_form.leadership_management') },
+                            { value: 'Planejamento de carreira', label: t('quiz_form.career_planning') },
+                            { value: 'Empreendedorismo', label: t('quiz_form.entrepreneurship') },
+                            { value: 'Equilíbrio vida pessoal/profissional', label: t('quiz_form.work_life_balance') },
                         ].map((option) => (
                             <div key={option.value} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                                 <Checkbox
@@ -205,10 +207,10 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                             </div>
                         ))}
                         <div className="pt-2">
-                            <Label htmlFor="other-area" className="text-sm">Outro (especifique):</Label>
+                            <Label htmlFor="other-area" className="text-sm">{t('quiz_form.other_area_specify')}</Label>
                             <Input
                                 id="other-area"
-                                placeholder="Digite outra área de interesse..."
+                                placeholder={t('quiz_form.other_area_placeholder')}
                                 value={formData.developmentAreasOther || ''}
                                 onChange={(e) => updateFormData('developmentAreasOther', e.target.value)}
                                 className="mt-2"
@@ -221,12 +223,12 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                 return (
                     <div className="space-y-4">
                         <TextareaWithVoice
-                            placeholder="Exemplo: Encontrar um novo hobby, desenvolver projetos pessoais, melhorar relacionamentos, cuidar da saúde mental..."
+                            placeholder={t('quiz_form.personal_life_placeholder')}
                             value={formData.personalLifeHelp || ''}
                             onChange={(value) => updateFormData('personalLifeHelp', value)}
                         />
                         <p className="text-xs text-muted-foreground">
-                            Mínimo de 10 caracteres • {formData.personalLifeHelp?.length || 0} caracteres
+                            {t('quiz_form.min_chars')} • {formData.personalLifeHelp?.length || 0} {t('quiz_form.chars')}
                         </p>
                     </div>
                 )
@@ -239,11 +241,11 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                         className="space-y-3"
                     >
                         {[
-                            { value: 'sim-muito', label: 'Sim, tenho muito interesse em compartilhar' },
-                            { value: 'sim-talvez', label: 'Sim, talvez no futuro' },
-                            { value: 'nao-pensou', label: 'Não, nunca pensei nisso' },
-                            { value: 'nao-tempo', label: 'Gostaria, mas não tenho tempo' },
-                            { value: 'ja-faco', label: 'Já faço isso de alguma forma' },
+                            { value: 'sim-muito', label: t('quiz_form.share_knowledge_yes_very') },
+                            { value: 'sim-talvez', label: t('quiz_form.share_knowledge_yes_maybe') },
+                            { value: 'nao-pensou', label: t('quiz_form.share_knowledge_no_never_thought') },
+                            { value: 'nao-tempo', label: t('quiz_form.share_knowledge_no_time') },
+                            { value: 'ja-faco', label: t('quiz_form.share_knowledge_already_do') },
                         ].map((option) => (
                             <div key={option.value} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                                 <RadioGroupItem value={option.value} id={option.value} />
@@ -259,34 +261,34 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                 return (
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="name">Nome completo *</Label>
+                            <Label htmlFor="name">{t('quiz_form.full_name')}</Label>
                             <Input
                                 id="name"
-                                placeholder="Seu nome completo"
+                                placeholder={t('quiz_form.full_name_placeholder')}
                                 value={formData.name || ''}
                                 onChange={(e) => updateFormData('name', e.target.value)}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email *</Label>
+                            <Label htmlFor="email">{t('quiz_form.email')}</Label>
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="seu@email.com"
+                                placeholder={t('quiz_form.email_placeholder')}
                                 value={formData.email || ''}
                                 onChange={(e) => updateFormData('email', e.target.value)}
                             />
                             {formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
-                                <p className="text-xs text-destructive">Email inválido</p>
+                                <p className="text-xs text-destructive">{t('quiz_form.invalid_email')}</p>
                             )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="linkedin">LinkedIn (opcional)</Label>
+                            <Label htmlFor="linkedin">{t('quiz_form.linkedin_optional')}</Label>
                             <Input
                                 id="linkedin"
-                                placeholder="https://linkedin.com/in/seu-perfil"
+                                placeholder={t('quiz_form.linkedin_placeholder')}
                                 value={formData.linkedinUrl || ''}
                                 onChange={(e) => updateFormData('linkedinUrl', e.target.value)}
                             />
@@ -294,7 +296,7 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
 
                         <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                             <p className="text-sm text-blue-900 dark:text-blue-100">
-                                Você receberá sua análise por e-mail e um convite exclusivo de acesso a MENVO.
+                                {t('quiz_form.analysis_notification')}
                             </p>
                         </div>
                     </div>
@@ -318,10 +320,10 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                                 onClick={currentStep === 1 ? onBack : handlePrevious}
                             >
                                 <ChevronLeft className="h-4 w-4 mr-1" />
-                                Voltar
+                                {t('quiz_form.back')}
                             </Button>
                             <span className="text-sm font-medium text-muted-foreground">
-                                Pergunta {currentStep} de {totalSteps}
+                                {t('quiz_form.progress_header', { currentStep, totalSteps })}
                             </span>
                         </div>
                         <Progress value={progress} className="h-2" />
@@ -331,24 +333,24 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                     <Card className="border-2 shadow-lg">
                         <CardHeader>
                             <CardTitle className="text-2xl">
-                                {currentStep === 1 && 'Qual é o seu momento de carreira atual?'}
-                                {currentStep === 2 && 'Qual é o seu maior desafio profissional no momento?'}
-                                {currentStep === 3 && 'Você já teve alguma experiência com mentoria?'}
-                                {currentStep === 4 && 'Onde você se vê daqui a 2 anos?'}
-                                {currentStep === 5 && 'Quais áreas você mais gostaria de desenvolver?'}
-                                {currentStep === 6 && 'Em quais desafios da vida pessoal uma conversa poderia te ajudar?'}
-                                {currentStep === 7 && 'Você já pensou em compartilhar seu conhecimento ou experiência com outros?'}
-                                {currentStep === 8 && 'Informações de Contato'}
+                                {currentStep === 1 && t('quiz_form.career_moment_title')}
+                                {currentStep === 2 && t('quiz_form.professional_challenge_title')}
+                                {currentStep === 3 && t('quiz_form.mentorship_experience_title')}
+                                {currentStep === 4 && t('quiz_form.future_vision_title')}
+                                {currentStep === 5 && t('quiz_form.development_areas_title')}
+                                {currentStep === 6 && t('quiz_form.personal_life_challenges_title')}
+                                {currentStep === 7 && t('quiz_form.share_knowledge_title')}
+                                {currentStep === 8 && t('quiz_form.contact_information_title')}
                             </CardTitle>
                             <CardDescription>
-                                {currentStep === 1 && 'Selecione a opção que melhor descreve seu momento atual'}
-                                {currentStep === 2 && 'Conte-nos sobre o que mais te preocupa ou desafia na sua carreira'}
-                                {currentStep === 3 && 'Queremos entender sua experiência prévia com mentoria'}
-                                {currentStep === 4 && 'Compartilhe sua visão de futuro profissional'}
-                                {currentStep === 5 && 'Você pode selecionar múltiplas opções'}
-                                {currentStep === 6 && 'Como novos hobbies, projetos pessoais ou outros aspectos da vida'}
-                                {currentStep === 7 && 'Queremos saber se você também tem interesse em ajudar outras pessoas'}
-                                {currentStep === 8 && 'Para enviarmos sua análise personalizada'}
+                                {currentStep === 1 && t('quiz_form.career_moment_description')}
+                                {currentStep === 2 && t('quiz_form.professional_challenge_description')}
+                                {currentStep === 3 && t('quiz_form.mentorship_experience_description')}
+                                {currentStep === 4 && t('quiz_form.future_vision_description')}
+                                {currentStep === 5 && t('quiz_form.development_areas_description')}
+                                {currentStep === 6 && t('quiz_form.personal_life_challenges_description')}
+                                {currentStep === 7 && t('quiz_form.share_knowledge_description')}
+                                {currentStep === 8 && t('quiz_form.contact_information_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
@@ -366,7 +368,7 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                                         className="flex-1"
                                         size="lg"
                                     >
-                                        Próxima
+                                        {t('quiz_form.next')}
                                         <ChevronRight className="ml-2 h-4 w-4" />
                                     </Button>
                                 ) : (
@@ -379,10 +381,10 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
                                         {isSubmitting ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Processando...
+                                                {t('quiz_form.processing')}
                                             </>
                                         ) : (
-                                            'Finalizar e Ver Resultado'
+                                            t('quiz_form.submit')
                                         )}
                                     </Button>
                                 )}
@@ -392,7 +394,7 @@ export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
 
                     {/* Help text */}
                     <p className="text-center text-sm text-muted-foreground mt-4">
-                        Suas respostas são confidenciais e serão usadas apenas para gerar sua análise personalizada
+                        {t('quiz_form.confidential_responses')}
                     </p>
                 </div>
             </div>
