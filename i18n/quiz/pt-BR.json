@@ -73,7 +73,11 @@
     "invalid_email": "Email inválido",
     "linkedin_optional": "LinkedIn (opcional)",
     "linkedin_placeholder": "https://linkedin.com/in/seu-perfil",
-    "analysis_notification": "Você receberá sua análise por e-mail e um convite exclusivo de acesso a MENVO."
+    "analysis_notification": "Você receberá sua análise por e-mail e um convite exclusivo de acesso a MENVO.",
+    "submit_success_title": "Questionário enviado!",
+    "submit_success_description": "Aguarde enquanto processamos sua análise...",
+    "submit_error_title": "Erro ao enviar",
+    "submit_error_description": "Ocorreu um erro ao enviar o questionário. Tente novamente."
   },
   "quiz_results": {
     "processing_analysis": "Processando sua análise...",
