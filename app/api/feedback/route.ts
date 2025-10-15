@@ -130,15 +130,12 @@ export async function POST(request: NextRequest) {
         comment: comment || null,
         email: user ? null : email, // Only store email for non-authenticated users
       })
-      .select(`
-        *,
-        user:profiles(full_name, avatar_url)
-      `)
+      .select()
       .single()
 
     if (error) {
       console.error("Error creating feedback:", error)
-      return NextResponse.json({ error: "Failed to create feedback" }, { status: 500 })
+      return NextResponse.json({ error: error.message || "Failed to create feedback" }, { status: 500 })
     }
 
     return NextResponse.json({ feedback }, { status: 201 })
