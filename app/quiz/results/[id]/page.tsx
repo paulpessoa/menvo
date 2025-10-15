@@ -229,24 +229,26 @@ export default function QuizResultsPage() {
                         </Card>
 
                         {/* Dicas para melhorar as respostas */}
-                        <Card className="mt-6">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Lightbulb className="h-5 w-5 text-yellow-600" />
-                                    {t('quiz_results.tips_for_better_analysis')}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="space-y-3">
-                                    {analysis.conselhos_praticos.map((conselho, index) => (
-                                        <li key={index} className="flex items-start gap-3">
-                                            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                                            <span>{conselho}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
+                        {analysis.conselhos_praticos && analysis.conselhos_praticos.length > 0 && (
+                            <Card className="mt-6">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Lightbulb className="h-5 w-5 text-yellow-600" />
+                                        {t('quiz_results.tips_for_better_analysis')}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul className="space-y-3">
+                                        {analysis.conselhos_praticos.map((conselho, index) => (
+                                            <li key={index} className="flex items-start gap-3">
+                                                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                                <span>{conselho}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </AnimatedBackground>
