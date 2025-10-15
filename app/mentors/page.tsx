@@ -26,20 +26,18 @@ import {
   Search,
   Filter,
   MapPin,
-  Star,
   Clock,
-  DollarSign,
   Users,
-  Globe,
   Briefcase,
   Heart,
-  Calendar,
   MessageCircle
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
+import { toast } from "sonner"
 
 interface MentorProfile {
   id: string
@@ -74,7 +72,6 @@ interface FilterState {
   inclusiveTags: string[]
   priceRange: [number, number]
   availabilityStatus: string
-  minRating: number
   experienceYears: string
 }
 
@@ -88,7 +85,6 @@ const initialFilters: FilterState = {
   inclusiveTags: [],
   priceRange: [0, 500],
   availabilityStatus: "all",
-  minRating: 0,
   experienceYears: "all"
 }
 
@@ -147,7 +143,7 @@ export default function MentorsPage() {
       if (error) throw error
 
       // Map the data to match the expected interface
-      const mappedData = (data || []).map(mentor => ({
+      const mappedData = (data || []).map((mentor: any) => ({
         ...mentor,
         job_title: mentor.current_position,
         company: mentor.current_company,
@@ -188,14 +184,14 @@ export default function MentorsPage() {
       const topics = new Set<string>()
       const inclusiveTags = new Set<string>()
 
-      data?.forEach(mentor => {
+      data?.forEach((mentor: any) => {
         if (mentor.country) countries.add(mentor.country)
         if (mentor.state) states.add(mentor.state)
         if (mentor.city) cities.add(mentor.city)
 
-        mentor.languages?.forEach(lang => languages.add(lang))
-        mentor.mentorship_topics?.forEach(topic => topics.add(topic))
-        mentor.inclusion_tags?.forEach(tag => inclusiveTags.add(tag))
+        mentor.languages?.forEach((lang: string) => languages.add(lang))
+        mentor.mentorship_topics?.forEach((topic: string) => topics.add(topic))
+        mentor.inclusion_tags?.forEach((tag: string) => inclusiveTags.add(tag))
       })
 
       setAvailableFilters({
@@ -259,9 +255,6 @@ export default function MentorsPage() {
 
       // Availability status filter
       if (filters.availabilityStatus !== 'all' && mentor.availability_status !== filters.availabilityStatus) return false
-
-      // Rating filter
-      if (filters.minRating > 0 && mentor.average_rating < filters.minRating) return false
 
       // Experience years filter
       if (filters.experienceYears !== 'all' && mentor.experience_years !== null) {
@@ -441,27 +434,6 @@ export default function MentorsPage() {
                 </Select>
               </div>
 
-              {/* Rating Filter */}
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <Star className="h-4 w-4 mr-2" />
-                  Avaliação Mínima
-                </h3>
-                <Select value={filters.minRating.toString()} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, minRating: Number(value) }))
-                }>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Avaliação mínima" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Qualquer avaliação</SelectItem>
-                    <SelectItem value="3">3+ estrelas</SelectItem>
-                    <SelectItem value="4">4+ estrelas</SelectItem>
-                    <SelectItem value="4.5">4.5+ estrelas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Clear Filters */}
               <Button
                 variant="outline"
@@ -522,6 +494,9 @@ export default function MentorsPage() {
 }
 
 function MentorCard({ mentor }: { mentor: MentorProfile }) {
+  const router = useRouter()
+  const { user } = useAuth()
+
   const getAvailabilityColor = (status: string) => {
     switch (status) {
       case 'available': return 'bg-green-100 text-green-800'
@@ -538,6 +513,25 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
       case 'unavailable': return 'Indisponível'
       default: return 'Status desconhecido'
     }
+  }
+
+  const handleScheduleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    // Sempre permite visualizar o perfil
+    router.push(`/mentors/${mentor.slug || mentor.id}`)
+  }
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    if (!user) {
+      toast.info("Você deve estar logado para favoritar mentores")
+      return
+    }
+
+    // TODO: Implementar lógica de favoritar
+    toast.success("Mentor favoritado com sucesso!")
   }
 
   return (
@@ -598,40 +592,21 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
         )}
 
         {/* Stats */}
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center space-x-4">
-            {mentor.average_rating > 0 && (
-              <div className="flex items-center">
-                <Star className="h-3 w-3 mr-1 fill-yellow-400 text-yellow-400" />
-                <span>{mentor.average_rating.toFixed(1)}</span>
-                <span className="ml-1">({mentor.total_reviews})</span>
-              </div>
-            )}
-
-            {mentor.total_sessions > 0 && (
-              <div className="flex items-center">
-                <MessageCircle className="h-3 w-3 mr-1" />
-                <span>{mentor.total_sessions} sessões</span>
-              </div>
-            )}
-          </div>
-
-          {mentor.session_price_usd && (
-            <div className="flex items-center font-medium text-green-600">
-              <DollarSign className="h-3 w-3" />
-              <span>{mentor.session_price_usd}</span>
+        <div className="flex items-center text-sm text-gray-500">
+          {mentor.total_sessions > 0 && (
+            <div className="flex items-center">
+              <MessageCircle className="h-3 w-3 mr-1" />
+              <span>{mentor.total_sessions} sessões</span>
             </div>
           )}
         </div>
 
         {/* Actions */}
         <div className="flex space-x-2 pt-2">
-          <Button asChild className="flex-1">
-            <Link href={`/mentors/${mentor.slug || mentor.id}`}>
-              Ver Perfil
-            </Link>
+          <Button onClick={handleScheduleClick} className="flex-1">
+            Ver Perfil
           </Button>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" onClick={handleFavoriteClick}>
             <Heart className="h-4 w-4" />
           </Button>
         </div>

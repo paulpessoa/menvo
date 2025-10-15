@@ -10,9 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import {
     MapPin,
-    Star,
     Clock,
-    DollarSign,
     Users,
     Globe,
     Briefcase,
@@ -26,6 +24,7 @@ import {
     Share2,
     Loader2
 } from "lucide-react"
+import { toast } from "sonner"
 import Link from "next/link"
 import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
 
@@ -266,10 +265,18 @@ export default function MentorProfilePage() {
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <Button variant="outline" size="icon">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+                                    >
                                         <Heart className="h-4 w-4" />
                                     </Button>
-                                    <Button variant="outline" size="icon">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+                                    >
                                         <Share2 className="h-4 w-4" />
                                     </Button>
                                 </div>
@@ -282,14 +289,6 @@ export default function MentorProfilePage() {
                                 </Badge>
 
                                 <div className="flex items-center space-x-6 text-sm text-gray-600">
-                                    {mentor.average_rating > 0 && (
-                                        <div className="flex items-center">
-                                            <Star className="h-4 w-4 mr-1 fill-yellow-400 text-yellow-400" />
-                                            <span className="font-medium">{mentor.average_rating.toFixed(1)}</span>
-                                            <span className="ml-1">({mentor.total_reviews} avaliações)</span>
-                                        </div>
-                                    )}
-
                                     {mentor.total_sessions > 0 && (
                                         <div className="flex items-center">
                                             <MessageCircle className="h-4 w-4 mr-1" />
@@ -404,22 +403,25 @@ export default function MentorProfilePage() {
                     {/* Booking Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center justify-between">
-                                Agendar Sessão
-                                {mentor.session_price_usd && (
-                                    <div className="flex items-center text-green-600 font-bold">
-                                        <DollarSign className="h-4 w-4" />
-                                        <span>{mentor.session_price_usd}</span>
-                                    </div>
-                                )}
-                            </CardTitle>
+                            <CardTitle>Agendar Sessão</CardTitle>
+                            <CardDescription>Mentorias 100% gratuitas</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <Button className="w-full" size="lg">
+                            <Button
+                                className="w-full"
+                                size="lg"
+                                disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
+                            >
                                 <Calendar className="h-4 w-4 mr-2" />
-                                Agendar Mentoria
+                                {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
+                                    ? 'Agenda Lotada'
+                                    : 'Agendar Mentoria'}
                             </Button>
-                            <Button variant="outline" className="w-full">
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+                            >
                                 <MessageCircle className="h-4 w-4 mr-2" />
                                 Enviar Mensagem
                             </Button>
