@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       .from("feedback")
       .insert({
         user_id: user?.id || null,
-        rating: Number.parseInt(rating),
+        rating: typeof rating === 'string' ? Number.parseInt(rating) : rating,
         comment: comment || null,
         email: user ? null : email, // Only store email for non-authenticated users
       })
