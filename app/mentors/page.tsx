@@ -172,7 +172,8 @@ export default function MentorsPage() {
           city,
           languages,
           mentorship_topics,
-          inclusion_tags
+          inclusion_tags,
+          expertise_areas
         `)
 
       if (error) throw error
@@ -183,6 +184,7 @@ export default function MentorsPage() {
       const languages = new Set<string>()
       const topics = new Set<string>()
       const inclusiveTags = new Set<string>()
+      const expertiseAreas = new Set<string>()
 
       data?.forEach((mentor: any) => {
         if (mentor.country) countries.add(mentor.country)
@@ -192,6 +194,7 @@ export default function MentorsPage() {
         mentor.languages?.forEach((lang: string) => languages.add(lang))
         mentor.mentorship_topics?.forEach((topic: string) => topics.add(topic))
         mentor.inclusion_tags?.forEach((tag: string) => inclusiveTags.add(tag))
+        mentor.expertise_areas?.forEach((area: string) => expertiseAreas.add(area))
       })
 
       setAvailableFilters({
@@ -389,6 +392,101 @@ export default function MentorsPage() {
                     </SelectContent>
                   </Select>
                 )}
+
+                {filters.state !== 'all' && availableFilters.cities.length > 0 && (
+                  <Select value={filters.city} onValueChange={(value) =>
+                    setFilters(prev => ({ ...prev, city: value }))
+                  }>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Cidade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Todas as cidades</SelectItem>
+                      {availableFilters.cities.map(city => (
+                        <SelectItem key={city} value={city}>{city}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              {/* Mentorship Topics Filter */}
+              <div className="space-y-3">
+                <h3 className="font-medium">Temas de Mentoria</h3>
+                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                  {availableFilters.topics.map(topic => (
+                    <Badge
+                      key={topic}
+                      variant={filters.topics.includes(topic) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setFilters(prev => ({
+                          ...prev,
+                          topics: prev.topics.includes(topic)
+                            ? prev.topics.filter(t => t !== topic)
+                            : [...prev.topics, topic]
+                        }))
+                      }}
+                    >
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Expertise Areas Filter */}
+              <div className="space-y-3">
+                <h3 className="font-medium flex items-center">
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Áreas de Expertise
+                </h3>
+                <div className="space-y-2">
+                  {availableFilters.topics.slice(0, 5).map(topic => (
+                    <label key={topic} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.topics.includes(topic)}
+                        onChange={(e) => {
+                          setFilters(prev => ({
+                            ...prev,
+                            topics: e.target.checked
+                              ? [...prev.topics, topic]
+                              : prev.topics.filter(t => t !== topic)
+                          }))
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-sm">{topic}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Inclusive Tags Filter */}
+              <div className="space-y-3">
+                <h3 className="font-medium flex items-center">
+                  <Heart className="h-4 w-4 mr-2" />
+                  Tags Inclusivas
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {availableFilters.inclusiveTags.map(tag => (
+                    <Badge
+                      key={tag}
+                      variant={filters.inclusiveTags.includes(tag) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setFilters(prev => ({
+                          ...prev,
+                          inclusiveTags: prev.inclusiveTags.includes(tag)
+                            ? prev.inclusiveTags.filter(t => t !== tag)
+                            : [...prev.inclusiveTags, tag]
+                        }))
+                      }}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
               </div>
 
               {/* Experience Filter */}
