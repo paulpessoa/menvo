@@ -32,7 +32,7 @@ import {
   Heart,
   MessageCircle
 } from "lucide-react"
-import Link from "next/link"
+
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
@@ -277,12 +277,31 @@ export default function MentorsPage() {
     setFilters(initialFilters)
   }
 
-  const activeFiltersCount = Object.values(filters).filter(value => {
-    if (Array.isArray(value)) return value.length > 0
-    if (typeof value === 'string') return value !== '' && value !== 'all'
-    if (typeof value === 'number') return value > 0
-    return false
-  }).length
+  const activeFiltersCount = useMemo(() => {
+    let count = 0
+
+    // Search
+    if (filters.search) count++
+
+    // Location
+    if (filters.country !== 'all') count++
+    if (filters.state !== 'all') count++
+    if (filters.city) count++
+
+    // Arrays
+    if (filters.languages.length > 0) count++
+    if (filters.topics.length > 0) count++
+    if (filters.inclusiveTags.length > 0) count++
+
+    // Price range (only count if different from default)
+    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 500) count++
+
+    // Status
+    if (filters.availabilityStatus !== 'all') count++
+    if (filters.experienceYears !== 'all') count++
+
+    return count
+  }, [filters])
 
   if (loading) {
     return (
@@ -358,57 +377,49 @@ export default function MentorsPage() {
 
             <div className="mt-6 space-y-6">
               {/* Location Filters */}
+              {/* Estado Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <MapPin className="h-4 w-4 mr-2" />
-                  Localização
+                  Estado
                 </h3>
-                <Select value={filters.country} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, country: value, state: "all", city: "" }))
+                <Select value={filters.state} onValueChange={(value) =>
+                  setFilters(prev => ({ ...prev, state: value }))
                 }>
                   <SelectTrigger>
-                    <SelectValue placeholder="País" />
+                    <SelectValue placeholder="Selecione o estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos os países</SelectItem>
-                    {availableFilters.countries.map(country => (
-                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    <SelectItem value="all">Todos os estados</SelectItem>
+                    {availableFilters.states.map(state => (
+                      <SelectItem key={state} value={state}>{state}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
 
-                {filters.country !== 'all' && (
-                  <Select value={filters.state} onValueChange={(value) =>
-                    setFilters(prev => ({ ...prev, state: value, city: "" }))
+              {/* Cidade Filter */}
+              {availableFilters.cities.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Cidade
+                  </h3>
+                  <Select value={filters.city || "all"} onValueChange={(value) =>
+                    setFilters(prev => ({ ...prev, city: value === "all" ? "" : value }))
                   }>
                     <SelectTrigger>
-                      <SelectValue placeholder="Estado" />
+                      <SelectValue placeholder="Selecione a cidade" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos os estados</SelectItem>
-                      {availableFilters.states.map(state => (
-                        <SelectItem key={state} value={state}>{state}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-
-                {filters.state !== 'all' && availableFilters.cities.length > 0 && (
-                  <Select value={filters.city} onValueChange={(value) =>
-                    setFilters(prev => ({ ...prev, city: value }))
-                  }>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Cidade" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todas as cidades</SelectItem>
+                      <SelectItem value="all">Todas as cidades</SelectItem>
                       {availableFilters.cities.map(city => (
                         <SelectItem key={city} value={city}>{city}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Mentorship Topics Filter */}
               <div className="space-y-3">
