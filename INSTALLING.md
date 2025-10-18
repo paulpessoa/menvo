@@ -13,7 +13,7 @@ This guide contains all the necessary instructions to install and run the Menvo 
     - [1. Fork and Clone the Repository](#1-fork-and-clone-the-repository)
     - [2. Install Dependencies](#2-install-dependencies)
     - [3. Set Up Environment Variables](#3-set-up-environment-variables)
-- [Example .env file content](#example-env-file-content)
+      - [Example .env file content](#example-env-file-content)
     - [4. Run the Project](#4-run-the-project)
   - [Additional Scripts](#additional-scripts)
 
@@ -29,19 +29,19 @@ Before you begin, ensure you have the following software installed on your machi
 
 First, fork the project to your own GitHub account and then clone your fork to your local machine.
 
-\`\`\`bash
-$ git clone https://github.com/YOUR-USERNAME/menvo.git
+```bash
+$ git clone https://github.com/your-username/menvo.git
 
 $ cd menvo
-\`\`\`
+```
 
 ### 2. Install Dependencies
 
 With the project cloned, install all the necessary dependencies by running the following command in the project root:
 
-\`\`\`bash
+```bash
 $ npm install
-\`\`\`
+```
 
 ### 3. Set Up Environment Variables
 
@@ -52,11 +52,11 @@ The Menvo project uses Supabase as its backend. To run the project locally, you 
 3.  **Create the .env file:** In the project's root directory, create a copy of the `.env.example` file and rename it to `.env`.
 4.  **Fill in the .env file:** Paste your URL and your `anon` key into the `.env` file you just created. See the example below.
 
-\`\`\`
-# Example .env file content
+#### Example .env file content
+```bash
 NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_PROJECT_URL"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
-\`\`\`
+```
 
 **Important:** The `.env` file contains sensitive information and should not be committed to the repository. It is already included in the project's `.gitignore`.
 
@@ -64,9 +64,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
 
 With everything set up, start the development server:
 
-\`\`\`
+```bash
 $ npm run dev
-\`\`\`
+```
 
 Now, open your browser and navigate to [http://localhost:3000](http://localhost:3000) to see the application running!
 
