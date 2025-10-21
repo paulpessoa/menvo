@@ -27,6 +27,8 @@ import {
 import { toast } from "sonner"
 import Link from "next/link"
 import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
+import { ScheduleMentorshipModal } from "@/components/mentorship/ScheduleMentorshipModal"
+import { ChatInterface } from "@/components/chat/ChatInterface"
 
 interface MentorProfile {
     id: string
@@ -47,6 +49,7 @@ interface MentorProfile {
     average_rating: number
     total_reviews: number
     total_sessions: number
+    chat_enabled: boolean
     experience_years: number | null
     linkedin_url: string | null
     github_url: string | null
@@ -70,6 +73,9 @@ export default function MentorProfilePage() {
     const [availability, setAvailability] = useState<MentorAvailability[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
+    const [isChatOpen, setIsChatOpen] = useState(false)
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
     const supabase = createClient()
 
@@ -77,7 +83,16 @@ export default function MentorProfilePage() {
         if (params.slug) {
             fetchMentorProfile(params.slug as string)
         }
+        // Buscar usuário atual
+        fetchCurrentUser()
     }, [params.slug])
+
+    const fetchCurrentUser = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            setCurrentUserId(user.id)
+        }
+    }
 
     const fetchMentorProfile = async (slug: string) => {
         try {
@@ -102,6 +117,7 @@ export default function MentorProfilePage() {
           expertise_areas,
           session_price_usd,
           availability_status,
+          chat_enabled,
           rating,
           reviews,
           sessions,
@@ -411,6 +427,7 @@ export default function MentorProfilePage() {
                                 className="w-full"
                                 size="lg"
                                 disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
+                                onClick={() => setIsScheduleModalOpen(true)}
                             >
                                 <Calendar className="h-4 w-4 mr-2" />
                                 {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
@@ -420,10 +437,12 @@ export default function MentorProfilePage() {
                             <Button
                                 variant="outline"
                                 className="w-full"
-                                onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+                                disabled={!mentor.chat_enabled || !currentUserId}
+                                onClick={() => setIsChatOpen(true)}
+                                title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : !currentUserId ? 'Faça login para usar o chat' : ''}
                             >
                                 <MessageCircle className="h-4 w-4 mr-2" />
-                                Enviar Mensagem
+                                {mentor.chat_enabled ? 'Chat' : 'Chat Indisponível'}
                             </Button>
                         </CardContent>
                     </Card>
@@ -488,6 +507,37 @@ export default function MentorProfilePage() {
                     )}
                 </div>
             </div>
+
+            {/* Schedule Modal */}
+            <ScheduleMentorshipModal
+                isOpen={isScheduleModalOpen}
+                onClose={() => setIsScheduleModalOpen(false)}
+                mentorId={mentor.id}
+                mentorName={mentor.full_name}
+            />
+
+            {/* Chat Modal */}
+            {isChatOpen && currentUserId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h2 className="text-lg font-semibold">Chat com {mentor.full_name}</h2>
+                            <button
+                                onClick={() => setIsChatOpen(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <ChatInterface
+                            mentorId={mentor.id}
+                            currentUserId={currentUserId}
+                            mentorName={mentor.full_name}
+                            mentorAvatar={mentor.avatar_url || undefined}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
