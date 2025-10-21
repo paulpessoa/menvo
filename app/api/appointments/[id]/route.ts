@@ -126,17 +126,66 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updateData.notes = notes;
     }
 
-    // Handle calendar event updates
+    // Handle status change to confirmed - trigger full confirmation flow
+    if (status === 'confirmed' && currentAppointment.status === 'pending') {
+      // Update status first
+      const { error: statusUpdateError } = await supabase
+        .from('appointments')
+        .update({ status: 'confirmed' })
+        .eq('id', appointmentId);
+
+      if (statusUpdateError) {
+        console.error('Error updating status:', statusUpdateError);
+        return NextResponse.json(
+          { error: 'Failed to update status' },
+          { status: 500 }
+        );
+      }
+
+      // Trigger confirmation flow (Google Calendar + emails)
+      try {
+        const confirmResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/appointments/confirm`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            appointmentId: parseInt(appointmentId),
+          }),
+        });
+
+        if (!confirmResponse.ok) {
+          console.error('Error in confirmation flow');
+        }
+      } catch (confirmError) {
+        console.error('Error triggering confirmation:', confirmError);
+        // Don't fail the request, status is already updated
+      }
+
+      // Return early since we already updated
+      const { data: confirmedAppointment } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          mentor:mentor_id(id, email, first_name, last_name, full_name, avatar_url),
+          mentee:mentee_id(id, email, first_name, last_name, full_name, avatar_url)
+        `)
+        .eq('id', appointmentId)
+        .single();
+
+      return NextResponse.json({
+        success: true,
+        appointment: confirmedAppointment,
+        message: 'Appointment confirmed successfully',
+      });
+    }
+
+    // Handle calendar event updates for other status changes
     if (status && currentAppointment.google_event_id) {
       try {
         if (status === 'cancelled') {
           // Delete calendar event
           await deleteCalendarEvent(currentAppointment.google_event_id);
-        } else if (status === 'confirmed') {
-          // Update calendar event (could add confirmation details)
-          await updateCalendarEvent(currentAppointment.google_event_id, {
-            description: `Sessão de mentoria confirmada.\n\n${notes || ''}`,
-          });
         }
       } catch (calendarError) {
         console.error('Error updating calendar event:', calendarError);
