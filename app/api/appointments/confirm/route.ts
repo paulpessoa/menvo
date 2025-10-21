@@ -5,7 +5,7 @@ import { createCalendarEvent } from '@/lib/calendar/google-calendar';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Parse do body
     const body = await request.json();

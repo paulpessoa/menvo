@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verificar autenticação
     const {

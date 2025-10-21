@@ -10,13 +10,13 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verificar autenticação
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       console.error('[CHAT] Erro de autenticação:', authError);

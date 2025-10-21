@@ -5,13 +5,35 @@ import { format } from "date-fns"
 import { CheckCircle, XCircle, Clock, MessageSquare } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog"
 import { useAuth } from "@/lib/auth"
-import { useVolunteerActivities, useValidateActivity } from "@/hooks/api/use-volunteer-activities"
+import {
+  useVolunteerActivities,
+  useValidateActivity
+} from "@/hooks/api/use-volunteer-activities"
 
 export default function AdminVoluntariosPage() {
   const { user } = useAuth()
@@ -21,7 +43,11 @@ export default function AdminVoluntariosPage() {
   const validateActivity = useValidateActivity()
 
   // Fetch pending activities for validation
-  const { data: activities, isLoading, refetch } = useVolunteerActivities({ status: "pending" })
+  const {
+    data: activities,
+    isLoading,
+    refetch
+  } = useVolunteerActivities({ status: "pending" })
 
   // Check if user has admin/moderator permissions
   if (!user || (user.role !== "admin" && user.role !== "moderator")) {
@@ -32,7 +58,9 @@ export default function AdminVoluntariosPage() {
             <div className="text-center">
               <XCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium mb-2">Acesso Restrito</h3>
-              <p className="text-muted-foreground">Esta área é restrita a administradores e moderadores.</p>
+              <p className="text-muted-foreground">
+                Esta área é restrita a administradores e moderadores.
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -40,12 +68,15 @@ export default function AdminVoluntariosPage() {
     )
   }
 
-  const handleValidation = async (activityId: string, status: "validated" | "rejected") => {
+  const handleValidation = async (
+    activityId: string,
+    status: "validated" | "rejected"
+  ) => {
     try {
       await validateActivity.mutateAsync({
         activityId,
         status,
-        notes: validationNotes,
+        notes: validationNotes
       })
       setValidationNotes("")
       setSelectedActivity(null)
@@ -73,7 +104,10 @@ export default function AdminVoluntariosPage() {
               <Clock className="h-5 w-5" />
               Validação de Atividades Voluntárias
             </CardTitle>
-            <CardDescription>Atividades pendentes de validação por administradores e moderadores</CardDescription>
+            <CardDescription>
+              Atividades pendentes de validação por administradores e
+              moderadores
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {activities && activities.length > 0 ? (
@@ -97,14 +131,22 @@ export default function AdminVoluntariosPage() {
                           <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm">
                             {activity.user?.full_name?.[0] || "?"}
                           </div>
-                          <span className="font-medium">{activity.user?.full_name || "Usuário"}</span>
+                          <span className="font-medium">
+                            {activity.user?.full_name || "Usuário"}
+                          </span>
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium">{activity.title}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{activity.activity_type}</Badge>
+                      <TableCell className="font-medium">
+                        {activity.title}
                       </TableCell>
-                      <TableCell>{format(new Date(activity.date), "dd/MM/yyyy")}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {activity.activity_type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(activity.date), "dd/MM/yyyy")}
+                      </TableCell>
                       <TableCell>{activity.hours}h</TableCell>
                       <TableCell className="max-w-xs">
                         {activity.description ? (
@@ -117,7 +159,9 @@ export default function AdminVoluntariosPage() {
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle>Descrição da Atividade</DialogTitle>
+                                <DialogTitle>
+                                  Descrição da Atividade
+                                </DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
@@ -125,7 +169,9 @@ export default function AdminVoluntariosPage() {
                                   <p>{activity.title}</p>
                                 </div>
                                 <div>
-                                  <h4 className="font-medium mb-2">Descrição:</h4>
+                                  <h4 className="font-medium mb-2">
+                                    Descrição:
+                                  </h4>
                                   <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                                     {activity.description}
                                   </p>
@@ -134,7 +180,9 @@ export default function AdminVoluntariosPage() {
                             </DialogContent>
                           </Dialog>
                         ) : (
-                          <span className="text-muted-foreground text-sm">Sem descrição</span>
+                          <span className="text-muted-foreground text-sm">
+                            Sem descrição
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -161,30 +209,42 @@ export default function AdminVoluntariosPage() {
                                     <strong>Título:</strong> {activity.title}
                                   </p>
                                   <p>
-                                    <strong>Voluntário:</strong> {activity.user?.full_name}
+                                    <strong>Voluntário:</strong>{" "}
+                                    {activity.user?.full_name}
                                   </p>
                                   <p>
                                     <strong>Horas:</strong> {activity.hours}h
                                   </p>
                                 </div>
                                 <div>
-                                  <label className="text-sm font-medium">Notas (opcional):</label>
+                                  <label className="text-sm font-medium">
+                                    Notas (opcional):
+                                  </label>
                                   <Textarea
                                     value={validationNotes}
-                                    onChange={(e) => setValidationNotes(e.target.value)}
+                                    onChange={(e) =>
+                                      setValidationNotes(e.target.value)
+                                    }
                                     placeholder="Adicione comentários sobre a validação..."
                                     rows={3}
                                   />
                                 </div>
                                 <div className="flex gap-2">
                                   <Button
-                                    onClick={() => handleValidation(activity.id, "validated")}
+                                    onClick={() =>
+                                      handleValidation(activity.id, "validated")
+                                    }
                                     disabled={validateActivity.isPending}
                                     className="bg-green-600 hover:bg-green-700"
                                   >
-                                    {validateActivity.isPending ? "Aprovando..." : "Confirmar Aprovação"}
+                                    {validateActivity.isPending
+                                      ? "Aprovando..."
+                                      : "Confirmar Aprovação"}
                                   </Button>
-                                  <Button variant="outline" onClick={() => setSelectedActivity(null)}>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setSelectedActivity(null)}
+                                  >
                                     Cancelar
                                   </Button>
                                 </div>
@@ -194,7 +254,11 @@ export default function AdminVoluntariosPage() {
 
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button size="sm" variant="destructive" onClick={() => setSelectedActivity(activity)}>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => setSelectedActivity(activity)}
+                              >
                                 <XCircle className="h-4 w-4 mr-1" />
                                 Rejeitar
                               </Button>
@@ -209,17 +273,22 @@ export default function AdminVoluntariosPage() {
                                     <strong>Título:</strong> {activity.title}
                                   </p>
                                   <p>
-                                    <strong>Voluntário:</strong> {activity.user?.full_name}
+                                    <strong>Voluntário:</strong>{" "}
+                                    {activity.user?.full_name}
                                   </p>
                                   <p>
                                     <strong>Horas:</strong> {activity.hours}h
                                   </p>
                                 </div>
                                 <div>
-                                  <label className="text-sm font-medium">Motivo da rejeição:</label>
+                                  <label className="text-sm font-medium">
+                                    Motivo da rejeição:
+                                  </label>
                                   <Textarea
                                     value={validationNotes}
-                                    onChange={(e) => setValidationNotes(e.target.value)}
+                                    onChange={(e) =>
+                                      setValidationNotes(e.target.value)
+                                    }
                                     placeholder="Explique o motivo da rejeição..."
                                     rows={3}
                                     required
@@ -228,12 +297,22 @@ export default function AdminVoluntariosPage() {
                                 <div className="flex gap-2">
                                   <Button
                                     variant="destructive"
-                                    onClick={() => handleValidation(activity.id, "rejected")}
-                                    disabled={validateActivity.isPending || !validationNotes.trim()}
+                                    onClick={() =>
+                                      handleValidation(activity.id, "rejected")
+                                    }
+                                    disabled={
+                                      validateActivity.isPending ||
+                                      !validationNotes.trim()
+                                    }
                                   >
-                                    {validateActivity.isPending ? "Rejeitando..." : "Confirmar Rejeição"}
+                                    {validateActivity.isPending
+                                      ? "Rejeitando..."
+                                      : "Confirmar Rejeição"}
                                   </Button>
-                                  <Button variant="outline" onClick={() => setSelectedActivity(null)}>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => setSelectedActivity(null)}
+                                  >
                                     Cancelar
                                   </Button>
                                 </div>
@@ -249,9 +328,12 @@ export default function AdminVoluntariosPage() {
             ) : (
               <div className="text-center py-8">
                 <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Nenhuma atividade pendente</h3>
+                <h3 className="text-lg font-medium mb-2">
+                  Nenhuma atividade pendente
+                </h3>
                 <p className="text-muted-foreground">
-                  Todas as atividades foram validadas ou não há atividades para revisar.
+                  Todas as atividades foram validadas ou não há atividades para
+                  revisar.
                 </p>
               </div>
             )}
