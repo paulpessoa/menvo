@@ -49,3 +49,6 @@ yarn-error.log*
 
 # Kiro IDE
 .kiro/
+
+# Supabase CLI temporary files
+supabase/.temp/
