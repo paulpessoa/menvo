@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verificar autenticação
     const {

@@ -4,7 +4,7 @@ import { getOrCreateConversation, sendMessage } from '@/lib/chat/chat-service';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Verificar autenticação
     const {
