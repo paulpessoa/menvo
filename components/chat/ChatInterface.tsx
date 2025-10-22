@@ -119,11 +119,29 @@ export function ChatInterface({
             console.log('[CHAT] ConversationId:', data.conversationId);
             setMessages(data.messages || []);
             setConversationId(data.conversationId);
+
+            // Marcar mensagens como lidas após carregar
+            if (data.conversationId) {
+                markAsRead(data.conversationId);
+            }
         } catch (error) {
             console.error('[CHAT] Erro ao carregar mensagens:', error);
             toast.error('Erro ao carregar mensagens');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const markAsRead = async (convId: string) => {
+        try {
+            await fetch('/api/chat/mark-read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversationId: convId }),
+            });
+            console.log('[CHAT] ✅ Mensagens marcadas como lidas');
+        } catch (error) {
+            console.error('[CHAT] Erro ao marcar como lida:', error);
         }
     };
 
