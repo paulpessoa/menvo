@@ -32,7 +32,9 @@ export function ChatInterface({
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
     const [realtimeStatus, setRealtimeStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+    const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const supabase = createClient();
 
     // Carregar mensagens ao montar
@@ -51,11 +53,12 @@ export function ChatInterface({
 
         console.log('[CHAT] 🔌 Subscrevendo ao Realtime para conversa:', conversationId);
 
-        // Criar subscription para novas mensagens
+        // Criar subscription para novas mensagens e typing indicator
         const channel = supabase
             .channel(`conversation:${conversationId}`, {
                 config: {
-                    broadcast: { self: true },
+                    broadcast: { self: false }, // Não receber próprios eventos
+                    presence: { key: currentUserId },
                 },
             })
             .on(
@@ -82,6 +85,20 @@ export function ChatInterface({
                     });
                 }
             )
+            .on('broadcast', { event: 'typing' }, (payload: any) => {
+                console.log('[CHAT] ✍️ Usuário está digitando:', payload);
+                setIsTyping(true);
+
+                // Limpar timeout anterior
+                if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current);
+                }
+
+                // Parar de mostrar "digitando" após 3 segundos
+                typingTimeoutRef.current = setTimeout(() => {
+                    setIsTyping(false);
+                }, 3000);
+            })
             .subscribe((status, err) => {
                 console.log('[CHAT] 📡 Status da subscription:', status);
                 if (err) console.error('[CHAT] ❌ Erro:', err);
@@ -100,6 +117,9 @@ export function ChatInterface({
         // Cleanup: unsubscribe ao desmontar
         return () => {
             console.log('[CHAT] Removendo subscription');
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
             supabase.removeChannel(channel);
         };
     }, [conversationId]);
@@ -143,6 +163,17 @@ export function ChatInterface({
         } catch (error) {
             console.error('[CHAT] Erro ao marcar como lida:', error);
         }
+    };
+
+    const handleTyping = () => {
+        if (!conversationId) return;
+
+        // Enviar evento de "digitando" via broadcast
+        supabase.channel(`conversation:${conversationId}`).send({
+            type: 'broadcast',
+            event: 'typing',
+            payload: { userId: currentUserId },
+        });
     };
 
     const scrollToBottom = () => {
@@ -239,7 +270,9 @@ export function ChatInterface({
                                 'bg-red-500'
                             }`} />
                         <p className="text-xs text-gray-500">
-                            {realtimeStatus === 'connected' ? 'Online' :
+                            {isTyping ? (
+                                <span className="italic">digitando...</span>
+                            ) : realtimeStatus === 'connected' ? 'Online' :
                                 realtimeStatus === 'connecting' ? 'Conectando...' :
                                     'Desconectado'}
                         </p>
@@ -289,7 +322,10 @@ export function ChatInterface({
                     <input
                         type="text"
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={(e) => {
+                            setNewMessage(e.target.value);
+                            handleTyping();
+                        }}
                         placeholder="Digite sua mensagem..."
                         disabled={sending}
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
