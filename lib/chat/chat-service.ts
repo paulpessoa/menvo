@@ -3,7 +3,7 @@
  * Serviço para gerenciar conversas e mensagens em tempo real
  */
 
-import { createClient } from '@/lib/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 export interface Message {
   id: string;
@@ -27,29 +27,26 @@ export interface Conversation {
  * Busca ou cria uma conversa entre mentor e mentee
  */
 export async function getOrCreateConversation(
+  supabase: SupabaseClient,
   mentorId: string,
   menteeId: string
 ): Promise<string> {
-  const supabase = createClient();
 
   console.log('[CHAT SERVICE] Buscando conversa:', { mentorId, menteeId });
 
-  // Tentar buscar conversa existente
-  const { data: existingConversation, error: fetchError } = await supabase
+  // Tentar buscar conversa existente (em qualquer ordem)
+  const { data: existingConversations, error: fetchError } = await supabase
     .from('conversations')
     .select('id')
-    .eq('mentor_id', mentorId)
-    .eq('mentee_id', menteeId)
-    .single();
+    .or(`and(mentor_id.eq.${mentorId},mentee_id.eq.${menteeId}),and(mentor_id.eq.${menteeId},mentee_id.eq.${mentorId})`);
 
-  if (fetchError && fetchError.code !== 'PGRST116') {
-    // PGRST116 = not found, é esperado
+  if (fetchError) {
     console.error('[CHAT SERVICE] Erro ao buscar conversa:', fetchError);
   }
 
-  if (existingConversation) {
-    console.log('[CHAT SERVICE] Conversa existente encontrada:', existingConversation.id);
-    return existingConversation.id;
+  if (existingConversations && existingConversations.length > 0) {
+    console.log('[CHAT SERVICE] Conversa existente encontrada:', existingConversations[0].id);
+    return existingConversations[0].id;
   }
 
   console.log('[CHAT SERVICE] Criando nova conversa...');
@@ -77,11 +74,11 @@ export async function getOrCreateConversation(
  * Envia uma mensagem em uma conversa
  */
 export async function sendMessage(
+  supabase: SupabaseClient,
   conversationId: string,
   senderId: string,
   content: string
 ): Promise<Message> {
-  const supabase = createClient();
 
   const { data: message, error } = await supabase
     .from('messages')
@@ -105,10 +102,10 @@ export async function sendMessage(
  * Busca mensagens de uma conversa
  */
 export async function getMessages(
+  supabase: SupabaseClient,
   conversationId: string,
   limit: number = 50
 ): Promise<Message[]> {
-  const supabase = createClient();
 
   const { data: messages, error } = await supabase
     .from('messages')
@@ -129,10 +126,10 @@ export async function getMessages(
  * Marca mensagens como lidas
  */
 export async function markMessagesAsRead(
+  supabase: SupabaseClient,
   conversationId: string,
   userId: string
 ): Promise<void> {
-  const supabase = createClient();
 
   const { error } = await supabase
     .from('messages')
@@ -150,10 +147,10 @@ export async function markMessagesAsRead(
  * Conta mensagens não lidas em uma conversa
  */
 export async function getUnreadCount(
+  supabase: SupabaseClient,
   conversationId: string,
   userId: string
 ): Promise<number> {
-  const supabase = createClient();
 
   const { count, error } = await supabase
     .from('messages')
@@ -174,9 +171,9 @@ export async function getUnreadCount(
  * Busca conversas do usuário
  */
 export async function getUserConversations(
+  supabase: SupabaseClient,
   userId: string
 ): Promise<Conversation[]> {
-  const supabase = createClient();
 
   const { data: conversations, error } = await supabase
     .from('conversations')
