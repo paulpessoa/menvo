@@ -31,6 +31,7 @@ export function ChatInterface({
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [realtimeStatus, setRealtimeStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const supabase = createClient();
 
@@ -48,9 +49,15 @@ export function ChatInterface({
     useEffect(() => {
         if (!conversationId) return;
 
+        console.log('[CHAT] 🔌 Subscrevendo ao Realtime para conversa:', conversationId);
+
         // Criar subscription para novas mensagens
         const channel = supabase
-            .channel(`conversation:${conversationId}`)
+            .channel(`conversation:${conversationId}`, {
+                config: {
+                    broadcast: { self: true },
+                },
+            })
             .on(
                 'postgres_changes',
                 {
@@ -59,15 +66,40 @@ export function ChatInterface({
                     table: 'messages',
                     filter: `conversation_id=eq.${conversationId}`,
                 },
-                (payload) => {
+                (payload: any) => {
+                    console.log('[CHAT] 🔥 REALTIME DISPAROU! Nova mensagem:', payload);
                     const newMessage = payload.new as Message;
-                    setMessages((prev) => [...prev, newMessage]);
+
+                    // Evitar duplicatas
+                    setMessages((prev) => {
+                        const exists = prev.some(m => m.id === newMessage.id);
+                        if (exists) {
+                            console.log('[CHAT] ⚠️ Mensagem duplicada, ignorando');
+                            return prev;
+                        }
+                        console.log('[CHAT] ✅ Adicionando mensagem ao estado');
+                        return [...prev, newMessage];
+                    });
                 }
             )
-            .subscribe();
+            .subscribe((status, err) => {
+                console.log('[CHAT] 📡 Status da subscription:', status);
+                if (err) console.error('[CHAT] ❌ Erro:', err);
+
+                if (status === 'SUBSCRIBED') {
+                    console.log('[CHAT] ✅ REALTIME CONECTADO!');
+                    setRealtimeStatus('connected');
+                } else if (status === 'CLOSED') {
+                    console.log('[CHAT] ❌ REALTIME DESCONECTADO');
+                    setRealtimeStatus('disconnected');
+                } else {
+                    setRealtimeStatus('connecting');
+                }
+            });
 
         // Cleanup: unsubscribe ao desmontar
         return () => {
+            console.log('[CHAT] Removendo subscription');
             supabase.removeChannel(channel);
         };
     }, [conversationId]);
@@ -75,6 +107,7 @@ export function ChatInterface({
     const loadMessages = async () => {
         try {
             setLoading(true);
+            console.log('[CHAT] Carregando mensagens para mentorId:', mentorId, 'currentUserId:', currentUserId);
             const response = await fetch(`/api/chat/messages/${mentorId}`);
 
             if (!response.ok) {
@@ -82,6 +115,8 @@ export function ChatInterface({
             }
 
             const data = await response.json();
+            console.log('[CHAT] Dados recebidos:', data);
+            console.log('[CHAT] ConversationId:', data.conversationId);
             setMessages(data.messages || []);
             setConversationId(data.conversationId);
         } catch (error) {
@@ -122,7 +157,26 @@ export function ChatInterface({
                 throw new Error(data.error || 'Erro ao enviar mensagem');
             }
 
-            // A mensagem será adicionada via Realtime
+            const data = await response.json();
+            console.log('[CHAT] Mensagem enviada:', data);
+
+            // Adicionar mensagem otimisticamente (fallback se Realtime falhar)
+            // O Realtime vai adicionar de novo, mas temos proteção contra duplicatas
+            const optimisticMessage: Message = {
+                id: data.messageId,
+                conversation_id: data.conversationId,
+                sender_id: currentUserId,
+                content: messageContent,
+                created_at: new Date().toISOString(),
+            };
+
+            setMessages((prev) => {
+                const exists = prev.some(m => m.id === optimisticMessage.id);
+                if (!exists) {
+                    return [...prev, optimisticMessage];
+                }
+                return prev;
+            });
         } catch (error) {
             console.error('[CHAT] Erro ao enviar mensagem:', error);
             toast.error(error instanceof Error ? error.message : 'Erro ao enviar mensagem');
@@ -161,7 +215,17 @@ export function ChatInterface({
                 )}
                 <div>
                     <h3 className="font-semibold text-gray-900">{mentorName}</h3>
-                    <p className="text-xs text-gray-500">Chat em tempo real</p>
+                    <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${realtimeStatus === 'connected' ? 'bg-green-500' :
+                            realtimeStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' :
+                                'bg-red-500'
+                            }`} />
+                        <p className="text-xs text-gray-500">
+                            {realtimeStatus === 'connected' ? 'Online' :
+                                realtimeStatus === 'connecting' ? 'Conectando...' :
+                                    'Desconectado'}
+                        </p>
+                    </div>
                 </div>
             </div>
 

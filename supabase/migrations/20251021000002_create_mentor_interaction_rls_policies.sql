@@ -342,9 +342,29 @@ CREATE POLICY "Mentors can update their request status"
 -- 8. ENABLE REALTIME FOR CHAT TABLES
 -- =================================================================
 
--- Enable Realtime publications for chat functionality
-ALTER PUBLICATION supabase_realtime ADD TABLE public.conversations;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+-- Enable Realtime publications for chat functionality (only if not already added)
+DO $$
+BEGIN
+  -- Add conversations if not already in publication
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' 
+    AND schemaname = 'public' 
+    AND tablename = 'conversations'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.conversations;
+  END IF;
+  
+  -- Add messages if not already in publication
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' 
+    AND schemaname = 'public' 
+    AND tablename = 'messages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+  END IF;
+END $$;
 
 -- =================================================================
 -- 9. GRANT PERMISSIONS

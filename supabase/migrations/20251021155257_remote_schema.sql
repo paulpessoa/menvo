@@ -1,5 +1,8 @@
 drop trigger if exists "update_user_roles_updated_at" on "public"."user_roles";
 
+-- Drop trigger first, then function
+drop trigger if exists "on_auth_user_deleted_cleanup_mentorship_sessions" on "auth"."users";
+
 drop function if exists "public"."cleanup_mentorship_sessions"();
 
 

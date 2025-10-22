@@ -3,112 +3,108 @@
 import { Suspense, useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, MessageCircle, Clock, User } from "lucide-react"
+import { MessageCircle, ArrowLeft, User } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ChatInterface } from "@/components/chat/ChatInterface"
+import { createClient } from "@/utils/supabase/client"
 
-interface Message {
+interface Conversation {
   id: string
-  sender: {
+  mentor_id: string
+  mentee_id: string
+  last_message_at: string | null
+  created_at: string
+  other_user: {
     id: string
-    name: string
-    avatar?: string
-    role: string
+    full_name: string
+    avatar_url: string | null
+    is_mentor: boolean
   }
-  recipient: {
-    id: string
-    name: string
-    avatar?: string
-    role: string
-  }
-  subject: string
-  preview: string
-  timestamp: string
-  isRead: boolean
-  isImportant: boolean
 }
 
 function MessagesContent() {
   const { user, loading } = useAuth()
-  const [messages, setMessages] = useState<Message[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filter, setFilter] = useState<"all" | "unread" | "important">("all")
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const supabase = createClient()
 
   useEffect(() => {
-    // Simular carregamento de mensagens
-    const loadMessages = async () => {
-      setIsLoading(true)
-      // Aqui você faria a chamada real para a API
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Dados mock para demonstração
-      const mockMessages: Message[] = [
-        {
-          id: "1",
-          sender: {
-            id: "mentor1",
-            name: "Ana Silva",
-            avatar: "/placeholder-user.jpg",
-            role: "mentor",
-          },
-          recipient: {
-            id: user?.id || "current-user",
-            name: "Você",
-            role: "mentee",
-          },
-          subject: "Sessão de mentoria agendada",
-          preview: "Olá! Confirmando nossa sessão de mentoria para amanhã às 14h...",
-          timestamp: "2024-01-15T10:30:00Z",
-          isRead: false,
-          isImportant: true,
-        },
-        {
-          id: "2",
-          sender: {
-            id: "mentee1",
-            name: "João Santos",
-            avatar: "/placeholder-user.jpg",
-            role: "mentee",
-          },
-          recipient: {
-            id: user?.id || "current-user",
-            name: "Você",
-            role: "mentor",
-          },
-          subject: "Dúvida sobre carreira",
-          preview: "Gostaria de conversar sobre transição de carreira...",
-          timestamp: "2024-01-14T16:45:00Z",
-          isRead: true,
-          isImportant: false,
-        },
-      ]
-
-      setMessages(mockMessages)
-      setIsLoading(false)
-    }
-
     if (user) {
-      loadMessages()
+      loadConversations()
     }
   }, [user])
 
-  const filteredMessages = messages.filter((message) => {
-    const matchesSearch =
-      message.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      message.sender.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      message.preview.toLowerCase().includes(searchTerm.toLowerCase())
+  const loadConversations = async () => {
+    if (!user) return
 
-    const matchesFilter =
-      filter === "all" || (filter === "unread" && !message.isRead) || (filter === "important" && message.isImportant)
+    setIsLoading(true)
+    try {
+      // Buscar conversas do usuário
+      const { data: convs, error } = await supabase
+        .from('conversations')
+        .select(`
+          id,
+          mentor_id,
+          mentee_id,
+          last_message_at,
+          created_at
+        `)
+        .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`)
+        .order('last_message_at', { ascending: false, nullsFirst: false })
 
-    return matchesSearch && matchesFilter
-  })
+      if (error) throw error
 
-  const formatTimestamp = (timestamp: string) => {
+      // Para cada conversa, buscar dados do outro usuário
+      const conversationsWithUsers = await Promise.all(
+        (convs || []).map(async (conv) => {
+          // Determinar quem é o "outro usuário" (não é o usuário atual)
+          const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
+          const isMentor = conv.mentor_id === otherUserId
+
+          console.log('[MESSAGES] Conversa:', {
+            conversationId: conv.id,
+            currentUserId: user.id,
+            mentorId: conv.mentor_id,
+            menteeId: conv.mentee_id,
+            otherUserId,
+            isMentor
+          })
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id, first_name, last_name, avatar_url')
+            .eq('id', otherUserId)
+            .single()
+
+          console.log('[MESSAGES] Perfil do outro usuário:', profile)
+
+          return {
+            ...conv,
+            other_user: {
+              id: otherUserId,
+              full_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Usuário',
+              avatar_url: profile?.avatar_url || null,
+              is_mentor: isMentor,
+            },
+          }
+        })
+      )
+
+      setConversations(conversationsWithUsers)
+    } catch (error) {
+      console.error('Erro ao carregar conversas:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const formatTimestamp = (timestamp: string | null) => {
+    if (!timestamp) return 'Agora'
+
     const date = new Date(timestamp)
     const now = new Date()
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
@@ -137,106 +133,86 @@ function MessagesContent() {
     )
   }
 
+  // Se uma conversa está selecionada, mostrar o chat
+  if (selectedConversation) {
+    // O ChatInterface espera mentorId, mas vamos passar sempre o mentor_id da conversa
+    // O nome e avatar são do "outro usuário" (quem está do outro lado da conversa)
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            className="mb-4"
+            onClick={() => setSelectedConversation(null)}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar para conversas
+          </Button>
+
+          <ChatInterface
+            key={selectedConversation.id}
+            mentorId={selectedConversation.other_user.id}
+            currentUserId={user.id}
+            mentorName={selectedConversation.other_user.full_name}
+            mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Mensagens</h1>
-          <p className="text-muted-foreground">Gerencie suas conversas com mentores e mentorados</p>
+          <p className="text-muted-foreground">Suas conversas com mentores e mentorados</p>
         </div>
 
-        {/* Search and filters */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar mensagens..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button variant={filter === "all" ? "default" : "outline"} size="sm" onClick={() => setFilter("all")}>
-              Todas
-            </Button>
-            <Button variant={filter === "unread" ? "default" : "outline"} size="sm" onClick={() => setFilter("unread")}>
-              Não lidas
-            </Button>
-            <Button
-              variant={filter === "important" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setFilter("important")}
-            >
-              Importantes
-            </Button>
-          </div>
-        </div>
-
-        {/* Messages list */}
-        {filteredMessages.length === 0 ? (
+        {/* Conversations list */}
+        {conversations.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
               <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Nenhuma mensagem encontrada</h3>
+              <h3 className="text-lg font-semibold mb-2">Nenhuma conversa ainda</h3>
               <p className="text-muted-foreground">
-                {searchTerm || filter !== "all" ? "Tente ajustar os filtros de busca" : "Você ainda não tem mensagens"}
+                Inicie uma conversa com um mentor para começar!
               </p>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
-            {filteredMessages.map((message) => (
+            {conversations.map((conversation) => (
               <Card
-                key={message.id}
-                className={`cursor-pointer transition-colors hover:bg-muted/50 ${!message.isRead ? "border-l-4 border-l-primary" : ""
-                  }`}
+                key={conversation.id}
+                className="cursor-pointer transition-colors hover:bg-muted/50"
+                onClick={() => setSelectedConversation(conversation)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={message.sender.avatar || "/placeholder.svg"} />
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={conversation.other_user.avatar_url || "/placeholder.svg"} />
                         <AvatarFallback>
-                          <User className="h-4 w-4" />
+                          <User className="h-6 w-6" />
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold">{message.sender.name}</span>
+                          <span className="font-semibold">{conversation.other_user.full_name}</span>
                           <Badge variant="secondary" className="text-xs">
-                            {message.sender.role === "mentor" ? "Mentor" : "Mentorado"}
+                            {conversation.other_user.is_mentor ? "Mentor" : "Mentorado"}
                           </Badge>
                         </div>
-                        <CardTitle className="text-sm font-medium">{message.subject}</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {formatTimestamp(conversation.last_message_at)}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {message.isImportant && (
-                        <Badge variant="destructive" className="text-xs">
-                          Importante
-                        </Badge>
-                      )}
-                      {!message.isRead && <div className="h-2 w-2 bg-primary rounded-full" />}
-                    </div>
+                    <Button size="sm">Abrir chat</Button>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4 line-clamp-2">{message.preview}</p>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {formatTimestamp(message.timestamp)}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        Responder
-                      </Button>
-                      <Button size="sm">Ver conversa</Button>
-                    </div>
-                  </div>
-                </CardContent>
               </Card>
             ))}
           </div>

@@ -26,12 +26,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { mentorId } = params;
     console.log('[CHAT] Buscando conversa entre:', { mentorId, userId: user.id });
 
-    // Buscar ou criar conversa
-    const conversationId = await getOrCreateConversation(mentorId, user.id);
+    // Buscar ou criar conversa (a função agora busca em qualquer ordem)
+    const conversationId = await getOrCreateConversation(supabase, mentorId, user.id);
     console.log('[CHAT] Conversa encontrada/criada:', conversationId);
 
     // Buscar mensagens
-    const messages = await getMessages(conversationId);
+    const messages = await getMessages(supabase, conversationId);
     console.log('[CHAT] Mensagens encontradas:', messages.length);
 
     return NextResponse.json({

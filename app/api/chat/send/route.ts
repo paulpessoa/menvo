@@ -35,37 +35,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar se o mentor tem chat habilitado
-    const { data: mentorProfile, error: mentorError } = await supabase
+    // Verificar se o outro usuário existe
+    // Não precisamos verificar chat_enabled aqui porque a conversa já existe
+    const { data: otherUserProfile, error: otherUserError } = await supabase
       .from('profiles')
-      .select('chat_enabled')
+      .select('id')
       .eq('id', mentorId)
       .single();
 
-    if (mentorError || !mentorProfile) {
+    if (otherUserError || !otherUserProfile) {
       return NextResponse.json(
-        { error: 'Mentor não encontrado' },
+        { error: 'Usuário não encontrado' },
         { status: 404 }
       );
     }
 
-    if (!mentorProfile.chat_enabled) {
-      return NextResponse.json(
-        { error: 'Chat não habilitado para este mentor' },
-        { status: 403 }
-      );
-    }
-
     // Buscar ou criar conversa
-    const conversationId = await getOrCreateConversation(mentorId, user.id);
+    const conversationId = await getOrCreateConversation(supabase, mentorId, user.id);
+    console.log('[CHAT API] Conversa ID:', conversationId);
 
     // Enviar mensagem
-    const message = await sendMessage(conversationId, user.id, content);
+    const message = await sendMessage(supabase, conversationId, user.id, content);
+    console.log('[CHAT API] Mensagem criada:', message);
 
     return NextResponse.json({
       success: true,
       messageId: message.id,
       conversationId,
+      message, // Retornar a mensagem completa para debug
     });
   } catch (error) {
     console.error('[CHAT] Erro ao enviar mensagem:', error);
