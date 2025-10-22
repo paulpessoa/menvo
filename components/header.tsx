@@ -19,6 +19,7 @@ import {
   HeartHandshake,
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
+import { MessagesBadge } from "@/components/MessagesBadge"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -111,7 +112,11 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          {/* Messages Badge */}
+          <MessagesBadge />
+
+          {/* Language Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1">

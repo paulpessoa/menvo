@@ -17,6 +17,7 @@ interface Conversation {
   mentee_id: string
   last_message_at: string | null
   created_at: string
+  unread_count: number
   other_user: {
     id: string
     full_name: string
@@ -58,32 +59,31 @@ function MessagesContent() {
 
       if (error) throw error
 
-      // Para cada conversa, buscar dados do outro usuário
+      // Para cada conversa, buscar dados do outro usuário e contar não lidas
       const conversationsWithUsers = await Promise.all(
         (convs || []).map(async (conv) => {
           // Determinar quem é o "outro usuário" (não é o usuário atual)
           const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
           const isMentor = conv.mentor_id === otherUserId
 
-          console.log('[MESSAGES] Conversa:', {
-            conversationId: conv.id,
-            currentUserId: user.id,
-            mentorId: conv.mentor_id,
-            menteeId: conv.mentee_id,
-            otherUserId,
-            isMentor
-          })
-
+          // Buscar perfil do outro usuário
           const { data: profile } = await supabase
             .from('profiles')
             .select('id, first_name, last_name, avatar_url')
             .eq('id', otherUserId)
             .single()
 
-          console.log('[MESSAGES] Perfil do outro usuário:', profile)
+          // Contar mensagens não lidas (mensagens que não são minhas e não foram lidas)
+          const { count: unreadCount } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('conversation_id', conv.id)
+            .neq('sender_id', user.id)
+            .is('read_at', null)
 
           return {
             ...conv,
+            unread_count: unreadCount || 0,
             other_user: {
               id: otherUserId,
               full_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Usuário',
@@ -186,21 +186,31 @@ function MessagesContent() {
             {conversations.map((conversation) => (
               <Card
                 key={conversation.id}
-                className="cursor-pointer transition-colors hover:bg-muted/50"
+                className={`cursor-pointer transition-colors hover:bg-muted/50 ${conversation.unread_count > 0 ? 'border-l-4 border-l-indigo-600' : ''
+                  }`}
                 onClick={() => setSelectedConversation(conversation)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={conversation.other_user.avatar_url || "/placeholder.svg"} />
-                        <AvatarFallback>
-                          <User className="h-6 w-6" />
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="relative">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={conversation.other_user.avatar_url || "/placeholder.svg"} />
+                          <AvatarFallback>
+                            <User className="h-6 w-6" />
+                          </AvatarFallback>
+                        </Avatar>
+                        {conversation.unread_count > 0 && (
+                          <div className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                            {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
+                          </div>
+                        )}
+                      </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold">{conversation.other_user.full_name}</span>
+                          <span className={`font-semibold ${conversation.unread_count > 0 ? 'text-indigo-600' : ''}`}>
+                            {conversation.other_user.full_name}
+                          </span>
                           <Badge variant="secondary" className="text-xs">
                             {conversation.other_user.is_mentor ? "Mentor" : "Mentorado"}
                           </Badge>
@@ -210,7 +220,14 @@ function MessagesContent() {
                         </p>
                       </div>
                     </div>
-                    <Button size="sm">Abrir chat</Button>
+                    <div className="flex items-center gap-2">
+                      {conversation.unread_count > 0 && (
+                        <Badge variant="default" className="bg-indigo-600">
+                          {conversation.unread_count} nova{conversation.unread_count > 1 ? 's' : ''}
+                        </Badge>
+                      )}
+                      <Button size="sm">Abrir chat</Button>
+                    </div>
                   </div>
                 </CardHeader>
               </Card>
