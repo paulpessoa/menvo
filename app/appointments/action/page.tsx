@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,10 +24,10 @@ export default function AppointmentActionPage() {
         setError('');
 
         try {
-            const response = await fetch(`/api/appointments/${action}`, {
+            const response = await fetch('/api/appointments/action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, reason }),
+                body: JSON.stringify({ token, action, reason }),
             });
 
             const data = await response.json();
