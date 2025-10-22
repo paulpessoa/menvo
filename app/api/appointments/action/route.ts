@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
-interface RouteParams {
-  params: {
-    action: 'confirm' | 'cancel';
-  };
-}
-
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { action } = params;
     const body = await request.json();
-    const { token, reason } = body;
+    const { token, action, reason } = body;
 
-    if (!token) {
-      return NextResponse.json({ error: 'Token é obrigatório' }, { status: 400 });
+    if (!token || !action) {
+      return NextResponse.json({ error: 'Token e ação são obrigatórios' }, { status: 400 });
+    }
+
+    if (!['confirm', 'cancel'].includes(action)) {
+      return NextResponse.json({ error: 'Ação inválida' }, { status: 400 });
     }
 
     // Buscar appointment pelo token
