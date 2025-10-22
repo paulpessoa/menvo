@@ -77,7 +77,7 @@ export function ScheduleMentorshipModal({
                 setDuration(60);
                 setMessage('');
                 setSuccess(false);
-            }, 2000);
+            }, 5000);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Erro ao agendar mentoria');
         } finally {
