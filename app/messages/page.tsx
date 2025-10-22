@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { MessageCircle, ArrowLeft, User } from "lucide-react"
+import { MessageCircle, ArrowLeft, User, Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/chat/ChatInterface"
@@ -31,6 +32,7 @@ function MessagesContent() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -161,6 +163,11 @@ function MessagesContent() {
     )
   }
 
+  // Filtrar conversas pela busca
+  const filteredConversations = conversations.filter((conv) =>
+    conv.other_user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -170,20 +177,37 @@ function MessagesContent() {
           <p className="text-muted-foreground">Suas conversas com mentores e mentorados</p>
         </div>
 
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar conversas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+
         {/* Conversations list */}
-        {conversations.length === 0 ? (
+        {filteredConversations.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
               <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">Nenhuma conversa ainda</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                {searchTerm ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
+              </h3>
               <p className="text-muted-foreground">
-                Inicie uma conversa com um mentor para começar!
+                {searchTerm
+                  ? 'Tente buscar por outro nome'
+                  : 'Inicie uma conversa com um mentor para começar!'}
               </p>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
-            {conversations.map((conversation) => (
+            {filteredConversations.map((conversation) => (
               <Card
                 key={conversation.id}
                 className={`cursor-pointer transition-colors hover:bg-muted/50 ${conversation.unread_count > 0 ? 'border-l-4 border-l-indigo-600' : ''
