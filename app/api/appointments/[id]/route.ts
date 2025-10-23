@@ -186,10 +186,24 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         });
 
         if (!confirmResponse.ok) {
-          const errorData = await confirmResponse.json();
-          console.error('❌ [PATCH APPOINTMENT] Confirmation flow error:', errorData);
+          const errorText = await confirmResponse.text();
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { error: errorText };
+          }
+          console.error('❌ [PATCH APPOINTMENT] Confirmation flow error:', {
+            status: confirmResponse.status,
+            statusText: confirmResponse.statusText,
+            error: errorData,
+          });
           return NextResponse.json(
-            { error: 'Failed to confirm appointment', details: errorData },
+            { 
+              error: 'Failed to trigger confirmation flow', 
+              details: errorData,
+              status: confirmResponse.status,
+            },
             { status: 500 }
           );
         }
