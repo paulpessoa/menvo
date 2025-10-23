@@ -11,12 +11,16 @@ const CLIENT_ID = process.env.GOOGLE_CALENDAR_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CALENDAR_CLIENT_SECRET;
 
 // IMPORTANTE: Use uma URI que JÁ ESTÁ configurada no Google Cloud Console
-// Opções que você provavelmente já tem:
+// Baseado na imagem que você mostrou, estas URIs estão configuradas:
 const REDIRECT_URIS = [
-  'https://menvo.com.br/auth/callback',
   'https://menvo.com.br/auth/userinfo.email',
+  'https://menvo.com.br',
+  'https://evxrzmzkghshjmmyegxu.supabase.co',
   'https://menvo.com.br/auth/userinfo.profile',
+  'https://evxrzmzkghshjmmyegxu.supabase.co/auth/v1/callback',
+  'https://menvo.com.br/api/auth/google-calendar/callback',
   'http://localhost:3000/api/auth/google-calendar/callback',
+  'http://localhost:3000/api/calendar/test',
 ];
 
 console.log('🔐 GERADOR DE REFRESH TOKEN - PRODUÇÃO (Simplificado)');
