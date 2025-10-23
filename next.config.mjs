@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['@supabase/supabase-js'],
+  serverExternalPackages: ['@supabase/supabase-js', 'googleapis', 'google-auth-library'],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

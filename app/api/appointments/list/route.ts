@@ -3,17 +3,20 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
+      console.error('❌ [APPOINTMENTS] Auth error:', authError);
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
+
+    console.log('✅ [APPOINTMENTS] User authenticated:', user.id);
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status'); // pending, confirmed, cancelled, completed
@@ -47,15 +50,20 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
+    console.log('🔍 [APPOINTMENTS] Query params:', { role, status, limit, offset });
+
     const { data: appointments, error: appointmentsError } = await query;
 
     if (appointmentsError) {
-      console.error('Error fetching appointments:', appointmentsError);
+      console.error('❌ [APPOINTMENTS] Error fetching appointments:', appointmentsError);
+      console.error('   Details:', JSON.stringify(appointmentsError, null, 2));
       return NextResponse.json(
-        { error: 'Failed to fetch appointments' },
+        { error: 'Failed to fetch appointments', details: appointmentsError.message },
         { status: 500 }
       );
     }
+
+    console.log('✅ [APPOINTMENTS] Found:', appointments?.length || 0, 'appointments');
 
     // Get total count for pagination
     let countQuery = supabase

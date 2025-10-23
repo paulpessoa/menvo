@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createCalendarEvent } from '@/lib/google-calendar';
 import { CreateAppointmentRequest } from '@/types/appointments';
 
 export async function POST(request: NextRequest) {
@@ -100,52 +99,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create calendar event
+    // Note: Calendar event will be created when mentor confirms the appointment
+    // This allows mentor to add notes before creating the event
     let googleEventId: string | undefined;
     let googleMeetLink: string | undefined;
-
-    try {
-      const calendarEvent = {
-        summary: `Mentoria: ${mentorProfile.full_name || mentorProfile.first_name} & ${menteeProfile.full_name || menteeProfile.first_name}`,
-        description: `Sessão de mentoria agendada através da plataforma.\n\n${message ? `Mensagem do mentee: ${message}` : ''}`,
-        start: {
-          dateTime: scheduledDate.toISOString(),
-          timeZone: 'America/Sao_Paulo',
-        },
-        end: {
-          dateTime: endTime.toISOString(),
-          timeZone: 'America/Sao_Paulo',
-        },
-        attendees: [
-          {
-            email: mentorProfile.email,
-            displayName: mentorProfile.full_name || `${mentorProfile.first_name} ${mentorProfile.last_name}`,
-          },
-          {
-            email: menteeProfile.email,
-            displayName: menteeProfile.full_name || `${menteeProfile.first_name} ${menteeProfile.last_name}`,
-          },
-        ],
-      };
-
-      const calendarResult = await createCalendarEvent(calendarEvent);
-      googleEventId = calendarResult.id;
-      
-      // Extract Google Meet link
-      if (calendarResult.hangoutLink) {
-        googleMeetLink = calendarResult.hangoutLink;
-      } else if (calendarResult.conferenceData?.entryPoints) {
-        const meetEntry = calendarResult.conferenceData.entryPoints.find(
-          entry => entry.entryPointType === 'video'
-        );
-        if (meetEntry) {
-          googleMeetLink = meetEntry.uri;
-        }
-      }
-    } catch (calendarError) {
-      console.error('Error creating calendar event:', calendarError);
-      // Continue without calendar event - we can create it later
-    }
 
     // Create appointment in database
     const { data: appointment, error: appointmentError } = await supabase

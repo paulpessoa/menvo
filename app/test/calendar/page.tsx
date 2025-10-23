@@ -1,195 +1,203 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { CheckCircle2, XCircle, AlertCircle, Calendar, Loader2 } from 'lucide-react'
 
-export default function CalendarTestPage() {
-    const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState<any>(null);
+export default function TestCalendarPage() {
+    const [testing, setTesting] = useState(false)
+    const [result, setResult] = useState<any>(null)
 
     const testCalendarIntegration = async () => {
-        try {
-            setLoading(true);
-            setResult(null);
+        setTesting(true)
+        setResult(null)
 
+        try {
             const response = await fetch('/api/calendar/test', {
                 method: 'POST',
-            });
+            })
 
-            const data = await response.json();
+            const data = await response.json()
 
-            if (response.ok) {
-                setResult(data);
-                toast.success('Evento de teste criado com sucesso!');
-            } else {
-                throw new Error(data.error || 'Erro desconhecido');
-            }
+            setResult({
+                success: response.ok,
+                data,
+                status: response.status,
+            })
         } catch (error) {
-            console.error('Error testing calendar:', error);
-            toast.error(error instanceof Error ? error.message : 'Erro ao testar integração');
-            setResult({ success: false, error: error instanceof Error ? error.message : 'Erro desconhecido' });
+            setResult({
+                success: false,
+                data: { error: error instanceof Error ? error.message : 'Erro desconhecido' },
+                status: 500,
+            })
         } finally {
-            setLoading(false);
+            setTesting(false)
         }
-    };
-
-    const getAuthUrl = async () => {
-        try {
-            const response = await fetch('/api/auth/google-calendar/authorize');
-            const data = await response.json();
-
-            if (response.ok && data.authUrl) {
-                window.open(data.authUrl, '_blank');
-            } else {
-                toast.error('Erro ao gerar URL de autorização');
-            }
-        } catch (error) {
-            console.error('Error getting auth URL:', error);
-            toast.error('Erro ao gerar URL de autorização');
-        }
-    };
+    }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="max-w-2xl mx-auto space-y-6">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold mb-2">Teste da Integração Google Calendar</h1>
-                    <p className="text-muted-foreground">
-                        Teste a configuração da API do Google Calendar
+        <div className="container max-w-4xl mx-auto py-10 px-4">
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-3xl font-bold">Teste de Integração - Google Calendar</h1>
+                    <p className="text-muted-foreground mt-2">
+                        Verifique se a integração com Google Calendar está funcionando corretamente
                     </p>
                 </div>
 
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Calendar className="h-5 w-5" />
-                            Configuração da API
+                            <Calendar className="w-5 h-5" />
+                            Teste de Criação de Evento
                         </CardTitle>
                         <CardDescription>
-                            Verifique se a integração com Google Calendar está funcionando
+                            Este teste vai criar um evento de teste no Google Calendar com link do Google Meet
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex gap-3">
-                            <Button onClick={getAuthUrl} variant="outline">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Autorizar Google Calendar
-                            </Button>
-
-                            <Button onClick={testCalendarIntegration} disabled={loading}>
-                                {loading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                        Testando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Calendar className="h-4 w-4 mr-2" />
-                                        Testar Integração
-                                    </>
-                                )}
-                            </Button>
-                        </div>
+                        <Button
+                            onClick={testCalendarIntegration}
+                            disabled={testing}
+                            className="w-full"
+                        >
+                            {testing ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Testando...
+                                </>
+                            ) : (
+                                <>
+                                    <Calendar className="w-4 h-4 mr-2" />
+                                    Testar Integração
+                                </>
+                            )}
+                        </Button>
 
                         {result && (
-                            <div className="mt-6 p-4 rounded-lg border">
-                                <div className="flex items-center gap-2 mb-3">
-                                    {result.success ? (
-                                        <CheckCircle className="h-5 w-5 text-green-500" />
-                                    ) : (
-                                        <XCircle className="h-5 w-5 text-red-500" />
-                                    )}
-                                    <span className="font-medium">
-                                        {result.success ? 'Sucesso!' : 'Erro'}
-                                    </span>
-                                </div>
-
+                            <Alert variant={result.success ? 'default' : 'destructive'}>
                                 {result.success ? (
-                                    <div className="space-y-2 text-sm">
-                                        <p><strong>Event ID:</strong> {result.event.id}</p>
-                                        <p><strong>HTML Link:</strong>
-                                            <a
-                                                href={result.event.htmlLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-500 hover:underline ml-1"
-                                            >
-                                                Ver no Google Calendar
-                                            </a>
-                                        </p>
-                                        {result.event.hangoutLink && (
-                                            <p><strong>Google Meet:</strong>
-                                                <a
-                                                    href={result.event.hangoutLink}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-500 hover:underline ml-1"
-                                                >
-                                                    Entrar na reunião
-                                                </a>
-                                            </p>
-                                        )}
-                                    </div>
+                                    <CheckCircle2 className="h-4 w-4" />
                                 ) : (
-                                    <div className="text-sm text-red-600">
-                                        <p><strong>Erro:</strong> {result.error}</p>
-
-                                        {result.error.includes('invalid_grant') && (
-                                            <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
-                                                <p className="font-medium">Como resolver:</p>
-                                                <ol className="list-decimal list-inside mt-1 space-y-1">
-                                                    <li>Clique em "Autorizar Google Calendar" acima</li>
-                                                    <li>Complete o fluxo de autorização</li>
-                                                    <li>Atualize o GOOGLE_CALENDAR_REFRESH_TOKEN no .env.local</li>
-                                                    <li>Teste novamente</li>
-                                                </ol>
-                                            </div>
+                                    <XCircle className="h-4 w-4" />
+                                )}
+                                <AlertTitle>
+                                    {result.success ? 'Sucesso!' : 'Erro'}
+                                </AlertTitle>
+                                <AlertDescription>
+                                    <div className="mt-2 space-y-2">
+                                        {result.success ? (
+                                            <>
+                                                <p className="font-medium">Evento criado com sucesso!</p>
+                                                {result.data.event?.htmlLink && (
+                                                    <a
+                                                        href={result.data.event.htmlLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:underline block"
+                                                    >
+                                                        Ver evento no Google Calendar →
+                                                    </a>
+                                                )}
+                                                {result.data.event?.hangoutLink && (
+                                                    <a
+                                                        href={result.data.event.hangoutLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:underline block"
+                                                    >
+                                                        Entrar no Google Meet →
+                                                    </a>
+                                                )}
+                                                <pre className="mt-4 p-3 bg-gray-100 rounded text-xs overflow-auto">
+                                                    {JSON.stringify(result.data, null, 2)}
+                                                </pre>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="font-medium">Falha ao criar evento</p>
+                                                <p className="text-sm">{result.data.error}</p>
+                                                <pre className="mt-4 p-3 bg-gray-100 rounded text-xs overflow-auto">
+                                                    {JSON.stringify(result.data, null, 2)}
+                                                </pre>
+                                            </>
                                         )}
                                     </div>
-                                )}
-                            </div>
+                                </AlertDescription>
+                            </Alert>
                         )}
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Instruções de Configuração</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5" />
+                            Instruções de Configuração
+                        </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-3 text-sm">
-                        <div>
-                            <h4 className="font-medium">1. Variáveis de Ambiente Necessárias:</h4>
-                            <ul className="list-disc list-inside ml-4 space-y-1 text-muted-foreground">
-                                <li>GOOGLE_CALENDAR_CLIENT_ID</li>
-                                <li>GOOGLE_CALENDAR_CLIENT_SECRET</li>
-                                <li>GOOGLE_CALENDAR_REFRESH_TOKEN</li>
-                                <li>GOOGLE_CALENDAR_REDIRECT_URI</li>
-                            </ul>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">1. Configure as variáveis de ambiente</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Adicione no seu <code className="bg-gray-100 px-1 rounded">.env.local</code>:
+                            </p>
+                            <pre className="p-3 bg-gray-100 rounded text-xs overflow-auto">
+                                {`GOOGLE_CALENDAR_CLIENT_ID=seu_client_id
+GOOGLE_CALENDAR_CLIENT_SECRET=seu_client_secret
+GOOGLE_CALENDAR_REDIRECT_URI=http://localhost:3000/api/auth/google-calendar/callback
+GOOGLE_CALENDAR_REFRESH_TOKEN=seu_refresh_token`}
+                            </pre>
                         </div>
 
-                        <div>
-                            <h4 className="font-medium">2. Para obter as credenciais:</h4>
-                            <ol className="list-decimal list-inside ml-4 space-y-1 text-muted-foreground">
-                                <li>Acesse o Google Cloud Console</li>
-                                <li>Ative a Google Calendar API</li>
-                                <li>Crie credenciais OAuth 2.0</li>
-                                <li>Configure a tela de consentimento</li>
-                                <li>Use o botão "Autorizar" acima para obter o refresh token</li>
-                            </ol>
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">2. Gere o refresh token</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Execute o script para gerar o refresh token:
+                            </p>
+                            <pre className="p-3 bg-gray-100 rounded text-xs">
+                                node scripts/generate-refresh-token.js
+                            </pre>
                         </div>
 
-                        <div>
-                            <h4 className="font-medium">3. Documentação completa:</h4>
-                            <p className="text-muted-foreground ml-4">
-                                Consulte o arquivo <code>docs/google-calendar-setup.md</code> para instruções detalhadas.
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">3. Reinicie o servidor</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Após adicionar as variáveis, reinicie o servidor de desenvolvimento
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <h3 className="font-semibold">4. Teste a integração</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Clique no botão "Testar Integração" acima
                             </p>
                         </div>
                     </CardContent>
                 </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Documentação</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                        <a
+                            href="/GUIA_SETUP_GOOGLE_CALENDAR.md"
+                            className="text-blue-600 hover:underline block"
+                        >
+                            📖 Guia Completo de Configuração
+                        </a>
+                        <a
+                            href="/RELATORIO_GOOGLE_CALENDAR.md"
+                            className="text-blue-600 hover:underline block"
+                        >
+                            📊 Relatório de Análise da Integração
+                        </a>
+                    </CardContent>
+                </Card>
             </div>
         </div>
-    );
+    )
 }
