@@ -12,7 +12,7 @@ import EventFilters from "@/components/events/event-filters"
 import EventMap from "@/components/events/event-map"
 import EventCard from "@/components/events/event-card"
 import EventCalendar from "@/components/events/event-calendar"
-import { mockEvents } from "@/data/mock-eventss"
+import { mockEvents } from "@/data/mock-events"
 
 export default function EventsPage() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list")
