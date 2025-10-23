@@ -6,6 +6,15 @@ import { createCalendarEvent, isGoogleCalendarConfigured } from '@/lib/services/
 
 export async function POST(request: NextRequest) {
   try {
+    // Debug: Verificar variáveis de ambiente
+    console.log('🔍 [CONFIRM] Verificando env vars:', {
+      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasGoogleClientId: !!process.env.GOOGLE_CALENDAR_CLIENT_ID,
+      hasGoogleSecret: !!process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+      hasGoogleRefreshToken: !!process.env.GOOGLE_CALENDAR_REFRESH_TOKEN,
+    });
+
     // Usar Service Role para bypass RLS (chamada interna)
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
