@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
+import { deleteCalendarEvent } from '@/lib/services/google-calendar.service';
 
 interface RouteParams {
   params: {
@@ -10,7 +10,7 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -22,7 +22,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const appointmentId = params.id;
+    // Await params (Next.js 15 requirement)
+    const { id } = await params;
+    const appointmentId = id;
 
     // Get appointment with profiles
     const { data: appointment, error: appointmentError } = await supabase
@@ -66,21 +68,28 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
+      console.error('❌ [PATCH APPOINTMENT] Auth error:', authError);
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    const appointmentId = params.id;
+    // Await params (Next.js 15 requirement)
+    const { id } = await params;
+    const appointmentId = id;
+    console.log('🔄 [PATCH APPOINTMENT] ID:', appointmentId, 'User:', user.id);
+    
     const body = await request.json();
     const { status, notes } = body;
+    
+    console.log('📝 [PATCH APPOINTMENT] Body:', { status, notes });
 
     // Validate status
     const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
@@ -92,18 +101,39 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get current appointment
+    console.log('🔍 [PATCH APPOINTMENT] Buscando appointment ID:', appointmentId);
+    
     const { data: currentAppointment, error: fetchError } = await supabase
       .from('appointments')
       .select('*')
       .eq('id', appointmentId)
       .single();
 
-    if (fetchError || !currentAppointment) {
+    if (fetchError) {
+      console.error('❌ [PATCH APPOINTMENT] Erro ao buscar:', fetchError);
+    }
+
+    if (!currentAppointment) {
+      console.error('❌ [PATCH APPOINTMENT] Appointment não encontrado. ID:', appointmentId);
+      
+      // Debug: listar todos os appointments
+      const { data: allAppointments } = await supabase
+        .from('appointments')
+        .select('id, status')
+        .limit(10);
+      
+      console.log('📋 [PATCH APPOINTMENT] Appointments disponíveis:', allAppointments);
+      
       return NextResponse.json(
-        { error: 'Appointment not found' },
+        { error: 'Appointment not found', availableIds: allAppointments?.map(a => a.id) },
         { status: 404 }
       );
     }
+
+    console.log('✅ [PATCH APPOINTMENT] Appointment encontrado:', {
+      id: currentAppointment.id,
+      status: currentAppointment.status,
+    });
 
     // Check if user is involved in this appointment
     if (currentAppointment.mentor_id !== user.id && currentAppointment.mentee_id !== user.id) {
@@ -128,56 +158,70 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Handle status change to confirmed - trigger full confirmation flow
     if (status === 'confirmed' && currentAppointment.status === 'pending') {
-      // Update status first
-      const { error: statusUpdateError } = await supabase
-        .from('appointments')
-        .update({ status: 'confirmed' })
-        .eq('id', appointmentId);
-
-      if (statusUpdateError) {
-        console.error('Error updating status:', statusUpdateError);
-        return NextResponse.json(
-          { error: 'Failed to update status' },
-          { status: 500 }
-        );
-      }
-
+      console.log('✅ [PATCH APPOINTMENT] Confirming appointment...');
+      console.log('📋 [PATCH APPOINTMENT] Current appointment:', {
+        id: currentAppointment.id,
+        mentor_id: currentAppointment.mentor_id,
+        mentee_id: currentAppointment.mentee_id,
+        status: currentAppointment.status,
+      });
+      
+      // NÃO atualizar o status ainda - deixar o /confirm fazer isso
       // Trigger confirmation flow (Google Calendar + emails)
+      console.log('🔄 [PATCH APPOINTMENT] Triggering confirmation flow...');
+      
       try {
-        const confirmResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/appointments/confirm`, {
+        const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments/confirm`;
+        console.log('📞 [PATCH APPOINTMENT] Calling:', confirmUrl);
+        
+        const confirmResponse = await fetch(confirmUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            appointmentId: parseInt(appointmentId),
+            appointmentId: appointmentId,
+            mentorNotes: notes, // Passar as notas do mentor
           }),
         });
 
         if (!confirmResponse.ok) {
-          console.error('Error in confirmation flow');
+          const errorData = await confirmResponse.json();
+          console.error('❌ [PATCH APPOINTMENT] Confirmation flow error:', errorData);
+          return NextResponse.json(
+            { error: 'Failed to confirm appointment', details: errorData },
+            { status: 500 }
+          );
         }
+        
+        const successData = await confirmResponse.json();
+        console.log('✅ [PATCH APPOINTMENT] Confirmation flow success:', successData);
+        
+        // Buscar appointment atualizado
+        const { data: confirmedAppointment } = await supabase
+          .from('appointments')
+          .select(`
+            *,
+            mentor:mentor_id(id, email, first_name, last_name, full_name, avatar_url),
+            mentee:mentee_id(id, email, first_name, last_name, full_name, avatar_url)
+          `)
+          .eq('id', appointmentId)
+          .single();
+
+        return NextResponse.json({
+          success: true,
+          appointment: confirmedAppointment,
+          googleMeetLink: successData.googleMeetLink,
+          message: 'Appointment confirmed successfully',
+        });
+        
       } catch (confirmError) {
-        console.error('Error triggering confirmation:', confirmError);
-        // Don't fail the request, status is already updated
+        console.error('❌ [PATCH APPOINTMENT] Error triggering confirmation:', confirmError);
+        return NextResponse.json(
+          { error: 'Failed to trigger confirmation flow' },
+          { status: 500 }
+        );
       }
-
-      // Return early since we already updated
-      const { data: confirmedAppointment } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          mentor:mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-          mentee:mentee_id(id, email, first_name, last_name, full_name, avatar_url)
-        `)
-        .eq('id', appointmentId)
-        .single();
-
-      return NextResponse.json({
-        success: true,
-        appointment: confirmedAppointment,
-        message: 'Appointment confirmed successfully',
-      });
     }
 
     // Handle calendar event updates for other status changes
@@ -230,7 +274,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -242,7 +286,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const appointmentId = params.id;
+    // Await params (Next.js 15 requirement)
+    const { id } = await params;
+    const appointmentId = id;
 
     // Get current appointment
     const { data: appointment, error: fetchError } = await supabase

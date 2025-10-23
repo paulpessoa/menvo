@@ -65,9 +65,13 @@ export default function AppointmentsList({
 
     const updateAppointmentStatus = async (appointmentId: number, newStatus: string) => {
         try {
+            console.log('🔄 [FRONTEND] Updating appointment:', appointmentId, 'to status:', newStatus);
             setUpdating(appointmentId);
 
-            const response = await fetch(`/api/appointments/${appointmentId}`, {
+            const url = `/api/appointments/${appointmentId}`;
+            console.log('📞 [FRONTEND] Calling:', url);
+
+            const response = await fetch(url, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

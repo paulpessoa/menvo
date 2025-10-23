@@ -1,5 +1,24 @@
 import { NextResponse } from 'next/server';
-import { getAuthUrl } from '@/lib/google-calendar';
+import { OAuth2Client } from 'google-auth-library';
+
+function getAuthUrl(): string {
+  const oauth2Client = new OAuth2Client(
+    process.env.GOOGLE_CALENDAR_CLIENT_ID,
+    process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+    process.env.GOOGLE_CALENDAR_REDIRECT_URI
+  );
+
+  const scopes = [
+    'https://www.googleapis.com/auth/calendar',
+    'https://www.googleapis.com/auth/calendar.events',
+  ];
+
+  return oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    prompt: 'consent',
+  });
+}
 
 export async function GET() {
   try {

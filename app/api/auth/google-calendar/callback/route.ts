@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokensFromCode } from '@/lib/google-calendar';
+import { OAuth2Client } from 'google-auth-library';
 import { saveGoogleCalendarTokens } from '@/lib/google-calendar-db';
 import { supabase } from '@/lib/supabase';
+
+async function getTokensFromCode(code: string) {
+  const oauth2Client = new OAuth2Client(
+    process.env.GOOGLE_CALENDAR_CLIENT_ID,
+    process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+    process.env.GOOGLE_CALENDAR_REDIRECT_URI
+  );
+
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+    return tokens;
+  } catch (error) {
+    console.error('Error getting tokens:', error);
+    throw new Error('Failed to exchange authorization code');
+  }
+}
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

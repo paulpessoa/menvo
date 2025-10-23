@@ -1,80 +1,92 @@
 import { NextResponse } from 'next/server';
-import { createUserGoogleCalendarClient } from '@/lib/google-calendar-db';
-import { supabase } from '@/lib/supabase';
+import { createCalendarEvent, isGoogleCalendarConfigured, getMissingEnvVars } from '@/lib/services/google-calendar.service';
 
 export async function POST() {
   try {
-    // Verificar autenticação
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    // Verificar se está configurado
+    if (!isGoogleCalendarConfigured()) {
+      const missing = getMissingEnvVars();
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
+        {
+          success: false,
+          error: 'Google Calendar não configurado',
+          missingEnvVars: missing,
+          instructions: [
+            '1. Configure as variáveis de ambiente no .env.local',
+            '2. Execute: node scripts/generate-refresh-token.js',
+            '3. Adicione o refresh_token no .env.local',
+            '4. Reinicie o servidor',
+          ],
+        },
+        { status: 400 }
       );
     }
 
-    // Obter cliente do Google Calendar do usuário
-    const { calendar } = await createUserGoogleCalendarClient(user.id);
-
     // Criar evento de teste
-    const testEvent = {
-      summary: 'Teste de Integração - Google Calendar',
-      description: 'Este é um evento de teste criado pela integração do MENVO com Google Calendar.',
-      start: {
-        dateTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
-        timeZone: 'America/Sao_Paulo',
-      },
-      end: {
-        dateTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
-        timeZone: 'America/Sao_Paulo',
-      },
-      attendees: [
-        {
-          email: user.email || 'test@example.com',
-          displayName: user.user_metadata?.full_name || 'Usuário Teste',
-        },
-      ],
-      conferenceData: {
-        createRequest: {
-          requestId: `meet-${Date.now()}`,
-          conferenceSolutionKey: {
-            type: 'hangoutsMeet',
-          },
-        },
-      },
+    const now = new Date();
+    const startTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hora a partir de agora
+    const endTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 horas a partir de agora
+
+    const eventData = {
+      summary: '🧪 Teste de Integração - MENVO Calendar',
+      description: `Este é um evento de teste criado pela integração do MENVO com Google Calendar.
+
+📅 Criado em: ${now.toLocaleString('pt-BR')}
+🔧 Ambiente: ${process.env.NODE_ENV || 'development'}
+
+Se você está vendo este evento, significa que a integração está funcionando corretamente! ✅
+
+Você pode deletar este evento com segurança.`,
+      startTime,
+      endTime,
+      mentorEmail: process.env.GOOGLE_CALENDAR_TEST_EMAIL || 'test@example.com',
+      mentorName: 'Mentor Teste',
+      menteeEmail: process.env.GOOGLE_CALENDAR_TEST_EMAIL || 'test@example.com',
+      menteeName: 'Mentee Teste',
     };
 
-    const response = await calendar.events.insert({
-      calendarId: 'primary',
-      conferenceDataVersion: 1,
-      requestBody: testEvent,
-    });
-
-    const event = response.data;
+    const result = await createCalendarEvent(eventData);
 
     return NextResponse.json({
       success: true,
       message: 'Evento de teste criado com sucesso!',
       event: {
-        id: event.id,
-        htmlLink: event.htmlLink,
-        hangoutLink: event.hangoutLink,
-        conferenceData: event.conferenceData,
+        id: result.eventId,
+        htmlLink: result.calendarLink,
+        hangoutLink: result.meetLink,
       },
+      instructions: [
+        '✅ Verifique seu Google Calendar',
+        '✅ O evento deve aparecer com link do Google Meet',
+        '✅ Você pode deletar este evento de teste',
+      ],
     });
+
   } catch (error) {
     console.error('Error creating test event:', error);
-    
+
     let errorMessage = 'Erro desconhecido';
+    let errorDetails = null;
+
     if (error instanceof Error) {
       errorMessage = error.message;
+      errorDetails = {
+        name: error.name,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      };
     }
 
     return NextResponse.json(
       {
         success: false,
         error: errorMessage,
+        details: errorDetails,
+        troubleshooting: [
+          'Verifique se todas as variáveis de ambiente estão configuradas',
+          'Verifique se o refresh_token é válido',
+          'Execute: node scripts/generate-refresh-token.js para gerar novo token',
+          'Verifique os logs do servidor para mais detalhes',
+        ],
       },
       { status: 500 }
     );
@@ -82,8 +94,17 @@ export async function POST() {
 }
 
 export async function GET() {
+  const configured = isGoogleCalendarConfigured();
+  const missing = getMissingEnvVars();
+
   return NextResponse.json({
     message: 'Google Calendar API test endpoint',
-    instructions: 'Send a POST request to create a test event',
+    configured,
+    missingEnvVars: missing,
+    instructions: {
+      test: 'Send a POST request to this endpoint to create a test event',
+      setup: 'Run: node scripts/generate-refresh-token.js',
+      docs: 'See: /GUIA_SETUP_GOOGLE_CALENDAR.md',
+    },
   });
 }

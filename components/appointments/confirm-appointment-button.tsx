@@ -37,6 +37,8 @@ export function ConfirmAppointmentButton({
     onConfirmed
 }: ConfirmAppointmentButtonProps) {
     const [isConfirming, setIsConfirming] = useState(false)
+    const [mentorNotes, setMentorNotes] = useState('')
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     const formatDateTime = (dateString: string) => {
         const date = new Date(dateString)
@@ -65,6 +67,7 @@ export function ConfirmAppointmentButton({
                 },
                 body: JSON.stringify({
                     appointmentId: appointment.id,
+                    mentorNotes: mentorNotes.trim() || undefined,
                 }),
             })
 
@@ -74,9 +77,19 @@ export function ConfirmAppointmentButton({
                 throw new Error(data.error || 'Erro ao confirmar agendamento')
             }
 
-            toast.success('Agendamento confirmado com sucesso!', {
-                description: 'Um evento foi criado no Google Calendar com link do Meet.',
+            // Mensagem de sucesso baseada no resultado
+            const description = data.googleMeetLink
+                ? 'Um evento foi criado no Google Calendar com link do Meet.'
+                : data.calendarError
+                    ? `Mentoria confirmada, mas houve um problema ao criar o evento: ${data.calendarError}`
+                    : 'Mentoria confirmada com sucesso!';
+
+            toast.success('Agendamento confirmado!', {
+                description,
             })
+
+            setIsDialogOpen(false)
+            setMentorNotes('')
 
             if (onConfirmed) {
                 onConfirmed(data.appointment)
@@ -95,19 +108,20 @@ export function ConfirmAppointmentButton({
     const { date, time } = formatDateTime(appointment.scheduled_at)
 
     return (
-        <AlertDialog>
+        <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
                 <Button
                     variant="default"
                     size="sm"
                     className="bg-green-600 hover:bg-green-700"
+                    onClick={() => setIsDialogOpen(true)}
                 >
                     <Calendar className="w-4 h-4 mr-2" />
                     Confirmar Mentoria
                 </Button>
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-md">
+            <AlertDialogContent className="max-w-lg">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-green-600" />
@@ -115,7 +129,7 @@ export function ConfirmAppointmentButton({
                     </AlertDialogTitle>
                     <AlertDialogDescription asChild>
                         <div className="space-y-4 text-left">
-                            <p>
+                            <p className="text-sm text-gray-600">
                                 Você está prestes a confirmar esta sessão de mentoria.
                                 Um evento será criado automaticamente no Google Calendar com link do Meet.
                             </p>
@@ -147,10 +161,27 @@ export function ConfirmAppointmentButton({
 
                                 {appointment.notes && (
                                     <div className="pt-2 border-t">
-                                        <p className="text-sm font-medium text-gray-700 mb-1">Observações:</p>
-                                        <p className="text-sm text-gray-600">{appointment.notes}</p>
+                                        <p className="text-sm font-medium text-gray-700 mb-1">Mensagem do mentee:</p>
+                                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{appointment.notes}</p>
                                     </div>
                                 )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="mentor-notes" className="text-sm font-medium text-gray-700">
+                                    Observações (opcional)
+                                </label>
+                                <textarea
+                                    id="mentor-notes"
+                                    value={mentorNotes}
+                                    onChange={(e) => setMentorNotes(e.target.value)}
+                                    placeholder="Adicione observações sobre a mentoria, preparação necessária, etc..."
+                                    className="w-full min-h-[100px] p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                                    disabled={isConfirming}
+                                />
+                                <p className="text-xs text-gray-500">
+                                    Estas observações serão incluídas no evento do Google Calendar e visíveis para o mentee.
+                                </p>
                             </div>
                         </div>
                     </AlertDialogDescription>
