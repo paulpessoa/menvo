@@ -1,26 +1,7 @@
--- Fix mentors_view to only show verified mentors with complete profiles
--- This ensures mentors must:
--- 1. Be verified by admin
--- 2. Have complete profile information (name, bio)
+-- Adicionar campo chat_enabled nas views de mentores
+-- Execute este script no SQL Editor do Supabase Dashboard
 
--- First, add verified_at column if it doesn't exist
-DO $$ 
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_schema = 'public' 
-    AND table_name = 'profiles' 
-    AND column_name = 'verified_at'
-  ) THEN
-    ALTER TABLE public.profiles ADD COLUMN verified_at TIMESTAMPTZ;
-    
-    -- Set verified_at for already verified mentors
-    UPDATE public.profiles 
-    SET verified_at = updated_at 
-    WHERE verified = true AND verified_at IS NULL;
-  END IF;
-END $$;
-
+-- 1. Recriar mentors_view com o campo chat_enabled
 DROP VIEW IF EXISTS public.mentors_view CASCADE;
 
 CREATE OR REPLACE VIEW public.mentors_view AS
@@ -50,11 +31,11 @@ SELECT
   
   -- Mentorship specific fields
   p.expertise_areas,
-  p.expertise_areas as mentor_skills, -- Alias for API compatibility
+  p.expertise_areas as mentor_skills,
   p.mentorship_topics,
   p.languages,
   p.inclusive_tags,
-  p.inclusive_tags as inclusion_tags, -- Alias for API compatibility
+  p.inclusive_tags as inclusion_tags,
   p.session_price_usd,
   p.availability_status,
   COALESCE(p.chat_enabled, false) as chat_enabled,
@@ -63,7 +44,7 @@ SELECT
   p.city,
   p.state,
   p.country,
-  COALESCE(p.city, '') as location, -- Alias for API compatibility
+  COALESCE(p.city, '') as location,
   p.timezone,
   
   -- Rating and session fields
@@ -76,10 +57,10 @@ SELECT
   
   -- Availability and status
   (p.availability_status = 'available') as is_available,
-  60 as session_duration, -- Default session duration in minutes
+  60 as session_duration,
   
   -- Role information
-  ARRAY['mentor'] as active_roles, -- Always mentor for this view
+  ARRAY['mentor'] as active_roles,
   
   -- Contact fields
   p.phone,
@@ -91,15 +72,15 @@ FROM public.profiles p
 JOIN public.user_roles ur ON p.id = ur.user_id
 JOIN public.roles r ON ur.role_id = r.id
 WHERE r.name = 'mentor' 
-  AND p.verified = true  -- Must be verified by admin
-  AND p.first_name IS NOT NULL  -- Must have first name
-  AND p.last_name IS NOT NULL  -- Must have last name
-  AND TRIM(p.first_name) != ''  -- First name must not be empty
-  AND TRIM(p.last_name) != ''  -- Last name must not be empty
-  AND p.bio IS NOT NULL  -- Must have bio
-  AND LENGTH(TRIM(p.bio)) > 0;  -- Bio must not be empty
+  AND p.verified = true
+  AND p.first_name IS NOT NULL
+  AND p.last_name IS NOT NULL
+  AND TRIM(p.first_name) != ''
+  AND TRIM(p.last_name) != ''
+  AND p.bio IS NOT NULL
+  AND LENGTH(TRIM(p.bio)) > 0;
 
--- Create/update admin view for all mentors (for admin panel)
+-- 2. Recriar mentors_admin_view com o campo chat_enabled
 DROP VIEW IF EXISTS public.mentors_admin_view CASCADE;
 
 CREATE OR REPLACE VIEW public.mentors_admin_view AS
@@ -162,10 +143,14 @@ JOIN public.user_roles ur ON p.id = ur.user_id
 JOIN public.roles r ON ur.role_id = r.id
 WHERE r.name = 'mentor';
 
--- Add comments for documentation
+-- 3. Adicionar comentários
 COMMENT ON VIEW public.mentors_view IS 'Public view of verified mentors with complete profiles - safe for public consumption';
 COMMENT ON VIEW public.mentors_admin_view IS 'Admin view of all mentors with profile status - for admin panel use';
 
--- Grant appropriate permissions
+-- 4. Garantir permissões
 GRANT SELECT ON public.mentors_view TO anon, authenticated, service_role;
 GRANT SELECT ON public.mentors_admin_view TO authenticated, service_role;
+
+-- 5. Verificar se funcionou
+SELECT COUNT(*) as mentores_com_chat FROM mentors_view WHERE chat_enabled = true;
+SELECT COUNT(*) as total_mentores FROM mentors_view;
