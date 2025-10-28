@@ -106,20 +106,20 @@ export default function ProfilePage() {
     last_name: "",
     slug: "",
     bio: "",
-    current_position: "",
-    current_company: "",
+    job_title: "",
+    company: "",
     linkedin_url: "",
     portfolio_url: "",
-    personal_website_url: "",
+    website_url: "",
     avatar_url: "",
     address: "",
     city: "",
     state: "",
     country: "",
     expertise_areas: [] as string[],
-    topics: [] as string[],
+    mentorship_topics: [] as string[],
     free_topics: [] as string[],
-    inclusion_tags: [] as string[],
+    inclusive_tags: [] as string[],
     languages: ["Português"] as string[],
     mentorship_approach: "",
     what_to_expect: "",
@@ -156,20 +156,20 @@ export default function ProfilePage() {
         last_name: profile.last_name || "",
         slug: profile.slug || "",
         bio: profile.bio || "",
-        current_position: profile.current_position || "",
-        current_company: profile.current_company || "",
+        job_title: profile.job_title || "",
+        company: profile.company || "",
         linkedin_url: profile.linkedin_url || "",
         portfolio_url: profile.portfolio_url || "",
-        personal_website_url: profile.personal_website_url || "",
+        website_url: profile.website_url || "",
         avatar_url: profile.avatar_url || "",
         address: profile.address || "",
         city: profile.city || "",
         state: profile.state || "",
         country: profile.country || "",
         expertise_areas: profile.expertise_areas || [],
-        topics: profile.topics || [],
+        mentorship_topics: profile.mentorship_topics || [],
         free_topics: profile.free_topics || [],
-        inclusion_tags: profile.inclusion_tags || [],
+        inclusive_tags: profile.inclusive_tags || [],
         languages: profile.languages || ["Português"],
         mentorship_approach: profile.mentorship_approach || "",
         what_to_expect: profile.what_to_expect || "",
@@ -419,20 +419,20 @@ export default function ProfilePage() {
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="current_position">Cargo Atual</Label>
+                      <Label htmlFor="job_title">Cargo Atual</Label>
                       <Input
-                        id="current_position"
-                        value={formData.current_position}
-                        onChange={(e) => setFormData(prev => ({ ...prev, current_position: e.target.value }))}
+                        id="job_title"
+                        value={formData.job_title}
+                        onChange={(e) => setFormData(prev => ({ ...prev, job_title: e.target.value }))}
                         placeholder="Ex: Desenvolvedor Senior"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="current_company">Empresa Atual</Label>
+                      <Label htmlFor="company">Empresa Atual</Label>
                       <Input
-                        id="current_company"
-                        value={formData.current_company}
-                        onChange={(e) => setFormData(prev => ({ ...prev, current_company: e.target.value }))}
+                        id="company"
+                        value={formData.company}
+                        onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                         placeholder="Ex: Tech Company"
                       />
                     </div>
@@ -467,13 +467,13 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="personal_website_url">Site Pessoal/Profissional</Label>
+                    <Label htmlFor="website_url">Site Pessoal/Profissional</Label>
                     <div className="relative">
                       <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
-                        id="personal_website_url"
-                        value={formData.personal_website_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, personal_website_url: e.target.value }))}
+                        id="website_url"
+                        value={formData.website_url}
+                        onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
                         placeholder="https://seu-site.com"
                         className="pl-10"
                       />
@@ -678,8 +678,8 @@ export default function ProfilePage() {
                   <div>
                     <Label>Tópicos de Mentoria</Label>
                     <ChipInput
-                      value={formData.topics}
-                      onChange={(value) => setFormData(prev => ({ ...prev, topics: value }))}
+                      value={formData.mentorship_topics}
+                      onChange={(value) => setFormData(prev => ({ ...prev, mentorship_topics: value }))}
                       placeholder="Digite um tópico e pressione Enter"
                       suggestions={topicsSuggestions}
                     />
