@@ -181,10 +181,10 @@ export const PROFILE_VALIDATION_RULES: ValidationRules = {
   bio: {
     maxLength: 500,
   },
-  current_position: {
+  job_title: {
     maxLength: 100,
   },
-  current_company: {
+  company: {
     maxLength: 100,
   },
   linkedin_url: {
@@ -205,7 +205,7 @@ export const PROFILE_VALIDATION_RULES: ValidationRules = {
       return null;
     }
   },
-  personal_website_url: {
+  website_url: {
     pattern: /^https?:\/\/.+\..+/,
     custom: (value: string) => {
       if (value && !value.startsWith('http')) {
