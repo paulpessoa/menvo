@@ -7,9 +7,9 @@ import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer"
 import { FeedbackBanner } from "@/components/FeedbackBanner"
+import { CookieConsentBanner } from "@/components/cookie-consent-banner"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import Script from "next/script"
-import { RequireAuth } from "@/lib/auth"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -132,6 +132,22 @@ export default function RootLayout({
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
               t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
               y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              
+              // Check for cookie consent before starting Clarity
+              try {
+                var consent = localStorage.getItem('cookie-consent');
+                if (consent) {
+                  var prefs = JSON.parse(consent);
+                  // Send consent signal to Clarity
+                  c[a]('consent', prefs.analytics || false);
+                } else {
+                  // Default to no consent until user makes a choice
+                  c[a]('consent', false);
+                }
+              } catch(e) {
+                console.error('[Clarity] Error checking consent:', e);
+                c[a]('consent', false);
+              }
             })(window, document, "clarity", "script", "rz28fusa38");`
           }}
         />
@@ -178,17 +194,18 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
             <FeedbackBanner />
+            <CookieConsentBanner />
             <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
           </div>
           <Toaster />
         </Providers>
 
         {/* Start of menvo Zendesk Widget script */}
-        <Script
+        {/* <Script
           id="ze-snippet"
           src="https://static.zdassets.com/ekr/snippet.js?key=a3906e97-a348-41e5-abdb-4cccbcfa87a8"
           strategy="beforeInteractive"
-        />
+        /> */}
         {/* End of menvo Zendesk Widget script */}
       </body>
     </html>

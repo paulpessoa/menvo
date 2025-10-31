@@ -560,21 +560,33 @@
       "title": "Data Storage",
       "text": "All data is securely stored in Supabase, with access restricted to the Menvo team and following best security practices."
     },
+    "googleCalendar": {
+      "title": "Google Calendar API",
+      "text": "We use the Google Calendar API exclusively to create mentorship events when a session is confirmed. When you schedule a mentorship, we automatically create an event in Google Calendar with session details and send invitations to both mentor and mentee. The data accessed includes only information necessary to create the event (date, time, participants). We do not store, share, or use your Google Calendar data for any other purpose. You can revoke access at any time through your Google account settings."
+    },
+    "dataSharing": {
+      "title": "Data Sharing",
+      "text": "We do not share your personal data with third parties for commercial or marketing purposes. Data is shared only with essential services for platform operation: Supabase (secure storage), Brevo (transactional email delivery), Google (OAuth authentication and calendar event creation), and LinkedIn (OAuth authentication). Each service processes data only for the specific purposes described in this policy."
+    },
+    "dataUsage": {
+      "title": "Data Usage",
+      "text": "Your data is used exclusively to: (1) Authenticate and manage your account; (2) Facilitate connections between mentors and mentees; (3) Create mentorship events in Google Calendar; (4) Send notifications and communications related to your mentorships; (5) Improve platform experience and security. We never use your data for AI/ML model training or purposes unrelated to mentorship."
+    },
     "mentorship": {
       "title": "Mentorship & Interactions",
       "text": "Information about mentorship sessions, reviews, and messages is used to improve the experience and ensure community safety."
     },
     "thirdParty": {
       "title": "Third-Party Services",
-      "text": "We use third-party services such as Google, LinkedIn (login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy."
+      "text": "We use third-party services such as Google (OAuth login and Calendar API), LinkedIn (OAuth login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy and processes data only for the specific purposes described in this policy."
     },
     "rights": {
       "title": "Your Rights",
-      "text": "You may request access, correction, or deletion of your data at any time. Contact us for assistance."
+      "text": "You may request access, correction, or deletion of your data at any time. To exercise your rights or revoke Google Calendar access permissions, contact us at contato@menvo.com.br."
     },
     "contact": {
       "title": "Contact",
-      "text": "Questions about privacy? Contact us at contato@menvo.com."
+      "text": "Questions about privacy? Contact us at contato@menvo.com.br."
     },
     "links": {
       "cookies": "Cookie Policy",
@@ -591,7 +603,7 @@
     },
     "social": {
       "title": "Social Login",
-      "text": "Cookies may be used for authentication via Google, and LinkedIn, enabling secure login."
+      "text": "Cookies may be used for authentication via Google and LinkedIn, enabling secure login."
     },
     "preferences": {
       "title": "Preferences",
@@ -599,11 +611,42 @@
     },
     "analytics": {
       "title": "Analytics & Performance",
-      "text": "We use cookies to understand how the platform is used and to improve our services."
+      "text": "We use cookies and analytics tools like Microsoft Clarity to understand how the platform is used and improve our services. Clarity helps us visualize how users interact with the site through session recordings and heatmaps. For users from the European Union (EEA), United Kingdom, and Switzerland, we request your explicit consent before activating these analytics tools."
+    },
+    "clarity": {
+      "title": "Microsoft Clarity",
+      "text": "We use Microsoft Clarity to understand how you use our website through behavioral metrics, heatmaps, and session recordings. Data collected by Clarity is processed according to Microsoft's Privacy Policy. For users from the EEA, UK, and Switzerland, Clarity will only be activated after your explicit consent through the cookie banner."
     },
     "links": {
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
+    }
+  },
+  "cookieConsent": {
+    "title": "We use cookies",
+    "description": "We use essential cookies for site functionality and analytics cookies to improve your experience. You can choose which cookies to accept.",
+    "learnMore": "Learn more",
+    "acceptAll": "Accept All",
+    "acceptNecessary": "Necessary Only",
+    "customize": "Customize",
+    "savePreferences": "Save Preferences",
+    "settings": {
+      "title": "Cookie Settings",
+      "description": "Choose which types of cookies you want to accept. Necessary cookies cannot be disabled.",
+      "alwaysActive": "Always Active",
+      "necessary": {
+        "title": "Necessary Cookies",
+        "description": "Essential for basic site functionality, including authentication, security, and navigation."
+      },
+      "analytics": {
+        "title": "Analytics Cookies",
+        "description": "Help us understand how you use the site to improve your experience.",
+        "tools": "Tools: Microsoft Clarity (session recordings, heatmaps)"
+      },
+      "functional": {
+        "title": "Functional Cookies",
+        "description": "Enable advanced features like language preferences and personalization."
+      }
     }
   },
   "terms": {
