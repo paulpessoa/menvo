@@ -1,543 +1,113 @@
-"use client"
+import { Metadata } from 'next'
+import { createClient } from '@/utils/supabase/server'
+import { notFound } from 'next/navigation'
+import MentorProfileClient from './MentorProfileClient'
 
-import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { createClient } from "@/utils/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import {
-    MapPin,
-    Clock,
-    Users,
-    Globe,
-    Briefcase,
-    Calendar,
-    MessageCircle,
-    ExternalLink,
-    ArrowLeft,
-    Languages,
-    Award,
-    Heart,
-    Share2,
-    Loader2
-} from "lucide-react"
-import { toast } from "sonner"
-import Link from "next/link"
-import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
-import { ScheduleMentorshipModal } from "@/components/mentorship/ScheduleMentorshipModal"
-import { ChatInterface } from "@/components/chat/ChatInterface"
-
-interface MentorProfile {
-    id: string
-    full_name: string
-    avatar_url: string | null
-    bio: string | null
-    job_title: string | null
-    company: string | null
-    city: string | null
-    state: string | null
-    country: string | null
-    languages: string[] | null
-    mentorship_topics: string[] | null
-    inclusive_tags: string[] | null
-    expertise_areas: string[] | null
-    session_price_usd: number | null
-    availability_status: string
-    average_rating: number
-    total_reviews: number
-    total_sessions: number
-    chat_enabled: boolean
-    experience_years: number | null
-    linkedin_url: string | null
-    github_url: string | null
-    twitter_url: string | null
-    website_url: string | null
-    timezone: string | null
-    slug: string | null
+interface PageProps {
+    params: {
+        slug: string
+    }
 }
 
-interface MentorAvailability {
-    day_of_week: number
-    start_time: string
-    end_time: string
-    timezone: string
-}
+// Buscar dados do mentor e disponibilidade
+async function getMentorData(slug: string) {
+    const supabase = await createClient()
 
-export default function MentorProfilePage() {
-    const params = useParams()
-    const router = useRouter()
-    const [mentor, setMentor] = useState<MentorProfile | null>(null)
-    const [availability, setAvailability] = useState<MentorAvailability[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
-    const [isChatOpen, setIsChatOpen] = useState(false)
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null)
-
-    const supabase = createClient()
-
-    useEffect(() => {
-        if (params.slug) {
-            fetchMentorProfile(params.slug as string)
-        }
-        // Buscar usuário atual
-        fetchCurrentUser()
-    }, [params.slug])
-
-    const fetchCurrentUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-            setCurrentUserId(user.id)
-        }
-    }
-
-    const fetchMentorProfile = async (slug: string) => {
-        try {
-            setLoading(true)
-
-            // Fetch mentor profile using mentors_view
-            const { data: mentorData, error: mentorError } = await supabase
-                .from('mentors_view')
-                .select(`
-          id,
-          full_name,
-          avatar_url,
-          bio,
-          current_position,
-          current_company,
-          city,
-          state,
-          country,
-          languages,
-          mentorship_topics,
-          inclusion_tags,
-          expertise_areas,
-          session_price_usd,
-          availability_status,
-          chat_enabled,
-          rating,
-          reviews,
-          sessions,
-          experience_years,
-          linkedin_url,
-          github_url,
-          twitter_url,
-          website_url,
-          timezone,
-          slug
-        `)
-                .eq('slug', slug)
-                .single()
-
-            if (mentorError) {
-                if (mentorError.code === 'PGRST116') {
-                    setError('Mentor não encontrado')
-                } else {
-                    throw mentorError
-                }
-                return
-            }
-
-            // Map the data to match the expected interface
-            const mappedMentor = {
-                ...mentorData,
-                job_title: mentorData.current_position,
-                company: mentorData.current_company,
-                inclusive_tags: mentorData.inclusion_tags,
-                average_rating: mentorData.rating,
-                total_reviews: mentorData.reviews,
-                total_sessions: mentorData.sessions
-            }
-
-            setMentor(mappedMentor)
-
-            // Fetch availability
-            const { data: availabilityData, error: availabilityError } = await supabase
-                .from('mentor_availability')
-                .select('*')
-                .eq('mentor_id', mentorData.id)
-                .order('day_of_week')
-
-            if (availabilityError) {
-                console.error('Error fetching availability:', availabilityError)
-            } else {
-                setAvailability(availabilityData || [])
-            }
-
-        } catch (error) {
-            console.error('Error fetching mentor profile:', error)
-            setError('Erro ao carregar perfil do mentor')
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const getAvailabilityColor = (status: string) => {
-        switch (status) {
-            case 'available': return 'bg-green-100 text-green-800 border-green-200'
-            case 'busy': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-            case 'unavailable': return 'bg-red-100 text-red-800 border-red-200'
-            default: return 'bg-gray-100 text-gray-800 border-gray-200'
-        }
-    }
-
-    const getAvailabilityText = (status: string) => {
-        switch (status) {
-            case 'available': return 'Disponível'
-            case 'busy': return 'Ocupado'
-            case 'unavailable': return 'Indisponível'
-            default: return 'Status desconhecido'
-        }
-    }
-
-    const getDayName = (dayOfWeek: number) => {
-        const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
-        return days[dayOfWeek]
-    }
-
-    const formatTime = (time: string) => {
-        return new Date(`2000-01-01T${time}`).toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    }
-
-    if (loading) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-gray-600">Carregando perfil do mentor...</p>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+    // Buscar mentor
+    const { data: mentor, error } = await supabase
+        .from('mentors_view')
+        .select('*')
+        .eq('slug', slug)
+        .eq('verified', true)
+        .single()
 
     if (error || !mentor) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="text-center py-12">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        {error || 'Mentor não encontrado'}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                        O mentor que você está procurando não existe ou não está mais disponível.
-                    </p>
-                    <Button asChild>
-                        <Link href="/mentors">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Voltar para Mentores
-                        </Link>
-                    </Button>
-                </div>
-            </div>
-        )
+        return null
+    }
+
+    // Buscar disponibilidade
+    const { data: availability } = await supabase
+        .from('mentor_availability')
+        .select('*')
+        .eq('mentor_id', mentor.id)
+        .order('day_of_week')
+
+    return {
+        mentor,
+        availability: availability || []
+    }
+}
+
+// Metadados dinâmicos para SEO e Open Graph
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const data = await getMentorData(params.slug)
+
+    if (!data) {
+        return {
+            title: 'Mentor não encontrado | Menvo',
+            description: 'O mentor que você procura não está disponível.',
+        }
+    }
+
+    const { mentor } = data
+    const title = `${mentor.full_name} - ${mentor.current_position || 'Mentor'} | Menvo`
+    const description = mentor.bio?.substring(0, 160) ||
+        `Conecte-se com ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 3).join(', ') || 'diversas áreas'}. Mentorias 100% gratuitas.`
+
+    const imageUrl = mentor.avatar_url || `${process.env.NEXT_PUBLIC_SITE_URL}/og-default.png`
+    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/mentors/${params.slug}`
+
+    return {
+        title,
+        description,
+        openGraph: {
+            type: 'profile',
+            url,
+            title,
+            description,
+            images: [{ url: imageUrl, width: 1200, height: 630, alt: mentor.full_name }],
+            siteName: 'Menvo',
+            locale: 'pt_BR',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [imageUrl],
+        },
+        alternates: {
+            canonical: url,
+        },
+    }
+}
+
+// ISR: Revalidar a cada 1 hora
+export const revalidate = 3600
+
+export default async function MentorProfilePage({ params }: PageProps) {
+    const data = await getMentorData(params.slug)
+
+    if (!data) {
+        notFound()
+    }
+
+    const { mentor, availability } = data
+
+    // Mapear campos da view para o formato esperado pelo componente
+    const mappedMentor = {
+        ...mentor,
+        job_title: mentor.current_position,
+        company: mentor.current_company,
+        inclusive_tags: mentor.inclusion_tags,
+        average_rating: mentor.rating,
+        total_reviews: mentor.reviews,
+        total_sessions: mentor.sessions,
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {/* Breadcrumb */}
-            <div className="mb-6">
-                <Button variant="ghost" asChild className="mb-4">
-                    <Link href="/mentors">
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Voltar para Mentores
-                    </Link>
-                </Button>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Profile */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Header */}
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <Avatar className="h-20 w-20">
-                                        <AvatarImage src={mentor.avatar_url || undefined} />
-                                        <AvatarFallback className="text-lg">
-                                            {mentor.full_name?.split(' ').map(n => n[0]).join('') || 'M'}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <CardTitle className="text-2xl">{mentor.full_name}</CardTitle>
-                                        <CardDescription className="text-lg">
-                                            {mentor.job_title}
-                                            {mentor.company && ` @ ${mentor.company}`}
-                                        </CardDescription>
-                                        {(mentor.city || mentor.country) && (
-                                            <div className="flex items-center text-gray-500 mt-1">
-                                                <MapPin className="h-4 w-4 mr-1" />
-                                                {[mentor.city, mentor.state, mentor.country].filter(Boolean).join(', ')}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => toast.info("Funcionalidade em desenvolvimento")}
-                                    >
-                                        <Heart className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => toast.info("Funcionalidade em desenvolvimento")}
-                                    >
-                                        <Share2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {/* Status and Stats */}
-                            <div className="flex items-center justify-between pt-4">
-                                <Badge className={getAvailabilityColor(mentor.availability_status)}>
-                                    {getAvailabilityText(mentor.availability_status)}
-                                </Badge>
-
-                                <div className="flex items-center space-x-6 text-sm text-gray-600">
-                                    {mentor.total_sessions > 0 && (
-                                        <div className="flex items-center">
-                                            <MessageCircle className="h-4 w-4 mr-1" />
-                                            <span>{mentor.total_sessions} sessões</span>
-                                        </div>
-                                    )}
-
-                                    {mentor.experience_years && (
-                                        <div className="flex items-center">
-                                            <Briefcase className="h-4 w-4 mr-1" />
-                                            <span>{mentor.experience_years} anos de experiência</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </CardHeader>
-                    </Card>
-
-                    {/* Bio */}
-                    {mentor.bio && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Sobre</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-gray-700 leading-relaxed">{mentor.bio}</p>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Topics and Expertise */}
-                    {(mentor.mentorship_topics?.length || mentor.expertise_areas?.length) && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Especialidades</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-                                    <div>
-                                        <h4 className="font-medium mb-2">Temas de Mentoria</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.mentorship_topics.map((topic, index) => (
-                                                <Badge key={index} variant="secondary">
-                                                    {topic}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
-                                    <div>
-                                        <h4 className="font-medium mb-2">Áreas de Expertise</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.expertise_areas.map((area, index) => (
-                                                <Badge key={index} variant="outline">
-                                                    {area}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Languages and Inclusive Tags */}
-                    {(mentor.languages?.length || mentor.inclusive_tags?.length) && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Idiomas e Inclusão</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {mentor.languages && mentor.languages.length > 0 && (
-                                    <div>
-                                        <h4 className="font-medium mb-2 flex items-center">
-                                            <Languages className="h-4 w-4 mr-2" />
-                                            Idiomas
-                                        </h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.languages.map((language, index) => (
-                                                <Badge key={index} variant="secondary">
-                                                    {language}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {mentor.inclusive_tags && mentor.inclusive_tags.length > 0 && (
-                                    <div>
-                                        <h4 className="font-medium mb-2 flex items-center">
-                                            <Award className="h-4 w-4 mr-2" />
-                                            Tags Inclusivas
-                                        </h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.inclusive_tags.map((tag, index) => (
-                                                <Badge key={index} className="bg-purple-100 text-purple-800 border-purple-200">
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
-
-                {/* Sidebar */}
-                <div className="space-y-6">
-                    {/* Booking Card */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Agendar Sessão</CardTitle>
-                            <CardDescription>Mentorias 100% gratuitas</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <Button
-                                className="w-full"
-                                size="lg"
-                                disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
-                                onClick={() => setIsScheduleModalOpen(true)}
-                            >
-                                <Calendar className="h-4 w-4 mr-2" />
-                                {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
-                                    ? 'Agenda Lotada'
-                                    : 'Agendar Mentoria'}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                className="w-full"
-                                disabled={!mentor.chat_enabled || !currentUserId}
-                                onClick={() => setIsChatOpen(true)}
-                                title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : !currentUserId ? 'Faça login para usar o chat' : ''}
-                            >
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                {mentor.chat_enabled ? 'Chat' : 'Chat Indisponível'}
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    {/* Availability */}
-                    <AvailabilityDisplay
-                        mentorId={mentor.id}
-                        availability={availability}
-                        timezone={mentor.timezone || 'America/Sao_Paulo'}
-                        showBookingButtons={true}
-                        onBookSlot={(slot) => {
-                            // TODO: Implement booking logic
-                            console.log('Book slot:', slot)
-                        }}
-                        compact={true}
-                    />
-
-                    {/* Social Links */}
-                    {(mentor.linkedin_url || mentor.github_url || mentor.twitter_url || mentor.website_url) && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center">
-                                    <Globe className="h-4 w-4 mr-2" />
-                                    Links
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                                {mentor.linkedin_url && (
-                                    <Button variant="outline" className="w-full justify-start" asChild>
-                                        <a href={mentor.linkedin_url} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="h-4 w-4 mr-2" />
-                                            LinkedIn
-                                        </a>
-                                    </Button>
-                                )}
-                                {mentor.github_url && (
-                                    <Button variant="outline" className="w-full justify-start" asChild>
-                                        <a href={mentor.github_url} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="h-4 w-4 mr-2" />
-                                            GitHub
-                                        </a>
-                                    </Button>
-                                )}
-                                {mentor.twitter_url && (
-                                    <Button variant="outline" className="w-full justify-start" asChild>
-                                        <a href={mentor.twitter_url} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="h-4 w-4 mr-2" />
-                                            Twitter
-                                        </a>
-                                    </Button>
-                                )}
-                                {mentor.website_url && (
-                                    <Button variant="outline" className="w-full justify-start" asChild>
-                                        <a href={mentor.website_url} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="h-4 w-4 mr-2" />
-                                            Website
-                                        </a>
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
-            </div>
-
-            {/* Schedule Modal */}
-            <ScheduleMentorshipModal
-                isOpen={isScheduleModalOpen}
-                onClose={() => setIsScheduleModalOpen(false)}
-                mentorId={mentor.id}
-                mentorName={mentor.full_name}
-            />
-
-            {/* Chat Modal */}
-            {isChatOpen && currentUserId && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
-                        <div className="flex items-center justify-between p-4 border-b">
-                            <h2 className="text-lg font-semibold">Chat com {mentor.full_name}</h2>
-                            <button
-                                onClick={() => setIsChatOpen(false)}
-                                className="text-gray-400 hover:text-gray-600"
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <ChatInterface
-                            mentorId={mentor.id}
-                            currentUserId={currentUserId}
-                            mentorName={mentor.full_name}
-                            mentorAvatar={mentor.avatar_url || undefined}
-                        />
-                    </div>
-                </div>
-            )}
-        </div>
+        <MentorProfileClient
+            mentor={mappedMentor}
+            availability={availability}
+        />
     )
 }
