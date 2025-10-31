@@ -1,5 +1,5 @@
 "use client"
-import { Shield, Mail, User, Image as ImageIcon, Database, Users, Globe } from "lucide-react"
+import { Shield, Mail, User, Image as ImageIcon, Database, Users, Globe, Calendar } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
@@ -27,6 +27,14 @@ export default function PrivacyPage() {
           <p>{t("privacy.dataCollection.text")}</p>
         </section>
         <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Database className="h-5 w-5" /> {t("privacy.dataUsage.title")}</h2>
+          <p>{t("privacy.dataUsage.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Users className="h-5 w-5" /> {t("privacy.dataSharing.title")}</h2>
+          <p>{t("privacy.dataSharing.text")}</p>
+        </section>
+        <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Mail className="h-5 w-5" /> {t("privacy.email.title")}</h2>
           <p>{t("privacy.email.text")}</p>
         </section>
@@ -37,6 +45,10 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Database className="h-5 w-5" /> {t("privacy.storage.title")}</h2>
           <p>{t("privacy.storage.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Calendar className="h-5 w-5" /> {t("privacy.googleCalendar.title")}</h2>
+          <p className="whitespace-pre-line">{t("privacy.googleCalendar.text")}</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Users className="h-5 w-5" /> {t("privacy.mentorship.title")}</h2>

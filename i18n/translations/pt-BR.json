@@ -563,21 +563,33 @@
       "title": "Armazenamento de Dados",
       "text": "Todos os dados são armazenados de forma segura no Supabase, com acesso restrito à equipe Menvo e seguindo as melhores práticas de segurança."
     },
+    "googleCalendar": {
+      "title": "Google Calendar API",
+      "text": "Utilizamos a Google Calendar API exclusivamente para criar eventos de mentoria quando uma sessão é confirmada. Quando você agenda uma mentoria, criamos automaticamente um evento no Google Calendar com os detalhes da sessão e enviamos convites para mentor e mentorado. Os dados acessados incluem apenas informações necessárias para criar o evento (data, hora, participantes). Não armazenamos, compartilhamos ou utilizamos seus dados do Google Calendar para nenhum outro propósito. Você pode revogar o acesso a qualquer momento através das configurações da sua conta Google."
+    },
+    "dataSharing": {
+      "title": "Compartilhamento de Dados",
+      "text": "Não compartilhamos seus dados pessoais com terceiros para fins comerciais ou de marketing. Os dados são compartilhados apenas com os serviços essenciais para o funcionamento da plataforma: Supabase (armazenamento seguro), Brevo (envio de e-mails transacionais), Google (autenticação OAuth e criação de eventos de calendário), e LinkedIn (autenticação OAuth). Cada serviço processa dados apenas para as finalidades específicas descritas nesta política."
+    },
+    "dataUsage": {
+      "title": "Uso de Dados",
+      "text": "Seus dados são utilizados exclusivamente para: (1) Autenticação e gerenciamento de conta; (2) Facilitar conexões entre mentores e mentorados; (3) Criar eventos de mentoria no Google Calendar; (4) Enviar notificações e comunicações relacionadas às suas mentorias; (5) Melhorar a experiência e segurança da plataforma. Nunca utilizamos seus dados para treinamento de modelos de IA/ML ou para fins não relacionados à mentoria."
+    },
     "mentorship": {
       "title": "Mentoria e Interações",
       "text": "As informações sobre sessões de mentoria, avaliações e mensagens são usadas para melhorar a experiência e garantir a segurança da comunidade."
     },
     "thirdParty": {
       "title": "Serviços de Terceiros",
-      "text": "Utilizamos serviços de terceiros como Google, LinkedIn (login), Supabase (armazenamento) e Brevo (e-mails). Cada serviço tem sua própria política de privacidade."
+      "text": "Utilizamos serviços de terceiros como Google (login OAuth e Calendar API), LinkedIn (login OAuth), Supabase (armazenamento) e Brevo (e-mails). Cada serviço tem sua própria política de privacidade e processa dados apenas para as finalidades específicas descritas nesta política."
     },
     "rights": {
       "title": "Seus Direitos",
-      "text": "Você pode solicitar acesso, correção ou exclusão de seus dados a qualquer momento. Entre em contato conosco para obter assistência."
+      "text": "Você pode solicitar acesso, correção ou exclusão de seus dados a qualquer momento. Para exercer seus direitos ou revogar permissões de acesso ao Google Calendar, entre em contato conosco em contato@menvo.com.br."
     },
     "contact": {
       "title": "Contato",
-      "text": "Dúvidas sobre privacidade? Entre em contato conosco em contato@menvo.com."
+      "text": "Dúvidas sobre privacidade? Entre em contato conosco em contato@menvo.com.br."
     },
     "links": {
       "cookies": "Política de Cookies",
@@ -602,11 +614,42 @@
     },
     "analytics": {
       "title": "Análise e Desempenho",
-      "text": "Usamos cookies para entender como a plataforma é usada e para melhorar nossos serviços."
+      "text": "Usamos cookies e ferramentas de análise como Microsoft Clarity para entender como a plataforma é usada e melhorar nossos serviços. O Clarity nos ajuda a visualizar como os usuários interagem com o site através de gravações de sessão e mapas de calor. Para usuários da União Europeia (EEA), Reino Unido e Suíça, solicitamos seu consentimento explícito antes de ativar essas ferramentas de análise."
+    },
+    "clarity": {
+      "title": "Microsoft Clarity",
+      "text": "Utilizamos o Microsoft Clarity para entender como você usa nosso site através de métricas comportamentais, mapas de calor e gravações de sessão. Os dados coletados pelo Clarity são processados de acordo com a Política de Privacidade da Microsoft. Para usuários da EEA, Reino Unido e Suíça, o Clarity só será ativado após seu consentimento explícito através do banner de cookies."
     },
     "links": {
       "privacy": "Política de Privacidade",
       "terms": "Termos de Serviço"
+    }
+  },
+  "cookieConsent": {
+    "title": "Nós usamos cookies",
+    "description": "Usamos cookies essenciais para o funcionamento do site e cookies de análise para melhorar sua experiência. Você pode escolher quais cookies aceitar.",
+    "learnMore": "Saiba mais",
+    "acceptAll": "Aceitar Todos",
+    "acceptNecessary": "Apenas Necessários",
+    "customize": "Personalizar",
+    "savePreferences": "Salvar Preferências",
+    "settings": {
+      "title": "Configurações de Cookies",
+      "description": "Escolha quais tipos de cookies você deseja aceitar. Cookies necessários não podem ser desativados.",
+      "alwaysActive": "Sempre Ativo",
+      "necessary": {
+        "title": "Cookies Necessários",
+        "description": "Essenciais para o funcionamento básico do site, incluindo autenticação, segurança e navegação."
+      },
+      "analytics": {
+        "title": "Cookies de Análise",
+        "description": "Nos ajudam a entender como você usa o site para melhorar sua experiência.",
+        "tools": "Ferramentas: Microsoft Clarity (gravações de sessão, mapas de calor)"
+      },
+      "functional": {
+        "title": "Cookies Funcionais",
+        "description": "Permitem funcionalidades avançadas como preferências de idioma e personalização."
+      }
     }
   },
   "terms": {

@@ -35,7 +35,11 @@ export default function CookiesPage() {
         </section>
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Globe className="h-5 w-5" /> {t("cookies.analytics.title")}</h2>
-          <p>{t("cookies.analytics.text")}</p>
+          <p className="whitespace-pre-line">{t("cookies.analytics.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Globe className="h-5 w-5" /> {t("cookies.clarity.title")}</h2>
+          <p className="whitespace-pre-line">{t("cookies.clarity.text")}</p>
         </section>
       </div>
       <div className="mt-10 flex flex-wrap gap-4 justify-center text-sm">

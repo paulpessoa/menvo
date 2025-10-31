@@ -1,0 +1,125 @@
+Hello Google Developer Team,
+
+Thank you for reviewing our application. We have addressed all the issues highlighted in your review:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. JUSTIFICATION FOR OAUTH SCOPES
+
+We require the `https://www.googleapis.com/auth/calendar` scope exclusively to create mentorship session events in Google Calendar when a mentor confirms a session with a mentee.
+
+SPECIFIC USE CASE:
+Menvo is a volunteer mentorship platform that connects mentors with mentees for free professional guidance sessions. When a mentorship session is confirmed by the mentor, our application:
+
+• Automatically creates a calendar event with session details (date, time, duration, title, description)
+• Sends calendar invitations to both mentor and mentee via email
+• Generates a Google Meet link for the video call session
+• Adds the event to both participants' Google Calendars with automatic reminders
+
+WHAT WE DO NOT DO:
+• We do NOT access, read, or modify any other calendar events
+• We do NOT store calendar data on our servers beyond the event creation
+• We do NOT share calendar data with any third parties
+• We do NOT use calendar data for any purpose other than creating mentorship events
+
+WHY THIS SCOPE IS NECESSARY:
+The `calendar` scope is the minimum required to create calendar events and send invitations to participants. Without this scope, we cannot provide this essential functionality, and users would need to manually create calendar events for each mentorship session, significantly degrading the user experience and reducing the effectiveness of our mentorship platform.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. OAUTH CONSENT SCREEN WORKFLOW VIDEO
+
+Demo video URL: [ADICIONE SEU LINK DO YOUTUBE AQUI]
+
+The video demonstrates the complete OAuth workflow:
+• User logging into the Menvo platform
+• Navigating to the mentorship scheduling page
+• Selecting a mentor and available time slot
+• Mentor confirming the mentorship session
+• OAuth consent screen appearing with clearly visible requested scopes
+• User reviewing and authorizing the access
+• Calendar event being created successfully in Google Calendar
+• Invitations sent to both mentor and mentee
+• Event visible in both participants' calendars with Google Meet link
+
+The video clearly shows the OAuth consent screen with the requested scopes and the user granting permission.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. UPDATED PRIVACY POLICY
+
+Privacy Policy URL: https://menvo.com.br/privacy
+
+Our privacy policy has been comprehensively updated and now includes all required sections:
+
+✓ DATA COLLECTION SECTION
+Clearly describes what data we collect from users (name, email, profile information, OAuth data from Google and LinkedIn)
+
+✓ DATA USAGE SECTION
+Explicitly explains how we use collected data:
+  • Account authentication and management
+  • Facilitating mentor-mentee connections
+  • Creating mentorship events in Google Calendar
+  • Sending mentorship-related notifications
+  • Improving platform experience and security
+  • We explicitly state we do NOT use data for AI/ML training
+
+✓ DATA SHARING SECTION
+Comprehensive description of third-party data sharing:
+  • Supabase (secure data storage)
+  • Brevo (transactional email delivery)
+  • Google (OAuth authentication and Calendar API for event creation)
+  • LinkedIn (OAuth authentication)
+  • Clear statement that we do NOT share data for commercial or marketing purposes
+
+✓ GOOGLE CALENDAR API SECTION
+Dedicated section explaining:
+  • We use the API exclusively to create mentorship events
+  • What specific data we access (date, time, participants)
+  • We do not store or share calendar data beyond event creation
+  • How users can revoke access at any time through Google account settings
+
+✓ USER RIGHTS SECTION
+Explains how users can:
+  • Request access to their data
+  • Request correction of their data
+  • Request deletion of their data
+  • Revoke Google Calendar access permissions
+
+✓ CONTACT INFORMATION
+Clear contact information provided: contato@menvo.com.br
+
+The privacy policy is available in three languages (Portuguese, English, Spanish) and all sections are clearly labeled and easy to navigate.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ADDITIONAL INFORMATION
+
+Application Details:
+• App Name: Menvo
+• App Homepage: https://menvo.com.br
+• Privacy Policy: https://menvo.com.br/privacy
+• Terms of Service: https://menvo.com.br/terms
+• Cookie Policy: https://menvo.com.br/cookies
+• Project ID: menvo-460822
+• Project Number: 428487318740
+
+Domain Verification:
+• Verified domain: menvo.com.br
+
+Contact Information:
+• Primary contact: contato@menvo.com.br
+• Development contact: paulmspessoa@gmail.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+We believe these updates fully address all the requirements for verification. Our privacy policy now comprehensively covers data collection, usage, and sharing practices, with a dedicated section for Google Calendar API usage. The demo video clearly shows the OAuth consent screen workflow, and we have provided a detailed justification for the requested scopes.
+
+Please let us know if you need any additional information or clarification.
+
+Thank you for your time and consideration.
+
+Best regards,
+Menvo Team
+contato@menvo.com.br
+https://menvo.com.br
