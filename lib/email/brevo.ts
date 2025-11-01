@@ -18,6 +18,7 @@ interface AppointmentConfirmationData {
   mentorName: string;
   menteeName: string;
   scheduledAt: string;
+  meetLink: string | null;
 }
 
 /**
@@ -126,9 +127,15 @@ export async function sendAppointmentRequest(
 export async function sendAppointmentConfirmation(
   data: AppointmentConfirmationData
 ): Promise<void> {
-  const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt } = data;
+  const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt, meetLink } = data;
 
-  // Template HTML simples
+  // Formatar data
+  const formattedDate = new Date(scheduledAt).toLocaleString('pt-BR', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  });
+
+  // Template HTML com link do Meet
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -140,6 +147,8 @@ export async function sendAppointmentConfirmation(
         .header { background-color: #10B981; color: white; padding: 20px; text-align: center; }
         .content { padding: 20px; background-color: #f9fafb; }
         .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #10B981; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; font-weight: bold; }
+        .meet-link { background-color: #EEF2FF; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #4F46E5; }
         .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
       </style>
     </head>
@@ -154,15 +163,38 @@ export async function sendAppointmentConfirmation(
           <div class="info">
             <p><strong>👤 Mentor:</strong> ${mentorName}</p>
             <p><strong>👤 Mentee:</strong> ${menteeName}</p>
-            <p><strong>📅 Data e Hora:</strong> ${new Date(scheduledAt).toLocaleString('pt-BR')}</p>
+            <p><strong>📅 Data e Hora:</strong> ${formattedDate}</p>
           </div>
           
-          <p>Você receberá mais informações sobre o link da reunião em breve.</p>
+          ${meetLink ? `
+          <div class="meet-link">
+            <p><strong>🎥 Link da Reunião:</strong></p>
+            <p style="margin: 10px 0;">
+              <a href="${meetLink}" class="button">Entrar no Google Meet</a>
+            </p>
+            <p style="font-size: 12px; color: #666; word-break: break-all;">
+              Ou copie e cole este link: ${meetLink}
+            </p>
+          </div>
+          ` : `
+          <div class="meet-link">
+            <p><strong>📧 Convite do Google Calendar:</strong></p>
+            <p>Você também receberá um convite do Google Calendar com o link da reunião.</p>
+          </div>
+          `}
+          
+          <p><strong>💡 Dicas para a sessão:</strong></p>
+          <ul>
+            <li>Entre alguns minutos antes do horário agendado</li>
+            <li>Teste seu microfone e câmera</li>
+            <li>Prepare suas dúvidas e objetivos</li>
+            <li>Tenha papel e caneta para anotações</li>
+          </ul>
           
           <p>Prepare-se para uma ótima sessão de mentoria! 🚀</p>
         </div>
         <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
+          <p>Menvo - Plataforma de Mentoria Voluntária</p>
           <p>Este é um email automático, por favor não responda.</p>
         </div>
       </div>
