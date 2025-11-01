@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Inbox, CheckCircle, Clock, XCircle } from "lucide-react"
+import { ArrowLeft, Inbox, CheckCircle, Clock, XCircle, Send } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import AppointmentsList from "@/components/appointments/AppointmentsList"
@@ -27,91 +27,186 @@ export default function MentorMentorshipPage() {
                     <div>
                         <h1 className="text-3xl font-bold">Minhas Mentorias</h1>
                         <p className="text-muted-foreground">
-                            Gerencie solicitações recebidas e suas sessões de mentoria
+                            Gerencie todas as suas mentorias - recebidas e solicitadas
                         </p>
                     </div>
 
-                    {/* Tabs de Mentorias */}
-                    <Tabs defaultValue="pendentes" className="w-full">
-                        <TabsList className="grid w-full grid-cols-4">
-                            <TabsTrigger value="pendentes" className="flex items-center gap-2">
-                                <Inbox className="h-4 w-4" />
-                                Pendentes
-                            </TabsTrigger>
-                            <TabsTrigger value="confirmadas" className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4" />
-                                Agendadas
-                            </TabsTrigger>
-                            <TabsTrigger value="avaliadas" className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4" />
-                                Avaliadas
-                            </TabsTrigger>
-                            <TabsTrigger value="canceladas" className="flex items-center gap-2">
-                                <XCircle className="h-4 w-4" />
-                                Canceladas
-                            </TabsTrigger>
-                        </TabsList>
+                    {/* Mentorias Recebidas (como Mentor) */}
+                    <div>
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <Inbox className="h-5 w-5 text-indigo-600" />
+                            Mentorias Recebidas
+                            <span className="text-sm font-normal text-muted-foreground">(você como mentor)</span>
+                        </h2>
 
-                        {/* Solicitações Pendentes */}
-                        <TabsContent value="pendentes" className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Pedidos Recebidos</CardTitle>
-                                    <CardDescription>
-                                        Solicitações de mentoria aguardando sua confirmação
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <AppointmentsList role="mentor" status="pending" limit={20} />
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
+                        <Tabs defaultValue="pendentes" className="w-full">
+                            <TabsList className="grid w-full grid-cols-4">
+                                <TabsTrigger value="pendentes" className="flex items-center gap-2">
+                                    <Inbox className="h-4 w-4" />
+                                    Pendentes
+                                </TabsTrigger>
+                                <TabsTrigger value="confirmadas" className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4" />
+                                    Agendadas
+                                </TabsTrigger>
+                                <TabsTrigger value="avaliadas" className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4" />
+                                    Avaliadas
+                                </TabsTrigger>
+                                <TabsTrigger value="canceladas" className="flex items-center gap-2">
+                                    <XCircle className="h-4 w-4" />
+                                    Canceladas
+                                </TabsTrigger>
+                            </TabsList>
 
-                        {/* Mentorias Confirmadas */}
-                        <TabsContent value="confirmadas" className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Mentorias Agendadas</CardTitle>
-                                    <CardDescription>
-                                        Sessões confirmadas e agendadas. Após a mentoria, clique em "Avaliar" para deixar seu feedback.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <AppointmentsList role="mentor" status="confirmed" limit={20} />
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
+                            {/* Solicitações Pendentes */}
+                            <TabsContent value="pendentes" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Pedidos Recebidos</CardTitle>
+                                        <CardDescription>
+                                            Solicitações de mentoria aguardando sua confirmação
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentor" status="pending" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
 
-                        {/* Mentorias Avaliadas */}
-                        <TabsContent value="avaliadas" className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Mentorias Avaliadas</CardTitle>
-                                    <CardDescription>
-                                        Sessões finalizadas com feedback registrado
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <AppointmentsList role="mentor" status="completed" limit={20} />
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
+                            {/* Mentorias Confirmadas */}
+                            <TabsContent value="confirmadas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Mentorias Agendadas</CardTitle>
+                                        <CardDescription>
+                                            Sessões confirmadas e agendadas. Após a mentoria, clique em "Avaliar" para deixar seu feedback.
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentor" status="confirmed" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
 
-                        {/* Mentorias Canceladas */}
-                        <TabsContent value="canceladas" className="space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Sessões Canceladas</CardTitle>
-                                    <CardDescription>
-                                        Mentorias que foram canceladas
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <AppointmentsList role="mentor" status="cancelled" limit={20} />
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-                    </Tabs>
+                            {/* Mentorias Avaliadas */}
+                            <TabsContent value="avaliadas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Mentorias Avaliadas</CardTitle>
+                                        <CardDescription>
+                                            Sessões finalizadas com feedback registrado
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentor" status="completed" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            {/* Mentorias Canceladas */}
+                            <TabsContent value="canceladas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Sessões Canceladas</CardTitle>
+                                        <CardDescription>
+                                            Mentorias que foram canceladas
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentor" status="cancelled" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                        </Tabs>
+                    </div>
+
+                    {/* Mentorias Solicitadas (como Mentee) */}
+                    <div>
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <Send className="h-5 w-5 text-blue-600" />
+                            Mentorias Solicitadas
+                            <span className="text-sm font-normal text-muted-foreground">(você como mentee)</span>
+                        </h2>
+
+                        <Tabs defaultValue="pendentes-solicitadas" className="w-full">
+                            <TabsList className="grid w-full grid-cols-4">
+                                <TabsTrigger value="pendentes-solicitadas" className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4" />
+                                    Pendentes
+                                </TabsTrigger>
+                                <TabsTrigger value="confirmadas-solicitadas" className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4" />
+                                    Agendadas
+                                </TabsTrigger>
+                                <TabsTrigger value="avaliadas-solicitadas" className="flex items-center gap-2">
+                                    <CheckCircle className="h-4 w-4" />
+                                    Avaliadas
+                                </TabsTrigger>
+                                <TabsTrigger value="canceladas-solicitadas" className="flex items-center gap-2">
+                                    <XCircle className="h-4 w-4" />
+                                    Canceladas
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="pendentes-solicitadas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Aguardando Confirmação</CardTitle>
+                                        <CardDescription>
+                                            Solicitações pendentes de confirmação dos mentores
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentee" status="pending" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            <TabsContent value="confirmadas-solicitadas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Mentorias Agendadas</CardTitle>
+                                        <CardDescription>
+                                            Sessões confirmadas pelos mentores
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentee" status="confirmed" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            <TabsContent value="avaliadas-solicitadas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Mentorias Avaliadas</CardTitle>
+                                        <CardDescription>
+                                            Sessões finalizadas com seu feedback
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentee" status="completed" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+
+                            <TabsContent value="canceladas-solicitadas" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Sessões Canceladas</CardTitle>
+                                        <CardDescription>
+                                            Mentorias que foram canceladas
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <AppointmentsList role="mentee" status="cancelled" limit={20} />
+                                    </CardContent>
+                                </Card>
+                            </TabsContent>
+                        </Tabs>
+                    </div>
 
                     {/* Recursos e Materiais - Em Desenvolvimento */}
                     <Card className="bg-muted/50">
