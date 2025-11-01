@@ -10,7 +10,8 @@ import {
     User,
     Video,
     MessageSquare,
-    ExternalLink
+    ExternalLink,
+    XCircle
 } from 'lucide-react'
 import { AppointmentStatusBadge } from './appointment-status-badge'
 import { ConfirmAppointmentButton } from './confirm-appointment-button'
@@ -18,12 +19,14 @@ import { CancelAppointmentButton } from './cancel-appointment-button'
 import { ChatButton } from './chat-button'
 
 interface Appointment {
-    id: string
+    id: string | number
     scheduled_at: string
     duration_minutes: number
     status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
     notes?: string
     google_meet_link?: string
+    cancellation_reason?: string
+    cancelled_at?: string
     mentor: {
         id: string
         full_name: string
@@ -78,6 +81,7 @@ export function AppointmentCard({
     const { date, time, isToday, isPast } = formatDateTime(appointment.scheduled_at)
 
     const getInitials = (name: string) => {
+        if (!name) return '??';
         return name
             .split(' ')
             .map(n => n[0])
@@ -91,17 +95,52 @@ export function AppointmentCard({
     const canJoinMeet = appointment.status === 'confirmed' && appointment.google_meet_link && !isPast
     const canChat = appointment.status === 'pending' || appointment.status === 'confirmed'
 
+    const handleProfileClick = async () => {
+        if (isMentor) {
+            // Mentor vendo mentee - buscar slug do profile
+            try {
+                const response = await fetch(`/api/profiles/${otherPerson.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const slug = data.slug || otherPerson.id;
+                    window.location.href = `/mentee/${slug}`;
+                } else {
+                    console.error('Mentee não encontrado');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar mentee:', error);
+            }
+        } else {
+            // Mentee vendo mentor - buscar slug do mentor
+            try {
+                const response = await fetch(`/api/mentors/${otherPerson.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const slug = data.slug || otherPerson.id;
+                    window.location.href = `/mentors/${slug}`;
+                } else {
+                    console.error('Mentor não encontrado');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar mentor:', error);
+            }
+        }
+    };
+
     return (
         <Card className="w-full">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
+                    <div
+                        className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={handleProfileClick}
+                    >
                         <Avatar className="h-10 w-10">
                             <AvatarImage src={otherPerson.avatar_url} />
                             <AvatarFallback>{getInitials(otherPerson.full_name)}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h3 className="font-semibold text-sm">
+                            <h3 className="font-semibold text-sm hover:text-indigo-600 transition-colors">
                                 {otherPerson.full_name}
                             </h3>
                             <p className="text-xs text-muted-foreground">
@@ -153,56 +192,70 @@ export function AppointmentCard({
                         </p>
                     </div>
                 )}
+
+                {appointment.status === 'cancelled' && appointment.cancellation_reason && (
+                    <div className="space-y-1 bg-red-50 p-3 rounded-md border border-red-200">
+                        <div className="flex items-center gap-2 text-sm">
+                            <XCircle className="w-4 h-4 text-red-600" />
+                            <span className="font-medium text-red-900">Motivo do Cancelamento:</span>
+                        </div>
+                        <p className="text-sm text-red-800 pl-6">
+                            {appointment.cancellation_reason}
+                        </p>
+                        {appointment.cancelled_at && (
+                            <p className="text-xs text-red-600 pl-6 mt-1">
+                                Cancelado em {new Date(appointment.cancelled_at).toLocaleString('pt-BR')}
+                            </p>
+                        )}
+                    </div>
+                )}
             </CardContent>
 
-            <CardFooter className="pt-3 gap-2 flex-wrap">
-                {canJoinMeet && (
-                    <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                        asChild
-                    >
-                        <a
-                            href={appointment.google_meet_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <Video className="w-4 h-4 mr-2" />
-                            Entrar no Meet
-                            <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                    </Button>
-                )}
-
-                {canChat && (
-                    <ChatButton
-                        appointment={appointment}
-                        currentUserId={currentUserId}
-                        isMentor={isMentor}
-                    />
-                )}
-
-                {canConfirm && (
-                    <>
+            <CardFooter className="pt-3 flex-col sm:flex-row gap-3">
+                <div className="flex gap-2 flex-wrap">
+                    {(canChat || canConfirm) && (
                         <ChatButton
                             appointment={appointment}
                             currentUserId={currentUserId}
                             isMentor={isMentor}
                         />
+                    )}
+
+                    {canJoinMeet && (
+                        <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                            asChild
+                        >
+                            <a
+                                href={appointment.google_meet_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Video className="w-4 h-4 mr-2" />
+                                Entrar no Meet
+                                <ExternalLink className="w-3 h-3 ml-1" />
+                            </a>
+                        </Button>
+                    )}
+                </div>
+
+                <div className="flex gap-2 flex-wrap sm:ml-auto">
+
+                    {canCancel && (
+                        <CancelAppointmentButton
+                            appointment={appointment}
+                            onCancelled={onAppointmentUpdate}
+                            variant="outline"
+                        />
+                    )}
+                    {canConfirm && (
                         <ConfirmAppointmentButton
                             appointment={appointment}
                             onConfirmed={onAppointmentUpdate}
                         />
-                    </>
-                )}
-
-                {canCancel && (
-                    <CancelAppointmentButton
-                        appointment={appointment}
-                        onCancelled={onAppointmentUpdate}
-                        variant="outline"
-                    />
-                )}
+                    )}
+                </div>
             </CardFooter>
         </Card>
     )
