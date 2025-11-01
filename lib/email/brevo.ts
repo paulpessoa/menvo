@@ -4,21 +4,23 @@
  */
 
 interface AppointmentRequestData {
-  mentorEmail: string;
-  mentorName: string;
-  menteeName: string;
-  scheduledAt: string;
-  message: string;
-  token: string;
+  mentorEmail: string
+  mentorName: string
+  menteeName: string
+  scheduledAt: string
+  message: string
+  token: string
 }
 
 interface AppointmentConfirmationData {
-  mentorEmail: string;
-  menteeEmail: string;
-  mentorName: string;
-  menteeName: string;
-  scheduledAt: string;
-  meetLink: string | null;
+  mentorEmail: string
+  menteeEmail: string
+  mentorName: string
+  menteeName: string
+  scheduledAt: string
+  meetLink: string | null
+  menteeNotes?: string // Comentários do mentee
+  mentorNotes?: string // Anotações do mentor
 }
 
 /**
@@ -27,10 +29,11 @@ interface AppointmentConfirmationData {
 export async function sendAppointmentRequest(
   data: AppointmentRequestData
 ): Promise<void> {
-  const { mentorEmail, mentorName, menteeName, scheduledAt, message, token } = data;
+  const { mentorEmail, mentorName, menteeName, scheduledAt, message, token } =
+    data
 
   // URL de confirmação
-  const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/appointments/confirm?token=${token}`;
+  const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/appointments/confirm?token=${token}`
 
   // Template HTML simples
   const htmlContent = `
@@ -59,7 +62,9 @@ export async function sendAppointmentRequest(
           <p><strong>${menteeName}</strong> solicitou uma sessão de mentoria com você.</p>
           
           <div class="info">
-            <p><strong>📅 Data e Hora:</strong> ${new Date(scheduledAt).toLocaleString('pt-BR')}</p>
+            <p><strong>📅 Data e Hora:</strong> ${new Date(
+              scheduledAt
+            ).toLocaleString("pt-BR")}</p>
             <p><strong>💬 Mensagem:</strong></p>
             <p>${message}</p>
           </div>
@@ -82,42 +87,45 @@ export async function sendAppointmentRequest(
       </div>
     </body>
     </html>
-  `;
+  `
 
   try {
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'api-key': process.env.BREVO_API_KEY || '',
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
       },
       body: JSON.stringify({
         sender: {
-          name: process.env.BREVO_SENDER_NAME || 'Menvo',
-          email: process.env.BREVO_SENDER_EMAIL || 'noreply@menvo.com.br',
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
         },
         to: [
           {
             email: mentorEmail,
-            name: mentorName,
-          },
+            name: mentorName
+          }
         ],
         subject: `Nova solicitação de mentoria de ${menteeName}`,
-        htmlContent,
-      }),
-    });
+        htmlContent
+      })
+    })
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('[EMAIL] Erro ao enviar email de agendamento:', error);
-      throw new Error(`Falha ao enviar email: ${response.status}`);
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar email de agendamento:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
     }
 
-    console.log('[EMAIL] Email de agendamento enviado com sucesso para:', mentorEmail);
+    console.log(
+      "[EMAIL] Email de agendamento enviado com sucesso para:",
+      mentorEmail
+    )
   } catch (error) {
-    console.error('[EMAIL] Erro ao enviar email:', error);
-    throw error;
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
   }
 }
 
@@ -127,13 +135,22 @@ export async function sendAppointmentRequest(
 export async function sendAppointmentConfirmation(
   data: AppointmentConfirmationData
 ): Promise<void> {
-  const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt, meetLink } = data;
+  const {
+    mentorEmail,
+    menteeEmail,
+    mentorName,
+    menteeName,
+    scheduledAt,
+    meetLink,
+    menteeNotes,
+    mentorNotes
+  } = data
 
   // Formatar data
-  const formattedDate = new Date(scheduledAt).toLocaleString('pt-BR', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  });
+  const formattedDate = new Date(scheduledAt).toLocaleString("pt-BR", {
+    dateStyle: "full",
+    timeStyle: "short"
+  })
 
   // Template HTML com link do Meet
   const htmlContent = `
@@ -166,7 +183,31 @@ export async function sendAppointmentConfirmation(
             <p><strong>📅 Data e Hora:</strong> ${formattedDate}</p>
           </div>
           
-          ${meetLink ? `
+          ${
+            menteeNotes
+              ? `
+          <div class="info">
+            <p><strong>💬 Comentários do Mentee:</strong></p>
+            <p style="white-space: pre-wrap;">${menteeNotes}</p>
+          </div>
+          `
+              : ""
+          }
+          
+          ${
+            mentorNotes
+              ? `
+          <div class="info">
+            <p><strong>📝 Observações do Mentor:</strong></p>
+            <p style="white-space: pre-wrap;">${mentorNotes}</p>
+          </div>
+          `
+              : ""
+          }
+          
+          ${
+            meetLink
+              ? `
           <div class="meet-link">
             <p><strong>🎥 Link da Reunião:</strong></p>
             <p style="margin: 10px 0;">
@@ -176,12 +217,14 @@ export async function sendAppointmentConfirmation(
               Ou copie e cole este link: ${meetLink}
             </p>
           </div>
-          ` : `
+          `
+              : `
           <div class="meet-link">
             <p><strong>📧 Convite do Google Calendar:</strong></p>
             <p>Você também receberá um convite do Google Calendar com o link da reunião.</p>
           </div>
-          `}
+          `
+          }
           
           <p><strong>💡 Dicas para a sessão:</strong></p>
           <ul>
@@ -200,46 +243,46 @@ export async function sendAppointmentConfirmation(
       </div>
     </body>
     </html>
-  `;
+  `
 
   try {
     // Enviar para ambos (mentor e mentee)
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'api-key': process.env.BREVO_API_KEY || '',
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
       },
       body: JSON.stringify({
         sender: {
-          name: process.env.BREVO_SENDER_NAME || 'Menvo',
-          email: process.env.BREVO_SENDER_EMAIL || 'noreply@menvo.com.br',
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
         },
         to: [
           {
             email: mentorEmail,
-            name: mentorName,
+            name: mentorName
           },
           {
             email: menteeEmail,
-            name: menteeName,
-          },
+            name: menteeName
+          }
         ],
-        subject: 'Mentoria confirmada!',
-        htmlContent,
-      }),
-    });
+        subject: "Mentoria confirmada!",
+        htmlContent
+      })
+    })
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('[EMAIL] Erro ao enviar email de confirmação:', error);
-      throw new Error(`Falha ao enviar email: ${response.status}`);
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar email de confirmação:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
     }
 
-    console.log('[EMAIL] Email de confirmação enviado com sucesso');
+    console.log("[EMAIL] Email de confirmação enviado com sucesso")
   } catch (error) {
-    console.error('[EMAIL] Erro ao enviar email:', error);
-    throw error;
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
   }
 }

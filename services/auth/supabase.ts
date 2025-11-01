@@ -37,7 +37,6 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
 
 export const auth = {
   signUp: async (email: string, password: string, metadata?: any) => {
-    console.log("🔄 Supabase signUp iniciado:", { email })
 
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
@@ -53,12 +52,10 @@ export const auth = {
       throw error
     }
 
-    console.log("✅ Supabase signUp bem-sucedido:", data.user?.id)
     return data
   },
 
   signIn: async (email: string, password: string) => {
-    console.log("🔄 Supabase signIn iniciado:", { email })
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase().trim(),
@@ -70,12 +67,10 @@ export const auth = {
       throw error
     }
 
-    console.log("✅ Supabase signIn bem-sucedido:", data.user?.id)
     return data
   },
 
   signInWithGoogle: async () => {
-    console.log("🔄 Google OAuth iniciado")
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -93,12 +88,10 @@ export const auth = {
       throw error
     }
 
-    console.log("✅ Google OAuth iniciado com sucesso")
     return data
   },
 
   signInWithLinkedIn: async () => {
-    console.log("🔄 LinkedIn OAuth iniciado")
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "linkedin_oidc",
@@ -115,12 +108,10 @@ export const auth = {
       throw error
     }
 
-    console.log("✅ LinkedIn OAuth iniciado com sucesso")
     return data
   },
 
   signOut: async () => {
-    console.log("🔄 SignOut iniciado")
 
     const { error } = await supabase.auth.signOut()
 
@@ -129,7 +120,6 @@ export const auth = {
       throw error
     }
 
-    console.log("✅ SignOut bem-sucedido")
   },
 
   getUser: async () => {
@@ -147,7 +137,6 @@ export const auth = {
   },
 
   resendConfirmationEmail: async (email: string) => {
-    console.log("🔄 Reenviando email de confirmação:", { email })
 
     const { error } = await supabase.auth.resend({
       type: "signup",
@@ -162,11 +151,9 @@ export const auth = {
       throw error
     }
 
-    console.log("✅ Email de confirmação reenviado")
   },
 
   resetPassword: async (email: string) => {
-    console.log("🔄 Iniciando reset de senha:", { email })
 
     const { error } = await supabase.auth.resetPasswordForEmail(
       email.toLowerCase().trim(),
@@ -179,13 +166,9 @@ export const auth = {
       console.error("❌ Erro no reset de senha:", error)
       throw error
     }
-
-    console.log("✅ Email de reset enviado")
   },
 
   updatePassword: async (newPassword: string) => {
-    console.log("🔄 Atualizando senha")
-
     const { error } = await supabase.auth.updateUser({
       password: newPassword
     })
@@ -194,7 +177,5 @@ export const auth = {
       console.error("❌ Erro ao atualizar senha:", error)
       throw error
     }
-
-    console.log("✅ Senha atualizada")
   }
 }

@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         scheduled_at: scheduledAt,
         duration_minutes: duration,
         status: 'pending',
-        notes: message,
+        notes_mentee: message, // Comentários/notas do mentee
         action_token: actionToken,
       })
       .select()

@@ -4,7 +4,7 @@ import { CreateAppointmentRequest } from '@/types/appointments';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get the current user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         google_event_id: googleEventId,
         google_meet_link: googleMeetLink,
         status: 'pending',
-        notes: message,
+        notes_mentee: message, // Comentários/notas do mentee
       })
       .select(`
         *,

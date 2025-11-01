@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { PdfViewerDialog } from '@/components/ui/pdf-viewer-dialog'
 import {
     MapPin,
     Mail,
@@ -12,7 +14,9 @@ import {
     Briefcase,
     GraduationCap,
     Target,
-    FileText
+    FileText,
+    User,
+    Languages
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -35,6 +39,11 @@ interface MenteeProfile {
     linkedin_url?: string
     github_url?: string
     portfolio_url?: string
+    cv_url?: string
+    phone?: string
+    age?: number
+    languages?: string[]
+    expertise_areas?: string[]
     created_at: string
 }
 
@@ -43,6 +52,8 @@ interface Props {
 }
 
 export default function MenteeProfileClient({ mentee }: Props) {
+    const [isPdfViewerOpen, setIsPdfViewerOpen] = useState(false)
+
     const fullName = `${mentee.first_name} ${mentee.last_name}`.trim()
     const initials = `${mentee.first_name?.[0] || ''}${mentee.last_name?.[0] || ''}`.toUpperCase()
 
@@ -169,32 +180,120 @@ export default function MenteeProfileClient({ mentee }: Props) {
 
                 {/* Sidebar */}
                 <div className="space-y-6">
-                    {/* Contact Info */}
+                    {/* Informações Profissionais */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Informações</CardTitle>
+                            <CardTitle>Informações Profissionais</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                            <div className="flex items-center gap-2 text-sm">
-                                <Mail className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-gray-600">{mentee.email}</span>
-                            </div>
-
                             {mentee.current_position && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Briefcase className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-gray-600">{mentee.current_position}</span>
+                                <div className="flex items-start gap-2 text-sm">
+                                    <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-gray-900">Cargo Atual</p>
+                                        <p className="text-gray-600">{mentee.current_position}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {mentee.current_company && (
+                                <div className="flex items-start gap-2 text-sm">
+                                    <Briefcase className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-gray-900">Empresa</p>
+                                        <p className="text-gray-600">{mentee.current_company}</p>
+                                    </div>
                                 </div>
                             )}
 
                             {mentee.education_level && (
-                                <div className="flex items-center gap-2 text-sm">
-                                    <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-gray-600">{mentee.education_level}</span>
+                                <div className="flex items-start gap-2 text-sm">
+                                    <GraduationCap className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-gray-900">Formação</p>
+                                        <p className="text-gray-600">{mentee.education_level}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {(mentee.city || mentee.state || mentee.country) && (
+                                <div className="flex items-start gap-2 text-sm">
+                                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-gray-900">Localização</p>
+                                        <p className="text-gray-600">
+                                            {[mentee.city, mentee.state, mentee.country].filter(Boolean).join(', ')}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {mentee.languages && mentee.languages.length > 0 && (
+                                <div className="flex items-start gap-2 text-sm">
+                                    <Languages className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-gray-900">Idiomas</p>
+                                        <p className="text-gray-600">{mentee.languages.join(', ')}</p>
+                                    </div>
                                 </div>
                             )}
                         </CardContent>
                     </Card>
+
+                    {/* Áreas de Expertise */}
+                    {mentee.expertise_areas && mentee.expertise_areas.length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Áreas de Interesse</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex flex-wrap gap-2">
+                                    {mentee.expertise_areas.map((area, index) => (
+                                        <Badge key={index} variant="outline">
+                                            {area}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Feedback e Avaliações - Em Desenvolvimento */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Avaliações de Mentores</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-center py-6 text-muted-foreground">
+                                <p className="text-sm italic">Em desenvolvimento</p>
+                                <p className="text-xs mt-2">
+                                    Em breve você poderá ver feedbacks e avaliações recebidas de mentores
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Currículo */}
+                    {mentee.cv_url && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center">
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Currículo
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Button
+                                    variant="default"
+                                    className="w-full"
+                                    onClick={() => setIsPdfViewerOpen(true)}
+                                >
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Visualizar Currículo
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {/* Links */}
                     {(mentee.linkedin_url || mentee.github_url || mentee.portfolio_url) && (
@@ -232,6 +331,16 @@ export default function MenteeProfileClient({ mentee }: Props) {
                     )}
                 </div>
             </div>
+
+            {/* PDF Viewer Dialog */}
+            {mentee.cv_url && (
+                <PdfViewerDialog
+                    open={isPdfViewerOpen}
+                    onOpenChange={setIsPdfViewerOpen}
+                    pdfUrl={mentee.cv_url}
+                    title={`Currículo - ${fullName}`}
+                />
+            )}
         </div>
     )
 }

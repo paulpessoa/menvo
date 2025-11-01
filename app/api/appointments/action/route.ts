@@ -39,11 +39,11 @@ export async function POST(request: NextRequest) {
 
     // Atualizar status
     const newStatus = action === 'confirm' ? 'confirmed' : 'cancelled';
-    const updateData: any = { status: newStatus };
-    
-    if (action === 'cancel' && reason) {
-      updateData.notes = `${appointment.notes}\n\n[Cancelado] Motivo: ${reason}`;
-    }
+    const updateData: any = { 
+      status: newStatus,
+      cancellation_reason: action === 'cancel' ? reason : null,
+      cancelled_at: action === 'cancel' ? new Date().toISOString() : null,
+    };
 
     const { error: updateError } = await supabase
       .from('appointments')

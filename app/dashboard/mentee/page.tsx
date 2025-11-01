@@ -194,18 +194,18 @@ export default function MenteeDashboard() {
 
     const quickActions = [
         {
+            title: "Minhas Mentorias",
+            description: "Gerencie suas solicitações e sessões agendadas",
+            href: "/mentorship/mentee",
+            icon: Calendar,
+            color: "bg-green-500"
+        },
+        {
             title: "Encontrar Mentores",
             description: "Busque mentores verificados em sua área de interesse",
             href: "/mentors",
             icon: Search,
             color: "bg-blue-500"
-        },
-        {
-            title: "Meus Agendamentos",
-            description: "Veja suas sessões de mentoria agendadas",
-            href: "/mentee/appointments",
-            icon: Calendar,
-            color: "bg-green-500"
         },
         {
             title: "Editar Perfil",
@@ -319,192 +319,62 @@ export default function MenteeDashboard() {
                         </div>
                     </div>
 
-                    {/* Upcoming Appointments */}
-                    {upcomingAppointments.length > 0 && (
-                        <div>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-semibold">Próximas Sessões</h2>
-                                <Button variant="outline" asChild>
-                                    <Link href="/mentee/appointments">
-                                        Ver Todas
-                                    </Link>
-                                </Button>
-                            </div>
-                            <div className="space-y-4">
-                                {upcomingAppointments.map((appointment) => {
-                                    const { date, time } = formatDateTime(appointment.scheduled_at)
-                                    return (
-                                        <Card key={appointment.id}>
-                                            <CardContent className="flex items-center justify-between p-6">
-                                                <div className="flex items-center gap-4">
-                                                    <Avatar className="h-12 w-12">
-                                                        <AvatarImage src={appointment.mentor.avatar_url || undefined} />
-                                                        <AvatarFallback>
-                                                            {appointment.mentor.full_name.split(' ').map(n => n[0]).join('')}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <div>
-                                                        <h3 className="font-medium">{appointment.mentor.full_name}</h3>
-                                                        {appointment.mentor.job_title && (
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {appointment.mentor.job_title}
-                                                            </p>
-                                                        )}
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {date} às {time} • {appointment.duration_minutes} min
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant={appointment.status === 'confirmed' ? 'default' : 'secondary'}>
-                                                        {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
-                                                    </Badge>
-                                                    <Button size="sm" variant="outline">
-                                                        <MessageCircle className="h-4 w-4 mr-2" />
-                                                        Detalhes
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    )}
+                    {/* Próximas Sessões - Removido (redundante com /mentorship/mentee) */}
 
-                    {/* Getting Started */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Primeiros Passos</CardTitle>
-                            <CardDescription>
-                                Complete estas etapas para aproveitar ao máximo a plataforma
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center gap-3">
-                                <CheckCircle className="h-5 w-5 text-green-600" />
-                                <span className="text-sm">Cadastro realizado</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <CheckCircle className="h-5 w-5 text-green-600" />
-                                <span className="text-sm">Papel de mentee selecionado</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                <span className="text-sm text-muted-foreground">Complete seu perfil</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                <span className="text-sm text-muted-foreground">Encontre seu primeiro mentor</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                <span className="text-sm text-muted-foreground">Agende sua primeira sessão</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Getting Started */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Primeiros Passos</CardTitle>
+                                <CardDescription>
+                                    Complete estas etapas para aproveitar ao máximo a plataforma
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <CheckCircle className="h-5 w-5 text-green-600" />
+                                    <span className="text-sm">Cadastro realizado</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <CheckCircle className="h-5 w-5 text-green-600" />
+                                    <span className="text-sm">Papel de mentee selecionado</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
+                                    <span className="text-sm text-muted-foreground">Complete seu perfil</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
+                                    <span className="text-sm text-muted-foreground">Encontre seu primeiro mentor</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
+                                    <span className="text-sm text-muted-foreground">Agende sua primeira sessão</span>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                    {/* Featured Mentors */}
-                    <div>
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h2 className="text-2xl font-semibold">Mentores em Destaque</h2>
-                                <p className="text-muted-foreground">
-                                    Conheça alguns dos nossos mentores mais bem avaliados
-                                </p>
-                            </div>
-                            <Button variant="outline" asChild>
-                                <Link href="/mentors">
-                                    Ver Todos
-                                </Link>
-                            </Button>
-                        </div>
-
-                        {loading ? (
-                            <div className="flex items-center justify-center py-8">
-                                <Loader2 className="h-8 w-8 animate-spin" />
-                            </div>
-                        ) : featuredMentors.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {featuredMentors.map((mentor) => (
-                                    <Card key={mentor.id} className="hover:shadow-md transition-shadow">
-                                        <CardContent className="p-6">
-                                            <div className="flex items-start gap-4">
-                                                <Avatar className="h-12 w-12">
-                                                    <AvatarImage src={mentor.avatar_url || undefined} />
-                                                    <AvatarFallback>
-                                                        {mentor.full_name.split(' ').map(n => n[0]).join('')}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className="font-medium truncate">{mentor.full_name}</h3>
-                                                    {mentor.job_title && (
-                                                        <p className="text-sm text-muted-foreground truncate">
-                                                            {mentor.job_title}
-                                                            {mentor.company && ` @ ${mentor.company}`}
-                                                        </p>
-                                                    )}
-
-                                                    {mentor.average_rating > 0 && (
-                                                        <div className="flex items-center gap-1 mt-2">
-                                                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                                            <span className="text-sm font-medium">
-                                                                {mentor.average_rating.toFixed(1)}
-                                                            </span>
-                                                            <span className="text-sm text-muted-foreground">
-                                                                ({mentor.total_reviews})
-                                                            </span>
-                                                        </div>
-                                                    )}
-
-                                                    {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-                                                        <div className="flex flex-wrap gap-1 mt-2">
-                                                            {mentor.mentorship_topics.slice(0, 2).map((topic, index) => (
-                                                                <Badge key={index} variant="secondary" className="text-xs">
-                                                                    {topic}
-                                                                </Badge>
-                                                            ))}
-                                                            {mentor.mentorship_topics.length > 2 && (
-                                                                <Badge variant="outline" className="text-xs">
-                                                                    +{mentor.mentorship_topics.length - 2}
-                                                                </Badge>
-                                                            )}
-                                                        </div>
-                                                    )}
-
-                                                    <div className="flex gap-2 mt-4">
-                                                        <Button size="sm" asChild className="flex-1">
-                                                            <Link href={`/mentors/${mentor.slug || mentor.id}`}>
-                                                                Ver Perfil
-                                                            </Link>
-                                                        </Button>
-                                                        <Button size="sm" variant="outline">
-                                                            <Heart className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        ) : (
-                            <Card>
-                                <CardContent className="text-center py-8">
-                                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                                    <h3 className="text-lg font-semibold mb-2">Nenhum mentor encontrado</h3>
-                                    <p className="text-muted-foreground mb-4">
-                                        Ainda não temos mentores verificados disponíveis.
+                        {/* Progresso e Recursos - Em Desenvolvimento */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Meu Progresso</CardTitle>
+                                <CardDescription>
+                                    Acompanhe seu desenvolvimento profissional
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-center py-6 text-muted-foreground">
+                                    <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                    <p className="text-sm italic">Em desenvolvimento</p>
+                                    <p className="text-xs mt-2">
+                                        Em breve: gráficos de progresso, metas alcançadas, certificados e recursos de aprendizado
                                     </p>
-                                    <Button asChild>
-                                        <Link href="/mentors">
-                                            Ver Todos os Mentores
-                                        </Link>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        )}
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
+
+                    {/* Mentores em Destaque - Comentado (pode adicionar depois se necessário) */}
                 </div>
             </div>
         </RequireRole>

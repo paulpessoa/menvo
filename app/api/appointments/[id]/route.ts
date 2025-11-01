@@ -87,9 +87,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     console.log('🔄 [PATCH APPOINTMENT] ID:', appointmentId, 'User:', user.id);
     
     const body = await request.json();
-    const { status, notes } = body;
+    const { status, notes_mentor } = body;
     
-    console.log('📝 [PATCH APPOINTMENT] Body:', { status, notes });
+    console.log('📝 [PATCH APPOINTMENT] Body:', { status, notes_mentor });
 
     // Validate status
     const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
@@ -152,8 +152,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updateData.status = status;
     }
 
-    if (notes !== undefined) {
-      updateData.notes = notes;
+    if (notes_mentor !== undefined) {
+      updateData.notes_mentor = notes_mentor;
     }
 
     // Handle status change to confirmed - trigger full confirmation flow
@@ -181,7 +181,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           },
           body: JSON.stringify({
             appointmentId: appointmentId,
-            mentorNotes: notes, // Passar as notas do mentor
+            mentorNotes: notes_mentor, // Passar as notas do mentor
           }),
         });
 

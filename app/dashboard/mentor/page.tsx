@@ -159,9 +159,9 @@ export default function MentorDashboard() {
             disabled: !isVerified
         },
         {
-            title: "Ver Agendamentos",
+            title: "Minhas Mentorias",
             description: "Gerencie suas sessões de mentoria",
-            href: "/dashboard/mentor/appointments",
+            href: "/mentorship/mentor",
             icon: Clock,
             color: "bg-green-500",
             disabled: !isVerified
@@ -316,13 +316,13 @@ export default function MentorDashboard() {
                         </div>
                     </div>
 
-                    {/* Upcoming Appointments */}
-                    {isVerified && upcomingAppointments.length > 0 && (
+                    {/* Próximos Agendamentos - Comentado (redundante com /mentorship/mentor) */}
+                    {false && isVerified && upcomingAppointments.length > 0 && (
                         <div>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-semibold">Próximos Agendamentos</h2>
                                 <Button variant="outline" asChild>
-                                    <Link href="/dashboard/mentor/appointments">
+                                    <Link href="/mentorship/mentor">
                                         Ver Todos
                                     </Link>
                                 </Button>
