@@ -54,12 +54,17 @@ export default function Header() {
   ]
 
   const userNavigation = isAuthenticated
-    ? [
-      { name: "Dashboard", href: "/dashboard", icon: User },
-      { name: "Perfil", href: "/profile", icon: User },
-      { name: "Mensagens", href: "/messages", icon: MessageSquare },
-      { name: "Configurações", href: "/settings", icon: Settings },
-    ]
+    ? isAdmin
+      ? [
+        { name: "Painel Administrativo", href: "/admin", icon: Shield },
+        { name: "Configurações", href: "/settings", icon: Settings },
+      ]
+      : [
+        { name: "Dashboard", href: "/dashboard", icon: User },
+        { name: "Perfil", href: "/profile", icon: User },
+        { name: "Mensagens", href: "/messages", icon: MessageSquare },
+        { name: "Configurações", href: "/settings", icon: Settings },
+      ]
     : []
 
   const volunteerNavigation =
@@ -83,7 +88,22 @@ export default function Header() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="MENVO" width={120} height={40} priority />
+            <Image
+              src="/menvo-logo-light.png"
+              alt="MENVO"
+              width={120}
+              height={40}
+              priority
+              className="dark:hidden"
+            />
+            <Image
+              src="/menvo-logo-dark.png"
+              alt="MENVO"
+              width={120}
+              height={40}
+              priority
+              className="hidden dark:block"
+            />
           </Link>
         </div>
 

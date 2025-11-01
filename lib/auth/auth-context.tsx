@@ -275,7 +275,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getRoleDashboardPath = useCallback((userRole: string | null) => {
         switch (userRole) {
             case 'admin':
-                return '/dashboard/admin'
+                return '/admin'
             case 'mentor':
                 return '/dashboard/mentor'
             case 'mentee':

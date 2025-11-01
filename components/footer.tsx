@@ -32,7 +32,20 @@ export default function Footer() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Image src="/logo.png" alt="MENVO" width={120} height={40} />
+                <Image
+                  src="/menvo-logo-light.png"
+                  alt="MENVO"
+                  width={120}
+                  height={40}
+                  className="dark:hidden"
+                />
+                <Image
+                  src="/menvo-logo-dark.png"
+                  alt="MENVO"
+                  width={120}
+                  height={40}
+                  className="hidden dark:block"
+                />
               </div>
               <p className="text-sm text-muted-foreground">
                 {t("footer.description")}

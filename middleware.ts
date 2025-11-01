@@ -4,13 +4,13 @@ import {
   protectedRoutes,
   adminRoutes,
   onboardingRequiredRoutes,
-  authRoutes,
+  authRoutes
 } from "@/config/routes"
-import { 
-  determineRedirect, 
-  isProfileComplete, 
+import {
+  determineRedirect,
+  isProfileComplete,
   shouldSkipRoleSelection,
-  isAuthorizedForPath 
+  isAuthorizedForPath
 } from "@/lib/auth-redirect"
 
 // Consolidated Supabase client creation for middleware
@@ -49,12 +49,16 @@ function createClient(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
 
   // Skip middleware if Supabase credentials are not available
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("[middleware] Supabase credentials not found, skipping auth middleware")
+    console.warn(
+      "[middleware] Supabase credentials not found, skipping auth middleware"
+    )
     return NextResponse.next()
   }
 
@@ -105,9 +109,11 @@ export async function middleware(request: NextRequest) {
     try {
       const { data: roleData } = await supabase
         .from("user_roles")
-        .select(`
+        .select(
+          `
           roles(name)
-        `)
+        `
+        )
         .eq("user_id", user.id)
         .single()
 
@@ -122,17 +128,17 @@ export async function middleware(request: NextRequest) {
       // User has role, redirect to appropriate dashboard
       let dashboardPath = "/dashboard"
       switch (userRole) {
-        case 'admin':
-          dashboardPath = "/dashboard/admin"
+        case "admin":
+          dashboardPath = "/admin"
           break
-        case 'mentor':
+        case "mentor":
           dashboardPath = "/dashboard/mentor"
           break
-        case 'mentee':
+        case "mentee":
           dashboardPath = "/dashboard/mentee"
           break
       }
-      
+
       const redirectUrl = new URL(dashboardPath, request.url)
       return NextResponse.redirect(redirectUrl)
     } catch (error) {
@@ -154,9 +160,11 @@ export async function middleware(request: NextRequest) {
     try {
       const { data: roleData } = await supabase
         .from("user_roles")
-        .select(`
+        .select(
+          `
           roles(name)
-        `)
+        `
+        )
         .eq("user_id", user.id)
         .single()
 
@@ -179,9 +187,11 @@ export async function middleware(request: NextRequest) {
     try {
       const { data: roleData } = await supabase
         .from("user_roles")
-        .select(`
+        .select(
+          `
           roles(name)
-        `)
+        `
+        )
         .eq("user_id", user.id)
         .single()
 
@@ -198,13 +208,13 @@ export async function middleware(request: NextRequest) {
         if (pathname === "/auth/select-role") {
           let dashboardPath = "/dashboard"
           switch (userRole) {
-            case 'admin':
-              dashboardPath = "/dashboard/admin"
+            case "admin":
+              dashboardPath = "/admin"
               break
-            case 'mentor':
+            case "mentor":
               dashboardPath = "/dashboard/mentor"
               break
-            case 'mentee':
+            case "mentee":
               dashboardPath = "/dashboard/mentee"
               break
           }
@@ -234,6 +244,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+  ]
 }

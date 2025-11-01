@@ -13,148 +13,149 @@ export async function GET(request: NextRequest) {
   // Handle email callback (token_hash or code with type)
   if (type && (tokenHash || code)) {
     try {
-      
-      let verifyResult
-      let redirectPath = '/dashboard'
+      let verifyResult:
+        | { data: { user: any; session: any }; error: any }
+        | undefined
+      let redirectPath = "/dashboard"
 
       switch (type) {
-        case 'signup':
+        case "signup":
           // Email confirmation after registration
           if (tokenHash) {
             verifyResult = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'signup'
+              type: "signup"
             })
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
-          
+
           // Check if user already has a role after email confirmation
-          if (verifyResult.data?.user) {
+          if (verifyResult?.data?.user) {
             const { data: roleData } = await supabase
-              .from('user_roles')
+              .from("user_roles")
               .select(`roles (name)`)
-              .eq('user_id', verifyResult.data.user.id)
+              .eq("user_id", verifyResult.data.user.id)
               .single()
-            
+
             const roleName = (roleData?.roles as any)?.name
             if (roleName) {
               // User has role, redirect to appropriate dashboard
               switch (roleName) {
-                case 'admin':
-                  redirectPath = '/dashboard/admin'
+                case "admin":
+                  redirectPath = "/dashboard/admin"
                   break
-                case 'mentor':
-                  redirectPath = '/dashboard/mentor'
+                case "mentor":
+                  redirectPath = "/dashboard/mentor"
                   break
-                case 'mentee':
-                  redirectPath = '/dashboard/mentee'
+                case "mentee":
+                  redirectPath = "/dashboard/mentee"
                   break
                 default:
-                  redirectPath = '/dashboard'
+                  redirectPath = "/dashboard"
               }
             } else {
-              redirectPath = '/auth/select-role'
+              redirectPath = "/auth/select-role"
             }
           } else {
-            redirectPath = '/auth/select-role'
+            redirectPath = "/auth/select-role"
           }
           break
 
-        case 'recovery':
+        case "recovery":
           // Password recovery
           if (tokenHash) {
             verifyResult = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'recovery'
+              type: "recovery"
             })
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
-          redirectPath = '/auth/reset-password'
+          redirectPath = "/auth/reset-password"
           break
 
-        case 'invite':
+        case "invite":
           // Admin invitation
           if (tokenHash) {
             verifyResult = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'invite'
+              type: "invite"
             })
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
-          redirectPath = '/auth/set-password'
+          redirectPath = "/auth/set-password"
           break
 
-        case 'magiclink':
+        case "magiclink":
           // Magic link login
           if (tokenHash) {
             verifyResult = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'magiclink'
+              type: "magiclink"
             })
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
-          
+
           // Check if user has a role for magic link login
           if (verifyResult.data?.user) {
             const { data: roleData } = await supabase
-              .from('user_roles')
+              .from("user_roles")
               .select(`roles (name)`)
-              .eq('user_id', verifyResult.data.user.id)
+              .eq("user_id", verifyResult.data.user.id)
               .single()
-            
+
             const roleName = (roleData?.roles as any)?.name
             if (roleName) {
               // User has role, redirect to appropriate dashboard
               switch (roleName) {
-                case 'admin':
-                  redirectPath = '/dashboard/admin'
+                case "admin":
+                  redirectPath = "/dashboard/admin"
                   break
-                case 'mentor':
-                  redirectPath = '/dashboard/mentor'
+                case "mentor":
+                  redirectPath = "/dashboard/mentor"
                   break
-                case 'mentee':
-                  redirectPath = '/dashboard/mentee'
+                case "mentee":
+                  redirectPath = "/dashboard/mentee"
                   break
                 default:
-                  redirectPath = '/dashboard'
+                  redirectPath = "/dashboard"
               }
             } else {
-              redirectPath = '/auth/select-role'
+              redirectPath = "/auth/select-role"
             }
           } else {
-            redirectPath = '/auth/select-role'
+            redirectPath = "/auth/select-role"
           }
           break
 
-        case 'email_change':
+        case "email_change":
           // Email change confirmation
           if (tokenHash) {
             verifyResult = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'email_change'
+              type: "email_change"
             })
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
-          redirectPath = '/dashboard'
+          redirectPath = "/dashboard"
           break
 
-        case 'reauthentication':
+        case "reauthentication":
           // Reauthentication for sensitive operations
           if (tokenHash) {
             verifyResult = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'reauthentication'
+              type: "reauthentication"
             })
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
           const next = requestUrl.searchParams.get("next")
-          redirectPath = next || '/dashboard'
+          redirectPath = next || "/dashboard"
           break
 
         default:
@@ -166,15 +167,17 @@ export async function GET(request: NextRequest) {
 
       if (verifyResult.error) {
         console.error(`❌ Error verifying ${type} token:`, verifyResult.error)
-        
-        let errorParam = 'verification_error'
-        if (verifyResult.error.message?.includes('expired')) {
-          errorParam = 'token_expired'
-        } else if (verifyResult.error.message?.includes('invalid')) {
-          errorParam = 'token_invalid'
-        } else if (verifyResult.error.message?.includes('already_confirmed')) {
+
+        let errorParam = "verification_error"
+        if (verifyResult.error.message?.includes("expired")) {
+          errorParam = "token_expired"
+        } else if (verifyResult.error.message?.includes("invalid")) {
+          errorParam = "token_invalid"
+        } else if (verifyResult.error.message?.includes("already_confirmed")) {
           // For already confirmed, redirect to login
-          return NextResponse.redirect(new URL("/auth/login?message=already_confirmed", request.url))
+          return NextResponse.redirect(
+            new URL("/auth/login?message=already_confirmed", request.url)
+          )
         }
 
         return NextResponse.redirect(
@@ -183,7 +186,6 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.redirect(new URL(redirectPath, request.url))
-
     } catch (error) {
       console.error(`Email callback error for ${type}:`, error)
       return NextResponse.redirect(
@@ -210,13 +212,15 @@ export async function GET(request: NextRequest) {
 
         // Check if user has a role
         const { data: roleData } = await supabase
-          .from('user_roles')
-          .select(`
+          .from("user_roles")
+          .select(
+            `
             roles (
               name
             )
-          `)
-          .eq('user_id', data.user.id)
+          `
+          )
+          .eq("user_id", data.user.id)
           .single()
 
         const redirectTo = requestUrl.searchParams.get("redirectTo")
@@ -231,15 +235,15 @@ export async function GET(request: NextRequest) {
 
         // Role-based redirection logic
         let dashboardPath = "/dashboard"
-        
+
         switch (roleName) {
-          case 'admin':
-            dashboardPath = "/dashboard/admin"
+          case "admin":
+            dashboardPath = "/admin"
             break
-          case 'mentor':
+          case "mentor":
             dashboardPath = "/dashboard/mentor"
             break
-          case 'mentee':
+          case "mentee":
             dashboardPath = "/dashboard/mentee"
             break
           default:
@@ -248,10 +252,8 @@ export async function GET(request: NextRequest) {
 
         // Use redirectTo if provided and valid, otherwise use role-based dashboard
         const finalRedirect = redirectTo || dashboardPath
-        
-        return NextResponse.redirect(
-          new URL(finalRedirect, request.url)
-        )
+
+        return NextResponse.redirect(new URL(finalRedirect, request.url))
       }
 
       return NextResponse.redirect(new URL("/dashboard", request.url))

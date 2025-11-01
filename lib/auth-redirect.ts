@@ -3,7 +3,7 @@
  * Only handles basic role-based redirects for 3 user types: mentor, mentee, admin
  */
 
-export type SimpleUserRole = 'mentor' | 'mentee' | 'admin' | null
+export type SimpleUserRole = "mentor" | "mentee" | "admin" | null
 
 /**
  * Simple redirect based only on user role
@@ -17,7 +17,7 @@ export function getSimpleRedirect(role: SimpleUserRole): string {
   // Role-based dashboard redirect
   switch (role) {
     case "admin":
-      return "/dashboard/admin"
+      return "/admin"
     case "mentor":
       return "/dashboard/mentor"
     case "mentee":
@@ -54,7 +54,7 @@ export function isAuthorizedForPath(
 ): boolean {
   // Public paths
   const publicPaths = ["/", "/about", "/how-it-works", "/mentors"]
-  if (publicPaths.some(p => path.startsWith(p))) {
+  if (publicPaths.some((p) => path.startsWith(p))) {
     return true
   }
 
@@ -64,7 +64,7 @@ export function isAuthorizedForPath(
   }
 
   // Admin paths
-  if (path.startsWith("/admin") || path.startsWith("/dashboard/admin")) {
+  if (path.startsWith("/admin")) {
     return role === "admin"
   }
 
