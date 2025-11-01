@@ -183,10 +183,17 @@ export function AppointmentCard({
                 )}
 
                 {canConfirm && (
-                    <ConfirmAppointmentButton
-                        appointment={appointment}
-                        onConfirmed={onAppointmentUpdate}
-                    />
+                    <>
+                        <ChatButton
+                            appointment={appointment}
+                            currentUserId={currentUserId}
+                            isMentor={isMentor}
+                        />
+                        <ConfirmAppointmentButton
+                            appointment={appointment}
+                            onConfirmed={onAppointmentUpdate}
+                        />
+                    </>
                 )}
 
                 {canCancel && (
