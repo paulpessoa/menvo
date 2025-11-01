@@ -1,123 +1,112 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
-
-// Initialize OAuth2 client
-const oauth2Client = new OAuth2Client(
-  process.env.GOOGLE_CALENDAR_CLIENT_ID,
-  process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
-  process.env.GOOGLE_CALENDAR_REDIRECT_URI
-);
-
-// Set credentials if refresh token is available
-if (process.env.GOOGLE_CALENDAR_REFRESH_TOKEN) {
-  oauth2Client.setCredentials({
-    refresh_token: process.env.GOOGLE_CALENDAR_REFRESH_TOKEN,
-  });
-}
-
-const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerClient } from '@/utils/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
-    
-    // Get the current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
+    // Buscar usuário atual
+    const serverSupabase = await createServerClient();
+    const { data: { user } } = await serverSupabase.auth.getUser();
+
+    if (!user) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Não autenticado' },
         { status: 401 }
       );
     }
 
-    // Parse request body
-    const { appointmentId, reason } = await request.json();
+    // Usar Service Role para bypass RLS
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
 
-    if (!appointmentId) {
+    const body = await request.json();
+    const { appointmentId, reason } = body;
+
+    console.log('[CANCEL] Request body:', { appointmentId, reason, userId: user.id });
+
+    if (!appointmentId || !reason) {
       return NextResponse.json(
-        { error: 'Missing appointmentId' },
+        { error: 'appointmentId e reason são obrigatórios' },
         { status: 400 }
       );
     }
 
-    // Get appointment details
-    const { data: appointment, error: appointmentError } = await supabase
+    console.log('[CANCEL] Cancelando appointment:', appointmentId, 'Reason:', reason);
+
+    // Buscar appointment
+    const { data: appointment, error: fetchError } = await supabase
       .from('appointments')
       .select(`
         *,
-        mentor:mentor_id(id, email, first_name, last_name, full_name),
-        mentee:mentee_id(id, email, first_name, last_name, full_name)
+        mentor:mentor_id(id, full_name, email),
+        mentee:mentee_id(id, full_name, email)
       `)
       .eq('id', appointmentId)
-      .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`) // Allow both mentor and mentee to cancel
       .single();
 
-    if (appointmentError || !appointment) {
+    if (fetchError || !appointment) {
+      console.error('[CANCEL] Erro ao buscar appointment:', fetchError);
       return NextResponse.json(
-        { error: 'Appointment not found or unauthorized' },
+        { error: 'Agendamento não encontrado' },
         { status: 404 }
       );
     }
 
-    // Check if appointment can be cancelled
+    // Verificar se já está cancelado
     if (appointment.status === 'cancelled') {
       return NextResponse.json(
-        { error: 'Appointment is already cancelled' },
+        { error: 'Agendamento já foi cancelado' },
         { status: 400 }
       );
     }
 
-    // Delete Google Calendar event if it exists
-    if (appointment.google_event_id) {
-      try {
-        await calendar.events.delete({
-          calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary', 
-          eventId: appointment.google_event_id,
-        });
-      } catch (calendarError) {
-        console.error('Error deleting calendar event:', calendarError);
-        // Continue with cancellation even if calendar deletion fails
-      }
-    }
+    // Atualizar status para cancelled e salvar motivo
+    const updateData = {
+      status: 'cancelled',
+      cancellation_reason: reason,
+      cancelled_at: new Date().toISOString(),
+      cancelled_by: user.id,
+      updated_at: new Date().toISOString(),
+    };
 
-    // Update appointment status to cancelled
-    const { data: updatedAppointment, error: updateError } = await supabase
+    console.log('[CANCEL] Update data:', updateData);
+
+    const { error: updateError } = await supabase
       .from('appointments')
-      .update({
-        status: 'cancelled',
-        cancelled_at: new Date().toISOString(),
-        cancellation_reason: reason,
-        cancelled_by: user.id,
-      })
-      .eq('id', appointmentId)
-      .select(`
-        *,
-        mentor:mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-        mentee:mentee_id(id, email, first_name, last_name, full_name, avatar_url)
-      `)
-      .single();
+      .update(updateData)
+      .eq('id', appointmentId);
 
     if (updateError) {
-      console.error('Error updating appointment:', updateError);
+      console.error('[CANCEL] Erro ao cancelar appointment:', updateError);
+      console.error('[CANCEL] Error details:', JSON.stringify(updateError, null, 2));
       return NextResponse.json(
-        { error: 'Failed to cancel appointment' },
+        { error: 'Erro ao cancelar agendamento', details: updateError.message },
         { status: 500 }
       );
     }
 
+    console.log('[CANCEL] ✅ Appointment cancelado com sucesso');
+
+    // TODO: Remover evento do Google Calendar se existir
+    // TODO: Enviar email de notificação
+
     return NextResponse.json({
       success: true,
-      appointment: updatedAppointment,
-      message: 'Appointment cancelled successfully',
+      message: 'Agendamento cancelado com sucesso',
     });
 
   } catch (error) {
-    console.error('Error in appointment cancellation:', error);
+    console.error('[CANCEL] Erro inesperado:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Erro interno do servidor' },
       { status: 500 }
     );
   }
