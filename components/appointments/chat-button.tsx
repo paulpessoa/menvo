@@ -13,7 +13,7 @@ import { ChatInterface } from '@/components/chat/ChatInterface';
 
 interface ChatButtonProps {
     appointment: {
-        id: string;
+        id: string | number;
         mentor: {
             id: string;
             full_name: string;
