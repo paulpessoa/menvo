@@ -320,40 +320,42 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                     </p>
                                 </div>
                             ) : (
-                                <Button
-                                    className="w-full"
-                                    size="lg"
-                                    disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
-                                    onClick={() => {
-                                        if (!currentUserId) {
-                                            setShowLoginModal(true)
-                                        } else {
-                                            setIsScheduleModalOpen(true)
-                                        }
-                                    }}
-                                >
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
-                                        ? 'Agenda Lotada'
-                                        : 'Agendar Mentoria'}
-                                </Button>
+                                <>
+                                    <Button
+                                        className="w-full"
+                                        size="lg"
+                                        disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
+                                        onClick={() => {
+                                            if (!currentUserId) {
+                                                setShowLoginModal(true)
+                                            } else {
+                                                setIsScheduleModalOpen(true)
+                                            }
+                                        }}
+                                    >
+                                        <Calendar className="h-4 w-4 mr-2" />
+                                        {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
+                                            ? 'Agenda Lotada'
+                                            : 'Agendar Mentoria'}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full"
+                                        disabled={!mentor.chat_enabled}
+                                        onClick={() => {
+                                            if (!currentUserId) {
+                                                setShowLoginModal(true)
+                                            } else {
+                                                setIsChatOpen(true)
+                                            }
+                                        }}
+                                        title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : ''}
+                                    >
+                                        <MessageCircle className="h-4 w-4 mr-2" />
+                                        {mentor.chat_enabled ? 'Chat' : 'Chat Indisponível'}
+                                    </Button>
+                                </>
                             )}
-                            <Button
-                                variant="outline"
-                                className="w-full"
-                                disabled={!mentor.chat_enabled}
-                                onClick={() => {
-                                    if (!currentUserId) {
-                                        setShowLoginModal(true)
-                                    } else {
-                                        setIsChatOpen(true)
-                                    }
-                                }}
-                                title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : ''}
-                            >
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                {mentor.chat_enabled ? 'Chat' : 'Chat Indisponível'}
-                            </Button>
                         </CardContent>
                     </Card>
 
@@ -418,7 +420,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             </div>
 
             {/* Schedule Modal */}
-            {currentUserId && (
+            {currentUserId && currentUserId !== mentor.id && (
                 <BookMentorshipModal
                     isOpen={isScheduleModalOpen}
                     onClose={() => setIsScheduleModalOpen(false)}

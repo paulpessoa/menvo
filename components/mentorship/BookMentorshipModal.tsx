@@ -72,13 +72,18 @@ export function BookMentorshipModal({
 
     const generateUpcomingSlots = (availability: any[]): TimeSlot[] => {
         const slots: TimeSlot[] = [];
-        const today = new Date();
-        const twoWeeksFromNow = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+        const now = new Date();
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
         const SLOT_DURATION = 45; // Duração fixa de 45 minutos
+        const DAYS_TO_CHECK = 14; // Próximas 2 semanas
 
         // Para cada dia nas próximas 2 semanas
-        for (let d = new Date(today); d <= twoWeeksFromNow; d.setDate(d.getDate() + 1)) {
-            const dayOfWeek = d.getDay();
+        for (let dayOffset = 0; dayOffset <= DAYS_TO_CHECK; dayOffset++) {
+            const currentDate = new Date(now);
+            currentDate.setDate(now.getDate() + dayOffset);
+            currentDate.setHours(0, 0, 0, 0);
+
+            const dayOfWeek = currentDate.getDay();
 
             // Encontrar disponibilidade para este dia da semana
             const dayAvailability = availability.filter(a => a.day_of_week === dayOfWeek);
@@ -95,22 +100,18 @@ export function BookMentorshipModal({
                 for (let currentTime = startTimeInMinutes; currentTime + SLOT_DURATION <= endTimeInMinutes; currentTime += SLOT_DURATION) {
                     const slotStartHours = Math.floor(currentTime / 60);
                     const slotStartMinutes = currentTime % 60;
-                    const slotEndHours = Math.floor((currentTime + SLOT_DURATION) / 60);
-                    const slotEndMinutes = (currentTime + SLOT_DURATION) % 60;
 
-                    const slotDate = new Date(d);
+                    const slotDate = new Date(currentDate);
                     slotDate.setHours(slotStartHours, slotStartMinutes, 0, 0);
 
                     // Só adicionar se for no futuro (com 1h de antecedência mínima)
-                    const oneHourFromNow = new Date(today.getTime() + 60 * 60 * 1000);
                     if (slotDate > oneHourFromNow) {
                         const startTimeStr = `${String(slotStartHours).padStart(2, '0')}:${String(slotStartMinutes).padStart(2, '0')}`;
-                        const endTimeStr = `${String(slotEndHours).padStart(2, '0')}:${String(slotEndMinutes).padStart(2, '0')}`;
 
                         slots.push({
                             day_of_week: dayOfWeek,
                             start_time: startTimeStr + ':00',
-                            end_time: endTimeStr + ':00',
+                            end_time: `${String(Math.floor((currentTime + SLOT_DURATION) / 60)).padStart(2, '0')}:${String((currentTime + SLOT_DURATION) % 60).padStart(2, '0')}:00`,
                             date: slotDate,
                             formatted_date: slotDate.toLocaleDateString('pt-BR', {
                                 weekday: 'short',
@@ -123,7 +124,6 @@ export function BookMentorshipModal({
                 }
             });
         }
-
         return slots.slice(0, 30); // Limitar a 30 slots
     };
 
