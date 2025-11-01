@@ -22,8 +22,9 @@ import {
 import { toast } from "sonner"
 import Link from "next/link"
 import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
-import { ScheduleMentorshipModal } from "@/components/mentorship/ScheduleMentorshipModal"
+import { BookMentorshipModal } from "@/components/mentorship/BookMentorshipModal"
 import { ChatInterface } from "@/components/chat/ChatInterface"
+import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 
 interface MentorProfile {
     id: string
@@ -69,6 +70,7 @@ interface Props {
 export default function MentorProfileClient({ mentor, availability }: Props) {
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
     const [isChatOpen, setIsChatOpen] = useState(false)
+    const [showLoginModal, setShowLoginModal] = useState(false)
     const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
     const supabase = createClient()
@@ -315,7 +317,13 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                 className="w-full"
                                 size="lg"
                                 disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
-                                onClick={() => setIsScheduleModalOpen(true)}
+                                onClick={() => {
+                                    if (!currentUserId) {
+                                        setShowLoginModal(true)
+                                    } else {
+                                        setIsScheduleModalOpen(true)
+                                    }
+                                }}
                             >
                                 <Calendar className="h-4 w-4 mr-2" />
                                 {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
@@ -325,9 +333,15 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                             <Button
                                 variant="outline"
                                 className="w-full"
-                                disabled={!mentor.chat_enabled || !currentUserId}
-                                onClick={() => setIsChatOpen(true)}
-                                title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : !currentUserId ? 'Faça login para usar o chat' : ''}
+                                disabled={!mentor.chat_enabled}
+                                onClick={() => {
+                                    if (!currentUserId) {
+                                        setShowLoginModal(true)
+                                    } else {
+                                        setIsChatOpen(true)
+                                    }
+                                }}
+                                title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : ''}
                             >
                                 <MessageCircle className="h-4 w-4 mr-2" />
                                 {mentor.chat_enabled ? 'Chat' : 'Chat Indisponível'}
@@ -396,11 +410,21 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             </div>
 
             {/* Schedule Modal */}
-            <ScheduleMentorshipModal
-                isOpen={isScheduleModalOpen}
-                onClose={() => setIsScheduleModalOpen(false)}
-                mentorId={mentor.id}
-                mentorName={mentor.full_name}
+            {currentUserId && (
+                <BookMentorshipModal
+                    isOpen={isScheduleModalOpen}
+                    onClose={() => setIsScheduleModalOpen(false)}
+                    mentorId={mentor.id}
+                    mentorName={mentor.full_name}
+                />
+            )}
+
+            {/* Login Required Modal */}
+            <LoginRequiredModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+                title="Login Necessário"
+                description="Você precisa estar logado para agendar uma mentoria ou usar o chat."
             />
 
             {/* Chat Modal */}
