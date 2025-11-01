@@ -313,23 +313,31 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                             <CardDescription>Mentorias 100% gratuitas</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <Button
-                                className="w-full"
-                                size="lg"
-                                disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
-                                onClick={() => {
-                                    if (!currentUserId) {
-                                        setShowLoginModal(true)
-                                    } else {
-                                        setIsScheduleModalOpen(true)
-                                    }
-                                }}
-                            >
-                                <Calendar className="h-4 w-4 mr-2" />
-                                {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
-                                    ? 'Agenda Lotada'
-                                    : 'Agendar Mentoria'}
-                            </Button>
+                            {currentUserId === mentor.id ? (
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                                    <p className="text-sm text-gray-600">
+                                        Este é o seu perfil de mentor
+                                    </p>
+                                </div>
+                            ) : (
+                                <Button
+                                    className="w-full"
+                                    size="lg"
+                                    disabled={mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'}
+                                    onClick={() => {
+                                        if (!currentUserId) {
+                                            setShowLoginModal(true)
+                                        } else {
+                                            setIsScheduleModalOpen(true)
+                                        }
+                                    }}
+                                >
+                                    <Calendar className="h-4 w-4 mr-2" />
+                                    {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
+                                        ? 'Agenda Lotada'
+                                        : 'Agendar Mentoria'}
+                                </Button>
+                            )}
                             <Button
                                 variant="outline"
                                 className="w-full"

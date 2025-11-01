@@ -74,6 +74,7 @@ export function BookMentorshipModal({
         const slots: TimeSlot[] = [];
         const today = new Date();
         const twoWeeksFromNow = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+        const SLOT_DURATION = 45; // Duração fixa de 45 minutos
 
         // Para cada dia nas próximas 2 semanas
         for (let d = new Date(today); d <= twoWeeksFromNow; d.setDate(d.getDate() + 1)) {
@@ -82,30 +83,48 @@ export function BookMentorshipModal({
             // Encontrar disponibilidade para este dia da semana
             const dayAvailability = availability.filter(a => a.day_of_week === dayOfWeek);
 
-            dayAvailability.forEach(slot => {
-                const slotDate = new Date(d);
-                const [hours, minutes] = slot.start_time.split(':');
-                slotDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+            dayAvailability.forEach(availabilitySlot => {
+                // Gerar slots de 45min dentro do intervalo de disponibilidade
+                const [startHours, startMinutes] = availabilitySlot.start_time.split(':').map(Number);
+                const [endHours, endMinutes] = availabilitySlot.end_time.split(':').map(Number);
 
-                // Só adicionar se for no futuro
-                if (slotDate > today) {
-                    slots.push({
-                        day_of_week: dayOfWeek,
-                        start_time: slot.start_time,
-                        end_time: slot.end_time,
-                        date: slotDate,
-                        formatted_date: slotDate.toLocaleDateString('pt-BR', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short',
-                        }),
-                        formatted_time: `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}`,
-                    });
+                const startTimeInMinutes = startHours * 60 + startMinutes;
+                const endTimeInMinutes = endHours * 60 + endMinutes;
+
+                // Criar slots de 45min
+                for (let currentTime = startTimeInMinutes; currentTime + SLOT_DURATION <= endTimeInMinutes; currentTime += SLOT_DURATION) {
+                    const slotStartHours = Math.floor(currentTime / 60);
+                    const slotStartMinutes = currentTime % 60;
+                    const slotEndHours = Math.floor((currentTime + SLOT_DURATION) / 60);
+                    const slotEndMinutes = (currentTime + SLOT_DURATION) % 60;
+
+                    const slotDate = new Date(d);
+                    slotDate.setHours(slotStartHours, slotStartMinutes, 0, 0);
+
+                    // Só adicionar se for no futuro (com 1h de antecedência mínima)
+                    const oneHourFromNow = new Date(today.getTime() + 60 * 60 * 1000);
+                    if (slotDate > oneHourFromNow) {
+                        const startTimeStr = `${String(slotStartHours).padStart(2, '0')}:${String(slotStartMinutes).padStart(2, '0')}`;
+                        const endTimeStr = `${String(slotEndHours).padStart(2, '0')}:${String(slotEndMinutes).padStart(2, '0')}`;
+
+                        slots.push({
+                            day_of_week: dayOfWeek,
+                            start_time: startTimeStr + ':00',
+                            end_time: endTimeStr + ':00',
+                            date: slotDate,
+                            formatted_date: slotDate.toLocaleDateString('pt-BR', {
+                                weekday: 'short',
+                                day: 'numeric',
+                                month: 'short',
+                            }),
+                            formatted_time: `${startTimeStr}`,
+                        });
+                    }
                 }
             });
         }
 
-        return slots.slice(0, 20); // Limitar a 20 slots
+        return slots.slice(0, 30); // Limitar a 30 slots
     };
 
     const handleBookSlot = (slot: TimeSlot) => {
@@ -136,7 +155,7 @@ export function BookMentorshipModal({
                 body: JSON.stringify({
                     mentorId,
                     scheduledAt: selectedSlot.date.toISOString(),
-                    duration: 60, // Padrão 60 minutos
+                    duration: 45, // Duração fixa de 45 minutos
                     message: message.trim(),
                 }),
             });
@@ -188,6 +207,11 @@ export function BookMentorshipModal({
                 ) : !selectedSlot ? (
                     // Mostrar horários disponíveis
                     <div className="space-y-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+                            <p className="text-sm text-blue-800">
+                                ℹ️ Todas as mentorias têm duração de <strong>45 minutos</strong>
+                            </p>
+                        </div>
                         <p className="text-sm text-gray-600">
                             Selecione um horário disponível:
                         </p>
@@ -223,7 +247,7 @@ export function BookMentorshipModal({
                                                 </p>
                                                 <p className="text-sm text-gray-600 flex items-center gap-1">
                                                     <Clock className="w-3 h-3" />
-                                                    {slot.formatted_time}
+                                                    {slot.formatted_time} • 45min
                                                 </p>
                                             </div>
                                         </div>
@@ -248,6 +272,9 @@ export function BookMentorshipModal({
                                     </p>
                                     <p className="text-sm text-gray-600">
                                         {selectedSlot.formatted_time}
+                                    </p>
+                                    <p className="text-xs text-indigo-600 font-medium mt-1">
+                                        Duração: 45 minutos
                                     </p>
                                 </div>
                             </div>

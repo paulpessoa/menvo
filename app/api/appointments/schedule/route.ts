@@ -29,10 +29,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar duração (30 ou 60 minutos)
-    if (![30, 60].includes(duration)) {
+    // Validar duração (apenas 45 minutos)
+    if (duration !== 45) {
       return NextResponse.json(
-        { error: 'Duração deve ser 30 ou 60 minutos' },
+        { error: 'Duração deve ser até 60 minutos' },
+        { status: 400 }
+      );
+    }
+
+    // Impedir que mentor agende consigo mesmo
+    if (mentorId === user.id) {
+      return NextResponse.json(
+        { error: 'Você não pode agendar uma mentoria consigo mesmo' },
         { status: 400 }
       );
     }
