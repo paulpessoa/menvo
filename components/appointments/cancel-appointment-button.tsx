@@ -19,7 +19,7 @@ import { X, Calendar, Clock, User } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Appointment {
-    id: string
+    id: string | number
     scheduled_at: string
     duration_minutes: number
     notes?: string
@@ -119,7 +119,13 @@ export function CancelAppointmentButton({
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant={variant} size={size}>
+                <Button
+                    variant={variant}
+                    size={size}
+                    onClick={() => {
+                        setIsOpen(true);
+                    }}
+                >
                     <X className="w-4 h-4 mr-2" />
                     Cancelar
                 </Button>

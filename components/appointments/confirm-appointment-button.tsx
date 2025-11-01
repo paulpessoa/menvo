@@ -17,7 +17,7 @@ import { Calendar, Clock, User, Video } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Appointment {
-    id: string
+    id: string | number
     scheduled_at: string
     duration_minutes: number
     notes?: string
