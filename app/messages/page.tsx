@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -41,6 +41,47 @@ function MessagesContent() {
     }
   }, [user])
 
+  // Subscrever ao Realtime para atualizar a lista de conversas
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('conversations-list-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        () => {
+          console.log('[MESSAGES] Nova mensagem via Realtime, recarregando conversas');
+          loadConversations();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload: any) => {
+          console.log('[MESSAGES] Mensagem atualizada via Realtime:', payload);
+          // Recarregar se foi marcada como lida (para atualizar contador)
+          if (payload.new.read_at !== payload.old.read_at) {
+            console.log('[MESSAGES] Mensagem marcada como lida, recarregando conversas');
+            loadConversations();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user])
+
   const loadConversations = async () => {
     if (!user) return
 
@@ -63,7 +104,7 @@ function MessagesContent() {
 
       // Para cada conversa, buscar dados do outro usuário e contar não lidas
       const conversationsWithUsers = await Promise.all(
-        (convs || []).map(async (conv) => {
+        (convs || []).map(async (conv: any) => {
           // Determinar quem é o "outro usuário" (não é o usuário atual)
           const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
           const isMentor = conv.mentor_id === otherUserId
@@ -118,9 +159,7 @@ function MessagesContent() {
     }
   }
 
-  if (loading || isLoading) {
-    return <MessagesLoadingSkeleton />
-  }
+  // Removido loading screen - mantém conversas visíveis durante carregamento
 
   if (!user) {
     return (
@@ -135,87 +174,61 @@ function MessagesContent() {
     )
   }
 
-  // Se uma conversa está selecionada, mostrar o chat
-  if (selectedConversation) {
-    // O ChatInterface espera mentorId, mas vamos passar sempre o mentor_id da conversa
-    // O nome e avatar são do "outro usuário" (quem está do outro lado da conversa)
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
-            className="mb-4"
-            onClick={() => setSelectedConversation(null)}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para conversas
-          </Button>
-
-          <ChatInterface
-            key={selectedConversation.id}
-            mentorId={selectedConversation.other_user.id}
-            currentUserId={user.id}
-            mentorName={selectedConversation.other_user.full_name}
-            mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
-          />
-        </div>
-      </div>
-    )
-  }
-
   // Filtrar conversas pela busca
   const filteredConversations = conversations.filter((conv) =>
     conv.other_user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Mensagens</h1>
-          <p className="text-muted-foreground">Suas conversas com mentores e mentorados</p>
-        </div>
-
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar conversas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+    <div className="container mx-auto py-6 px-4">
+      <div className="max-w-7xl mx-auto h-[600px] border rounded-lg overflow-hidden flex bg-background shadow-sm">
+        {/* Sidebar de Conversas */}
+        <div className="w-full md:w-96 border-r bg-background flex flex-col">
+          {/* Header da Sidebar */}
+          <div className="p-4 border-b">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl font-bold">Mensagens</h1>
+              {isLoading && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  Carregando...
+                </div>
+              )}
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar conversas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Conversations list */}
-        {filteredConversations.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2">
-                {searchTerm ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
-              </h3>
-              <p className="text-muted-foreground">
-                {searchTerm
-                  ? 'Tente buscar por outro nome'
-                  : 'Inicie uma conversa com um mentor para começar!'}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {filteredConversations.map((conversation) => (
-              <Card
-                key={conversation.id}
-                className={`cursor-pointer transition-colors hover:bg-muted/50 ${conversation.unread_count > 0 ? 'border-l-4 border-l-indigo-600' : ''
-                  }`}
-                onClick={() => setSelectedConversation(conversation)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
+          {/* Lista de Conversas */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredConversations.length === 0 ? (
+              <div className="p-8 text-center">
+                <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="font-semibold mb-2">
+                  {searchTerm ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {searchTerm
+                    ? 'Tente buscar por outro nome'
+                    : 'Inicie uma conversa com um mentor!'}
+                </p>
+              </div>
+            ) : (
+              <div>
+                {filteredConversations.map((conversation) => (
+                  <div
+                    key={conversation.id}
+                    className={`p-4 border-b cursor-pointer transition-colors hover:bg-muted/50 ${selectedConversation?.id === conversation.id ? 'bg-muted' : ''
+                      } ${conversation.unread_count > 0 ? 'border-l-4 border-l-primary' : ''}`}
+                    onClick={() => setSelectedConversation(conversation)}
+                  >
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <Avatar className="h-12 w-12">
@@ -225,100 +238,101 @@ function MessagesContent() {
                           </AvatarFallback>
                         </Avatar>
                         {conversation.unread_count > 0 && (
-                          <div className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                          <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
                             {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
                           </div>
                         )}
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-semibold ${conversation.unread_count > 0 ? 'text-indigo-600' : ''}`}>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className={`font-semibold truncate ${conversation.unread_count > 0 ? 'text-primary' : ''}`}>
                             {conversation.other_user.full_name}
                           </span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {formatTimestamp(conversation.last_message_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="text-xs">
                             {conversation.other_user.is_mentor ? "Mentor" : "Mentorado"}
                           </Badge>
+                          {conversation.unread_count > 0 && (
+                            <span className="text-xs text-primary font-semibold">
+                              {conversation.unread_count} nova{conversation.unread_count > 1 ? 's' : ''}
+                            </span>
+                          )}
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {formatTimestamp(conversation.last_message_at)}
-                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {conversation.unread_count > 0 && (
-                        <Badge variant="default" className="bg-indigo-600">
-                          {conversation.unread_count} nova{conversation.unread_count > 1 ? 's' : ''}
-                        </Badge>
-                      )}
-                      <Button size="sm">Abrir chat</Button>
-                    </div>
                   </div>
-                </CardHeader>
-              </Card>
-            ))}
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Área do Chat */}
+        <div className="hidden md:flex flex-1 flex-col">
+          {selectedConversation ? (
+            <ChatInterface
+              key={selectedConversation.id}
+              mentorId={selectedConversation.other_user.id}
+              currentUserId={user.id}
+              mentorName={selectedConversation.other_user.full_name}
+              mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center bg-muted/20">
+              <div className="text-center">
+                <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">Selecione uma conversa</h3>
+                <p className="text-muted-foreground">
+                  Escolha uma conversa na sidebar para começar a trocar mensagens
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile: Chat em tela cheia quando selecionado */}
+        {selectedConversation && (
+          <div className="md:hidden fixed inset-0 bg-background z-50 flex flex-col">
+            <div className="p-4 border-b flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedConversation(null)}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={selectedConversation.other_user.avatar_url || "/placeholder.svg"} />
+                <AvatarFallback>
+                  <User className="h-5 w-5" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h2 className="font-semibold">{selectedConversation.other_user.full_name}</h2>
+                <Badge variant="secondary" className="text-xs">
+                  {selectedConversation.other_user.is_mentor ? "Mentor" : "Mentorado"}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <ChatInterface
+                key={selectedConversation.id}
+                mentorId={selectedConversation.other_user.id}
+                currentUserId={user.id}
+                mentorName={selectedConversation.other_user.full_name}
+                mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
+              />
+            </div>
           </div>
         )}
       </div>
     </div>
   )
 }
-
-function MessagesLoadingSkeleton() {
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-
-        {/* Search and filters */}
-        <div className="mb-6 flex gap-4">
-          <Skeleton className="h-10 flex-1" />
-          <Skeleton className="h-10 w-32" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-
-        {/* Messages list */}
-        <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div>
-                      <Skeleton className="h-4 w-32 mb-1" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
-                  </div>
-                  <Skeleton className="h-6 w-16" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-3/4 mb-2" />
-                <div className="flex justify-between items-center mt-4">
-                  <Skeleton className="h-3 w-20" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-8 w-16" />
-                    <Skeleton className="h-8 w-16" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function MessagesPage() {
-  return (
-    <Suspense fallback={<MessagesLoadingSkeleton />}>
-      <MessagesContent />
-    </Suspense>
-  )
+  return <MessagesContent />
 }

@@ -19,7 +19,7 @@ export function MessagesBadge() {
 
         // Subscrever ao Realtime para atualizar o contador
         const channel = supabase
-            .channel('unread-messages')
+            .channel('unread-messages-badge')
             .on(
                 'postgres_changes',
                 {
@@ -28,7 +28,7 @@ export function MessagesBadge() {
                     table: 'messages',
                 },
                 () => {
-                    // Quando uma nova mensagem chega, recarregar o contador
+                    console.log('[BADGE] Nova mensagem via Realtime, recarregando contador');
                     loadUnreadCount();
                 }
             )
@@ -39,9 +39,13 @@ export function MessagesBadge() {
                     schema: 'public',
                     table: 'messages',
                 },
-                () => {
-                    // Quando uma mensagem é marcada como lida, recarregar
-                    loadUnreadCount();
+                (payload: any) => {
+                    console.log('[BADGE] Mensagem atualizada via Realtime:', payload);
+                    // Recarregar apenas se foi marcada como lida (read_at mudou)
+                    if (payload.new.read_at !== payload.old.read_at) {
+                        console.log('[BADGE] Mensagem marcada como lida, recarregando contador');
+                        loadUnreadCount();
+                    }
                 }
             )
             .subscribe();
