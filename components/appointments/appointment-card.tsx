@@ -15,6 +15,7 @@ import {
 import { AppointmentStatusBadge } from './appointment-status-badge'
 import { ConfirmAppointmentButton } from './confirm-appointment-button'
 import { CancelAppointmentButton } from './cancel-appointment-button'
+import { ChatButton } from './chat-button'
 
 interface Appointment {
     id: string
@@ -88,6 +89,7 @@ export function AppointmentCard({
     const canConfirm = isMentor && appointment.status === 'pending'
     const canCancel = appointment.status === 'pending' || appointment.status === 'confirmed'
     const canJoinMeet = appointment.status === 'confirmed' && appointment.google_meet_link && !isPast
+    const canChat = appointment.status === 'pending' || appointment.status === 'confirmed'
 
     return (
         <Card className="w-full">
@@ -153,7 +155,7 @@ export function AppointmentCard({
                 )}
             </CardContent>
 
-            <CardFooter className="pt-3 gap-2">
+            <CardFooter className="pt-3 gap-2 flex-wrap">
                 {canJoinMeet && (
                     <Button
                         size="sm"
@@ -170,6 +172,14 @@ export function AppointmentCard({
                             <ExternalLink className="w-3 h-3 ml-1" />
                         </a>
                     </Button>
+                )}
+
+                {canChat && (
+                    <ChatButton
+                        appointment={appointment}
+                        currentUserId={currentUserId}
+                        isMentor={isMentor}
+                    />
                 )}
 
                 {canConfirm && (
