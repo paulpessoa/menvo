@@ -343,7 +343,7 @@ export default function MentorDashboard() {
                                                             />
                                                         ) : (
                                                             <span className="text-sm font-medium">
-                                                                {appointment.mentee.full_name.split(' ').map(n => n[0]).join('')}
+                                                                {appointment.mentee.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
                                                             </span>
                                                         )}
                                                     </div>
