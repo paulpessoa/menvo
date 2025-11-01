@@ -56,8 +56,9 @@ export default function Header() {
   const userNavigation = isAuthenticated
     ? [
       { name: "Dashboard", href: "/dashboard", icon: User },
-      { name: "Perfil", href: "/profile", icon: Settings },
+      { name: "Perfil", href: "/profile", icon: User },
       { name: "Mensagens", href: "/messages", icon: MessageSquare },
+      { name: "Configurações", href: "/settings", icon: Settings },
     ]
     : []
 
@@ -69,19 +70,8 @@ export default function Header() {
       ]
       : []
 
-  const adminNavigation =
-    isAuthenticated && (canAdminSystem || canAdminUsers || canAdminVerifications)
-      ? [
-        ...(canAdminSystem ? [{ name: "Painel Admin", href: "/admin", icon: Shield }] : []),
-        ...(canAdminUsers ? [{ name: "Gerenciar Usuários", href: "/admin/users", icon: Users }] : []),
-        ...(canAdminVerifications ? [{ name: "Verificações", href: "/admin/verifications", icon: UserCheck }] : []),
-        ...(canValidateActivities
-          ? [{ name: "Validar Atividades", href: "/admin/validations", icon: UserCheck }]
-          : []),
-        ...(canViewReports ? [{ name: "Relatórios", href: "/admin/reports", icon: BarChart3 }] : []),
-        ...(canAdminSystem ? [{ name: "Configurações", href: "/admin/settings", icon: Cog }] : []),
-      ]
-      : []
+  // Admin navigation removido - agora está na sidebar do /admin/layout.tsx
+  const adminNavigation: any[] = []
 
   const handleSignOut = async () => {
     await signOut()
@@ -114,21 +104,6 @@ export default function Header() {
         <div className="flex items-center gap-2">
           {/* Messages Badge */}
           <MessagesBadge />
-
-          {/* Language Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-1">
-                <Globe className="h-4 w-4" />
-                <span>{currentLanguage === "en" ? "EN" : currentLanguage === "pt-BR" ? "PT" : "ES"}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLanguage("en")}>{t("common.english")}</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLanguage("pt-BR")}>{t("common.portuguese")}</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLanguage("es")}>{t("common.spanish")}</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
 
           {isAuthenticated ? (
             <DropdownMenu>

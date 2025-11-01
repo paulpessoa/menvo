@@ -5,19 +5,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
     Users,
-    CheckCircle,
-    Clock,
-    Settings,
     BarChart3,
     Shield,
     Menu,
     X,
-    Home,
-    UserCheck,
-    FileText
+    Home
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"
@@ -34,34 +28,22 @@ const adminNavItems = [
         description: "Visão geral da plataforma"
     },
     {
-        title: "Gerenciar Mentores",
+        title: "Mentores",
         href: "/admin/mentors",
-        icon: CheckCircle,
-        description: "Visualizar e verificar mentores"
+        icon: Users,
+        description: "Gerenciar e verificar mentores"
     },
     {
-        title: "Verificar Mentores",
-        href: "/admin/mentors/verify",
-        icon: Clock,
-        description: "Aprovar mentores pendentes"
-    },
-    {
-        title: "Gerenciar Usuários",
+        title: "Usuários",
         href: "/admin/users",
         icon: Users,
-        description: "Todos os usuários da plataforma"
+        description: "Gerenciar usuários da plataforma"
     },
     {
         title: "Relatórios",
         href: "/admin/reports",
         icon: BarChart3,
         description: "Estatísticas e métricas"
-    },
-    {
-        title: "Configurações",
-        href: "/admin/settings",
-        icon: Settings,
-        description: "Configurações da plataforma"
     }
 ]
 
@@ -89,7 +71,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
                 {/* Sidebar */}
                 <div className={cn(
-                    "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+                    "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out lg:translate-x-0",
                     sidebarOpen ? "translate-x-0" : "-translate-x-full"
                 )}>
                     <div className="flex flex-col h-full">

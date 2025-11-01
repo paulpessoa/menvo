@@ -93,12 +93,17 @@ export default function AdminDashboard() {
             const pendingMentors = totalMentors - verifiedMentors
 
             // Fetch mentees stats
-            const { count: totalMentees, error: menteesError } = await supabase
+            const { data: menteeRoles, error: menteesError } = await supabase
                 .from('user_roles')
-                .select('*', { count: 'exact', head: true })
+                .select(`
+                    profiles!inner(id),
+                    roles!inner(name)
+                `)
                 .eq('roles.name', 'mentee')
 
             if (menteesError) throw menteesError
+
+            const totalMentees = menteeRoles?.length || 0
 
             // Fetch appointments stats
             const { data: appointments, error: appointmentsError } = await supabase
