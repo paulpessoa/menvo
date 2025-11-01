@@ -20,7 +20,7 @@ interface Appointment {
     id: string | number
     scheduled_at: string
     duration_minutes: number
-    notes?: string
+    notes_mentee?: string // Comentários/notas do mentee
     mentee: {
         full_name: string
         email: string
@@ -121,30 +121,34 @@ export function ConfirmAppointmentButton({
                 </Button>
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-lg">
+            <AlertDialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-green-600" />
                         Confirmar Mentoria
                     </AlertDialogTitle>
                     <AlertDialogDescription asChild>
-                        <div className="space-y-4 text-left">
+                        <div className="space-y-4 text-left mt-4">
                             <p className="text-sm text-gray-600">
                                 Você está prestes a confirmar esta sessão de mentoria.
                                 Um evento será criado automaticamente no Google Calendar com link do Meet.
                             </p>
 
                             <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                                <div className="flex items-center gap-2 text-sm">
-                                    <User className="w-4 h-4 text-gray-500" />
-                                    <span className="font-medium">Mentee:</span>
-                                    <span>{appointment.mentee.full_name}</span>
+                                <div className="flex items-start gap-2 text-sm">
+                                    <User className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <span className="font-medium">Mentee: </span>
+                                        <span className="break-words">{appointment.mentee.full_name}</span>
+                                    </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 text-sm">
-                                    <Calendar className="w-4 h-4 text-gray-500" />
-                                    <span className="font-medium">Data:</span>
-                                    <span className="capitalize">{date}</span>
+                                <div className="flex items-start gap-2 text-sm">
+                                    <Calendar className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <span className="font-medium">Data: </span>
+                                        <span className="capitalize break-words">{date}</span>
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-2 text-sm">
@@ -159,16 +163,16 @@ export function ConfirmAppointmentButton({
                                     <span>Link será gerado automaticamente</span>
                                 </div>
 
-                                {appointment.notes && (
+                                {appointment.notes_mentee && (
                                     <div className="pt-2 border-t">
                                         <p className="text-sm font-medium text-gray-700 mb-1">Mensagem do mentee:</p>
-                                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{appointment.notes}</p>
+                                        <p className="text-sm text-gray-600 whitespace-pre-wrap break-words">{appointment.notes_mentee}</p>
                                     </div>
                                 )}
                             </div>
 
                             <div className="space-y-2">
-                                <label htmlFor="mentor-notes" className="text-sm font-medium text-gray-700">
+                                <label htmlFor="mentor-notes" className="text-sm font-medium text-gray-700 block">
                                     Observações (opcional)
                                 </label>
                                 <textarea
@@ -176,8 +180,9 @@ export function ConfirmAppointmentButton({
                                     value={mentorNotes}
                                     onChange={(e) => setMentorNotes(e.target.value)}
                                     placeholder="Adicione observações sobre a mentoria, preparação necessária, etc..."
-                                    className="w-full min-h-[100px] p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                                    className="w-full min-h-[100px] p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none box-border"
                                     disabled={isConfirming}
+                                    maxLength={500}
                                 />
                                 <p className="text-xs text-gray-500">
                                     Estas observações serão incluídas no evento do Google Calendar e visíveis para o mentee.

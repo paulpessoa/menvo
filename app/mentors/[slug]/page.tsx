@@ -25,17 +25,21 @@ async function getMentorData(slug: string) {
         return null
     }
 
-    // Buscar disponibilidade via API (usa Service Role, bypass RLS)
+    // Buscar disponibilidade configurada via API (usa Service Role, bypass RLS)
     let availability = []
     try {
-        const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/mentors/${mentor.id}/availability`
+        const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/mentors/${mentor.id}/availability?format=config`
         const response = await fetch(apiUrl, { cache: 'no-store' })
         if (response.ok) {
-            availability = await response.json()
+            const data = await response.json()
+            // Se a API retornar o formato novo, extrair availableSlots
+            // Se retornar array direto, usar como está
+            availability = Array.isArray(data) ? data : (data.weeklyConfig || data.availableSlots || [])
         }
     } catch (error) {
         console.error('Erro ao buscar disponibilidade:', error)
     }
+
 
     return {
         mentor,

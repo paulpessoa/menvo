@@ -58,7 +58,6 @@ export default function Header() {
       { name: "Dashboard", href: "/dashboard", icon: User },
       { name: "Perfil", href: "/profile", icon: Settings },
       { name: "Mensagens", href: "/messages", icon: MessageSquare },
-      { name: "Calendário", href: "/calendar", icon: Calendar },
     ]
     : []
 

@@ -6,8 +6,14 @@ export interface Appointment {
   duration_minutes: number;
   google_event_id?: string;
   google_meet_link?: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  notes_mentee?: string; // Comentários/notas do mentee ao solicitar
+  notes_mentor?: string; // Anotações/notas do mentor ao confirmar
+  cancellation_reason?: string; // Motivo do cancelamento
+  cancelled_at?: string; // Data/hora do cancelamento
+  cancelled_by?: string; // ID de quem cancelou
   created_at: string;
+  updated_at?: string;
 }
 
 export interface CreateAppointmentRequest {

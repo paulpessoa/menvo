@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   // Handle email callback (token_hash or code with type)
   if (type && (tokenHash || code)) {
     try {
-      console.log(`🔄 Email callback - verifying ${type} token...`)
       
       let verifyResult
       let redirectPath = '/dashboard'
@@ -183,7 +182,6 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      console.log(`✅ ${type} verification successful`)
       return NextResponse.redirect(new URL(redirectPath, request.url))
 
     } catch (error) {
@@ -197,7 +195,6 @@ export async function GET(request: NextRequest) {
   // Handle OAuth callback (code exchange without type)
   if (code && !type) {
     try {
-      console.log("🔄 OAuth callback - exchanging code for session...")
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
@@ -206,8 +203,6 @@ export async function GET(request: NextRequest) {
           new URL("/auth/error?error=oauth_error", request.url)
         )
       }
-
-      console.log("✅ OAuth session exchange successful, user:", data.user?.id)
 
       if (data.user) {
         // Wait a moment for profile creation trigger
@@ -269,6 +264,5 @@ export async function GET(request: NextRequest) {
   }
 
   // No valid callback parameters, redirect to login
-  console.log("❌ No valid callback parameters found")
   return NextResponse.redirect(new URL("/auth/login", request.url))
 }

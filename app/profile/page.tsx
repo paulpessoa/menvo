@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { Camera, Globe, Linkedin, FileText, X, Loader2, Eye, Trash2 } from "lucide-react"
+import { Camera, Globe, Linkedin, FileText, X, Loader2, Eye, Trash2, Target } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useProfile } from "@/hooks/useProfile"
 import { useSimpleImageUpload, useSimplePDFUpload } from "@/hooks/useSimpleUpload"
@@ -29,11 +29,17 @@ function ChipInput({ value, onChange, placeholder, suggestions = [] }: ChipInput
   const [showSuggestions, setShowSuggestions] = useState(false)
 
   const filteredSuggestions = suggestions.filter(
-    (suggestion) => suggestion.toLowerCase().includes(inputValue.toLowerCase()) && !value.includes(suggestion),
+    (suggestion) =>
+      suggestion &&
+      inputValue &&
+      value &&
+      Array.isArray(value) &&
+      suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
+      !value.includes(suggestion),
   )
 
   const addChip = (chip: string) => {
-    if (chip.trim() && !value.includes(chip.trim())) {
+    if (chip.trim() && value && Array.isArray(value) && !value.includes(chip.trim())) {
       onChange([...value, chip.trim()])
       setInputValue("")
       setShowSuggestions(false)
@@ -54,7 +60,7 @@ function ChipInput({ value, onChange, placeholder, suggestions = [] }: ChipInput
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2 mb-2">
-        {value.map((chip, index) => (
+        {value && Array.isArray(value) && value.map((chip, index) => (
           <Badge key={index} variant="secondary" className="flex items-center gap-1">
             {chip}
             <X className="h-3 w-3 cursor-pointer" onClick={() => removeChip(index)} />
@@ -92,11 +98,13 @@ function ChipInput({ value, onChange, placeholder, suggestions = [] }: ChipInput
 }
 
 export default function ProfilePage() {
-  const { user, refreshProfile } = useAuth()
+  const { user, refreshProfile, role } = useAuth()
   const { profile, loading, isUpdating, updateProfile } = useProfile()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cvInputRef = useRef<HTMLInputElement>(null)
+
+  const isMentor = role === 'mentor'
 
   const imageUpload = useSimpleImageUpload('/api/upload/profile-photo')
   const cvUpload = useSimplePDFUpload('/api/upload/cv')
@@ -310,7 +318,11 @@ export default function ProfilePage() {
               <TabsTrigger value="basic">Básico</TabsTrigger>
               <TabsTrigger value="professional">Profissional</TabsTrigger>
               <TabsTrigger value="location">Localização</TabsTrigger>
-              <TabsTrigger value="mentorship">Mentoria</TabsTrigger>
+              {isMentor ? (
+                <TabsTrigger value="mentorship">Mentoria</TabsTrigger>
+              ) : (
+                <TabsTrigger value="goals">Objetivos</TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">
@@ -704,8 +716,8 @@ export default function ProfilePage() {
                   <div>
                     <Label>Tags Inclusivas</Label>
                     <ChipInput
-                      value={formData.inclusion_tags}
-                      onChange={(value) => setFormData(prev => ({ ...prev, inclusion_tags: value }))}
+                      value={formData.inclusive_tags}
+                      onChange={(value) => setFormData(prev => ({ ...prev, inclusive_tags: value }))}
                       placeholder="Digite uma tag e pressione Enter"
                       suggestions={inclusionTagsSuggestions}
                     />
@@ -747,6 +759,28 @@ export default function ProfilePage() {
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <p className="text-sm text-green-800">
                       <strong>Mentorias Gratuitas:</strong> Todas as mentorias na plataforma são gratuitas e baseadas em voluntariado.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Aba Objetivos - Para Mentees */}
+            <TabsContent value="goals" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Meus Objetivos de Desenvolvimento</CardTitle>
+                  <CardDescription>
+                    Defina seus objetivos e acompanhe seu progresso
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Target className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg font-semibold mb-2">Em Desenvolvimento</h3>
+                    <p className="text-sm max-w-md mx-auto">
+                      Em breve você poderá definir objetivos de carreira, criar checklists de aprendizado,
+                      acompanhar seu progresso e muito mais!
                     </p>
                   </div>
                 </CardContent>

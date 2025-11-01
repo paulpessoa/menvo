@@ -90,7 +90,7 @@ export default function AdminReportsPage() {
         totalSessions = total || 0
         completedSessions = completed || 0
       } catch (error) {
-        console.log("Mentorship sessions table not available")
+        console.error("Mentorship sessions table not available")
       }
 
       // Fetch volunteer hours (if table exists)
@@ -103,7 +103,7 @@ export default function AdminReportsPage() {
 
         totalVolunteerHours = volunteerData?.reduce((sum, activity) => sum + activity.hours, 0) || 0
       } catch (error) {
-        console.log("Volunteer activities table not available")
+        console.error("Volunteer activities table not available")
       }
 
       // Fetch users by role

@@ -23,7 +23,6 @@ import { toast } from "sonner"
 import Link from "next/link"
 import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
 import { BookMentorshipModal } from "@/components/mentorship/BookMentorshipModal"
-import { ChatInterface } from "@/components/chat/ChatInterface"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 
 interface MentorProfile {
@@ -69,7 +68,6 @@ interface Props {
 
 export default function MentorProfileClient({ mentor, availability }: Props) {
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
-    const [isChatOpen, setIsChatOpen] = useState(false)
     const [showLoginModal, setShowLoginModal] = useState(false)
     const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
@@ -338,22 +336,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                             ? 'Agenda Lotada'
                                             : 'Agendar Mentoria'}
                                     </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full"
-                                        disabled={!mentor.chat_enabled}
-                                        onClick={() => {
-                                            if (!currentUserId) {
-                                                setShowLoginModal(true)
-                                            } else {
-                                                setIsChatOpen(true)
-                                            }
-                                        }}
-                                        title={!mentor.chat_enabled ? 'Chat não habilitado pelo mentor' : ''}
-                                    >
-                                        <MessageCircle className="h-4 w-4 mr-2" />
-                                        {mentor.chat_enabled ? 'Chat' : 'Chat Indisponível'}
-                                    </Button>
                                 </>
                             )}
                         </CardContent>
@@ -437,28 +419,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 description="Você precisa estar logado para agendar uma mentoria ou usar o chat."
             />
 
-            {/* Chat Modal */}
-            {isChatOpen && currentUserId && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
-                        <div className="flex items-center justify-between p-4 border-b">
-                            <h2 className="text-lg font-semibold">Chat com {mentor.full_name}</h2>
-                            <button
-                                onClick={() => setIsChatOpen(false)}
-                                className="text-gray-400 hover:text-gray-600"
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <ChatInterface
-                            mentorId={mentor.id}
-                            currentUserId={currentUserId}
-                            mentorName={mentor.full_name}
-                            mentorAvatar={mentor.avatar_url || undefined}
-                        />
-                    </div>
-                </div>
-            )}
+
         </div>
     )
 }
