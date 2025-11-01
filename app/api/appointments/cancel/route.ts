@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     if (appointment.google_event_id) {
       try {
         await calendar.events.delete({
-          calendarId: 'primary',
+          calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary', 
           eventId: appointment.google_event_id,
         });
       } catch (calendarError) {

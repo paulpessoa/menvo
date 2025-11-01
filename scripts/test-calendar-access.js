@@ -101,7 +101,7 @@ async function testCalendarAccess() {
     };
 
     const response = await calendar.events.insert({
-      calendarId: 'primary',
+      calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
       conferenceDataVersion: 1,
       requestBody: event,
     });
