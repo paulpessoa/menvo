@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation'
 import MentorProfileClient from './MentorProfileClient'
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string
-    }
+    }>
 }
 
 // Buscar dados do mentor e disponibilidade
@@ -45,7 +45,8 @@ async function getMentorData(slug: string) {
 
 // Metadados dinâmicos para SEO e Open Graph
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const data = await getMentorData(params.slug)
+    const { slug } = await params
+    const data = await getMentorData(slug)
 
     if (!data) {
         return {
@@ -60,7 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         `Conecte-se com ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 3).join(', ') || 'diversas áreas'}. Mentorias 100% gratuitas.`
 
     const imageUrl = mentor.avatar_url || `${process.env.NEXT_PUBLIC_SITE_URL}/og-default.png`
-    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/mentors/${params.slug}`
+    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/mentors/${slug}`
 
     return {
         title,
@@ -90,7 +91,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export const revalidate = 3600
 
 export default async function MentorProfilePage({ params }: PageProps) {
-    const data = await getMentorData(params.slug)
+    const { slug } = await params
+    const data = await getMentorData(slug)
 
     if (!data) {
         notFound()
