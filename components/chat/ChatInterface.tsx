@@ -42,10 +42,16 @@ export function ChatInterface({
         loadMessages();
     }, [mentorId]);
 
-    // Scroll para o final quando novas mensagens chegarem
+    // Scroll para o final quando carregar ou receber novas mensagens
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (messages.length > 0) {
+            // Pequeno delay para garantir que o DOM foi atualizado
+            const timer = setTimeout(() => {
+                scrollToBottom();
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [messages.length]);
 
     // Subscrever ao Realtime quando conversationId estiver disponível
     useEffect(() => {
@@ -81,6 +87,12 @@ export function ChatInterface({
                             return prev;
                         }
                         console.log('[CHAT] ✅ Adicionando mensagem ao estado');
+
+                        // Se a mensagem não é minha, marcar como lida
+                        if (newMessage.sender_id !== currentUserId) {
+                            markAsRead(conversationId);
+                        }
+
                         return [...prev, newMessage];
                     });
                 }
@@ -99,7 +111,7 @@ export function ChatInterface({
                     setIsTyping(false);
                 }, 3000);
             })
-            .subscribe((status, err) => {
+            .subscribe((status: any, err: any) => {
                 console.log('[CHAT] 📡 Status da subscription:', status);
                 if (err) console.error('[CHAT] ❌ Erro:', err);
 
@@ -154,12 +166,15 @@ export function ChatInterface({
 
     const markAsRead = async (convId: string) => {
         try {
-            await fetch('/api/chat/mark-read', {
+            const response = await fetch('/api/chat/mark-read', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ conversationId: convId }),
             });
-            console.log('[CHAT] ✅ Mensagens marcadas como lidas');
+
+            if (response.ok) {
+                console.log('[CHAT] ✅ Mensagens marcadas como lidas');
+            }
         } catch (error) {
             console.error('[CHAT] Erro ao marcar como lida:', error);
         }
@@ -177,7 +192,9 @@ export function ChatInterface({
     };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
     };
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -264,19 +281,9 @@ export function ChatInterface({
                 )}
                 <div>
                     <h3 className="font-semibold text-gray-900">{mentorName}</h3>
-                    <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${realtimeStatus === 'connected' ? 'bg-green-500' :
-                            realtimeStatus === 'connecting' ? 'bg-yellow-500 animate-pulse' :
-                                'bg-red-500'
-                            }`} />
-                        <p className="text-xs text-gray-500">
-                            {isTyping ? (
-                                <span className="italic">digitando...</span>
-                            ) : realtimeStatus === 'connected' ? 'Online' :
-                                realtimeStatus === 'connecting' ? 'Conectando...' :
-                                    'Desconectado'}
-                        </p>
-                    </div>
+                    {isTyping && (
+                        <p className="text-xs text-gray-500 italic">digitando...</p>
+                    )}
                 </div>
             </div>
 
