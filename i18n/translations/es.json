@@ -562,7 +562,7 @@
     },
     "googleCalendar": {
       "title": "Google Calendar API",
-      "text": "Utilizamos la API de Google Calendar exclusivamente para crear eventos de mentoría cuando se confirma una sesión. Cuando agendas una mentoría, creamos automáticamente un evento en Google Calendar con los detalles de la sesión y enviamos invitaciones al mentor y mentee. Los datos accedidos incluyen solo información necesaria para crear el evento (fecha, hora, participantes). No almacenamos, compartimos ni utilizamos tus datos de Google Calendar para ningún otro propósito. Puedes revocar el acceso en cualquier momento a través de la configuración de tu cuenta de Google."
+      "text": "Utilizamos la API de Google Calendar exclusivamente para crear eventos de mentoría cuando una sesión es confirmada por el mentor. Creamos el evento en nuestra propia agenda y enviamos invitaciones por correo electrónico al mentor y mentee. NO accedemos, leemos ni modificamos tu agenda personal de Google Calendar. Solo recibes una invitación por correo que puedes aceptar o rechazar libremente. Los datos utilizados son solo: fecha, hora, duración de la sesión y correos de los participantes."
     },
     "dataSharing": {
       "title": "Compartir Datos",
