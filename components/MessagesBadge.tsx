@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { MessageSquare } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -66,7 +66,7 @@ export function MessagesBadge() {
                 return;
             }
 
-            const conversationIds = conversations.map((c) => c.id);
+            const conversationIds = conversations.map((c: any) => c.id);
 
             // Contar mensagens não lidas em todas as conversas
             const { count } = await supabase
@@ -87,7 +87,7 @@ export function MessagesBadge() {
     return (
         <Button variant="ghost" size="icon" className="relative" asChild>
             <Link href="/messages">
-                <MessageSquare className="h-5 w-5" />
+                <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
                         {unreadCount > 9 ? '9+' : unreadCount}
