@@ -252,7 +252,7 @@ export function ChatInterface({
     }
 
     return (
-        <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-lg">
+        <div className="flex flex-col h-[500px] bg-white rounded-lg">
             {/* Header */}
             <div className="flex items-center gap-3 p-4 border-b bg-indigo-50">
                 {mentorAvatar && (
