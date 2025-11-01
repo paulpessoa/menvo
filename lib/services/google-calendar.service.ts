@@ -19,6 +19,14 @@ if (missingVars.length > 0) {
 }
 
 /**
+ * ID da agenda do Google Calendar
+ * Se não especificado, usa 'primary' (agenda principal)
+ * Para usar agenda específica "Menvo Mentorias", adicione no .env.local:
+ * GOOGLE_CALENDAR_ID=seu_calendar_id@group.calendar.google.com
+ */
+const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'primary';
+
+/**
  * Criar cliente OAuth2 autenticado
  * EXATAMENTE como no script que funcionou
  */
@@ -122,7 +130,7 @@ export async function createCalendarEvent(
     };
 
     const response = await calendar.events.insert({
-      calendarId: 'primary',
+      calendarId: CALENDAR_ID,
       conferenceDataVersion: 1,
       requestBody: event,
     });
@@ -194,7 +202,7 @@ export async function updateCalendarEvent(
     }
 
     await calendar.events.update({
-      calendarId: 'primary',
+      calendarId: CALENDAR_ID,
       eventId,
       sendUpdates: 'all',
       requestBody: updateData,
@@ -221,7 +229,7 @@ export async function deleteCalendarEvent(eventId: string): Promise<void> {
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
     await calendar.events.delete({
-      calendarId: 'primary',
+      calendarId: CALENDAR_ID,
       eventId,
       sendUpdates: 'all', // Notifica participantes
     });
