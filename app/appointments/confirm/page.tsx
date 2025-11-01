@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase';
 
 export default function ConfirmAppointmentPage() {
     const searchParams = useSearchParams();
@@ -24,75 +23,31 @@ export default function ConfirmAppointmentPage() {
 
     async function confirmAppointment() {
         try {
-            const supabase = createClient();
+            // Chamar API passando o token - ela faz todo o trabalho
+            const response = await fetch('/api/appointments/confirm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: token,
+                }),
+            });
 
-            // Buscar appointment pelo token
-            const { data: appointment, error: fetchError } = await supabase
-                .from('appointments')
-                .select('*')
-                .eq('action_token', token)
-                .single();
+            const data = await response.json();
 
-            if (fetchError || !appointment) {
+            if (!response.ok) {
                 setStatus('error');
-                setMessage('Agendamento não encontrado ou token inválido');
+                setMessage(data.error || 'Erro ao confirmar agendamento');
                 return;
-            }
-
-            // Verificar se já foi confirmado
-            if (appointment.status === 'confirmed') {
-                setStatus('success');
-                setMessage('Este agendamento já foi confirmado anteriormente!');
-                return;
-            }
-
-            // Verificar se está pendente
-            if (appointment.status !== 'pending') {
-                setStatus('error');
-                setMessage(`Este agendamento está com status: ${appointment.status}`);
-                return;
-            }
-
-            // Atualizar status para confirmed
-            const { error: updateError } = await supabase
-                .from('appointments')
-                .update({ status: 'confirmed' })
-                .eq('id', appointment.id);
-
-            if (updateError) {
-                console.error('[CONFIRM] Erro ao atualizar status:', updateError);
-                setStatus('error');
-                setMessage('Erro ao confirmar agendamento');
-                return;
-            }
-
-            // Chamar API para criar evento no Google Calendar e enviar emails
-            try {
-                const response = await fetch('/api/appointments/confirm', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        appointmentId: appointment.id,
-                    }),
-                });
-
-                if (!response.ok) {
-                    console.error('[CONFIRM] Erro ao processar confirmação completa');
-                    // Não falhar, pois o status já foi atualizado
-                }
-            } catch (apiError) {
-                console.error('[CONFIRM] Erro ao chamar API de confirmação:', apiError);
-                // Não falhar, pois o status já foi atualizado
             }
 
             setStatus('success');
-            setMessage('Agendamento confirmado com sucesso! Você receberá um email de confirmação em breve.');
+            setMessage(data.message || 'Agendamento confirmado com sucesso! Você receberá um email de confirmação em breve.');
         } catch (error) {
             console.error('[CONFIRM] Erro inesperado:', error);
             setStatus('error');
-            setMessage('Erro inesperado ao confirmar agendamento');
+            setMessage('Erro ao conectar com o servidor. Tente novamente.');
         }
     }
 

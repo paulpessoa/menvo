@@ -31,33 +31,52 @@ export async function POST(request: NextRequest) {
 
     // Parse do body
     const body = await request.json();
-    const { appointmentId: rawAppointmentId, mentorNotes } = body;
+    const { appointmentId: rawAppointmentId, token, mentorNotes } = body;
 
-    if (!rawAppointmentId) {
+    // Suportar tanto token quanto appointmentId
+    let appointment;
+    let fetchError;
+
+    if (token) {
+      // Buscar por token (fluxo do email)
+      console.log('🔍 [CONFIRM] Buscando appointment por token...');
+      const result = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          mentor:mentor_id(id, full_name, email),
+          mentee:mentee_id(id, full_name, email)
+        `)
+        .eq('action_token', token)
+        .single();
+      
+      appointment = result.data;
+      fetchError = result.error;
+    } else if (rawAppointmentId) {
+      // Buscar por ID (fluxo antigo)
+      const appointmentId = typeof rawAppointmentId === 'string' 
+        ? parseInt(rawAppointmentId, 10) 
+        : rawAppointmentId;
+
+      console.log('🔍 [CONFIRM] Buscando appointment por ID:', appointmentId);
+      const result = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          mentor:mentor_id(id, full_name, email),
+          mentee:mentee_id(id, full_name, email)
+        `)
+        .eq('id', appointmentId)
+        .single();
+      
+      appointment = result.data;
+      fetchError = result.error;
+    } else {
       return NextResponse.json(
-        { error: 'appointmentId é obrigatório' },
+        { error: 'Token ou appointmentId é obrigatório' },
         { status: 400 }
       );
     }
-
-    // Converter para number se for string
-    const appointmentId = typeof rawAppointmentId === 'string' 
-      ? parseInt(rawAppointmentId, 10) 
-      : rawAppointmentId;
-
-    console.log('🔍 [CONFIRM] Appointment ID:', appointmentId, 'Type:', typeof appointmentId);
-
-    // Buscar appointment com informações do mentor e mentee
-    console.log('🔍 [CONFIRM] Buscando appointment no banco...');
-    const { data: appointment, error: fetchError } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        mentor:mentor_id(id, full_name, email),
-        mentee:mentee_id(id, full_name, email)
-      `)
-      .eq('id', appointmentId)
-      .single();
 
     if (fetchError) {
       console.error('❌ [CONFIRM] Erro ao buscar appointment:', fetchError);
@@ -65,19 +84,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (!appointment) {
-      console.error('❌ [CONFIRM] Appointment não encontrado. ID:', appointmentId);
-      
-      // Debug: tentar buscar sem o join para ver se o appointment existe
-      const { data: simpleAppointment } = await supabase
-        .from('appointments')
-        .select('*')
-        .eq('id', appointmentId)
-        .single();
-      
-      console.log('🔍 [CONFIRM] Appointment simples:', simpleAppointment ? 'Encontrado' : 'Não encontrado');
+      console.error('❌ [CONFIRM] Appointment não encontrado');
+      console.error('   Error:', fetchError);
       
       return NextResponse.json(
-        { error: 'Agendamento não encontrado', details: fetchError?.message },
+        { error: 'Agendamento não encontrado ou token inválido' },
         { status: 404 }
       );
     }
@@ -92,7 +103,19 @@ export async function POST(request: NextRequest) {
     // Verificar se já está confirmado
     if (appointment.status === 'confirmed') {
       return NextResponse.json(
-        { error: 'Agendamento já foi confirmado' },
+        { 
+          success: true,
+          message: 'Este agendamento já foi confirmado anteriormente!',
+          alreadyConfirmed: true 
+        },
+        { status: 200 }
+      );
+    }
+
+    // Verificar se está pendente
+    if (appointment.status !== 'pending') {
+      return NextResponse.json(
+        { error: `Este agendamento está com status: ${appointment.status}` },
         { status: 400 }
       );
     }
@@ -184,7 +207,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from('appointments')
       .update(updateData)
-      .eq('id', appointmentId);
+      .eq('id', appointment.id);
 
     if (updateError) {
       console.error('❌ [CONFIRM] Erro ao atualizar appointment:', updateError);
