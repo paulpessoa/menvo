@@ -25,12 +25,17 @@ async function getMentorData(slug: string) {
         return null
     }
 
-    // Buscar disponibilidade
-    const { data: availability } = await supabase
-        .from('mentor_availability')
-        .select('*')
-        .eq('mentor_id', mentor.id)
-        .order('day_of_week')
+    // Buscar disponibilidade via API (usa Service Role, bypass RLS)
+    let availability = []
+    try {
+        const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/mentors/${mentor.id}/availability`
+        const response = await fetch(apiUrl, { cache: 'no-store' })
+        if (response.ok) {
+            availability = await response.json()
+        }
+    } catch (error) {
+        console.error('Erro ao buscar disponibilidade:', error)
+    }
 
     return {
         mentor,
