@@ -40,6 +40,8 @@
     "hero.description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
     "hero.findMentor": "Encontrar um Mentor",
     "hero.becomeMentor": "Torne-se um Mentor",
+    "testimonials.title": "Histórias que Inspiram",
+    "testimonials.description": "Vidas transformadas através da mentoria",
     "howItWorks.title": "Como Funciona",
     "howItWorks.description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
     "howItWorks.step1.title": "Encontrar um Mentor",
@@ -72,7 +74,7 @@
     "events.card.register": "Inscrever-se",
     "events.viewAll": "Ver Todos os Eventos",
     "cta.title": "Pronto para Começar?",
-    "cta.description": "Junte-se à nossa comunidade hoje e conecte-se com mentores que podem ajudar você a alcançar seus objetivos",
+    "cta.description": "Junte-se a nós hoje e conecte-se com pessoas que podem ajudar você a alcançar seus objetivos",
     "cta.signup": "Inscreva-se Agora",
     "cta.learnMore": "Saiba Mais",
     "event.type": "Online"
