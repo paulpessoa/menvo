@@ -40,6 +40,8 @@
     "hero.description": "Find guidance, share experiences, and grow together. Our platform connects you with volunteer mentors for free mentorship sessions.",
     "hero.findMentor": "Find a Mentor",
     "hero.becomeMentor": "Become a Mentor",
+    "testimonials.title": "Stories That Inspire",
+    "testimonials.description": "Lives transformed through mentorship",
     "howItWorks.title": "How It Works",
     "howItWorks.description": "Our platform makes it easy to connect with mentors and schedule sessions",
     "howItWorks.step1.title": "Find a Mentor",
@@ -72,7 +74,7 @@
     "events.card.register": "Register",
     "events.viewAll": "View All Events",
     "cta.title": "Ready to Get Started?",
-    "cta.description": "Join our community today and connect with mentors who can help you achieve your goals",
+    "cta.description": "Join us today and connect with people who can help you achieve your goals",
     "cta.signup": "Sign Up Now",
     "cta.learnMore": "Learn More",
     "event.type": "Online"

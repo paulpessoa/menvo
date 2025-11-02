@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['@supabase/supabase-js', 'googleapis', 'google-auth-library'],
+  serverExternalPackages: [
+    "@supabase/supabase-js",
+    "googleapis",
+    "google-auth-library"
+  ],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -8,29 +12,35 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-        crypto: false,
+        crypto: false
       }
     }
     return config
   },
   images: {
-    domains: ['localhost', 'supabase.co'],
+    domains: ["localhost", "supabase.co", "images.unsplash.com"],
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        protocol: "https",
+        hostname: "*.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/**"
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**"
+      }
     ],
-    unoptimized: true,
+    unoptimized: true
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
   typescript: {
-    ignoreBuildErrors: true,
-  },
+    ignoreBuildErrors: true
+  }
 }
 
 export default nextConfig

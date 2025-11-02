@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { useEffect, useState } from "react"
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel"
 
 export default function Home() {
   const { t } = useTranslation()
@@ -106,9 +107,8 @@ export default function Home() {
                   width={550}
                   height={550}
                   alt={t("home.hero.title")}
-                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${
-                    index === currentIndex ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
+                    }`}
                 />
               ))}
             </div>
@@ -275,6 +275,23 @@ export default function Home() {
             </div>
           </div>
         </section> */}
+
+      {/* Testimonials Section */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary/30">
+        <div className="container max-w-7xl px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                {t("home.testimonials.title")}
+              </h2>
+              <p className="max-w-[800px] text-muted-foreground md:text-xl">
+                {t("home.testimonials.description")}
+              </p>
+            </div>
+          </div>
+          <TestimonialsCarousel />
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-primary-600 text-primary-foreground">
