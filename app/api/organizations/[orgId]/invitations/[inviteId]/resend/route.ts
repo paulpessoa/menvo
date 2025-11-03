@@ -6,6 +6,7 @@ import {
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
+import { sendOrganizationInvitation } from "@/lib/email/brevo"
 import { randomUUID } from "crypto"
 
 // POST /api/organizations/[orgId]/invitations/[inviteId]/resend - Resend invitation
@@ -78,7 +79,41 @@ export async function POST(
 
     if (updateError) throw updateError
 
-    // TODO: Send invitation email
+    // Get organization and inviter details for email
+    const { data: organization } = await supabase
+      .from("organizations")
+      .select("name")
+      .eq("id", orgId)
+      .single()
+
+    const { data: inviterProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single()
+
+    const { data: recipientProfile } = await supabase
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", invitation.user_id)
+      .single()
+
+    // Send invitation email
+    if (organization && inviterProfile && recipientProfile) {
+      try {
+        await sendOrganizationInvitation({
+          recipientEmail: recipientProfile.email,
+          recipientName: recipientProfile.full_name || recipientProfile.email,
+          organizationName: organization.name,
+          inviterName: inviterProfile.full_name || "Admin",
+          role: invitation.role,
+          invitationToken: newToken
+        })
+      } catch (emailError) {
+        console.error("Failed to send invitation email:", emailError)
+        // Don't fail the request if email fails
+      }
+    }
 
     return successResponse(updated, "Invitation resent successfully")
   } catch (error) {

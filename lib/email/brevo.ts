@@ -286,3 +286,128 @@ export async function sendAppointmentConfirmation(
     throw error
   }
 }
+
+interface OrganizationInvitationData {
+  recipientEmail: string
+  recipientName: string
+  organizationName: string
+  inviterName: string
+  role: string
+  invitationToken: string
+}
+
+/**
+ * Envia email de convite para organização
+ */
+export async function sendOrganizationInvitation(
+  data: OrganizationInvitationData
+): Promise<void> {
+  const {
+    recipientEmail,
+    recipientName,
+    organizationName,
+    inviterName,
+    role,
+    invitationToken
+  } = data
+
+  // URL de aceitação do convite
+  const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/invitations/accept?token=${invitationToken}`
+
+  // Template HTML
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f9fafb; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Convite para Organização</h1>
+        </div>
+        <div class="content">
+          <p>Olá, <strong>${recipientName}</strong>!</p>
+          
+          <p><strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong>.</p>
+          
+          <div class="info">
+            <p><strong>🏢 Organização:</strong> ${organizationName}</p>
+            <p><strong>👤 Função:</strong> ${
+              role === "mentor" ? "Mentor" : "Mentee"
+            }</p>
+            <p><strong>✉️ Convidado por:</strong> ${inviterName}</p>
+          </div>
+          
+          <p>Para aceitar este convite, clique no botão abaixo:</p>
+          
+          <div style="text-align: center;">
+            <a href="${acceptUrl}" class="button">Aceitar Convite</a>
+          </div>
+          
+          <p style="font-size: 12px; color: #666; margin-top: 20px;">
+            Ou copie e cole este link no seu navegador:<br>
+            ${acceptUrl}
+          </p>
+          
+          <p style="font-size: 12px; color: #999; margin-top: 20px;">
+            Este convite expira em 30 dias.
+          </p>
+        </div>
+        <div class="footer">
+          <p>Menvo - Plataforma de Mentoria</p>
+          <p>Este é um email automático, por favor não responda.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: {
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
+        },
+        to: [
+          {
+            email: recipientEmail,
+            name: recipientName
+          }
+        ],
+        subject: `Convite para ${organizationName}`,
+        htmlContent
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar convite de organização:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
+    }
+
+    console.log(
+      "[EMAIL] Convite de organização enviado com sucesso para:",
+      recipientEmail
+    )
+  } catch (error) {
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
+  }
+}
