@@ -54,7 +54,7 @@ export async function POST(
       return errorResponse("Invitation not found", "NOT_FOUND", 404)
     }
 
-    // Update status to cancelled
+    // Update status to cancelled and invalidate token
     const { error: updateError } = await serviceSupabase
       .from("organization_members")
       .update({
@@ -65,6 +65,18 @@ export async function POST(
       .eq("id", inviteId)
 
     if (updateError) throw updateError
+
+    // Log activity to organization_activity_log
+    await serviceSupabase.from("organization_activity_log").insert({
+      organization_id: orgId,
+      activity_type: "invitation_cancelled",
+      actor_id: user.id,
+      metadata: {
+        invitation_id: inviteId,
+        invited_user_id: invitation.user_id,
+        role: invitation.role
+      }
+    })
 
     return successResponse(
       { success: true },
