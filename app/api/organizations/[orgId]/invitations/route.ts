@@ -14,6 +14,7 @@ export async function GET(
   try {
     const supabase = await createClient()
     const { orgId } = params
+    const searchParams = request.nextUrl.searchParams
 
     // Authenticate user
     const {
@@ -40,22 +41,41 @@ export async function GET(
       return errorResponse("Forbidden", "FORBIDDEN", 403)
     }
 
-    // Get pending invitations
-    const { data: invitations, error } = await supabase
+    // Get pagination parameters
+    const page = parseInt(searchParams.get("page") || "1")
+    const limit = parseInt(searchParams.get("limit") || "20")
+    const offset = (page - 1) * limit
+
+    // Get pending invitations with pagination
+    const {
+      data: invitations,
+      error,
+      count
+    } = await supabase
       .from("organization_members")
       .select(
         `
         *,
         user:profiles(id, email, first_name, last_name, full_name, avatar_url)
-      `
+      `,
+        { count: "exact" }
       )
       .eq("organization_id", orgId)
       .eq("status", "invited")
       .order("invited_at", { ascending: false })
+      .range(offset, offset + limit - 1)
 
     if (error) throw error
 
-    return successResponse({ invitations })
+    return successResponse({
+      invitations,
+      pagination: {
+        page,
+        limit,
+        total: count || 0,
+        totalPages: Math.ceil((count || 0) / limit)
+      }
+    })
   } catch (error) {
     return handleApiError(error)
   }
