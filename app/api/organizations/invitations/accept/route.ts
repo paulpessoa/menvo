@@ -91,6 +91,19 @@ export async function POST(request: NextRequest) {
 
     if (updateError) throw updateError
 
+    // Check if user profile is incomplete (for onboarding flag)
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("first_name, last_name, bio")
+      .eq("id", user.id)
+      .single()
+
+    const needsOnboarding =
+      !profile ||
+      !profile.first_name ||
+      !profile.last_name ||
+      (invitation.role === "mentor" && !profile.bio)
+
     // Log activity
     await serviceSupabase.from("organization_activity_log").insert({
       organization_id: invitation.organization_id,
@@ -100,12 +113,38 @@ export async function POST(request: NextRequest) {
       metadata: { role: invitation.role }
     })
 
-    // TODO: Send notification to org admins
+    // Send notification to org admins
+    const { data: admins } = await supabase
+      .from("organization_members")
+      .select("user_id, user:profiles(email, full_name)")
+      .eq("organization_id", invitation.organization_id)
+      .eq("role", "admin")
+      .eq("status", "active")
+
+    if (admins && admins.length > 0) {
+      // Create notifications for admins
+      const notifications = admins.map((admin) => ({
+        user_id: admin.user_id,
+        type: "organization_member_joined",
+        title: "Novo membro na organização",
+        message: `Um novo ${
+          invitation.role === "mentor" ? "mentor" : "mentee"
+        } aceitou o convite para ${invitation.organization.name}`,
+        metadata: {
+          organization_id: invitation.organization_id,
+          member_id: user.id,
+          role: invitation.role
+        }
+      }))
+
+      await serviceSupabase.from("notifications").insert(notifications)
+    }
 
     return successResponse(
       {
         member: updatedMember,
-        organization: invitation.organization
+        organization: invitation.organization,
+        needsOnboarding
       },
       "Invitation accepted successfully"
     )
