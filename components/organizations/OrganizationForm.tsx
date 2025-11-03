@@ -6,7 +6,7 @@ import { Upload, Loader2 } from "lucide-react"
 
 interface OrganizationFormData {
     name: string
-    type: "school" | "company" | "nonprofit" | "community"
+    type: "company" | "ngo" | "hackathon" | "sebrae" | "community" | "other"
     description: string
     logo_url?: string
     website?: string
@@ -185,10 +185,12 @@ export function OrganizationForm({
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
-                    <option value="school">Escola/Universidade</option>
                     <option value="company">Empresa</option>
-                    <option value="nonprofit">ONG/Sem fins lucrativos</option>
+                    <option value="ngo">ONG/Sem fins lucrativos</option>
+                    <option value="hackathon">Hackathon</option>
+                    <option value="sebrae">SEBRAE</option>
                     <option value="community">Comunidade</option>
+                    <option value="other">Outro</option>
                 </select>
             </div>
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, Search, Filter, CheckCircle, XCircle, Clock, Loader2 } from "lucide-react"
+import { Building2, Search, CheckCircle, XCircle, Clock, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Organization } from "@/types/organizations"
 
@@ -23,8 +23,14 @@ export default function AdminOrganizationsPage() {
 
             const response = await fetch(`/api/admin/organizations?${params}`)
             if (response.ok) {
-                const data = await response.json()
+                const result = await response.json()
+                console.log("API Response:", result)
+                // API returns { data: { organizations: [...] } }
+                const data = result.data || result
+                console.log("Organizations:", data.organizations)
                 setOrganizations(data.organizations || [])
+            } else {
+                console.error("API Error:", response.status, await response.text())
             }
         } catch (err) {
             console.error("Error fetching organizations:", err)

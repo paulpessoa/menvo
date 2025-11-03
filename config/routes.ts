@@ -13,8 +13,9 @@ export const publicRoutes = [
   "/auth/error",
   "/auth/resend-confirmation",
   "/test-callback", // Para debug
-  "/mentors"
-];
+  "/mentors",
+  "/organizations" // Public listing of organizations
+]
 
 export const protectedRoutes = [
   "/dashboard",
@@ -26,10 +27,22 @@ export const protectedRoutes = [
   "/mentorship",
   "/volunteer-activities",
   "/onboarding",
-];
+  "/organizations/new",
+  "/settings"
+]
 
-export const adminRoutes = ["/admin"];
+export const adminRoutes = ["/admin"]
 
-export const onboardingRequiredRoutes = ["/dashboard", "/mentors/[id]/schedule", "/messages", "/calendar"];
+export const onboardingRequiredRoutes = [
+  "/dashboard",
+  "/mentors/[id]/schedule",
+  "/messages",
+  "/calendar"
+]
 
-export const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
+export const authRoutes = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password"
+]

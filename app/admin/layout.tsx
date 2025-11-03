@@ -11,7 +11,8 @@ import {
     Shield,
     Menu,
     X,
-    Home
+    Home,
+    Building2
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"
@@ -26,6 +27,12 @@ const adminNavItems = [
         href: "/admin",
         icon: Home,
         description: "Visão geral da plataforma"
+    },
+    {
+        title: "Organizações",
+        href: "/admin/organizations",
+        icon: Building2,
+        description: "Gerenciar organizações"
     },
     {
         title: "Mentores",
