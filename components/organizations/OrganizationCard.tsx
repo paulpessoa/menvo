@@ -2,38 +2,35 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Building2, Users, GraduationCap, Briefcase, Heart, Users2 } from "lucide-react"
-
-interface Organization {
-    id: string
-    name: string
-    slug: string
-    type: "school" | "company" | "nonprofit" | "community"
-    description?: string
-    logo_url?: string
-    member_counts?: {
-        mentors: number
-        mentees: number
-    }
-}
+import { Building2, Users, GraduationCap, Briefcase, Heart, Users2, Zap, Globe } from "lucide-react"
+import { Organization, OrganizationType } from "@/types/organizations"
 
 interface OrganizationCardProps {
-    organization: Organization
+    organization: Organization & {
+        member_counts?: {
+            mentors: number
+            mentees: number
+        }
+    }
     layout?: "grid" | "list"
 }
 
-const typeIcons = {
-    school: GraduationCap,
+const typeIcons: Record<OrganizationType, any> = {
     company: Briefcase,
-    nonprofit: Heart,
-    community: Users2
+    ngo: Heart,
+    hackathon: Zap,
+    sebrae: Building2,
+    community: Users2,
+    other: Globe
 }
 
-const typeLabels = {
-    school: "Escola/Universidade",
+const typeLabels: Record<OrganizationType, string> = {
     company: "Empresa",
-    nonprofit: "ONG",
-    community: "Comunidade"
+    ngo: "ONG",
+    hackathon: "Hackathon",
+    sebrae: "SEBRAE",
+    community: "Comunidade",
+    other: "Outro"
 }
 
 export function OrganizationCard({ organization, layout = "grid" }: OrganizationCardProps) {
