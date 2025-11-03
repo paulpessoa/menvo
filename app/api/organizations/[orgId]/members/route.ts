@@ -8,6 +8,7 @@ import {
   validateRequiredFields
 } from "@/lib/api/error-handler"
 import { validateQuota } from "@/lib/organizations/quota-checker"
+import { checkRateLimit, RATE_LIMITS, formatResetTime } from "@/lib/rate-limit"
 import type { InvitationRequest } from "@/types/organizations"
 import { randomUUID } from "crypto"
 
@@ -125,6 +126,37 @@ export async function POST(
       membership.status !== "active"
     ) {
       return errorResponse("Forbidden", "FORBIDDEN", 403)
+    }
+
+    // Check rate limits
+    const minuteLimit = checkRateLimit(
+      `org:${orgId}:invitations:minute`,
+      RATE_LIMITS.INVITATION_PER_MINUTE
+    )
+
+    if (!minuteLimit.allowed) {
+      return errorResponse(
+        `Limite de convites excedido. Tente novamente em ${formatResetTime(
+          minuteLimit.resetAt
+        )}`,
+        "RATE_LIMIT_EXCEEDED",
+        429
+      )
+    }
+
+    const dayLimit = checkRateLimit(
+      `org:${orgId}:invitations:day`,
+      RATE_LIMITS.INVITATION_PER_DAY
+    )
+
+    if (!dayLimit.allowed) {
+      return errorResponse(
+        `Limite diário de convites excedido. Tente novamente em ${formatResetTime(
+          dayLimit.resetAt
+        )}`,
+        "RATE_LIMIT_EXCEEDED",
+        429
+      )
     }
 
     // Check organization is active

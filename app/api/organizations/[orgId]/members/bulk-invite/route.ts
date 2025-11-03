@@ -8,6 +8,7 @@ import {
   validateRequiredFields
 } from "@/lib/api/error-handler"
 import { checkQuota } from "@/lib/organizations/quota-checker"
+import { checkRateLimit, RATE_LIMITS, formatResetTime } from "@/lib/rate-limit"
 import type {
   BulkInvitationRequest,
   BulkInvitationResult
@@ -47,6 +48,22 @@ export async function POST(
       membership.status !== "active"
     ) {
       return errorResponse("Forbidden", "FORBIDDEN", 403)
+    }
+
+    // Check rate limits for bulk invitations
+    const bulkLimit = checkRateLimit(
+      `org:${orgId}:bulk-invitations:hour`,
+      RATE_LIMITS.BULK_INVITATION_PER_HOUR
+    )
+
+    if (!bulkLimit.allowed) {
+      return errorResponse(
+        `Limite de convites em massa excedido. Tente novamente em ${formatResetTime(
+          bulkLimit.resetAt
+        )}`,
+        "RATE_LIMIT_EXCEEDED",
+        429
+      )
     }
 
     // Check organization is active
