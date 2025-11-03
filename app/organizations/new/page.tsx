@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { OrganizationForm } from "@/components/organizations/OrganizationForm"
 import { ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { createClient } from "@/utils/supabase/client"
 
 export default function NewOrganizationPage() {
     const router = useRouter()
@@ -18,8 +19,10 @@ export default function NewOrganizationPage() {
 
     const checkAuth = async () => {
         try {
-            const response = await fetch("/api/auth/session")
-            if (response.ok) {
+            const supabase = createClient()
+            const { data: { user }, error } = await supabase.auth.getUser()
+
+            if (user && !error) {
                 setIsAuthenticated(true)
             } else {
                 router.push("/auth/login?redirect=/organizations/new")

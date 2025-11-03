@@ -26,9 +26,9 @@ export default function AdminOrganizationDetailsPage() {
         try {
             const response = await fetch(`/api/admin/organizations/${id}`)
             if (response.ok) {
-                const data = await response.json()
-                setOrganization(data.organization)
-                setStats(data.stats)
+                const result = await response.json()
+                setOrganization(result.data.organization)
+                setStats(result.data.stats)
             }
         } catch (err) {
             console.error("Error fetching organization:", err)
