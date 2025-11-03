@@ -1,0 +1,12 @@
+{
+    "crons": [
+        {
+            "path": "/api/cron/expire-memberships",
+            "schedule": "0 0 * * *"
+        },
+        {
+            "path": "/api/cron/expire-invitations",
+            "schedule": "0 0 * * *"
+        }
+    ]
+}
