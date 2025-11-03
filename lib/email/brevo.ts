@@ -411,3 +411,121 @@ export async function sendOrganizationInvitation(
     throw error
   }
 }
+
+interface OrganizationApprovedData {
+  adminEmail: string
+  adminName: string
+  organizationName: string
+  organizationId: string
+}
+
+/**
+ * Envia email de aprovação de organização para o admin
+ */
+export async function sendOrganizationApprovedEmail(
+  data: OrganizationApprovedData
+): Promise<void> {
+  const { adminEmail, adminName, organizationName, organizationId } = data
+
+  // URL do dashboard da organização
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/${organizationId}`
+
+  // Template HTML
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #10B981; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f9fafb; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #10B981; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .steps { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .steps li { margin: 10px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>✅ Organização Aprovada!</h1>
+        </div>
+        <div class="content">
+          <p>Olá, <strong>${adminName}</strong>!</p>
+          
+          <p>Temos ótimas notícias! Sua organização <strong>${organizationName}</strong> foi aprovada e está pronta para uso.</p>
+          
+          <div class="info">
+            <p><strong>🎉 Próximos Passos:</strong></p>
+          </div>
+          
+          <div class="steps">
+            <ol>
+              <li><strong>Convide membros:</strong> Adicione mentores e mentees à sua organização</li>
+              <li><strong>Configure preferências:</strong> Ajuste as configurações de visibilidade e permissões</li>
+              <li><strong>Explore o dashboard:</strong> Acompanhe métricas e atividades da organização</li>
+            </ol>
+          </div>
+          
+          <p>Acesse o painel de controle da sua organização:</p>
+          
+          <div style="text-align: center;">
+            <a href="${dashboardUrl}" class="button">Acessar Dashboard</a>
+          </div>
+          
+          <p style="font-size: 12px; color: #666; margin-top: 20px;">
+            Ou copie e cole este link no seu navegador:<br>
+            ${dashboardUrl}
+          </p>
+        </div>
+        <div class="footer">
+          <p>Menvo - Plataforma de Mentoria</p>
+          <p>Este é um email automático, por favor não responda.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: {
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
+        },
+        to: [
+          {
+            email: adminEmail,
+            name: adminName
+          }
+        ],
+        subject: `${organizationName} foi aprovada!`,
+        htmlContent
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar email de aprovação:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
+    }
+
+    console.log(
+      "[EMAIL] Email de aprovação enviado com sucesso para:",
+      adminEmail
+    )
+  } catch (error) {
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
+  }
+}
