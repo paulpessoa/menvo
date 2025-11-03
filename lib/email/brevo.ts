@@ -291,6 +291,7 @@ interface OrganizationInvitationData {
   recipientEmail: string
   recipientName: string
   organizationName: string
+  organizationLogo?: string
   inviterName: string
   role: string
   invitationToken: string
@@ -306,6 +307,7 @@ export async function sendOrganizationInvitation(
     recipientEmail,
     recipientName,
     organizationName,
+    organizationLogo,
     inviterName,
     role,
     invitationToken
@@ -314,7 +316,7 @@ export async function sendOrganizationInvitation(
   // URL de aceitação do convite
   const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/invitations/accept?token=${invitationToken}`
 
-  // Template HTML
+  // Template HTML with organization branding
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -332,9 +334,11 @@ export async function sendOrganizationInvitation(
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Convite para Organização</h1>
-        </div>
+        ${getEmailHeaderWithBranding(
+          "Convite para Organização",
+          organizationName,
+          organizationLogo
+        )}
         <div class="content">
           <p>Olá, <strong>${recipientName}</strong>!</p>
           
@@ -391,7 +395,10 @@ export async function sendOrganizationInvitation(
             name: recipientName
           }
         ],
-        subject: `Convite para ${organizationName}`,
+        subject: getEmailSubject(
+          `Convite para ${organizationName}`,
+          organizationName
+        ),
         htmlContent
       })
     })
@@ -417,6 +424,7 @@ interface OrganizationApprovedData {
   adminName: string
   organizationName: string
   organizationId: string
+  organizationLogo?: string
 }
 
 /**
@@ -425,12 +433,18 @@ interface OrganizationApprovedData {
 export async function sendOrganizationApprovedEmail(
   data: OrganizationApprovedData
 ): Promise<void> {
-  const { adminEmail, adminName, organizationName, organizationId } = data
+  const {
+    adminEmail,
+    adminName,
+    organizationName,
+    organizationId,
+    organizationLogo
+  } = data
 
   // URL do dashboard da organização
   const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/${organizationId}`
 
-  // Template HTML
+  // Template HTML with organization branding
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -450,6 +464,11 @@ export async function sendOrganizationApprovedEmail(
     </head>
     <body>
       <div class="container">
+        ${
+          organizationLogo
+            ? `<div style="text-align: center; padding: 20px;"><img src="${organizationLogo}" alt="${organizationName}" style="max-width: 150px; max-height: 150px;" /></div>`
+            : ""
+        }
         <div class="header">
           <h1>✅ Organização Aprovada!</h1>
         </div>
@@ -509,7 +528,7 @@ export async function sendOrganizationApprovedEmail(
             name: adminName
           }
         ],
-        subject: `${organizationName} foi aprovada!`,
+        subject: getEmailSubject("Organização aprovada!", organizationName),
         htmlContent
       })
     })
@@ -802,4 +821,46 @@ export async function sendMembershipExpiredEmail(
     console.error("[EMAIL] Erro ao enviar email:", error)
     throw error
   }
+}
+
+/**
+ * Helper function to add organization branding to email templates
+ */
+function getEmailHeaderWithBranding(
+  title: string,
+  organizationName?: string,
+  organizationLogo?: string
+): string {
+  const backgroundColor = organizationName ? "#4F46E5" : "#4F46E5"
+
+  let logoHtml = ""
+  if (organizationLogo) {
+    logoHtml = `<img src="${organizationLogo}" alt="${organizationName}" style="max-width: 100px; max-height: 100px; margin-bottom: 10px;" />`
+  }
+
+  let orgNameHtml = ""
+  if (organizationName) {
+    orgNameHtml = `<p style="margin: 5px 0; font-size: 14px; opacity: 0.9;">${organizationName}</p>`
+  }
+
+  return `
+    <div class="header" style="background-color: ${backgroundColor}; color: white; padding: 20px; text-align: center;">
+      ${logoHtml}
+      <h1 style="margin: 10px 0;">${title}</h1>
+      ${orgNameHtml}
+    </div>
+  `
+}
+
+/**
+ * Get email subject with organization name prefix
+ */
+function getEmailSubject(
+  baseSubject: string,
+  organizationName?: string
+): string {
+  if (organizationName) {
+    return `[${organizationName}] ${baseSubject}`
+  }
+  return baseSubject
 }
