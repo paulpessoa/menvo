@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update status to declined
+    // Update status to declined and invalidate token
     const { error: updateError } = await serviceSupabase
       .from("organization_members")
       .update({
@@ -64,6 +64,18 @@ export async function POST(request: NextRequest) {
       .eq("id", invitation.id)
 
     if (updateError) throw updateError
+
+    // Log activity to organization_activity_log
+    await serviceSupabase.from("organization_activity_log").insert({
+      organization_id: invitation.organization_id,
+      activity_type: "invitation_declined",
+      actor_id: user.id,
+      target_id: user.id,
+      metadata: {
+        invitation_id: invitation.id,
+        role: invitation.role
+      }
+    })
 
     return successResponse({ success: true }, "Invitation declined")
   } catch (error) {
