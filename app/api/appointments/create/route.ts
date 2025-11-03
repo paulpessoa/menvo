@@ -56,6 +56,39 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if mentor is exclusive and validate mentee access
+    const { data: mentorVisibility } = await supabase
+      .from("mentor_visibility_settings")
+      .select("visibility_scope, visible_to_organizations")
+      .eq("mentor_id", mentor_id)
+      .single()
+
+    if (mentorVisibility && mentorVisibility.visibility_scope === "exclusive") {
+      // Mentor is exclusive - verify mentee has access
+      const visibleOrgs = mentorVisibility.visible_to_organizations || []
+
+      if (visibleOrgs.length > 0) {
+        // Check if mentee is member of at least one organization where mentor is visible
+        const { data: menteeOrgs } = await supabase
+          .from("organization_members")
+          .select("organization_id")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .in("organization_id", visibleOrgs)
+
+        if (!menteeOrgs || menteeOrgs.length === 0) {
+          return NextResponse.json(
+            {
+              error:
+                "This mentor is only available to members of specific organizations",
+              code: "MENTOR_NOT_ACCESSIBLE"
+            },
+            { status: 403 }
+          )
+        }
+      }
+    }
+
     // Get mentee profile
     const { data: menteeProfile, error: menteeError } = await supabase
       .from("profiles")
