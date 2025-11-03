@@ -529,3 +529,277 @@ export async function sendOrganizationApprovedEmail(
     throw error
   }
 }
+
+interface MemberJoinedData {
+  adminEmail: string
+  adminName: string
+  organizationName: string
+  memberName: string
+  memberRole: string
+}
+
+/**
+ * Envia email para admins quando um novo membro entra na organização
+ */
+export async function sendMemberJoinedEmail(
+  data: MemberJoinedData
+): Promise<void> {
+  const { adminEmail, adminName, organizationName, memberName, memberRole } =
+    data
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f9fafb; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>👋 Novo Membro</h1>
+        </div>
+        <div class="content">
+          <p>Olá, <strong>${adminName}</strong>!</p>
+          
+          <p><strong>${memberName}</strong> aceitou o convite e agora faz parte de <strong>${organizationName}</strong>.</p>
+          
+          <div class="info">
+            <p><strong>👤 Membro:</strong> ${memberName}</p>
+            <p><strong>🎯 Função:</strong> ${
+              memberRole === "mentor" ? "Mentor" : "Mentee"
+            }</p>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Menvo - Plataforma de Mentoria</p>
+          <p>Este é um email automático, por favor não responda.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: {
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
+        },
+        to: [
+          {
+            email: adminEmail,
+            name: adminName
+          }
+        ],
+        subject: `Novo membro em ${organizationName}`,
+        htmlContent
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar email de novo membro:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
+    }
+
+    console.log("[EMAIL] Email de novo membro enviado com sucesso")
+  } catch (error) {
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
+  }
+}
+
+interface MemberLeftData {
+  adminEmail: string
+  adminName: string
+  organizationName: string
+  memberName: string
+  memberRole: string
+}
+
+/**
+ * Envia email para admins quando um membro sai da organização
+ */
+export async function sendMemberLeftEmail(data: MemberLeftData): Promise<void> {
+  const { adminEmail, adminName, organizationName, memberName, memberRole } =
+    data
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #EF4444; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f9fafb; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>👋 Membro Saiu</h1>
+        </div>
+        <div class="content">
+          <p>Olá, <strong>${adminName}</strong>!</p>
+          
+          <p><strong>${memberName}</strong> saiu de <strong>${organizationName}</strong>.</p>
+          
+          <div class="info">
+            <p><strong>👤 Membro:</strong> ${memberName}</p>
+            <p><strong>🎯 Função:</strong> ${
+              memberRole === "mentor" ? "Mentor" : "Mentee"
+            }</p>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Menvo - Plataforma de Mentoria</p>
+          <p>Este é um email automático, por favor não responda.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: {
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
+        },
+        to: [
+          {
+            email: adminEmail,
+            name: adminName
+          }
+        ],
+        subject: `Membro saiu de ${organizationName}`,
+        htmlContent
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar email de saída de membro:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
+    }
+
+    console.log("[EMAIL] Email de saída de membro enviado com sucesso")
+  } catch (error) {
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
+  }
+}
+
+interface MembershipExpiredData {
+  userEmail: string
+  userName: string
+  organizationName: string
+}
+
+/**
+ * Envia email para usuário quando sua membership expira
+ */
+export async function sendMembershipExpiredEmail(
+  data: MembershipExpiredData
+): Promise<void> {
+  const { userEmail, userName, organizationName } = data
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #F59E0B; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f9fafb; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>⏰ Membership Expirada</h1>
+        </div>
+        <div class="content">
+          <p>Olá, <strong>${userName}</strong>!</p>
+          
+          <p>Sua membership em <strong>${organizationName}</strong> expirou.</p>
+          
+          <div class="info">
+            <p>Se você deseja continuar fazendo parte desta organização, entre em contato com os administradores.</p>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Menvo - Plataforma de Mentoria</p>
+          <p>Este é um email automático, por favor não responda.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: {
+          name: process.env.BREVO_SENDER_NAME || "Menvo",
+          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
+        },
+        to: [
+          {
+            email: userEmail,
+            name: userName
+          }
+        ],
+        subject: `Sua membership em ${organizationName} expirou`,
+        htmlContent
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      console.error("[EMAIL] Erro ao enviar email de expiração:", error)
+      throw new Error(`Falha ao enviar email: ${response.status}`)
+    }
+
+    console.log("[EMAIL] Email de expiração enviado com sucesso")
+  } catch (error) {
+    console.error("[EMAIL] Erro ao enviar email:", error)
+    throw error
+  }
+}
