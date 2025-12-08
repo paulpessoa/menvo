@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Globe, Heart, Users, Map } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Contributors } from "@/components/Contributors"
 import { Partners } from "@/components/Partners"
 
 export default function AboutPage() {
@@ -193,16 +192,6 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold text-center mb-4">
-          {t("about.contributors.title")}
-        </h2>
-        <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-8">
-          {t("about.contributors.description")}
-        </p>
-        <Contributors />
       </div>
 
       <div className="bg-primary-600 text-primary-foreground rounded-lg p-8 md:p-12 mb-16">
