@@ -57,4 +57,5 @@ GEMINI.md
 
 # Supabase CLI
 .supabase/
+.branches
 supabase/.temp/
