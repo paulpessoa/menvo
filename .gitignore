@@ -50,5 +50,11 @@ yarn-error.log*
 # Kiro IDE
 .kiro/
 
-# Supabase CLI temporary files
+# Gemini CLI
+.gemini/
+.geminirc
+GEMINI.md
+
+# Supabase CLI
+.supabase/
 supabase/.temp/
