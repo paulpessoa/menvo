@@ -5,9 +5,9 @@
 - **Racional:** Melhorar a latência de resposta e a eficiência em tarefas de "Vibe Coding" e pequenas correções iterativas, mantendo a inteligência necessária para o contexto do projeto.
 - **Ação:** Criação dos arquivos `HEARTBEAT.md` e `JOURNAL.md` para conformidade com o padrão SSoT definido no `GEMINI.md`.
 
-## 2026-03-30: Correção da Listagem de Mentores (P0)
-- **Problema:** View `mentors_view` vazia para usuários anônimos.
-- **Causa:** RLS restritivo nas tabelas `public.roles` e `public.user_roles` impedindo o join necessário para a view.
-- **Solução:** Criada migração `20260330000001_fix_mentors_list_public_access.sql` concedendo permissão de SELECT para `anon` nestas tabelas.
-- **Desafio:** Erro de histórico (Drift) no Supabase CLI. Resolvido com `migration repair` e sincronização via `db push`.
-- **Status:** **Resolvido**. 4 mentores listados com sucesso.
+## 2026-03-30: Gestão Global e Correções Críticas
+- **Painel Admin:** Evolução da página `/admin/users` para um dashboard global. Inclui agora métricas de distribuição de roles, tendência de cadastros e engajamento de mentorias usando `recharts`.
+- **Controle de Mentores:** Adicionada funcionalidade de aprovar/revogar mentores diretamente no painel global.
+- **Chat RLS:** Identificado que policies antigas estavam conflitando. Criada migração `20260330000002_fix_chat_rls_final.sql` que limpa e redefine permissões granulares para conversas e mensagens.
+- **Internacionalização:** Adicionados arquivos de tradução para Dinamarquês (`da`), Francês (`fr`) e Sueco (`sv`). Estrutura `next-intl` validada e em produção.
+- **Status:** **Fase 1 e 2 concluídas**. Site estável e pronto para escala europeia.

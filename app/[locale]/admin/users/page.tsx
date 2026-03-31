@@ -17,10 +17,22 @@ import {
   Mail,
   Calendar,
   Shield,
-  Eye
+  Eye,
+  MoreVertical,
+  Check,
+  X
 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
+import { UserMetrics } from "@/components/admin/UserMetrics"
 import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
 
@@ -46,6 +58,7 @@ interface UserStats {
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
+  const [appointments, setAppointments] = useState<any[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [stats, setStats] = useState<UserStats>({
     total: 0,
@@ -57,23 +70,23 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const supabase = createClient()
 
   useEffect(() => {
-    fetchUsers()
+    fetchData()
   }, [])
 
   useEffect(() => {
     filterUsers()
   }, [users, searchTerm, activeTab])
 
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     setLoading(true)
-
     try {
-      // Fetch all users with their roles
-      const { data, error } = await supabase
+      // Fetch users
+      const { data: userDataRaw, error: userError } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -92,17 +105,24 @@ export default function AdminUsersPage() {
         `)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (userError) throw userError
 
-      // Transform data to include roles array
-      const userData = (data || []).map(user => ({
+      // Fetch appointments for metrics
+      const { data: appData, error: appError } = await supabase
+        .from('appointments')
+        .select('created_at')
+        .order('created_at', { ascending: true })
+
+      if (appError) console.error('Error fetching appointments for metrics:', appError)
+
+      const userData = (userDataRaw || []).map(user => ({
         ...user,
-        roles: user.user_roles?.map(ur => ur.roles?.name).filter(Boolean) || []
+        roles: user.user_roles?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
       }))
 
       setUsers(userData)
+      setAppointments(appData || [])
 
-      // Calculate stats
       const total = userData.length
       const mentors = userData.filter(u => u.roles.includes('mentor')).length
       const mentees = userData.filter(u => u.roles.includes('mentee')).length
@@ -111,17 +131,36 @@ export default function AdminUsersPage() {
 
       setStats({ total, mentors, mentees, admins, verified })
     } catch (error) {
-      console.error('Error fetching users:', error)
-      toast.error('Erro ao carregar usuários')
+      console.error('Error fetching dashboard data:', error)
+      toast.error('Erro ao carregar dados do painel')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const toggleVerification = async (userId: string, currentStatus: boolean) => {
+    setActionLoading(userId)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ verified: !currentStatus })
+        .eq('id', userId)
+
+      if (error) throw error
+
+      toast.success(currentStatus ? 'Mentor desverificado' : 'Mentor verificado com sucesso')
+      fetchData()
+    } catch (error) {
+      console.error('Error updating verification:', error)
+      toast.error('Erro ao atualizar verificação')
+    } finally {
+      setActionLoading(null)
     }
   }
 
   const filterUsers = () => {
     let filtered = users
 
-    // Filter by tab
     switch (activeTab) {
       case 'mentors':
         filtered = filtered.filter(u => u.roles.includes('mentor'))
@@ -135,10 +174,8 @@ export default function AdminUsersPage() {
       case 'verified':
         filtered = filtered.filter(u => u.verified)
         break
-      // 'all' shows everything
     }
 
-    // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(user =>
@@ -167,31 +204,10 @@ export default function AdminUsersPage() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'admin':
-        return 'bg-red-100 text-red-800'
-      case 'mentor':
-        return 'bg-blue-100 text-blue-800'
-      case 'mentee':
-        return 'bg-green-100 text-green-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getTabCount = (tab: string) => {
-    switch (tab) {
-      case 'all':
-        return stats.total
-      case 'mentors':
-        return stats.mentors
-      case 'mentees':
-        return stats.mentees
-      case 'admins':
-        return stats.admins
-      case 'verified':
-        return stats.verified
-      default:
-        return 0
+      case 'admin': return 'bg-red-100 text-red-800'
+      case 'mentor': return 'bg-blue-100 text-blue-800'
+      case 'mentee': return 'bg-green-100 text-green-800'
+      default: return 'bg-gray-100 text-gray-800'
     }
   }
 
@@ -201,7 +217,7 @@ export default function AdminUsersPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Carregando usuários...</span>
+            <span className="ml-2">Carregando painel de controle...</span>
           </div>
         </div>
       </RequireRole>
@@ -212,81 +228,28 @@ export default function AdminUsersPage() {
     <RequireRole roles={['admin']}>
       <div className="container mx-auto px-4 py-8">
         <AdminBreadcrumb />
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Gerenciamento de Usuários</h1>
+              <h1 className="text-3xl font-bold">Gestão Global de Usuários</h1>
               <p className="text-muted-foreground">
-                Visualize e gerencie todos os usuários da plataforma
+                Controle de permissões, mentores e métricas de engajamento
               </p>
             </div>
-            <Button onClick={fetchUsers} variant="outline">
+            <Button onClick={fetchUsers} variant="outline" className="w-full md:w-auto">
               <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
+              Atualizar Dados
             </Button>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
-              </CardContent>
-            </Card>
+          {/* Metrics Section */}
+          <UserMetrics data={users} />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Mentores</CardTitle>
-                <UserCheck className="h-4 w-4 text-blue-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.mentors}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Mentees</CardTitle>
-                <Users className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.mentees}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Admins</CardTitle>
-                <Shield className="h-4 w-4 text-red-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">{stats.admins}</div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Verificados</CardTitle>
-                <UserCheck className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.verified}</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Search */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Buscar Usuários</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative">
+          {/* Search & List */}
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por nome ou email..."
@@ -295,119 +258,102 @@ export default function AdminUsersPage() {
                   className="pl-10"
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Users List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Lista de Usuários</CardTitle>
-              <CardDescription>
-                {filteredUsers.length} usuário(s) encontrado(s)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="all">
-                    Todos ({getTabCount('all')})
-                  </TabsTrigger>
-                  <TabsTrigger value="mentors">
-                    Mentores ({getTabCount('mentors')})
-                  </TabsTrigger>
-                  <TabsTrigger value="mentees">
-                    Mentees ({getTabCount('mentees')})
-                  </TabsTrigger>
-                  <TabsTrigger value="admins">
-                    Admins ({getTabCount('admins')})
-                  </TabsTrigger>
-                  <TabsTrigger value="verified">
-                    Verificados ({getTabCount('verified')})
-                  </TabsTrigger>
-                </TabsList>
+            <Card>
+              <CardContent className="p-0">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <div className="px-4 pt-4 border-b">
+                    <TabsList className="w-full justify-start overflow-x-auto">
+                      <TabsTrigger value="all">Todos ({stats.total})</TabsTrigger>
+                      <TabsTrigger value="mentors">Mentores ({stats.mentors})</TabsTrigger>
+                      <TabsTrigger value="mentees">Mentees ({stats.mentees})</TabsTrigger>
+                      <TabsTrigger value="admins">Admins ({stats.admins})</TabsTrigger>
+                      <TabsTrigger value="verified">Verificados ({stats.verified})</TabsTrigger>
+                    </TabsList>
+                  </div>
 
-                <TabsContent value={activeTab} className="mt-6">
-                  {filteredUsers.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Nenhum usuário encontrado</h3>
-                      <p className="text-muted-foreground">
-                        {searchTerm
-                          ? "Tente ajustar os filtros de busca"
-                          : "Não há usuários nesta categoria"
-                        }
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {filteredUsers.map((user) => (
-                        <Card key={user.id} className="hover:shadow-md transition-shadow">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src={user.avatar_url || undefined} />
-                                <AvatarFallback className="bg-primary/10">
-                                  {getInitials(user.full_name)}
-                                </AvatarFallback>
-                              </Avatar>
+                  <TabsContent value={activeTab} className="m-0">
+                    <div className="divide-y">
+                      {filteredUsers.length === 0 ? (
+                        <div className="text-center py-12">
+                          <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-medium">Nenhum usuário encontrado</h3>
+                        </div>
+                      ) : (
+                        filteredUsers.map((user) => (
+                          <div key={user.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-4">
+                            <Avatar className="h-10 w-10 border">
+                              <AvatarImage src={user.avatar_url || undefined} />
+                              <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
+                            </Avatar>
 
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold truncate">
-                                    {user.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Usuário sem nome'}
-                                  </h3>
-                                  {user.verified && (
-                                    <Badge variant="outline" className="bg-green-100 text-green-800">
-                                      Verificado
-                                    </Badge>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-                                  <Mail className="h-4 w-4" />
-                                  <span className="truncate">{user.email}</span>
-                                </div>
-
-                                <div className="flex items-center gap-2 mb-2">
-                                  {user.roles.length > 0 ? (
-                                    user.roles.map((role) => (
-                                      <Badge
-                                        key={role}
-                                        variant="outline"
-                                        className={getRoleBadgeColor(role)}
-                                      >
-                                        {role}
-                                      </Badge>
-                                    ))
-                                  ) : (
-                                    <Badge variant="outline" className="bg-gray-100 text-gray-800">
-                                      Sem role
-                                    </Badge>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <Calendar className="h-3 w-3" />
-                                  <span>Cadastrado em {formatDate(user.created_at)}</span>
-                                </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-sm truncate">
+                                  {user.full_name || 'Usuário sem nome'}
+                                </span>
+                                {user.verified && (
+                                  <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 text-[10px] h-5">
+                                    VERIFICADO
+                                  </Badge>
+                                )}
                               </div>
-
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline">
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  Ver Perfil
-                                </Button>
-                              </div>
+                              <div className="text-xs text-muted-foreground truncate">{user.email}</div>
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+
+                            <div className="hidden md:flex gap-1">
+                              {user.roles.map(role => (
+                                <Badge key={role} variant="outline" className={`${getRoleBadgeColor(role)} text-[10px]`}>
+                                  {role.toUpperCase()}
+                                </Badge>
+                              ))}
+                            </div>
+
+                            <div className="text-xs text-muted-foreground hidden lg:block">
+                              Desde {formatDate(user.created_at)}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                  <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem onClick={() => window.open(`/mentors/${user.id}`, '_blank')}>
+                                    <Eye className="mr-2 h-4 w-4" /> Ver Perfil Público
+                                  </DropdownMenuItem>
+                                  
+                                  {user.roles.includes('mentor') && (
+                                    <DropdownMenuItem onClick={() => toggleVerification(user.id, user.verified)}>
+                                      {user.verified ? (
+                                        <><X className="mr-2 h-4 w-4 text-red-500" /> Revogar Verificação</>
+                                      ) : (
+                                        <><Check className="mr-2 h-4 w-4 text-green-500" /> Aprovar Mentor</>
+                                      )}
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Gerenciar Papéis</DropdownMenuLabel>
+                                  <DropdownMenuItem className="text-xs">Tornar Admin (Pendente)</DropdownMenuItem>
+                                  <DropdownMenuItem className="text-xs">Tornar Mentor (Pendente)</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  )}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </RequireRole>
