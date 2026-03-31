@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'common' });
+  const t = await getTranslations({ locale, namespace: 'metadata' });
 
   return {
     metadataBase: new URL('https://menvo.com.br'),
@@ -26,21 +26,23 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       default: t('title') || 'Menvo',
       template: `%s | ${t('title') || 'Menvo'}`
     },
-    description: t('welcome') || 'Conectando mentores e mentees',
+    description: t('description') || 'Conectando mentores e mentees para sessões de mentoria gratuitas',
     authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
     creator: "Paul Pessoa",
     publisher: "MENVO",
+    keywords: t('keywords') || ["mentoria", "voluntariado"],
     openGraph: {
       type: "website",
       locale: locale,
       url: "https://menvo.com.br",
-      title: t('title') || 'Menvo',
-      description: t('welcome') || 'Conectando mentores e mentees',
-      siteName: "MENVO",
+      title: t('og.title') || t('title'),
+      description: t('og.description') || t('description'),
+      siteName: t('og.siteName') || "MENVO",
     },
     twitter: {
       card: "summary_large_image",
-      title: t('title') || 'Menvo',
+      title: t('twitter.title') || t('title'),
+      description: t('twitter.description') || t('description'),
       creator: "@paulpessoa",
     },
     robots: {

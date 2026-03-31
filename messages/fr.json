@@ -739,5 +739,23 @@
         "description": "Não foi possível enviar sua sugestão. Por favor, tente novamente mais tarde."
       }
     }
+  },
+  "metadata": {
+    "title": "MENVO - Mentoria Voluntária",
+    "description": "Conectando mentores e mentees para sessões de mentoria gratuitas",
+    "keywords": [
+      "mentoria",
+      "voluntariado",
+      "carreira"
+    ],
+    "og": {
+      "title": "MENVO - Mentoria Voluntária",
+      "description": "Conectando mentores e mentees para sessões de mentoria gratuitas",
+      "siteName": "MENVO"
+    },
+    "twitter": {
+      "title": "MENVO - Mentoria Voluntária",
+      "description": "Conectando mentores e mentees para sessões de mentoria gratuitas"
+    }
   }
 }
