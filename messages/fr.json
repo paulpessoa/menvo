@@ -35,49 +35,75 @@
     "subtitle": "Connecter mentors et mentorés"
   },
   "home": {
-    "badge.freeMentorship": "Plataforma de Mentores Voluntários",
-    "hero.title": "Conecte-se com Mentores Voluntários",
-    "hero.description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
-    "hero.findMentor": "Encontrar um Mentor",
-    "hero.becomeMentor": "Torne-se um Mentor",
-    "testimonials.title": "Histórias que Inspiram",
-    "testimonials.description": "Vidas transformadas através da mentoria",
-    "howItWorks.title": "Como Funciona",
-    "howItWorks.description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
-    "howItWorks.step1.title": "Encontrar um Mentor",
-    "howItWorks.step1.description": "Explore nossa comunidade diversa de mentores voluntários e encontre a combinação ideal para suas necessidades.",
-    "howItWorks.step2.title": "Agendar uma Sessão",
-    "howItWorks.step2.description": "Agende um horário que funcione para ambos usando nosso sistema de agendamento integrado.",
-    "howItWorks.step3.title": "Conecte-se e Cresça",
-    "howItWorks.step3.description": "Encontre-se virtualmente, compartilhe experiências e desenvolva suas habilidades com orientação personalizada.",
-    "howItWorks.learnMore": "Saiba Mais",
-    "featuredMentors.title": "Mentores em Destaque",
-    "featuredMentors.description": "Conheça alguns de nossos dedicados mentores voluntários",
-    "featuredMentors.viewAll": "Ver Todos os Mentores",
-    "mentor.sampleName": "Sarah Johnson",
-    "mentor.field": "Engenharia de Software",
-    "mentor.tags": [
-      "Carreira",
-      "Tecnologia",
-      "Liderança"
-    ],
-    "mentor.description": "Desenvolvedora Sênior com mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
-    "mentor.languages": "Inglês, Espanhol",
-    "mentor.viewProfile": "Ver Perfil",
-    "events.title": "Próximos Eventos",
-    "events.description": "Participe de nossos eventos comunitários e sessões de mentoria em grupo",
-    "events.card.title": "Painel de Carreira em Tecnologia: Como Entrar no Setor",
-    "events.card.date": "15 de Junho de 2025",
-    "events.card.time": "18h00 - 20h00",
-    "events.card.description": "Participe de nosso painel de especialistas da indústria e descubra como iniciar e desenvolver sua carreira em tecnologia.",
-    "events.card.attendees": "{{count}} participantes",
-    "events.card.register": "Inscrever-se",
-    "events.viewAll": "Ver Todos os Eventos",
-    "cta.title": "Pronto para Começar?",
-    "cta.description": "Junte-se a nós hoje e conecte-se com pessoas que podem ajudar você a alcançar seus objetivos",
-    "cta.signup": "Inscreva-se Agora",
-    "cta.learnMore": "Saiba Mais",
-    "event.type": "Online"
+    "badge": {
+      "freeMentorship": "Plataforma de Mentores Voluntários"
+    },
+    "hero": {
+      "title": "Conecte-se com Mentores Voluntários",
+      "description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
+      "findMentor": "Encontrar um Mentor",
+      "becomeMentor": "Torne-se um Mentor"
+    },
+    "testimonials": {
+      "title": "Histórias que Inspiram",
+      "description": "Vidas transformadas através da mentoria"
+    },
+    "howItWorks": {
+      "title": "Como Funciona",
+      "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
+      "step1": {
+        "title": "Encontrar um Mentor",
+        "description": "Explore nossa comunidade diversa de mentores voluntários e encontre a combinação ideal para suas necessidades."
+      },
+      "step2": {
+        "title": "Agendar uma Sessão",
+        "description": "Agende um horário que funcione para ambos usando nosso sistema de agendamento integrado."
+      },
+      "step3": {
+        "title": "Conecte-se e Cresça",
+        "description": "Encontre-se virtualmente, compartilhe experiências e desenvolva suas habilidades com orientação personalizada."
+      },
+      "learnMore": "Saiba Mais"
+    },
+    "featuredMentors": {
+      "title": "Mentores em Destaque",
+      "description": "Conheça alguns de nossos dedicados mentores voluntários",
+      "viewAll": "Ver Todos os Mentores"
+    },
+    "mentor": {
+      "sampleName": "Sarah Johnson",
+      "field": "Engenharia de Software",
+      "tags": [
+        "Carreira",
+        "Tecnologia",
+        "Liderança"
+      ],
+      "description": "Desenvolvedora Sênior com mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
+      "languages": "Inglês, Espanhol",
+      "viewProfile": "Ver Perfil"
+    },
+    "events": {
+      "title": "Próximos Eventos",
+      "description": "Participe de nossos eventos comunitários e sessões de mentoria em grupo",
+      "card": {
+        "title": "Painel de Carreira em Tecnologia: Como Entrar no Setor",
+        "date": "15 de Junho de 2025",
+        "time": "18h00 - 20h00",
+        "description": "Participe de nosso painel de especialistas da indústria e descubra como iniciar e desenvolver sua carreira em tecnologia.",
+        "attendees": "{{count}} participantes",
+        "register": "Inscrever-se"
+      },
+      "viewAll": "Ver Todos os Eventos"
+    },
+    "cta": {
+      "title": "Pronto para Começar?",
+      "description": "Junte-se a nós hoje e conecte-se com pessoas que podem ajudar você a alcançar seus objetivos",
+      "signup": "Inscreva-se Agora",
+      "learnMore": "Saiba Mais"
+    },
+    "event": {
+      "type": "Online"
+    }
   },
   "about": {
     "badge": "Sobre Nós",

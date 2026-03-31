@@ -25,7 +25,8 @@ import { useEffect, useState } from "react"
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel"
 
 export default function Home() {
-  const t = useTranslations()
+  const t = useTranslations('home')
+  const tCommon = useTranslations('common')
   const images = [
     "/images/e.jpg",
     "/images/d.jpg",
@@ -80,20 +81,20 @@ export default function Home() {
           {/* Texto */}
           <div className="flex-1 flex flex-col justify-center items-center lg:items-start max-w-xl">
             <Badge variant="outline" className="w-fit mb-4">
-              {t("home.badge.freeMentorship")}
+              {t("badge.freeMentorship")}
             </Badge>
             <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold tracking-tighter mb-4 text-center lg:text-left leading-tight">
-              {t("home.hero.title")}
+              {t("hero.title")}
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl mb-6 text-center lg:text-left">
-              {t("home.hero.description")}
+              {t("hero.description")}
             </p>
             <div className="flex flex-col gap-2 w-full max-w-xs mx-auto lg:flex-row lg:max-w-none lg:mx-0">
               <Button size="lg" asChild className="w-full">
-                <Link href="/mentors">{t("home.hero.findMentor")}</Link>
+                <Link href="/mentors">{t("hero.findMentor")}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="w-full">
-                <Link href="/signup">{t("home.hero.becomeMentor")}</Link>
+                <Link href="/signup">{t("hero.becomeMentor")}</Link>
               </Button>
             </div>
           </div>

@@ -35,49 +35,75 @@
     "subtitle": "Connecting mentors and mentees"
   },
   "home": {
-    "badge.freeMentorship": "Volunteer Mentorship Platform",
-    "hero.title": "Connect with Volunteer Mentors",
-    "hero.description": "Find guidance, share experiences, and grow together. Our platform connects you with volunteer mentors for free mentorship sessions.",
-    "hero.findMentor": "Find a Mentor",
-    "hero.becomeMentor": "Become a Mentor",
-    "testimonials.title": "Stories That Inspire",
-    "testimonials.description": "Lives transformed through mentorship",
-    "howItWorks.title": "How It Works",
-    "howItWorks.description": "Our platform makes it easy to connect with mentors and schedule sessions",
-    "howItWorks.step1.title": "Find a Mentor",
-    "howItWorks.step1.description": "Browse our diverse community of volunteer mentors and find the perfect match for your needs.",
-    "howItWorks.step2.title": "Schedule a Session",
-    "howItWorks.step2.description": "Book a time that works for both of you using our integrated scheduling system.",
-    "howItWorks.step3.title": "Connect & Grow",
-    "howItWorks.step3.description": "Meet virtually, share experiences, and develop your skills with personalized guidance.",
-    "howItWorks.learnMore": "Learn More",
-    "featuredMentors.title": "Featured Mentors",
-    "featuredMentors.description": "Meet some of our dedicated volunteer mentors",
-    "featuredMentors.viewAll": "View All Mentors",
-    "mentor.sampleName": "Sarah Johnson",
-    "mentor.field": "Software Engineering",
-    "mentor.tags": [
-      "Career",
-      "Tech",
-      "Leadership"
-    ],
-    "mentor.description": "Senior Developer with 10+ years of experience helping new programmers navigate the tech industry.",
-    "mentor.languages": "English, Spanish",
-    "mentor.viewProfile": "View Profile",
-    "events.title": "Upcoming Events",
-    "events.description": "Join our community events and group mentorship sessions",
-    "events.card.title": "Tech Career Panel: Breaking Into the Industry",
-    "events.card.date": "June 15, 2025",
-    "events.card.time": "6:00 PM - 8:00 PM",
-    "events.card.description": "Join our panel of industry experts as they share insights on how to start and grow your career in technology.",
-    "events.card.attendees": "{{count}} attendees",
-    "events.card.register": "Register",
-    "events.viewAll": "View All Events",
-    "cta.title": "Ready to Get Started?",
-    "cta.description": "Join us today and connect with people who can help you achieve your goals",
-    "cta.signup": "Sign Up Now",
-    "cta.learnMore": "Learn More",
-    "event.type": "Online"
+    "badge": {
+      "freeMentorship": "Volunteer Mentorship Platform"
+    },
+    "hero": {
+      "title": "Connect with Volunteer Mentors",
+      "description": "Find guidance, share experiences, and grow together. Our platform connects you with volunteer mentors for free mentorship sessions.",
+      "findMentor": "Find a Mentor",
+      "becomeMentor": "Become a Mentor"
+    },
+    "testimonials": {
+      "title": "Stories That Inspire",
+      "description": "Lives transformed through mentorship"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "description": "Our platform makes it easy to connect with mentors and schedule sessions",
+      "step1": {
+        "title": "Find a Mentor",
+        "description": "Browse our diverse community of volunteer mentors and find the perfect match for your needs."
+      },
+      "step2": {
+        "title": "Schedule a Session",
+        "description": "Book a time that works for both of you using our integrated scheduling system."
+      },
+      "step3": {
+        "title": "Connect & Grow",
+        "description": "Meet virtually, share experiences, and develop your skills with personalized guidance."
+      },
+      "learnMore": "Learn More"
+    },
+    "featuredMentors": {
+      "title": "Featured Mentors",
+      "description": "Meet some of our dedicated volunteer mentors",
+      "viewAll": "View All Mentors"
+    },
+    "mentor": {
+      "sampleName": "Sarah Johnson",
+      "field": "Software Engineering",
+      "tags": [
+        "Career",
+        "Tech",
+        "Leadership"
+      ],
+      "description": "Senior Developer with 10+ years of experience helping new programmers navigate the tech industry.",
+      "languages": "English, Spanish",
+      "viewProfile": "View Profile"
+    },
+    "events": {
+      "title": "Upcoming Events",
+      "description": "Join our community events and group mentorship sessions",
+      "card": {
+        "title": "Tech Career Panel: Breaking Into the Industry",
+        "date": "June 15, 2025",
+        "time": "6:00 PM - 8:00 PM",
+        "description": "Join our panel of industry experts as they share insights on how to start and grow your career in technology.",
+        "attendees": "{{count}} attendees",
+        "register": "Register"
+      },
+      "viewAll": "View All Events"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Join us today and connect with people who can help you achieve your goals",
+      "signup": "Sign Up Now",
+      "learnMore": "Learn More"
+    },
+    "event": {
+      "type": "Online"
+    }
   },
   "about": {
     "badge": "About Us",
