@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from \"next-intl\"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from \"next-intl\"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Instagram, Linkedin, Youtube, Github } from "lucide-react"
 import { NewsletterModal } from "@/components/newsletter/NewsletterModal"
 import Image from "next/image"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from \"next-intl\"
 
 export default function Footer() {
   const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false)

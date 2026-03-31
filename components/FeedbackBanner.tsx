@@ -5,7 +5,7 @@ import { Star, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from \"next-intl\"
 import { useToast } from "@/hooks/useToast"
 import {
   Dialog,

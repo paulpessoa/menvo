@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from \"next-intl\"
 import { Card } from "@/components/ui/card"
 import { GraduationCap, Users } from "lucide-react"
 import { Dispatch, SetStateAction } from "react"

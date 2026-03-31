@@ -1,0 +1,13 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "home": "Accueil",
+    "findMentors": "Trouver des mentors",
+    "events": "Événements",
+    "howItWorks": "Comment ça marche",
+    "aboutUs": "À propos de nous",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion"
+  }
+}

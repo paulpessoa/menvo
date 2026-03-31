@@ -1,0 +1,13 @@
+{
+  "common": {
+    "welcome": "Velkommen",
+    "home": "Hjem",
+    "findMentors": "Find mentorer",
+    "events": "Begivenheder",
+    "howItWorks": "Hvordan det virker",
+    "aboutUs": "Om os",
+    "login": "Log ind",
+    "register": "Registrer",
+    "logout": "Log ud"
+  }
+}
