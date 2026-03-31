@@ -10,11 +10,56 @@ import { CookieConsentBanner } from "@/components/cookie-consent-banner"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import Script from "next/script"
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 
 const inter = Inter({ subsets: ["latin"] })
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'common' });
+
+  return {
+    metadataBase: new URL('https://menvo.com.br'),
+    title: {
+      default: t('title') || 'Menvo',
+      template: `%s | ${t('title') || 'Menvo'}`
+    },
+    description: t('welcome') || 'Conectando mentores e mentees',
+    authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
+    creator: "Paul Pessoa",
+    publisher: "MENVO",
+    openGraph: {
+      type: "website",
+      locale: locale,
+      url: "https://menvo.com.br",
+      title: t('title') || 'Menvo',
+      description: t('welcome') || 'Conectando mentores e mentees',
+      siteName: "MENVO",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t('title') || 'Menvo',
+      creator: "@paulpessoa",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    alternates: {
+      canonical: '/',
+      languages: {
+        'pt-BR': '/pt-BR',
+        'en': '/en',
+        'es': '/es',
+        'da': '/da',
+        'fr': '/fr',
+        'sv': '/sv'
+      }
+    }
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -25,13 +70,10 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
 
-  // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
   const messages = await getMessages();
 
   return (
