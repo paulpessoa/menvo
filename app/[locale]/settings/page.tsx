@@ -17,7 +17,7 @@ import {
   AlertTriangle
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useTheme } from "next-themes"
@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function SettingsPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { currentLanguage, changeLanguage } = useLanguage()
   const { user, signOut } = useAuth()
   const { toast } = useToast()

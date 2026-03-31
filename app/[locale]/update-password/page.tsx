@@ -16,12 +16,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 function UpdatePasswordForm() {
   const router = useRouter()
   const { toast } = useToast()
-  const { t } = useTranslation()
+  const t = useTranslations()
   const supabase = createClientComponentClient()
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")

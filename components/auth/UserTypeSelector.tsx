@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
 import { GraduationCap, Users } from "lucide-react"
 import { Dispatch, SetStateAction } from "react"
@@ -15,7 +15,7 @@ interface UserTypeSelectorProps {
 }
 
 export function UserTypeSelector({ userType, setUserType }: UserTypeSelectorProps) {
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   const userTypes = [
     {

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Instagram, Linkedin, Youtube, Github } from "lucide-react"
 import { NewsletterModal } from "@/components/newsletter/NewsletterModal"
 import Image from "next/image"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 
 export default function Footer() {
   const [isNewsletterModalOpen, setIsNewsletterModalOpen] = useState(false)
@@ -15,7 +15,7 @@ export default function Footer() {
   const [emailInput, setEmailInput] = useState("")
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   const isEmailValid = emailRegex.test(emailInput)
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   const handleSubscribeClick = () => {
     setIsNewsletterModalOpen(true)

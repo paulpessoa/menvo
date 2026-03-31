@@ -34,7 +34,7 @@ import { useMentor } from "@/hooks/useMentors"
 import { useAuth } from "@/lib/auth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useState } from "react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 interface MentorProfilePageProps {
@@ -42,7 +42,7 @@ interface MentorProfilePageProps {
 }
 
 export default function MentorProfilePage({ params }: MentorProfilePageProps) {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { user } = useAuth()
   const { data: mentor, isLoading, error } = useMentor(params.id)
   const [showLoginModal, setShowLoginModal] = useState(false)

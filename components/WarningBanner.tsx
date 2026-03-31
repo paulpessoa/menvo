@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { AlertTriangle, X, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useTranslation } from 'react-i18next'
+import { useTranslations } from "next-intl"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export function WarningBanner() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const [showBanner, setShowBanner] = useState(false)
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false)
 

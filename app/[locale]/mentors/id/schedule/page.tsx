@@ -34,7 +34,7 @@ import {
 import { useMentor } from "@/hooks/useMentors"
 import { useAuth } from "@/lib/auth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { format, addDays, isSameDay, isBefore, isAfter } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -60,7 +60,7 @@ interface SessionRequest {
 }
 
 export default function SchedulePage({ params }: SchedulePageProps) {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { user } = useAuth()
   const router = useRouter()
   const { data: mentor, isLoading, error } = useMentor(params.id)

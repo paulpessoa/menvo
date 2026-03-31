@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Building2, Calendar, CheckCircle2, Clock, FileText, HandHeart, Mail, MessageSquare, Search, Shield, TrendingUp, User, Users, Video } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 export default function HowItWorksPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   return (
     <div className="container py-8 md:py-12">

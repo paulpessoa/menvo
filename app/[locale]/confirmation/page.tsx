@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, CheckCircle, ArrowRight, AlertTriangle } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 import { UserType } from "@/hooks/useSignupForm"
@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/useToast"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export default function ConfirmationPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { user, loading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()

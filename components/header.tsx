@@ -16,7 +16,7 @@ import {
   UserCheck,
   BarChart3,
   Cog,
-  HeartHandshake,
+  HeartHandshake
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { MessagesBadge } from "@/components/MessagesBadge"
@@ -30,17 +30,29 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
+  DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
-  const { t } = useTranslation()
+  const t = useTranslations()
 
-  const { isAuthenticated, user, profile, role, signOut, canAdminSystem, canAdminUsers, canAdminVerifications, canValidateActivities, canViewReports, isAdmin } = useAuth()
+  const {
+    isAuthenticated,
+    user,
+    profile,
+    role,
+    signOut,
+    canAdminSystem,
+    canAdminUsers,
+    canAdminVerifications,
+    canValidateActivities,
+    canViewReports,
+    isAdmin
+  } = useAuth()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
@@ -50,21 +62,21 @@ export default function Header() {
     { name: t("common.home"), href: "/" },
     { name: t("common.findMentors"), href: "/mentors" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
-    { name: t("common.aboutUs"), href: "/about" },
+    { name: t("common.aboutUs"), href: "/about" }
   ]
 
   const userNavigation = isAuthenticated
     ? isAdmin
       ? [
-        { name: "Painel Administrativo", href: "/admin", icon: Shield },
-        { name: "Configurações", href: "/settings", icon: Settings },
-      ]
+          { name: "Painel Administrativo", href: "/admin", icon: Shield },
+          { name: "Configurações", href: "/settings", icon: Settings }
+        ]
       : [
-        { name: "Dashboard", href: "/dashboard", icon: User },
-        { name: "Perfil", href: "/profile", icon: User },
-        { name: "Mensagens", href: "/messages", icon: MessageSquare },
-        { name: "Configurações", href: "/settings", icon: Settings },
-      ]
+          { name: "Dashboard", href: "/dashboard", icon: User },
+          { name: "Perfil", href: "/profile", icon: User },
+          { name: "Mensagens", href: "/messages", icon: MessageSquare },
+          { name: "Configurações", href: "/settings", icon: Settings }
+        ]
     : []
 
   // Admin navigation removido - agora está na sidebar do /admin/layout.tsx
@@ -105,8 +117,11 @@ export default function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary-600 ${pathname === item.href ? "text-primary-600" : "text-foreground/60"
-                }`}
+              className={`text-sm font-medium transition-colors hover:text-primary-600 ${
+                pathname === item.href
+                  ? "text-primary-600"
+                  : "text-foreground/60"
+              }`}
             >
               {item.name}
             </Link>
@@ -120,10 +135,18 @@ export default function Header() {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full p-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full p-0"
+                >
                   <Avatar>
                     <AvatarImage
-                      src={user?.user_metadata?.avatar_url || user?.user_metadata?.picture || profile?.avatar_url}
+                      src={
+                        user?.user_metadata?.avatar_url ||
+                        user?.user_metadata?.picture ||
+                        profile?.avatar_url
+                      }
                       alt={profile?.full_name || user?.email || "User"}
                     />
                     <AvatarFallback>
@@ -138,9 +161,19 @@ export default function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{profile?.full_name || user?.user_metadata?.full_name || "Usuário"}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">{user?.email}</p>
-                    {role && <p className="text-xs text-muted-foreground capitalize">{role}</p>}
+                    <p className="font-medium">
+                      {profile?.full_name ||
+                        user?.user_metadata?.full_name ||
+                        "Usuário"}
+                    </p>
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {user?.email}
+                    </p>
+                    {role && (
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {role}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -162,7 +195,10 @@ export default function Header() {
                     <DropdownMenuLabel>Administração</DropdownMenuLabel>
                     {adminNavigation.map((item) => (
                       <DropdownMenuItem key={item.name} asChild>
-                        <Link href={item.href} className="flex items-center gap-2">
+                        <Link
+                          href={item.href}
+                          className="flex items-center gap-2"
+                        >
                           <item.icon className="h-4 w-4" />
                           {item.name}
                         </Link>
@@ -172,7 +208,10 @@ export default function Header() {
                 )}
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2">
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2"
+                >
                   <LogOut className="h-4 w-4" />
                   Sair
                 </DropdownMenuItem>
@@ -226,7 +265,9 @@ export default function Header() {
                       {adminNavigation.length > 0 && (
                         <>
                           <div className="border-t pt-2 mt-2">
-                            <p className="px-2 py-1 text-sm font-medium text-muted-foreground">Administração</p>
+                            <p className="px-2 py-1 text-sm font-medium text-muted-foreground">
+                              Administração
+                            </p>
                             {adminNavigation.map((item) => (
                               <Link
                                 key={item.name}
@@ -254,13 +295,20 @@ export default function Header() {
                   </>
                 ) : (
                   <div className="border-t pt-4 space-y-2">
-                    <Button variant="ghost" asChild className="w-full justify-start">
+                    <Button
+                      variant="ghost"
+                      asChild
+                      className="w-full justify-start"
+                    >
                       <Link href="/auth/login" onClick={() => setIsOpen(false)}>
                         {t("common.login")}
                       </Link>
                     </Button>
                     <Button asChild className="w-full">
-                      <Link href="/auth/register" onClick={() => setIsOpen(false)}>
+                      <Link
+                        href="/auth/register"
+                        onClick={() => setIsOpen(false)}
+                      >
                         {t("common.register")}
                       </Link>
                     </Button>

@@ -1,12 +1,12 @@
 "use client"
 import { Shield, Mail, User, Image as ImageIcon, Database, Users, Globe, Calendar } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import Image from "next/image"
 
 export default function PrivacyPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   return (
     <div className="container max-w-3xl py-10 md:py-16">
       <div className="flex flex-col items-center text-center mb-8">

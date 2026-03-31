@@ -29,7 +29,7 @@ import {
 import Image from "next/image"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from "next-intl";
 
 interface AnalysisResult {
     precisa_refazer?: boolean
@@ -62,7 +62,7 @@ export default function QuizResultsPage() {
     const params = useParams()
     const router = useRouter()
     const { toast } = useToast()
-    const { t } = useTranslation('quiz');
+    const t = useTranslations('quiz');
     const [loading, setLoading] = useState(true)
     const [response, setResponse] = useState<QuizResponse | null>(null)
     const [selectedGift, setSelectedGift] = useState<"caneta" | "botton" | null>(

@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 
 const partners = [
   {
@@ -38,7 +38,7 @@ const partners = [
 ]
 
 export function Partners() {
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   return (
     <section className="py-12 bg-gray-50">

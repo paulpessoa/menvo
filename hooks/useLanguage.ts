@@ -1,22 +1,18 @@
-import { useState, useEffect } from 'react';
-import i18n from '../i18n/config';
+import { useLocale } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 export const useLanguage = () => {
-  const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setCurrentLanguage(lng);
-    localStorage.setItem('language', lng); // <-- salva no localStorage garantindo que na próxima vez que o usuário acessar a aplicação,
-  };                                      // ela já esteja no idioma que ele selecionou, sem precisar escolher novamente.
-
-  useEffect(() => {
-    const language = localStorage.getItem('language') || 'pt-BR';
-    changeLanguage(language);
-  }, []);
+  const changeLanguage = (newLocale: string) => {
+    // next-intl handled routing will preserve the pathname but change the locale
+    router.replace(pathname, { locale: newLocale });
+  };
 
   return {
-    currentLanguage,
+    currentLanguage: locale,
     changeLanguage,
   };
 };

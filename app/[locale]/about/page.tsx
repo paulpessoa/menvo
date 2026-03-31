@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Globe, Heart, Users, Map } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { Partners } from "@/components/Partners"
 
 export default function AboutPage() {
-  const { t } = useTranslation()
+  const t = useTranslations()
 
   return (
     <div className="container py-8 md:py-12">

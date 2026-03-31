@@ -9,14 +9,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Mail, User, Phone, MessageSquare, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 
 interface WaitingListFormProps {
     onSuccess?: () => void
 }
 
 export function WaitingListForm({ onSuccess }: WaitingListFormProps) {
-    const { t } = useTranslation()
+    const t = useTranslations()
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [whatsapp, setWhatsapp] = useState("")

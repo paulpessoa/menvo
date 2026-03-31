@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
+  DialogFooter
 } from "@/components/ui/dialog"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 import type { UserType } from "@/hooks/useSignupForm"
@@ -25,7 +25,7 @@ interface WaitingListProps {
 }
 
 export function WaitingList({ isOpen, onClose }: WaitingListProps) {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const supabase = createClientComponentClient()
 
   const [name, setName] = useState("")
@@ -46,13 +46,15 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
           email,
           whatsapp: whatsapp || null,
           reason,
-          user_type: userType,
-        },
+          user_type: userType
+        }
       ])
 
       if (error) throw error
 
-      toast.success(t("waitingList.successMessage") || "Thank you for your interest!")
+      toast.success(
+        t("waitingList.successMessage") || "Thank you for your interest!"
+      )
       setName("")
       setEmail("")
       setWhatsapp("")
@@ -60,7 +62,11 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
       setUserType("mentee")
       onClose()
     } catch (error: any) {
-      toast.error(error.message || t("waitingList.errorMessage") || "Error submitting form")
+      toast.error(
+        error.message ||
+          t("waitingList.errorMessage") ||
+          "Error submitting form"
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -70,7 +76,9 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("waitingList.title") || "Join the Waiting List"}</DialogTitle>
+          <DialogTitle>
+            {t("waitingList.title") || "Join the Waiting List"}
+          </DialogTitle>
           <DialogDescription>
             {t("waitingList.description") ||
               "Thank you for your interest! Please fill out the form below."}
@@ -83,7 +91,9 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
             <Input
               id="name"
               type="text"
-              placeholder={t("waitingList.namePlaceholder") || "Enter your full name"}
+              placeholder={
+                t("waitingList.namePlaceholder") || "Enter your full name"
+              }
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -95,7 +105,9 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
             <Input
               id="email"
               type="email"
-              placeholder={t("waitingList.emailPlaceholder") || "your@email.com"}
+              placeholder={
+                t("waitingList.emailPlaceholder") || "your@email.com"
+              }
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -103,21 +115,30 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="whatsapp">{t("waitingList.whatsappLabel") || "WhatsApp (optional)"}</Label>
+            <Label htmlFor="whatsapp">
+              {t("waitingList.whatsappLabel") || "WhatsApp (optional)"}
+            </Label>
             <Input
               id="whatsapp"
               type="text"
-              placeholder={t("waitingList.whatsappPlaceholder") || "Your WhatsApp number"}
+              placeholder={
+                t("waitingList.whatsappPlaceholder") || "Your WhatsApp number"
+              }
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reason">{t("waitingList.reasonLabel") || "Why do you want to be part?"}</Label>
+            <Label htmlFor="reason">
+              {t("waitingList.reasonLabel") || "Why do you want to be part?"}
+            </Label>
             <Textarea
               id="reason"
-              placeholder={t("waitingList.reasonPlaceholder") || "Tell us why you want to join"}
+              placeholder={
+                t("waitingList.reasonPlaceholder") ||
+                "Tell us why you want to join"
+              }
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               required
@@ -129,7 +150,9 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
 
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? t("common.submitting") || "Submitting..." : t("common.submit") || "Submit"}
+              {isSubmitting
+                ? t("common.submitting") || "Submitting..."
+                : t("common.submit") || "Submit"}
             </Button>
           </DialogFooter>
         </form>

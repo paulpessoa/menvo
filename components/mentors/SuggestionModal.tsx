@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import { mentorService } from "@/services/mentors/mentors"
@@ -36,7 +36,7 @@ export function SuggestionModal({
   onSubmit,
   userId,
 }: SuggestionModalProps) {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const [suggestionText, setSuggestionText] = useState("")
   const [freeTopics, setFreeTopics] = useState<string[]>([])
   const [inclusionTags, setInclusionTags] = useState<string[]>([])

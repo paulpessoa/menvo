@@ -19,12 +19,12 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowRight, Loader2, AlertTriangle, Mail } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { WaitingList } from "@/components/WaitingList"
 
 function SignupForm() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { user, role, loading, signUp, signInWithProvider } = useAuth()
 
   const isAuthenticated = !!user && !loading

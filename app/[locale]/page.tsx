@@ -20,12 +20,12 @@ import {
   Search,
   Users
 } from "lucide-react"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel"
 
 export default function Home() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const images = [
     "/images/e.jpg",
     "/images/d.jpg",

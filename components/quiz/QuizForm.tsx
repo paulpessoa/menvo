@@ -11,7 +11,7 @@ import { TextareaWithVoice } from '@/components/ui/textarea-with-voice'
 import { Label } from '@/components/ui/label'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { AnimatedBackground } from '@/components/ui/animated-background'
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from "next-intl";
 
 export interface QuizFormData {
     careerMoment: string
@@ -33,7 +33,7 @@ interface QuizFormProps {
 }
 
 export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
-    const { t } = useTranslation('quiz');
+    const t = useTranslations('quiz');
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formData, setFormData] = useState<Partial<QuizFormData>>({

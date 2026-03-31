@@ -14,13 +14,13 @@ import { Gift, Sparkles, Users, Target, Clock } from "lucide-react"
 import { QuizForm, QuizFormData } from "@/components/quiz/QuizForm"
 import { useToast } from "@/hooks/use-toast"
 import { AnimatedBackground } from "@/components/ui/animated-background"
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from "next-intl";
 
 export default function QuizPage() {
   const [showQuiz, setShowQuiz] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const { t } = useTranslation('quiz');
+  const t = useTranslations('quiz');
 
   const handleQuizSubmit = async (data: QuizFormData) => {
     try {

@@ -5,7 +5,7 @@ import { Star, MessageSquare } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { useTranslation } from \"next-intl\"
+import { useTranslations } from "next-intl"
 import { useToast } from "@/hooks/useToast"
 import {
   Dialog,
@@ -24,7 +24,7 @@ import {
 import { useAuth } from "@/lib/auth"
 
 export function FeedbackBanner() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { isAuthenticated } = useAuth()
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
@@ -55,13 +55,13 @@ export function FeedbackBanner() {
       const response = await fetch("/api/feedback", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           rating,
           comment,
-          email: isAuthenticated ? undefined : email,
-        }),
+          email: isAuthenticated ? undefined : email
+        })
       })
 
       if (!response.ok) {
@@ -154,10 +154,11 @@ export function FeedbackBanner() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setRating(star)}
-                      className={`h-8 w-8 ${rating && star <= rating
-                        ? "text-yellow-400"
-                        : "text-gray-300"
-                        }`}
+                      className={`h-8 w-8 ${
+                        rating && star <= rating
+                          ? "text-yellow-400"
+                          : "text-gray-300"
+                      }`}
                       aria-label={t("feedback.rateStars", { count: star })}
                     >
                       <Star className="h-5 w-5" />

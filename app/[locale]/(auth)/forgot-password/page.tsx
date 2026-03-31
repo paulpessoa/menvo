@@ -11,11 +11,11 @@ import { Label } from "@/components/ui/label"
 import { ArrowLeft, Mail, Loader2, AlertTriangle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 function ForgotPasswordForm() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const auth = useAuth()
 
   const resetPassword = async (email: string) => {
