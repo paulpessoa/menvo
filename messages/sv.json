@@ -36,73 +36,40 @@
   },
   "home": {
     "badge": {
-      "freeMentorship": "Plataforma de Mentores Voluntários"
+      "freeMentorship": "Plattform för Frivilligt Mentorskap"
     },
     "hero": {
-      "title": "Conecte-se com Mentores Voluntários",
-      "description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
-      "findMentor": "Encontrar um Mentor",
-      "becomeMentor": "Torne-se um Mentor"
+      "title": "Anslut med Frivilliga Mentorer",
+      "description": "Hitta vägledning, dela erfarenheter och väx med oss. Vår plattform kopplar ihop dig med frivilliga mentorer för gratis mentorskapssessioner.",
+      "findMentor": "Hitta en Mentor",
+      "becomeMentor": "Bli Mentor"
     },
     "testimonials": {
-      "title": "Histórias que Inspiram",
-      "description": "Vidas transformadas através da mentoria"
+      "title": "Berättelser som inspirerar",
+      "description": "Liv förvandlade genom mentorskap"
     },
     "howItWorks": {
-      "title": "Como Funciona",
-      "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
+      "title": "Hur det fungerar",
+      "description": "Vår plattform gör det enkelt att komma i kontakt med mentorer och boka sessioner",
       "step1": {
-        "title": "Encontrar um Mentor",
-        "description": "Explore nossa comunidade diversa de mentores voluntários e encontre a combinação ideal para suas necessidades."
+        "title": "Hitta en Mentor",
+        "description": "Utforska vår mångfaldiga gemenskap av frivilliga mentorer och hitta den perfekta matchningen för dina behov."
       },
       "step2": {
-        "title": "Agendar uma Sessão",
-        "description": "Agende um horário que funcione para ambos usando nosso sistema de agendamento integrado."
+        "title": "Boka en Session",
+        "description": "Planera en tid som passar er båda med hjälp av vårt integrerade bokningssystem."
       },
       "step3": {
-        "title": "Conecte-se e Cresça",
-        "description": "Encontre-se virtualmente, compartilhe experiências e desenvolva suas habilidades com orientação personalizada."
+        "title": "Anslut och Väx",
+        "description": "Träffas virtuellt, dela erfarenheter och utveckla dina färdigheter med personlig vägledning."
       },
-      "learnMore": "Saiba Mais"
-    },
-    "featuredMentors": {
-      "title": "Mentores em Destaque",
-      "description": "Conheça alguns de nossos dedicados mentores voluntários",
-      "viewAll": "Ver Todos os Mentores"
-    },
-    "mentor": {
-      "sampleName": "Sarah Johnson",
-      "field": "Engenharia de Software",
-      "tags": [
-        "Carreira",
-        "Tecnologia",
-        "Liderança"
-      ],
-      "description": "Desenvolvedora Sênior com mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
-      "languages": "Inglês, Espanhol",
-      "viewProfile": "Ver Perfil"
-    },
-    "events": {
-      "title": "Próximos Eventos",
-      "description": "Participe de nossos eventos comunitários e sessões de mentoria em grupo",
-      "card": {
-        "title": "Painel de Carreira em Tecnologia: Como Entrar no Setor",
-        "date": "15 de Junho de 2025",
-        "time": "18h00 - 20h00",
-        "description": "Participe de nosso painel de especialistas da indústria e descubra como iniciar e desenvolver sua carreira em tecnologia.",
-        "attendees": "{{count}} participantes",
-        "register": "Inscrever-se"
-      },
-      "viewAll": "Ver Todos os Eventos"
+      "learnMore": "Läs mer"
     },
     "cta": {
-      "title": "Pronto para Começar?",
-      "description": "Junte-se a nós hoje e conecte-se com pessoas que podem ajudar você a alcançar seus objetivos",
-      "signup": "Inscreva-se Agora",
-      "learnMore": "Saiba Mais"
-    },
-    "event": {
-      "type": "Online"
+      "title": "Redo att börja?",
+      "description": "Gå med idag och få kontakt med människor som kan hjälpa dig att nå dina mål",
+      "signup": "Registrera dig nu",
+      "learnMore": "Läs mer"
     }
   },
   "about": {
@@ -133,14 +100,14 @@
       }
     },
     "sdg": {
-      "title": "Objetivos de Desenvolvimento Sustentável",
-      "description": "Nossa plataforma está alinhada aos Objetivos de Desenvolvimento Sustentável (ODS) da ONU, com foco especial em:",
-      "goalNumber": "ODS {{number}}",
+      "title": "Mål för Hållbar Utveckling",
+      "description": "Vår plattform är i linje med FN:s globala mål (SDG), med särskilt fokus på:",
+      "goalNumber": "Globalt mål {{number}}",
       "goals": {
-        "qualityEducation": "Educação de Qualidade",
-        "genderEquality": "Igualdade de Gênero",
-        "decentWork": "Trabalho Decente e Crescimento Econômico",
-        "reducedInequalities": "Redução das Desigualdades"
+        "qualityEducation": "Kvalitetsutbildning",
+        "genderEquality": "Jämställdhet",
+        "decentWork": "Anständiga arbetsvillkor och ekonomisk tillväxt",
+        "reducedInequalities": "Minskad ojämlikhet"
       }
     },
     "ourTeam": {

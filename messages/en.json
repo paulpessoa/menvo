@@ -392,7 +392,9 @@
       "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
       "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
       "networkError": "Connection error. Please check your internet and try again."
-    }
+    },
+    "orContinueWith": "Ou continue com email",
+    "success": "Login realizado com sucesso!"
   },
   "register": {
     "title": "Join Menvo",
@@ -478,7 +480,8 @@
         "title": "Recruiter",
         "description": "I'm seeking qualified professionals for opportunities"
       }
-    }
+    },
+    "success": "Conta criada com sucesso!"
   },
   "mentors": {
     "title": "Find a Mentor",

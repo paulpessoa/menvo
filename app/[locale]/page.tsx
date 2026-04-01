@@ -123,10 +123,10 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                {t("home.howItWorks.title")}
+                {t("howItWorks.title")}
               </h2>
               <p className="max-w-[700px] text-muted-foreground md:text-xl">
-                {t("home.howItWorks.description")}
+                {t("howItWorks.description")}
               </p>
             </div>
           </div>
@@ -136,10 +136,10 @@ export default function Home() {
                 <Search className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-bold">
-                {t("home.howItWorks.step1.title")}
+                {t("howItWorks.step1.title")}
               </h3>
               <p className="text-muted-foreground">
-                {t("home.howItWorks.step1.description")}
+                {t("howItWorks.step1.description")}
               </p>
             </div>
             <div className="flex flex-col items-center space-y-2 text-center">
@@ -147,10 +147,10 @@ export default function Home() {
                 <Calendar className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-bold">
-                {t("home.howItWorks.step2.title")}
+                {t("howItWorks.step2.title")}
               </h3>
               <p className="text-muted-foreground">
-                {t("home.howItWorks.step2.description")}
+                {t("howItWorks.step2.description")}
               </p>
             </div>
             <div className="flex flex-col items-center space-y-2 text-center">
@@ -158,16 +158,16 @@ export default function Home() {
                 <MessageSquare className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-bold">
-                {t("home.howItWorks.step3.title")}
+                {t("howItWorks.step3.title")}
               </h3>
               <p className="text-muted-foreground">
-                {t("home.howItWorks.step3.description")}
+                {t("howItWorks.step3.description")}
               </p>
             </div>
           </div>
           <div className="flex justify-center mt-8">
             <Button asChild>
-              <Link href="/how-it-works">{t("home.howItWorks.learnMore")}</Link>
+              <Link href="/how-it-works">{t("howItWorks.learnMore")}</Link>
             </Button>
           </div>
         </div>
@@ -283,10 +283,10 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                {t("home.testimonials.title")}
+                {t("testimonials.title")}
               </h2>
               <p className="max-w-[800px] text-muted-foreground md:text-xl">
-                {t("home.testimonials.description")}
+                {t("testimonials.description")}
               </p>
             </div>
           </div>
@@ -300,15 +300,15 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                {t("home.cta.title")}
+                {t("cta.title")}
               </h2>
               <p className="max-w-[700px] md:text-xl">
-                {t("home.cta.description")}
+                {t("cta.description")}
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button size="lg" variant="secondary" asChild>
-                <Link href="/signup">{t("home.cta.signup")}</Link>
+                <Link href="/signup">{t("cta.signup")}</Link>
               </Button>
               <Button
                 size="lg"
@@ -316,7 +316,7 @@ export default function Home() {
                 className="bg-transparent"
                 asChild
               >
-                <Link href="/how-it-works">{t("home.cta.learnMore")}</Link>
+                <Link href="/how-it-works">{t("cta.learnMore")}</Link>
               </Button>
             </div>
           </div>
