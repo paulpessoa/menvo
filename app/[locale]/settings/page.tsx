@@ -144,27 +144,48 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Button
                   variant={currentLanguage === "pt-BR" ? "default" : "outline"}
                   onClick={() => changeLanguage("pt-BR")}
-                  className="w-full"
+                  className="w-full justify-start md:justify-center"
                 >
                   🇧🇷 Português
                 </Button>
                 <Button
                   variant={currentLanguage === "en" ? "default" : "outline"}
                   onClick={() => changeLanguage("en")}
-                  className="w-full"
+                  className="w-full justify-start md:justify-center"
                 >
                   🇺🇸 English
                 </Button>
                 <Button
                   variant={currentLanguage === "es" ? "default" : "outline"}
                   onClick={() => changeLanguage("es")}
-                  className="w-full"
+                  className="w-full justify-start md:justify-center"
                 >
                   🇪🇸 Español
+                </Button>
+                <Button
+                  variant={currentLanguage === "fr" ? "default" : "outline"}
+                  onClick={() => changeLanguage("fr")}
+                  className="w-full justify-start md:justify-center"
+                >
+                  🇫🇷 Français
+                </Button>
+                <Button
+                  variant={currentLanguage === "da" ? "default" : "outline"}
+                  onClick={() => changeLanguage("da")}
+                  className="w-full justify-start md:justify-center"
+                >
+                  🇩🇰 Dansk
+                </Button>
+                <Button
+                  variant={currentLanguage === "sv" ? "default" : "outline"}
+                  onClick={() => changeLanguage("sv")}
+                  className="w-full justify-start md:justify-center"
+                >
+                  🇸🇪 Svenska
                 </Button>
               </div>
             </CardContent>

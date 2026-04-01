@@ -28,7 +28,14 @@
     "loading": "Loading...",
     "saving": "Saving...",
     "close": "Close",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "languageSelector": {
+      "title": "Choose your language",
+      "description": "Select your language to continue",
+      "successTitle": "Language Set!",
+      "successDescription": "You can change this preference at any time in the Settings menu after logging in.",
+      "button": "Start Browsing"
+    }
   },
   "header": {
     "title": "MENVO - Volunteer Mentors",
@@ -393,8 +400,8 @@
       "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
       "networkError": "Connection error. Please check your internet and try again."
     },
-    "orContinueWith": "Ou continue com email",
-    "success": "Login realizado com sucesso!"
+    "orContinueWith": "Or continue with email",
+    "success": "Login successful!"
   },
   "register": {
     "title": "Join Menvo",
@@ -481,7 +488,7 @@
         "description": "I'm seeking qualified professionals for opportunities"
       }
     },
-    "success": "Conta criada com sucesso!"
+    "success": "Account created successfully!"
   },
   "mentors": {
     "title": "Find a Mentor",

@@ -28,7 +28,14 @@
     "loading": "Carregando...",
     "saving": "Salvando...",
     "close": "Fechar",
-    "submitting": "Enviando..."
+    "submitting": "Enviando...",
+    "languageSelector": {
+      "title": "Escolha seu idioma",
+      "description": "Selecione seu idioma para continuar",
+      "successTitle": "Idioma Definido!",
+      "successDescription": "Você pode alterar esta preferência a qualquer momento no menu de Configurações após o login.",
+      "button": "Começar a Navegar"
+    }
   },
   "header": {
     "title": "MENVO - Mentores Voluntários",

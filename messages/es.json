@@ -28,7 +28,14 @@
     "loading": "Cargando...",
     "saving": "Guardando...",
     "close": "Cerrar",
-    "submitting": "Enviando..."
+    "submitting": "Enviando...",
+    "languageSelector": {
+      "title": "Elige tu idioma",
+      "description": "Selecciona tu idioma para continuar",
+      "successTitle": "¡Idioma Definido!",
+      "successDescription": "Puedes cambiar esta preferencia en cualquier momento en el menú de Configuración después de iniciar sesión.",
+      "button": "Empezar a navegar"
+    }
   },
   "header": {
     "title": "Plataforma de Mentoria Voluntaria",
@@ -101,8 +108,8 @@
       "type": "En línea"
     },
     "testimonials": {
-      "title": "Histórias que Inspiram",
-      "description": "Vidas transformadas através da mentoria"
+      "title": "Historias que Inspiran",
+      "description": "Vidas transformadas a través de la mentoría"
     }
   },
   "about": {
@@ -146,7 +153,7 @@
     "ourTeam": {
       "title": "Nuestro Equipo",
       "paragraph1": "Somos un equipo diverso de profesionales apasionados por hacer que la mentoría sea accesible para todos. Nuestros miembros provienen de varios orígenes e industrias, aportando una riqueza de experiencia y perspectivas.",
-      "paragraph2": "Lo que nos une es nuestra creencia en el poder de la mentoría para transformar vidas y nuestro compromiso de crear una plataforma que facilite conexiones significativas.",
+      "paragraph2": "Lo que nos unites es nuestra creencia en el poder de la mentoría para transformar vidas y nuestro compromiso de crear una plataforma que facilite conexiones significativas.",
       "paragraph3": "Siempre estamos buscando individuos apasionados para unirse a nuestra misión. Si estás interesado en contribuir a Menvo, ¡nos encantaría saber de ti!",
       "joinTeam": "Únete a Nuestro Equipo"
     },
@@ -393,8 +400,8 @@
       "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
       "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
     },
-    "orContinueWith": "Ou continue com email",
-    "success": "Login realizado com sucesso!"
+    "orContinueWith": "O continúa con correo electrónico",
+    "success": "¡Inicio de sesión exitoso!"
   },
   "register": {
     "title": "Únete a Menvo",
@@ -481,7 +488,7 @@
         "description": "Busco profesionales calificados para oportunidades"
       }
     },
-    "success": "Conta criada com sucesso!"
+    "success": "¡Cuenta creada exitosamente!"
   },
   "mentors": {
     "title": "Encuentra un Mentor",

@@ -13,6 +13,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { LanguageSelectorOverlay } from "@/components/LanguageSelectorOverlay"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -99,6 +100,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <div className="flex min-h-screen flex-col">
+              <LanguageSelectorOverlay />
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />

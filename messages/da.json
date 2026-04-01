@@ -28,7 +28,14 @@
     "loading": "Indlæser...",
     "saving": "Gemmer...",
     "close": "Luk",
-    "submitting": "Indsender..."
+    "submitting": "Indsender...",
+    "languageSelector": {
+      "title": "Vælg dit sprog",
+      "description": "Vælg dit sprog for at fortsætte",
+      "successTitle": "Sprog indstillet!",
+      "successDescription": "Du kan til enhver tid ændre denne præference i menuen Indstillinger efter log ind.",
+      "button": "Begynd at browse"
+    }
   },
   "header": {
     "title": "MENVO - Frivillige Mentorer",
@@ -713,6 +720,25 @@
     "links": {
       "privacy": "Privatlivspolitik",
       "cookies": "Cookiepolitik"
+    },
+    "warning": {
+      "title": "Bemærk",
+      "message": "Platformen er i øjeblikket under udvikling. Vi er meget glade for at modtage din feedback og mening om, hvad du har set indtil videre!",
+      "dismiss": "Forstået",
+      "giveFeedback": "Giv feedback"
+    },
+    "feedback": {
+      "title": "Hvad syntes du om Menvo?",
+      "description": "Din mening er meget vigtig for os! Fortæl os, hvad du syntes om platformen.",
+      "openFeedback": "Åbn feedback",
+      "helpUsImprove": "Hjælp os med at forbedre platformen",
+      "commentPlaceholder": "Fortæl os, hvad du syntes om platformen...",
+      "emailPlaceholder": "Din e-mail (valgfrit)",
+      "submit": "Indsend feedback",
+      "thankYou": "Tak for din feedback!",
+      "error": "Fejl ved afsendelse af feedback. Prøv igen.",
+      "ratingRequired": "Vælg venligst en bedømmelse.",
+      "rateStars": "Bedøm med {{count}} stjerner"
     }
   },
   "waitingList": {
@@ -771,8 +797,14 @@
     "description": "Forbinder mentorer og mentees til gratis mentorsessioner",
     "keywords": [
       "mentorordning",
-      "frivilligt arbejde",
-      "karriere"
+      "frivillig mentorordning",
+      "faglig udvikling",
+      "karriere",
+      "læring",
+      "mentorer",
+      "mentees",
+      "uddannelse",
+      "personlig udvikling"
     ],
     "og": {
       "title": "MENVO - Frivillig Mentorordning",

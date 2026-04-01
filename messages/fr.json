@@ -28,7 +28,14 @@
     "loading": "Chargement...",
     "saving": "Enregistrement...",
     "close": "Fermer",
-    "submitting": "Envoi en cours..."
+    "submitting": "Envoi en cours...",
+    "languageSelector": {
+      "title": "Choisissez votre langue",
+      "description": "Sélectionnez votre langue pour continuer",
+      "successTitle": "Langue définie !",
+      "successDescription": "Vous pouvez modifier cette préférence à tout moment dans le menu Paramètres après vous être connecté.",
+      "button": "Commencer à naviguer"
+    }
   },
   "header": {
     "title": "MENVO - Mentors Bénévoles",
@@ -713,6 +720,25 @@
     "links": {
       "privacy": "Politique de Confidentialité",
       "cookies": "Politique relative aux Cookies"
+    },
+    "warning": {
+      "title": "Attention",
+      "message": "La plateforme est actuellement en cours de développement. Nous sommes très heureux de recevoir vos retours et opinions sur ce que vous avez vu jusqu'à présent !",
+      "dismiss": "J'ai compris",
+      "giveFeedback": "Donner un avis"
+    },
+    "feedback": {
+      "title": "Qu'avez-vous pensé de Menvo ?",
+      "description": "Votre opinion est très importante pour nous ! Dites-nous ce que vous avez pensé de la plateforme.",
+      "openFeedback": "Ouvrir les retours",
+      "helpUsImprove": "Aidez-nous à améliorer la plateforme",
+      "commentPlaceholder": "Dites-nous ce que vous avez pensé de la plateforme...",
+      "emailPlaceholder": "Votre e-mail (optionnel)",
+      "submit": "Envoyer le retour",
+      "thankYou": "Merci pour votre retour !",
+      "error": "Erreur lors de l'envoi des commentaires. Veuillez réessayer.",
+      "ratingRequired": "Veuillez sélectionner une évaluation.",
+      "rateStars": "Évaluer à {{count}} étoiles"
     }
   },
   "waitingList": {
@@ -771,8 +797,14 @@
     "description": "Connecter mentors et mentorés pour des sessions de mentorat gratuites",
     "keywords": [
       "mentorat",
-      "bénévolat",
-      "carrière"
+      "mentorat bénévole",
+      "développement professionnel",
+      "carrière",
+      "apprentissage",
+      "mentors",
+      "mentorés",
+      "éducation",
+      "développement personnel"
     ],
     "og": {
       "title": "MENVO - Mentorat Bénévole",
