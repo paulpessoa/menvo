@@ -815,5 +815,63 @@
         "description": "Could not send your suggestion. Please try again later."
       }
     }
+  },
+  "mentorsPage": {
+    "title": "Find your Ideal Mentor",
+    "subtitle": "Connect with verified mentors and accelerate your career",
+    "searchPlaceholder": "Search by name, specialty, company...",
+    "filters": "Filters",
+    "sheetTitle": "Advanced Filters",
+    "sheetDescription": "Refine your search to find the perfect mentor",
+    "state": "State/Province",
+    "statePlaceholder": "Select state",
+    "allStates": "All states",
+    "city": "City",
+    "cityPlaceholder": "Select city",
+    "allCities": "All cities",
+    "topics": "Mentorship Topics",
+    "expertise": "Expertise Areas",
+    "inclusiveTags": "Inclusive Tags",
+    "experience": "Experience",
+    "experiencePlaceholder": "Years of experience",
+    "anyExperience": "Any experience",
+    "availability": "Availability",
+    "availabilityPlaceholder": "Availability status",
+    "anyStatus": "Any status",
+    "clearFilters": "Clear Filters",
+    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+    "noMentorsTitle": "No mentors found",
+    "noMentorsDescription": "Try adjusting your filters to find more mentors.",
+    "suggestTopic": "Suggest Topic or Area",
+    "viewProfile": "View Profile",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "status": {
+      "available": "Available",
+      "busy": "Busy",
+      "unavailable": "Unavailable",
+      "unknown": "Unknown status"
+    },
+    "backToMentors": "Back to Mentors",
+    "about": "About",
+    "specialties": "Specialties",
+    "languagesAndInclusion": "Languages and Inclusion",
+    "languages": "Languages",
+    "scheduleSession": "Schedule Session",
+    "freeMentorships": "100% free mentorships",
+    "ownProfileMessage": "This is your mentor profile",
+    "bookMentorship": "Book Mentorship",
+    "fullSchedule": "Full Schedule",
+    "links": "Links",
+    "yearsExperienceCount": "{count, plural, =1 {1 year of experience} other {# years of experience}}",
+    "loginRequired": {
+      "title": "Login Required",
+      "description": "You need to be logged in to book a mentorship or use the chat."
+    },
+    "share": {
+      "title": "{name} - Mentor at Menvo",
+      "text": "Meet {name}, mentor specialized in {topics}",
+      "success": "Shared successfully!",
+      "copySuccess": "Link copied to clipboard!"
+    }
   }
 }

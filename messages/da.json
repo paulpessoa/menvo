@@ -815,5 +815,63 @@
       "title": "MENVO - Frivillig Mentorordning",
       "description": "Forbinder mentorer og mentees til gratis mentorsessioner"
     }
+  },
+  "mentorsPage": {
+    "title": "Find din ideelle mentor",
+    "subtitle": "Connect with verified mentors and accelerate your career",
+    "searchPlaceholder": "Search by name, specialty, company...",
+    "filters": "Filters",
+    "sheetTitle": "Advanced Filters",
+    "sheetDescription": "Refine your search to find the perfect mentor",
+    "state": "State/Province",
+    "statePlaceholder": "Select state",
+    "allStates": "All states",
+    "city": "City",
+    "cityPlaceholder": "Select city",
+    "allCities": "All cities",
+    "topics": "Mentorship Topics",
+    "expertise": "Expertise Areas",
+    "inclusiveTags": "Inkluderende tags",
+    "experience": "Experience",
+    "experiencePlaceholder": "Years of experience",
+    "anyExperience": "Any experience",
+    "availability": "Availability",
+    "availabilityPlaceholder": "Availability status",
+    "anyStatus": "Any status",
+    "clearFilters": "Clear Filters",
+    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+    "noMentorsTitle": "No mentors found",
+    "noMentorsDescription": "Try adjusting your filters to find more mentors.",
+    "suggestTopic": "Suggest Topic or Area",
+    "viewProfile": "Se profil",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "status": {
+      "available": "Available",
+      "busy": "Busy",
+      "unavailable": "Unavailable",
+      "unknown": "Unknown status"
+    },
+    "backToMentors": "Tilbage til mentorer",
+    "about": "Om",
+    "specialties": "Specialer",
+    "languagesAndInclusion": "Sprog og inklusion",
+    "languages": "Sprog",
+    "scheduleSession": "Book en session",
+    "freeMentorships": "100% gratis mentorskab",
+    "ownProfileMessage": "Dette er din mentorprofil",
+    "bookMentorship": "Book mentorskab",
+    "fullSchedule": "Fuldt booket",
+    "links": "Links",
+    "yearsExperienceCount": "{count, plural, =1 {1 års erfaring} other {# års erfaring}}",
+    "loginRequired": {
+      "title": "Login påkrævet",
+      "description": "Du skal være logget ind for at booke et mentorskab eller bruge chatten."
+    },
+    "share": {
+      "title": "{name} - Mentor hos Menvo",
+      "text": "Mød {name}, mentor specialiseret i {topics}",
+      "success": "Delt med succes!",
+      "copySuccess": "Link kopieret til udklipsholder!"
+    }
   }
 }

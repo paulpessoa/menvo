@@ -24,6 +24,7 @@ import Link from "next/link"
 import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
 import { BookMentorshipModal } from "@/components/mentorship/BookMentorshipModal"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
+import { useTranslations } from "next-intl"
 
 interface MentorProfile {
     id: string
@@ -67,20 +68,19 @@ interface Props {
 }
 
 export default function MentorProfileClient({ mentor, availability }: Props) {
+    const t = useTranslations("mentorsPage")
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
     const [showLoginModal, setShowLoginModal] = useState(false)
     const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
     const supabase = createClient()
 
-    // Buscar usuário atual
     useEffect(() => {
         const fetchUser = async () => {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) setCurrentUserId(user.id)
         }
         fetchUser()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleShare = async () => {
@@ -89,13 +89,15 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
         if (navigator.share) {
             try {
                 await navigator.share({
-                    title: `${mentor.full_name} - Mentor na Menvo`,
-                    text: `Conheça ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 2).join(', ')}`,
+                    title: t("share.title", { name: mentor.full_name }),
+                    text: t("share.text", { 
+                        name: mentor.full_name, 
+                        topics: mentor.mentorship_topics?.slice(0, 2).join(', ') || "" 
+                    }),
                     url: url,
                 })
-                toast.success('Compartilhado com sucesso!')
+                toast.success(t("share.success"))
             } catch (error) {
-                // Usuário cancelou ou erro
                 if ((error as Error).name !== 'AbortError') {
                     copyToClipboard(url)
                 }
@@ -107,7 +109,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text)
-        toast.success('Link copiado para a área de transferência!')
+        toast.success(t("share.copySuccess"))
     }
 
     const getAvailabilityColor = (status: string) => {
@@ -121,29 +123,26 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
 
     const getAvailabilityText = (status: string) => {
         switch (status) {
-            case 'available': return 'Disponível'
-            case 'busy': return 'Ocupado'
-            case 'unavailable': return 'Indisponível'
-            default: return 'Status desconhecido'
+            case 'available': return t("status.available")
+            case 'busy': return t("status.busy")
+            case 'unavailable': return t("status.unavailable")
+            default: return t("status.unknown")
         }
     }
 
     return (
         <div className="container mx-auto px-4 py-8">
-            {/* Breadcrumb */}
             <div className="mb-6">
                 <Button variant="ghost" asChild className="mb-4">
                     <Link href="/mentors">
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Voltar para Mentores
+                        {t("backToMentors")}
                     </Link>
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Profile */}
                 <div className="lg:col-span-2 space-y-6">
-                    {/* Header */}
                     <Card>
                         <CardHeader>
                             <div className="flex items-start justify-between">
@@ -172,7 +171,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        onClick={() => toast.info("Funcionalidade em desenvolvimento")}
+                                        onClick={() => toast.info(t("toast.featureUnderDevelopment") || "Feature under development")}
                                     >
                                         <Heart className="h-4 w-4" />
                                     </Button>
@@ -186,7 +185,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                 </div>
                             </div>
 
-                            {/* Status and Stats */}
                             <div className="flex items-center justify-between pt-4">
                                 <Badge className={getAvailabilityColor(mentor.availability_status)}>
                                     {getAvailabilityText(mentor.availability_status)}
@@ -196,14 +194,14 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                     {mentor.total_sessions > 0 && (
                                         <div className="flex items-center">
                                             <MessageCircle className="h-4 w-4 mr-1" />
-                                            <span>{mentor.total_sessions} sessões</span>
+                                            <span>{t("sessionsCount", { count: mentor.total_sessions })}</span>
                                         </div>
                                     )}
 
                                     {mentor.experience_years && (
                                         <div className="flex items-center">
                                             <Briefcase className="h-4 w-4 mr-1" />
-                                            <span>{mentor.experience_years} anos de experiência</span>
+                                            <span>{t("yearsExperienceCount", { count: mentor.experience_years })}</span>
                                         </div>
                                     )}
                                 </div>
@@ -211,11 +209,10 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         </CardHeader>
                     </Card>
 
-                    {/* Bio */}
                     {mentor.bio && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Sobre</CardTitle>
+                                <CardTitle>{t("about")}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{mentor.bio}</p>
@@ -223,16 +220,15 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         </Card>
                     )}
 
-                    {/* Topics and Expertise */}
                     {(mentor.mentorship_topics?.length || mentor.expertise_areas?.length) && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Especialidades</CardTitle>
+                                <CardTitle>{t("specialties")}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
                                     <div>
-                                        <h4 className="font-medium mb-2">Temas de Mentoria</h4>
+                                        <h4 className="font-medium mb-2">{t("topics")}</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {mentor.mentorship_topics.map((topic, index) => (
                                                 <Badge key={index} variant="secondary">
@@ -245,7 +241,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
 
                                 {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
                                     <div>
-                                        <h4 className="font-medium mb-2">Áreas de Expertise</h4>
+                                        <h4 className="font-medium mb-2">{t("expertise")}</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {mentor.expertise_areas.map((area, index) => (
                                                 <Badge key={index} variant="outline">
@@ -259,18 +255,17 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         </Card>
                     )}
 
-                    {/* Languages and Inclusive Tags */}
                     {(mentor.languages?.length || mentor.inclusive_tags?.length) && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Idiomas e Inclusão</CardTitle>
+                                <CardTitle>{t("languagesAndInclusion")}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {mentor.languages && mentor.languages.length > 0 && (
                                     <div>
                                         <h4 className="font-medium mb-2 flex items-center">
                                             <Languages className="h-4 w-4 mr-2" />
-                                            Idiomas
+                                            {t("languages")}
                                         </h4>
                                         <div className="flex flex-wrap gap-2">
                                             {mentor.languages.map((language, index) => (
@@ -286,7 +281,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                     <div>
                                         <h4 className="font-medium mb-2 flex items-center">
                                             <Award className="h-4 w-4 mr-2" />
-                                            Tags Inclusivas
+                                            {t("inclusiveTags")}
                                         </h4>
                                         <div className="flex flex-wrap gap-2">
                                             {mentor.inclusive_tags.map((tag, index) => (
@@ -302,19 +297,17 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     )}
                 </div>
 
-                {/* Sidebar */}
                 <div className="space-y-6">
-                    {/* Booking Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Agendar Sessão</CardTitle>
-                            <CardDescription>Mentorias 100% gratuitas</CardDescription>
+                            <CardTitle>{t("scheduleSession")}</CardTitle>
+                            <CardDescription>{t("freeMentorships")}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {currentUserId === mentor.id ? (
                                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
                                     <p className="text-sm text-gray-600">
-                                        Este é o seu perfil de mentor
+                                        {t("ownProfileMessage")}
                                     </p>
                                 </div>
                             ) : (
@@ -333,15 +326,14 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                     >
                                         <Calendar className="h-4 w-4 mr-2" />
                                         {mentor.availability_status === 'busy' || mentor.availability_status === 'unavailable'
-                                            ? 'Agenda Lotada'
-                                            : 'Agendar Mentoria'}
+                                            ? t("fullSchedule")
+                                            : t("bookMentorship")}
                                     </Button>
                                 </>
                             )}
                         </CardContent>
                     </Card>
 
-                    {/* Availability */}
                     <AvailabilityDisplay
                         mentorId={mentor.id}
                         availability={availability}
@@ -353,13 +345,12 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         compact={true}
                     />
 
-                    {/* Social Links */}
                     {(mentor.linkedin_url || mentor.github_url || mentor.twitter_url || mentor.website_url) && (
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center">
                                     <Globe className="h-4 w-4 mr-2" />
-                                    Links
+                                    {t("links")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
@@ -401,7 +392,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 </div>
             </div>
 
-            {/* Schedule Modal */}
             {currentUserId && currentUserId !== mentor.id && (
                 <BookMentorshipModal
                     isOpen={isScheduleModalOpen}
@@ -411,15 +401,12 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 />
             )}
 
-            {/* Login Required Modal */}
             <LoginRequiredModal
                 isOpen={showLoginModal}
                 onClose={() => setShowLoginModal(false)}
-                title="Login Necessário"
-                description="Você precisa estar logado para agendar uma mentoria ou usar o chat."
+                title={t("loginRequired.title")}
+                description={t("loginRequired.description")}
             />
-
-
         </div>
     )
 }

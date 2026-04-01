@@ -815,5 +815,63 @@
       "title": "MENVO - Mentorat Bénévole",
       "description": "Connecter mentors et mentorés pour des sessions de mentorat gratuites"
     }
+  },
+  "mentorsPage": {
+    "title": "Trouvez votre Mentor Idéal",
+    "subtitle": "Connect with verified mentors and accelerate your career",
+    "searchPlaceholder": "Search by name, specialty, company...",
+    "filters": "Filters",
+    "sheetTitle": "Advanced Filters",
+    "sheetDescription": "Refine your search to find the perfect mentor",
+    "state": "State/Province",
+    "statePlaceholder": "Select state",
+    "allStates": "All states",
+    "city": "City",
+    "cityPlaceholder": "Select city",
+    "allCities": "All cities",
+    "topics": "Mentorship Topics",
+    "expertise": "Expertise Areas",
+    "inclusiveTags": "Tags Inclusifs",
+    "experience": "Experience",
+    "experiencePlaceholder": "Years of experience",
+    "anyExperience": "Any experience",
+    "availability": "Availability",
+    "availabilityPlaceholder": "Availability status",
+    "anyStatus": "Any status",
+    "clearFilters": "Clear Filters",
+    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+    "noMentorsTitle": "No mentors found",
+    "noMentorsDescription": "Try adjusting your filters to find more mentors.",
+    "suggestTopic": "Suggest Topic or Area",
+    "viewProfile": "Voir le profil",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "status": {
+      "available": "Available",
+      "busy": "Busy",
+      "unavailable": "Unavailable",
+      "unknown": "Unknown status"
+    },
+    "backToMentors": "Retour aux mentors",
+    "about": "À propos",
+    "specialties": "Spécialités",
+    "languagesAndInclusion": "Langues et Inclusion",
+    "languages": "Langues",
+    "scheduleSession": "Prendre rendez-vous",
+    "freeMentorships": "Mentorat 100% gratuit",
+    "ownProfileMessage": "Ceci est votre profil de mentor",
+    "bookMentorship": "Réserver un mentorat",
+    "fullSchedule": "Complet",
+    "links": "Liens",
+    "yearsExperienceCount": "{count, plural, =1 {1 an d'expérience} other {# ans d'expérience}}",
+    "loginRequired": {
+      "title": "Connexion requise",
+      "description": "Vous devez être connecté pour réserver un mentorat ou utiliser le chat."
+    },
+    "share": {
+      "title": "{name} - Mentor sur Menvo",
+      "text": "Découvrez {name}, mentor spécialisé en {topics}",
+      "success": "Partagé avec succès !",
+      "copySuccess": "Lien copié dans le presse-papier !"
+    }
   }
 }

@@ -38,6 +38,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { toast } from "sonner"
+import { useTranslations } from "next-intl"
 
 interface MentorProfile {
   id: string
@@ -89,6 +90,7 @@ const initialFilters: FilterState = {
 }
 
 export default function MentorsPage() {
+  const t = useTranslations("mentorsPage")
   const [mentors, setMentors] = useState<MentorProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState<FilterState>(initialFilters)
@@ -112,7 +114,6 @@ export default function MentorsPage() {
 
   const fetchMentors = async () => {
     try {
-      // Use mentors_view which shows only verified mentors and works for anonymous users
       const { data, error } = await supabase
         .from('mentors_view')
         .select(`
@@ -142,7 +143,6 @@ export default function MentorsPage() {
 
       if (error) throw error
 
-      // Map the data to match the expected interface
       const mappedData = (data || []).map((mentor: any) => ({
         ...mentor,
         job_title: mentor.current_position,
@@ -163,7 +163,6 @@ export default function MentorsPage() {
 
   const fetchFilterOptions = async () => {
     try {
-      // Use mentors_view for filter options as well
       const { data, error } = await supabase
         .from('mentors_view')
         .select(`
@@ -212,7 +211,6 @@ export default function MentorsPage() {
 
   const filteredMentors = useMemo(() => {
     return mentors.filter(mentor => {
-      // Search filter
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase()
         const searchableText = [
@@ -227,39 +225,32 @@ export default function MentorsPage() {
         if (!searchableText.includes(searchTerm)) return false
       }
 
-      // Location filters
       if (filters.country !== 'all' && mentor.country !== filters.country) return false
       if (filters.state !== 'all' && mentor.state !== filters.state) return false
       if (filters.city && mentor.city !== filters.city) return false
 
-      // Language filter
       if (filters.languages.length > 0) {
         const mentorLanguages = mentor.languages || []
         if (!filters.languages.some(lang => mentorLanguages.includes(lang))) return false
       }
 
-      // Topics filter
       if (filters.topics.length > 0) {
         const mentorTopics = mentor.mentorship_topics || []
         if (!filters.topics.some(topic => mentorTopics.includes(topic))) return false
       }
 
-      // Inclusive tags filter
       if (filters.inclusiveTags.length > 0) {
         const mentorTags = mentor.inclusive_tags || []
         if (!filters.inclusiveTags.some(tag => mentorTags.includes(tag))) return false
       }
 
-      // Price range filter
       if (mentor.session_price_usd !== null) {
         if (mentor.session_price_usd < filters.priceRange[0] ||
           mentor.session_price_usd > filters.priceRange[1]) return false
       }
 
-      // Availability status filter
       if (filters.availabilityStatus !== 'all' && mentor.availability_status !== filters.availabilityStatus) return false
 
-      // Experience years filter
       if (filters.experienceYears !== 'all' && mentor.experience_years !== null) {
         const [min, max] = filters.experienceYears.split('-').map(Number)
         if (max) {
@@ -279,27 +270,16 @@ export default function MentorsPage() {
 
   const activeFiltersCount = useMemo(() => {
     let count = 0
-
-    // Search
     if (filters.search) count++
-
-    // Location
     if (filters.country !== 'all') count++
     if (filters.state !== 'all') count++
     if (filters.city) count++
-
-    // Arrays
     if (filters.languages.length > 0) count++
     if (filters.topics.length > 0) count++
     if (filters.inclusiveTags.length > 0) count++
-
-    // Price range (only count if different from default)
     if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 500) count++
-
-    // Status
     if (filters.availabilityStatus !== 'all') count++
     if (filters.experienceYears !== 'all') count++
-
     return count
   }, [filters])
 
@@ -336,10 +316,10 @@ export default function MentorsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Encontre seu Mentor Ideal
+          {t("title")}
         </h1>
         <p className="text-gray-600">
-          Conecte-se com mentores verificados e acelere sua carreira
+          {t("subtitle")}
         </p>
       </div>
 
@@ -348,7 +328,7 @@ export default function MentorsPage() {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Buscar por nome, especialidade, empresa..."
+            placeholder={t("searchPlaceholder")}
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
             className="pl-10"
@@ -359,7 +339,7 @@ export default function MentorsPage() {
           <SheetTrigger asChild>
             <Button variant="outline" className="relative">
               <Filter className="h-4 w-4 mr-2" />
-              Filtros
+              {t("filters")}
               {activeFiltersCount > 0 && (
                 <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
                   {activeFiltersCount}
@@ -369,28 +349,26 @@ export default function MentorsPage() {
           </SheetTrigger>
           <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>Filtros Avançados</SheetTitle>
+              <SheetTitle>{t("sheetTitle")}</SheetTitle>
               <SheetDescription>
-                Refine sua busca para encontrar o mentor perfeito
+                {t("sheetDescription")}
               </SheetDescription>
             </SheetHeader>
 
             <div className="mt-6 space-y-6">
-              {/* Location Filters */}
-              {/* Estado Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <MapPin className="h-4 w-4 mr-2" />
-                  Estado
+                  {t("state")}
                 </h3>
                 <Select value={filters.state} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, state: value }))
                 }>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione o estado" />
+                    <SelectValue placeholder={t("statePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Todos os estados</SelectItem>
+                    <SelectItem value="all">{t("allStates")}</SelectItem>
                     {availableFilters.states.map(state => (
                       <SelectItem key={state} value={state}>{state}</SelectItem>
                     ))}
@@ -398,21 +376,20 @@ export default function MentorsPage() {
                 </Select>
               </div>
 
-              {/* Cidade Filter */}
               {availableFilters.cities.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center">
                     <MapPin className="h-4 w-4 mr-2" />
-                    Cidade
+                    {t("city")}
                   </h3>
                   <Select value={filters.city || "all"} onValueChange={(value) =>
                     setFilters(prev => ({ ...prev, city: value === "all" ? "" : value }))
                   }>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione a cidade" />
+                      <SelectValue placeholder={t("cityPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todas as cidades</SelectItem>
+                      <SelectItem value="all">{t("allCities")}</SelectItem>
                       {availableFilters.cities.map(city => (
                         <SelectItem key={city} value={city}>{city}</SelectItem>
                       ))}
@@ -421,9 +398,8 @@ export default function MentorsPage() {
                 </div>
               )}
 
-              {/* Mentorship Topics Filter */}
               <div className="space-y-3">
-                <h3 className="font-medium">Temas de Mentoria</h3>
+                <h3 className="font-medium">{t("topics")}</h3>
                 <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
                   {availableFilters.topics.map(topic => (
                     <Badge
@@ -445,11 +421,10 @@ export default function MentorsPage() {
                 </div>
               </div>
 
-              {/* Expertise Areas Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <Briefcase className="h-4 w-4 mr-2" />
-                  Áreas de Expertise
+                  {t("expertise")}
                 </h3>
                 <div className="space-y-2">
                   {availableFilters.topics.slice(0, 5).map(topic => (
@@ -473,11 +448,10 @@ export default function MentorsPage() {
                 </div>
               </div>
 
-              {/* Inclusive Tags Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <Heart className="h-4 w-4 mr-2" />
-                  Tags Inclusivas
+                  {t("inclusiveTags")}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {availableFilters.inclusiveTags.map(tag => (
@@ -500,20 +474,19 @@ export default function MentorsPage() {
                 </div>
               </div>
 
-              {/* Experience Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <Briefcase className="h-4 w-4 mr-2" />
-                  Experiência
+                  {t("experience")}
                 </h3>
                 <Select value={filters.experienceYears} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, experienceYears: value }))
                 }>
                   <SelectTrigger>
-                    <SelectValue placeholder="Anos de experiência" />
+                    <SelectValue placeholder={t("experiencePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Qualquer experiência</SelectItem>
+                    <SelectItem value="all">{t("anyExperience")}</SelectItem>
                     <SelectItem value="1-3">1-3 anos</SelectItem>
                     <SelectItem value="3-5">3-5 anos</SelectItem>
                     <SelectItem value="5-10">5-10 anos</SelectItem>
@@ -522,35 +495,33 @@ export default function MentorsPage() {
                 </Select>
               </div>
 
-              {/* Availability Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <Clock className="h-4 w-4 mr-2" />
-                  Disponibilidade
+                  {t("availability")}
                 </h3>
                 <Select value={filters.availabilityStatus} onValueChange={(value) =>
                   setFilters(prev => ({ ...prev, availabilityStatus: value }))
                 }>
                   <SelectTrigger>
-                    <SelectValue placeholder="Status de disponibilidade" />
+                    <SelectValue placeholder={t("availabilityPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Qualquer status</SelectItem>
-                    <SelectItem value="available">Disponível</SelectItem>
-                    <SelectItem value="busy">Ocupado</SelectItem>
-                    <SelectItem value="unavailable">Indisponível</SelectItem>
+                    <SelectItem value="all">{t("anyStatus")}</SelectItem>
+                    <SelectItem value="available">{t("status.available")}</SelectItem>
+                    <SelectItem value="busy">{t("status.busy")}</SelectItem>
+                    <SelectItem value="unavailable">{t("status.unavailable")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Clear Filters */}
               <Button
                 variant="outline"
                 onClick={clearFilters}
                 className="w-full"
                 disabled={activeFiltersCount === 0}
               >
-                Limpar Filtros
+                {t("clearFilters")}
               </Button>
             </div>
           </SheetContent>
@@ -560,7 +531,7 @@ export default function MentorsPage() {
       {/* Results Count */}
       <div className="mb-6">
         <p className="text-gray-600">
-          {filteredMentors.length} mentor{filteredMentors.length !== 1 ? 'es' : ''} encontrado{filteredMentors.length !== 1 ? 's' : ''}
+          {t("resultsFound", { count: filteredMentors.length })}
         </p>
       </div>
 
@@ -576,17 +547,17 @@ export default function MentorsPage() {
         <div className="text-center py-12">
           <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Nenhum mentor encontrado
+            {t("noMentorsTitle")}
           </h3>
           <p className="text-gray-600 mb-4">
-            Tente ajustar seus filtros para encontrar mais mentores.
+            {t("noMentorsDescription")}
           </p>
           <div className="flex justify-center gap-4">
             <Button onClick={clearFilters} variant="outline">
-              Limpar Filtros
+              {t("clearFilters")}
             </Button>
             <Button onClick={openModal}>
-              Sugerir Tema ou Área
+              {t("suggestTopic")}
             </Button>
           </div>
         </div>
@@ -603,6 +574,7 @@ export default function MentorsPage() {
 }
 
 function MentorCard({ mentor }: { mentor: MentorProfile }) {
+  const t = useTranslations("mentorsPage")
   const router = useRouter()
   const { user } = useAuth()
 
@@ -617,29 +589,24 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
 
   const getAvailabilityText = (status: string) => {
     switch (status) {
-      case 'available': return 'Disponível'
-      case 'busy': return 'Ocupado'
-      case 'unavailable': return 'Indisponível'
-      default: return 'Status desconhecido'
+      case 'available': return t("status.available")
+      case 'busy': return t("status.busy")
+      case 'unavailable': return t("status.unavailable")
+      default: return t("status.unknown")
     }
   }
 
   const handleScheduleClick = (e: React.MouseEvent) => {
     e.preventDefault()
-
-    // Sempre permite visualizar o perfil
     router.push(`/mentors/${mentor.slug || mentor.id}`)
   }
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault()
-
     if (!user) {
       toast.info("Você deve estar logado para favoritar mentores")
       return
     }
-
-    // TODO: Implementar lógica de favoritar
     toast.success("Mentor favoritado com sucesso!")
   }
 
@@ -669,14 +636,12 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Bio */}
         {mentor.bio && (
           <p className="text-sm text-gray-600 line-clamp-2">
             {mentor.bio}
           </p>
         )}
 
-        {/* Location */}
         {(mentor.city || mentor.country) && (
           <div className="flex items-center text-sm text-gray-500">
             <MapPin className="h-3 w-3 mr-1" />
@@ -684,7 +649,6 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
           </div>
         )}
 
-        {/* Topics */}
         {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
@@ -700,20 +664,18 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
           </div>
         )}
 
-        {/* Stats */}
         <div className="flex items-center text-sm text-gray-500">
           {mentor.total_sessions > 0 && (
             <div className="flex items-center">
               <MessageCircle className="h-3 w-3 mr-1" />
-              <span>{mentor.total_sessions} sessões</span>
+              <span>{t("sessionsCount", { count: mentor.total_sessions })}</span>
             </div>
           )}
         </div>
 
-        {/* Actions */}
         <div className="flex space-x-2 pt-2">
           <Button onClick={handleScheduleClick} className="flex-1">
-            Ver Perfil
+            {t("viewProfile")}
           </Button>
           <Button variant="outline" size="icon" onClick={handleFavoriteClick}>
             <Heart className="h-4 w-4" />

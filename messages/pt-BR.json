@@ -790,5 +790,63 @@
       "title": "MENVO - Mentoria Voluntária",
       "description": "Conectando mentores e mentees para sessões de mentoria gratuitas"
     }
+  },
+  "mentorsPage": {
+    "title": "Encontre seu Mentor Ideal",
+    "subtitle": "Conecte-se com mentores verificados e acelere sua carreira",
+    "searchPlaceholder": "Buscar por nome, especialidade, empresa...",
+    "filters": "Filtros",
+    "sheetTitle": "Filtros Avançados",
+    "sheetDescription": "Refine sua busca para encontrar o mentor perfeito",
+    "state": "Estado",
+    "statePlaceholder": "Selecione o estado",
+    "allStates": "Todos os estados",
+    "city": "Cidade",
+    "cityPlaceholder": "Selecione a cidade",
+    "allCities": "Todas as cidades",
+    "topics": "Temas de Mentoria",
+    "expertise": "Áreas de Expertise",
+    "inclusiveTags": "Tags Inclusivas",
+    "experience": "Experiência",
+    "experiencePlaceholder": "Anos de experiência",
+    "anyExperience": "Qualquer experiência",
+    "availability": "Disponibilidade",
+    "availabilityPlaceholder": "Status de disponibilidade",
+    "anyStatus": "Qualquer status",
+    "clearFilters": "Limpar Filtros",
+    "resultsFound": "{count, plural, =0 {Nenhum mentor encontrado} =1 {1 mentor encontrado} other {# mentores encontrados}}",
+    "noMentorsTitle": "Nenhum mentor encontrado",
+    "noMentorsDescription": "Tente ajustar seus filtros para encontrar mais mentores.",
+    "suggestTopic": "Sugerir Tema ou Área",
+    "viewProfile": "Ver Perfil",
+    "sessionsCount": "{count, plural, =1 {1 sessão} other {# sessões}}",
+    "status": {
+      "available": "Disponível",
+      "busy": "Ocupado",
+      "unavailable": "Indisponível",
+      "unknown": "Status desconhecido"
+    },
+    "backToMentors": "Voltar para Mentores",
+    "about": "Sobre",
+    "specialties": "Especialidades",
+    "languagesAndInclusion": "Idiomas e Inclusão",
+    "languages": "Idiomas",
+    "scheduleSession": "Agendar Sessão",
+    "freeMentorships": "Mentorias 100% gratuitas",
+    "ownProfileMessage": "Este é o seu perfil de mentor",
+    "bookMentorship": "Agendar Mentoria",
+    "fullSchedule": "Agenda Lotada",
+    "links": "Links",
+    "yearsExperienceCount": "{count, plural, =1 {1 ano de experiência} other {# anos de experiência}}",
+    "loginRequired": {
+      "title": "Login Necessário",
+      "description": "Você precisa estar logado para agendar uma mentoria ou usar o chat."
+    },
+    "share": {
+      "title": "{name} - Mentor na Menvo",
+      "text": "Conheça {name}, mentor especializado em {topics}",
+      "success": "Compartilhado com sucesso!",
+      "copySuccess": "Link copiado para a área de transferência!"
+    }
   }
 }
