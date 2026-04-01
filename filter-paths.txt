@@ -1,5 +1,0 @@
-.env.local
-.env
-.env.production
-.env.development.local
-docs/production-setup-guide.md

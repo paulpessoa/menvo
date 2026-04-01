@@ -106,30 +106,30 @@
     }
   },
   "about": {
-    "badge": "Sobre Nós",
+    "badge": "À Propos de Nous",
     "ourMission": {
-      "title": "Nossa Missão",
-      "description": "Simplificar a mentoria em conversas abertas. Qualquer pessoa pode compartilhar sua experiência com quem está buscando — sempre de forma gratuita."
+      "title": "Notre Mission",
+      "description": "Simplifier le mentorat par des conversations ouvertes. Chacun peut partager son expérience avec ceux qui en recherchent — toujours gratuitement."
     },
     "whyWeStarted": {
-      "title": "Por Que Começamos",
-      "paragraph1": "O Menvo nasceu de uma ideia simples: todas as pessoas merecem acesso à mentoria, independentemente de sua origem ou situação financeira. Acreditamos que compartilhar conhecimento e experiências pode transformar vidas e comunidades.",
-      "paragraph2": "Nosso fundador vivenciou na prática o impacto que uma boa mentoria pode ter no crescimento pessoal e profissional. Porém, também percebeu como as oportunidades de mentoria muitas vezes estavam limitadas a quem já tinha conexões ou recursos financeiros.",
-      "paragraph3": "Foi por isso que criamos uma plataforma que torna a mentoria acessível a todos, conectando quem busca orientação com quem está disposto a compartilhar sua experiência — totalmente de graça."
+      "title": "Pourquoi Nous Avons Commencé",
+      "paragraph1": "Menvo est né d'une idée simple : tout le monde mérite l'accès au mentorat, peu importe son origine ou sa situation financière. Nous croyons que le partage de connaissances et d'expériences peut transformer des vies et des communautés.",
+      "paragraph2": "Notre fondateur a vécu en pratique l'impact qu'un bon mentorat peut avoir sur la croissance personnelle et professionnelle. Cependant, il a également réalisé que les opportunités de mentorat étaient souvent limitées à ceux qui avaient déjà des relations ou des ressources financières.",
+      "paragraph3": "C'est pourquoi nous avons créé une plateforme qui rend le mentorat accessible à tous, en connectant ceux qui cherchent des conseils avec ceux qui sont prêts à partager leur expérience — de manière totalement gratuite."
     },
-    "ourStoryImageAlt": "Ilustração da nossa história",
+    "ourStoryImageAlt": "Illustration de notre histoire",
     "values": {
       "community": {
-        "title": "Comunidade",
-        "description": "Construir uma comunidade acolhedora, onde o conhecimento é compartilhado livremente e conexões são feitas além de origens e fronteiras."
+        "title": "Communauté",
+        "description": "Construir une communauté accueillante, où les connaissances sont partagées librement et où des liens se tissent au-delà des origines et des frontières."
       },
       "accessibility": {
-        "title": "Acessibilidade",
-        "description": "Tornar a mentoria acessível a todos, independentemente de sua situação financeira, localização ou histórico."
+        "title": "Accessibilité",
+        "description": "Rendre le mentorat accessible à tous, indépendamment de leur situation financière, de leur localisation ou de leurs antécédents."
       },
       "impact": {
-        "title": "Impacto",
-        "description": "Gerar mudanças positivas por meio do compartilhamento de conhecimento e conexões significativas que empoderam pessoas."
+        "title": "Impact",
+        "description": "Créer des changements positifs grâce au partage de connaissances et à des connexions significatives qui autonomisent les gens."
       }
     },
     "sdg": {
@@ -144,644 +144,644 @@
       }
     },
     "ourTeam": {
-      "title": "Nosso Time",
-      "paragraph1": "Somos uma equipe diversa de profissionais apaixonados por tornar a mentoria acessível a todos. Nossos membros vêm de diferentes origens e setores, trazendo uma riqueza de experiências e perspectivas.",
-      "paragraph2": "O que nos une é a crença no poder da mentoria para transformar vidas e o compromisso de criar uma plataforma que facilite conexões significativas.",
-      "paragraph3": "Estamos sempre em busca de pessoas apaixonadas para se juntar à nossa missão. Se você quer contribuir com o Menvo, adoraríamos ouvir você!",
-      "joinTeam": "Junte-se ao Nosso Time"
+      "title": "Notre Équipe",
+      "paragraph1": "Nous sommes une équipe diversifiée de professionnels passionnés par l'idée de rendre le mentorat accessible à tous. Nos membres viennent de différents horizons et secteurs, apportant une richesse d'expériences et de perspectives.",
+      "paragraph2": "Ce qui nous unit, c'est la conviction du pouvoir du mentorat pour transformer des vies et l'engagement à créer une plateforme qui facilite des connexions significatives.",
+      "paragraph3": "Nous sommes toujours à la recherche de personnes passionnées pour rejoindre notre mission. Si vous souhaitez contribuer à Menvo, nous serions ravis de vous entendre !",
+      "joinTeam": "Rejoignez Notre Équipe"
     },
-    "ourTeamImageAlt": "Ilustração do nosso time",
+    "ourTeamImageAlt": "Illustration de notre équipe",
     "ourImpact": {
-      "title": "Nosso Impacto",
+      "title": "Notre Impact",
       "volunteerMentors": {
         "count": "1.000+",
-        "label": "Mentores Voluntários"
+        "label": "Mentors Bénévoles"
       },
       "mentorshipSessions": {
         "count": "5.000+",
-        "label": "Sessões de Mentoria"
+        "label": "Sessions de Mentorat"
       },
       "countriesReached": {
         "count": "50+",
-        "label": "Países Alcançados"
+        "label": "Pays Atteints"
       },
-      "description": "Esses números representam pessoas reais cujas vidas foram positivamente impactadas pelas conexões de mentoria em nossa plataforma."
+      "description": "Ces chiffres représentent des personnes réelles dont la vie a été positivement influencée par les connexions de mentorat sur notre plateforme."
     },
     "ourPartners": {
-      "title": "Nossos Parceiros",
-      "description": "Temos orgulho de colaborar com organizações que compartilham nossa visão de tornar a mentoria acessível a todos.",
-      "partnerLogoAlt": "Logo do Parceiro {{number}}"
+      "title": "Nos Partenaires",
+      "description": "Nous sommes fiers de collaborer avec des organisations qui partagent notre vision de rendre le mentorat accessible à tous.",
+      "partnerLogoAlt": "Logo du Partenaire {{number}}"
     },
     "joinOurMission": {
-      "title": "Junte-se à Nossa Missão",
-      "description": "Seja para compartilhar sua experiência como mentor ou para buscar orientação como mentorado, você pode fazer parte da nossa missão de tornar a mentoria acessível a todos.",
-      "signUpNow": "Cadastre-se Agora",
-      "contactUs": "Fale Conosco"
+      "title": "Rejoignez Notre Mission",
+      "description": "Que ce soit pour partager votre expérience en tant que mentor ou pour chercher des conseils en tant que mentoré, vous pouvez faire partie de notre mission visant à rendre le mentorat accessible à tous.",
+      "signUpNow": "S'inscrire Maintenant",
+      "contactUs": "Nous Contacter"
     }
   },
   "howItWorks": {
-    "title": "Como o Menvo Funciona",
-    "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões de mentoria gratuitas.",
-    "forMentees": "Para Mentorados",
-    "forMentors": "Para Mentores",
-    "forNGOs": "Para ONGs",
-    "forCompanies": "Para Empresas",
+    "title": "Comment Fonctionne Menvo",
+    "description": "Notre plateforme facilite la connexion avec les mentors et la planification de sessions de mentorat gratuites.",
+    "forMentees": "Pour les Mentorés",
+    "forMentors": "Pour les Mentors",
+    "forNGOs": "Pour les ONG",
+    "forCompanies": "Pour les Entreprises",
     "mentees": {
       "step1": {
-        "title": "Crie Seu Perfil",
-        "description": "Cadastre-se e crie seu perfil com informações sobre sua trajetória, objetivos e interesses. Isso nos ajuda a conectá-lo com os mentores ideais.",
-        "feature1": "Envie seu currículo",
-        "feature2": "Adicione uma foto de perfil",
-        "feature3": "Conecte seu perfil do LinkedIn"
+        "title": "Créez Votre Profil",
+        "description": "Inscrivez-vous et créez votre profil avec des informations sur votre parcours, vos objectifs et vos intérêts. Cela nous aide à vous connecter avec les mentors idéaux.",
+        "feature1": "Envoyez votre CV",
+        "feature2": "Ajoutez une photo de profil",
+        "feature3": "Connectez votre profil LinkedIn"
       },
       "step2": {
-        "title": "Encontre o Mentor Ideal",
-        "description": "Explore nossa comunidade diversa de mentores voluntários. Use filtros para buscar mentores por área de atuação, setor, localização e mais.",
-        "feature1": "Filtre por temas e especialidades",
-        "feature2": "Busque por localização ou idioma",
-        "feature3": "Leia avaliações de outros mentorados"
+        "title": "Trouvez le Mentor Idéal",
+        "description": "Explorez notre communauté diversifiée de mentors bénévoles. Utilisez des filtres pour rechercher des mentors par domaine, secteur d'activité, localisation, et plus encore.",
+        "feature1": "Filtrez par sujets et spécialités",
+        "feature2": "Recherchez par lieu ou langue",
+        "feature3": "Lisez les avis d'autres mentorés"
       },
       "step3": {
-        "title": "Agende uma Sessão",
-        "description": "Quando encontrar um mentor com quem gostaria de se conectar, veja sua disponibilidade e agende uma sessão gratuita de 45 minutos.",
-        "feature1": "Veja o calendário do mentor",
-        "feature2": "Escolha o horário mais conveniente",
-        "feature3": "Adicione os temas que deseja discutir"
+        "title": "Réservez une Session",
+        "description": "Lorsque vous trouvez un mentor avec qui vous souhaitez vous connecter, vérifiez ses disponibilités et réservez une session gratuite de 45 minutes.",
+        "feature1": "Consultez le calendrier du mentor",
+        "feature2": "Choisissez l'heure la plus pratique",
+        "feature3": "Ajoutez les sujets que vous souhaitez aborder"
       },
       "step4": {
-        "title": "Conecte-se e Evolua",
-        "description": "Encontre-se com seu mentor por videochamada. Compartilhe seus desafios, tire dúvidas e receba orientações personalizadas para alcançar seus objetivos.",
-        "feature1": "Participe pelo link da videochamada",
-        "feature2": "Converse sobre seus objetivos e desafios",
-        "feature3": "Receba orientações personalizadas"
+        "title": "Connectez-vous et Évoluez",
+        "description": "Rencontrez votre mentor par appel vidéo. Partagez vos défis, posez vos questions et recevez des conseils personnalisés pour atteindre vos objectifs.",
+        "feature1": "Rejoignez via le lien d'appel vidéo",
+        "feature2": "Parlez de vos objectifs et défis",
+        "feature3": "Recevez des conseils personnalisés"
       },
-      "getStarted": "Comece como Mentorado"
+      "getStarted": "Commencer en tant que Mentoré"
     },
     "mentors": {
       "step1": {
-        "title": "Crie Seu Perfil de Mentor",
-        "description": "Cadastre-se e crie seu perfil de mentor com informações sobre sua experiência, áreas de conhecimento e temas com os quais pode ajudar.",
-        "feature1": "Destaque sua experiência e especialidade",
-        "feature2": "Especifique os temas que pode mentorar",
-        "feature3": "Conecte seus perfis profissionais"
+        "title": "Créez Votre Profil de Mentor",
+        "description": "Inscrivez-vous et créez votre profil de mentor avec des informations sur votre expérience, vos domaines d'expertise et les sujets sur lesquels vous pouvez aider.",
+        "feature1": "Mettez en avant votre expérience et spécialité",
+        "feature2": "Spécifiez les sujets que vous pouvez aborder",
+        "feature3": "Connectez vos profils professionnels"
       },
       "step2": {
-        "title": "Conclua a Verificação",
-        "description": "Para garantir a segurança da nossa comunidade, todos os mentores passam por um processo de verificação, incluindo uma breve videochamada com nossa equipe.",
-        "feature1": "Agende uma chamada de verificação",
-        "feature2": "Verifique sua identidade e conhecimento",
-        "feature3": "Seja aprovado para começar a mentorar"
+        "title": "Complétez la Vérification",
+        "description": "Pour assurer la sécurité de notre communauté, tous les mentors passent par un processus de vérification, incluant un court appel vidéo avec notre équipe.",
+        "feature1": "Planifiez un appel de vérification",
+        "feature2": "Vérifiez votre identité et vos connaissances",
+        "feature3": "Soyez approuvé pour commencer le mentorat"
       },
       "step3": {
-        "title": "Defina Sua Disponibilidade",
-        "description": "Defina os horários em que estará disponível para mentorar. Você tem total controle da sua agenda e pode atualizá-la a qualquer momento.",
-        "feature1": "Configure sua disponibilidade semanal",
-        "feature2": "Defina a duração das sessões",
-        "feature3": "Atualize seu calendário quando necessário"
+        "title": "Définissez Votre Disponibilité",
+        "description": "Définissez les heures où vous serez disponible pour le mentorat. Vous avez un contrôle total sur votre emploi du temps et pouvez le mettre à jour à tout moment.",
+        "feature1": "Configurez votre disponibilité hebdomadaire",
+        "feature2": "Définissez la durée des sessions",
+        "feature3": "Mettez à jour votre calendrier si nécessaire"
       },
       "step4": {
-        "title": "Realize Sessões de Mentoria",
-        "description": "Conecte-se com mentorados por videochamada. Compartilhe seu conhecimento, ofereça orientações e ajude-os a superar desafios.",
-        "feature1": "Receba solicitações de sessão",
-        "feature2": "Realize sessões de mentoria por vídeo",
-        "feature3": "Acompanhe seu impacto e sessões"
+        "title": "Réalisez des Sessions de Mentorat",
+        "description": "Connectez-vous avec les mentorés par appel vidéo. Partagez vos connaissances, offrez des conseils et aidez-les à surmonter leurs défis.",
+        "feature1": "Recevez des demandes de session",
+        "feature2": "Réalisez des sessions de mentorat vidéo",
+        "feature3": "Suivez votre impact et vos sessions"
       },
-      "becomeMentor": "Torne-se um Mentor"
+      "becomeMentor": "Devenir Mentor"
     },
     "ngos": {
       "step1": {
-        "title": "Cadastre sua ONG Gratuitamente",
-        "description": "ONGs e organizações sociais podem se cadastrar gratuitamente na plataforma para conectar os jovens atendidos com mentores voluntários.",
-        "feature1": "Cadastro 100% gratuito para ONGs",
-        "feature2": "Acesso ilimitado à plataforma",
-        "feature3": "Suporte dedicado para organizações"
+        "title": "Inscrivez votre ONG Gratuitement",
+        "description": "Les ONG et les organisations sociales peuvent s'inscrire gratuitement sur la plateforme pour connecter les jeunes qu'elles accompagnent à des mentors bénévoles.",
+        "feature1": "Inscription 100% gratuite pour les ONG",
+        "feature2": "Accès illimité à la plateforme",
+        "feature3": "Support dédié pour les organisations"
       },
       "step2": {
-        "title": "Conecte Jovens com Mentores",
-        "description": "Cadastre os jovens atendidos pela sua organização e ajude-os a encontrar mentores que possam orientá-los em suas jornadas profissionais e pessoais.",
-        "feature1": "Cadastre múltiplos jovens da sua organização",
-        "feature2": "Acompanhe o progresso das mentorias",
-        "feature3": "Receba relatórios de impacto social"
+        "title": "Connectez les Jeunes aux Mentors",
+        "description": "Inscrivez les jeunes soutenus par votre organisation et aidez-les à trouver des mentors qui peuvent les guider dans leur parcours professionnel et personnel.",
+        "feature1": "Inscrivez plusieurs jeunes de votre organisation",
+        "feature2": "Suivez la progression des mentorats",
+        "feature3": "Recevez des rapports d'impact social"
       },
-      "getStarted": "Cadastrar Minha ONG"
+      "getStarted": "Inscrire Mon ONG"
     },
     "companies": {
       "step1": {
-        "title": "Voluntariado Corporativo através da Mentoria",
-        "description": "Desenvolva programas de voluntariado corporativo permitindo que seus colaboradores se tornem mentores voluntários, fortalecendo o propósito da empresa.",
-        "feature1": "Engaje colaboradores em ações sociais",
-        "feature2": "Desenvolva lideranças através da mentoria",
-        "feature3": "Fortaleça a cultura organizacional"
+        "title": "Bénévolat d'Entreprise via le Mentorat",
+        "description": "Développez des programmes de bénévolat d'entreprise en permettant à vos employés de devenir des mentors bénévoles, renforçant ainsi la mission de l'entreprise.",
+        "feature1": "Engagez vos employés dans des actions sociales",
+        "feature2": "Développez le leadership grâce au mentorat",
+        "feature3": "Renforcez la culture organisationnelle"
       },
       "step2": {
-        "title": "Relatórios ESG e Impacto Social",
-        "description": "Receba relatórios detalhados sobre o impacto social das mentorias realizadas pelos seus colaboradores, fortalecendo suas métricas ESG.",
-        "feature1": "Relatórios mensais de impacto social",
-        "feature2": "Métricas para relatórios ESG",
-        "feature3": "Certificados de voluntariado corporativo"
+        "title": "Rapports ESG et Impact Social",
+        "description": "Recevez des rapports détaillés sur l'impact social du mentorat fourni par vos employés, renforçant ainsi vos indicateurs ESG.",
+        "feature1": "Rapports d'impact social mensuels",
+        "feature2": "Indicateurs pour les rapports ESG",
+        "feature3": "Certificats de bénévolat d'entreprise"
       },
       "step3": {
-        "title": "Políticas de Incentivo e Benefícios",
-        "description": "Crie políticas de incentivo para colaboradores mentores, como folgas remuneradas, reconhecimento interno e desenvolvimento de carreira.",
-        "feature1": "Banco de horas para mentoria voluntária",
-        "feature2": "Reconhecimento e gamificação interna",
-        "feature3": "Desenvolvimento de soft skills"
+        "title": "Politiques d'Incitations et Avantages",
+        "description": "Créez des politiques incitatives pour les employés mentors, telles que des congés payés, une reconnaissance interne et un développement de carrière.",
+        "feature1": "Banque d'heures pour le mentorat bénévole",
+        "feature2": "Reconnaissance et gamification interne",
+        "feature3": "Développement des soft skills"
       },
-      "getStarted": "Tornar-se Parceiro Corporativo"
+      "getStarted": "Devenir Partenaire Corporatif"
     },
     "faq": {
-      "title": "Perguntas Frequentes",
-      "description": "Encontre respostas para as dúvidas mais comuns sobre a plataforma.",
-      "viewAll": "Ver Todas as Perguntas",
+      "title": "Foire Aux Questions",
+      "description": "Trouvez des réponses aux questions les plus courantes sur la plateforme.",
+      "viewAll": "Voir Toutes les Questions",
       "q1": {
-        "question": "A mentoria é realmente gratuita?",
-        "answer": "Sim, todas as sessões de mentoria na nossa plataforma são totalmente gratuitas. Nossos mentores dedicam seu tempo voluntariamente para ajudar outras pessoas a crescer."
+        "question": "Le mentorat est-il vraiment gratuit ?",
+        "answer": "Oui, toutes les sessions de mentorat sur notre plateforme sont entièrement gratuites. Nos mentors donnent de leur temps bénévolement pour aider les autres à grandir."
       },
       "q2": {
-        "question": "Qual a duração das sessões de mentoria?",
-        "answer": "As sessões de mentoria padrão duram 45 minutos. Esse tempo é suficiente para uma conversa significativa, respeitando a agenda de todos."
+        "question": "Quelle est la durée des sessions de mentorat ?",
+        "answer": "Les sessions de mentorat standards durent 45 minutes. Ce temps est suffisant pour une conversation significative tout en respectant l'emploi du temps de chacun."
       },
       "q3": {
-        "question": "Com que frequência posso me encontrar com um mentor?",
-        "answer": "Isso depende da disponibilidade e preferência do mentor. Alguns estão abertos a encontros regulares, enquanto outros preferem encontros pontuais."
+        "question": "À quelle fréquence puis-je rencontrer un mentor ?",
+        "answer": "Cela dépend de la disponibilité et des préférences du mentor. Certains sont ouverts à des rencontres régulières, tandis que d'autres préfèrent des sessions ponctuelles."
       },
       "q4": {
-        "question": "O que acontece se eu precisar cancelar?",
-        "answer": "Pedimos que o cancelamento seja feito com pelo menos 24 horas de antecedência, em respeito ao tempo do mentor. Você pode reagendar facilmente pelo seu painel."
+        "question": "Que se passe-t-il si je dois annuler ?",
+        "answer": "Nous demandons que les annulations soient effectuées au moins 24 heures à l'avance par respect pour le temps du mentor. Vous pouvez facilement reprogrammer depuis votre tableau de bord."
       },
       "q5": {
-        "question": "Como me torno um mentor verificado?",
-        "answer": "Após criar seu perfil de mentor, você precisará agendar uma breve chamada de verificação com nossa equipe. Isso garante a qualidade e segurança da comunidade."
+        "question": "Comment puis-je devenir un mentor vérifié ?",
+        "answer": "Après avoir créé votre profil de mentor, vous devrez planifier un court appel de vérification avec notre équipe. Cela garantit la qualité et la sécurité de la communauté."
       },
       "q6": {
-        "question": "Minhas informações estão seguras?",
-        "answer": "Sim, levamos privacidade e segurança muito a sério. Suas informações pessoais são protegidas e compartilhadas apenas com quem você decidir se conectar."
+        "question": "Mes informations sont-elles en sécurité ?",
+        "answer": "Oui, nous prenons la confidentialité et la sécurité très au sérieux. Vos informations personnelles sont protégées et partagées uniquement avec ceux avec qui vous choisissez de vous connecter."
       },
-      "stillHaveQuestions": "Ainda tem dúvidas?",
-      "supportDescription": "Nossa equipe de suporte está aqui para ajudar com qualquer pergunta que você tenha.",
-      "contactSupport": "Fale com o Suporte"
+      "stillHaveQuestions": "Vous avez encore des questions ?",
+      "supportDescription": "Notre équipe de support est là pour vous aider avec toutes les questions que vous pourriez avoir.",
+      "contactSupport": "Contacter le Support"
     }
   },
   "faq": {
-    "title": "Perguntas Frequentes",
-    "description": "Encontre respostas para as dúvidas mais comuns sobre a plataforma Menvo.",
+    "title": "Foire Aux Questions",
+    "description": "Trouvez des réponses aux questions les plus courantes sur la plateforme Menvo.",
     "q1": {
-      "question": "A mentoria é realmente gratuita?",
-      "answer": "Sim, todas as sessões de mentoria na nossa plataforma são totalmente gratuitas. Nossos mentores dedicam seu tempo voluntariamente para ajudar outras pessoas a crescer."
+      "question": "Le mentorat est-il vraiment gratuit ?",
+      "answer": "Oui, toutes les sessions de mentorat sur notre plateforme sont entièrement gratuites. Nos mentors donnent de leur temps bénévolement pour aider les autres à grandir."
     },
     "q2": {
-      "question": "Qual a duração das sessões de mentoria?",
-      "answer": "As sessões de mentoria padrão duram 45 minutos. Esse tempo é suficiente para uma conversa significativa, respeitando a agenda de todos."
+      "question": "Quelle est la durée des sessions de mentorat ?",
+      "answer": "Les sessions de mentorat standards durent 45 minutes. Ce temps est suffisant pour une conversation significative tout en respectant l'emploi du temps de chacun."
     },
     "q3": {
-      "question": "Com que frequência posso me encontrar com um mentor?",
-      "answer": "Isso depende da disponibilidade e preferência do mentor. Alguns estão abertos a encontros regulares, enquanto outros preferem encontros pontuais."
+      "question": "À quelle fréquence puis-je rencontrer un mentor ?",
+      "answer": "Cela dépend de la disponibilité et des préférences du mentor. Certains sont ouverts à des rencontres régulières, tandis que d'autres préfèrent des sessions ponctuelles."
     },
     "q4": {
-      "question": "O que acontece se eu precisar cancelar?",
-      "answer": "Pedimos que o cancelamento seja feito com pelo menos 24 horas de antecedência, em respeito ao tempo do mentor. Você pode reagendar facilmente pelo seu painel."
+      "question": "Que se passe-t-il si je dois annuler ?",
+      "answer": "Nous demandons que les annulations soient effectuées au moins 24 heures à l'avance par respect pour le temps du mentor. Vous pouvez facilement reprogrammer depuis votre tableau de bord."
     },
     "q5": {
-      "question": "Como me torno um mentor verificado?",
-      "answer": "Após criar seu perfil de mentor, você precisará agendar uma breve chamada de verificação com nossa equipe. Isso garante a qualidade e segurança da comunidade."
+      "question": "Comment puis-je devenir un mentor vérifié ?",
+      "answer": "Après avoir créé votre profil de mentor, vous devrez planifier un court appel de vérification avec notre équipe. Cela garantit la qualité et la sécurité de la communauté."
     },
     "q6": {
-      "question": "Minhas informações estão seguras?",
-      "answer": "Sim, levamos privacidade e segurança muito a sério. Suas informações pessoais são protegidas e compartilhadas apenas com quem você decidir se conectar."
+      "question": "Mes informations sont-elles en sécurité ?",
+      "answer": "Oui, nous prenons la confidentialité et la sécurité très au sérieux. Vos informations personnelles sont protégées et partagées uniquement avec ceux avec qui vous choisissez de vous connecter."
     },
     "q7": {
-      "question": "Como funciona para ONGs?",
-      "answer": "ONGs podem se cadastrar gratuitamente e conectar os jovens atendidos com mentores voluntários. É uma forma de ampliar o impacto social da organização sem custos."
+      "question": "Comment cela fonctionne-t-il pour les ONG ?",
+      "answer": "Les ONG peuvent s'inscrire gratuitement et connecter les jeunes qu'elles accompagnent à des mentors bénévoles. C'est un moyen d'amplifier l'impact social de l'organisation sans frais."
     },
     "q8": {
-      "question": "Empresas podem participar?",
-      "answer": "Sim! Empresas podem desenvolver programas de voluntariado corporativo através da mentoria, receber relatórios ESG e criar políticas de incentivo para colaboradores mentores."
+      "question": "Les entreprises peuvent-elles participer ?",
+      "answer": "Oui ! Les entreprises peuvent développer des programmes de bénévolat d'entreprise par le mentorat, recevoir des rapports ESG et créer des politiques incitatives pour les employés mentors."
     },
     "q9": {
-      "question": "Como funciona o acesso de recrutadores?",
-      "answer": "Esta funcionalidade está em desenvolvimento. Em breve, recrutadores terão acesso a talentos qualificados que participam da plataforma, respeitando sempre a privacidade dos usuários."
+      "question": "Comment fonctionne l'accès pour les recruteurs ?",
+      "answer": "Cette fonctionnalité est en cours de développement. Bientôt, les recruteurs auront accès aux talents qualifiés participant à la plateforme, toujours dans le respect de la vie privée des utilisateurs."
     },
     "q10": {
-      "question": "Posso ser mentor e mentorado ao mesmo tempo?",
-      "answer": "Sim! Você pode ter ambos os perfis na plataforma. Muitos profissionais buscam mentoria em áreas específicas enquanto mentoram em suas áreas de expertise."
+      "question": "Puis-je être à la fois mentor et mentoré ?",
+      "answer": "Oui ! Vous pouvez avoir les deux profils sur la plateforme. De nombreux professionnels recherchent un mentorat dans des domaines spécifiques tout en encadrant d'autres dans leurs domaines d'expertise."
     },
-    "stillHaveQuestions": "Ainda tem dúvidas?",
-    "supportDescription": "Nossa equipe de suporte está aqui para ajudar com qualquer pergunta que você tenha.",
-    "contactSupport": "Fale com o Suporte"
+    "stillHaveQuestions": "Vous avez encore des questions ?",
+    "supportDescription": "Notre équipe de support est là pour vous aider avec toutes les questions que vous pourriez avoir.",
+    "contactSupport": "Contacter le Support"
   },
   "login": {
-    "title": "Bem-vindo de volta",
-    "description": "Entre na sua conta para acessar a plataforma",
+    "title": "Bon retour",
+    "description": "Connectez-vous à votre compte pour accéder à la plateforme",
     "email": "E-mail",
-    "emailPlaceholder": "nome@exemplo.com",
-    "password": "Senha",
-    "passwordPlaceholder": "Digite sua senha",
-    "forgotPassword": "Esqueceu a senha?",
-    "loginButton": "Entrar",
-    "loggingIn": "Entrando...",
-    "noAccount": "Não tem uma conta?",
-    "signUp": "Cadastrar",
-    "continueWith": "Continuar com",
-    "orContinueWith": "Ou continue com email",
+    "emailPlaceholder": "nom@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Saisissez votre mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "loginButton": "Se Connecter",
+    "loggingIn": "Connexion en cours...",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "signUp": "S'inscrire",
+    "continueWith": "Continuer avec",
+    "orContinueWith": "Ou continuer avec l'e-mail",
     "google": "Google",
     "linkedin": "LinkedIn",
-    "connecting": "Conectando...",
-    "success": "Login realizado com sucesso!",
-    "emailNotConfirmedInfo": "Verifique sua caixa de entrada para confirmar seu e-mail.",
-    "dontHaveAccount": "Não tem uma conta?",
+    "connecting": "Connexion en cours...",
+    "success": "Connexion réussie !",
+    "emailNotConfirmedInfo": "Veuillez vérifier votre boîte de réception pour confirmer votre e-mail.",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
     "error": {
-      "invalidCredentials": "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.",
-      "emailNotConfirmed": "E-mail não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.",
-      "tooManyAttempts": "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.",
-      "networkError": "Erro de conexão. Verifique sua internet e tente novamente."
+      "invalidCredentials": "E-mail ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
+      "emailNotConfirmed": "E-mail non confirmé. Vérifiez votre boîte de réception et cliquez sur le lien de confirmation.",
+      "tooManyAttempts": "Trop de tentatives de connexion. Veuillez patienter quelques minutes avant de réessayer.",
+      "networkError": "Erreur de connexion. Vérifiez votre connexion internet et réessayez."
     }
   },
   "register": {
-    "title": "Junte-se à Menvo",
-    "subtitle": "Conecte-se com mentores voluntários e desenvolva sua carreira gratuitamente",
-    "signupTitle": "Criar Conta",
-    "description": "Preencha seus dados para começar sua jornada",
-    "firstName": "Nome",
-    "firstNamePlaceholder": "Digite seu promeiro nome",
-    "lastName": "Sobrenome",
-    "lastNamePlaceholder": "Digite seu sobrenome",
+    "title": "Rejoignez Menvo",
+    "subtitle": "Connectez-vous avec des mentors bénévoles et développez votre carrière gratuitement",
+    "signupTitle": "Créer un Compte",
+    "description": "Remplissez vos coordonnées pour commencer votre parcours",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Saisissez votre prénom",
+    "lastName": "Nom de famille",
+    "lastNamePlaceholder": "Saisissez votre nom de famille",
     "email": "E-mail",
-    "emailPlaceholder": "Digite seu e-mail",
-    "emailInvalid": "E-mail inválido",
-    "password": "Senha",
-    "passwordPlaceholder": "Crie uma senha",
-    "confirmPassword": "Confirmar Senha",
-    "confirmPasswordPlaceholder": "Digite a senha novamente",
+    "emailPlaceholder": "Saisissez votre e-mail",
+    "emailInvalid": "E-mail invalide",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Créez un mot de passe",
+    "confirmPassword": "Confirmez le Mot de Passe",
+    "confirmPasswordPlaceholder": "Saisissez à nouveau le mot de passe",
     "mentor": "Mentor",
-    "mentee": "Mentorado",
-    "registerButton": "Registrar",
-    "creatingAccount": "Criando conta...",
-    "alreadyHaveAccount": "Já tem uma conta?",
-    "signIn": "Entrar",
-    "orContinueWith": "Ou continue com email",
-    "success": "Conta criada com sucesso!",
-    "confirmEmail": "Confirme seu e-mail",
-    "confirmEmailDescription": "Um e-mail de confirmação foi enviado para {{email}}. Por favor, acesse sua caixa de entrada e clique no link para ativar sua conta.",
-    "nextSteps": "Próximos passos:",
+    "mentee": "Mentoré",
+    "registerButton": "S'inscrire",
+    "creatingAccount": "Création du compte...",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "signIn": "Se Connecter",
+    "orContinueWith": "Ou continuer avec l'e-mail",
+    "success": "Compte créé avec succès !",
+    "confirmEmail": "Confirmez votre e-mail",
+    "confirmEmailDescription": "Un e-mail de confirmation a été envoyé à {{email}}. Veuillez accéder à votre boîte de réception et cliquer sur le lien pour activer votre compte.",
+    "nextSteps": "Prochaines étapes :",
     "nextStepsList": [
-      "Verifique sua caixa de entrada (e pasta de spam)",
-      "Clique no link de confirmação no email",
-      "Escolha seu tipo de usuário (mentor ou mentorado)",
-      "Complete seu perfil com suas informações",
-      "Aguarde a validação da nossa equipe (apenas para mentores)"
+      "Vérifiez votre boîte de réception (et dossier spam)",
+      "Cliquez sur le lien de confirmation dans l'e-mail",
+      "Choisissez votre type d'utilisateur (mentor ou mentoré)",
+      "Complétez votre profil avec vos informations",
+      "Attendez la validation de notre équipe (uniquement pour les mentors)"
     ],
-    "afterConfirmation": "Após confirmar seu e-mail, você poderá escolher se quer ser mentor ou mentorado e completar seu perfil. Mentores passarão por uma validação da nossa equipe antes de serem publicados.",
-    "didntReceiveEmail": "Não recebeu o e-mail?",
-    "checkSpam": "Verifique sua pasta de spam ou lixo eletrônico. O link de confirmação expira em 24 horas.",
-    "emailExpired": "O link de confirmação expirou?",
-    "emailExpiredDescription": "Se o link de confirmação expirou (24 horas), você pode usar a opção 'Esqueci minha senha' para redefinir e confirmar sua conta.",
-    "resendEmail": "Reenviar e-mail",
-    "emailExpiredAction": "Link expirado? Redefinir senha",
-    "tryAgain": "Tentar novamente",
-    "emailConfirmed": "Email Confirmado!",
-    "emailConfirmedDescription": "Seu email foi confirmado com sucesso. Agora escolha como você quer usar a plataforma.",
-    "selectRoleDescription": "Escolha como você quer usar a plataforma:",
-    "menteeDescription": "Busco orientação e desenvolvimento profissional",
-    "mentorDescription": "Quero compartilhar conhecimento e orientar outros profissionais",
-    "continue": "Continuar",
+    "afterConfirmation": "Après avoir confirmé votre e-mail, vous pourrez choisir d'être mentor ou mentoré et compléter votre profil. Les mentors passeront par une validation de notre équipe avant d'être publiés.",
+    "didntReceiveEmail": "Vous n'avez pas reçu l'e-mail ?",
+    "checkSpam": "Vérifiez votre dossier spam ou courrier indésirable. Le lien de confirmation expire en 24 heures.",
+    "emailExpired": "Le lien de confirmation a expiré ?",
+    "emailExpiredDescription": "Si le lien de confirmation a expiré (24 heures), vous pouvez utiliser l'option 'Mot de passe oublié' pour réinitialiser et confirmer votre compte.",
+    "resendEmail": "Renvoyer l'e-mail",
+    "emailExpiredAction": "Lien expiré ? Réinitialiser le mot de passe",
+    "tryAgain": "Réessayer",
+    "emailConfirmed": "E-mail Confirmé !",
+    "emailConfirmedDescription": "Votre e-mail a été confirmé avec succès. Choisissez maintenant comment vous souhaitez utiliser la plateforme.",
+    "selectRoleDescription": "Choisissez comment vous souhaitez utiliser la plateforme :",
+    "menteeDescription": "Je cherche des conseils et un développement professionnel",
+    "mentorDescription": "Je souhaite partager mes connaissances et guider d'autres professionnels",
+    "continue": "Continuer",
     "welcome": {
-      "title": "Bem-vindo ao Menvo!",
-      "description": "Sua conta foi confirmada com sucesso. Agora escolha como você quer usar a plataforma.",
-      "selectRoleDescription": "Escolha como você quer usar a plataforma:",
-      "continue": "Continuar"
+      "title": "Bienvenue sur Menvo !",
+      "description": "Votre compte a été confirmé avec succès. Choisissez maintenant comment vous souhaitez utiliser la plateforme.",
+      "selectRoleDescription": "Choisissez comment vous souhaitez utiliser la plateforme :",
+      "continue": "Continuer"
     },
-    "goToLogin": "Ir para Login",
-    "goToHome": "Voltar ao Início",
-    "goToVerification": "Ir para página de verificação",
+    "goToLogin": "Aller à la Connexion",
+    "goToHome": "Retour à l'Accueil",
+    "goToVerification": "Aller à la page de vérification",
     "passwordValidation": {
-      "passwordsDontMatch": "As senhas não coincidem",
-      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
-      "passwordStrength": "Força da senha:",
-      "passwordTooWeak": "Senha muito curta",
-      "passwordMedium": "Senha média",
-      "passwordStrong": "Senha forte",
-      "passwordsMatch": "✓ Senhas coincidem",
-      "passwordsDontMatchError": "As senhas não coincidem"
+      "passwordsDontMatch": "Les mots de passe ne correspondent pas",
+      "passwordTooShort": "Le mot de passe doit comporter au moins 6 caractères",
+      "passwordStrength": "Force du mot de passe :",
+      "passwordTooWeak": "Mot de passe trop court",
+      "passwordMedium": "Mot de passe moyen",
+      "passwordStrong": "Mot de passe fort",
+      "passwordsMatch": "✓ Les mots de passe correspondent",
+      "passwordsDontMatchError": "Les mots de passe ne correspondent pas"
     },
     "userType": {
-      "title": "Como você quer participar?",
+      "title": "Comment souhaitez-vous participer ?",
       "mentee": {
-        "title": "Mentorado",
-        "description": "Busco orientação para desenvolver minha carreira"
+        "title": "Mentoré",
+        "description": "Je cherche des conseils pour développer ma carrière"
       },
       "mentor": {
         "title": "Mentor",
-        "description": "Quero compartilhar minha experiência e ajudar outros"
+        "description": "Je souhaite partager mon expérience et aider les autres"
       },
       "company": {
-        "title": "Empresa",
-        "description": "Quero indicar profissionais da nossa empresa"
+        "title": "Entreprise",
+        "description": "Je souhaite recommander des professionnels de notre entreprise"
       },
       "recruiter": {
-        "title": "Recrutador",
-        "description": "Busco profissionais qualificados para oportunidades"
+        "title": "Recruteur",
+        "description": "Je recherche des professionnels qualifiés pour des opportunités"
       }
     }
   },
   "mentors": {
-    "title": "Encontre um Mentor",
-    "description": "Navegue pela nossa comunidade de mentores voluntários e encontre o match perfeito para suas necessidades",
-    "searchPlaceholder": "Buscar por nome, especialidade ou palavras-chave...",
-    "filtersTitle": "Filtros",
-    "applyFilters": "Aplicar Filtros",
-    "clearFilters": "Limpar",
-    "showingResults": "{{count}} mentores encontrados",
-    "sortBy": "Ordenar por",
+    "title": "Trouvez un Mentor",
+    "description": "Parcourez notre communauté de mentors bénévoles et trouvez le match parfait pour vos besoins",
+    "searchPlaceholder": "Rechercher par nom, spécialité ou mots-clés...",
+    "filtersTitle": "Filtres",
+    "applyFilters": "Appliquer les Filtres",
+    "clearFilters": "Effacer",
+    "showingResults": "{{count}} mentors trouvés",
+    "sortBy": "Trier par",
     "sortOptions": {
-      "relevance": "Relevância",
-      "name": "Nome",
-      "experience": "Experiência",
-      "rating": "Avaliação"
+      "relevance": "Pertinence",
+      "name": "Nom",
+      "experience": "Expérience",
+      "rating": "Évaluation"
     },
-    "noMentorsFound": "Nenhum mentor encontrado",
-    "noMentorsDescription": "Tente ajustar os filtros ou termos de busca",
-    "clearFiltersButton": "Limpar Filtros",
-    "loadMore": "Carregar Mais",
+    "noMentorsFound": "Aucun mentor trouvé",
+    "noMentorsDescription": "Essayez d'ajuster vos filtres ou termes de recherche",
+    "clearFiltersButton": "Effacer les Filtres",
+    "loadMore": "Charger Plus",
     "filterOptions": {
-      "topics": "Tópicos",
-      "languages": "Idiomas",
-      "experience": "Experiência",
-      "inclusionTags": "Tags de Inclusão",
-      "education": "Nível de Educação",
-      "location": "Localização",
-      "city": "Cidade",
-      "country": "País",
-      "availability": "Disponibilidade",
-      "rating": "Avaliação",
-      "all": "Todas",
-      "available": "Disponível",
-      "busy": "Ocupado",
-      "aboveRating": "{{rating}}+ estrelas"
+      "topics": "Sujets",
+      "languages": "Langues",
+      "experience": "Expérience",
+      "inclusionTags": "Tags d'Inclusion",
+      "education": "Niveau d'Éducation",
+      "location": "Localisation",
+      "city": "Ville",
+      "country": "Pays",
+      "availability": "Disponibilité",
+      "rating": "Évaluation",
+      "all": "Tous",
+      "available": "Disponible",
+      "busy": "Occupé",
+      "aboveRating": "{{rating}}+ étoiles"
     },
     "mentorCard": {
-      "available": "Disponível",
-      "busy": "Ocupado",
-      "specialties": "Especialidades:",
-      "viewProfile": "Ver Perfil",
-      "scheduleSession": "Agendar"
+      "available": "Disponible",
+      "busy": "Occupé",
+      "specialties": "Spécialités :",
+      "viewProfile": "Voir le Profil",
+      "scheduleSession": "Planifier"
     },
     "loginRequired": {
-      "title": "Login Necessário",
-      "description": "Você precisa estar logado para ver perfis de mentores e agendar sessões.",
-      "descriptionWithName": "Você precisa estar logado para ver o perfil de {{mentorName}} e agendar sessões.",
+      "title": "Connexion Requise",
+      "description": "Vous devez être connecté pour voir les profils des mentors et réserver des sessions.",
+      "descriptionWithName": "Vous devez être connecté pour voir le profil de {{mentorName}} et réserver des sessions.",
       "benefits": {
-        "title": "O que você pode fazer após fazer login:",
-        "item1": "Ver perfis detalhados dos mentores",
-        "item2": "Agendar sessões gratuitas de mentoria",
-        "item3": "Enviar mensagens diretas para mentores",
-        "item4": "Acessar seu histórico de mentorias"
+        "title": "Ce que vous pouvez faire après vous être connecté :",
+        "item1": "Voir les profils détaillés des mentors",
+        "item2": "Planifier des sessions de mentorat gratuites",
+        "item3": "Envoyer des messages directs aux mentors",
+        "item4": "Accéder à votre historique de mentorat"
       },
-      "signUp": "Cadastrar",
-      "login": "Entrar"
+      "signUp": "S'inscrire",
+      "login": "Se Connecter"
     },
     "pagination": {
-      "previous": "Anterior",
-      "next": "Próximo",
-      "page": "Página {{current}} de {{total}}"
+      "previous": "Précédent",
+      "next": "Suivant",
+      "page": "Page {{current}} sur {{total}}"
     }
   },
   "footer": {
-    "description": "Simplificando a mentoria em conversas abertas. Qualquer pessoa pode compartilhar sua experiência com quem busca, sempre gratuitamente.",
-    "platform": "Plataforma",
-    "findMentors": "Encontrar Mentores",
-    "events": "Eventos & Cursos",
-    "howItWorks": "Como Funciona",
-    "store": "Loja",
-    "company": "Empresa",
-    "aboutUs": "Sobre Nós",
-    "mission": "Nossa Missão",
-    "team": "Nossa Equipe",
-    "partners": "Parceiros",
-    "contact": "Contato",
-    "subscribe": "Inscreva-se",
-    "newsletter": "Fique atualizado com nossa newsletter",
-    "privacyPolicy": "Política de Privacidade",
-    "termsOfService": "Termos de Serviço",
-    "cookiePolicy": "Política de Cookies",
-    "allRightsReserved": "Todos os direitos reservados."
+    "description": "Simplifier le mentorat par des conversations ouvertes. Chacun peut partager son expérience avec ceux qui en recherchent, toujours gratuitement.",
+    "platform": "Plateforme",
+    "findMentors": "Trouver des Mentors",
+    "events": "Événements & Cours",
+    "howItWorks": "Comment ça Fonctionne",
+    "store": "Boutique",
+    "company": "Entreprise",
+    "aboutUs": "À Propos de Nous",
+    "mission": "Notre Mission",
+    "team": "Notre Équipe",
+    "partners": "Partenaires",
+    "contact": "Contact",
+    "subscribe": "S'abonner",
+    "newsletter": "Restez au courant grâce à notre newsletter",
+    "privacyPolicy": "Politique de Confidentialité",
+    "termsOfService": "Conditions d'Utilisation",
+    "cookiePolicy": "Politique relative aux Cookies",
+    "allRightsReserved": "Tous droits réservés."
   },
   "privacy": {
-    "badge": "Privacidade",
-    "title": "Política de Privacidade",
-    "intro": "Sua privacidade é importante para nós. Esta política explica como coletamos, usamos e protegemos seus dados no Menvo.",
+    "badge": "Confidentialité",
+    "title": "Politique de Confidentialité",
+    "intro": "Votre vie privée est importante pour nous. Cette politique explique comment nous collectons, utilisons et protégeons vos données sur Menvo.",
     "dataCollection": {
-      "title": "Coleta de Dados",
-      "text": "Coletamos as informações que você fornece ao criar uma conta, como nome, e-mail, foto de perfil e detalhes profissionais. Também coletamos dados de login social (Google, LinkedIn) se você optar por se autenticar com essas plataformas."
+      "title": "Collecte de Données",
+      "text": "Nous collectons les informations que vous fournissez lors de la création d'un compte, telles que le nom, l'e-mail, la photo de profil et les détails professionnels. Nous recueillons également des données de connexion sociale (Google, LinkedIn) si vous choisissez de vous authentifier via ces plateformes."
     },
     "email": {
-      "title": "E-mails e Comunicação",
-      "text": "Usamos seu e-mail para comunicações essenciais, notificações de mentoria e atualizações. Os e-mails são enviados via Brevo, respeitando sua privacidade e preferências de exclusão."
+      "title": "E-mails et Communication",
+      "text": "Nous utilisons votre e-mail pour les communications essentielles, les notifications de mentorat et les mises à jour. Les e-mails sont envoyés via Brevo, en respectant votre vie privée et vos préférences de désinscription."
     },
     "photos": {
-      "title": "Fotos e Conteúdo Visual",
-      "text": "As fotos do perfil e as imagens enviadas são armazenadas de forma segura no Supabase e usadas apenas para identificação e personalização do perfil."
+      "title": "Photos et Contenu Visuel",
+      "text": "Les photos de profil et les images téléchargées sont stockées en toute sécurité sur Supabase et utilisées uniquement pour l'identification et la personnalisation du profil."
     },
     "storage": {
-      "title": "Armazenamento de Dados",
-      "text": "Todos os dados são armazenados de forma segura no Supabase, com acesso restrito à equipe Menvo e seguindo as melhores práticas de segurança."
+      "title": "Stockage des Données",
+      "text": "Toutes les données sont stockées en toute sécurité sur Supabase, avec un accès restreint à l'équipe Menvo et en suivant les meilleures pratiques de sécurité."
     },
     "googleCalendar": {
-      "title": "Google Calendar API",
-      "text": "Utilizamos a Google Calendar API exclusivamente para criar eventos de mentoria quando uma sessão é confirmada pelo mentor. Criamos o evento em nossa própria agenda e enviamos convites por email para mentor e mentorado. NÃO acessamos, lemos ou modificamos sua agenda pessoal do Google Calendar. Você recebe apenas um convite por email que pode aceitar ou recusar livremente. Os dados utilizados são apenas: data, hora, duração da sessão e emails dos participantes."
+      "title": "API Google Calendar",
+      "text": "Nous utilisons l'API Google Calendar exclusivement pour créer des événements de mentorat lorsqu'une session est confirmée par le mentor. Nous créons l'événement dans notre propre calendrier et envoyons des invitations par e-mail au mentor et au mentoré. Nous n'accédons PAS, ne lisons PAS et ne modifions PAS votre calendrier Google personnel. Vous ne recevez qu'une invitation par e-mail que vous pouvez accepter ou refuser librement. Les données utilisées sont uniquement : date, heure, durée de la session et e-mails des participants."
     },
     "dataSharing": {
-      "title": "Compartilhamento de Dados",
-      "text": "Não compartilhamos seus dados pessoais com terceiros para fins comerciais ou de marketing. Os dados são compartilhados apenas com os serviços essenciais para o funcionamento da plataforma: Supabase (armazenamento seguro), Brevo (envio de e-mails transacionais), Google (autenticação OAuth e criação de eventos de calendário), e LinkedIn (autenticação OAuth). Cada serviço processa dados apenas para as finalidades específicas descritas nesta política."
+      "title": "Partage des Données",
+      "text": "Nous ne partageons pas vos données personnelles avec des tiers à des fins commerciales ou de marketing. Les données sont partagées uniquement avec les services essentiels au fonctionnement de la plateforme : Supabase (stockage sécurisé), Brevo (envoi d'e-mails transactionnels), Google (authentification OAuth et création d'événements calendrier), et LinkedIn (authentification OAuth). Chaque service traite les données uniquement pour les finalités spécifiques décrites dans cette politique."
     },
     "dataUsage": {
-      "title": "Uso de Dados",
-      "text": "Seus dados são utilizados exclusivamente para: (1) Autenticação e gerenciamento de conta; (2) Facilitar conexões entre mentores e mentorados; (3) Criar eventos de mentoria no Google Calendar; (4) Enviar notificações e comunicações relacionadas às suas mentorias; (5) Melhorar a experiência e segurança da plataforma. Nunca utilizamos seus dados para treinamento de modelos de IA/ML ou para fins não relacionados à mentoria."
+      "title": "Utilisation des Données",
+      "text": "Vos données sont utilisées exclusivement pour : (1) Authentification et gestion de compte ; (2) Faciliter les connexions entre mentors et mentorés ; (3) Créer des événements de mentorat sur Google Calendar ; (4) Envoyer des notifications et communications liées à vos mentorats ; (5) Améliorer l'expérience et la sécurité de la plateforme. Nous n'utilisons jamais vos données pour la formation de modèles d'IA/ML ou à des fins non liées au mentorat."
     },
     "mentorship": {
-      "title": "Mentoria e Interações",
-      "text": "As informações sobre sessões de mentoria, avaliações e mensagens são usadas para melhorar a experiência e garantir a segurança da comunidade."
+      "title": "Mentorat et Interactions",
+      "text": "Les informations sur les sessions de mentorat, les évaluations et les messages sont utilisées pour améliorer l'expérience et garantir la sécurité de la communauté."
     },
     "thirdParty": {
-      "title": "Serviços de Terceiros",
-      "text": "Utilizamos serviços de terceiros como Google (login OAuth e Calendar API), LinkedIn (login OAuth), Supabase (armazenamento) e Brevo (e-mails). Cada serviço tem sua própria política de privacidade e processa dados apenas para as finalidades específicas descritas nesta política."
+      "title": "Services Tiers",
+      "text": "Nous utilisons des services tiers tels que Google (connexion OAuth et API Calendar), LinkedIn (connexion OAuth), Supabase (stockage) et Brevo (e-mails). Chaque service a sa propre politique de confidentialité et traite les données uniquement pour les finalités spécifiques décrites dans cette politique."
     },
     "rights": {
-      "title": "Seus Direitos",
-      "text": "Você pode solicitar acesso, correção ou exclusão de seus dados a qualquer momento. Para exercer seus direitos ou revogar permissões de acesso ao Google Calendar, entre em contato conosco em contato@menvo.com.br."
+      "title": "Vos Droits",
+      "text": "Vous pouvez demander l'accès, la correction ou la suppression de vos données à tout moment. Pour exercer vos droits ou révoquer l'accès à Google Calendar, veuillez nous contacter à contato@menvo.com.br."
     },
     "contact": {
-      "title": "Contato",
-      "text": "Dúvidas sobre privacidade? Entre em contato conosco em contato@menvo.com.br."
+      "title": "Contact",
+      "text": "Des questions sur la confidentialité ? Contactez-nous à contato@menvo.com.br."
     },
     "links": {
-      "cookies": "Política de Cookies",
-      "terms": "Termos de Serviço"
+      "cookies": "Politique relative aux Cookies",
+      "terms": "Conditions d'Utilisation"
     }
   },
   "cookies": {
     "badge": "Cookies",
-    "title": "Política de Cookies",
-    "intro": "Usamos cookies para aprimorar sua experiência, garantir recursos essenciais e analisar o uso da plataforma.",
+    "title": "Politique relative aux Cookies",
+    "intro": "Nous utilisons des cookies pour améliorer votre expérience, garantir les fonctionnalités essentielles et analyser l'utilisation de la plateforme.",
     "essential": {
-      "title": "Cookies Essenciais",
-      "text": "Necessários para a operação do site, autenticação e segurança. Não podem ser desativados."
+      "title": "Cookies Essentiels",
+      "text": "Nécessaires au fonctionnement du site, à l'authentification et à la sécurité. Ils ne peuvent pas être désactivés."
     },
     "social": {
-      "title": "Login Social",
-      "text": "Os cookies podem ser usados para autenticação via Google e LinkedIn, permitindo um login seguro."
+      "title": "Connexion Sociale",
+      "text": "Des cookies peuvent être utilisés pour l'authentification via Google et LinkedIn, permettant une connexion sécurisée."
     },
     "preferences": {
-      "title": "Preferências",
-      "text": "Armazenamos suas preferências de idioma e configurações para personalizar sua experiência."
+      "title": "Préférences",
+      "text": "Nous stockons vos préférences linguistiques et paramètres pour personnaliser votre expérience."
     },
     "analytics": {
-      "title": "Análise e Desempenho",
-      "text": "Usamos cookies e ferramentas de análise como Microsoft Clarity para entender como a plataforma é usada e melhorar nossos serviços. O Clarity nos ajuda a visualizar como os usuários interagem com o site através de gravações de sessão e mapas de calor. Para usuários da União Europeia (EEA), Reino Unido e Suíça, solicitamos seu consentimento explícito antes de ativar essas ferramentas de análise."
+      "title": "Analyse et Performance",
+      "text": "Nous utilisons des cookies et des outils d'analyse tels que Microsoft Clarity pour comprendre comment la plateforme est utilisée et améliorer nos services. Clarity nous aide à visualiser la façon dont les utilisateurs interagissent avec le site via des enregistrements de sessions et des cartes de chaleur. Pour les utilisateurs de l'Espace Économique Européen (EEE), du Royaume-Uni et de la Suisse, nous demandons votre consentement explicite avant d'activer ces outils d'analyse."
     },
     "clarity": {
       "title": "Microsoft Clarity",
-      "text": "Utilizamos o Microsoft Clarity para entender como você usa nosso site através de métricas comportamentais, mapas de calor e gravações de sessão. Os dados coletados pelo Clarity são processados de acordo com a Política de Privacidade da Microsoft. Para usuários da EEA, Reino Unido e Suíça, o Clarity só será ativado após seu consentimento explícito através do banner de cookies."
+      "text": "Nous utilisons Microsoft Clarity pour comprendre comment vous utilisez notre site grâce à des métriques comportementales, des cartes de chaleur et des enregistrements de sessions. Les données collectées par Clarity sont traitées conformément à la politique de confidentialité de Microsoft. Pour les utilisateurs de l'EEE, du Royaume-Uni et de la Suisse, Clarity ne sera activé qu'après votre consentement explicite via la bannière de cookies."
     },
     "links": {
-      "privacy": "Política de Privacidade",
-      "terms": "Termos de Serviço"
+      "privacy": "Politique de Confidentialité",
+      "terms": "Conditions d'Utilisation"
     }
   },
   "cookieConsent": {
-    "title": "Nós usamos cookies",
-    "description": "Usamos cookies essenciais para o funcionamento do site e cookies de análise para melhorar sua experiência. Você pode escolher quais cookies aceitar.",
-    "learnMore": "Saiba mais",
-    "acceptAll": "Aceitar Todos",
-    "acceptNecessary": "Apenas Necessários",
-    "customize": "Personalizar",
-    "savePreferences": "Salvar Preferências",
+    "title": "Nous utilisons des cookies",
+    "description": "Nous utilisons des cookies essentiels au fonctionnement du site et des cookies d'analyse pour améliorer votre expérience. Vous pouvez choisir les cookies à accepter.",
+    "learnMore": "En savoir plus",
+    "acceptAll": "Tout Accepter",
+    "acceptNecessary": "Seulement Nécessaires",
+    "customize": "Personnaliser",
+    "savePreferences": "Enregistrer les Préférences",
     "settings": {
-      "title": "Configurações de Cookies",
-      "description": "Escolha quais tipos de cookies você deseja aceitar. Cookies necessários não podem ser desativados.",
-      "alwaysActive": "Sempre Ativo",
+      "title": "Paramètres des Cookies",
+      "description": "Choisissez les types de cookies que vous souhaitez accepter. Les cookies nécessaires ne peuvent pas être désactivés.",
+      "alwaysActive": "Toujours Actif",
       "necessary": {
-        "title": "Cookies Necessários",
-        "description": "Essenciais para o funcionamento básico do site, incluindo autenticação, segurança e navegação."
+        "title": "Cookies Nécessaires",
+        "description": "Essentiels au fonctionnement de base du site, y compris l'authentification, la sécurité et la navigation."
       },
       "analytics": {
-        "title": "Cookies de Análise",
-        "description": "Nos ajudam a entender como você usa o site para melhorar sua experiência.",
-        "tools": "Ferramentas: Microsoft Clarity (gravações de sessão, mapas de calor)"
+        "title": "Cookies d'Analyse",
+        "description": "Nous aident à comprendre comment vous utilisez le site pour améliorer votre expérience.",
+        "tools": "Outils : Microsoft Clarity (enregistrements de sessions, cartes de chaleur)"
       },
       "functional": {
-        "title": "Cookies Funcionais",
-        "description": "Permitem funcionalidades avançadas como preferências de idioma e personalização."
+        "title": "Cookies Fonctionnels",
+        "description": "Permettent des fonctionnalités avancées telles que les préférences de langue et la personnalisation."
       }
     }
   },
   "terms": {
-    "badge": "Termos",
-    "title": "Termos de Serviço",
-    "intro": "Ao usar o Menvo, você concorda com estes termos. Por favor, leia com atenção para entender seus direitos e responsabilidades.",
+    "badge": "Conditions",
+    "title": "Conditions d'Utilisation",
+    "intro": "En utilisant Menvo, vous acceptez ces conditions. Veuillez les lire attentivement pour comprendre vos droits et responsabilités.",
     "usage": {
-      "title": "Uso da Plataforma",
-      "text": "O Menvo conecta mentores e mentorados para sessões gratuitas. O uso deve ser respeitoso e de acordo com as leis aplicáveis."
+      "title": "Utilisation de la Plateforme",
+      "text": "Menvo connecte les mentors et mentorés pour des sessions gratuites. L'utilisation doit être respectueuse et conforme aux lois applicables."
     },
     "account": {
-      "title": "Conta e Login Social",
-      "text": "Você pode criar uma conta por e-mail ou login social (Google, LinkedIn). Mantenha suas credenciais seguras e não compartilhe sua conta."
+      "title": "Compte et Connexion Sociale",
+      "text": "Vous pouvez créer un compte par e-mail ou par connexion sociale (Google, LinkedIn). Gardez vos identifiants en sécurité et ne partagez pas votre compte."
     },
     "security": {
-      "title": "Segurança",
-      "text": "Tomamos medidas para proteger seus dados, mas você também é responsável por manter sua senha segura."
+      "title": "Sécurité",
+      "text": "Nous prenons des mesures pour protéger vos données, mais vous êtes également responsable de la sécurité de votre mot de passe."
     },
     "content": {
-      "title": "Conteúdo e Fotos",
-      "text": "Você é responsável pelo conteúdo que carrega (fotos, texto). Não carregue conteúdo ofensivo ou protegido por direitos autorais sem permissão."
+      "title": "Contenu et Photos",
+      "text": "Vous êtes responsable du contenu que vous téléchargez (photos, textes). Ne téléchargez pas de contenu offensant ou protégé par des droits d'auteur sans autorisation."
     },
     "communication": {
-      "title": "Comunicação e E-mails",
-      "text": "Enviaremos comunicações importantes sobre mentorias e atualizações. Você pode optar por não receber e-mails promocionais."
+      "title": "Communication et E-mails",
+      "text": "Nous enverrons des communications importantes concernant les mentorats et les mises à jour. Vous pouvez choisir de ne pas recevoir d'e-mails promotionnels."
     },
     "storage": {
-      "title": "Armazenamento e Terceiros",
-      "text": "Os dados são armazenados no Supabase e os e-mails são enviados via Brevo. Usamos login social de terceiros."
+      "title": "Stockage et Tiers",
+      "text": "Les données sont stockées sur Supabase et les e-mails sont envoyés via Brevo. Nous utilisons la connexion sociale de tiers."
     },
     "rights": {
-      "title": "Direitos e Responsabilidades",
-      "text": "Você pode acessar, corrigir ou excluir seus dados. O uso indevido da plataforma pode resultar na suspensão da conta."
+      "title": "Droits et Responsabilités",
+      "text": "Vous pouvez accéder, corriger ou supprimer vos données. Toute mauvaise utilisation de la plateforme peut entraîner la suspension du compte."
     },
     "contact": {
-      "title": "Contato",
-      "text": "Dúvidas? Entre em contato conosco em contato@menvo.com."
+      "title": "Contact",
+      "text": "Des questions ? Contactez-nous à contato@menvo.com."
     },
     "links": {
-      "privacy": "Política de Privacidade",
-      "cookies": "Política de Cookies"
+      "privacy": "Politique de Confidentialité",
+      "cookies": "Politique relative aux Cookies"
     }
   },
   "waitingList": {
-    "title": "Junte-se à Lista de Espera",
-    "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",
-    "nameLabel": "Nome",
-    "namePlaceholder": "Digite seu nome completo",
-    "emailPlaceholder": "seu@email.com",
-    "whatsappLabel": "WhatsApp (opcional)",
-    "whatsappPlaceholder": "Seu número de WhatsApp",
-    "reasonLabel": "Por que você quer fazer parte?",
-    "reasonPlaceholder": "Conte-nos por que você quer participar",
-    "successMessage": "Obrigado pelo seu interesse!",
-    "errorMessage": "Erro ao enviar o formulário"
+    "title": "Rejoindre la Liste d'Attente",
+    "description": "Merci pour votre intérêt ! Veuillez remplir le formulaire ci-dessous.",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Saisissez votre nom complet",
+    "emailPlaceholder": "votre@email.com",
+    "whatsappLabel": "WhatsApp (optionnel)",
+    "whatsappPlaceholder": "Votre numéro WhatsApp",
+    "reasonLabel": "Pourquoi voulez-vous nous rejoindre ?",
+    "reasonPlaceholder": "Dites-nous pourquoi vous souhaitez participer",
+    "successMessage": "Merci pour votre intérêt !",
+    "errorMessage": "Erreur lors de l'envoi du formulaire"
   },
   "feedback": {
-    "title": "Feedback",
-    "description": "Sua opinião é muito importante para nós. Como podemos melhorar?",
-    "helpUsImprove": "Ajude-nos a melhorar",
-    "ratingRequired": "Por favor, selecione uma avaliação",
-    "commentPlaceholder": "Conte-nos sobre sua experiência... (opcional)",
-    "emailPlaceholder": "Seu e-mail (para feedback anônimo)",
-    "submit": "Enviar Feedback",
-    "thankYou": "Obrigado pelo seu feedback!",
-    "error": "Erro ao enviar feedback. Tente novamente.",
-    "rateStars": "Avaliar com {{count}} estrelas"
+    "title": "Retour d'Expérience",
+    "description": "Votre opinion est très importante pour nous. Comment pouvons-nous nous améliorer ?",
+    "helpUsImprove": "Aidez-nous à nous améliorer",
+    "ratingRequired": "Veuillez sélectionner une évaluation",
+    "commentPlaceholder": "Parlez-nous de votre expérience... (optionnel)",
+    "emailPlaceholder": "Votre e-mail (pour un retour anonyme)",
+    "submit": "Envoyer le Retour",
+    "thankYou": "Merci pour votre retour !",
+    "error": "Erreur lors de l'envoi de vos commentaires. Veuillez réessayer.",
+    "rateStars": "Évaluer à {{count}} étoiles"
   },
   "mentorSuggestion": {
-    "loginRequiredTitle": "Login Necessário",
-    "loginRequiredDescription": "Você precisa estar logado para sugerir um tema ou área de mentoria.",
-    "title": "Sugerir Tema ou Área",
-    "description": "Não encontrou o que procurava? Sugira novos temas ou áreas de conhecimento que você gostaria de encontrar na plataforma.",
-    "observationLabel": "O que você está procurando?",
-    "observationPlaceholder": "Ex: Gostaria de encontrar mentores especializados em Design de Produto, especialmente com experiência em UX Research e acessibilidade digital. Também seria interessante ter mentores que trabalhem com Design Systems...",
-    "freeTopicsLabel": "Temas ou Áreas (Opcional)",
-    "freeTopicsDescription": "Adicione palavras-chave relacionadas à sua sugestão",
-    "freeTopicsPlaceholder": "Ex: Design Thinking, Prototipagem Rápida...",
-    "addTopic": "Adicionar",
-    "inclusionTagsLabel": "Tags de Inclusão (Opcional)",
-    "inclusionTagsDescription": "Selecione tags de diversidade e inclusão relevantes"
+    "loginRequiredTitle": "Connexion Requise",
+    "loginRequiredDescription": "Vous devez être connecté pour suggérer un sujet ou un domaine de mentorat.",
+    "title": "Suggérer un Sujet ou un Domaine",
+    "description": "Vous n'avez pas trouvé ce que vous cherchiez ? Suggérez de nouveaux sujets ou domaines d'expertise que vous aimeriez voir sur la plateforme.",
+    "observationLabel": "Que recherchez-vous ?",
+    "observationPlaceholder": "Ex : J'aimerais trouver des mentors spécialisés en Design de Produits, particulièrement avec une expérience en recherche UX et accessibilité numérique. Il serait également intéressant d'avoir des mentors travaillant avec des Design Systems...",
+    "freeTopicsLabel": "Sujets ou Domaines (Optionnel)",
+    "freeTopicsDescription": "Ajoutez des mots-clés liés à votre suggestion",
+    "freeTopicsPlaceholder": "Ex : Design Thinking, Prototypage Rapide...",
+    "addTopic": "Ajouter",
+    "inclusionTagsLabel": "Tags d'Inclusion (Optionnel)",
+    "inclusionTagsDescription": "Sélectionnez les balises de diversité et d'inclusion pertinentes"
   },
   "toast": {
     "suggestion": {
       "success": {
-        "title": "Sugestão enviada!",
-        "description": "Obrigado por sua sugestão. Nossa equipe irá analisar e avisaremos sobre novidades."
+        "title": "Suggestion envoyée !",
+        "description": "Merci pour votre suggestion. Notre équipe va l'examiner et nous vous tiendrons informés des nouveautés."
       },
       "error": {
-        "title": "Erro ao enviar sugestão",
-        "description": "Não foi possível enviar sua sugestão. Por favor, tente novamente mais tarde."
+        "title": "Erreur lors de l'envoi de la suggestion",
+        "description": "Impossible d'envoyer votre suggestion. Veuillez réessayer plus tard."
       }
     }
   },
   "metadata": {
-    "title": "MENVO - Mentoria Voluntária",
-    "description": "Conectando mentores e mentees para sessões de mentoria gratuitas",
+    "title": "MENVO - Mentorat Bénévole",
+    "description": "Connecter mentors et mentorés pour des sessions de mentorat gratuites",
     "keywords": [
-      "mentoria",
-      "voluntariado",
-      "carreira"
+      "mentorat",
+      "bénévolat",
+      "carrière"
     ],
     "og": {
-      "title": "MENVO - Mentoria Voluntária",
-      "description": "Conectando mentores e mentees para sessões de mentoria gratuitas",
+      "title": "MENVO - Mentorat Bénévole",
+      "description": "Connecter mentors et mentorés pour des sessions de mentorat gratuites",
       "siteName": "MENVO"
     },
     "twitter": {
-      "title": "MENVO - Mentoria Voluntária",
-      "description": "Conectando mentores e mentees para sessões de mentoria gratuitas"
+      "title": "MENVO - Mentorat Bénévole",
+      "description": "Connecter mentors et mentorés pour des sessions de mentorat gratuites"
     }
   }
 }
