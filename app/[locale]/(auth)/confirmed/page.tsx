@@ -6,21 +6,22 @@ import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, Loader2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 export default function EmailConfirmedPage() {
+  const t = useTranslations("auth.confirmed")
+  const tCommon = useTranslations("common")
   const router = useRouter()
   const { user, profile, loading } = useAuth()
   const [countdown, setCountdown] = useState(5)
 
   useEffect(() => {
     if (!loading && !user) {
-      // Se não está logado, redireciona para login
       router.push("/login")
       return
     }
 
     if (!loading && user && profile) {
-      // Inicia countdown para redirecionamento automático
       const timer = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -39,9 +40,8 @@ export default function EmailConfirmedPage() {
   const handleRedirect = () => {
     if (!profile) return
 
-    // Lógica de redirecionamento baseada no perfil
     if (!profile.role || profile.role === "pending") {
-      router.push("/onboarding/role-selection")
+      router.push("/select-role")
     } else if (profile.status === "pending") {
       router.push("/profile?complete=true")
     } else {
@@ -50,14 +50,14 @@ export default function EmailConfirmedPage() {
   }
 
   const getRedirectMessage = () => {
-    if (!profile) return "Carregando..."
+    if (!profile) return tCommon("loading")
 
     if (!profile.role || profile.role === "pending") {
-      return "Você será redirecionado para selecionar seu tipo de conta"
+      return t("messages.role")
     } else if (profile.status === "pending") {
-      return "Você será redirecionado para completar seu perfil"
+      return t("messages.profile")
     } else {
-      return "Você será redirecionado para o dashboard"
+      return t("messages.dashboard")
     }
   }
 
@@ -67,7 +67,7 @@ export default function EmailConfirmedPage() {
         <Card className="w-full max-w-md">
           <CardContent className="flex items-center justify-center p-6">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">Carregando...</span>
+            <span className="ml-2">{tCommon("loading")}</span>
           </CardContent>
         </Card>
       </div>
@@ -75,28 +75,28 @@ export default function EmailConfirmedPage() {
   }
 
   if (!user) {
-    return null // Será redirecionado para login
+    return null
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4 text-foreground">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
           <CardTitle className="text-2xl font-bold text-green-800">
-            Email Confirmado!
+            {t("title")}
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Sua conta foi ativada com sucesso. Bem-vindo ao Menvo!
+            {t("description")}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-2">
-              Olá, <strong>{profile?.first_name || user.email}</strong>!
+              {tCommon("welcome")}, <strong>{profile?.first_name || user.email}</strong>!
             </p>
             <p className="text-sm text-gray-500">
               {getRedirectMessage()}
@@ -106,7 +106,7 @@ export default function EmailConfirmedPage() {
           {countdown > 0 && (
             <div className="text-center">
               <p className="text-sm text-gray-400">
-                Redirecionando automaticamente em {countdown} segundos...
+                {t("redirecting", { count: countdown })}
               </p>
             </div>
           )}
@@ -116,7 +116,7 @@ export default function EmailConfirmedPage() {
               onClick={handleRedirect}
               className="w-full"
             >
-              Continuar Agora
+              {t("continueNow")}
             </Button>
 
             <Button
@@ -124,13 +124,13 @@ export default function EmailConfirmedPage() {
               onClick={() => router.push("/")}
               className="w-full"
             >
-              Voltar ao Início
+              {tCommon("goToHome" ? tCommon("home") : "Home")}
             </Button>
           </div>
 
           <div className="text-center">
             <p className="text-xs text-gray-400">
-              Precisa de ajuda? Entre em contato conosco.
+              {t("help")}
             </p>
           </div>
         </CardContent>

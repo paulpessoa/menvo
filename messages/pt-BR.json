@@ -919,5 +919,100 @@
       "step5Mentor": "Receber primeiro agendamento",
       "step5Mentee": "Agende sua primeira sessão"
     }
+  },
+  "onboarding": {
+    "title": "Escolha seu perfil",
+    "description": "Selecione como você gostaria de participar da nossa plataforma. Você poderá alterar isso depois nas configurações.",
+    "configuringFor": "Configurando perfil para:",
+    "mentee": {
+      "title": "Mentorado",
+      "description": "Busco orientação e acompanhamento para crescer profissionalmente",
+      "benefits": [
+        "Acesso a mentores experientes",
+        "Sessões de mentoria personalizadas",
+        "Networking profissional",
+        "Desenvolvimento de carreira"
+      ],
+      "success": "Perfil Mentorado selecionado com sucesso!"
+    },
+    "mentor": {
+      "title": "Mentor",
+      "description": "Quero compartilhar conhecimento e ajudar outros profissionais",
+      "benefits": [
+        "Compartilhar experiência",
+        "Impactar carreiras",
+        "Expandir rede de contatos",
+        "Desenvolver habilidades de liderança"
+      ],
+      "success": "Perfil Mentor selecionado com sucesso!"
+    },
+    "saving": "Salvando seu perfil...",
+    "confirm": "Confirmar Seleção",
+    "error": {
+      "notAuthenticated": "Usuário não autenticado",
+      "sessionExpired": "Sessão expirada. Faça login novamente.",
+      "saveError": "Erro ao salvar perfil. Verifique sua conexão.",
+      "selectRequired": "Por favor, selecione um perfil"
+    }
+  },
+  "auth": {
+    "confirmed": {
+      "title": "Email Confirmado!",
+      "description": "Sua conta foi ativada com sucesso. Bem-vindo ao Menvo!",
+      "redirecting": "Redirecionando automaticamente em {count} segundos...",
+      "continueNow": "Continuar Agora",
+      "help": "Precisa de ajuda? Entre em contato conosco.",
+      "messages": {
+        "role": "Você será redirecionado para selecionar seu tipo de conta",
+        "profile": "Você será redirecionado para completar seu perfil",
+        "dashboard": "Você será redirecionado para o dashboard"
+      }
+    },
+    "forgotPassword": {
+      "title": "Esqueceu a senha?",
+      "description": "Insira seu e-mail e enviaremos um link para redefinir sua senha.",
+      "sendLink": "Enviar Link de Recuperação",
+      "backToLogin": "Voltar para o Login",
+      "success": "Link enviado! Verifique seu e-mail."
+    },
+    "resend": {
+      "title": "Reenviar Confirmação",
+      "description": "Digite seu email para receber um novo link de confirmação",
+      "successTitle": "Email Reenviado!",
+      "successDescription": "Verifique sua caixa de entrada e spam.",
+      "sentTo": "Enviamos um novo email de confirmação para",
+      "otherEmail": "Enviar para Outro Email",
+      "button": "Reenviar Email",
+      "error": "Erro ao reenviar email. Verifique se o email está correto."
+    },
+    "setPassword": {
+      "title": "Defina sua senha",
+      "description": "Você foi convidado para a plataforma. Defina sua senha para continuar.",
+      "successTitle": "Senha definida!",
+      "successDescription": "Sua conta foi configurada com sucesso",
+      "redirecting": "Redirecionando para seleção de papel...",
+      "invalidInvite": "Convite Inválido",
+      "invalidInviteDesc": "O link de convite expirou ou é inválido",
+      "checkingSession": "Verificando convite...",
+      "button": "Definir senha e continuar",
+      "agreement": "Ao definir sua senha, você concorda com nossos"
+    }
+  },
+  "newsletter": {
+    "unsubscribe": {
+      "title": "Cancelar inscrição da newsletter",
+      "description": "Lamentamos que você queira sair. Digite seu email para cancelar a inscrição.",
+      "successTitle": "Inscrição cancelada com sucesso",
+      "successDescription": "Você foi removido da nossa lista de newsletter. Sentiremos sua falta!",
+      "rejoinText": "Se mudou de ideia, você pode se inscrever novamente a qualquer momento através do nosso site.",
+      "rejoinButton": "Inscrever novamente",
+      "considerTitle": "Antes de cancelar, considere:",
+      "considerItem1": "Você receberá apenas conteúdo relevante sobre mentoria",
+      "considerItem2": "Enviamos no máximo 2 emails por semana",
+      "considerItem3": "Você pode se reinscrever a qualquer momento",
+      "button": "Cancelar inscrição",
+      "cancelling": "Cancelando...",
+      "backToSite": "Voltar ao site"
+    }
   }
 }

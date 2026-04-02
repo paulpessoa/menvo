@@ -10,8 +10,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Lock, Loader2, CheckCircle, AlertTriangle, UserPlus } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 export default function SetPasswordPage() {
+    const t = useTranslations("auth.setPassword")
+    const tRegister = useTranslations("register")
+    const tCommon = useTranslations("common")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
@@ -29,15 +33,14 @@ export default function SetPasswordPage() {
             try {
                 const { data: { session } } = await supabase.auth.getSession()
 
-                // Check if user has a valid session from invite
                 if (session?.user) {
                     setIsValidSession(true)
                     setUserEmail(session.user.email || "")
                 } else {
-                    setError("Sessão inválida. Solicite um novo convite do administrador.")
+                    setError(t("invalidInvite"))
                 }
             } catch (error) {
-                setError("Erro ao verificar sessão. Tente novamente.")
+                setError(tCommon("error"))
             } finally {
                 setCheckingSession(false)
             }
@@ -51,15 +54,14 @@ export default function SetPasswordPage() {
         setIsLoading(true)
         setError("")
 
-        // Validation
         if (password !== confirmPassword) {
-            setError("As senhas não coincidem")
+            setError(tRegister("passwordValidation.passwordsDontMatch"))
             setIsLoading(false)
             return
         }
 
         if (password.length < 6) {
-            setError("A senha deve ter pelo menos 6 caracteres")
+            setError(tRegister("passwordValidation.passwordTooShort"))
             setIsLoading(false)
             return
         }
@@ -70,16 +72,15 @@ export default function SetPasswordPage() {
             })
 
             if (error) {
-                setError(error.message || "Erro ao definir senha. Tente novamente.")
+                setError(error.message || tCommon("error"))
             } else {
                 setSuccess(true)
-                // Redirect to role selection after 3 seconds
                 setTimeout(() => {
-                    router.push("/auth/select-role")
+                    router.push("/select-role")
                 }, 3000)
             }
         } catch (error) {
-            setError("Erro inesperado. Tente novamente.")
+            setError(tCommon("error"))
         } finally {
             setIsLoading(false)
         }
@@ -87,10 +88,10 @@ export default function SetPasswordPage() {
 
     if (checkingSession) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 text-foreground">
                 <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                    <p className="text-gray-600">Verificando convite...</p>
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+                    <p className="text-gray-600">{t("checkingSession")}</p>
                 </div>
             </div>
         )
@@ -98,15 +99,15 @@ export default function SetPasswordPage() {
 
     if (!isValidSession) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-foreground">
                 <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
                         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
                             <AlertTriangle className="h-6 w-6 text-red-600" />
                         </div>
-                        <CardTitle>Convite Inválido</CardTitle>
+                        <CardTitle>{t("invalidInvite")}</CardTitle>
                         <CardDescription>
-                            O link de convite expirou ou é inválido
+                            {t("invalidInviteDesc")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -118,12 +119,12 @@ export default function SetPasswordPage() {
                     <CardFooter className="flex flex-col gap-2">
                         <Button asChild className="w-full">
                             <Link href="/signup">
-                                Criar conta
+                                {tRegister("signupTitle")}
                             </Link>
                         </Button>
                         <Button asChild variant="outline" className="w-full">
                             <Link href="/login">
-                                Fazer Login
+                                {tCommon("login")}
                             </Link>
                         </Button>
                     </CardFooter>
@@ -134,31 +135,31 @@ export default function SetPasswordPage() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-foreground">
                 <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
                         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
                             <CheckCircle className="h-6 w-6 text-green-600" />
                         </div>
-                        <CardTitle>Senha definida!</CardTitle>
+                        <CardTitle>{t("successTitle")}</CardTitle>
                         <CardDescription>
-                            Sua conta foi configurada com sucesso
+                            {t("successDescription")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="text-center">
                             <p className="text-sm text-muted-foreground mb-4">
-                                Agora você precisa selecionar seu papel na plataforma.
+                                {t("redirecting")}
                             </p>
                             <div className="animate-pulse text-sm text-blue-600">
-                                Redirecionando para seleção de papel...
+                                {t("redirecting")}
                             </div>
                         </div>
                     </CardContent>
                     <CardFooter>
                         <Button asChild className="w-full">
-                            <Link href="/auth/select-role">
-                                Selecionar papel agora
+                            <Link href="/select-role">
+                                {tCommon("continue")}
                             </Link>
                         </Button>
                     </CardFooter>
@@ -168,22 +169,22 @@ export default function SetPasswordPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-foreground">
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
                         <UserPlus className="h-6 w-6 text-blue-600" />
                     </div>
-                    <CardTitle className="text-2xl font-bold text-center">Bem-vindo!</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-center">{tCommon("welcome")}!</CardTitle>
                     <CardDescription className="text-center">
-                        Você foi convidado para a plataforma. Defina sua senha para continuar.
+                        {t("description")}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     {userEmail && (
                         <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
                             <p className="text-sm text-blue-800">
-                                <strong>Email:</strong> {userEmail}
+                                <strong>{tCommon("email")}:</strong> {userEmail}
                             </p>
                         </div>
                     )}
@@ -197,13 +198,13 @@ export default function SetPasswordPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label htmlFor="password">Senha</Label>
+                            <Label htmlFor="password">{tRegister("password")}</Label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input
                                     id="password"
                                     type="password"
-                                    placeholder="Mínimo 6 caracteres"
+                                    placeholder={tRegister("passwordPlaceholder")}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="pl-10"
@@ -213,13 +214,13 @@ export default function SetPasswordPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirmar senha</Label>
+                            <Label htmlFor="confirmPassword">{tRegister("confirmPassword")}</Label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input
                                     id="confirmPassword"
                                     type="password"
-                                    placeholder="Digite a senha novamente"
+                                    placeholder={tRegister("confirmPasswordPlaceholder")}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     className="pl-10"
@@ -232,10 +233,10 @@ export default function SetPasswordPage() {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Definindo senha...
+                                    {tCommon("saving" ? "..." : "")}
                                 </>
                             ) : (
-                                "Definir senha e continuar"
+                                t("button")
                             )}
                         </Button>
                     </form>
@@ -243,13 +244,13 @@ export default function SetPasswordPage() {
                 <CardFooter>
                     <div className="w-full text-center">
                         <p className="text-xs text-muted-foreground">
-                            Ao definir sua senha, você concorda com nossos{" "}
+                            {t("agreement")}{" "}
                             <Link href="/terms" className="text-blue-600 hover:underline">
-                                Termos de Uso
+                                {tCommon("terms" ? tCommon("terms") : "Terms")}
                             </Link>{" "}
-                            e{" "}
+                            {tCommon("and" ? tCommon("and") : "and")}{" "}
                             <Link href="/privacy" className="text-blue-600 hover:underline">
-                                Política de Privacidade
+                                {tCommon("privacy" ? tCommon("privacy") : "Privacy")}
                             </Link>
                         </p>
                     </div>

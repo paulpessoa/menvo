@@ -8,156 +8,129 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, Mail, Loader2, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Mail, Loader2, AlertTriangle, CheckCircle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
 function ForgotPasswordForm() {
-  const t = useTranslations()
+  const t = useTranslations("auth.forgotPassword")
+  const tLogin = useTranslations("login")
   const auth = useAuth()
-
-  const resetPassword = async (email: string) => {
-    const supabase = createClient()
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
-    })
-    if (error) throw error
-  }
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const [error, setError] = useState("")
+  const [isSubmitted, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const supabase = createClient()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
     setIsLoading(true)
+    setError(null)
 
     try {
-      await resetPassword(email)
-      setIsSuccess(true)
-      toast.success("Email de recuperação enviado!")
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+
+      if (error) throw error
+
+      setIsSubmitting(true)
+      toast.success(t("success"))
     } catch (err: any) {
-      setError(err?.message || "Erro ao enviar email de recuperação")
-      toast.error(err?.message || "Erro ao enviar email de recuperação")
+      console.error("Error resetting password:", err)
+      const message = auth.handleAuthError(err)
+      setError(message)
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (isSuccess) {
+  if (isSubmitted) {
     return (
-      <div className="container flex py-16 max-w-screen-xl flex-col items-center justify-center">
-        <Card className="mx-auto max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <Mail className="h-6 w-6 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl font-bold">Email enviado!</CardTitle>
-            <CardDescription>
-              Enviamos um link de recuperação para <span className="font-semibold">{email}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-800">
-                <strong>Próximos passos:</strong>
-              </p>
-              <ol className="mt-2 list-decimal list-inside text-sm text-blue-700 space-y-1">
-                <li>Verifique sua caixa de entrada</li>
-                <li>Clique no link de recuperação</li>
-                <li>Crie uma nova senha</li>
-              </ol>
-            </div>
-            <p className="text-center text-sm text-muted-foreground">
-              Não recebeu o email? Verifique sua pasta de spam ou tente novamente.
-            </p>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <Button
-              variant="outline"
-              className="w-full bg-transparent"
-              onClick={() => {
-                setIsSuccess(false)
-                setEmail("")
-              }}
-            >
-              Tentar outro email
-            </Button>
-            <Link href="/login" className="w-full">
-              <Button variant="ghost" className="w-full">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar ao login
-              </Button>
+      <Card className="w-full max-w-md border-green-100 bg-green-50/30">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle className="h-6 w-6 text-green-600" />
+          </div>
+          <CardTitle className="text-green-800">{t("success")}</CardTitle>
+          <CardDescription>
+            {t("description")}
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button asChild variant="outline" className="w-full">
+            <Link href="/login">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("backToLogin")}
             </Link>
-          </CardFooter>
-        </Card>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
     )
   }
 
   return (
-    <div className="container flex py-16 max-w-screen-xl flex-col items-center justify-center">
-      <Card className="mx-auto max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Esqueci minha senha</CardTitle>
-          <CardDescription>Digite seu e-mail para receber um link de recuperação</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+    <Card className="w-full max-w-md">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">{t("title")}</CardTitle>
+        <CardDescription className="text-center">
+          {t("description")}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4" />
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="email">{tLogin("email")}</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 id="email"
                 type="email"
-                placeholder="Digite seu e-mail"
+                placeholder={tLogin("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="pl-10"
                 required
               />
             </div>
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-600" />
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
+          </div>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {tLogin("loggingIn" ? "..." : "")}
+              </>
+            ) : (
+              t("sendLink")
             )}
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                  Enviando...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Enviar link de recuperação
-                </span>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter>
-          <Link href="/login" className="w-full">
-            <Button variant="ghost" className="w-full">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Voltar ao login
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-    </div>
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter>
+        <Link href="/login" className="text-sm text-primary hover:underline mx-auto flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          {t("backToLogin")}
+        </Link>
+      </CardFooter>
+    </Card>
   )
 }
 
 export default function ForgotPasswordPage() {
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
-      <ForgotPasswordForm />
-    </Suspense>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin text-primary" />}>
+        <ForgotPasswordForm />
+      </Suspense>
+    </div>
   )
 }

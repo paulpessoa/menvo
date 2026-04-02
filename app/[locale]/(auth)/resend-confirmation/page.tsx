@@ -6,10 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react"
+import { Mail, ArrowLeft, CheckCircle, Loader2 } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
 export default function ResendConfirmationPage() {
+  const t = useTranslations("auth.resend")
+  const tCommon = useTranslations("common")
+  const tLogin = useTranslations("login")
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
@@ -20,7 +24,7 @@ export default function ResendConfirmationPage() {
     e.preventDefault()
     
     if (!email) {
-      setError("Por favor, digite seu email")
+      setError(tCommon("email" ? "error" : "")) // Fallback
       return
     }
 
@@ -40,13 +44,13 @@ export default function ResendConfirmationPage() {
 
       if (error) {
         console.error("Error resending confirmation:", error)
-        setError("Erro ao reenviar email. Verifique se o email está correto.")
+        setError(t("error"))
       } else {
         setSent(true)
       }
     } catch (error) {
       console.error("Unexpected error:", error)
-      setError("Erro inesperado. Tente novamente.")
+      setError(t("error"))
     } finally {
       setLoading(false)
     }
@@ -61,17 +65,17 @@ export default function ResendConfirmationPage() {
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
             <CardTitle className="text-2xl font-bold text-green-800">
-              Email Reenviado!
+              {t("successTitle")}
             </CardTitle>
             <CardDescription className="text-gray-600">
-              Verifique sua caixa de entrada e spam.
+              {t("successDescription")}
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-4">
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-4">
-                Enviamos um novo email de confirmação para <strong>{email}</strong>
+                {t("sentTo")} <strong>{email}</strong>
               </p>
             </div>
 
@@ -80,7 +84,7 @@ export default function ResendConfirmationPage() {
                 onClick={() => router.push("/login")}
                 className="w-full"
               >
-                Ir para Login
+                {tLogin("loginButton")}
               </Button>
               
               <Button 
@@ -88,7 +92,7 @@ export default function ResendConfirmationPage() {
                 onClick={() => setSent(false)}
                 className="w-full"
               >
-                Enviar para Outro Email
+                {t("otherEmail")}
               </Button>
             </div>
           </CardContent>
@@ -99,27 +103,27 @@ export default function ResendConfirmationPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md text-foreground">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
             <Mail className="h-8 w-8 text-blue-600" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            Reenviar Confirmação
+            {t("title")}
           </CardTitle>
           <CardDescription className="text-gray-600">
-            Digite seu email para receber um novo link de confirmação
+            {t("description")}
           </CardDescription>
         </CardHeader>
         
         <CardContent>
           <form onSubmit={handleResend} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{tCommon("email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
+                placeholder={tLogin("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -137,7 +141,14 @@ export default function ResendConfirmationPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Enviando..." : "Reenviar Email"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {tLogin("loggingIn" ? "..." : "")}
+                </>
+              ) : (
+                t("button")
+              )}
             </Button>
 
             <Button 
@@ -147,7 +158,7 @@ export default function ResendConfirmationPage() {
               className="w-full"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
+              {tCommon("back")}
             </Button>
           </form>
         </CardContent>

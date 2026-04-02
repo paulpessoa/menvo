@@ -944,5 +944,100 @@
       "step5Mentor": "Receive first booking",
       "step5Mentee": "Schedule your first session"
     }
+  },
+  "onboarding": {
+    "title": "Choose your profile",
+    "description": "Select how you would like to participate in our platform. You can change this later in settings.",
+    "configuringFor": "Configuring profile for:",
+    "mentee": {
+      "title": "Mentee",
+      "description": "I seek guidance and support to grow professionally",
+      "benefits": [
+        "Access to experienced mentors",
+        "Personalized mentorship sessions",
+        "Professional networking",
+        "Career development"
+      ],
+      "success": "Mentee profile successfully selected!"
+    },
+    "mentor": {
+      "title": "Mentor",
+      "description": "I want to share knowledge and help other professionals",
+      "benefits": [
+        "Share experience",
+        "Impact careers",
+        "Expand networking",
+        "Develop leadership skills"
+      ],
+      "success": "Mentor profile successfully selected!"
+    },
+    "saving": "Saving your profile...",
+    "confirm": "Confirm Selection",
+    "error": {
+      "notAuthenticated": "User not authenticated",
+      "sessionExpired": "Session expired. Please log in again.",
+      "saveError": "Error saving profile. Check your connection.",
+      "selectRequired": "Please select a profile"
+    }
+  },
+  "auth": {
+    "confirmed": {
+      "title": "Email Confirmed!",
+      "description": "Your account has been successfully activated. Welcome to Menvo!",
+      "redirecting": "Automatically redirecting in {count} seconds...",
+      "continueNow": "Continue Now",
+      "help": "Need help? Contact us.",
+      "messages": {
+        "role": "You will be redirected to select your account type",
+        "profile": "You will be redirected to complete your profile",
+        "dashboard": "You will be redirected to the dashboard"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "description": "Enter your email and we'll send you a link to reset your password.",
+      "sendLink": "Send Recovery Link",
+      "backToLogin": "Back to Login",
+      "success": "Link sent! Check your email."
+    },
+    "resend": {
+      "title": "Resend Confirmation",
+      "description": "Enter your email to receive a new confirmation link",
+      "successTitle": "Email Resent!",
+      "successDescription": "Check your inbox and spam folder.",
+      "sentTo": "We've sent a new confirmation email to",
+      "otherEmail": "Send to Another Email",
+      "button": "Resend Email",
+      "error": "Error resending email. Please check if the email is correct."
+    },
+    "setPassword": {
+      "title": "Set your password",
+      "description": "You have been invited to the platform. Set your password to continue.",
+      "successTitle": "Password set!",
+      "successDescription": "Your account has been successfully configured",
+      "redirecting": "Redirecting to role selection...",
+      "invalidInvite": "Invalid Invite",
+      "invalidInviteDesc": "The invite link has expired or is invalid",
+      "checkingSession": "Verifying invite...",
+      "button": "Set password and continue",
+      "agreement": "By setting your password, you agree to our"
+    }
+  },
+  "newsletter": {
+    "unsubscribe": {
+      "title": "Unsubscribe from newsletter",
+      "description": "We're sorry to see you go. Enter your email to unsubscribe.",
+      "successTitle": "Successfully unsubscribed",
+      "successDescription": "You have been removed from our newsletter list. We'll miss you!",
+      "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
+      "rejoinButton": "Subscribe again",
+      "considerTitle": "Before you cancel, consider:",
+      "considerItem1": "You will only receive relevant content about mentorship",
+      "considerItem2": "We send a maximum of 2 emails per week",
+      "considerItem3": "You can re-subscribe at any time",
+      "button": "Unsubscribe",
+      "cancelling": "Unsubscribing...",
+      "backToSite": "Back to site"
+    }
   }
 }

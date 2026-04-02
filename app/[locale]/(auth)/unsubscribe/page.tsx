@@ -7,8 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Mail, CheckCircle, AlertCircle } from "lucide-react"
 import { useNewsletterUnsubscribe } from "@/hooks/useNewsletter"
+import { useTranslations } from "next-intl"
+import Link from "next/link"
 
 export default function UnsubscribePage() {
+  const t = useTranslations("newsletter.unsubscribe")
+  const tCommon = useTranslations("common")
   const [email, setEmail] = useState("")
   const [isSuccess, setIsSuccess] = useState(false)
   
@@ -33,22 +37,22 @@ export default function UnsubscribePage() {
             <div className="flex justify-center mb-4">
               <CheckCircle className="h-12 w-12 text-green-500" />
             </div>
-            <CardTitle>Inscrição cancelada com sucesso</CardTitle>
+            <CardTitle>{t("successTitle")}</CardTitle>
             <CardDescription>
-              Você foi removido da nossa lista de newsletter. Sentiremos sua falta! 😢
+              {t("successDescription")} 😢
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Se mudou de ideia, você pode se inscrever novamente a qualquer momento através do nosso site.
+              {t("rejoinText")}
             </p>
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
                 className="flex-1"
-                onClick={() => window.location.href = '/'}
+                asChild
               >
-                Voltar ao site
+                <Link href="/">{t("backToSite")}</Link>
               </Button>
               <Button 
                 className="flex-1"
@@ -57,7 +61,7 @@ export default function UnsubscribePage() {
                   setEmail("")
                 }}
               >
-                Inscrever novamente
+                {t("rejoinButton")}
               </Button>
             </div>
           </CardContent>
@@ -67,21 +71,21 @@ export default function UnsubscribePage() {
   }
 
   return (
-    <div className="container max-w-md py-16">
+    <div className="container max-w-md py-16 text-foreground">
       <Card>
         <CardHeader>
           <div className="flex justify-center mb-4">
             <Mail className="h-12 w-12 text-primary" />
           </div>
-          <CardTitle>Cancelar inscrição da newsletter</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
           <CardDescription>
-            Lamentamos que você queira sair. Digite seu email para cancelar a inscrição.
+            {t("description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUnsubscribe} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{tCommon("email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -96,11 +100,11 @@ export default function UnsubscribePage() {
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-amber-800">
-                  <p className="font-medium">Antes de cancelar, considere:</p>
-                  <ul className="mt-1 space-y-1 text-xs">
-                    <li>• Você receberá apenas conteúdo relevante sobre mentoria</li>
-                    <li>• Enviamos no máximo 2 emails por semana</li>
-                    <li>• Você pode se reinscrever a qualquer momento</li>
+                  <p className="font-medium">{t("considerTitle")}</p>
+                  <ul className="mt-1 space-y-1 text-xs text-left list-disc list-inside">
+                    <li>{t("considerItem1")}</li>
+                    <li>{t("considerItem2")}</li>
+                    <li>{t("considerItem3")}</li>
                   </ul>
                 </div>
               </div>
@@ -112,16 +116,16 @@ export default function UnsubscribePage() {
               className="w-full"
               disabled={!email.includes('@') || unsubscribeMutation.isPending}
             >
-              {unsubscribeMutation.isPending ? 'Cancelando...' : 'Cancelar inscrição'}
+              {unsubscribeMutation.isPending ? t("cancelling") : t("button")}
             </Button>
             
             <Button 
               type="button" 
               variant="outline"
               className="w-full"
-              onClick={() => window.location.href = '/'}
+              asChild
             >
-              Voltar ao site
+              <Link href="/">{t("backToSite")}</Link>
             </Button>
           </form>
         </CardContent>

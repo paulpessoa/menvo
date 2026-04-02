@@ -7,93 +7,67 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, GraduationCap, CheckCircle, ArrowRight, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/lib/auth"
+import { useTranslations } from "next-intl"
 
 type UserRole = "mentee" | "mentor"
 
-const roles = [
-    {
-        id: "mentee" as UserRole,
-        name: "Mentorado",
-        description: "Busco orientação e acompanhamento para crescer profissionalmente",
-        icon: Users,
-        color: "bg-blue-100 text-blue-800",
-        benefits: [
-            "Acesso a mentores experientes",
-            "Sessões de mentoria personalizadas",
-            "Networking profissional",
-            "Desenvolvimento de carreira",
-        ],
-    },
-    {
-        id: "mentor" as UserRole,
-        name: "Mentor",
-        description: "Quero compartilhar conhecimento e ajudar outros profissionais",
-        icon: GraduationCap,
-        color: "bg-green-100 text-green-800",
-        benefits: [
-            "Compartilhar experiência",
-            "Impactar carreiras",
-            "Expandir rede de contatos",
-            "Desenvolver habilidades de liderança",
-        ],
-    },
-]
-
 export default function SelectRolePage() {
+    const t = useTranslations("onboarding")
     const [selectedRole, setSelectedRole] = useState<UserRole | "">("")
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
-    const { user, selectRole, handleAuthError, getRoleDashboardPath } = useAuth()
+    const { user, selectRole, getRoleDashboardPath } = useAuth()
+
+    const roles = [
+        {
+            id: "mentee" as UserRole,
+            name: t("mentee.title"),
+            description: t("mentee.description"),
+            icon: Users,
+            color: "bg-blue-100 text-blue-800",
+            benefits: t.raw("mentee.benefits") as string[],
+        },
+        {
+            id: "mentor" as UserRole,
+            name: t("mentor.title"),
+            description: t("mentor.description"),
+            icon: GraduationCap,
+            color: "bg-green-100 text-green-800",
+            benefits: t.raw("mentor.benefits") as string[],
+        },
+    ]
 
     const handleRoleSelection = async () => {
         if (!selectedRole) {
-            toast.error("Por favor, selecione um perfil")
+            toast.error(t("error.selectRequired"))
             return
         }
 
         if (!user) {
-            toast.error("Usuário não autenticado")
+            toast.error(t("error.notAuthenticated"))
             router.push('/login')
             return
         }
 
         setIsLoading(true)
-        const loadingToast = toast.loading("Salvando seu perfil...")
+        const loadingToast = toast.loading(t("saving"))
         try {
-            console.log("🔄 Iniciando seleção de role:", selectedRole, "para usuário:", user.id)
-
-            // Use the selectRole method from auth context
             await selectRole(selectedRole)
-
-            // Dismiss loading toast
             toast.dismiss(loadingToast)
+            toast.success(t(`${selectedRole}.success`))
 
-            console.log("✅ Role atualizada com sucesso")
-            toast.success(`Perfil ${selectedRole === 'mentor' ? 'Mentor' : 'Mentorado'} selecionado com sucesso!`)
-
-            // Small delay to show success message
             await new Promise(resolve => setTimeout(resolve, 1000))
-
-            // Use role-based redirection from auth context
             const dashboardPath = getRoleDashboardPath(selectedRole)
-            console.log("🔄 Redirecionando para:", dashboardPath)
-
             router.push(dashboardPath)
         } catch (error: any) {
             console.error("❌ Erro ao selecionar role:", error)
             toast.dismiss(loadingToast)
 
-            // Show specific error messages
-            let errorMessage = "Erro inesperado. Tente novamente."
-
-            if (error.message?.includes('Failed to select role')) {
-                errorMessage = "Erro ao salvar perfil. Verifique sua conexão e tente novamente."
-            } else if (error.message?.includes('User not authenticated')) {
-                errorMessage = "Sessão expirada. Faça login novamente."
+            let errorMessage = t("error.saveError")
+            if (error.message?.includes('User not authenticated')) {
+                errorMessage = t("error.sessionExpired")
                 router.push('/login')
                 return
-            } else if (error.message?.includes('Network')) {
-                errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
             }
 
             toast.error(errorMessage)
@@ -102,24 +76,22 @@ export default function SelectRolePage() {
         }
     }
 
-    // Redirect if user already has a role
     const { role, loading } = useAuth()
+    
     if (!loading && role) {
         const dashboardPath = getRoleDashboardPath(role)
         router.push(dashboardPath)
         return null
     }
 
-    // Show loading while checking auth state
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <Loader2 className="animate-spin h-8 w-8 text-primary" />
             </div>
         )
     }
 
-    // Redirect to login if not authenticated
     if (!user) {
         router.push('/login')
         return null
@@ -129,13 +101,13 @@ export default function SelectRolePage() {
         <div className="container max-w-4xl py-16">
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">Escolha seu perfil</CardTitle>
+                    <CardTitle className="text-2xl">{t("title")}</CardTitle>
                     <CardDescription>
-                        Selecione como você gostaria de participar da nossa plataforma. Você poderá alterar isso depois nas configurações.
+                        {t("description")}
                     </CardDescription>
                     {user?.email && (
                         <div className="text-sm text-muted-foreground mt-2">
-                            Configurando perfil para: <span className="font-medium">{user.email}</span>
+                            {t("configuringFor")} <span className="font-medium">{user.email}</span>
                         </div>
                     )}
                 </CardHeader>
@@ -162,7 +134,7 @@ export default function SelectRolePage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium">Benefícios:</p>
+                                        <p className="text-sm font-medium">{t("mentee.benefits" ? "Benefícios:" : "")}</p>
                                         <ul className="text-sm text-muted-foreground space-y-1">
                                             {role.benefits.map((benefit, index) => (
                                                 <li key={index} className="flex items-center gap-2">
@@ -186,11 +158,11 @@ export default function SelectRolePage() {
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Salvando...
+                                {t("saving")}
                             </>
                         ) : (
                             <>
-                                Confirmar Seleção
+                                {t("confirm")}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </>
                         )}
