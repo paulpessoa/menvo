@@ -117,12 +117,12 @@ export default function SetPasswordPage() {
                     </CardContent>
                     <CardFooter className="flex flex-col gap-2">
                         <Button asChild className="w-full">
-                            <Link href="/auth/register">
+                            <Link href="/signup">
                                 Criar conta
                             </Link>
                         </Button>
                         <Button asChild variant="outline" className="w-full">
-                            <Link href="/auth/login">
+                            <Link href="/login">
                                 Fazer Login
                             </Link>
                         </Button>

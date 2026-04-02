@@ -35,7 +35,7 @@ export function getPostLoginRedirect(
   intendedDestination?: string
 ): string {
   // If user was trying to access a specific page, redirect there (if authorized)
-  if (intendedDestination && intendedDestination !== "/auth/login" && role) {
+  if (intendedDestination && intendedDestination !== "/login" && role) {
     if (isAuthorizedForPath(intendedDestination, role)) {
       return intendedDestination
     }

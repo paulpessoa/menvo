@@ -34,7 +34,7 @@ export default function AuthErrorPage() {
   }, [searchParams])
 
   const handleRetry = () => {
-    router.push("/auth/login")
+    router.push("/login")
   }
 
   const handleResendEmail = () => {
@@ -44,10 +44,10 @@ export default function AuthErrorPage() {
         router.push("/auth/confirm-email")
         break
       case 'recovery':
-        router.push("/auth/forgot-password")
+        router.push("/forgot-password")
         break
       case 'invite':
-        router.push("/auth/login") // Admin needs to resend invite
+        router.push("/login") // Admin needs to resend invite
         break
       default:
         router.push("/auth/confirm-email")

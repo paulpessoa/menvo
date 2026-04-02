@@ -33,7 +33,7 @@ export function AuthGuard({
 
     // Redirect to login if not authenticated
     if (!auth.isAuthenticated) {
-        router.push('/auth/login')
+        router.push('/login')
         return null
     }
 

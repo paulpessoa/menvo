@@ -220,10 +220,10 @@ export default function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/auth/login">Entrar</Link>
+                <Link href="/login">Entrar</Link>
               </Button>
               <Button asChild>
-                <Link href="/auth/register">Cadastrar</Link>
+                <Link href="/signup">Cadastrar</Link>
               </Button>
             </div>
           )}
@@ -300,13 +300,13 @@ export default function Header() {
                       asChild
                       className="w-full justify-start"
                     >
-                      <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                      <Link href="/login" onClick={() => setIsOpen(false)}>
                         {t("common.login")}
                       </Link>
                     </Button>
                     <Button asChild className="w-full">
                       <Link
-                        href="/auth/register"
+                        href="/signup"
                         onClick={() => setIsOpen(false)}
                       >
                         {t("common.register")}

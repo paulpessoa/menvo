@@ -22,9 +22,9 @@ export function oauthValidationMiddleware(request: NextRequest): NextResponse | 
   
   // Skip validation for certain routes that don't need OAuth
   const skipRoutes = [
-    '/auth/login',
-    '/auth/register', 
-    '/auth/reset-password',
+    '/login',
+    '/signup', 
+    '/reset-password',
     '/api/auth/callback' // This is handled by Supabase
   ]
   

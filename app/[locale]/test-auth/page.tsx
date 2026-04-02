@@ -54,10 +54,10 @@ export default function TestAuthPage() {
                 {!isAuthenticated && (
                     <div className="space-x-2">
                         <Button asChild>
-                            <a href="/auth/login">Fazer Login</a>
+                            <a href="/login">Fazer Login</a>
                         </Button>
                         <Button variant="outline" asChild>
-                            <a href="/auth/register">Cadastrar</a>
+                            <a href="/signup">Cadastrar</a>
                         </Button>
                     </div>
                 )}

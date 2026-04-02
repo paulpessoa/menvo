@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
           } else if (code) {
             verifyResult = await supabase.auth.exchangeCodeForSession(code)
           }
-          redirectPath = "/auth/reset-password"
+          redirectPath = "/reset-password"
           break
 
         case "invite":
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
         } else if (verifyResult.error.message?.includes("already_confirmed")) {
           // For already confirmed, redirect to login
           return NextResponse.redirect(
-            new URL("/auth/login?message=already_confirmed", request.url)
+            new URL("/login?message=already_confirmed", request.url)
           )
         }
 
@@ -266,5 +266,5 @@ export async function GET(request: NextRequest) {
   }
 
   // No valid callback parameters, redirect to login
-  return NextResponse.redirect(new URL("/auth/login", request.url))
+  return NextResponse.redirect(new URL("/login", request.url))
 }

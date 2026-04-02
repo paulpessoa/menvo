@@ -286,7 +286,7 @@ export default function ConfirmEmailPage() {
                                 )}
                             </Button>
                             <Button variant="ghost" asChild className="w-full">
-                                <Link href="/auth/login">Voltar ao Login</Link>
+                                <Link href="/login">Voltar ao Login</Link>
                             </Button>
                         </div>
                     )}
@@ -294,7 +294,7 @@ export default function ConfirmEmailPage() {
                     {status === 'error' && (
                         <div className="space-y-3">
                             <Button variant="outline" asChild className="w-full">
-                                <Link href="/auth/login">Voltar ao Login</Link>
+                                <Link href="/login">Voltar ao Login</Link>
                             </Button>
                         </div>
                     )}

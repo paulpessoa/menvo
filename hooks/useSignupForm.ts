@@ -30,7 +30,7 @@ export function useSignupMutation() {
     mutationFn: async ({ email, password, firstName, lastName, userType }: SignupData): Promise<SignupResponse> => {
       console.log("🚀 Iniciando registro:", { email, firstName, lastName, userType })
 
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

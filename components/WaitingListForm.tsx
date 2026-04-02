@@ -219,7 +219,7 @@ export function WaitingListForm({ onSuccess }: WaitingListFormProps) {
             <CardFooter>
                 <div className="text-center text-sm text-muted-foreground w-full">
                     Já tem uma conta?{" "}
-                    <Link href="/auth/login" className="text-primary hover:underline">
+                    <Link href="/login" className="text-primary hover:underline">
                         Faça login
                     </Link>
                 </div>

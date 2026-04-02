@@ -53,7 +53,7 @@ export default function SelectRolePage() {
 
         if (!user) {
             toast.error("Usuário não autenticado")
-            router.push('/auth/login')
+            router.push('/login')
             return
         }
 
@@ -90,7 +90,7 @@ export default function SelectRolePage() {
                 errorMessage = "Erro ao salvar perfil. Verifique sua conexão e tente novamente."
             } else if (error.message?.includes('User not authenticated')) {
                 errorMessage = "Sessão expirada. Faça login novamente."
-                router.push('/auth/login')
+                router.push('/login')
                 return
             } else if (error.message?.includes('Network')) {
                 errorMessage = "Erro de conexão. Verifique sua internet e tente novamente."
@@ -121,7 +121,7 @@ export default function SelectRolePage() {
 
     // Redirect to login if not authenticated
     if (!user) {
-        router.push('/auth/login')
+        router.push('/login')
         return null
     }
 

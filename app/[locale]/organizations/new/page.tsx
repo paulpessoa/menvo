@@ -25,10 +25,10 @@ export default function NewOrganizationPage() {
             if (user && !error) {
                 setIsAuthenticated(true)
             } else {
-                router.push("/auth/login?redirect=/organizations/new")
+                router.push("/login?redirect=/organizations/new")
             }
         } catch (err) {
-            router.push("/auth/login?redirect=/organizations/new")
+            router.push("/login?redirect=/organizations/new")
         } finally {
             setLoading(false)
         }
