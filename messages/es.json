@@ -400,7 +400,7 @@
       "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera unos minutos antes de intentar de nuevo.",
       "networkError": "Error de conexión. Verifica tu internet e inténtalo de nuevo."
     },
-    "orContinueWith": "O continúa con correo electrónico",
+    "orContinueWith": "o continuar con",
     "success": "¡Inicio de sesión exitoso!"
   },
   "register": {
@@ -438,7 +438,7 @@
     ],
     "afterConfirmation": "Después de confirmar tu correo, podrás elegir si quieres ser mentor o mentee y completar tu perfil. Los mentores pasarán por una validación de nuestro equipo antes de ser publicados.",
     "didntReceiveEmail": "¿No recibiste el correo?",
-    "checkSpam": "Revisa tu carpeta de spam o correo no deseado. El enlace de confirmación expira en 24 horas.",
+    "checkSpam": "Revisa tu carpeta de spam.",
     "emailExpired": "¿Expiró el enlace de confirmación?",
     "emailExpiredDescription": "Si el enlace de confirmación expiró (24 horas), puedes usar la opción 'Olvidé mi contraseña' para restablecer y confirmar tu cuenta.",
     "resendEmail": "Reenviar correo",
@@ -467,7 +467,7 @@
       "passwordsMatch": "✓ Las contraseñas coinciden",
       "passwordsDontMatchError": "Las contraseñas no coinciden"
     },
-    "goToHome": "Volver al Inicio",
+    "goToHome": "Volver al inicio",
     "goToVerification": "Ir a la página de verificación",
     "userType": {
       "title": "¿Cómo quieres participar?",
@@ -488,7 +488,7 @@
         "description": "Busco profesionales calificados para oportunidades"
       }
     },
-    "success": "¡Cuenta creada exitosamente!"
+    "success": "¡Cuenta creada con éxito!"
   },
   "mentors": {
     "title": "Encuentra un Mentor",

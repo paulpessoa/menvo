@@ -389,7 +389,7 @@
     "noAccount": "Vous n'avez pas de compte ?",
     "signUp": "S'inscrire",
     "continueWith": "Continuer avec",
-    "orContinueWith": "Ou continuer avec l'e-mail",
+    "orContinueWith": "ou continuer avec",
     "google": "Google",
     "linkedin": "LinkedIn",
     "connecting": "Connexion en cours...",
@@ -439,7 +439,7 @@
     ],
     "afterConfirmation": "Après avoir confirmé votre e-mail, vous pourrez choisir d'être mentor ou mentoré et compléter votre profil. Les mentors passeront par une validation de notre équipe avant d'être publiés.",
     "didntReceiveEmail": "Vous n'avez pas reçu l'e-mail ?",
-    "checkSpam": "Vérifiez votre dossier spam ou courrier indésirable. Le lien de confirmation expire en 24 heures.",
+    "checkSpam": "Vérifiez vos spams.",
     "emailExpired": "Le lien de confirmation a expiré ?",
     "emailExpiredDescription": "Si le lien de confirmation a expiré (24 heures), vous pouvez utiliser l'option 'Mot de passe oublié' pour réinitialiser et confirmer votre compte.",
     "resendEmail": "Renvoyer l'e-mail",
@@ -458,7 +458,7 @@
       "continue": "Continuer"
     },
     "goToLogin": "Aller à la Connexion",
-    "goToHome": "Retour à l'Accueil",
+    "goToHome": "Retour à l'accueil",
     "goToVerification": "Aller à la page de vérification",
     "passwordValidation": {
       "passwordsDontMatch": "Les mots de passe ne correspondent pas",

@@ -400,7 +400,7 @@
       "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
       "networkError": "Connection error. Please check your internet and try again."
     },
-    "orContinueWith": "Or continue with email",
+    "orContinueWith": "or continue with",
     "success": "Login successful!"
   },
   "register": {
@@ -438,7 +438,7 @@
     ],
     "afterConfirmation": "After confirming your email, you'll be able to choose whether you want to be a mentor or mentee and complete your profile. Mentors will go through a validation process with our team before being published.",
     "didntReceiveEmail": "Didn't receive the email?",
-    "checkSpam": "Check your spam or junk folder. The confirmation link expires in 24 hours.",
+    "checkSpam": "Check your spam folder.",
     "emailExpired": "Confirmation link expired?",
     "emailExpiredDescription": "If the confirmation link expired (24 hours), you can use the 'Forgot my password' option to reset and confirm your account.",
     "resendEmail": "Resend email",

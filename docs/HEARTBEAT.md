@@ -1,25 +1,24 @@
 # ❤️ HEARTBEAT - Single Source of Truth
 
-## 📅 Última Atualização: 30/03/2026
-**Status Atual:** Mentores listados ✅ / Dash Admin Global ✅ / Chat RLS Corrigido ✅ / i18n Expandido ✅
+## 📅 Última Atualização: 01/04/2026
+**Status Atual:** Mentores i18n ✅ / Suécia Localizada ✅ / Onboarding de Idioma ✅ / Auth i18n (Pendente)
 
 ---
 
 ## 📍 Onde Paramos?
 - **Sessão Iniciada:** Configuração de persona Staff confirmada.
-- **Mudança de Modelo:** Atualizado para `gemini-2.5-pro`.
-- **Fix Listagem:** Corrigido RLS nas tabelas `roles` e `user_roles`.
-- **i18n:** Migrado para `next-intl` com suporte a Dinamarquês, Francês e Sueco.
-- **Dash Admin:** Criado painel global de usuários com métricas de engajamento e controle de mentores.
-- **Chat RLS:** Aplicada migração definitiva para corrigir erros de permissão em conversas e mensagens.
+- **Traduções:** Finalizada localização completa para Dinamarquês (da) e Francês (fr). Sincronia de chaves em todos os arquivos.
+- **Páginas Públicas:** Refatorada a página de listagem e perfil de mentores para usar `next-intl`.
+- **Onboarding:** Implementado `LanguageSelectorOverlay` para forçar escolha de idioma na primeira visita.
+- **Auditoria de Auth:** Mapeado que `login-form.tsx` e `register-form.tsx` ainda possuem textos hardcoded.
 
 ---
 
 ## 🎯 Objetivos de Curto Prazo (P0)
-1. [x] **Fix:** Listagem de mentores na página `/mentors`.
-2. [x] **Fix:** RLS Policy da tabela `conversations`.
-3. [x] **Feat:** Gestão global de usuários e métricas no Admin.
-4. [x] **i18n:** Adicionar suporte a `da`, `fr`, `sv`.
+1. [x] **Fix:** Listagem de mentores internacionalizada.
+2. [x] **Feat:** Suporte completo a `da`, `fr`, `sv`.
+3. [ ] **Fix:** Internacionalizar componentes internos de Auth (Login/Registro).
+4. [ ] **Fix:** RLS Policy da tabela `conversations` (Validar em produção).
 
 ---
 

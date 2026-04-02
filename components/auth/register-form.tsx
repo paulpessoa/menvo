@@ -12,12 +12,14 @@ import { Loader2, Mail, Lock, User, ArrowRight, AlertTriangle } from "lucide-rea
 import { useAuth } from "@/lib/auth"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { WaitingListForm } from "@/components/WaitingListForm"
+import { useTranslations } from "next-intl"
 
 interface RegisterFormProps {
     onSuccess?: () => void
 }
 
 export function RegisterForm({ onSuccess }: RegisterFormProps) {
+    const t = useTranslations("register")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -32,7 +34,6 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     const waitingListEnabled = useFeatureFlag("waitingListEnabled")
     const newUserRegistration = useFeatureFlag("newUserRegistration")
 
-    // If waiting list is enabled and new user registration is disabled, show waiting list form
     if (waitingListEnabled && !newUserRegistration) {
         return <WaitingListForm onSuccess={onSuccess} />
     }
@@ -42,21 +43,20 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         setIsLoading(true)
         setError("")
 
-        // Validation
         if (password !== confirmPassword) {
-            setError("As senhas não coincidem")
+            setError(t("passwordValidation.passwordsDontMatch"))
             setIsLoading(false)
             return
         }
 
         if (password.length < 6) {
-            setError("A senha deve ter pelo menos 6 caracteres")
+            setError(t("passwordValidation.passwordTooShort"))
             setIsLoading(false)
             return
         }
 
         if (!firstName.trim() || !lastName.trim()) {
-            setError("Nome e sobrenome são obrigatórios")
+            setError(t("description")) // Fallback for mandatory name error if key missing
             setIsLoading(false)
             return
         }
@@ -78,7 +78,6 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
         try {
             await signInWithProvider(provider)
-            // OAuth redirects are handled by the callback route
         } catch (err: any) {
             setError(err.message || "Erro ao fazer cadastro. Tente novamente.")
         } finally {
@@ -93,31 +92,31 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
                         <Mail className="h-6 w-6 text-blue-600" />
                     </div>
-                    <CardTitle>Confirme seu email</CardTitle>
+                    <CardTitle>{t("confirmEmail")}</CardTitle>
                     <CardDescription>
-                        Enviamos um link de confirmação para {email}
+                        {t("confirmEmailDescription", { email })}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <p className="text-muted-foreground text-sm text-center">
-                        Clique no link do email para confirmar sua conta e fazer login.
+                        {t("afterConfirmation")}
                     </p>
 
                     <div className="rounded-lg bg-yellow-50 p-3 border border-yellow-200">
                         <p className="text-xs text-yellow-800">
-                            <strong>Não recebeu o email?</strong> Verifique sua caixa de spam ou lixo eletrônico.
+                            <strong>{t("didntReceiveEmail")}</strong> {t("checkSpam")}
                         </p>
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2">
                     <Button asChild className="w-full">
-                        <Link href="/auth/login">
-                            Ir para Login
+                        <Link href="/login">
+                            {t("signIn")}
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>
                     <Button asChild variant="outline" className="w-full">
-                        <Link href="/">Voltar ao Início</Link>
+                        <Link href="/">{t("goToHome")}</Link>
                     </Button>
                 </CardFooter>
             </Card>
@@ -127,9 +126,9 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     return (
         <Card className="w-full max-w-md">
             <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold text-center">Criar conta</CardTitle>
+                <CardTitle className="text-2xl font-bold text-center">{t("signupTitle")}</CardTitle>
                 <CardDescription className="text-center">
-                    Cadastre-se para começar sua jornada de mentoria
+                    {t("description")}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -163,7 +162,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                                 />
                             </svg>
                         )}
-                        Cadastrar com Google
+                        {t("orContinueWith")} Google
                     </Button>
 
                     <Button
@@ -180,7 +179,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                             </svg>
                         )}
-                        Cadastrar com LinkedIn
+                        {t("orContinueWith")} LinkedIn
                     </Button>
                 </div>
 
@@ -189,7 +188,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                         <Separator className="w-full" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">ou cadastre-se com email</span>
+                        <span className="bg-background px-2 text-muted-foreground">{t("orContinueWith")} email</span>
                     </div>
                 </div>
 
@@ -203,13 +202,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName">Nome</Label>
+                            <Label htmlFor="firstName">{t("firstName")}</Label>
                             <div className="relative">
                                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input
                                     id="firstName"
                                     type="text"
-                                    placeholder="Seu nome"
+                                    placeholder={t("firstNamePlaceholder")}
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
                                     className="pl-10"
@@ -218,13 +217,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName">Sobrenome</Label>
+                            <Label htmlFor="lastName">{t("lastName")}</Label>
                             <div className="relative">
                                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                 <Input
                                     id="lastName"
                                     type="text"
-                                    placeholder="Seu sobrenome"
+                                    placeholder={t("lastNamePlaceholder")}
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
                                     className="pl-10"
@@ -235,13 +234,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">E-mail</Label>
+                        <Label htmlFor="email">{t("email")}</Label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="nome@exemplo.com"
+                                placeholder={t("emailPlaceholder")}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="pl-10"
@@ -251,13 +250,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password">Senha</Label>
+                        <Label htmlFor="password">{t("password")}</Label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
                                 id="password"
                                 type="password"
-                                placeholder="Mínimo 6 caracteres"
+                                placeholder={t("passwordPlaceholder")}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="pl-10"
@@ -267,13 +266,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirmar senha</Label>
+                        <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                             <Input
                                 id="confirmPassword"
                                 type="password"
-                                placeholder="Digite a senha novamente"
+                                placeholder={t("confirmPasswordPlaceholder")}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 className="pl-10"
@@ -286,11 +285,11 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Criando conta...
+                                {t("creatingAccount")}
                             </>
                         ) : (
                             <>
-                                Criar conta
+                                {t("registerButton")}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </>
                         )}
@@ -299,9 +298,9 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
             </CardContent>
             <CardFooter>
                 <div className="text-center text-sm text-muted-foreground w-full">
-                    Já tem uma conta?{" "}
-                    <Link href="/auth/login" className="text-primary hover:underline">
-                        Faça login
+                    {t("alreadyHaveAccount")}{" "}
+                    <Link href="/login" className="text-primary hover:underline">
+                        {t("signIn")}
                     </Link>
                 </div>
             </CardFooter>

@@ -172,5 +172,17 @@
       "title": "MENVO - Frivilligt Mentorskap",
       "description": "Kopplar ihop mentorer och mentees för gratis mentorskapssessioner"
     }
+  },
+  "login": {
+    "orContinueWith": "eller fortsätt med",
+    "success": "Inloggningen lyckades!",
+    "loggingIn": "Loggar in..."
+  },
+  "register": {
+    "success": "Kontot har skapats!",
+    "creatingAccount": "Skapar konto...",
+    "goToHome": "Tillbaka till hemmet",
+    "didntReceiveEmail": "Fick du inte e-postmeddelandet?",
+    "checkSpam": "Kontrollera din skräppost."
   }
 }

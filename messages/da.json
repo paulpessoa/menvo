@@ -389,11 +389,11 @@
     "noAccount": "Har du ikke en konto?",
     "signUp": "Opret konto",
     "continueWith": "Fortsæt med",
-    "orContinueWith": "Eller fortsæt med e-mail",
+    "orContinueWith": "eller fortsæt med",
     "google": "Google",
     "linkedin": "LinkedIn",
     "connecting": "Forbinder...",
-    "success": "Log ind lykkedes!",
+    "success": "Login gennemført!",
     "emailNotConfirmedInfo": "Tjek venligst din indbakke for at bekræfte din e-mail.",
     "dontHaveAccount": "Har du ikke en konto?",
     "error": {
@@ -438,8 +438,8 @@
       "Vent på validering fra vores hold (kun for mentorer)"
     ],
     "afterConfirmation": "Når du har bekræftet din e-mail, kan du vælge at være mentor eller mentee og udfylde din profil. Mentorer vil gennemgå en validering af vores hold, før de offentliggøres.",
-    "didntReceiveEmail": "Fik du ikke e-mailen?",
-    "checkSpam": "Tjek din spam-mappe eller uønsket post. Bekræftelseslinket udløber om 24 timer.",
+    "didntReceiveEmail": "Modtog du ikke e-mailen?",
+    "checkSpam": "Tjek din spam-mappe.",
     "emailExpired": "Er bekræftelseslinket udløbet?",
     "emailExpiredDescription": "Hvis bekræftelseslinket er udløbet (24 timer), kan du bruge indstillingen 'Glemt adgangskode' til at nulstille og bekræfte din konto.",
     "resendEmail": "Send e-mail igen",
@@ -458,7 +458,7 @@
       "continue": "Fortsæt"
     },
     "goToLogin": "Gå til Log ind",
-    "goToHome": "Gå til Hjem",
+    "goToHome": "Tilbage til start",
     "goToVerification": "Gå til bekræftelsesside",
     "passwordValidation": {
       "passwordsDontMatch": "Adgangskoderne stemmer ikke overens",
