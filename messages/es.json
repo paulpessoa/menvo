@@ -7,9 +7,9 @@
     "howItWorks": "Cómo Funciona",
     "aboutUs": "Sobre Nosotros",
     "title": "Menvo",
-    "login": "Iniciar Sesión",
+    "login": "Entrar",
     "register": "Registrarse",
-    "logout": "Cerrar Sesión",
+    "logout": "Cerrar sesión",
     "language": "Idioma",
     "english": "Inglés",
     "portuguese": "Portugués",
@@ -35,7 +35,8 @@
       "successTitle": "¡Idioma Definido!",
       "successDescription": "Puedes cambiar esta preferencia en cualquier momento en el menú de Configuración después de iniciar sesión.",
       "button": "Empezar a navegar"
-    }
+    },
+    "administration": "Administración"
   },
   "header": {
     "title": "Plataforma de Mentoria Voluntaria",
@@ -424,7 +425,7 @@
     "registerButton": "Registrar",
     "creatingAccount": "Creando cuenta...",
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-    "signIn": "Iniciar sesión",
+    "signIn": "Entrar",
     "orContinueWith": "O continúa con",
     "confirmEmail": "Confirma tu correo electrónico",
     "confirmEmailDescription": "Se envió un correo de confirmación a {{email}}. Por favor, accede a tu bandeja de entrada y haz clic en el enlace para activar tu cuenta.",

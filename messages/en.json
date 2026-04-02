@@ -7,9 +7,9 @@
     "howItWorks": "How It Works",
     "aboutUs": "About Us",
     "title": "Menvo",
-    "login": "Login",
-    "register": "Register",
-    "logout": "Logout",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out",
     "language": "Language",
     "english": "English",
     "portuguese": "Portuguese",
@@ -35,7 +35,8 @@
       "successTitle": "Language Set!",
       "successDescription": "You can change this preference at any time in the Settings menu after logging in.",
       "button": "Start Browsing"
-    }
+    },
+    "administration": "Administration"
   },
   "header": {
     "title": "MENVO - Volunteer Mentors",
@@ -424,7 +425,7 @@
     "registerButton": "Register",
     "creatingAccount": "Creating account...",
     "alreadyHaveAccount": "Already have an account?",
-    "signIn": "Sign in",
+    "signIn": "Sign In",
     "orContinueWith": "Or continue with",
     "confirmEmail": "Confirm your email",
     "confirmEmailDescription": "A confirmation email was sent to {{email}}. Please access your inbox and click the link to activate your account.",

@@ -35,7 +35,8 @@
       "successTitle": "Langue définie !",
       "successDescription": "Vous pouvez modifier cette préférence à tout moment dans le menu Paramètres après vous être connecté.",
       "button": "Commencer à naviguer"
-    }
+    },
+    "administration": "Administration"
   },
   "header": {
     "title": "MENVO - Mentors Bénévoles",
@@ -424,7 +425,7 @@
     "registerButton": "S'inscrire",
     "creatingAccount": "Création du compte...",
     "alreadyHaveAccount": "Vous avez déjà un compte ?",
-    "signIn": "Se Connecter",
+    "signIn": "Connexion",
     "orContinueWith": "Ou continuer avec l'e-mail",
     "success": "Compte créé avec succès !",
     "confirmEmail": "Confirmez votre e-mail",

@@ -220,10 +220,10 @@ export default function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/login">Entrar</Link>
+                <Link href="/login">{t("common.login")}</Link>
               </Button>
               <Button asChild>
-                <Link href="/signup">Cadastrar</Link>
+                <Link href="/signup">{t("common.register")}</Link>
               </Button>
             </div>
           )}
@@ -289,7 +289,7 @@ export default function Header() {
                         className="flex items-center gap-2 px-2 py-1 text-lg justify-start mt-2"
                       >
                         <LogOut className="h-4 w-4" />
-                        Sair
+                        {t("common.logout")}
                       </Button>
                     </div>
                   </>

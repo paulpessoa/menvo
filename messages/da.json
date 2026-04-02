@@ -8,7 +8,7 @@
     "aboutUs": "Om os",
     "title": "Menvo",
     "login": "Log ind",
-    "register": "Opret konto",
+    "register": "Tilmeld dig",
     "logout": "Log ud",
     "language": "Sprog",
     "english": "Engelsk",
@@ -35,7 +35,8 @@
       "successTitle": "Sprog indstillet!",
       "successDescription": "Du kan til enhver tid ændre denne præference i menuen Indstillinger efter log ind.",
       "button": "Begynd at browse"
-    }
+    },
+    "administration": "Administration"
   },
   "header": {
     "title": "MENVO - Frivillige Mentorer",

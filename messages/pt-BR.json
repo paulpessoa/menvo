@@ -8,7 +8,7 @@
     "aboutUs": "Sobre Nós",
     "title": "Menvo",
     "login": "Entrar",
-    "register": "Registrar",
+    "register": "Cadastrar",
     "logout": "Sair",
     "language": "Idioma",
     "english": "Inglês",
@@ -35,7 +35,8 @@
       "successTitle": "Idioma Definido!",
       "successDescription": "Você pode alterar esta preferência a qualquer momento no menu de Configurações após o login.",
       "button": "Começar a Navegar"
-    }
+    },
+    "administration": "Administração"
   },
   "header": {
     "title": "MENVO - Mentores Voluntários",
