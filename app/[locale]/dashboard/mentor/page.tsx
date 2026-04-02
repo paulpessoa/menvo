@@ -9,6 +9,7 @@ import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
 interface MentorStats {
     totalAppointments: number
@@ -31,6 +32,7 @@ interface Appointment {
 }
 
 export default function MentorDashboard() {
+    const t = useTranslations("dashboard")
     const { user, profile, isVerified } = useAuth()
     const [stats, setStats] = useState<MentorStats>({
         totalAppointments: 0,
@@ -54,7 +56,6 @@ export default function MentorDashboard() {
 
     const fetchMentorStats = async () => {
         try {
-            // Fetch appointments stats
             const { data: appointments, error: appointmentsError } = await supabase
                 .from('appointments')
                 .select('id, status, scheduled_at')
@@ -69,7 +70,6 @@ export default function MentorDashboard() {
 
             const completed = appointments?.filter(apt => apt.status === 'completed').length || 0
 
-            // Count unique mentees
             const { data: uniqueMentees, error: menteesError } = await supabase
                 .from('appointments')
                 .select('mentee_id')
@@ -136,39 +136,31 @@ export default function MentorDashboard() {
 
     const getGreeting = () => {
         const hour = new Date().getHours()
-        if (hour < 12) return "Bom dia"
-        if (hour < 18) return "Boa tarde"
-        return "Boa noite"
-    }
-
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString)
-        return {
-            date: date.toLocaleDateString('pt-BR'),
-            time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-        }
+        if (hour < 12) return t("greetings.morning")
+        if (hour < 18) return t("greetings.afternoon")
+        return t("greetings.evening")
     }
 
     const quickActions = [
         {
-            title: "Configurar Disponibilidade",
-            description: "Defina seus horários disponíveis para mentoria",
+            title: t("mentor.actions.availability"),
+            description: t("mentor.actions.availabilityDesc"),
             href: "/dashboard/mentor/availability",
             icon: Calendar,
             color: "bg-blue-500",
             disabled: !isVerified
         },
         {
-            title: "Minhas Mentorias",
-            description: "Gerencie suas sessões de mentoria",
+            title: t("mentor.actions.mentorships"),
+            description: t("mentor.actions.mentorshipsDesc"),
             href: "/mentorship/mentor",
             icon: Clock,
             color: "bg-green-500",
             disabled: !isVerified
         },
         {
-            title: "Editar Perfil",
-            description: "Atualize suas informações e especialidades",
+            title: t("mentor.actions.editProfile"),
+            description: t("mentor.actions.editProfileDesc"),
             href: "/profile",
             icon: Settings,
             color: "bg-purple-500",
@@ -180,17 +172,15 @@ export default function MentorDashboard() {
         <RequireRole roles={['mentor']}>
             <div className="container mx-auto px-4 py-8">
                 <div className="space-y-8">
-                    {/* Header */}
                     <div>
                         <h1 className="text-3xl font-bold">
                             {getGreeting()}, {profile?.full_name || "Mentor"}!
                         </h1>
                         <p className="text-muted-foreground">
-                            Bem-vindo ao seu dashboard de mentor. Gerencie suas mentorias e ajude outros profissionais.
+                            {t("mentor.welcome")}
                         </p>
                     </div>
 
-                    {/* Verification Status */}
                     <Card className={isVerified ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"}>
                         <CardContent className="flex items-center gap-4 p-6">
                             {isVerified ? (
@@ -200,26 +190,25 @@ export default function MentorDashboard() {
                             )}
                             <div className="flex-1">
                                 <h3 className="font-semibold">
-                                    {isVerified ? "Perfil Verificado" : "Verificação Pendente"}
+                                    {isVerified ? t("mentor.verification.approved") : t("mentor.verification.pending")}
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
                                     {isVerified
-                                        ? "Seu perfil foi verificado! Você pode receber agendamentos de mentees."
-                                        : "Seu perfil está aguardando verificação. Você receberá um email quando for aprovado."
+                                        ? t("mentor.verification.approvedText")
+                                        : t("mentor.verification.pendingText")
                                     }
                                 </p>
                             </div>
                             <Badge variant={isVerified ? "default" : "secondary"}>
-                                {isVerified ? "Verificado" : "Pendente"}
+                                {isVerified ? t("mentor.verification.badgeApproved") : t("mentor.verification.badgePending")}
                             </Badge>
                         </CardContent>
                     </Card>
 
-                    {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Próximas Sessões</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentor.stats.upcoming")}</CardTitle>
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -227,14 +216,14 @@ export default function MentorDashboard() {
                                     {loading ? "..." : stats.upcomingAppointments}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Agendamentos confirmados
+                                    {t("mentor.stats.upcomingDesc")}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total de Mentees</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentor.stats.mentees")}</CardTitle>
                                 <Users className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -242,14 +231,14 @@ export default function MentorDashboard() {
                                     {loading ? "..." : stats.totalMentees}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Pessoas mentoradas
+                                    {t("mentor.stats.menteesDesc")}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Sessões Completas</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentor.stats.completed")}</CardTitle>
                                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -257,14 +246,14 @@ export default function MentorDashboard() {
                                     {loading ? "..." : stats.completedSessions}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Mentorias realizadas
+                                    {t("mentor.stats.completedDesc")}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Avaliação</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentor.stats.rating")}</CardTitle>
                                 <Star className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -272,15 +261,14 @@ export default function MentorDashboard() {
                                     {loading ? "..." : stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "N/A"}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    {stats.totalReviews > 0 ? `${stats.totalReviews} avaliações` : "Sem avaliações"}
+                                    {loading ? "..." : t("mentor.stats.reviews", { count: stats.totalReviews })}
                                 </p>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Quick Actions */}
                     <div>
-                        <h2 className="text-2xl font-semibold mb-6">Ações Rápidas</h2>
+                        <h2 className="text-2xl font-semibold mb-6">{t("mentor.actions.title")}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {quickActions.map((action, index) => (
                                 <Card key={index} className={`hover:shadow-md transition-shadow ${action.disabled ? 'opacity-50' : ''}`}>
@@ -299,14 +287,11 @@ export default function MentorDashboard() {
                                         >
                                             {action.disabled ? (
                                                 <span>
-                                                    {action.title.includes('Disponibilidade') || action.title.includes('Agendamentos')
-                                                        ? 'Aguardando Verificação'
-                                                        : 'Acessar'
-                                                    }
+                                                    {t("mentor.actions.waitingVerification")}
                                                 </span>
                                             ) : (
                                                 <Link href={action.href}>
-                                                    Acessar
+                                                    {t("mentor.actions.access")}
                                                 </Link>
                                             )}
                                         </Button>
@@ -316,90 +301,34 @@ export default function MentorDashboard() {
                         </div>
                     </div>
 
-                    {/* Próximos Agendamentos - Comentado (redundante com /mentorship/mentor) */}
-                    {false && isVerified && upcomingAppointments.length > 0 && (
-                        <div>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-semibold">Próximos Agendamentos</h2>
-                                <Button variant="outline" asChild>
-                                    <Link href="/mentorship/mentor">
-                                        Ver Todos
-                                    </Link>
-                                </Button>
-                            </div>
-                            <div className="space-y-4">
-                                {upcomingAppointments.map((appointment) => {
-                                    const { date, time } = formatDateTime(appointment.scheduled_at)
-                                    return (
-                                        <Card key={appointment.id}>
-                                            <CardContent className="flex items-center justify-between p-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                        {appointment.mentee.avatar_url ? (
-                                                            <img
-                                                                src={appointment.mentee.avatar_url}
-                                                                alt={appointment.mentee.full_name}
-                                                                className="h-10 w-10 rounded-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <span className="text-sm font-medium">
-                                                                {appointment.mentee.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="font-medium">{appointment.mentee.full_name}</h3>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {date} às {time} • {appointment.duration_minutes} min
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant={appointment.status === 'confirmed' ? 'default' : 'secondary'}>
-                                                        {appointment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}
-                                                    </Badge>
-                                                    <Button size="sm" variant="outline">
-                                                        <MessageCircle className="h-4 w-4 mr-2" />
-                                                        Detalhes
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Getting Started */}
                     {!isVerified && (
                         <Card>
                             <CardHeader>
-                                <CardTitle>Primeiros Passos</CardTitle>
+                                <CardTitle>{t("gettingStarted.title")}</CardTitle>
                                 <CardDescription>
-                                    Complete estas etapas para começar a oferecer mentorias
+                                    {t("gettingStarted.description")}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">Cadastro realizado</span>
+                                    <span className="text-sm">{t("gettingStarted.step1")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">Papel de mentor selecionado</span>
+                                    <span className="text-sm">{t("gettingStarted.step2")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <AlertCircle className="h-5 w-5 text-yellow-600" />
-                                    <span className="text-sm">Aguardando verificação do perfil</span>
+                                    <span className="text-sm">{t("gettingStarted.step3Mentor")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">Configurar disponibilidade</span>
+                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step4Mentor")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">Receber primeiro agendamento</span>
+                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step5Mentor")}</span>
                                 </div>
                             </CardContent>
                         </Card>

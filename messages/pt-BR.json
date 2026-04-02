@@ -849,5 +849,75 @@
       "success": "Compartilhado com sucesso!",
       "copySuccess": "Link copiado para a área de transferência!"
     }
+  },
+  "dashboard": {
+    "greetings": {
+      "morning": "Bom dia",
+      "afternoon": "Boa tarde",
+      "evening": "Boa noite"
+    },
+    "mentor": {
+      "welcome": "Bem-vindo ao seu dashboard de mentor. Gerencie suas mentorias e ajude outros profissionais.",
+      "verification": {
+        "pending": "Verificação Pendente",
+        "approved": "Perfil Verificado",
+        "pendingText": "Seu perfil está aguardando verificação. Você receberá um email quando for aprovado.",
+        "approvedText": "Seu perfil foi verificado! Você pode receber agendamentos de mentees.",
+        "badgePending": "Pendente",
+        "badgeApproved": "Verificado"
+      },
+      "stats": {
+        "upcoming": "Próximas Sessões",
+        "upcomingDesc": "Agendamentos confirmados",
+        "mentees": "Total de Mentees",
+        "menteesDesc": "Pessoas mentoradas",
+        "completed": "Sessões Completas",
+        "completedDesc": "Mentorias realizadas",
+        "rating": "Avaliação",
+        "reviews": "{count, plural, =0 {Sem avaliações} =1 {1 avaliação} other {# avaliações}}"
+      },
+      "actions": {
+        "title": "Ações Rápidas",
+        "availability": "Configurar Disponibilidade",
+        "availabilityDesc": "Defina seus horários disponíveis para mentoria",
+        "mentorships": "Minhas Mentorias",
+        "mentorshipsDesc": "Gerencie suas sessões de mentoria",
+        "editProfile": "Editar Perfil",
+        "editProfileDesc": "Atualize suas informações e especialidades",
+        "access": "Acessar",
+        "waitingVerification": "Aguardando Verificação"
+      }
+    },
+    "mentee": {
+      "welcome": "Bem-vindo ao seu dashboard. Encontre mentores e acelere seu crescimento profissional.",
+      "stats": {
+        "hours": "Horas de Mentoria",
+        "hoursDesc": "Total de aprendizado",
+        "mentors": "Mentores",
+        "mentorsDesc": "Mentores conectados"
+      },
+      "actions": {
+        "find": "Encontrar Mentores",
+        "findDesc": "Busque mentores verificados em sua área de interesse"
+      },
+      "progress": {
+        "title": "Meu Progresso",
+        "description": "Acompanhe seu desenvolvimento profissional",
+        "inDevelopment": "Em desenvolvimento",
+        "comingSoon": "Em breve: gráficos de progresso, metas alcançadas, certificados e recursos de aprendizado"
+      }
+    },
+    "gettingStarted": {
+      "title": "Primeiros Passos",
+      "description": "Complete estas etapas para aproveitar ao máximo a plataforma",
+      "step1": "Cadastro realizado",
+      "step2": "Papel selecionado",
+      "step3Mentor": "Aguardando verificação do perfil",
+      "step3Mentee": "Complete seu perfil",
+      "step4Mentor": "Configurar disponibilidade",
+      "step4Mentee": "Encontre seu primeiro mentor",
+      "step5Mentor": "Receber primeiro agendamento",
+      "step5Mentee": "Agende sua primeira sessão"
+    }
   }
 }

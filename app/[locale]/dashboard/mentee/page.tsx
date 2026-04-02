@@ -10,6 +10,7 @@ import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
 interface MenteeStats {
     totalAppointments: number
@@ -44,6 +45,7 @@ interface FeaturedMentor {
 }
 
 export default function MenteeDashboard() {
+    const t = useTranslations("dashboard")
     const { user, profile } = useAuth()
     const [stats, setStats] = useState<MenteeStats>({
         totalAppointments: 0,
@@ -68,7 +70,6 @@ export default function MenteeDashboard() {
 
     const fetchMenteeStats = async () => {
         try {
-            // Fetch appointments stats
             const { data: appointments, error: appointmentsError } = await supabase
                 .from('appointments')
                 .select('id, status, scheduled_at, duration_minutes, mentor_id')
@@ -83,12 +84,10 @@ export default function MenteeDashboard() {
 
             const completed = appointments?.filter(apt => apt.status === 'completed').length || 0
 
-            // Calculate total hours
             const totalMinutes = appointments?.filter(apt => apt.status === 'completed')
                 .reduce((sum, apt) => sum + apt.duration_minutes, 0) || 0
-            const totalHours = Math.round(totalMinutes / 60 * 10) / 10 // Round to 1 decimal
+            const totalHours = Math.round(totalMinutes / 60 * 10) / 10 
 
-            // Count unique mentors
             const uniqueMentors = new Set(appointments?.map(apt => apt.mentor_id)).size
 
             setStats({
@@ -179,37 +178,29 @@ export default function MenteeDashboard() {
 
     const getGreeting = () => {
         const hour = new Date().getHours()
-        if (hour < 12) return "Bom dia"
-        if (hour < 18) return "Boa tarde"
-        return "Boa noite"
-    }
-
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString)
-        return {
-            date: date.toLocaleDateString('pt-BR'),
-            time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-        }
+        if (hour < 12) return t("greetings.morning")
+        if (hour < 18) return t("greetings.afternoon")
+        return t("greetings.evening")
     }
 
     const quickActions = [
         {
-            title: "Minhas Mentorias",
-            description: "Gerencie suas solicitações e sessões agendadas",
+            title: t("mentor.actions.mentorships"),
+            description: t("mentee.actions.findDesc"),
             href: "/mentorship/mentee",
             icon: Calendar,
             color: "bg-green-500"
         },
         {
-            title: "Encontrar Mentores",
-            description: "Busque mentores verificados em sua área de interesse",
+            title: t("mentee.actions.find"),
+            description: t("mentee.actions.findDesc"),
             href: "/mentors",
             icon: Search,
             color: "bg-blue-500"
         },
         {
-            title: "Editar Perfil",
-            description: "Atualize suas informações e interesses",
+            title: t("mentor.actions.editProfile"),
+            description: t("mentor.actions.editProfileDesc"),
             href: "/profile",
             icon: Users,
             color: "bg-purple-500"
@@ -220,21 +211,19 @@ export default function MenteeDashboard() {
         <RequireRole roles={['mentee']}>
             <div className="container mx-auto px-4 py-8">
                 <div className="space-y-8">
-                    {/* Header */}
                     <div>
                         <h1 className="text-3xl font-bold">
                             {getGreeting()}, {profile?.full_name || "Mentee"}!
                         </h1>
                         <p className="text-muted-foreground">
-                            Bem-vindo ao seu dashboard. Encontre mentores e acelere seu crescimento profissional.
+                            {t("mentee.welcome")}
                         </p>
                     </div>
 
-                    {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Próximas Sessões</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentor.stats.upcoming")}</CardTitle>
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -242,14 +231,14 @@ export default function MenteeDashboard() {
                                     {loading ? "..." : stats.upcomingAppointments}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Agendamentos confirmados
+                                    {t("mentor.stats.upcomingDesc")}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Mentores</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentee.stats.mentors")}</CardTitle>
                                 <Users className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -257,14 +246,14 @@ export default function MenteeDashboard() {
                                     {loading ? "..." : stats.totalMentors}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Mentores conectados
+                                    {t("mentee.stats.mentorsDesc")}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Sessões Completas</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentor.stats.completed")}</CardTitle>
                                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -272,14 +261,14 @@ export default function MenteeDashboard() {
                                     {loading ? "..." : stats.completedSessions}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Mentorias realizadas
+                                    {t("mentor.stats.completedDesc")}
                                 </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Horas de Mentoria</CardTitle>
+                                <CardTitle className="text-sm font-medium">{t("mentee.stats.hours")}</CardTitle>
                                 <Clock className="h-4 w-4 text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
@@ -287,15 +276,14 @@ export default function MenteeDashboard() {
                                     {loading ? "..." : stats.totalHours}h
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Total de aprendizado
+                                    {t("mentee.stats.hoursDesc")}
                                 </p>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Quick Actions */}
                     <div>
-                        <h2 className="text-2xl font-semibold mb-6">Ações Rápidas</h2>
+                        <h2 className="text-2xl font-semibold mb-6">{t("mentor.actions.title")}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {quickActions.map((action, index) => (
                                 <Card key={index} className="hover:shadow-md transition-shadow">
@@ -309,7 +297,7 @@ export default function MenteeDashboard() {
                                     <CardContent>
                                         <Button asChild className="w-full">
                                             <Link href={action.href}>
-                                                Acessar
+                                                {t("mentor.actions.access")}
                                                 <ArrowRight className="ml-2 h-4 w-4" />
                                             </Link>
                                         </Button>
@@ -319,62 +307,56 @@ export default function MenteeDashboard() {
                         </div>
                     </div>
 
-                    {/* Próximas Sessões - Removido (redundante com /mentorship/mentee) */}
-
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Getting Started */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Primeiros Passos</CardTitle>
+                                <CardTitle>{t("gettingStarted.title")}</CardTitle>
                                 <CardDescription>
-                                    Complete estas etapas para aproveitar ao máximo a plataforma
+                                    {t("gettingStarted.description")}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">Cadastro realizado</span>
+                                    <span className="text-sm">{t("gettingStarted.step1")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">Papel de mentee selecionado</span>
+                                    <span className="text-sm">{t("gettingStarted.step2")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">Complete seu perfil</span>
+                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step3Mentee")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">Encontre seu primeiro mentor</span>
+                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step4Mentee")}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">Agende sua primeira sessão</span>
+                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step5Mentee")}</span>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* Progresso e Recursos - Em Desenvolvimento */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Meu Progresso</CardTitle>
+                                <CardTitle>{t("mentee.progress.title")}</CardTitle>
                                 <CardDescription>
-                                    Acompanhe seu desenvolvimento profissional
+                                    {t("mentee.progress.description")}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-center py-6 text-muted-foreground">
                                     <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                    <p className="text-sm italic">Em desenvolvimento</p>
+                                    <p className="text-sm italic">{t("mentee.progress.inDevelopment")}</p>
                                     <p className="text-xs mt-2">
-                                        Em breve: gráficos de progresso, metas alcançadas, certificados e recursos de aprendizado
+                                        {t("mentee.progress.comingSoon")}
                                     </p>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
-
-                    {/* Mentores em Destaque - Comentado (pode adicionar depois se necessário) */}
                 </div>
             </div>
         </RequireRole>
