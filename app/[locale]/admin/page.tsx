@@ -35,12 +35,15 @@ export default function AdminDashboard() {
   const supabase = createClient()
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && supabase) {
       fetchStats()
+    } else if (!supabase) {
+      setLoading(false)
     }
-  }, [user?.id])
+  }, [user?.id, supabase])
 
   const fetchStats = async () => {
+    if (!supabase) return
     try {
       // Total de usuários
       const { count: totalUsers } = await supabase

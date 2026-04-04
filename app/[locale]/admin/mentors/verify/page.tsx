@@ -1,12 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, CheckCircle, Clock, Loader2, AlertTriangle } from "lucide-react"
-import Link from "next/link"
-import { RequireRole } from "@/lib/auth/auth-guard"
+import { useRouter, Link } from "@/i18n/routing"
 import { createClient } from "@/utils/supabase/client"
 import { MentorCard } from "@/components/admin/MentorCard"
 import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
@@ -37,11 +36,8 @@ export default function VerifyMentorsPage() {
 
     const supabase = createClient()
 
-    useEffect(() => {
-        fetchPendingMentors()
-    }, [])
-
-    const fetchPendingMentors = async () => {
+    const fetchPendingMentors = useCallback(async () => {
+        if (!supabase) return
         setLoading(true)
 
         try {
@@ -78,7 +74,11 @@ export default function VerifyMentorsPage() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [supabase])
+
+    useEffect(() => {
+        fetchPendingMentors()
+    }, [fetchPendingMentors])
 
     const handleVerificationChange = (mentorId: string, verified: boolean) => {
         if (verified) {
@@ -97,7 +97,7 @@ export default function VerifyMentorsPage() {
     }
 
     const handleVerifyAll = async () => {
-        if (pendingMentors.length === 0) return
+        if (pendingMentors.length === 0 || !supabase) return
 
         setVerifyingAll(true)
 
@@ -127,172 +127,168 @@ export default function VerifyMentorsPage() {
 
     if (loading) {
         return (
-            <RequireRole roles={['admin']}>
-                <div className="container mx-auto px-4 py-8">
-                    <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin" />
-                        <span className="ml-2">Carregando mentores pendentes...</span>
-                    </div>
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <span className="ml-2">Carregando mentores pendentes...</span>
                 </div>
-            </RequireRole>
+            </div>
         )
     }
 
     return (
-        <RequireRole roles={['admin']}>
-            <div className="container mx-auto px-4 py-8">
-                <AdminBreadcrumb />
-                <div className="space-y-6">
-                    {/* Header */}
-                    <div className="flex items-center gap-4">
-                        <Button variant="outline" size="sm" asChild>
-                            <Link href="/admin/mentors">
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Voltar
-                            </Link>
-                        </Button>
-                        <div className="flex-1">
-                            <h1 className="text-3xl font-bold">Verificar Mentores</h1>
-                            <p className="text-muted-foreground">
-                                Revise e aprove mentores aguardando verificação
-                            </p>
-                        </div>
+        <div className="container mx-auto px-4 py-8">
+            <AdminBreadcrumb />
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center gap-4">
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href="/admin/mentors">
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Voltar
+                        </Link>
+                    </Button>
+                    <div className="flex-1">
+                        <h1 className="text-3xl font-bold">Verificar Mentores</h1>
+                        <p className="text-muted-foreground">
+                            Revise e aprove mentores aguardando verificação
+                        </p>
                     </div>
+                </div>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Clock className="h-5 w-5 text-yellow-600" />
-                                    Prontos para Verificação
-                                </CardTitle>
-                                <CardDescription>
-                                    {pendingMentors.length} mentor(es) com perfil completo
-                                </CardDescription>
-                            </CardHeader>
-                            {pendingMentors.length > 0 && (
-                                <CardContent>
-                                    <div className="flex items-center justify-between">
-                                        <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                            {pendingMentors.length} pronto(s)
-                                        </Badge>
-                                        <Button
-                                            onClick={handleVerifyAll}
-                                            disabled={verifyingAll}
-                                            size="sm"
-                                            className="bg-green-600 hover:bg-green-700"
-                                        >
-                                            {verifyingAll ? (
-                                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                            ) : (
-                                                <CheckCircle className="h-4 w-4 mr-2" />
-                                            )}
-                                            Verificar Todos
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            )}
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <AlertTriangle className="h-5 w-5 text-orange-600" />
-                                    Perfis Incompletos
-                                </CardTitle>
-                                <CardDescription>
-                                    {incompleteMentors.length} mentor(es) precisam completar o perfil
-                                </CardDescription>
-                            </CardHeader>
-                            {incompleteMentors.length > 0 && (
-                                <CardContent>
-                                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-                                        {incompleteMentors.length} incompleto(s)
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Clock className="h-5 w-5 text-yellow-600" />
+                                Prontos para Verificação
+                            </CardTitle>
+                            <CardDescription>
+                                {pendingMentors.length} mentor(es) com perfil completo
+                            </CardDescription>
+                        </CardHeader>
+                        {pendingMentors.length > 0 && (
+                            <CardContent>
+                                <div className="flex items-center justify-between">
+                                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                        {pendingMentors.length} pronto(s)
                                     </Badge>
-                                </CardContent>
-                            )}
-                        </Card>
-                    </div>
-
-                    {/* Mentors List - Ready for Verification */}
-                    {pendingMentors.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-semibold">Prontos para Verificação</h2>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {pendingMentors.map((mentor) => (
-                                    <MentorCard
-                                        key={mentor.id}
-                                        mentor={mentor}
-                                        onVerificationChange={handleVerificationChange}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Mentors List - Incomplete Profiles */}
-                    {incompleteMentors.length > 0 && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-semibold">Perfis Incompletos</h2>
-                            <p className="text-sm text-muted-foreground">
-                                Estes mentores precisam completar seus perfis antes de serem verificados.
-                            </p>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {incompleteMentors.map((mentor) => (
-                                    <MentorCard
-                                        key={mentor.id}
-                                        mentor={mentor}
-                                        onVerificationChange={handleVerificationChange}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Empty State */}
-                    {pendingMentors.length === 0 && incompleteMentors.length === 0 && (
-                        <Card>
-                            <CardContent className="flex flex-col items-center justify-center py-12">
-                                <CheckCircle className="h-16 w-16 text-green-600 mb-4" />
-                                <h3 className="text-xl font-semibold mb-2">
-                                    Todos os mentores estão verificados!
-                                </h3>
-                                <p className="text-muted-foreground text-center mb-6">
-                                    Não há mentores aguardando verificação no momento.
-                                </p>
-                                <Button asChild>
-                                    <Link href="/admin/mentors">
-                                        Ver Todos os Mentores
-                                    </Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Help Text */}
-                    {pendingMentors.length > 0 && (
-                        <Card className="border-blue-200 bg-blue-50">
-                            <CardContent className="p-6">
-                                <div className="flex items-start gap-3">
-                                    <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
-                                    <div>
-                                        <h4 className="font-medium text-blue-900 mb-1">
-                                            Dicas para Verificação de Mentores
-                                        </h4>
-                                        <ul className="text-sm text-blue-800 space-y-1">
-                                            <li>• Verifique se o perfil está completo com bio e áreas de expertise</li>
-                                            <li>• Confirme se a experiência profissional é relevante</li>
-                                            <li>• Mentores verificados ficam visíveis publicamente na plataforma</li>
-                                            <li>• Você pode remover a verificação a qualquer momento se necessário</li>
-                                        </ul>
-                                    </div>
+                                    <Button
+                                        onClick={handleVerifyAll}
+                                        disabled={verifyingAll}
+                                        size="sm"
+                                        className="bg-green-600 hover:bg-green-700"
+                                    >
+                                        {verifyingAll ? (
+                                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                        ) : (
+                                            <CheckCircle className="h-4 w-4 mr-2" />
+                                        )}
+                                        Verificar Todos
+                                    </Button>
                                 </div>
                             </CardContent>
-                        </Card>
-                    )}
+                        )}
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                                Perfis Incompletos
+                            </CardTitle>
+                            <CardDescription>
+                                {incompleteMentors.length} mentor(es) precisam completar o perfil
+                            </CardDescription>
+                        </CardHeader>
+                        {incompleteMentors.length > 0 && (
+                            <CardContent>
+                                <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                                    {incompleteMentors.length} incompleto(s)
+                                </Badge>
+                            </CardContent>
+                        )}
+                    </Card>
                 </div>
+
+                {/* Mentors List - Ready for Verification */}
+                {pendingMentors.length > 0 && (
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-semibold">Prontos para Verificação</h2>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {pendingMentors.map((mentor) => (
+                                <MentorCard
+                                    key={mentor.id}
+                                    mentor={mentor}
+                                    onVerificationChange={handleVerificationChange}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Mentors List - Incomplete Profiles */}
+                {incompleteMentors.length > 0 && (
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-semibold">Perfis Incompletos</h2>
+                        <p className="text-sm text-muted-foreground">
+                            Estes mentores precisam completar seus perfis antes de serem verificados.
+                        </p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {incompleteMentors.map((mentor) => (
+                                <MentorCard
+                                    key={mentor.id}
+                                    mentor={mentor}
+                                    onVerificationChange={handleVerificationChange}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {pendingMentors.length === 0 && incompleteMentors.length === 0 && (
+                    <Card>
+                        <CardContent className="flex flex-col items-center justify-center py-12">
+                            <CheckCircle className="h-16 w-16 text-green-600 mb-4" />
+                            <h3 className="text-xl font-semibold mb-2">
+                                Todos os mentores estão verificados!
+                            </h3>
+                            <p className="text-muted-foreground text-center mb-6">
+                                Não há mentores aguardando verificação no momento.
+                            </p>
+                            <Button asChild>
+                                <Link href="/admin/mentors">
+                                    Ver Todos os Mentores
+                                </Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Help Text */}
+                {pendingMentors.length > 0 && (
+                    <Card className="border-blue-200 bg-blue-50">
+                        <CardContent className="p-6">
+                            <div className="flex items-start gap-3">
+                                <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
+                                <div>
+                                    <h4 className="font-medium text-blue-900 mb-1">
+                                        Dicas para Verificação de Mentores
+                                    </h4>
+                                    <ul className="text-sm text-blue-800 space-y-1">
+                                        <li>• Verifique se o perfil está completo com bio e áreas de expertise</li>
+                                        <li>• Confirme se a experiência profissional é relevante</li>
+                                        <li>• Mentores verificados ficam visíveis publicamente na plataforma</li>
+                                        <li>• Você pode remover a verificação a qualquer momento se necessário</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
-        </RequireRole>
+        </div>
     )
 }

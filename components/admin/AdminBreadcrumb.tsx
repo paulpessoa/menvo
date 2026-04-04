@@ -39,7 +39,10 @@ const routeMap: Record<string, BreadcrumbItem[]> = {
 
 export function AdminBreadcrumb() {
     const pathname = usePathname()
-    const breadcrumbs = routeMap[pathname] || []
+    
+    // Handle localized paths by removing the locale prefix (e.g., /fr/admin -> /admin)
+    const normalizedPathname = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?\//, '/')
+    const breadcrumbs = routeMap[normalizedPathname] || []
 
     if (breadcrumbs.length === 0) {
         return null

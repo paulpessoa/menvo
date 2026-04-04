@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useRouter, Link, usePathname } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -103,7 +102,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                             {adminNavItems.map((item) => (
                                 <Link
                                     key={item.href}
-                                    href={item.href}
+                                    href={item.href as any}
                                     className={cn(
                                         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                                         isActive(item.href)
