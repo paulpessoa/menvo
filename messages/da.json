@@ -400,10 +400,12 @@
     "error": {
       "invalidCredentials": "Falsk e-mail eller adgangskode. Tjek dine oplysninger, og prøv igen.",
       "emailNotConfirmed": "E-mail ikke bekræftet. Tjek din indbakke, og klik på bekræftelseslinket.",
-      "tooManyAttempts": "For mange log ind forsøg. Vent venligst et par minutter, før du prøver igen.",
-      "networkError": "Netværksfejl. Tjek din internetforbindelse, og prøv igen."
-    }
-  },
+      "tooManyAttempts": "For many log ind forsøg. Vent venligst et par minutter, før du prøver igen.",
+      "networkError": "Netværksfejl. Tjek din internetforbindelse, og prøv igen.",
+      "unexpected": "Uventet fejl. Prøv venligst igen.",
+      "loginFailed": "Fejl ved login. Prøv venligst igen."
+      }
+      },
   "register": {
     "title": "Tilslut dig Menvo",
     "subtitle": "Kom i kontakt med frivillige mentorer og udvikl din karriere gratis",

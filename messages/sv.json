@@ -175,9 +175,33 @@
     }
   },
   "login": {
-    "orContinueWith": "eller fortsätt med",
+    "title": "Välkommen tillbaka",
+    "description": "Logga in på ditt konto för att komma åt plattformen",
+    "email": "E-post",
+    "emailPlaceholder": "namn@exempel.se",
+    "password": "Lösenord",
+    "passwordPlaceholder": "Ange ditt lösenord",
+    "forgotPassword": "Glömt lösenordet?",
+    "loginButton": "Logga in",
+    "loggingIn": "Loggar in...",
+    "noAccount": "Har du inget konto?",
+    "signUp": "Registrera dig",
+    "continueWith": "Fortsätt med",
+    "orContinueWith": "eller fortsätt med e-post",
+    "google": "Google",
+    "linkedin": "LinkedIn",
+    "connecting": "Ansluter...",
     "success": "Inloggningen lyckades!",
-    "loggingIn": "Loggar in..."
+    "emailNotConfirmedInfo": "Kontrollera din inkorg för att verifiera din e-postadress.",
+    "dontHaveAccount": "Har du inget konto?",
+    "error": {
+      "invalidCredentials": "Ogiltig e-postadress eller lösenord. Kontrollera dina uppgifter och försök igen.",
+      "emailNotConfirmed": "E-postadressen är inte bekräftad. Kontrollera din inkorg och klicka på bekräftelselänken.",
+      "tooManyAttempts": "För många inloggningsförsök. Vänta några minuter innan du försöker igen.",
+      "networkError": "Anslutningsfel. Kontrollera din internetanslutning och försök igen.",
+      "unexpected": "Oväntat fel. Försök igen.",
+      "loginFailed": "Det gick inte att logga in. Försök igen."
+    }
   },
   "register": {
     "success": "Kontot har skapats!",

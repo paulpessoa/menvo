@@ -278,6 +278,35 @@
       "agreement": "By setting your password, you agree to our"
     }
   },
+  "login": {
+    "title": "Bienvenido de nuevo",
+    "description": "Inicia sesión en tu cuenta para acceder a la plataforma",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Introduce tu contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginButton": "Entrar",
+    "loggingIn": "Entrando...",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate",
+    "continueWith": "Continuar con",
+    "orContinueWith": "o continúa con el correo electrónico",
+    "google": "Google",
+    "linkedin": "LinkedIn",
+    "connecting": "Conectando...",
+    "success": "¡Inicio de sesión exitoso!",
+    "emailNotConfirmedInfo": "Revisa tu bandeja de entrada para verificar tu correo electrónico.",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "error": {
+      "invalidCredentials": "Correo electrónico o contraseña incorrectos. Por favor, revisa tus credenciales e inténtalo de nuevo.",
+      "emailNotConfirmed": "Correo electrónico no confirmado. Revisa tu bandeja de entrada y haz clic en el enlace de confirmación.",
+      "tooManyAttempts": "Demasiados intentos de inicio de sesión. Por favor, espera unos minutos antes de intentarlo de nuevo.",
+      "networkError": "Error de conexión. Por favor, revisa tu internet e inténtalo de nuevo.",
+      "unexpected": "Error inesperado. Inténtalo de nuevo.",
+      "loginFailed": "Error al iniciar sesión. Inténtalo de nuevo."
+    }
+  },
   "newsletter": {
     "unsubscribe": {
       "title": "Unsubscribe from newsletter",

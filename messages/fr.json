@@ -401,9 +401,11 @@
       "invalidCredentials": "E-mail ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
       "emailNotConfirmed": "E-mail non confirmé. Vérifiez votre boîte de réception et cliquez sur le lien de confirmation.",
       "tooManyAttempts": "Trop de tentatives de connexion. Veuillez patienter quelques minutes avant de réessayer.",
-      "networkError": "Erreur de connexion. Vérifiez votre connexion internet et réessayez."
-    }
-  },
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion internet et réessayer.",
+      "unexpected": "Erreur inattendue. Veuillez réessayer.",
+      "loginFailed": "Échec de la connexion. Veuillez réessayer."
+      }
+      },
   "register": {
     "title": "Rejoignez Menvo",
     "subtitle": "Connectez-vous avec des mentors bénévoles et développez votre carrière gratuitement",
