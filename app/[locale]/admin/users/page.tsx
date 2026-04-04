@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,7 +20,8 @@ import {
   Eye,
   MoreVertical,
   Check,
-  X
+  X,
+  AlertTriangle
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -30,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { RequireRole } from "@/lib/auth/auth-guard"
+import { useRouter, Link } from "@/i18n/routing"
 import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
 import { UserMetrics } from "@/components/admin/UserMetrics"
 import { createClient } from "@/utils/supabase/client"
@@ -74,15 +75,8 @@ export default function AdminUsersPage() {
 
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    filterUsers()
-  }, [users, searchTerm, activeTab])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!supabase) return
     setLoading(true)
     try {
       // Fetch users
@@ -117,7 +111,7 @@ export default function AdminUsersPage() {
 
       const userData = (userDataRaw || []).map(user => ({
         ...user,
-        roles: user.user_roles?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
+        roles: (user.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
       }))
 
       setUsers(userData)
@@ -136,9 +130,22 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    if (supabase) {
+      fetchData()
+    } else {
+      setLoading(false)
+    }
+  }, [supabase, fetchData])
+
+  useEffect(() => {
+    filterUsers()
+  }, [users, searchTerm, activeTab])
 
   const toggleVerification = async (userId: string, currentStatus: boolean) => {
+    if (!supabase) return
     setActionLoading(userId)
     try {
       const { error } = await supabase
@@ -213,149 +220,163 @@ export default function AdminUsersPage() {
 
   if (loading) {
     return (
-      <RequireRole roles={['admin']}>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Carregando painel de controle...</span>
-          </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="ml-2">Carregando painel de controle...</span>
         </div>
-      </RequireRole>
+      </div>
+    )
+  }
+
+  if (!supabase) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <CardTitle className="text-red-800">Erro de Configuração</CardTitle>
+            </div>
+            <CardDescription className="text-red-700">
+              As variáveis de ambiente do Supabase não foram configuradas corretamente.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
     )
   }
 
   return (
-    <RequireRole roles={['admin']}>
-      <div className="container mx-auto px-4 py-8">
-        <AdminBreadcrumb />
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Gestão Global de Usuários</h1>
-              <p className="text-muted-foreground">
-                Controle de permissões, mentores e métricas de engajamento
-              </p>
+    <div className="container mx-auto px-4 py-8">
+      <AdminBreadcrumb />
+      <div className="space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Gestão Global de Usuários</h1>
+            <p className="text-muted-foreground">
+              Controle de permissões, mentores e métricas de engajamento
+            </p>
+          </div>
+          <Button onClick={fetchData} variant="outline" className="w-full md:w-auto">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Atualizar Dados
+          </Button>
+        </div>
+
+        {/* Metrics Section */}
+        <UserMetrics data={users} />
+
+        {/* Search & List */}
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nome ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <Button onClick={fetchUsers} variant="outline" className="w-full md:w-auto">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar Dados
-            </Button>
           </div>
 
-          {/* Metrics Section */}
-          <UserMetrics data={users} />
+          <Card>
+            <CardContent className="p-0">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <div className="px-4 pt-4 border-b">
+                  <TabsList className="w-full justify-start overflow-x-auto">
+                    <TabsTrigger value="all">Todos ({stats.total})</TabsTrigger>
+                    <TabsTrigger value="mentors">Mentores ({stats.mentors})</TabsTrigger>
+                    <TabsTrigger value="mentees">Mentees ({stats.mentees})</TabsTrigger>
+                    <TabsTrigger value="admins">Admins ({stats.admins})</TabsTrigger>
+                    <TabsTrigger value="verified">Verificados ({stats.verified})</TabsTrigger>
+                  </TabsList>
+                </div>
 
-          {/* Search & List */}
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar por nome ou email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
+                <TabsContent value={activeTab} className="m-0">
+                  <div className="divide-y">
+                    {filteredUsers.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium">Nenhum usuário encontrado</h3>
+                      </div>
+                    ) : (
+                      filteredUsers.map((user) => (
+                        <div key={user.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-4">
+                          <Avatar className="h-10 w-10 border">
+                            <AvatarImage src={user.avatar_url || undefined} />
+                            <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
+                          </Avatar>
 
-            <Card>
-              <CardContent className="p-0">
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <div className="px-4 pt-4 border-b">
-                    <TabsList className="w-full justify-start overflow-x-auto">
-                      <TabsTrigger value="all">Todos ({stats.total})</TabsTrigger>
-                      <TabsTrigger value="mentors">Mentores ({stats.mentors})</TabsTrigger>
-                      <TabsTrigger value="mentees">Mentees ({stats.mentees})</TabsTrigger>
-                      <TabsTrigger value="admins">Admins ({stats.admins})</TabsTrigger>
-                      <TabsTrigger value="verified">Verificados ({stats.verified})</TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  <TabsContent value={activeTab} className="m-0">
-                    <div className="divide-y">
-                      {filteredUsers.length === 0 ? (
-                        <div className="text-center py-12">
-                          <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-medium">Nenhum usuário encontrado</h3>
-                        </div>
-                      ) : (
-                        filteredUsers.map((user) => (
-                          <div key={user.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-4">
-                            <Avatar className="h-10 w-10 border">
-                              <AvatarImage src={user.avatar_url || undefined} />
-                              <AvatarFallback>{getInitials(user.full_name)}</AvatarFallback>
-                            </Avatar>
-
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-sm truncate">
-                                  {user.full_name || 'Usuário sem nome'}
-                                </span>
-                                {user.verified && (
-                                  <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 text-[10px] h-5">
-                                    VERIFICADO
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="text-xs text-muted-foreground truncate">{user.email}</div>
-                            </div>
-
-                            <div className="hidden md:flex gap-1">
-                              {user.roles.map(role => (
-                                <Badge key={role} variant="outline" className={`${getRoleBadgeColor(role)} text-[10px]`}>
-                                  {role.toUpperCase()}
-                                </Badge>
-                              ))}
-                            </div>
-
-                            <div className="text-xs text-muted-foreground hidden lg:block">
-                              Desde {formatDate(user.created_at)}
-                            </div>
-
+                          <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                  <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem onClick={() => window.open(`/mentors/${user.id}`, '_blank')}>
-                                    <Eye className="mr-2 h-4 w-4" /> Ver Perfil Público
-                                  </DropdownMenuItem>
-                                  
-                                  {user.roles.includes('mentor') && (
-                                    <DropdownMenuItem onClick={() => toggleVerification(user.id, user.verified)}>
-                                      {user.verified ? (
-                                        <><X className="mr-2 h-4 w-4 text-red-500" /> Revogar Verificação</>
-                                      ) : (
-                                        <><Check className="mr-2 h-4 w-4 text-green-500" /> Aprovar Mentor</>
-                                      )}
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Gerenciar Papéis</DropdownMenuLabel>
-                                  <DropdownMenuItem className="text-xs">Tornar Admin (Pendente)</DropdownMenuItem>
-                                  <DropdownMenuItem className="text-xs">Tornar Mentor (Pendente)</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <span className="font-semibold text-sm truncate">
+                                {user.full_name || 'Usuário sem nome'}
+                              </span>
+                              {user.verified && (
+                                <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 text-[10px] h-5">
+                                  VERIFICADO
+                                </Badge>
+                              )}
                             </div>
+                            <div className="text-xs text-muted-foreground truncate">{user.email}</div>
                           </div>
-                        ))
-                      )}
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
+
+                          <div className="hidden md:flex gap-1">
+                            {user.roles.map(role => (
+                              <Badge key={role} variant="outline" className={`${getRoleBadgeColor(role)} text-[10px]`}>
+                                {role.toUpperCase()}
+                              </Badge>
+                            ))}
+                          </div>
+
+                          <div className="text-xs text-muted-foreground hidden lg:block">
+                            Desde {formatDate(user.created_at)}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => window.open(`/mentors/${user.id}`, '_blank')}>
+                                  <Eye className="mr-2 h-4 w-4" /> Ver Perfil Público
+                                </DropdownMenuItem>
+                                
+                                {user.roles.includes('mentor') && (
+                                  <DropdownMenuItem onClick={() => toggleVerification(user.id, user.verified)}>
+                                    {user.verified ? (
+                                      <><X className="mr-2 h-4 w-4 text-red-500" /> Revogar Verificação</>
+                                    ) : (
+                                      <><Check className="mr-2 h-4 w-4 text-green-500" /> Aprovar Mentor</>
+                                    )}
+                                  </DropdownMenuItem>
+                                )}
+                                
+                                <DropdownMenuSeparator />
+                                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Gerenciar Papéis</DropdownMenuLabel>
+                                <DropdownMenuItem className="text-xs">Tornar Admin (Pendente)</DropdownMenuItem>
+                                <DropdownMenuItem className="text-xs">Tornar Mentor (Pendente)</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </RequireRole>
+    </div>
   )
 }
