@@ -401,7 +401,9 @@
       "invalidCredentials": "E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.",
       "emailNotConfirmed": "E-mail não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.",
       "tooManyAttempts": "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.",
-      "networkError": "Erro de conexão. Verifique sua internet e tente novamente."
+      "networkError": "Erro de conexão. Verifique sua internet e tente novamente.",
+      "unexpected": "Erro inesperado. Tente novamente.",
+      "loginFailed": "Erro ao fazer login. Tente novamente."
     }
   },
   "register": {

@@ -399,7 +399,9 @@
       "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
       "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
       "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
-      "networkError": "Connection error. Please check your internet and try again."
+      "networkError": "Connection error. Please check your internet and try again.",
+      "unexpected": "Unexpected error. Please try again.",
+      "loginFailed": "Error signing in. Please try again."
     },
     "orContinueWith": "or continue with",
     "success": "Login successful!"
