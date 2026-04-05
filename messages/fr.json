@@ -143,7 +143,7 @@
     "sdg": {
       "title": "Objectifs de Développement Durable",
       "description": "Notre plateforme est alignée sur les Objectifs de Développement Durable (ODD) des Nations Unies, avec un accent particulier sur :",
-      "goalNumber": "ODD {{number}}",
+      "goalNumber": "ODD {number}",
       "goals": {
         "qualityEducation": "Éducation de Qualité",
         "genderEquality": "Égalité entre les Sexes",
@@ -178,7 +178,7 @@
     "ourPartners": {
       "title": "Nos Partenaires",
       "description": "Nous sommes fiers de collaborer avec des organisations qui partagent notre vision de rendre le mentorat accessible à tous.",
-      "partnerLogoAlt": "Logo du Partenaire {{number}}"
+      "partnerLogoAlt": "Logo du Partenaire {number}"
     },
     "joinOurMission": {
       "title": "Rejoignez Notre Mission",
@@ -526,7 +526,7 @@
       "all": "Tous",
       "available": "Disponible",
       "busy": "Occupé",
-      "aboveRating": "{{rating}}+ étoiles"
+      "aboveRating": "{rating}+ étoiles"
     },
     "mentorCard": {
       "available": "Disponible",
@@ -538,7 +538,7 @@
     "loginRequired": {
       "title": "Connexion Requise",
       "description": "Vous devez être connecté pour voir les profils des mentors et réserver des sessions.",
-      "descriptionWithName": "Vous devez être connecté pour voir le profil de {{mentorName}} et réserver des sessions.",
+      "descriptionWithName": "Vous devez être connecté pour voir le profil de {mentorName} et réserver des sessions.",
       "benefits": {
         "title": "Ce que vous pouvez faire après vous être connecté :",
         "item1": "Voir les profils détaillés des mentors",
@@ -552,7 +552,7 @@
     "pagination": {
       "previous": "Précédent",
       "next": "Suivant",
-      "page": "Page {{current} sur {{total}}"
+      "page": "Page {current} sur {total}"
     }
   },
   "footer": {
@@ -842,12 +842,12 @@
     "availabilityPlaceholder": "Availability status",
     "anyStatus": "Any status",
     "clearFilters": "Clear Filters",
-    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}",
     "noMentorsTitle": "No mentors found",
     "noMentorsDescription": "Try adjusting your filters to find more mentors.",
     "suggestTopic": "Suggest Topic or Area",
     "viewProfile": "Voir le profil",
-    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}",
     "status": {
       "available": "Available",
       "busy": "Busy",
@@ -865,7 +865,7 @@
     "bookMentorship": "Réserver un mentorat",
     "fullSchedule": "Complet",
     "links": "Liens",
-    "yearsExperienceCount": "{count, plural, =1 {1 an d'expérience} other {# ans d'expérience}}",
+    "yearsExperienceCount": "{count, plural, =1 {1 an d'expérience} other {# ans d'expérience}",
     "loginRequired": {
       "title": "Connexion requise",
       "description": "Vous devez être connecté pour réserver un mentorat ou utiliser le chat."
@@ -901,7 +901,7 @@
         "completed": "Completed Sessions",
         "completedDesc": "Mentorships conducted",
         "rating": "Rating",
-        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
+        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}"
       },
       "actions": {
         "title": "Quick Actions",

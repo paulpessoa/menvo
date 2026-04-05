@@ -143,7 +143,7 @@
     "sdg": {
       "title": "Objetivos de Desenvolvimento Sustentável",
       "description": "Nossa plataforma está alinhada aos Objetivos de Desenvolvimento Sustentável (ODS) da ONU, com foco especial em:",
-      "goalNumber": "ODS {{number}}",
+      "goalNumber": "ODS {number}",
       "goals": {
         "qualityEducation": "Educação de Qualidade",
         "genderEquality": "Igualdade de Gênero",
@@ -178,7 +178,7 @@
     "ourPartners": {
       "title": "Nossos Parceiros",
       "description": "Temos orgulho de colaborar com organizações que compartilham nossa visão de tornar a mentoria acessível a todos.",
-      "partnerLogoAlt": "Logo do Parceiro {{number}}"
+      "partnerLogoAlt": "Logo do Parceiro {number}"
     },
     "joinOurMission": {
       "title": "Junte-se à Nossa Missão",
@@ -526,7 +526,7 @@
       "all": "Todas",
       "available": "Disponível",
       "busy": "Ocupado",
-      "aboveRating": "{{rating}}+ estrelas"
+      "aboveRating": "{rating}+ estrelas"
     },
     "mentorCard": {
       "available": "Disponível",
@@ -538,7 +538,7 @@
     "loginRequired": {
       "title": "Login Necessário",
       "description": "Você precisa estar logado para ver perfis de mentores e agendar sessões.",
-      "descriptionWithName": "Você precisa estar logado para ver o perfil de {{mentorName} e agendar sessões.",
+      "descriptionWithName": "Você precisa estar logado para ver o perfil de {mentorName} e agendar sessões.",
       "benefits": {
         "title": "O que você pode fazer após fazer login:",
         "item1": "Ver perfis detalhados dos mentores",
@@ -552,7 +552,7 @@
     "pagination": {
       "previous": "Anterior",
       "next": "Próximo",
-      "page": "Página {{current} de {{total}}"
+      "page": "Página {current} de {total}"
     }
   },
   "footer": {
@@ -817,12 +817,12 @@
     "availabilityPlaceholder": "Status de disponibilidade",
     "anyStatus": "Qualquer status",
     "clearFilters": "Limpar Filtros",
-    "resultsFound": "{count, plural, =0 {Nenhum mentor encontrado} =1 {1 mentor encontrado} other {# mentores encontrados}}",
+    "resultsFound": "{count, plural, =0 {Nenhum mentor encontrado} =1 {1 mentor encontrado} other {# mentores encontrados}",
     "noMentorsTitle": "Nenhum mentor encontrado",
     "noMentorsDescription": "Tente ajustar seus filtros para encontrar mais mentores.",
     "suggestTopic": "Sugerir Tema ou Área",
     "viewProfile": "Ver Perfil",
-    "sessionsCount": "{count, plural, =1 {1 sessão} other {# sessões}}",
+    "sessionsCount": "{count, plural, =1 {1 sessão} other {# sessões}",
     "status": {
       "available": "Disponível",
       "busy": "Ocupado",
@@ -840,7 +840,7 @@
     "bookMentorship": "Agendar Mentoria",
     "fullSchedule": "Agenda Lotada",
     "links": "Links",
-    "yearsExperienceCount": "{count, plural, =1 {1 ano de experiência} other {# anos de experiência}}",
+    "yearsExperienceCount": "{count, plural, =1 {1 ano de experiência} other {# anos de experiência}",
     "loginRequired": {
       "title": "Login Necessário",
       "description": "Você precisa estar logado para agendar uma mentoria ou usar o chat."
@@ -876,7 +876,7 @@
         "completed": "Sessões Completas",
         "completedDesc": "Mentorias realizadas",
         "rating": "Avaliação",
-        "reviews": "{count, plural, =0 {Sem avaliações} =1 {1 avaliação} other {# avaliações}}"
+        "reviews": "{count, plural, =0 {Sem avaliações} =1 {1 avaliação} other {# avaliações}"
       },
       "actions": {
         "title": "Ações Rápidas",

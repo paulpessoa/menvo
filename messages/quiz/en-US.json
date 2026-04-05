@@ -15,7 +15,7 @@
     "back": "Back",
     "question": "Question",
     "of": "of",
-    "progress_header": "Question {{currentStep}} of {{totalSteps}}",
+    "progress_header": "Question {currentStep} of {totalSteps}",
     "career_moment_title": "What is your current career moment?",
     "career_moment_description": "Select the option that best describes your current moment",
     "professional_challenge_title": "What is your biggest professional challenge at the moment?",

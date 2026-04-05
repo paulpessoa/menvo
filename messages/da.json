@@ -143,7 +143,7 @@
     "sdg": {
       "title": "Verdensmål for Bæredyrdig Udvikling",
       "description": "Vores platform støtter op om FN's verdensmål (SDG'er), med et særligt fokus på:",
-      "goalNumber": "Mål {{number}}",
+      "goalNumber": "Mål {number}",
       "goals": {
         "qualityEducation": "Kvalitetsuddannelse",
         "genderEquality": "Ligestilling mellem kønnene",
@@ -178,7 +178,7 @@
     "ourPartners": {
       "title": "Vores Partnere",
       "description": "Vi er stolte af at samarbejde med organisationer, der deler vores vision om at gøre mentorordninger tilgængelige for alle.",
-      "partnerLogoAlt": "Partnerens logo {{number}}"
+      "partnerLogoAlt": "Partnerens logo {number}"
     },
     "joinOurMission": {
       "title": "Vær med i Vores Mission",
@@ -526,7 +526,7 @@
       "all": "Alle",
       "available": "Tilgængelig",
       "busy": "Optaget",
-      "aboveRating": "{{rating}}+ stjerner"
+      "aboveRating": "{rating}+ stjerner"
     },
     "mentorCard": {
       "available": "Tilgængelig",
@@ -842,12 +842,12 @@
     "availabilityPlaceholder": "Availability status",
     "anyStatus": "Any status",
     "clearFilters": "Clear Filters",
-    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}",
     "noMentorsTitle": "No mentors found",
     "noMentorsDescription": "Try adjusting your filters to find more mentors.",
     "suggestTopic": "Suggest Topic or Area",
     "viewProfile": "Se profil",
-    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}",
     "status": {
       "available": "Available",
       "busy": "Busy",
@@ -865,7 +865,7 @@
     "bookMentorship": "Book mentorskab",
     "fullSchedule": "Fuldt booket",
     "links": "Links",
-    "yearsExperienceCount": "{count, plural, =1 {1 års erfaring} other {# års erfaring}}",
+    "yearsExperienceCount": "{count, plural, =1 {1 års erfaring} other {# års erfaring}",
     "loginRequired": {
       "title": "Login påkrævet",
       "description": "Du skal være logget ind for at booke et mentorskab eller bruge chatten."
@@ -901,7 +901,7 @@
         "completed": "Completed Sessions",
         "completedDesc": "Mentorships conducted",
         "rating": "Rating",
-        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
+        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}"
       },
       "actions": {
         "title": "Quick Actions",

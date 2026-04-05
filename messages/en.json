@@ -143,7 +143,7 @@
     "sdg": {
       "title": "Sustainable Development Goals",
       "description": "Our platform aligns with the United Nations' Sustainable Development Goals (SDGs), particularly focusing on:",
-      "goalNumber": "SDG {{number}}",
+      "goalNumber": "SDG {number}",
       "goals": {
         "qualityEducation": "Quality Education",
         "genderEquality": "Gender Equality",
@@ -526,7 +526,7 @@
       "all": "All",
       "available": "Available",
       "busy": "Busy",
-      "aboveRating": "{{rating}}+ stars"
+      "aboveRating": "{rating}+ stars"
     },
     "mentorCard": {
       "available": "Available",
@@ -538,7 +538,7 @@
     "loginRequired": {
       "title": "Login Required",
       "description": "You need to be logged in to view mentor profiles and schedule sessions.",
-      "descriptionWithName": "You need to be logged in to view {{mentorName}}'s profile and schedule sessions.",
+      "descriptionWithName": "You need to be logged in to view {mentorName}'s profile and schedule sessions.",
       "benefits": {
         "title": "What you can do after logging in:",
         "item1": "View detailed mentor profiles",
@@ -552,7 +552,7 @@
     "pagination": {
       "previous": "Previous",
       "next": "Next",
-      "page": "Page {{current}} of {{total}}"
+      "page": "Page {current} of {total}"
     }
   },
   "footer": {
@@ -842,12 +842,12 @@
     "availabilityPlaceholder": "Availability status",
     "anyStatus": "Any status",
     "clearFilters": "Clear Filters",
-    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}",
     "noMentorsTitle": "No mentors found",
     "noMentorsDescription": "Try adjusting your filters to find more mentors.",
     "suggestTopic": "Suggest Topic or Area",
     "viewProfile": "View Profile",
-    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}",
     "status": {
       "available": "Available",
       "busy": "Busy",
@@ -865,7 +865,7 @@
     "bookMentorship": "Book Mentorship",
     "fullSchedule": "Full Schedule",
     "links": "Links",
-    "yearsExperienceCount": "{count, plural, =1 {1 year of experience} other {# years of experience}}",
+    "yearsExperienceCount": "{count, plural, =1 {1 year of experience} other {# years of experience}",
     "loginRequired": {
       "title": "Login Required",
       "description": "You need to be logged in to book a mentorship or use the chat."
@@ -901,7 +901,7 @@
         "completed": "Completed Sessions",
         "completedDesc": "Mentorships conducted",
         "rating": "Rating",
-        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
+        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}"
       },
       "actions": {
         "title": "Quick Actions",

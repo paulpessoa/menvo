@@ -15,7 +15,7 @@
     "back": "Voltar",
     "question": "Pergunta",
     "of": "de",
-    "progress_header": "Pergunta {{currentStep}} de {{totalSteps}}",
+    "progress_header": "Pergunta {currentStep} de {totalSteps}",
     "career_moment_title": "Qual é o seu momento de carreira atual?",
     "career_moment_description": "Selecione a opção que melhor descreve seu momento atual",
     "professional_challenge_title": "Qual é o seu maior desafio profissional no momento?",
