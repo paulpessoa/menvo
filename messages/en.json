@@ -901,7 +901,7 @@
         "completed": "Completed Sessions",
         "completedDesc": "Mentorships conducted",
         "rating": "Rating",
-        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}",
+        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
       },
       "actions": {
         "title": "Quick Actions",
