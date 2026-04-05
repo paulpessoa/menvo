@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     authors: [{ name: "Paul Pessoa", url: "https://github.com/paulpessoa" }],
     creator: "Paul Pessoa",
     publisher: "MENVO",
-    keywords: t('keywords') || ["mentoria", "voluntariado"],
+    keywords: t.raw('keywords') || ["mentoria", "voluntariado"],
     openGraph: {
       type: "website",
       locale: locale,
