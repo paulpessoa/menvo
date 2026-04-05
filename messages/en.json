@@ -98,7 +98,7 @@
         "date": "June 15, 2025",
         "time": "6:00 PM - 8:00 PM",
         "description": "Join our panel of industry experts as they share insights on how to start and grow your career in technology.",
-        "attendees": "{{count}} attendees",
+        "attendees": "{count} attendees",
         "register": "Register"
       },
       "viewAll": "View All Events"
@@ -178,7 +178,7 @@
     "ourPartners": {
       "title": "Our Partners",
       "description": "We're proud to collaborate with organizations that share our vision of making mentorship accessible to all.",
-      "partnerLogoAlt": "Partner {{number}} logo"
+      "partnerLogoAlt": "Partner {number} logo"
     },
     "joinOurMission": {
       "title": "Join Our Mission",
@@ -430,7 +430,7 @@
     "signIn": "Sign In",
     "orContinueWith": "Or continue with",
     "confirmEmail": "Confirm your email",
-    "confirmEmailDescription": "A confirmation email was sent to {{email}}. Please access your inbox and click the link to activate your account.",
+    "confirmEmailDescription": "A confirmation email was sent to {email}. Please access your inbox and click the link to activate your account.",
     "nextSteps": "Next steps:",
     "nextStepsList": [
       "Check your inbox (and spam folder)",
@@ -500,7 +500,7 @@
     "filtersTitle": "Filters",
     "applyFilters": "Apply Filters",
     "clearFilters": "Clear",
-    "showingResults": "{{count}} mentors found",
+    "showingResults": "{count} mentors found",
     "sortBy": "Sort by",
     "sortOptions": {
       "relevance": "Relevance",
@@ -741,7 +741,7 @@
       "thankYou": "Thank you for your feedback!",
       "error": "Error submitting feedback. Please try again.",
       "ratingRequired": "Please select a rating.",
-      "rateStars": "Rate with {{count}} stars"
+      "rateStars": "Rate with {count} stars"
     }
   },
   "metadata": {
@@ -791,7 +791,7 @@
     "submit": "Submit Feedback",
     "thankYou": "Thank you for your feedback!",
     "error": "Error submitting feedback. Please try again.",
-    "rateStars": "Rate with {{count}} stars"
+    "rateStars": "Rate with {count} stars"
   },
   "mentorSuggestion": {
     "loginRequiredTitle": "Login Required",

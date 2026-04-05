@@ -204,12 +204,91 @@
     }
   },
   "register": {
-    "success": "Kontot har skapats!",
+    "title": "Gå med i Menvo",
+    "subtitle": "Anslut med frivilliga mentorer och utveckla din karriär gratis",
+    "signupTitle": "Skapa konto",
+    "description": "Fyll i dina uppgifter för att starta din resa",
+    "firstName": "Förnamn",
+    "firstNamePlaceholder": "Ange ditt förnamn",
+    "lastName": "Efternamn",
+    "lastNamePlaceholder": "Ange ditt efternamn",
+    "email": "E-post",
+    "emailPlaceholder": "Ange din e-post",
+    "emailInvalid": "Ogiltig e-post",
+    "password": "Lösenord",
+    "passwordPlaceholder": "Skapa ett lösenord",
+    "confirmPassword": "Bekräfta lösenord",
+    "confirmPasswordPlaceholder": "Ange lösenordet igen",
+    "mentor": "Mentor",
+    "mentee": "Mentee",
+    "registerButton": "Registrera dig",
     "creatingAccount": "Skapar konto...",
-    "goToHome": "Tillbaka till hemmet",
+    "alreadyHaveAccount": "Har du redan ett konto?",
+    "signIn": "Logga in",
+    "orContinueWith": "Eller fortsätt med",
+    "confirmEmail": "Bekräfta din e-post",
+    "confirmEmailDescription": "Ett bekräftelsemeddelande har skickats till {email}. Gå till din inkorg och klicka på länken för att aktivera ditt konto.",
+    "nextSteps": "Nästa steg:",
+    "nextStepsList": [
+      "Kontrollera din inkorg (och skräppost)",
+      "Klicka på bekräftelselänken i e-postmeddelandet",
+      "Välj din användartyp (mentor eller mentee)",
+      "Slutför din profil med din information",
+      "Vänta på validering från vårt team (endast mentorer)"
+    ],
+    "afterConfirmation": "Efter att du har bekräftat din e-post kommer du att kunna välja om du vill vara mentor eller mentee och slutföra din profil. Mentorer kommer att genomgå en valideringsprocess med vårt team innan de publiceras.",
     "didntReceiveEmail": "Fick du inte e-postmeddelandet?",
     "checkSpam": "Kontrollera din skräppost.",
-    "signIn": "Logga in"
+    "emailExpired": "Bekräftelselänken har gått ut?",
+    "emailExpiredDescription": "Om bekräftelselänken har gått ut (24 timmar) kan du använda alternativet 'Glömt lösenordet' för att återställa och bekräfta ditt konto.",
+    "resendEmail": "Skicka e-post igen",
+    "emailExpiredAction": "Länken har gått ut? Återställ lösenord",
+    "tryAgain": "Försök igen",
+    "emailConfirmed": "E-post bekräftad!",
+    "emailConfirmedDescription": "Din e-post har bekräftats. Välj nu hur du vill använda plattformen.",
+    "selectRoleDescription": "Välj hur du vill använda plattformen:",
+    "menteeDescription": "Jag söker vägledning och professionell utveckling",
+    "mentorDescription": "Jag vill dela med mig av kunskap och vägleda andra yrkesverksamma",
+    "continue": "Fortsätt",
+    "welcome": {
+      "title": "Välkommen till Menvo!",
+      "description": "Ditt konto har bekräftats framgångsrikt. Välj nu hur du vill använda plattformen.",
+      "selectRoleDescription": "Välj hur du vill använda plattformen:",
+      "continue": "Fortsätt"
+    },
+    "goToLogin": "Gå till logga in",
+    "passwordValidation": {
+      "passwordsDontMatch": "Lösenorden matchar inte",
+      "passwordTooShort": "Lösenordet måste vara minst 6 tecken långt",
+      "passwordStrength": "Lösenordsstyrka:",
+      "passwordTooWeak": "För svagt lösenord",
+      "passwordMedium": "Medelstarkt lösenord",
+      "passwordStrong": "Starkt lösenord",
+      "passwordsMatch": "✓ Lösenorden matchar",
+      "passwordsDontMatchError": "Lösenorden matchar inte"
+    },
+    "goToHome": "Tillbaka till hemmet",
+    "goToVerification": "Gå till verifieringssidan",
+    "userType": {
+      "title": "Hur vill du delta?",
+      "mentee": {
+        "title": "Mentee",
+        "description": "Jag söker vägledning för att utveckla min karriär"
+      },
+      "mentor": {
+        "title": "Mentor",
+        "description": "Jag vill dela med mig av min erfarenhet och hjälpa andra"
+      },
+      "company": {
+        "title": "Företag",
+        "description": "Jag vill anmäla yrkesverksamma från vårt företag"
+      },
+      "recruiter": {
+        "title": "Rekryterare",
+        "description": "Jag söker kvalificerade yrkesverksamma för möjligheter"
+      }
+    },
+    "success": "Kontot har skapats!"
   },
   "dashboard": {
     "greetings": {

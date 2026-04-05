@@ -98,7 +98,7 @@
         "date": "15. juni 2025",
         "time": "18:00 - 20:00",
         "description": "Slut dig til vores panel af brancheeksperter, og lær hvordan du starter og udvikler din teknologikarriere.",
-        "attendees": "{{count}} deltagere",
+        "attendees": "{count} deltagere",
         "register": "Tilmeld dig"
       },
       "viewAll": "Se alle begivenheder"
@@ -404,8 +404,8 @@
       "networkError": "Netværksfejl. Tjek din internetforbindelse, og prøv igen.",
       "unexpected": "Uventet fejl. Prøv venligst igen.",
       "loginFailed": "Fejl ved login. Prøv venligst igen."
-      }
-      },
+    }
+  },
   "register": {
     "title": "Tilslut dig Menvo",
     "subtitle": "Kom i kontakt med frivillige mentorer og udvikl din karriere gratis",
@@ -431,7 +431,7 @@
     "orContinueWith": "Eller fortsæt med e-mail",
     "success": "Konto oprettet med succes!",
     "confirmEmail": "Bekræft din e-mail",
-    "confirmEmailDescription": "En bekræftelsesmail er blevet sendt til {{email}}. Gå til din indbakke og klik på linket for at aktivere din konto.",
+    "confirmEmailDescription": "En bekræftelsesmail er blevet sendt til {email}. Gå til din indbakke og klik på linket for at aktivere din konto.",
     "nextSteps": "Næste trin:",
     "nextStepsList": [
       "Tjek din indbakke (og spam-mappen)",
@@ -500,7 +500,7 @@
     "filtersTitle": "Filtre",
     "applyFilters": "Anvend Filtre",
     "clearFilters": "Ryd",
-    "showingResults": "{{count}} mentorer fundet",
+    "showingResults": "{count} mentorer fundet",
     "sortBy": "Sortér efter",
     "sortOptions": {
       "relevance": "Relevans",
@@ -538,7 +538,7 @@
     "loginRequired": {
       "title": "Log ind Påkrævet",
       "description": "Du skal være logget ind for at se mentorprofiler og booke sessioner.",
-      "descriptionWithName": "Du skal være logget ind for at se profilen for {{mentorName}} og booke sessioner.",
+      "descriptionWithName": "Du skal være logget ind for at se profilen for {mentorName} og booke sessioner.",
       "benefits": {
         "title": "Hvad du kan gøre, efter du er logget ind:",
         "item1": "Se detaljerede mentorprofiler",
@@ -552,7 +552,7 @@
     "pagination": {
       "previous": "Forrige",
       "next": "Næste",
-      "page": "Side {{current}} af {{total}}"
+      "page": "Side {current} af {total}"
     }
   },
   "footer": {
@@ -741,7 +741,7 @@
       "thankYou": "Tak for din feedback!",
       "error": "Fejl ved afsendelse af feedback. Prøv igen.",
       "ratingRequired": "Vælg venligst en bedømmelse.",
-      "rateStars": "Bedøm med {{count}} stjerner"
+      "rateStars": "Bedøm med {count} stjerner"
     }
   },
   "waitingList": {
@@ -767,7 +767,7 @@
     "submit": "Indsend Feedback",
     "thankYou": "Tak for din feedback!",
     "error": "Der opstod en fejl ved afsendelse af feedback. Prøv igen.",
-    "rateStars": "Bedøm med {{count}} stjerner"
+    "rateStars": "Bedøm med {count} stjerner"
   },
   "mentorSuggestion": {
     "loginRequiredTitle": "Log ind Påkrævet",

@@ -98,7 +98,7 @@
         "date": "15 juin 2025",
         "time": "18h00 - 20h00",
         "description": "Rejoignez notre panel d'experts du secteur et découvrez comment lancer et développer votre carrière technologique.",
-        "attendees": "{{count}} participants",
+        "attendees": "{count} participants",
         "register": "S'inscrire"
       },
       "viewAll": "Voir tous les événements"
@@ -404,8 +404,8 @@
       "networkError": "Erreur réseau. Veuillez vérifier votre connexion internet et réessayer.",
       "unexpected": "Erreur inattendue. Veuillez réessayer.",
       "loginFailed": "Échec de la connexion. Veuillez réessayer."
-      }
-      },
+    }
+  },
   "register": {
     "title": "Rejoignez Menvo",
     "subtitle": "Connectez-vous avec des mentors bénévoles et développez votre carrière gratuitement",
@@ -431,7 +431,7 @@
     "orContinueWith": "Ou continuer avec l'e-mail",
     "success": "Compte créé avec succès !",
     "confirmEmail": "Confirmez votre e-mail",
-    "confirmEmailDescription": "Un e-mail de confirmation a été envoyé à {{email}}. Veuillez accéder à votre boîte de réception et cliquer sur le lien pour activer votre compte.",
+    "confirmEmailDescription": "Un e-mail de confirmation a été envoyé à {email}. Veuillez accéder à votre boîte de réception et cliquer sur le lien pour activer votre compte.",
     "nextSteps": "Prochaines étapes :",
     "nextStepsList": [
       "Vérifiez votre boîte de réception (et dossier spam)",
@@ -500,7 +500,7 @@
     "filtersTitle": "Filtres",
     "applyFilters": "Appliquer les Filtres",
     "clearFilters": "Effacer",
-    "showingResults": "{{count}} mentors trouvés",
+    "showingResults": "{count} mentors trouvés",
     "sortBy": "Trier par",
     "sortOptions": {
       "relevance": "Pertinence",
@@ -552,7 +552,7 @@
     "pagination": {
       "previous": "Précédent",
       "next": "Suivant",
-      "page": "Page {{current}} sur {{total}}"
+      "page": "Page {{current} sur {{total}}"
     }
   },
   "footer": {
@@ -741,7 +741,7 @@
       "thankYou": "Merci pour votre retour !",
       "error": "Erreur lors de l'envoi des commentaires. Veuillez réessayer.",
       "ratingRequired": "Veuillez sélectionner une évaluation.",
-      "rateStars": "Évaluer à {{count}} étoiles"
+      "rateStars": "Évaluer à {count} étoiles"
     }
   },
   "waitingList": {
@@ -767,7 +767,7 @@
     "submit": "Envoyer le Retour",
     "thankYou": "Merci pour votre retour !",
     "error": "Erreur lors de l'envoi de vos commentaires. Veuillez réessayer.",
-    "rateStars": "Évaluer à {{count}} étoiles"
+    "rateStars": "Évaluer à {count} étoiles"
   },
   "mentorSuggestion": {
     "loginRequiredTitle": "Connexion Requise",

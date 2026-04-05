@@ -30,7 +30,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (isAuthenticated) {
       if (needsRoleSelection()) {
-        router.push("/onboarding/role-selection")
+        router.push("/auth/select-role")
       } else {
         router.push("/dashboard")
       }

@@ -98,7 +98,7 @@
         "date": "15 de Junho de 2025",
         "time": "18h00 - 20h00",
         "description": "Participe de nosso painel de especialistas da indústria e descubra como iniciar e desenvolver sua carreira em tecnologia.",
-        "attendees": "{{count}} participantes",
+        "attendees": "{count} participantes",
         "register": "Inscrever-se"
       },
       "viewAll": "Ver Todos os Eventos"
@@ -431,7 +431,7 @@
     "orContinueWith": "Ou continue com email",
     "success": "Conta criada com sucesso!",
     "confirmEmail": "Confirme seu e-mail",
-    "confirmEmailDescription": "Um e-mail de confirmação foi enviado para {{email}}. Por favor, acesse sua caixa de entrada e clique no link para ativar sua conta.",
+    "confirmEmailDescription": "Um e-mail de confirmação foi enviado para {email}. Por favor, acesse sua caixa de entrada e clique no link para ativar sua conta.",
     "nextSteps": "Próximos passos:",
     "nextStepsList": [
       "Verifique sua caixa de entrada (e pasta de spam)",
@@ -500,7 +500,7 @@
     "filtersTitle": "Filtros",
     "applyFilters": "Aplicar Filtros",
     "clearFilters": "Limpar",
-    "showingResults": "{{count}} mentores encontrados",
+    "showingResults": "{count} mentores encontrados",
     "sortBy": "Ordenar por",
     "sortOptions": {
       "relevance": "Relevância",
@@ -538,7 +538,7 @@
     "loginRequired": {
       "title": "Login Necessário",
       "description": "Você precisa estar logado para ver perfis de mentores e agendar sessões.",
-      "descriptionWithName": "Você precisa estar logado para ver o perfil de {{mentorName}} e agendar sessões.",
+      "descriptionWithName": "Você precisa estar logado para ver o perfil de {{mentorName} e agendar sessões.",
       "benefits": {
         "title": "O que você pode fazer após fazer login:",
         "item1": "Ver perfis detalhados dos mentores",
@@ -552,7 +552,7 @@
     "pagination": {
       "previous": "Anterior",
       "next": "Próximo",
-      "page": "Página {{current}} de {{total}}"
+      "page": "Página {{current} de {{total}}"
     }
   },
   "footer": {
@@ -748,7 +748,7 @@
     "submit": "Enviar Feedback",
     "thankYou": "Obrigado pelo seu feedback!",
     "error": "Erro ao enviar feedback. Tente novamente.",
-    "rateStars": "Avaliar com {{count}} estrelas"
+    "rateStars": "Avaliar com {count} estrelas"
   },
   "mentorSuggestion": {
     "loginRequiredTitle": "Login Necessário",
