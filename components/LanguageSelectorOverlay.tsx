@@ -19,8 +19,10 @@ const languages = [
 export function LanguageSelectorOverlay() {
   const [isVisible, setIsVisible] = useState(false)
   const [step, setStep] = useState<"select" | "feedback">("select")
+  const [selectedLocale, setSelectedLocale] = useState<string | null>(null)
   const { currentLanguage, changeLanguage } = useLanguage()
   const t = useTranslations("common.languageSelector")
+  const commonT = useTranslations("common")
 
   useEffect(() => {
     // Verifica se já houve uma seleção prévia nesta máquina
@@ -31,13 +33,21 @@ export function LanguageSelectorOverlay() {
   }, [])
 
   const handleSelect = (code: string) => {
-    changeLanguage(code)
+    setSelectedLocale(code)
     setStep("feedback")
-    localStorage.setItem("language-selected", "true")
   }
 
   const handleFinish = () => {
-    setIsVisible(false)
+    if (selectedLocale) {
+      changeLanguage(selectedLocale)
+      localStorage.setItem("language-selected", "true")
+      setIsVisible(false)
+    }
+  }
+
+  const handleBack = () => {
+    setStep("select")
+    setSelectedLocale(null)
   }
 
   if (!isVisible) return null
@@ -85,9 +95,14 @@ export function LanguageSelectorOverlay() {
               <p className="text-muted-foreground mb-8">
                 {t("successDescription")}
               </p>
-              <Button onClick={handleFinish} size="lg" className="w-full">
-                {t("button")}
-              </Button>
+              <div className="flex flex-col gap-3">
+                <Button onClick={handleFinish} size="lg" className="w-full">
+                  {t("button")}
+                </Button>
+                <Button onClick={handleBack} variant="ghost" size="sm" className="w-full">
+                  {commonT("back")}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
