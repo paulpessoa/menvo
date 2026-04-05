@@ -817,12 +817,12 @@
     "availabilityPlaceholder": "Status de disponibilidade",
     "anyStatus": "Qualquer status",
     "clearFilters": "Limpar Filtros",
-    "resultsFound": "{count, plural, =0 {Nenhum mentor encontrado} =1 {1 mentor encontrado} other {# mentores encontrados}",
+    "resultsFound": "{count, plural, =0 {Nenhum mentor encontrado} =1 {1 mentor encontrado} other {# mentores encontrados}}",
     "noMentorsTitle": "Nenhum mentor encontrado",
     "noMentorsDescription": "Tente ajustar seus filtros para encontrar mais mentores.",
     "suggestTopic": "Sugerir Tema ou Área",
     "viewProfile": "Ver Perfil",
-    "sessionsCount": "{count, plural, =1 {1 sessão} other {# sessões}",
+    "sessionsCount": "{count, plural, =1 {1 sessão} other {# sessões}}",
     "status": {
       "available": "Disponível",
       "busy": "Ocupado",
@@ -840,7 +840,7 @@
     "bookMentorship": "Agendar Mentoria",
     "fullSchedule": "Agenda Lotada",
     "links": "Links",
-    "yearsExperienceCount": "{count, plural, =1 {1 ano de experiência} other {# anos de experiência}",
+    "yearsExperienceCount": "{count, plural, =1 {1 ano de experiência} other {# anos de experiência}}",
     "loginRequired": {
       "title": "Login Necessário",
       "description": "Você precisa estar logado para agendar uma mentoria ou usar o chat."
@@ -876,7 +876,7 @@
         "completed": "Sessões Completas",
         "completedDesc": "Mentorias realizadas",
         "rating": "Avaliação",
-        "reviews": "{count, plural, =0 {Sem avaliações} =1 {1 avaliação} other {# avaliações}"
+        "reviews": "{count, plural, =0 {Sem avaliações} =1 {1 avaliação} other {# avaliações}}"
       },
       "actions": {
         "title": "Ações Rápidas",
