@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Loader2, Mail, Shield, Users, Phone, CheckCircle, Heart } from "lucide-react"
 import { useNewsletterSubscribe } from "@/hooks/useNewsletter"
+import { useTranslations } from "next-intl"
 
 interface NewsletterModalProps {
   isOpen: boolean
@@ -24,6 +25,7 @@ interface NewsletterModalProps {
 }
 
 export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailClear }: NewsletterModalProps) {
+  const t = useTranslations("newsletter.modal")
   const [email, setEmail] = useState(initialEmail)
   const [name, setName] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
@@ -90,29 +92,29 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
-              <DialogTitle className="text-center text-xl">Obrigado por se juntar à nossa newsletter!</DialogTitle>
+              <DialogTitle className="text-center text-xl">{t("success.title")}</DialogTitle>
             </DialogHeader>
               <div className="text-center space-y-3">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-sm text-blue-800">
-                    <strong>O que você receberá:</strong>
+                    <strong>{t("success.receive")}</strong>
                   </p>
                   <ul className="text-xs text-blue-700 mt-2 space-y-1">
-                    <li>✨ Novidades sobre mentorias e oportunidades</li>
-                    <li>💡 Dicas exclusivas de desenvolvimento profissional</li>
-                    <li>🚀 Primeiras informações sobre novos recursos</li>
-                    {whatsapp && <li>📱 Atualizações importantes via WhatsApp</li>}
+                    <li>{t("success.news")}</li>
+                    <li>{t("success.tips")}</li>
+                    <li>{t("success.features")}</li>
+                    {whatsapp && <li>{t("success.whatsapp")}</li>}
                   </ul>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                   <Heart className="h-4 w-4 text-red-500" />
-                  <span>Feito com carinho pela equipe Menvo</span>
+                  <span>{t("success.madeWithLove")}</span>
                 </div>
               </div>
 
             <DialogFooter>
               <Button onClick={handleClose} className="w-full">
-                Continuar Explorando
+                {t("success.continue")}
               </Button>
             </DialogFooter>
           </>
@@ -122,17 +124,17 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-primary" />
-                Newsletter Menvo
+                {t("form.title")}
               </DialogTitle>
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="newsletter-email">Email *</Label>
+                <Label htmlFor="newsletter-email">{t("form.emailLabel")}</Label>
                 <Input
                   id="newsletter-email"
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder={t("form.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -140,11 +142,11 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newsletter-name">Nome (opcional)</Label>
+                <Label htmlFor="newsletter-name">{t("form.nameLabel")}</Label>
                 <Input
                   id="newsletter-name"
                   type="text"
-                  placeholder="Seu nome"
+                  placeholder={t("form.namePlaceholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -152,17 +154,17 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
 
               <div className="space-y-2">
                 <Label htmlFor="newsletter-whatsapp" className="flex items-center gap-2">
-                  WhatsApp (opcional)
+                  {t("form.whatsappLabel")}
                 </Label>
                 <Input
                   id="newsletter-whatsapp"
                   type="tel"
-                  placeholder="+55 11 99999-9999"
+                  placeholder={t("form.whatsappPlaceholder")}
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Receba atualizações via WhatsApp
+                  {t("form.whatsappInfo")}
                 </p>
               </div>
 
@@ -176,10 +178,10 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
                   />
                   <div className="space-y-1">
                     <Label htmlFor="consent-required" className="text-sm font-medium">
-                      Consentimento obrigatório *
+                      {t("form.consentLabel")}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Concordo em receber emails da Menvo com novidades, atualizações e conteúdo relevante.
+                      {t("form.consentInfo")}
                     </p>
                   </div>
                 </div>
@@ -193,10 +195,10 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
                   />
                   <div className="space-y-1">
                     <Label htmlFor="marketing-consent" className="text-sm font-medium">
-                      Marketing personalizado (opcional)
+                      {t("form.marketingLabel")}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Concordo em receber ofertas e promoções personalizadas baseadas no meu perfil e interesses.
+                      {t("form.marketingInfo")}
                     </p>
                   </div>
                 </div>
@@ -205,12 +207,10 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
               <div className="bg-muted/80 p-3 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Proteção de Dados</span>
+                  <span className="text-sm font-medium">{t("form.dataProtectionTitle")}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Seus dados são protegidos conforme a LGPD. Não compartilhamos suas informações com terceiros. 
-                  Você pode solicitar a exclusão dos seus dados a qualquer momento através do email{" "}
-                  <span className="font-medium">contato@menvo.com.br</span>.
+                  {t("form.dataProtectionInfo")}
                 </p>
               </div>
 
@@ -221,7 +221,7 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
                   onClick={handleClose}
                   className="w-full sm:w-auto"
                 >
-                  Cancelar
+                  {t("form.cancel")}
                 </Button>
                 <Button
                   type="submit"
@@ -231,12 +231,12 @@ export function NewsletterModal({ isOpen, onClose, initialEmail = "", onEmailCle
                   {subscribeMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Inscrevendo...
+                      {t("form.subscribing")}
                     </>
                   ) : (
                     <>
                       <Users className="mr-2 h-4 w-4" />
-                      Inscrever-se
+                      {t("form.subscribe")}
                     </>
                   )}
                 </Button>

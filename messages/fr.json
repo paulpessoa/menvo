@@ -575,6 +575,54 @@
     "cookiePolicy": "Politique relative aux Cookies",
     "allRightsReserved": "Tous droits réservés."
   },
+  "newsletter": {
+    "modal": {
+      "success": {
+        "title": "Merci de vous être inscrit à notre newsletter !",
+        "receive": "Ce que vous recevrez :",
+        "news": "✨ Nouvelles sur les mentorats et les opportunités",
+        "tips": "💡 Conseils exclusifs de développement professionnel",
+        "features": "🚀 Premières informations sur les nouvelles fonctionnalités",
+        "whatsapp": "📱 Mises à jour importantes via WhatsApp",
+        "madeWithLove": "Fait avec amour par l'équipe Menvo",
+        "continue": "Continuer à explorer"
+      },
+      "form": {
+        "title": "Newsletter Menvo",
+        "emailLabel": "Email *",
+        "emailPlaceholder": "votre@email.com",
+        "nameLabel": "Nom (optionnel)",
+        "namePlaceholder": "Votre nom",
+        "whatsappLabel": "WhatsApp (optionnel)",
+        "whatsappPlaceholder": "+33 6 12 34 56 78",
+        "whatsappInfo": "Recevez des mises à jour via WhatsApp",
+        "consentLabel": "Consentement obligatoire *",
+        "consentInfo": "J'accepte de recevoir des emails de Menvo avec des nouvelles, des mises à jour et du contenu pertinent.",
+        "marketingLabel": "Marketing personnalisé (optionnel)",
+        "marketingInfo": "J'accepte de recevoir des offres et des promotions personnalisées basées sur mon profil et mes intérêts.",
+        "dataProtectionTitle": "Protection des Données",
+        "dataProtectionInfo": "Vos données sont protégées conformément aux lois sur la vie privée. Nous ne partageons pas vos informations avec des tiers. Vous pouvez demander la suppression de vos données à tout moment via l'email contato@menvo.com.br.",
+        "cancel": "Annuler",
+        "subscribing": "Inscription en cours...",
+        "subscribe": "S'inscrire"
+      },
+      "unsubscribe": {
+        "title": "Se désabonner de la newsletter",
+        "description": "Nous sommes désolés de vous voir partir. Entrez votre email pour vous désabonner.",
+        "successTitle": "Désabonnement réussi",
+        "successDescription": "Vous avez été retiré de notre liste de newsletter. Vous nous manquerez !",
+        "rejoinText": "Si vous changez d'avis, vous pouvez vous réabonner à tout moment via notre site web.",
+        "rejoinButton": "S'abonner à nouveau",
+        "considerTitle": "Avant de vous désabonner, considérez ceci :",
+        "considerItem1": "Vous ne recevrez que du contenu pertinent sur le mentorat",
+        "considerItem2": "Nous envoyons un maximum de 2 emails par semaine",
+        "considerItem3": "Vous pouvez vous réabonner à tout moment",
+        "button": "Se désabonner",
+        "cancelling": "Désabonnement en cours...",
+        "backToSite": "Retour au site"
+      }
+    }
+  },
   "privacy": {
     "badge": "Confidentialité",
     "title": "Politique de Confidentialité",
