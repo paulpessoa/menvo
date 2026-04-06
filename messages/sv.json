@@ -126,7 +126,7 @@
     "bookMentorship": "Boka mentorskap",
     "fullSchedule": "Fullbokad",
     "links": "Länkar",
-    "yearsExperienceCount": "{count, plural, =1 {1 års erfarenhet} other {# års erfarenhet}",
+    "yearsExperienceCount": "{count, plural, =1 {1 års erfarenhet} other {# års erfarenhet}}",
     "loginRequired": {
       "title": "Inloggning krävs",
       "description": "Du måste vara inloggad för att boka ett mentorskap eller använda chatten."
@@ -136,6 +136,62 @@
       "text": "Möt {name}, mentor specialiserad på {topics}",
       "success": "Delat framgångsrikt!",
       "copySuccess": "Länk kopierad till urklipp!"
+    }
+  },
+  "cookies": {
+    "badge": "Cookies",
+    "title": "Cookiepolicy",
+    "intro": "Vi använder cookies för att förbättra din upplevelse, säkerställa viktiga funktioner och analysera användningen av plattformen.",
+    "essential": {
+      "title": "Nödvändiga Cookies",
+      "text": "Krävs för webbplatsens drift, autentisering och säkerhet. Kan inte inaktiveras."
+    },
+    "social": {
+      "title": "Social Inloggning",
+      "text": "Cookies kan användas för autentisering via Google och LinkedIn, vilket möjliggör säker inloggning."
+    },
+    "preferences": {
+      "title": "Inställningar",
+      "text": "Vi lagrar dina språk- och inställningspreferenser för att anpassa din upplevelse."
+    },
+    "analytics": {
+      "title": "Analys & Prestanda",
+      "text": "Vi använder cookies och analysverktyg som Microsoft Clarity för att förstå hur plattformen används och för att förbättra våra tjänster. Clarity hjälper oss att visualisera hur användare interagerar med webbplatsen genom sessionsinspelningar och heatmaps. För användare från Europeiska unionen (EES), Storbritannien och Schweiz begär vi ditt uttryckliga samtycke innan vi aktiverar dessa analysverktyg."
+    },
+    "clarity": {
+      "title": "Microsoft Clarity",
+      "text": "Vi använder Microsoft Clarity för att förstå hur du använder vår webbplats genom beteendemätningar, heatmaps och sessionsinspelningar. Data som samlas in av Clarity behandlas i enlighet med Microsofts integritetspolicy. För användare från EES, Storbritannien och Schweiz kommer Clarity endast att aktiveras efter ditt uttryckliga samtycke via cookie-bannern."
+    },
+    "links": {
+      "privacy": "Integritetspolicy",
+      "terms": "Användarvillkor"
+    }
+  },
+  "cookieConsent": {
+    "title": "Vi använder cookies",
+    "description": "Vi använder nödvändiga cookies för webbplatsens funktionalitet och analyscookies för att förbättra din upplevelse. Du kan välja vilka cookies du vill acceptera.",
+    "learnMore": "Läs mer",
+    "acceptAll": "Acceptera alla",
+    "acceptNecessary": "Endast nödvändiga",
+    "customize": "Anpassa",
+    "savePreferences": "Spara inställningar",
+    "settings": {
+      "title": "Cookie-inställningar",
+      "description": "Välj vilka typer av cookies du vill acceptera. Nödvändiga cookies kan inte inaktiveras.",
+      "alwaysActive": "Alltid aktiv",
+      "necessary": {
+        "title": "Nödvändiga cookies",
+        "description": "Viktiga för grundläggande webbplatsfunktionalitet, inklusive autentisering, säkerhet och navigering."
+      },
+      "analytics": {
+        "title": "Analyscookies",
+        "description": "Hjälper oss att förstå hur du använder webbplatsen för att förbättra din upplevelse.",
+        "tools": "Verktyg: Microsoft Clarity (sessionsinspelningar, heatmaps)"
+      },
+      "functional": {
+        "title": "Funktionella cookies",
+        "description": "Möjliggör avancerade funktioner som språkinställningar och personlig anpassning."
+      }
     }
   },
   "about": {
