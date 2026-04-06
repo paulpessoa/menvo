@@ -294,6 +294,27 @@
       "title": "Vårt uppdrag",
       "description": "Förenkla mentorskap genom öppna samtal. Vem som helst kan dela med sig av sin erfarenhet till de som söker den — alltid gratis."
     },
+    "whyWeStarted": {
+      "title": "Varför vi startade",
+      "paragraph1": "Menvo föddes ur en enkel idé: alla förtjänar tillgång till mentorskap, oavsett bakgrund eller ekonomisk situation. Vi tror att delning av kunskap och erfarenheter kan förändra liv och samhällen.",
+      "paragraph2": "Vår grundare upplevde personligen den inverkan ett bra mentorskap kan ha på personlig och professionell tillväxt. Men han insåg också hur mentorskap ofta var begränsat till de som redan hade kontakter eller ekonomiska resurser.",
+      "paragraph3": "Det var därför vi skapade en plattform som gör mentorskap tillgängligt för alla, genom att koppla ihop de som söker vägledning med de som är villiga att dela sin erfarenhet — helt gratis."
+    },
+    "ourStoryImageAlt": "Illustration av vår historia",
+    "values": {
+      "community": {
+        "title": "Gemenskap",
+        "description": "Bygga en välkomnande gemenskap där kunskap delas fritt och kopplingar skapas bortom bakgrunder och gränser."
+      },
+      "accessibility": {
+        "title": "Tillgänglighet",
+        "description": "Göra mentorskap tillgängligt för alla, oavsett ekonomisk situation, plats eller bakgrund."
+      },
+      "impact": {
+        "title": "Inverkan",
+        "description": "Skapa positiva förändringar genom kunskapsdelning och meningsfulla kopplingar som stärker människor."
+      }
+    },
     "sdg": {
       "title": "Mål för Hållbar Utveckling",
       "description": "Vår plattform är i linje med FN:s globala mål (SDG), med särskilt fokus på:",
@@ -304,6 +325,41 @@
         "decentWork": "Anständiga arbetsvillkor och ekonomisk tillväxt",
         "reducedInequalities": "Minskad ojämlikhet"
       }
+    },
+    "ourTeam": {
+      "title": "Vårt team",
+      "paragraph1": "Vi är ett mångsidigt team av yrkesverksamma som brinner för att göra mentorskap tillgängligt för alla. Våra medlemmar kommer från olika bakgrunder och branscher, vilket ger en rikedom av erfarenheter och perspektiv.",
+      "paragraph2": "Det som förenar oss är tron på mentorskapets kraft att förändra liv och åtagandet att skapa en plattform som underlättar meningsfulla kopplingar.",
+      "paragraph3": "Vi letar alltid efter passionerade människor som vill ansluta sig till vårt uppdrag. Om du vill bidra till Menvo, skulle vi gärna höra från dig!",
+      "joinTeam": "Gå med i vårt team"
+    },
+    "ourTeamImageAlt": "Illustration av vårt team",
+    "ourImpact": {
+      "title": "Vår inverkan",
+      "volunteerMentors": {
+        "count": "1 000+",
+        "label": "Frivilliga mentorer"
+      },
+      "mentorshipSessions": {
+        "count": "5 000+",
+        "label": "Mentorskapssessioner"
+      },
+      "countriesReached": {
+        "count": "50+",
+        "label": "Länder nådda"
+      },
+      "description": "Dessa siffror representerar riktiga människor vars liv har påverkats positivt av mentorskapskopplingarna på vår plattform."
+    },
+    "ourPartners": {
+      "title": "Våra partners",
+      "description": "Vi är stolta över att samarbeta med organisationer som delar vår vision om att göra mentorskap tillgängligt för alla.",
+      "partnerLogoAlt": "Partnerlogotyp {number}"
+    },
+    "joinOurMission": {
+      "title": "Gå med i vårt uppdrag",
+      "description": "Oavsett om du vill dela din erfarenhet som mentor or för att söka vägledning som mentee, kan du vara en del av vårt uppdrag att göra mentorskap tillgängligt för alla.",
+      "signUpNow": "Registrera dig nu",
+      "contactUs": "Kontakta oss"
     }
   },
   "metadata": {
