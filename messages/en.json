@@ -575,6 +575,54 @@
     "cookiePolicy": "Cookie Policy",
     "allRightsReserved": "All rights reserved."
   },
+  "newsletter": {
+    "modal": {
+      "success": {
+        "title": "Thank you for joining our newsletter!",
+        "receive": "What you will receive:",
+        "news": "✨ News about mentorships and opportunities",
+        "tips": "💡 Exclusive professional development tips",
+        "features": "🚀 First information about new features",
+        "whatsapp": "📱 Important updates via WhatsApp",
+        "madeWithLove": "Made with love by the Menvo team",
+        "continue": "Continue Exploring"
+      },
+      "form": {
+        "title": "Menvo Newsletter",
+        "emailLabel": "Email *",
+        "emailPlaceholder": "your@email.com",
+        "nameLabel": "Name (optional)",
+        "namePlaceholder": "Your name",
+        "whatsappLabel": "WhatsApp (optional)",
+        "whatsappPlaceholder": "+55 11 99999-9999",
+        "whatsappInfo": "Receive updates via WhatsApp",
+        "consentLabel": "Mandatory consent *",
+        "consentInfo": "I agree to receive emails from Menvo with news, updates, and relevant content.",
+        "marketingLabel": "Personalized marketing (optional)",
+        "marketingInfo": "I agree to receive personalized offers and promotions based on my profile and interests.",
+        "dataProtectionTitle": "Data Protection",
+        "dataProtectionInfo": "Your data is protected according to privacy laws. We do not share your information with third parties. You can request the deletion of your data at any time via email contato@menvo.com.br.",
+        "cancel": "Cancel",
+        "subscribing": "Subscribing...",
+        "subscribe": "Subscribe"
+      },
+      "unsubscribe": {
+        "title": "Unsubscribe from newsletter",
+        "description": "We're sorry to see you go. Enter your email to unsubscribe.",
+        "successTitle": "Successfully unsubscribed",
+        "successDescription": "You have been removed from our newsletter list. We'll miss you!",
+        "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
+        "rejoinButton": "Subscribe again",
+        "considerTitle": "Before you cancel, consider:",
+        "considerItem1": "You will only receive relevant content about mentorship",
+        "considerItem2": "We send a maximum of 2 emails per week",
+        "considerItem3": "You can re-subscribe at any time",
+        "button": "Unsubscribe",
+        "cancelling": "Unsubscribing...",
+        "backToSite": "Back to site"
+      }
+    }
+  },
   "privacy": {
     "badge": "Privacy",
     "title": "Privacy Policy",

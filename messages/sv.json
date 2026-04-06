@@ -453,62 +453,113 @@
   },
   "auth": {
     "confirmed": {
-      "title": "Email Confirmed!",
-      "description": "Your account has been successfully activated. Welcome to Menvo!",
-      "redirecting": "Automatically redirecting in {count} seconds...",
-      "continueNow": "Continue Now",
-      "help": "Need help? Contact us.",
+      "title": "E-post bekräftad!",
+      "description": "Ditt konto har aktiverats framgångsrikt. Välkommen till Menvo!",
+      "redirecting": "Omdirigerar automatiskt om {count} sekunder...",
+      "continueNow": "Fortsätt nu",
+      "help": "Behöver du hjälp? Kontakta oss.",
       "messages": {
-        "role": "You will be redirected to select your account type",
-        "profile": "You will be redirected to complete your profile",
-        "dashboard": "You will be redirected to the dashboard"
+        "role": "Du kommer att omdirigeras för att välja din kontotyp",
+        "profile": "Du kommer att omdirigeras för att slutföra din profil",
+        "dashboard": "Du kommer att omdirigeras till kontrollpanelen"
       }
     },
     "forgotPassword": {
-      "title": "Forgot Password?",
-      "description": "Enter your email and we'll send you a link to reset your password.",
-      "sendLink": "Send Recovery Link",
-      "backToLogin": "Back to Login",
-      "success": "Link sent! Check your email."
+      "title": "Glömt lösenordet?",
+      "description": "Ange din e-post så skickar vi en länk för att återställa ditt lösenord.",
+      "sendLink": "Skicka återställningslänk",
+      "backToLogin": "Tillbaka till logga in",
+      "success": "Länk skickad! Kontrollera din e-post."
     },
     "resend": {
-      "title": "Resend Confirmation",
-      "description": "Enter your email to receive a new confirmation link",
-      "successTitle": "Email Resent!",
-      "successDescription": "Check your inbox and spam folder.",
-      "sentTo": "We've sent a new confirmation email to",
-      "otherEmail": "Send to Another Email",
-      "button": "Resend Email",
-      "error": "Error resending email. Please check if the email is correct."
+      "title": "Skicka bekräftelse igen",
+      "description": "Ange din e-post för att få en ny bekräftelselänk",
+      "successTitle": "E-post skickad igen!",
+      "successDescription": "Kontrollera din inkorg och skräppostmapp.",
+      "sentTo": "Vi har skickat ett nytt bekräftelsemejl till",
+      "otherEmail": "Skicka till en annan e-post",
+      "button": "Skicka e-post igen",
+      "error": "Fel vid utskick av e-post. Kontrollera om e-postadressen är korrekt."
     },
     "setPassword": {
-      "title": "Set your password",
-      "description": "You have been invited to the platform. Set your password to continue.",
-      "successTitle": "Password set!",
-      "successDescription": "Your account has been successfully configured",
-      "redirecting": "Redirecting to role selection...",
-      "invalidInvite": "Invalid Invite",
-      "invalidInviteDesc": "The invite link has expired or is invalid",
-      "checkingSession": "Verifying invite...",
-      "button": "Set password and continue",
-      "agreement": "By setting your password, you agree to our"
+      "title": "Ange ditt lösenord",
+      "description": "Du har blivit inbjuden till plattformen. Ange ditt lösenord för att fortsätta.",
+      "successTitle": "Lösenordet är inställt!",
+      "successDescription": "Ditt konto har konfigurerats framgångsrikt",
+      "redirecting": "Omdirigerar till rollval...",
+      "invalidInvite": "Ogiltig inbjudan",
+      "invalidInviteDesc": "Inbjudningslänken har gått ut eller är ogiltig",
+      "checkingSession": "Verifierar inbjudan...",
+      "button": "Ange lösenord och fortsätt",
+      "agreement": "Genom att ange ditt lösenord godkänner du våra"
     }
   },
+  "footer": {
+    "description": "Förenkla mentorskap genom öppna samtal. Vem som helst kan dela med sig av sin erfarenhet till de som söker den — alltid gratis.",
+    "platform": "Plattform",
+    "findMentors": "Hitta mentorer",
+    "events": "Evenemang & kurser",
+    "howItWorks": "Hur det fungerar",
+    "store": "Butik",
+    "company": "Företag",
+    "aboutUs": "Om oss",
+    "mission": "Vårt uppdrag",
+    "team": "Vårt team",
+    "partners": "Partners",
+    "contact": "Kontakt",
+    "subscribe": "Prenumerera",
+    "newsletter": "Håll dig uppdaterad med vårt nyhetsbrev",
+    "privacyPolicy": "Integritetspolicy",
+    "termsOfService": "Användarvillkor",
+    "cookiePolicy": "Cookiepolicy",
+    "allRightsReserved": "Alla rättigheter förbehållna."
+  },
   "newsletter": {
-    "unsubscribe": {
-      "title": "Unsubscribe from newsletter",
-      "description": "We're sorry to see you go. Enter your email to unsubscribe.",
-      "successTitle": "Successfully unsubscribed",
-      "successDescription": "You have been removed from our newsletter list. We'll miss you!",
-      "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
-      "rejoinButton": "Subscribe again",
-      "considerTitle": "Before you cancel, consider:",
-      "considerItem1": "You will only receive relevant content about mentorship",
-      "considerItem2": "We send a maximum of 2 emails per week",
-      "considerItem3": "You can re-subscribe at any time",
-      "button": "Unsubscribe",
-      "cancelling": "Unsubscribing...",
-      "backToSite": "Back to site"
+    "modal": {
+      "success": {
+        "title": "Tack för att du gick med i vårt nyhetsbrev!",
+        "receive": "Vad du kommer att få:",
+        "news": "✨ Nyheter om mentorskap och möjligheter",
+        "tips": "💡 Exklusiva tips för professionell utveckling",
+        "features": "🚀 Första informationen om nya funktioner",
+        "whatsapp": "📱 Viktiga uppdateringar via WhatsApp",
+        "madeWithLove": "Skapat med kärlek av Menvo-teamet",
+        "continue": "Fortsätt utforska"
+      },
+      "form": {
+        "title": "Menvo Nyhetsbrev",
+        "emailLabel": "E-post *",
+        "emailPlaceholder": "din@e-post.se",
+        "nameLabel": "Namn (valfritt)",
+        "namePlaceholder": "Ditt namn",
+        "whatsappLabel": "WhatsApp (valfritt)",
+        "whatsappPlaceholder": "+46 70 123 45 67",
+        "whatsappInfo": "Få uppdateringar via WhatsApp",
+        "consentLabel": "Obligatoriskt samtycke *",
+        "consentInfo": "Jag samtycker till att få e-post från Menvo med nyheter, uppdateringar och relevant innehåll.",
+        "marketingLabel": "Personlig marknadsföring (valfritt)",
+        "marketingInfo": "Jag samtycker till att få personliga erbjudanden och kampanjer baserade på min profil och mina intressen.",
+        "dataProtectionTitle": "Dataskydd",
+        "dataProtectionInfo": "Dina uppgifter skyddas enligt integritetslagar. Vi delar inte din information med tredje part. Du kan när som helst begära radering av dina uppgifter via e-post contato@menvo.com.br.",
+        "cancel": "Avbryt",
+        "subscribing": "Prenumererar...",
+        "subscribe": "Prenumerera"
+      },
+      "unsubscribe": {
+        "title": "Avsluta prenumeration på nyhetsbrev",
+        "description": "Vi är ledsna att se dig gå. Ange din e-post för att avsluta prenumerationen.",
+        "successTitle": "Prenumerationen avslutad",
+        "successDescription": "Du har tagits bort från vår nyhetsbrevslista. Vi kommer att sakna dig!",
+        "rejoinText": "Om du ändrar dig kan du prenumerera igen när som helst via vår webbplats.",
+        "rejoinButton": "Prenumerera igen",
+        "considerTitle": "Innan du avbryter, tänk på:",
+        "considerItem1": "Du kommer bara att få relevant innehåll om mentorskap",
+        "considerItem2": "Vi skickar högst 2 e-postmeddelanden per vecka",
+        "considerItem3": "Du kan prenumerera igen när som helst",
+        "button": "Avsluta prenumeration",
+        "cancelling": "Avslutar prenumeration...",
+        "backToSite": "Tillbaka till webbplatsen"
+      }
     }
   }
 }

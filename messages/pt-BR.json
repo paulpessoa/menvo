@@ -575,6 +575,54 @@
     "cookiePolicy": "Política de Cookies",
     "allRightsReserved": "Todos os direitos reservados."
   },
+  "newsletter": {
+    "modal": {
+      "success": {
+        "title": "Obrigado por se juntar à nossa newsletter!",
+        "receive": "O que você receberá:",
+        "news": "✨ Novidades sobre mentorias e oportunidades",
+        "tips": "💡 Dicas exclusivas de desenvolvimento profissional",
+        "features": "🚀 Primeiras informações sobre novos recursos",
+        "whatsapp": "📱 Atualizações importantes via WhatsApp",
+        "madeWithLove": "Feito com carinho pela equipe Menvo",
+        "continue": "Continuar Explorando"
+      },
+      "form": {
+        "title": "Newsletter Menvo",
+        "emailLabel": "Email *",
+        "emailPlaceholder": "seu@email.com",
+        "nameLabel": "Nome (opcional)",
+        "namePlaceholder": "Seu nome",
+        "whatsappLabel": "WhatsApp (opcional)",
+        "whatsappPlaceholder": "+55 11 99999-9999",
+        "whatsappInfo": "Receba atualizações via WhatsApp",
+        "consentLabel": "Consentimento obrigatório *",
+        "consentInfo": "Concordo em receber emails da Menvo com novidades, atualizações e conteúdo relevante.",
+        "marketingLabel": "Marketing personalizado (opcional)",
+        "marketingInfo": "Concordo em receber ofertas e promoções personalizadas baseadas no meu perfil e interesses.",
+        "dataProtectionTitle": "Proteção de Dados",
+        "dataProtectionInfo": "Seus dados são protegidos conforme a LGPD. Não compartilhamos suas informações com terceiros. Você pode solicitar a exclusão dos seus dados a qualquer momento através do email contato@menvo.com.br.",
+        "cancel": "Cancelar",
+        "subscribing": "Inscrevendo...",
+        "subscribe": "Inscrever-se"
+      },
+      "unsubscribe": {
+        "title": "Cancelar assinatura da newsletter",
+        "description": "Lamentamos ver você partir. Digite seu e-mail para cancelar a assinatura.",
+        "successTitle": "Assinatura cancelada com sucesso",
+        "successDescription": "Você foi removido da nossa lista de newsletter. Sentiremos sua falta!",
+        "rejoinText": "Se você mudar de ideia, pode se inscrever novamente a qualquer momento através do nosso site.",
+        "rejoinButton": "Inscrever-se novamente",
+        "considerTitle": "Antes de cancelar, considere:",
+        "considerItem1": "Você só receberá conteúdo relevante sobre mentoria",
+        "considerItem2": "Enviamos no máximo 2 e-mails por semana",
+        "considerItem3": "Você pode se inscrever novamente a qualquer momento",
+        "button": "Cancelar assinatura",
+        "cancelling": "Cancelando assinatura...",
+        "backToSite": "Voltar para o site"
+      }
+    }
+  },
   "privacy": {
     "badge": "Privacidade",
     "title": "Política de Privacidade",
