@@ -362,6 +362,117 @@
       "contactUs": "Kontakta oss"
     }
   },
+  "howItWorks": {
+    "title": "Hur Menvo fungerar",
+    "description": "Vår plattform underlättar kontakten med mentorer och bokning av kostnadsfria mentorskapssessioner.",
+    "forMentees": "För mentees",
+    "forMentors": "För mentorer",
+    "forNGOs": "För NGO:er",
+    "forCompanies": "För företag",
+    "mentees": {
+      "step1": {
+        "title": "Skapa din profil",
+        "description": "Registrera dig och skapa din profil med information om din resa, mål och intressen. Detta hjälper oss att koppla ihop dig med de ideala mentorerna.",
+        "feature1": "Skicka in ditt CV",
+        "feature2": "Lägg till en profilbild",
+        "feature3": "Anslut din LinkedIn-profil"
+      },
+      "step2": {
+        "title": "Hitta den ideala mentorn",
+        "description": "Utforska vår mångdiverse gemenskap av frivilliga mentorer. Använd filter för att söka efter mentorer baserat på verksamhetsområde, bransch, plats och mer.",
+        "feature1": "Filtrera efter ämnen och specialiteter",
+        "feature2": "Sök efter plats eller språk",
+        "feature3": "Läs recensioner från andra mentees"
+      },
+      "step3": {
+        "title": "Boka en session",
+        "description": "När du hittar en mentor du vill komma i kontakt med, se deras tillgänglighet och boka en kostnadsfri session på 45 minuter.",
+        "feature1": "Se mentorns kalender",
+        "feature2": "Välj den mest bekväma tiden",
+        "feature3": "Lägg till de ämnen du vill diskutera"
+      },
+      "step4": {
+        "title": "Anslut och utvecklas",
+        "description": "Träffa din mentor via videosamtal. Dela dina utmaningar, ställ frågor och få personlig vägledning för att nå dina mål.",
+        "feature1": "Delta via länken för videosamtal",
+        "feature2": "Prata om dina mål och utmaningar",
+        "feature3": "Få personlig vägledning"
+      },
+      "getStarted": "Börja som mentee"
+    },
+    "mentors": {
+      "step1": {
+        "title": "Skapa din mentorprofil",
+        "description": "Registrera dig och skapa din mentorprofil med information om din erfarenhet, kunskapsområden och ämnen du kan hjälpa till med.",
+        "feature1": "Framhäv din erfarenhet och specialitet",
+        "feature2": "Specificera ämnen du kan mentora i",
+        "feature3": "Anslut dina professionella profiler"
+      },
+      "step2": {
+        "title": "Slutför verifieringen",
+        "description": "För att garantera säkerheten i vår gemenskap genomgår alla mentorer en verifieringsprocess, inklusive ett kort videosamtal med vårt team.",
+        "feature1": "Boka ett verifieringssamtal",
+        "feature2": "Verifiera din identitet och kunskap",
+        "feature3": "Bli godkänd för att börja mentora"
+      },
+      "step3": {
+        "title": "Ställ in din tillgänglighet",
+        "description": "Definiera tiderna då du är tillgänglig för mentorskap. Du har full kontroll över ditt schema och kan uppdatera det när som helst.",
+        "feature1": "Konfigurera din veckovisa tillgänglighet",
+        "feature2": "Definiera sessionernas längd",
+        "feature3": "Uppdatera din kalender vid behov"
+      },
+      "step4": {
+        "title": "Genomför mentorskapssessioner",
+        "description": "Anslut med mentees via videosamtal. Dela din kunskap, erbjud vägledning och hjälp dem att övervinna utmaningar.",
+        "feature1": "Ta emot sessionsförfrågningar",
+        "feature2": "Genomför mentorskapssessioner via video",
+        "feature3": "Följ din inverkan och dina sessioner"
+      },
+      "becomeMentor": "Bli en mentor"
+    },
+    "ngos": {
+      "step1": {
+        "title": "Registrera din NGO gratis",
+        "description": "NGO:er och sociala organisationer kan registrera sig gratis på plattformen för att koppla ihop de ungdomar de hjälper med frivilliga mentorer.",
+        "feature1": "100% gratis registrering för NGO:er",
+        "feature2": "Obegränsad tillgång till plattformen",
+        "feature3": "Dedikerad support för organisationer"
+      },
+      "step2": {
+        "title": "Koppla ihop ungdomar med mentorer",
+        "description": "Registrera de ungdomar som din organisation hjälper och hjälp dem att hitta mentorer som kan vägleda dem i deras professionella och personliga resor.",
+        "feature1": "Registrera flera ungdomar från din organisation",
+        "feature2": "Följ mentorskapets framsteg",
+        "feature3": "Få rapporter om social inverkan"
+      },
+      "getStarted": "Registrera min NGO"
+    },
+    "companies": {
+      "step1": {
+        "title": "Företagsvolontärarbete genom mentorskap",
+        "description": "Utveckla program för företagsvolontärarbete genom att låta dina anställda bli frivilliga mentorer, vilket stärker företagets syfte.",
+        "feature1": "Engagera anställda i sociala åtgärder",
+        "feature2": "Utveckla ledarskap genom mentorskap",
+        "feature3": "Stärk organisationskulturen"
+      },
+      "step2": {
+        "title": "ESG-rapporter och social inverkan",
+        "description": "Få detaljerade rapporter om den sociala inverkan av de mentorskap som utförs av dina anställda, vilket stärker dina ESG-mått.",
+        "feature1": "Månatliga rapporter om social inverkan",
+        "feature2": "Mått för ESG-rapporter",
+        "feature3": "Certifikat för företagsvolontärarbete"
+      },
+      "step3": {
+        "title": "Incitamentspolicyer och förmåner",
+        "description": "Skapa incitamentspolicyer för anställda som mentorer, såsom betald ledighet, internt erkännande och karriärutveckling.",
+        "feature1": "Tidsbank för frivilligt mentorskap",
+        "feature2": "Internt erkännande och gamification",
+        "feature3": "Utveckling av mjuka färdigheter"
+      },
+      "getStarted": "Bli en företagspartner"
+    }
+  },
   "metadata": {
     "title": "MENVO - Frivilligt Mentorskap",
     "description": "Kopplar ihop mentorer och mentees för gratis mentorskapssessioner",
