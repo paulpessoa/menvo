@@ -232,6 +232,18 @@
       "cookies": "Cookiepolicy"
     }
   },
+  "feedback": {
+    "title": "Feedback",
+    "description": "Din åsikt är mycket viktig för oss. Hur kan vi förbättra oss?",
+    "helpUsImprove": "Hjälp oss att bli bättre",
+    "ratingRequired": "Vänligen välj ett betyg",
+    "commentPlaceholder": "Berätta om din upplevelse... (valfritt)",
+    "emailPlaceholder": "Din e-post (för anonym feedback)",
+    "submit": "Skicka feedback",
+    "thankYou": "Tack för din feedback!",
+    "error": "Fel vid inskickning av feedback. Försök igen.",
+    "rateStars": "Betygsätt med {count} stjärnor"
+  },
   "cookies": {
     "badge": "Cookies",
     "title": "Cookiepolicy",
