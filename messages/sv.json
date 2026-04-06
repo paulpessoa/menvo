@@ -138,6 +138,100 @@
       "copySuccess": "Länk kopierad till urklipp!"
     }
   },
+  "privacy": {
+    "badge": "Integritet",
+    "title": "Integritetspolicy",
+    "intro": "Din integritet är viktig för oss. Denna policy förklarar hur vi samlar in, använder och skyddar dina data på Menvo.",
+    "dataCollection": {
+      "title": "Datainsamling",
+      "text": "Vi samlar in information som du anger när du skapar ett konto, såsom namn, e-post, profilbild och professionella uppgifter. Vi samlar också in data för social inloggning (Google, LinkedIn) om du väljer att autentisera dig via dessa plattformar."
+    },
+    "email": {
+      "title": "E-post och Kommunikation",
+      "text": "Vi använder din e-post för nödvändig kommunikation, mentorskapaviseringar och uppdateringar. E-postmeddelanden skickas via Brevo, med respekt för din integritet och dina inställningar för avanmälan."
+    },
+    "photos": {
+      "title": "Foton och Visuellt Innehåll",
+      "text": "Profilbilder och uppladdade bilder lagras säkert i Supabase och används endast för identifiering och personlig anpassning av profilen."
+    },
+    "storage": {
+      "title": "Datalagring",
+      "text": "Alla data lagras säkert i Supabase med begränsad åtkomst för Menvo-teamet och enligt bästa säkerhetspraxis."
+    },
+    "googleCalendar": {
+      "title": "Google Calendar API",
+      "text": "Vi använder Google Calendar API uteslutande för att skapa mentorskapshändelser när en session bekräftas av mentorn. Vi skapar händelsen i vår egen kalender och skickar e-postinbjudningar till mentor och mentee. Vi har INTE tillgång till, läser eller ändrar din personliga Google-kalender. Du får endast en inbjudan via e-post som du fritt kan acceptera eller avböja. De data som används är endast: datum, tid, sessionens längd och deltagarnas e-postadresser."
+    },
+    "dataSharing": {
+      "title": "Datadelning",
+      "text": "Vi delar inte dina personuppgifter med tredje part för kommersiella eller marknadsföringsändamål. Data delas endast med nödvändiga tjänster för plattformens drift: Supabase (säker lagring), Brevo (utskick av transaktionella e-postmeddelanden), Google (OAuth-autentisering och skapande av kalenderhändelser) och LinkedIn (OAuth-autentisering). Varje tjänst behandlar data endast för de specifika ändamål som beskrivs i denna policy."
+    },
+    "dataUsage": {
+      "title": "Användning av Data",
+      "text": "Dina data används uteslutande för att: (1) Autentisering och kontohantering; (2) Underlätta kopplingar mellan mentorer och mentees; (3) Skapa mentorskapshändelser i Google Calendar; (4) Skicka meddelanden och kommunikation relaterad till ditt mentorskap; (5) Förbättra plattformens upplevelse och säkerhet. Vi använder aldrig dina data för att träna AI/ML-modeller eller för ändamål som inte är relaterade till mentorskap."
+    },
+    "mentorship": {
+      "title": "Mentorskap och Interaktioner",
+      "text": "Information om mentorskapssessioner, utvärderingar och meddelanden används för att förbättra upplevelsen och garantera gemenskapens säkerhet."
+    },
+    "thirdParty": {
+      "title": "Tredjepartstjänster",
+      "text": "Vi använder tredjepartstjänster som Google (OAuth-inloggning och Calendar API), LinkedIn (OAuth-inloggning), Supabase (lagring) och Brevo (e-post). Varje tjänst har sin egen integritetspolicy och behandlar data endast för de specifika ändamål som beskrivs i denna policy."
+    },
+    "rights": {
+      "title": "Dina Rättigheter",
+      "text": "Du kan begära tillgång till, rättelse eller radering av dina data när som helst. För att utöva dina rättigheter eller återkalla åtkomstbehörigheter för Google Calendar, kontakta oss på contato@menvo.com.br."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "text": "Frågor om integritet? Kontakta oss på contato@menvo.com.br."
+    },
+    "links": {
+      "cookies": "Cookiepolicy",
+      "terms": "Användarvillkor"
+    }
+  },
+  "terms": {
+    "badge": "Villkor",
+    "title": "Användarvillkor",
+    "intro": "Genom att använda Menvo godkänner du dessa villkor. Vänligen läs dem noggrant för att förstå dina rättigheter och skyldigheter.",
+    "usage": {
+      "title": "Användning av Plattformen",
+      "text": "Menvo kopplar samman mentorer och mentees för kostnadsfria sessioner. Användningen måste vara respektfull och ske i enlighet med tillämpliga lagar."
+    },
+    "account": {
+      "title": "Konto och Social Inloggning",
+      "text": "Du kan skapa ett konto via e-post eller social inloggning (Google, LinkedIn). Håll dina inloggningsuppgifter säkra och dela inte ditt konto."
+    },
+    "security": {
+      "title": "Säkerhet",
+      "text": "Vi vidtar åtgärder för att skydda dina data, men du är också ansvarig för att hålla ditt lösenord säkert."
+    },
+    "content": {
+      "title": "Innehåll och Foton",
+      "text": "Du är ansvarig för det innehåll du laddar upp (foton, text). Ladda inte upp kränkande eller upphovsrättsskyddat innehåll utan tillstånd."
+    },
+    "communication": {
+      "title": "Kommunikation och E-post",
+      "text": "Vi skickar viktig kommunikation om mentorskap och uppdateringar. Du kan välja att inte ta emot reklammejl."
+    },
+    "storage": {
+      "title": "Lagring och Tredje Part",
+      "text": "Data lagras i Supabase och e-post skickas via Brevo. Vi använder social inloggning från tredje part."
+    },
+    "rights": {
+      "title": "Rättigheter och Skyldigheter",
+      "text": "Du kan få tillgång till, rätta eller radera dina data. Missbruk av plattformen kan leda till avstängning av kontot."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "text": "Frågor? Kontakta oss på contato@menvo.com."
+    },
+    "links": {
+      "privacy": "Integritetspolicy",
+      "cookies": "Cookiepolicy"
+    }
+  },
   "cookies": {
     "badge": "Cookies",
     "title": "Cookiepolicy",
