@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,8 @@ import {
   Users,
   Briefcase,
   Heart,
-  MessageCircle
+  MessageCircle,
+  Loader2
 } from "lucide-react"
 
 import { useRouter } from "next/navigation"
@@ -89,10 +90,17 @@ const initialFilters: FilterState = {
   experienceYears: "all"
 }
 
+const ITEMS_PER_PAGE = 12
+
 export default function MentorsPage() {
   const t = useTranslations("mentorsPage")
   const [mentors, setMentors] = useState<MentorProfile[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [page, setPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [availableFilters, setAvailableFilters] = useState({
     countries: [] as string[],
@@ -107,14 +115,16 @@ export default function MentorsPage() {
   const { user } = useAuth()
   const { isModalOpen, openModal, closeModal, handleSubmit } = useMentorSuggestion()
 
-  useEffect(() => {
-    fetchMentors()
-    fetchFilterOptions()
-  }, [])
+  const fetchMentors = useCallback(async (isReset = false) => {
+    const currentPage = isReset ? 0 : page
+    if (isReset) {
+      setLoading(true)
+    } else {
+      setLoadingMore(true)
+    }
 
-  const fetchMentors = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('mentors_view')
         .select(`
           id,
@@ -137,9 +147,56 @@ export default function MentorsPage() {
           sessions,
           experience_years,
           slug
-        `)
+        `, { count: 'exact' })
+
+      // Apply Filters
+      if (filters.search) {
+        const searchTerm = `%${filters.search}%`
+        query = query.or(`full_name.ilike.${searchTerm},current_position.ilike.${searchTerm},current_company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
+      }
+
+      if (filters.country !== 'all') {
+        query = query.eq('country', filters.country)
+      }
+      if (filters.state !== 'all') {
+        query = query.eq('state', filters.state)
+      }
+      if (filters.city) {
+        query = query.eq('city', filters.city)
+      }
+      if (filters.availabilityStatus !== 'all') {
+        query = query.eq('availability_status', filters.availabilityStatus)
+      }
+
+      if (filters.languages.length > 0) {
+        query = query.contains('languages', filters.languages)
+      }
+      if (filters.topics.length > 0) {
+        query = query.contains('mentorship_topics', filters.topics)
+      }
+      if (filters.inclusiveTags.length > 0) {
+        query = query.contains('inclusion_tags', filters.inclusiveTags)
+      }
+
+      if (filters.experienceYears !== 'all') {
+        const [min, max] = filters.experienceYears.split('-').map(Number)
+        if (max) {
+          query = query.gte('experience_years', min).lte('experience_years', max)
+        } else {
+          query = query.gte('experience_years', min)
+        }
+      }
+
+      // Pagination
+      const from = currentPage * ITEMS_PER_PAGE
+      const to = from + ITEMS_PER_PAGE - 1
+      
+      query = query
         .order('rating', { ascending: false })
         .order('sessions', { ascending: false })
+        .range(from, to)
+
+      const { data, error, count } = await query
 
       if (error) throw error
 
@@ -153,16 +210,29 @@ export default function MentorsPage() {
         total_sessions: mentor.sessions
       }))
 
-      setMentors(mappedData)
+      if (isReset) {
+        setMentors(mappedData)
+        setPage(0)
+      } else {
+        setMentors(prev => [...prev, ...mappedData])
+      }
+
+      setTotalCount(count || 0)
+      setHasMore((count || 0) > (from + mappedData.length))
+      
     } catch (error) {
       console.error('Error fetching mentors:', error)
+      toast.error(t("errorFetchingMentors", { defaultValue: "Erro ao carregar mentores" }))
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
-  }
+  }, [filters, page, supabase, t])
 
   const fetchFilterOptions = async () => {
     try {
+      // Fetch unique filter values - optimize by selecting only relevant columns
+      // For very large datasets, this should be a cached RPC or a separate table
       const { data, error } = await supabase
         .from('mentors_view')
         .select(`
@@ -174,6 +244,7 @@ export default function MentorsPage() {
           inclusion_tags,
           expertise_areas
         `)
+        .limit(1000) // Safety limit
 
       if (error) throw error
 
@@ -183,7 +254,6 @@ export default function MentorsPage() {
       const languages = new Set<string>()
       const topics = new Set<string>()
       const inclusiveTags = new Set<string>()
-      const expertiseAreas = new Set<string>()
 
       data?.forEach((mentor: any) => {
         if (mentor.country) countries.add(mentor.country)
@@ -193,7 +263,6 @@ export default function MentorsPage() {
         mentor.languages?.forEach((lang: string) => languages.add(lang))
         mentor.mentorship_topics?.forEach((topic: string) => topics.add(topic))
         mentor.inclusion_tags?.forEach((tag: string) => inclusiveTags.add(tag))
-        mentor.expertise_areas?.forEach((area: string) => expertiseAreas.add(area))
       })
 
       setAvailableFilters({
@@ -209,60 +278,28 @@ export default function MentorsPage() {
     }
   }
 
-  const filteredMentors = useMemo(() => {
-    return mentors.filter(mentor => {
-      if (filters.search) {
-        const searchTerm = filters.search.toLowerCase()
-        const searchableText = [
-          mentor.full_name,
-          mentor.bio,
-          mentor.job_title,
-          mentor.company,
-          ...(mentor.mentorship_topics || []),
-          ...(mentor.expertise_areas || [])
-        ].join(' ').toLowerCase()
+  // Effect to handle initial load and filter changes
+  useEffect(() => {
+    fetchMentors(true)
+  }, [filters.search, filters.country, filters.state, filters.city, filters.languages, filters.topics, filters.inclusiveTags, filters.availabilityStatus, filters.experienceYears])
 
-        if (!searchableText.includes(searchTerm)) return false
-      }
+  // Initial load of filter options
+  useEffect(() => {
+    fetchFilterOptions()
+  }, [])
 
-      if (filters.country !== 'all' && mentor.country !== filters.country) return false
-      if (filters.state !== 'all' && mentor.state !== filters.state) return false
-      if (filters.city && mentor.city !== filters.city) return false
+  const loadMore = () => {
+    if (!loadingMore && hasMore) {
+      setPage(prev => prev + 1)
+    }
+  }
 
-      if (filters.languages.length > 0) {
-        const mentorLanguages = mentor.languages || []
-        if (!filters.languages.some(lang => mentorLanguages.includes(lang))) return false
-      }
-
-      if (filters.topics.length > 0) {
-        const mentorTopics = mentor.mentorship_topics || []
-        if (!filters.topics.some(topic => mentorTopics.includes(topic))) return false
-      }
-
-      if (filters.inclusiveTags.length > 0) {
-        const mentorTags = mentor.inclusive_tags || []
-        if (!filters.inclusiveTags.some(tag => mentorTags.includes(tag))) return false
-      }
-
-      if (mentor.session_price_usd !== null) {
-        if (mentor.session_price_usd < filters.priceRange[0] ||
-          mentor.session_price_usd > filters.priceRange[1]) return false
-      }
-
-      if (filters.availabilityStatus !== 'all' && mentor.availability_status !== filters.availabilityStatus) return false
-
-      if (filters.experienceYears !== 'all' && mentor.experience_years !== null) {
-        const [min, max] = filters.experienceYears.split('-').map(Number)
-        if (max) {
-          if (mentor.experience_years < min || mentor.experience_years > max) return false
-        } else {
-          if (mentor.experience_years < min) return false
-        }
-      }
-
-      return true
-    })
-  }, [mentors, filters])
+  // Trigger load more when page changes (except for reset)
+  useEffect(() => {
+    if (page > 0) {
+      fetchMentors(false)
+    }
+  }, [page])
 
   const clearFilters = () => {
     setFilters(initialFilters)
@@ -282,34 +319,6 @@ export default function MentorsPage() {
     if (filters.experienceYears !== 'all') count++
     return count
   }, [filters])
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-32"></div>
-                    <div className="h-3 bg-gray-200 rounded w-24"></div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="h-3 bg-gray-200 rounded"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -423,33 +432,6 @@ export default function MentorsPage() {
 
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
-                  <Briefcase className="h-4 w-4 mr-2" />
-                  {t("expertise")}
-                </h3>
-                <div className="space-y-2">
-                  {availableFilters.topics.slice(0, 5).map(topic => (
-                    <label key={topic} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.topics.includes(topic)}
-                        onChange={(e) => {
-                          setFilters(prev => ({
-                            ...prev,
-                            topics: e.target.checked
-                              ? [...prev.topics, topic]
-                              : prev.topics.filter(t => t !== topic)
-                          }))
-                        }}
-                        className="rounded border-gray-300"
-                      />
-                      <span className="text-sm">{topic}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
                   <Heart className="h-4 w-4 mr-2" />
                   {t("inclusiveTags")}
                 </h3>
@@ -529,21 +511,53 @@ export default function MentorsPage() {
       </div>
 
       {/* Results Count */}
-      <div className="mb-6">
+      <div className="mb-6 flex justify-between items-center">
         <p className="text-gray-600">
-          {t("resultsFound", { count: filteredMentors.length })}
+          {t("resultsFound", { count: totalCount })}
         </p>
       </div>
 
-      {/* Mentors Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMentors.map((mentor) => (
-          <MentorCard key={mentor.id} mentor={mentor} />
-        ))}
-      </div>
+      {/* Mentors Grid or Loading State */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mentors.map((mentor) => (
+              <MentorCard key={mentor.id} mentor={mentor} />
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="mt-12 flex justify-center">
+              <Button 
+                onClick={loadMore} 
+                disabled={loadingMore}
+                variant="outline"
+                size="lg"
+                className="min-w-[200px]"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t("loading")}
+                  </>
+                ) : (
+                  t("loadMore", { defaultValue: "Carregar Mais" })
+                )}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Empty State */}
-      {filteredMentors.length === 0 && !loading && (
+      {mentors.length === 0 && !loading && (
         <div className="text-center py-12">
           <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -570,6 +584,31 @@ export default function MentorsPage() {
         userId={user?.id || null}
       />
     </div>
+  )
+}
+
+function SkeletonCard() {
+  return (
+    <Card className="animate-pulse">
+      <CardHeader>
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="h-3 bg-gray-200 rounded w-24"></div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="h-3 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+          </div>
+          <div className="h-8 bg-gray-200 rounded w-full"></div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -611,46 +650,48 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
   }
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
+    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12">
+            <Avatar className="h-12 w-12 border">
               <AvatarImage src={mentor.avatar_url || undefined} />
               <AvatarFallback>
                 {mentor.full_name?.split(' ').map(n => n[0]).join('') || 'M'}
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg">{mentor.full_name}</CardTitle>
-              <CardDescription className="text-sm">
+              <CardTitle className="text-lg line-clamp-1">{mentor.full_name}</CardTitle>
+              <CardDescription className="text-sm line-clamp-1">
                 {mentor.job_title}
                 {mentor.company && ` @ ${mentor.company}`}
               </CardDescription>
             </div>
           </div>
-          <Badge className={getAvailabilityColor(mentor.availability_status)}>
+          <Badge className={`${getAvailabilityColor(mentor.availability_status)} whitespace-nowrap`}>
             {getAvailabilityText(mentor.availability_status)}
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 flex-1 flex flex-col">
         {mentor.bio && (
-          <p className="text-sm text-gray-600 line-clamp-2">
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
             {mentor.bio}
           </p>
         )}
 
         {(mentor.city || mentor.country) && (
           <div className="flex items-center text-sm text-gray-500">
-            <MapPin className="h-3 w-3 mr-1" />
-            {[mentor.city, mentor.state, mentor.country].filter(Boolean).join(', ')}
+            <MapPin className="h-3 w-3 mr-1 shrink-0" />
+            <span className="truncate">
+              {[mentor.city, mentor.state, mentor.country].filter(Boolean).join(', ')}
+            </span>
           </div>
         )}
 
         {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1 mt-auto">
             {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
               <Badge key={index} variant="secondary" className="text-xs">
                 {topic}
@@ -665,15 +706,13 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
         )}
 
         <div className="flex items-center text-sm text-gray-500">
-          {mentor.total_sessions > 0 && (
-            <div className="flex items-center">
-              <MessageCircle className="h-3 w-3 mr-1" />
-              <span>{t("sessionsCount", { count: mentor.total_sessions })}</span>
-            </div>
-          )}
+          <div className="flex items-center">
+            <MessageCircle className="h-3 w-3 mr-1" />
+            <span>{t("sessionsCount", { count: mentor.total_sessions || 0 })}</span>
+          </div>
         </div>
 
-        <div className="flex space-x-2 pt-2">
+        <div className="flex space-x-2 pt-2 mt-auto">
           <Button onClick={handleScheduleClick} className="flex-1">
             {t("viewProfile")}
           </Button>
