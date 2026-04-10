@@ -20,19 +20,21 @@ export function useMentorSuggestion() {
       free_topics: string[]
       inclusion_tags: string[]
     }
-  ) => {
+  ): Promise<void> => {
+    console.log('[SUGGESTION_DEBUG] Submitting:', { userId, suggestion })
+    
     if (!userId) {
       toast({
         title: t("mentorSuggestion.loginRequiredTitle"),
         description: t("mentorSuggestion.loginRequiredDescription"),
         variant: "destructive",
       })
-      return
+      return Promise.reject('No user ID')
     }
 
     setIsSubmitting(true)
     try {
-      await mentorSuggestionService.createSuggestion({
+      const result = await mentorSuggestionService.createSuggestion({
         user_id: userId,
         suggestion_text: suggestion.suggestion_text,
         knowledge_topics: suggestion.knowledge_topics || [],
@@ -40,19 +42,23 @@ export function useMentorSuggestion() {
         inclusion_tags: suggestion.inclusion_tags || [],
       })
 
+      console.log('[SUGGESTION_DEBUG] Success:', result)
+
       toast({
         title: t("toast.suggestion.success.title"),
         description: t("toast.suggestion.success.description"),
       })
 
       closeModal()
-    } catch (error) {
-      console.error("Erro ao enviar sugestão:", error)
+      return Promise.resolve()
+    } catch (error: any) {
+      console.error("[SUGGESTION_DEBUG] Error:", error)
       toast({
         title: t("toast.suggestion.error.title"),
-        description: t("toast.suggestion.error.description"),
+        description: error.message || t("toast.suggestion.error.description"),
         variant: "destructive",
       })
+      return Promise.reject(error)
     } finally {
       setIsSubmitting(false)
     }

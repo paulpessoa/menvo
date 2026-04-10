@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
-import { X, Loader2 } from "lucide-react"
+import { X, Loader2, Plus } from "lucide-react"
 
 interface SuggestionModalProps {
   isOpen: boolean
@@ -24,7 +24,7 @@ interface SuggestionModalProps {
     knowledge_topics: string[]
     free_topics: string[]
     inclusion_tags: string[]
-  }) => void
+  }) => Promise<void>
   userId: string | null
   availableInclusionTags?: string[]
 }
@@ -43,57 +43,67 @@ export function SuggestionModal({
   const [freeTopicInput, setFreeTopicInput] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleAddFreeTopic = () => {
+  // Reset states when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSuggestionText("")
+      setFreeTopics([])
+      setInclusionTags([])
+      setFreeTopicInput("")
+      setIsSubmitting(false)
+    }
+  }, [isOpen])
+
+  const handleAddFreeTopic = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e) e.preventDefault()
+    
     const trimmedTopic = freeTopicInput.trim()
     if (trimmedTopic && !freeTopics.includes(trimmedTopic)) {
-      setFreeTopics([...freeTopics, trimmedTopic])
+      setFreeTopics(prev => [...prev, trimmedTopic])
       setFreeTopicInput("")
     }
   }
 
   const handleRemoveFreeTopic = (topic: string) => {
-    setFreeTopics(freeTopics.filter(t => t !== topic))
+    setFreeTopics(prev => prev.filter(t => t !== topic))
   }
 
   const handleToggleInclusionTag = (tag: string) => {
-    if (inclusionTags.includes(tag)) {
-      setInclusionTags(inclusionTags.filter(t => t !== tag))
-    } else {
-      setInclusionTags([...inclusionTags, tag])
-    }
+    setInclusionTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag) 
+        : [...prev, tag]
+    )
   }
 
-  const handleSubmit = async () => {
-    if (!suggestionText.trim()) return
+  const handleSubmitInternal = async () => {
+    if (!suggestionText.trim() || isSubmitting) return
 
     setIsSubmitting(true)
     try {
-      await onSubmit({
+      console.log('[SUGGESTION_MODAL] Submitting data:', {
         suggestion_text: suggestionText,
-        knowledge_topics: [], // Legado
         free_topics: freeTopics,
         inclusion_tags: inclusionTags
       })
-      // O fechamento e reset são tratados pelo onClose do Dialog se o onSubmit fechar o modal
+      
+      await onSubmit({
+        suggestion_text: suggestionText,
+        knowledge_topics: [],
+        free_topics: freeTopics,
+        inclusion_tags: inclusionTags
+      })
+      // Success: hook will close modal, which triggers reset via useEffect
     } catch (error) {
-      console.error('Erro no envio:', error)
+      console.error('[SUGGESTION_MODAL] Error in onSubmit:', error)
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleClose = () => {
-    if (isSubmitting) return
-    setSuggestionText("")
-    setFreeTopics([])
-    setInclusionTags([])
-    setFreeTopicInput("")
-    onClose()
-  }
-
   if (!userId) {
     return (
-      <Dialog open={isOpen} onOpenChange={handleClose}>
+      <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("mentorSuggestion.loginRequiredTitle")}</DialogTitle>
@@ -102,7 +112,7 @@ export function SuggestionModal({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={handleClose}>{t("common.close")}</Button>
+            <Button onClick={onClose}>{t("common.close")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -110,19 +120,21 @@ export function SuggestionModal({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("mentorSuggestion.title")}</DialogTitle>
           <DialogDescription>
             {t("mentorSuggestion.description")}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-5">
+        
+        <div className="space-y-6 py-4">
           {/* 1. Descrição - Obrigatório */}
-          <div>
-            <label htmlFor="suggestion-text" className="text-sm font-medium block mb-2">
-              {t("mentorSuggestion.observationLabel")} <span className="text-red-500">*</span>
+          <div className="space-y-2">
+            <label htmlFor="suggestion-text" className="text-sm font-semibold flex items-center gap-1">
+              {t("mentorSuggestion.observationLabel")} 
+              <span className="text-destructive">*</span>
             </label>
             <Textarea
               id="suggestion-text"
@@ -131,17 +143,21 @@ export function SuggestionModal({
               onChange={(e) => setSuggestionText(e.target.value)}
               rows={4}
               disabled={isSubmitting}
+              className="resize-none"
             />
           </div>
 
           {/* 2. Temas ou Áreas - Opcional */}
-          <div>
-            <label htmlFor="free-topics" className="text-sm font-medium block mb-1">
-              {t("mentorSuggestion.freeTopicsLabel")}
-            </label>
-            <p className="text-xs text-muted-foreground mb-2">
-              {t("mentorSuggestion.freeTopicsDescription")}
-            </p>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label htmlFor="free-topics" className="text-sm font-semibold">
+                {t("mentorSuggestion.freeTopicsLabel")}
+              </label>
+              <p className="text-xs text-muted-foreground">
+                {t("mentorSuggestion.freeTopicsDescription")}
+              </p>
+            </div>
+            
             <div className="flex gap-2">
               <Input
                 id="free-topics"
@@ -150,30 +166,32 @@ export function SuggestionModal({
                 onChange={(e) => setFreeTopicInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddFreeTopic()
+                    handleAddFreeTopic(e)
                   }
                 }}
                 disabled={isSubmitting}
               />
               <Button
                 type="button"
-                onClick={handleAddFreeTopic}
+                onClick={() => handleAddFreeTopic()}
                 disabled={!freeTopicInput.trim() || isSubmitting}
-                size="sm"
+                size="icon"
+                variant="secondary"
               >
-                {t("mentorSuggestion.addTopic")}
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
+            
             {freeTopics.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-2 pt-1">
                 {freeTopics.map((topic) => (
-                  <Badge key={topic} variant="secondary" className="gap-1">
+                  <Badge key={topic} variant="secondary" className="pl-2 pr-1 py-1 gap-1">
                     {topic}
                     <button
                       onClick={() => handleRemoveFreeTopic(topic)}
-                      className="ml-1 hover:text-destructive"
+                      className="ml-1 rounded-full hover:bg-muted p-0.5 transition-colors"
                       disabled={isSubmitting}
+                      type="button"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -185,35 +203,48 @@ export function SuggestionModal({
 
           {/* 3. Tags Inclusivas - Opcional */}
           {availableInclusionTags.length > 0 && (
-            <div>
-              <label className="text-sm font-medium block mb-1">
-                {t("mentorSuggestion.inclusionTagsLabel")}
-              </label>
-              <p className="text-xs text-muted-foreground mb-2">
-                {t("mentorSuggestion.inclusionTagsDescription")}
-              </p>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold">
+                  {t("mentorSuggestion.inclusionTagsLabel")}
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  {t("mentorSuggestion.inclusionTagsDescription")}
+                </p>
+              </div>
+              
               <div className="flex flex-wrap gap-2">
-                {availableInclusionTags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant={inclusionTags.includes(tag) ? "default" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => !isSubmitting && handleToggleInclusionTag(tag)}
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+                {availableInclusionTags.map((tag) => {
+                  const isSelected = inclusionTags.includes(tag)
+                  return (
+                    <Badge
+                      key={tag}
+                      variant={isSelected ? "default" : "outline"}
+                      className={`cursor-pointer transition-all ${isSelected ? 'scale-105' : 'hover:bg-muted'}`}
+                      onClick={() => !isSubmitting && handleToggleInclusionTag(tag)}
+                    >
+                      {tag}
+                    </Badge>
+                  )
+                })}
               </div>
             </div>
           )}
         </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={handleClose} disabled={isSubmitting}>
+
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button 
+            variant="ghost" 
+            onClick={onClose} 
+            disabled={isSubmitting}
+            type="button"
+          >
             {t("common.cancel")}
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={handleSubmitInternal}
             disabled={!suggestionText.trim() || isSubmitting}
+            className="min-w-[100px]"
           >
             {isSubmitting ? (
               <>
