@@ -1,7 +1,6 @@
-
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -15,8 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
-import { X } from "lucide-react"
-import { mentorService } from "@/services/mentors/mentors"
+import { X, Loader2 } from "lucide-react"
 
 interface SuggestionModalProps {
   isOpen: boolean
@@ -28,6 +26,7 @@ interface SuggestionModalProps {
     inclusion_tags: string[]
   }) => void
   userId: string | null
+  availableInclusionTags?: string[]
 }
 
 export function SuggestionModal({
@@ -35,29 +34,14 @@ export function SuggestionModal({
   onClose,
   onSubmit,
   userId,
+  availableInclusionTags = [],
 }: SuggestionModalProps) {
   const t = useTranslations()
   const [suggestionText, setSuggestionText] = useState("")
   const [freeTopics, setFreeTopics] = useState<string[]>([])
   const [inclusionTags, setInclusionTags] = useState<string[]>([])
   const [freeTopicInput, setFreeTopicInput] = useState("")
-  const [availableInclusionTags, setAvailableInclusionTags] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    if (isOpen) {
-      loadFilterOptions()
-    }
-  }, [isOpen])
-
-  const loadFilterOptions = async () => {
-    try {
-      const options = await mentorService.getFilterOptions()
-      setAvailableInclusionTags(options.inclusionTags)
-    } catch (error) {
-      console.error('Erro ao carregar opções:', error)
-    }
-  }
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleAddFreeTopic = () => {
     const trimmedTopic = freeTopicInput.trim()
@@ -79,24 +63,31 @@ export function SuggestionModal({
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!suggestionText.trim()) return
 
-    setIsLoading(true)
-    onSubmit({
-      suggestion_text: suggestionText,
-      knowledge_topics: [], // Não usado mais
-      free_topics: freeTopics,
-      inclusion_tags: inclusionTags
-    })
+    setIsSubmitting(true)
+    try {
+      await onSubmit({
+        suggestion_text: suggestionText,
+        knowledge_topics: [], // Legado
+        free_topics: freeTopics,
+        inclusion_tags: inclusionTags
+      })
+      // O fechamento e reset são tratados pelo onClose do Dialog se o onSubmit fechar o modal
+    } catch (error) {
+      console.error('Erro no envio:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleClose = () => {
+    if (isSubmitting) return
     setSuggestionText("")
     setFreeTopics([])
     setInclusionTags([])
     setFreeTopicInput("")
-    setIsLoading(false)
     onClose()
   }
 
@@ -139,7 +130,7 @@ export function SuggestionModal({
               value={suggestionText}
               onChange={(e) => setSuggestionText(e.target.value)}
               rows={4}
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -163,12 +154,12 @@ export function SuggestionModal({
                     handleAddFreeTopic()
                   }
                 }}
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
               <Button
                 type="button"
                 onClick={handleAddFreeTopic}
-                disabled={!freeTopicInput.trim() || isLoading}
+                disabled={!freeTopicInput.trim() || isSubmitting}
                 size="sm"
               >
                 {t("mentorSuggestion.addTopic")}
@@ -182,7 +173,7 @@ export function SuggestionModal({
                     <button
                       onClick={() => handleRemoveFreeTopic(topic)}
                       className="ml-1 hover:text-destructive"
-                      disabled={isLoading}
+                      disabled={isSubmitting}
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -207,7 +198,7 @@ export function SuggestionModal({
                     key={tag}
                     variant={inclusionTags.includes(tag) ? "default" : "outline"}
                     className="cursor-pointer"
-                    onClick={() => !isLoading && handleToggleInclusionTag(tag)}
+                    onClick={() => !isSubmitting && handleToggleInclusionTag(tag)}
                   >
                     {tag}
                   </Badge>
@@ -217,14 +208,19 @@ export function SuggestionModal({
           )}
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={handleClose} disabled={isLoading}>
+          <Button variant="ghost" onClick={handleClose} disabled={isSubmitting}>
             {t("common.cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!suggestionText.trim() || isLoading}
+            disabled={!suggestionText.trim() || isSubmitting}
           >
-            {isLoading ? t("common.submitting") : t("common.submit")}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t("common.submitting")}
+              </>
+            ) : t("common.submit")}
           </Button>
         </DialogFooter>
       </DialogContent>

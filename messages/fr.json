@@ -159,7 +159,8 @@
       "paragraph1": "Nous sommes une équipe diversifiée de professionnels passionnés par l'idée de rendre le mentorat accessible à tous. Nos membres viennent de différents horizons et secteurs, apportant une richesse d'expériences et de perspectives.",
       "paragraph2": "Ce qui nous unit, c'est la conviction du pouvoir du mentorat pour transformer des vies et l'engagement à créer une plateforme qui facilite des connexions significatives.",
       "paragraph3": "Nous sommes toujours à la recherche de personnes passionnées pour rejoindre notre mission. Si vous souhaitez contribuer à Menvo, nous serions ravis de vous entendre !",
-      "joinTeam": "Rejoignez Notre Équipe"
+      "joinTeam": "Rejoignez Notre Équipe",
+      "viewMap": "View Team Map"
     },
     "ourTeamImageAlt": "Illustration de notre équipe",
     "ourImpact": {
@@ -301,9 +302,9 @@
       "getStarted": "Devenir Partenaire Corporatif"
     },
     "faq": {
-      "title": "Foire Aux Questions",
-      "description": "Trouvez des réponses aux questions les plus courantes sur la plateforme.",
-      "viewAll": "Voir Toutes les Questions",
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to the most common questions about the platform.",
+      "viewAll": "View all questions",
       "q1": {
         "question": "Le mentorat est-il vraiment gratuit ?",
         "answer": "Oui, toutes les sessions de mentorat sur notre plateforme sont entièrement gratuites. Nos mentors donnent de leur temps bénévolement pour aider les autres à grandir."
@@ -837,12 +838,12 @@
   "toast": {
     "suggestion": {
       "success": {
-        "title": "Suggestion envoyée !",
-        "description": "Merci pour votre suggestion. Notre équipe va l'examiner et nous vous tiendrons informés des nouveautés."
+        "title": "Suggestion sent!",
+        "description": "Thank you for your suggestion. Our team will analyze it and let you know about updates."
       },
       "error": {
-        "title": "Erreur lors de l'envoi de la suggestion",
-        "description": "Impossible d'envoyer votre suggestion. Veuillez réessayer plus tard."
+        "title": "Error sending suggestion",
+        "description": "Could not send your suggestion. Please try again later."
       }
     }
   },

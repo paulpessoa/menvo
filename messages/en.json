@@ -881,7 +881,7 @@
     "suggestion": {
       "success": {
         "title": "Suggestion sent!",
-        "description": "Thank you for your suggestion. Our team will review it and we will let you know about any news."
+        "description": "Thank you for your suggestion. Our team will analyze it and let you know about updates."
       },
       "error": {
         "title": "Error sending suggestion",

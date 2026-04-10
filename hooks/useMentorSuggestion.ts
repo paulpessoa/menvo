@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { mentorSuggestionService } from "@/services/mentors/suggestions"
 import { useToast } from "@/hooks/use-toast"
-import { useTranslation } from "react-i18next"
+import { useTranslations } from "next-intl"
 
 export function useMentorSuggestion() {
-  const { t } = useTranslation()
+  const t = useTranslations()
   const { toast } = useToast()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)

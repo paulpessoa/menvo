@@ -837,12 +837,12 @@
   "toast": {
     "suggestion": {
       "success": {
-        "title": "Förslag skickat!",
-        "description": "Tack för ditt förslag. Vårt team ska analysera det och vi meddelar dig när det finns nyheter."
+        "title": "Forslag sendt!",
+        "description": "Tak for dit forslag. Vores team vil analysere det og give dig besked om opdateringer."
       },
       "error": {
-        "title": "Fel vid skickandet",
-        "description": "Det gick inte att skicka ditt förslag just nu. Försök igen senare."
+        "title": "Fejl ved afsendelse af forslag",
+        "description": "Kunne ikke sende dit forslag. Prøv venligst igen senere."
       }
     }
   },

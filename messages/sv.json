@@ -1114,5 +1114,17 @@
       "inDevelopment": "Under utveckling",
       "comingSoon": "Kommer snart: bibliotek med material, mallar och resurser att dela med mentees"
     }
+  },
+  "toast": {
+    "suggestion": {
+      "success": {
+        "title": "Förslag skickat!",
+        "description": "Tack för ditt förslag. Vårt team kommer att analysera det och meddela dig om uppdateringar."
+      },
+      "error": {
+        "title": "Fel vid skickande av förslag",
+        "description": "Kunde inte skicka ditt förslag. Försök igen senare."
+      }
+    }
   }
 }

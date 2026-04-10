@@ -591,6 +591,7 @@ export default function MentorsPage() {
         onClose={closeModal}
         onSubmit={(suggestion) => handleSubmit(user?.id || "", suggestion)}
         userId={user?.id || null}
+        availableInclusionTags={availableFilters.inclusiveTags}
       />
     </div>
   )

@@ -159,7 +159,8 @@
       "paragraph1": "Somos un equipo diverso de profesionales apasionados por hacer que la mentoría sea accesible para todos. Nuestros miembros provienen de diferentes orígenes y sectores, aportando una riqueza de experiencias y perspectivas.",
       "paragraph2": "Lo que nos une es la creencia en el poder de la mentoría para transformar vidas y el compromiso de crear una plataforma que facilite conexiones significativas.",
       "paragraph3": "Siempre estamos buscando personas apasionadas para unirse a nuestra misión. Si deseas contribuir con Menvo, ¡nos encantaría saber de ti!",
-      "joinTeam": "Únete a Nuestro Equipo"
+      "joinTeam": "Únete a Nuestro Equipo",
+      "viewMap": "View Team Map"
     },
     "ourTeamImageAlt": "Ilustración de nuestro equipo",
     "ourImpact": {
@@ -301,9 +302,9 @@
       "getStarted": "Convertirse en Socio Corporativo"
     },
     "faq": {
-      "title": "Preguntas Frecuentes",
-      "description": "Encuentra respuestas a las dudas más comunes sobre la plataforma.",
-      "viewAll": "Ver Todas las Preguntas",
+      "title": "Frequently Asked Questions",
+      "description": "Find answers to the most common questions about the platform.",
+      "viewAll": "View all questions",
       "q1": {
         "question": "¿La mentoría es realmente gratuita?",
         "answer": "Sí, todas las sesiones de mentoría en nuestra plataforma son completamente gratuitas. Nuestros mentores dedican su tiempo voluntariamente para ayudar a otros a crecer."
@@ -770,12 +771,12 @@
   "toast": {
     "suggestion": {
       "success": {
-        "title": "¡Sugerencia enviada!",
-        "description": "Gracias por tu sugerencia. Nuestro equipo la revisará y te informaremos sobre cualquier novedad."
+        "title": "Suggestion sent!",
+        "description": "Thank you for your suggestion. Our team will analyze it and let you know about updates."
       },
       "error": {
-        "title": "Error al enviar sugerencia",
-        "description": "No se pudo enviar tu sugerencia. Por favor, inténtalo de nuevo más tarde."
+        "title": "Error sending suggestion",
+        "description": "Could not send your suggestion. Please try again later."
       }
     }
   },
