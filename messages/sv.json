@@ -905,19 +905,19 @@
   },
   "newsletter": {
     "unsubscribe": {
-      "title": "",
-      "description": "",
-      "successTitle": "",
-      "successDescription": "",
-      "rejoinText": "",
-      "rejoinButton": "",
-      "considerTitle": "",
-      "considerItem1": "",
-      "considerItem2": "",
-      "considerItem3": "",
-      "button": "",
-      "cancelling": "",
-      "backToSite": ""
+      "title": "Avsluta prenumeration på nyhetsbrev",
+      "description": "Vi är ledsna att se dig gå. Ange din e-post för att avsluta prenumerationen.",
+      "successTitle": "Prenumerationen avslutad",
+      "successDescription": "Du har tagits bort från vår nyhetsbrevslista. Vi kommer att sakna dig!",
+      "rejoinText": "Om du ändrar dig kan du prenumerera igen när som helst via vår webbplats.",
+      "rejoinButton": "Prenumerera igen",
+      "considerTitle": "Innan du avbryter, tänk på:",
+      "considerItem1": "Du kommer bara att få relevant innehåll om mentorskap",
+      "considerItem2": "Vi skickar högst 2 e-postmeddelanden per vecka",
+      "considerItem3": "Du kan prenumerera igen när som helst",
+      "button": "Avsluta prenumeration",
+      "cancelling": "Avslutar prenumeration...",
+      "backToSite": "Tillbaka till webbplatsen"
     },
     "modal": {
       "success": {
