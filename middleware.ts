@@ -86,6 +86,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Match all paths including localized ones
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+    // Exclude static files and internal paths
+    "/((?!api|_next/static|_next/image|favicon.ico|site\\.webmanifest|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
   ]
 }
