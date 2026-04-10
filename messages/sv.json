@@ -621,72 +621,72 @@
   },
   "dashboard": {
     "greetings": {
-      "morning": "Good morning",
-      "afternoon": "Good afternoon",
-      "evening": "Good evening"
+      "morning": "God morgon",
+      "afternoon": "God eftermiddag",
+      "evening": "God kväll"
     },
     "mentor": {
-      "welcome": "Welcome to your mentor dashboard. Manage your mentorships and help other professionals.",
+      "welcome": "Välkommen till din kontrollpanel för mentorer. Hantera ditt mentorskap och hjälp andra yrkesverksamma.",
       "verification": {
-        "pending": "Verification Pending",
-        "approved": "Profile Verified",
-        "pendingText": "Your profile is awaiting verification. You will receive an email once approved.",
-        "approvedText": "Your profile has been verified! You can now receive bookings from mentees.",
-        "badgePending": "Pending",
-        "badgeApproved": "Verified"
+        "pending": "Verifiering väntar",
+        "approved": "Profil verifierad",
+        "pendingText": "Din profil väntar på verifiering. Du kommer att få ett e-postmeddelande när den har godkänts.",
+        "approvedText": "Din profil har blivit verifierad! Du kan nu ta emot bokningar från mentees.",
+        "badgePending": "Väntar",
+        "badgeApproved": "Verifierad"
       },
       "stats": {
-        "upcoming": "Upcoming Sessions",
-        "upcomingDesc": "Confirmed bookings",
-        "mentees": "Total Mentees",
-        "menteesDesc": "People mentored",
-        "completed": "Completed Sessions",
-        "completedDesc": "Mentorships conducted",
-        "rating": "Rating",
-        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
+        "upcoming": "Kommande sessioner",
+        "upcomingDesc": "Bekräftade bokningar",
+        "mentees": "Totalt antal mentees",
+        "menteesDesc": "Personer du har mentorerat",
+        "completed": "Slutförda sessioner",
+        "completedDesc": "Genomförda mentorskap",
+        "rating": "Betyg",
+        "reviews": "{count, plural, =0 {Inga recensioner} =1 {1 recension} other {# recensioner}}"
       },
       "actions": {
-        "title": "Quick Actions",
-        "availability": "Setup Availability",
-        "availabilityDesc": "Set your available hours for mentorship",
-        "mentorships": "My Mentorships",
-        "mentorshipsDesc": "Manage your mentorship sessions",
-        "editProfile": "Edit Profile",
-        "editProfileDesc": "Update your information and specialties",
-        "access": "Access",
-        "waitingVerification": "Awaiting Verification"
+        "title": "Snabbåtgärder",
+        "availability": "Ställ in tillgänglighet",
+        "availabilityDesc": "Ställ in dina lediga tider för mentorskap",
+        "mentorships": "Mina mentorskap",
+        "mentorshipsDesc": "Hantera dina mentorskapssessioner",
+        "editProfile": "Redigera profil",
+        "editProfileDesc": "Uppdatera din information och dina specialiteter",
+        "access": "Gå till",
+        "waitingVerification": "Väntar på verifiering"
       }
     },
     "mentee": {
-      "welcome": "Welcome to your dashboard. Find mentors and accelerate your professional growth.",
+      "welcome": "Välkommen till din kontrollpanel. Hitta mentorer och accelerera din professionella tillväxt.",
       "stats": {
-        "hours": "Mentorship Hours",
-        "hoursDesc": "Total learning",
-        "mentors": "Mentors",
-        "mentorsDesc": "Connected mentors"
+        "hours": "Mentorskapstimmar",
+        "hoursDesc": "Total inlärning",
+        "mentors": "Mentorer",
+        "mentorsDesc": "Anslutna mentorer"
       },
       "actions": {
-        "find": "Find Mentors",
-        "findDesc": "Search for verified mentors in your area of interest"
+        "find": "Hitta mentorer",
+        "findDesc": "Sök efter verifierade mentorer inom ditt intresseområde"
       },
       "progress": {
-        "title": "My Progress",
-        "description": "Track your professional development",
-        "inDevelopment": "In development",
-        "comingSoon": "Coming soon: progress charts, goals achieved, certificates and learning resources"
+        "title": "Mina framsteg",
+        "description": "Följ din professionella utveckling",
+        "inDevelopment": "Under utveckling",
+        "comingSoon": "Kommer snart: framstegsdiagram, uppnådda mål, certifikat och lärresurser"
       }
     },
     "gettingStarted": {
-      "title": "First Steps",
-      "description": "Complete these steps to make the most of the platform",
-      "step1": "Registration completed",
-      "step2": "Role selected",
-      "step3Mentor": "Awaiting profile verification",
-      "step3Mentee": "Complete your profile",
-      "step4Mentor": "Setup availability",
-      "step4Mentee": "Find your first mentor",
-      "step5Mentor": "Receive first booking",
-      "step5Mentee": "Schedule your first session"
+      "title": "Första stegen",
+      "description": "Slutför dessa steg för att få ut det mesta av plattformen",
+      "step1": "Registrering klar",
+      "step2": "Roll vald",
+      "step3Mentor": "Väntar på profilverifiering",
+      "step3Mentee": "Slutför din profil",
+      "step4Mentor": "Ställ in tillgänglighet",
+      "step4Mentee": "Hitta din första mentor",
+      "step5Mentor": "Ta emot första bokningen",
+      "step5Mentee": "Boka din första session"
     }
   },
   "onboarding": {
