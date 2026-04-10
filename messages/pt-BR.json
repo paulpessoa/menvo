@@ -174,7 +174,8 @@
       "paragraph1": "Somos uma equipe diversa de profissionais apaixonados por tornar a mentoria acessível a todos. Nossos membros vêm de diferentes origens e setores, trazendo uma riqueza de experiências e perspectivas.",
       "paragraph2": "O que nos une é a crença no poder da mentoria para transformar vidas e o compromisso de criar uma plataforma que facilite conexões significativas.",
       "paragraph3": "Estamos sempre em busca de pessoas apaixonadas para se juntar à nossa missão. Se você quer contribuir com o Menvo, adoraríamos ouvir você!",
-      "joinTeam": "Junte-se ao Nosso Time"
+      "joinTeam": "Junte-se ao Nosso Time",
+      "viewMap": "Ver Mapa da Equipe"
     },
     "ourTeamImageAlt": "Ilustração do nosso time",
     "ourImpact": {
@@ -318,7 +319,7 @@
     "faq": {
       "title": "Perguntas Frequentes",
       "description": "Encontre respostas para as dúvidas mais comuns sobre a plataforma.",
-      "viewAll": "Ver Todas as Perguntas",
+      "viewAll": "Ver todas as perguntas",
       "q1": {
         "question": "A mentoria é realmente gratuita?",
         "answer": "Sim, todas as sessões de mentoria na nossa plataforma são totalmente gratuitas. Nossos mentores dedicam seu tempo voluntariamente para ajudar outras pessoas a crescer."
@@ -978,7 +979,10 @@
       "cvAvailable": "Arquivo PDF salvo e disponível para visualização",
       "settingsDescription": "Gerencie as configurações da sua conta",
       "inDevelopment": "Em Desenvolvimento",
-      "settingsComingSoon": "Em breve você poderá gerenciar notificações, privacidade e outras configurações de conta."
+      "settingsComingSoon": "Em breve você poderá gerenciar notificações, privacidade e outras configurações de conta.",
+      "expertisePlaceholder": "Digite uma área e pressione Enter",
+      "topicsPlaceholder": "Digite um tópico e pressione Enter",
+      "tagsPlaceholder": "Digite uma tag e pressione Enter"
     }
   },
   "dashboard": {

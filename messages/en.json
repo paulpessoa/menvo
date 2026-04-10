@@ -174,7 +174,8 @@
       "paragraph1": "We're a diverse team of professionals passionate about making mentorship accessible to everyone. Our team members come from various backgrounds and industries, bringing together a wealth of experience and perspectives.",
       "paragraph2": "What unites us is our belief in the power of mentorship to transform lives and our commitment to creating a platform that facilitates meaningful connections.",
       "paragraph3": "We're always looking for passionate individuals to join our mission. If you're interested in contributing to Menvo, we'd love to hear from you!",
-      "joinTeam": "Join Our Team"
+      "joinTeam": "Join Our Team",
+      "viewMap": "View Team Map"
     },
     "ourTeamImageAlt": "Our team illustration",
     "ourImpact": {
@@ -318,7 +319,7 @@
     "faq": {
       "title": "Frequently Asked Questions",
       "description": "Find answers to the most common questions about the platform.",
-      "viewAll": "View All Questions",
+      "viewAll": "View all questions",
       "q1": {
         "question": "Is mentorship really free?",
         "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow and develop."
@@ -1003,7 +1004,10 @@
       "cvAvailable": "PDF file saved and available for viewing",
       "settingsDescription": "Manage your account settings",
       "inDevelopment": "In Development",
-      "settingsComingSoon": "Soon you will be able to manage notifications, privacy, and other account settings."
+      "settingsComingSoon": "Soon you will be able to manage notifications, privacy, and other account settings.",
+      "expertisePlaceholder": "Type an area and press Enter",
+      "topicsPlaceholder": "Type a topic and press Enter",
+      "tagsPlaceholder": "Type a tag and press Enter"
     }
   },
   "dashboard": {

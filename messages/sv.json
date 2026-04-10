@@ -408,7 +408,8 @@
       "paragraph1": "Vi är ett mångsidigt team av yrkesverksamma som brinner för att göra mentorskap tillgängligt för alla. Våra medlemmar kommer från olika bakgrunder och branscher, vilket ger en rikedom av erfarenheter och perspektiv.",
       "paragraph2": "Det som förenar oss är tron på mentorskapets kraft att förändra liv och åtagandet att skapa en plattform som underlättar meningsfulla kopplingar.",
       "paragraph3": "Vi letar alltid efter passionerade människor som vill ansluta sig till vårt uppdrag. Om du vill bidra till Menvo, skulle vi gärna höra från dig!",
-      "joinTeam": "Gå med i vårt team"
+      "joinTeam": "Gå med i vårt team",
+      "viewMap": "Visa teamkarta"
     },
     "ourTeamImageAlt": "Illustration av vårt team",
     "ourImpact": {
@@ -548,6 +549,11 @@
         "feature3": "Utveckling av mjuka färdigheter"
       },
       "getStarted": "Bli en företagspartner"
+    },
+    "faq": {
+      "title": "Vanliga frågor",
+      "description": "Hitta svar på de vanligaste frågorna om plattformen.",
+      "viewAll": "Visa alla frågor"
     }
   },
   "metadata": {
@@ -744,7 +750,10 @@
       "cvAvailable": "PDF-fil sparad och tillgänglig för visning",
       "settingsDescription": "Hantera dina kontoinställningar",
       "inDevelopment": "Under utveckling",
-      "settingsComingSoon": "Snart kommer du att kunna hantera aviseringar, integritet och andra kontoinställningar."
+      "settingsComingSoon": "Snart kommer du att kunna hantera aviseringar, integritet och andra kontoinställningar.",
+      "expertisePlaceholder": "Skriv ett område och tryck på Enter",
+      "topicsPlaceholder": "Skriv ett ämne och tryck på Enter",
+      "tagsPlaceholder": "Skriv en tagg och tryck på Enter"
     }
   },
   "dashboard": {

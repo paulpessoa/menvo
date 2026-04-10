@@ -174,7 +174,8 @@
       "paragraph1": "Vi är ett mångsidigt team av yrkesverksamma som brinner för att göra mentorskap tillgängligt för alla. Våra medlemmar kommer från olika bakgrunder och sektorer, vilket medför en rikedom av erfarenheter.",
       "paragraph2": "Det som förenar oss är tron på mentorskapets kraft att förändra liv och åtagandet att bygga en plattform som underlättar meningsfulla relationer.",
       "paragraph3": "Vi letar alltid efter passionerade personer att ansluta sig till vårt uppdrag. Om du vill bidra till Menvo, vill vi gärna höra från dig!",
-      "joinTeam": "Gå med i Vårt Team"
+      "joinTeam": "Gå med i Vårt Team",
+      "viewMap": "Se teamkort"
     },
     "ourTeamImageAlt": "Illustration av vårt team",
     "ourImpact": {
@@ -316,9 +317,9 @@
       "getStarted": "Bli Företagspartner"
     },
     "faq": {
-      "title": "Vanliga Frågor",
-      "description": "Hitta svar på de vanligaste frågorna om plattformen.",
-      "viewAll": "Se Alla Frågor",
+      "title": "Ofte stillede spørgsmål",
+      "description": "Find svar på de mest almindelige spørgsmål om platformen.",
+      "viewAll": "Se alle spørgsmål",
       "q1": {
         "question": "Är mentorskap verkligen gratis?",
         "answer": "Ja, alla mentorsessioner på vår plattform är helt gratis. Våra mentorer dedikerar sin tid frivilligt för att hjälpa andra att växa."
@@ -1139,7 +1140,10 @@
       "cvAvailable": "PDF-fil gemt og tilgængelig til visning",
       "settingsDescription": "Administrer dine kontoindstillinger",
       "inDevelopment": "Under udvikling",
-      "settingsComingSoon": "Snart vil du kunne administrere meddelelser, privatliv og andre kontoindstillinger."
+      "settingsComingSoon": "Snart vil du kunne administrere meddelelser, privatliv og andre kontoindstillinger.",
+      "expertisePlaceholder": "Skriv et område og tryk på Enter",
+      "topicsPlaceholder": "Skriv et emne og tryk på Enter",
+      "tagsPlaceholder": "Skriv et tag og tryk på Enter"
     }
   },
   "settings": {
