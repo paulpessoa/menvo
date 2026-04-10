@@ -1167,5 +1167,54 @@
     "selectConversationDesc": "Choose a conversation in the sidebar to start messaging",
     "roleMentor": "Mentor",
     "roleMentee": "Mentee"
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "security": "Security",
+      "appearance": "Appearance"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language"
+    },
+    "account": {
+      "title": "Account Information",
+      "description": "Your login details",
+      "email": "Email",
+      "verified": "Verified"
+    },
+    "security": {
+      "title": "Change Password",
+      "description": "Update your access password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Confirm your new password",
+      "changing": "Changing...",
+      "success": "Password changed successfully",
+      "error": "Could not change password",
+      "mismatch": "Passwords do not match",
+      "minLength": "Password must be at least 6 characters long"
+    },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "description": "Irreversible actions on your account",
+      "deleteButton": "Delete Account",
+      "confirmTitle": "Are you absolutely sure?",
+      "confirmDesc": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers.",
+      "cancel": "Cancel",
+      "confirmAction": "Yes, delete my account"
+    },
+    "appearance": {
+      "title": "Theme",
+      "description": "Choose the interface theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   }
 }

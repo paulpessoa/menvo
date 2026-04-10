@@ -34,7 +34,8 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function SettingsPage() {
-  const t = useTranslations()
+  const t = useTranslations("settings")
+  const commonT = useTranslations("common")
   const { currentLanguage, changeLanguage } = useLanguage()
   const { user, signOut } = useAuth()
   const { toast } = useToast()
@@ -47,8 +48,8 @@ export default function SettingsPage() {
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast({
-        title: "Erro",
-        description: "As senhas não coincidem",
+        title: commonT("error"),
+        description: t("security.mismatch"),
         variant: "destructive",
       })
       return
@@ -56,8 +57,8 @@ export default function SettingsPage() {
 
     if (newPassword.length < 6) {
       toast({
-        title: "Erro",
-        description: "A senha deve ter pelo menos 6 caracteres",
+        title: commonT("error"),
+        description: t("security.minLength"),
         variant: "destructive",
       })
       return
@@ -67,16 +68,16 @@ export default function SettingsPage() {
     try {
       // Implementar lógica de mudança de senha via Supabase
       toast({
-        title: "Sucesso",
-        description: "Senha alterada com sucesso",
+        title: commonT("success"),
+        description: t("security.success"),
       })
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível alterar a senha",
+        title: commonT("error"),
+        description: t("security.error"),
         variant: "destructive",
       })
     } finally {
@@ -88,46 +89,39 @@ export default function SettingsPage() {
     try {
       // Implementar lógica de deletar conta
       toast({
-        title: "Conta deletada",
-        description: "Sua conta foi removida permanentemente",
+        title: t("dangerZone.deleteButton"),
+        description: t("dangerZone.confirmDesc"),
       })
       await signOut()
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível deletar a conta",
+        title: commonT("error"),
+        description: commonT("error"),
         variant: "destructive",
       })
     }
   }
 
   return (
-    <div className="container max-w-4xl py-8">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
+    <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="flex items-center gap-2 mb-8">
         <Settings className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Configurações</h1>
-          <p className="text-muted-foreground">
-            Gerencie suas preferências e configurações de conta
-          </p>
-        </div>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
       </div>
 
-      {/* Tabs */}
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="general" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Geral
+            <Globe className="h-4 w-4" />
+            {t("tabs.general")}
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Lock className="h-4 w-4" />
-            Segurança
+            {t("tabs.security")}
           </TabsTrigger>
           <TabsTrigger value="appearance" className="flex items-center gap-2">
             <Sun className="h-4 w-4" />
-            Aparência
+            {t("tabs.appearance")}
           </TabsTrigger>
         </TabsList>
 
@@ -137,55 +131,55 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Idioma
+                {t("language.title")}
               </CardTitle>
               <CardDescription>
-                Escolha o idioma da plataforma
+                {t("language.description")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                 <Button
                   variant={currentLanguage === "pt-BR" ? "default" : "outline"}
                   onClick={() => changeLanguage("pt-BR")}
                   className="w-full justify-start md:justify-center"
                 >
-                  🇧🇷 Português
+                  🇧🇷 {commonT("portuguese")}
                 </Button>
                 <Button
                   variant={currentLanguage === "en" ? "default" : "outline"}
                   onClick={() => changeLanguage("en")}
                   className="w-full justify-start md:justify-center"
                 >
-                  🇺🇸 English
+                  🇺🇸 {commonT("english")}
                 </Button>
                 <Button
                   variant={currentLanguage === "es" ? "default" : "outline"}
                   onClick={() => changeLanguage("es")}
                   className="w-full justify-start md:justify-center"
                 >
-                  🇪🇸 Español
+                  🇪🇸 {commonT("spanish")}
                 </Button>
                 <Button
                   variant={currentLanguage === "fr" ? "default" : "outline"}
                   onClick={() => changeLanguage("fr")}
                   className="w-full justify-start md:justify-center"
                 >
-                  🇫🇷 Français
+                  🇫🇷 {commonT("french", { defaultValue: "Français" })}
                 </Button>
                 <Button
                   variant={currentLanguage === "da" ? "default" : "outline"}
                   onClick={() => changeLanguage("da")}
                   className="w-full justify-start md:justify-center"
                 >
-                  🇩🇰 Dansk
+                  🇩🇰 {commonT("danish", { defaultValue: "Dansk" })}
                 </Button>
                 <Button
                   variant={currentLanguage === "sv" ? "default" : "outline"}
                   onClick={() => changeLanguage("sv")}
                   className="w-full justify-start md:justify-center"
                 >
-                  🇸🇪 Svenska
+                  🇸🇪 {commonT("swedish", { defaultValue: "Svenska" })}
                 </Button>
               </div>
             </CardContent>
@@ -193,19 +187,19 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Informações da Conta</CardTitle>
+              <CardTitle>{t("account.title")}</CardTitle>
               <CardDescription>
-                Seus dados de login
+                {t("account.description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
-                    <p className="font-medium">Email</p>
+                    <p className="font-medium">{t("account.email")}</p>
                     <p className="text-sm text-muted-foreground">{user?.email}</p>
                   </div>
-                  <Badge variant="default">Verificado</Badge>
+                  <Badge variant="default">{t("account.verified")}</Badge>
                 </div>
               </div>
             </CardContent>
@@ -218,41 +212,41 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lock className="h-5 w-5" />
-                Alterar Senha
+                {t("security.title")}
               </CardTitle>
               <CardDescription>
-                Atualize sua senha de acesso
+                {t("security.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="current-password">Senha Atual</Label>
+                <Label htmlFor="current-password">{t("security.currentPassword")}</Label>
                 <Input
                   id="current-password"
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Digite sua senha atual"
+                  placeholder={t("security.currentPasswordPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">Nova Senha</Label>
+                <Label htmlFor="new-password">{t("security.newPassword")}</Label>
                 <Input
                   id="new-password"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Digite sua nova senha"
+                  placeholder={t("security.newPasswordPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
+                <Label htmlFor="confirm-password">{t("security.confirmPassword")}</Label>
                 <Input
                   id="confirm-password"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirme sua nova senha"
+                  placeholder={t("security.confirmPasswordPlaceholder")}
                 />
               </div>
               <Button
@@ -260,7 +254,7 @@ export default function SettingsPage() {
                 disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
                 className="w-full"
               >
-                {isChangingPassword ? "Alterando..." : "Alterar Senha"}
+                {isChangingPassword ? t("security.changing") : t("security.title")}
               </Button>
             </CardContent>
           </Card>
@@ -269,10 +263,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
-                Zona de Perigo
+                {t("dangerZone.title")}
               </CardTitle>
               <CardDescription>
-                Ações irreversíveis na sua conta
+                {t("dangerZone.description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -280,21 +274,20 @@ export default function SettingsPage() {
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="w-full">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Deletar Conta
+                    {t("dangerZone.deleteButton")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
+                    <AlertDialogTitle>{t("dangerZone.confirmTitle")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Esta ação não pode ser desfeita. Isso irá deletar permanentemente sua conta
-                      e remover todos os seus dados dos nossos servidores.
+                      {t("dangerZone.confirmDesc")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogCancel>{t("dangerZone.cancel")}</AlertDialogCancel>
                     <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                      Sim, deletar minha conta
+                      {t("dangerZone.confirmAction")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -309,10 +302,10 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sun className="h-5 w-5" />
-                Tema
+                {t("appearance.title")}
               </CardTitle>
               <CardDescription>
-                Escolha o tema da interface
+                {t("appearance.description")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -323,7 +316,7 @@ export default function SettingsPage() {
                   className="w-full flex items-center gap-2"
                 >
                   <Sun className="h-4 w-4" />
-                  Claro
+                  {t("appearance.light")}
                 </Button>
                 <Button
                   variant={theme === "dark" ? "default" : "outline"}
@@ -331,7 +324,7 @@ export default function SettingsPage() {
                   className="w-full flex items-center gap-2"
                 >
                   <Moon className="h-4 w-4" />
-                  Escuro
+                  {t("appearance.dark")}
                 </Button>
                 <Button
                   variant={theme === "system" ? "default" : "outline"}
@@ -339,7 +332,7 @@ export default function SettingsPage() {
                   className="w-full flex items-center gap-2"
                 >
                   <Settings className="h-4 w-4" />
-                  Sistema
+                  {t("appearance.system")}
                 </Button>
               </div>
             </CardContent>

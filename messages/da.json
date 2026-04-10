@@ -1087,5 +1087,54 @@
     "selectConversationDesc": "Vælg en samtale i sidebjælken for at begynde at sende beskeder",
     "roleMentor": "Mentor",
     "roleMentee": "Mentee"
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "tabs": {
+      "general": "Generelt",
+      "security": "Sikkerhed",
+      "appearance": "Udseende"
+    },
+    "language": {
+      "title": "Sprog",
+      "description": "Vælg dit foretrukne sprog"
+    },
+    "account": {
+      "title": "Kontooplysninger",
+      "description": "Dine loginoplysninger",
+      "email": "E-mail",
+      "verified": "Verificeret"
+    },
+    "security": {
+      "title": "Skift adgangskode",
+      "description": "Opdater din adgangskode",
+      "currentPassword": "Nuværende adgangskode",
+      "currentPasswordPlaceholder": "Indtast din nuværende adgangskode",
+      "newPassword": "Ny adgangskode",
+      "newPasswordPlaceholder": "Indtast din nye adgangskode",
+      "confirmPassword": "Bekræft ny adgangskode",
+      "confirmPasswordPlaceholder": "Bekræft din nye adgangskode",
+      "changing": "Ændrer...",
+      "success": "Adgangskode ændret korrekt",
+      "error": "Kunne ikke ændre adgangskode",
+      "mismatch": "Adgangskoderne stemmer ikke overens",
+      "minLength": "Adgangskoden skal være på mindst 6 tegn"
+    },
+    "dangerZone": {
+      "title": "Farezone",
+      "description": "Handlinger der ikke kan fortrydes på din konto",
+      "deleteButton": "Slet konto",
+      "confirmTitle": "Er du helt sikker?",
+      "confirmDesc": "Denne handling kan ikke fortrydes. Dette vil slette din konto permanent og fjerne alle dine data fra vores servere.",
+      "cancel": "Annuller",
+      "confirmAction": "Ja, slet min konto"
+    },
+    "appearance": {
+      "title": "Tema",
+      "description": "Vælg tema for brugerfladen",
+      "light": "Lys",
+      "dark": "Mørk",
+      "system": "System"
+    }
   }
 }

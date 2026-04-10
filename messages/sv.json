@@ -959,5 +959,54 @@
     "selectConversationDesc": "Välj en konversation i sidofältet för att börja skicka meddelanden",
     "roleMentor": "Mentor",
     "roleMentee": "Mentee"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "tabs": {
+      "general": "Allmänt",
+      "security": "Säkerhet",
+      "appearance": "Utseende"
+    },
+    "language": {
+      "title": "Språk",
+      "description": "Välj ditt föredragna språk"
+    },
+    "account": {
+      "title": "Kontoinformation",
+      "description": "Dina inloggningsuppgifter",
+      "email": "E-post",
+      "verified": "Verifierad"
+    },
+    "security": {
+      "title": "Ändra lösenord",
+      "description": "Uppdatera ditt lösenord",
+      "currentPassword": "Nuvarande lösenord",
+      "currentPasswordPlaceholder": "Ange ditt nuvarande lösenord",
+      "newPassword": "Nytt lösenord",
+      "newPasswordPlaceholder": "Ange ditt nya lösenord",
+      "confirmPassword": "Bekräfta nytt lösenord",
+      "confirmPasswordPlaceholder": "Bekräfta ditt nya lösenord",
+      "changing": "Ändrar...",
+      "success": "Lösenordet har ändrats framgångsrikt",
+      "error": "Kunde inte ändra lösenordet",
+      "mismatch": "Lösenorden matchar inte",
+      "minLength": "Lösenordet måste vara minst 6 tecken långt"
+    },
+    "dangerZone": {
+      "title": "Riskzon",
+      "description": "Oåterkalleliga åtgärder på ditt konto",
+      "deleteButton": "Radera konto",
+      "confirmTitle": "Är du helt säker?",
+      "confirmDesc": "Denna åtgärd kan inte ångras. Detta kommer att radera ditt konto permanent och ta bort alla dina data från våra servrar.",
+      "cancel": "Avbryt",
+      "confirmAction": "Ja, radera mitt konto"
+    },
+    "appearance": {
+      "title": "Tema",
+      "description": "Välj gränssnittstema",
+      "light": "Ljust",
+      "dark": "Mörkt",
+      "system": "System"
+    }
   }
 }

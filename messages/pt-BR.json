@@ -1142,5 +1142,54 @@
     "selectConversationDesc": "Escolha uma conversa na sidebar para começar a trocar mensagens",
     "roleMentor": "Mentor",
     "roleMentee": "Mentorado"
+  },
+  "settings": {
+    "title": "Configurações",
+    "tabs": {
+      "general": "Geral",
+      "security": "Segurança",
+      "appearance": "Aparência"
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Escolha seu idioma preferido"
+    },
+    "account": {
+      "title": "Informações da Conta",
+      "description": "Seus dados de login",
+      "email": "Email",
+      "verified": "Verificado"
+    },
+    "security": {
+      "title": "Alterar Senha",
+      "description": "Atualize sua senha de acesso",
+      "currentPassword": "Senha Atual",
+      "currentPasswordPlaceholder": "Digite sua senha atual",
+      "newPassword": "Nova Senha",
+      "newPasswordPlaceholder": "Digite sua nova senha",
+      "confirmPassword": "Confirmar Nova Senha",
+      "confirmPasswordPlaceholder": "Confirme sua nova senha",
+      "changing": "Alterando...",
+      "success": "Senha alterada com sucesso",
+      "error": "Não foi possível alterar a senha",
+      "mismatch": "As senhas não coincidem",
+      "minLength": "A senha deve ter pelo menos 6 caracteres"
+    },
+    "dangerZone": {
+      "title": "Zona de Perigo",
+      "description": "Ações irreversíveis na sua conta",
+      "deleteButton": "Deletar Conta",
+      "confirmTitle": "Você tem certeza absoluta?",
+      "confirmDesc": "Esta ação não pode ser desfeita. Isso irá deletar permanentemente sua conta e remover todos os seus dados dos nossos servidores.",
+      "cancel": "Cancelar",
+      "confirmAction": "Sim, deletar minha conta"
+    },
+    "appearance": {
+      "title": "Tema",
+      "description": "Escolha o tema da interface",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    }
   }
 }
