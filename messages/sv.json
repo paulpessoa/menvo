@@ -1126,5 +1126,22 @@
         "description": "Kunde inte skicka ditt förslag. Försök igen senare."
       }
     }
+  },
+  "appointments": {
+    "title": "Bokningar",
+    "loading": "Laddar bokningar...",
+    "empty": "Inga bokningar hittades",
+    "error": "Fel vid laddning av bokningar",
+    "today": "Idag",
+    "expired": "Utgången",
+    "minutes": "min",
+    "menteeComments": "Mentees kommentarer:",
+    "mentorNotes": "Mentorns anteckningar:",
+    "cancelledBy": "Avbokad av {name}",
+    "you": "dig",
+    "reason": "Orsak:",
+    "cancelledAt": "Avbokad den {date}",
+    "evaluate": "Utvärdera",
+    "joinMeet": "Gå med i Meet"
   }
 }

@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Clock, X, CheckCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface AppointmentStatusBadgeProps {
     status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
@@ -7,27 +8,29 @@ interface AppointmentStatusBadgeProps {
 }
 
 export function AppointmentStatusBadge({ status, className }: AppointmentStatusBadgeProps) {
+    const t = useTranslations("appointments.status")
+    
     const statusConfig = {
         pending: {
-            label: 'Pendente',
+            label: t('pending'),
             variant: 'secondary' as const,
             icon: Clock,
             className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
         },
         confirmed: {
-            label: 'Confirmado',
+            label: t('confirmed'),
             variant: 'default' as const,
             icon: CheckCircle,
             className: 'bg-green-100 text-green-800 border-green-200',
         },
         cancelled: {
-            label: 'Cancelado',
+            label: t('cancelled'),
             variant: 'destructive' as const,
             icon: X,
             className: 'bg-red-100 text-red-800 border-red-200',
         },
         completed: {
-            label: 'Concluído',
+            label: t('completed'),
             variant: 'outline' as const,
             icon: Calendar,
             className: 'bg-blue-100 text-blue-800 border-blue-200',

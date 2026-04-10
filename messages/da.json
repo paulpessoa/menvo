@@ -1275,5 +1275,22 @@
       "inDevelopment": "Under udvikling",
       "comingSoon": "Kommer snart: bibliotek med materialer, skabeloner og ressourcer til deling med mentees"
     }
+  },
+  "appointments": {
+    "title": "Aftaler",
+    "loading": "Indlæser aftaler...",
+    "empty": "Ingen aftaler fundet",
+    "error": "Fejl ved indlæsning af aftaler",
+    "today": "I dag",
+    "expired": "Udløbet",
+    "minutes": "min",
+    "menteeComments": "Mentees kommentarer:",
+    "mentorNotes": "Mentors noter:",
+    "cancelledBy": "Aflyst af {name}",
+    "you": "dig",
+    "reason": "Årsag:",
+    "cancelledAt": "Aflyst den {date}",
+    "evaluate": "Vurder",
+    "joinMeet": "Deltag i Meet"
   }
 }

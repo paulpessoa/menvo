@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar } from 'lucide-react';
+import { Calendar, Loader2 } from 'lucide-react';
 import { AppointmentWithProfiles } from '@/types/appointments';
 import { toast } from 'sonner';
 import { AppointmentCard } from './appointment-card';
-import { createClient } from '@/utils/supabase/client';
+import { useAuth } from '@/lib/auth';
+import { useTranslations } from 'next-intl';
 
 interface AppointmentsListProps {
     role?: 'mentor' | 'mentee';
@@ -19,23 +20,14 @@ export default function AppointmentsList({
     status,
     limit = 10
 }: AppointmentsListProps) {
+    const t = useTranslations("appointments");
     const [appointments, setAppointments] = useState<AppointmentWithProfiles[]>([]);
     const [loading, setLoading] = useState(true);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const { user, loading: authLoading } = useAuth();
 
-    const supabase = createClient();
+    const fetchAppointments = useCallback(async () => {
+        if (!user) return;
 
-    useEffect(() => {
-        fetchUser();
-        fetchAppointments();
-    }, [role, status, limit]);
-
-    const fetchUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) setCurrentUserId(user.id);
-    };
-
-    const fetchAppointments = async () => {
         try {
             setLoading(true);
 
@@ -54,16 +46,23 @@ export default function AppointmentsList({
             setAppointments(data.appointments || []);
         } catch (error) {
             console.error('Error fetching appointments:', error);
-            toast.error('Erro ao carregar agendamentos');
+            toast.error(t("error"));
         } finally {
             setLoading(false);
         }
-    };
+    }, [role, status, limit, user, t]);
 
-    if (loading) {
+    useEffect(() => {
+        if (!authLoading && user) {
+            fetchAppointments();
+        }
+    }, [user, authLoading, fetchAppointments]);
+
+    if (authLoading || (loading && appointments.length === 0)) {
         return (
-            <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">{t("loading")}</p>
             </div>
         );
     }
@@ -71,16 +70,12 @@ export default function AppointmentsList({
     if (appointments.length === 0) {
         return (
             <Card>
-                <CardContent className="text-center py-8">
+                <CardContent className="text-center py-12">
                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="text-muted-foreground">Nenhum agendamento encontrado</p>
+                    <p className="text-muted-foreground">{t("empty")}</p>
                 </CardContent>
             </Card>
         );
-    }
-
-    if (!currentUserId) {
-        return null;
     }
 
     return (
@@ -88,9 +83,9 @@ export default function AppointmentsList({
             {appointments.map((appointment) => (
                 <AppointmentCard
                     key={appointment.id}
-                    appointment={appointment}
-                    currentUserId={currentUserId}
-                    onAppointmentUpdate={fetchAppointments}
+                    appointment={appointment as any}
+                    currentUserId={user?.id || ''}
+                    onAppointmentUpdate={fetchAppointments as any}
                 />
             ))}
         </div>

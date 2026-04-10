@@ -1300,5 +1300,22 @@
       "inDevelopment": "In development",
       "comingSoon": "Coming soon: library of materials, templates and resources to share with mentees"
     }
+  },
+  "appointments": {
+    "title": "Appointments",
+    "loading": "Loading appointments...",
+    "empty": "No appointments found",
+    "error": "Error loading appointments",
+    "today": "Today",
+    "expired": "Expired",
+    "minutes": "min",
+    "menteeComments": "Mentee Comments:",
+    "mentorNotes": "Mentor Notes:",
+    "cancelledBy": "Cancelled by {name}",
+    "you": "you",
+    "reason": "Reason:",
+    "cancelledAt": "Cancelled on {date}",
+    "evaluate": "Evaluate",
+    "joinMeet": "Join Meet"
   }
 }

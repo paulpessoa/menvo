@@ -1275,5 +1275,22 @@
       "inDevelopment": "Em desenvolvimento",
       "comingSoon": "Em breve: biblioteca de materiais, templates e recursos para compartilhar com mentees"
     }
+  },
+  "appointments": {
+    "title": "Agendamentos",
+    "loading": "Carregando agendamentos...",
+    "empty": "Nenhum agendamento encontrado",
+    "error": "Erro ao carregar agendamentos",
+    "today": "Hoje",
+    "expired": "Expirado",
+    "minutes": "min",
+    "menteeComments": "Comentários do Mentee:",
+    "mentorNotes": "Anotações do Mentor:",
+    "cancelledBy": "Cancelado por {name}",
+    "you": "você",
+    "reason": "Motivo:",
+    "cancelledAt": "Cancelado em {date}",
+    "evaluate": "Avaliar",
+    "joinMeet": "Entrar no Meet"
   }
 }

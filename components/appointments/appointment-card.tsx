@@ -12,7 +12,8 @@ import {
     MessageSquare,
     ExternalLink,
     XCircle,
-    CheckCircle2
+    CheckCircle2,
+    Trash2
 } from 'lucide-react'
 import { AppointmentStatusBadge } from './appointment-status-badge'
 import { ConfirmAppointmentButton } from './confirm-appointment-button'
@@ -21,18 +22,19 @@ import { ChatButton } from './chat-button'
 import { CompleteAppointmentModal } from './complete-appointment-modal'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { useTranslations, useFormatter } from 'next-intl'
 
 interface Appointment {
     id: string | number
     scheduled_at: string
     duration_minutes: number
     status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
-    notes_mentee?: string // Comentários/notas do mentee
-    notes_mentor?: string // Anotações/notas do mentor
+    notes_mentee?: string
+    notes_mentor?: string
     google_meet_link?: string
     cancellation_reason?: string
     cancelled_at?: string
-    cancelled_by?: string // ID de quem cancelou
+    cancelled_by?: string
     mentor: {
         id: string
         full_name: string
@@ -58,6 +60,9 @@ export function AppointmentCard({
     currentUserId,
     onAppointmentUpdate
 }: AppointmentCardProps) {
+    const t = useTranslations("appointments")
+    const commonT = useTranslations("common")
+    const format = useFormatter()
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
     const [hasUserEvaluated, setHasUserEvaluated] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -66,10 +71,8 @@ export function AppointmentCard({
     const otherPerson = isMentor ? appointment.mentee : appointment.mentor
     const userRole = isMentor ? 'mentor' : 'mentee'
 
-    // Verificar se o mentee já avaliou (apenas mentees podem avaliar)
     useEffect(() => {
         const checkEvaluation = async () => {
-            // Se não for mentee ou não estiver confirmado, não precisa verificar
             if (isMentor || appointment.status !== 'confirmed') {
                 setLoading(false)
                 return
@@ -90,32 +93,23 @@ export function AppointmentCard({
         checkEvaluation()
     }, [appointment.id, appointment.status, currentUserId, isMentor])
 
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString)
-        const now = new Date()
-        const isToday = date.toDateString() === now.toDateString()
+    const dateObj = new Date(appointment.scheduled_at)
+    const now = new Date()
+    const isToday = dateObj.toDateString() === now.toDateString()
+    const endTime = new Date(dateObj.getTime() + appointment.duration_minutes * 60 * 1000)
+    const isPast = endTime < now
 
-        // Calcular o fim da mentoria (início + duração)
-        const endTime = new Date(date.getTime() + appointment.duration_minutes * 60 * 1000)
-        const isPast = endTime < now
+    const formattedDate = format.dateTime(dateObj, {
+        weekday: isToday ? undefined : 'short',
+        day: 'numeric',
+        month: 'short',
+        year: dateObj.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    })
 
-        return {
-            date: date.toLocaleDateString('pt-BR', {
-                weekday: isToday ? undefined : 'short',
-                day: 'numeric',
-                month: 'short',
-                year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-            }),
-            time: date.toLocaleTimeString('pt-BR', {
-                hour: '2-digit',
-                minute: '2-digit',
-            }),
-            isToday,
-            isPast,
-        }
-    }
-
-    const { date, time, isToday, isPast } = formatDateTime(appointment.scheduled_at)
+    const formattedTime = format.dateTime(dateObj, {
+        hour: '2-digit',
+        minute: '2-digit',
+    })
 
     const getInitials = (name: string) => {
         if (!name) return '??';
@@ -131,38 +125,21 @@ export function AppointmentCard({
     const canCancel = (appointment.status === 'pending' || appointment.status === 'confirmed') && !isPast
     const canJoinMeet = appointment.status === 'confirmed' && appointment.google_meet_link && !isPast
     const canChat = appointment.status === 'pending' || appointment.status === 'confirmed'
-    // Apenas o mentee pode avaliar a sessão
     const canComplete = !isMentor && appointment.status === 'confirmed' && isPast && !hasUserEvaluated && !loading
 
     const handleProfileClick = async () => {
-        if (isMentor) {
-            // Mentor vendo mentee - buscar slug do profile
-            try {
-                const response = await fetch(`/api/profiles/${otherPerson.id}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    const slug = data.slug || otherPerson.id;
-                    window.location.href = `/mentee/${slug}`;
-                } else {
-                    console.error('Mentee não encontrado');
-                }
-            } catch (error) {
-                console.error('Erro ao buscar mentee:', error);
+        const rolePath = isMentor ? 'mentee' : 'mentors'
+        try {
+            const response = await fetch(`/api/${rolePath}/${otherPerson.id}`);
+            if (response.ok) {
+                const data = await response.json();
+                const slug = data.slug || otherPerson.id;
+                window.location.href = `/${rolePath}/${slug}`;
+            } else {
+                window.location.href = `/${rolePath}/${otherPerson.id}`;
             }
-        } else {
-            // Mentee vendo mentor - buscar slug do mentor
-            try {
-                const response = await fetch(`/api/mentors/${otherPerson.id}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    const slug = data.slug || otherPerson.id;
-                    window.location.href = `/mentors/${slug}`;
-                } else {
-                    console.error('Mentor não encontrado');
-                }
-            } catch (error) {
-                console.error('Erro ao buscar mentor:', error);
-            }
+        } catch (error) {
+            window.location.href = `/${rolePath}/${otherPerson.id}`;
         }
     };
 
@@ -175,15 +152,15 @@ export function AppointmentCard({
                         onClick={handleProfileClick}
                     >
                         <Avatar className="h-10 w-10">
-                            <AvatarImage src={otherPerson.avatar_url} />
+                            <AvatarImage src={otherPerson.avatar_url || undefined} />
                             <AvatarFallback>{getInitials(otherPerson.full_name)}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h3 className="font-semibold text-sm hover:text-indigo-600 transition-colors">
+                            <h3 className="font-semibold text-sm hover:text-primary transition-colors">
                                 {otherPerson.full_name}
                             </h3>
                             <p className="text-xs text-muted-foreground">
-                                {userRole === 'mentor' ? 'Mentee' : 'Mentor'}
+                                {isMentor ? t("roleMentee", { defaultValue: "Mentee" }) : t("roleMentor", { defaultValue: "Mentor" })}
                             </p>
                         </div>
                     </div>
@@ -195,32 +172,29 @@ export function AppointmentCard({
                 <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
                     <span className={isToday ? 'font-medium text-blue-600' : ''}>
-                        {isToday ? 'Hoje' : date}
+                        {isToday ? t("today") : formattedDate}
                     </span>
-                    {isToday && <Badge variant="outline" className="text-xs">Hoje</Badge>}
+                    {isToday && <Badge variant="outline" className="text-xs">{t("today")}</Badge>}
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
                     <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span>{time}</span>
+                    <span>{formattedTime}</span>
                     <span className="text-muted-foreground">
-                        ({appointment.duration_minutes} min)
+                        ({appointment.duration_minutes} {t("minutes")})
                     </span>
                     {isPast && appointment.status !== 'completed' && (
                         <Badge variant="outline" className="text-xs text-orange-600">
-                            Expirado
+                            {t("expired")}
                         </Badge>
                     )}
                 </div>
 
-
-
-                {/* Comentários do Mentee */}
                 {appointment.notes_mentee && (
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm">
                             <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-medium">Comentários do Mentee:</span>
+                            <span className="font-medium">{t("menteeComments")}</span>
                         </div>
                         <p className="text-sm text-muted-foreground pl-6 whitespace-pre-wrap break-words">
                             {appointment.notes_mentee}
@@ -228,12 +202,11 @@ export function AppointmentCard({
                     </div>
                 )}
 
-                {/* Anotações do Mentor */}
                 {appointment.notes_mentor && (
                     <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm">
                             <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-semibold text-gray-700">Anotações do Mentor:</span>
+                            <span className="font-semibold text-gray-700">{t("mentorNotes")}</span>
                         </div>
                         <p className="text-sm text-muted-foreground pl-6 whitespace-pre-wrap break-words">
                             {appointment.notes_mentor}
@@ -246,16 +219,16 @@ export function AppointmentCard({
                         <div className="flex items-center gap-2 text-sm">
                             <XCircle className="w-4 h-4 text-red-600" />
                             <span className="font-medium text-red-900">
-                                Cancelado por {appointment.cancelled_by === currentUserId ? 'você' : otherPerson.full_name}
+                                {t("cancelledBy", { name: appointment.cancelled_by === currentUserId ? t("you") : otherPerson.full_name })}
                             </span>
                         </div>
-                        <p className="text-sm font-medium text-red-900 pl-6 mb-1">Motivo:</p>
+                        <p className="text-sm font-medium text-red-900 pl-6 mb-1">{t("reason")}</p>
                         <p className="text-sm text-red-800 pl-6">
                             {appointment.cancellation_reason}
                         </p>
                         {appointment.cancelled_at && (
                             <p className="text-xs text-red-600 pl-6 mt-1">
-                                Cancelado em {new Date(appointment.cancelled_at).toLocaleString('pt-BR')}
+                                {t("cancelledAt", { date: format.dateTime(new Date(appointment.cancelled_at), { dateStyle: 'short', timeStyle: 'short' }) })}
                             </p>
                         )}
                     </div>
@@ -266,13 +239,11 @@ export function AppointmentCard({
                 <div className="flex gap-2 flex-wrap">
                     {(canChat || canConfirm) && (
                         <ChatButton
-                            appointment={appointment}
+                            appointment={appointment as any}
                             currentUserId={currentUserId}
                             isMentor={isMentor}
                         />
                     )}
-
-
                 </div>
 
                 <div className="flex gap-2 flex-wrap sm:ml-auto">
@@ -283,21 +254,21 @@ export function AppointmentCard({
                             onClick={() => setIsCompleteModalOpen(true)}
                         >
                             <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Avaliar
+                            {t("evaluate")}
                         </Button>
                     )}
 
                     {canConfirm && (
                         <ConfirmAppointmentButton
-                            appointment={appointment}
-                            onConfirmed={onAppointmentUpdate}
+                            appointment={appointment as any}
+                            onConfirmed={() => onAppointmentUpdate?.(appointment)}
                         />
                     )}
 
                     {canCancel && (
                         <CancelAppointmentButton
-                            appointment={appointment}
-                            onCancelled={onAppointmentUpdate}
+                            appointment={appointment as any}
+                            onCancelled={() => onAppointmentUpdate?.(appointment)}
                             variant="outline"
                         />
                     )}
@@ -313,7 +284,7 @@ export function AppointmentCard({
                                 rel="noopener noreferrer"
                             >
                                 <Video className="w-4 h-4 mr-2" />
-                                Entrar no Meet
+                                {t("joinMeet")}
                                 <ExternalLink className="w-3 h-3 ml-1" />
                             </a>
                         </Button>
@@ -321,17 +292,14 @@ export function AppointmentCard({
                 </div>
             </CardFooter>
 
-            {/* Modal de Finalização */}
             <CompleteAppointmentModal
                 open={isCompleteModalOpen}
                 onOpenChange={setIsCompleteModalOpen}
-                appointment={appointment}
+                appointment={appointment as any}
                 currentUserId={currentUserId}
                 isMentor={isMentor}
                 onCompleted={() => {
-                    if (onAppointmentUpdate) {
-                        onAppointmentUpdate(appointment);
-                    }
+                    onAppointmentUpdate?.(appointment);
                 }}
             />
         </Card>
