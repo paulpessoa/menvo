@@ -82,38 +82,38 @@
   },
   "mentorsPage": {
     "title": "Hitta din ideala mentor",
-    "subtitle": "Connect with verified mentors and accelerate your career",
-    "searchPlaceholder": "Search by name, specialty, company...",
-    "filters": "Filters",
-    "sheetTitle": "Advanced Filters",
-    "sheetDescription": "Refine your search to find the perfect mentor",
-    "state": "State/Province",
-    "statePlaceholder": "Select state",
-    "allStates": "All states",
-    "city": "City",
-    "cityPlaceholder": "Select city",
-    "allCities": "All cities",
-    "topics": "Mentorship Topics",
-    "expertise": "Expertise Areas",
+    "subtitle": "Anslut med verifierade mentorer och accelerera din karriär",
+    "searchPlaceholder": "Sök efter namn, specialitet, företag...",
+    "filters": "Filter",
+    "sheetTitle": "Avancerade filter",
+    "sheetDescription": "Förfina din sökning för att hitta den perfekta mentorn",
+    "state": "Stat/Provins",
+    "statePlaceholder": "Välj stat",
+    "allStates": "Alla stater",
+    "city": "Stad",
+    "cityPlaceholder": "Välj stad",
+    "allCities": "Alla städer",
+    "topics": "Mentorskapsämnen",
+    "expertise": "Expertisområden",
     "inclusiveTags": "Inkluderande taggar",
-    "experience": "Experience",
-    "experiencePlaceholder": "Years of experience",
-    "anyExperience": "Any experience",
-    "availability": "Availability",
-    "availabilityPlaceholder": "Availability status",
-    "anyStatus": "Any status",
-    "clearFilters": "Clear Filters",
-    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
-    "noMentorsTitle": "No mentors found",
-    "noMentorsDescription": "Try adjusting your filters to find more mentors.",
-    "suggestTopic": "Suggest Topic or Area",
+    "experience": "Erfarenhet",
+    "experiencePlaceholder": "År av erfarenhet",
+    "anyExperience": "Vilken erfarenhet som helst",
+    "availability": "Tillgänglighet",
+    "availabilityPlaceholder": "Tillgänglighetsstatus",
+    "anyStatus": "Vilken status som helst",
+    "clearFilters": "Rensa filter",
+    "resultsFound": "{count, plural, =0 {Inga mentorer hittades} =1 {1 mentor hittad} other {# mentorer hittades}}",
+    "noMentorsTitle": "Inga mentorer hittades",
+    "noMentorsDescription": "Försök att justera dina filter för att hitta fler mentorer.",
+    "suggestTopic": "Föreslå ämne eller område",
     "viewProfile": "Visa profil",
-    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "sessionsCount": "{count, plural, =1 {1 session} other {# sessioner}}",
     "status": {
-      "available": "Available",
-      "busy": "Busy",
-      "unavailable": "Unavailable",
-      "unknown": "Unknown status"
+      "available": "Tillgänglig",
+      "busy": "Upptagen",
+      "unavailable": "Otillgänglig",
+      "unknown": "Okänd status"
     },
     "backToMentors": "Tillbaka till mentorer",
     "about": "Om",
@@ -137,6 +137,53 @@
       "success": "Delat framgångsrikt!",
       "copySuccess": "Länk kopierad till urklipp!"
     }
+  },
+  "faq": {
+    "title": "Vanliga frågor",
+    "description": "Hitta svar på de vanligaste frågorna om Menvo-plattformen.",
+    "q1": {
+      "question": "Är mentorskap verkligen gratis?",
+      "answer": "Ja, alla mentorskapssessioner på vår plattform är helt kostnadsfria. Våra mentorer avsätter sin tid ideellt för att hjälpa andra att växa."
+    },
+    "q2": {
+      "question": "Hur långa är mentorskapssessionerna?",
+      "answer": "Standardtiden för en mentorskapssession är 45 minuter. Denna tid är tillräcklig för ett meningsfullt samtal samtidigt som man respekterar allas tidsscheman."
+    },
+    "q3": {
+      "question": "Hur ofta kan jag träffa en mentor?",
+      "answer": "Det beror på mentorns tillgänglighet och preferenser. Vissa är öppna för regelbundna möten, medan andra föredrar enstaka möten."
+    },
+    "q4": {
+      "question": "Vad händer om jag behöver avboka?",
+      "answer": "Vi ber att avbokning sker minst 24 timmar i förväg, av respekt för mentorns tid. Du kan enkelt boka om via din kontrollpanel."
+    },
+    "q5": {
+      "question": "Hur blir jag en verifierad mentor?",
+      "answer": "Efter att ha skapat din mentorprofil behöver du boka ett kort verifieringssamtal med vårt team. Detta säkerställer kvaliteten och säkerheten i gemenskapen."
+    },
+    "q6": {
+      "question": "Är min information säker?",
+      "answer": "Ja, vi tar integritet och säkerhet på största allvar. Din personliga information är skyddad och delas endast med dem du väljer att ansluta dig till."
+    },
+    "q7": {
+      "question": "Hur fungerar det för NGO:er?",
+      "answer": "NGO:er kan registrera sig gratis och koppla ihop de ungdomar de hjälper med frivilliga mentorer. Det är ett sätt att utöka organisationens sociala inverkan utan kostnad."
+    },
+    "q8": {
+      "question": "Kan företag delta?",
+      "answer": "Ja! Företag kan utveckla program för företagsvolontärarbete genom mentorskap, ta emot ESG-rapporter och skapa incitamentspolicyer för anställda som mentorer."
+    },
+    "q9": {
+      "question": "Hur fungerar rekryterares tillgång?",
+      "answer": "Denna funktion är under utveckling. Snart kommer rekryterare att ha tillgång till kvalificerade talanger som deltar på plattformen, alltid med respekt för användarnas integritet."
+    },
+    "q10": {
+      "question": "Kan jag vara både mentor och mentee samtidigt?",
+      "answer": "Ja! Du kan ha båda profilerna på plattformen. Många yrkesverksamma söker mentorskap inom specifika områden samtidigt som de mentorerar inom sin egen expertis."
+    },
+    "stillHaveQuestions": "Har du fortfarande frågor?",
+    "supportDescription": "Vårt supportteam är här för att hjälpa dig med alla frågor du kan tänkas ha.",
+    "contactSupport": "Kontakta support"
   },
   "privacy": {
     "badge": "Integritet",
