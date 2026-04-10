@@ -41,7 +41,10 @@
       "description": "Menvo byggs med omsorg. Vi räknar med din feedback och dina förslag för att förbättra oss och nå fler människor!"
     },
     "administration": "Administration",
-    "progress": "Framsteg"
+    "progress": "Framsteg",
+    "confirmTitle": "Är du säker?",
+    "confirmDesc": "Denna åtgärd kan inte ångras.",
+    "confirmAction": "Ja, bekräfta"
   },
   "header": {
     "title": "MENVO - Frivilliga Mentorer",

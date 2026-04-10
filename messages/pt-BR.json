@@ -41,7 +41,10 @@
       "description": "O Menvo está sendo construído com carinho. Contamos com seu feedback e sugestões para melhorarmos cada vez mais!"
     },
     "administration": "Administração",
-    "progress": "Progresso"
+    "progress": "Progresso",
+    "confirmTitle": "Você tem certeza?",
+    "confirmDesc": "Esta ação não pode ser desfeita.",
+    "confirmAction": "Sim, confirmar"
   },
   "header": {
     "title": "MENVO - Mentores Voluntários",

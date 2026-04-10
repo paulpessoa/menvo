@@ -41,7 +41,10 @@
       "description": "Menvo is being built with care. We count on your feedback and suggestions to improve and reach more people!"
     },
     "administration": "Administration",
-    "progress": "Progress"
+    "progress": "Progress",
+    "confirmTitle": "Are you sure?",
+    "confirmDesc": "This action cannot be undone.",
+    "confirmAction": "Yes, confirm"
   },
   "header": {
     "title": "MENVO - Volunteer Mentors",
