@@ -1123,11 +1123,24 @@
       "rejoinButton": "Inscrever novamente",
       "considerTitle": "Antes de cancelar, considere:",
       "considerItem1": "Você receberá apenas conteúdo relevante sobre mentoria",
-      "considerItem2": "Enviamos no máximo 2 emails por semana",
+      "considerItem2": "Enviamos no máximo 2 e-mails por semana",
       "considerItem3": "Você pode se reinscrever a qualquer momento",
       "button": "Cancelar inscrição",
       "cancelling": "Cancelando...",
       "backToSite": "Voltar ao site"
     }
+  },
+  "messages": {
+    "title": "Mensagens",
+    "searchPlaceholder": "Buscar conversas...",
+    "noConversationsFound": "Nenhuma conversa encontrada",
+    "noConversationsYet": "Nenhuma conversa ainda",
+    "tryAnotherSearch": "Tente buscar por outro nome",
+    "startConversation": "Inicie uma conversa com um mentor!",
+    "newMessages": "{count, plural, =1 {1 nova} other {# novas}}",
+    "selectConversation": "Selecione uma conversa",
+    "selectConversationDesc": "Escolha uma conversa na sidebar para começar a trocar mensagens",
+    "roleMentor": "Mentor",
+    "roleMentee": "Mentorado"
   }
 }

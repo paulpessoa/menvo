@@ -1154,5 +1154,18 @@
       "cancelling": "Unsubscribing...",
       "backToSite": "Back to site"
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Search conversations...",
+    "noConversationsFound": "No conversations found",
+    "noConversationsYet": "No conversations yet",
+    "tryAnotherSearch": "Try searching for another name",
+    "startConversation": "Start a conversation with a mentor!",
+    "newMessages": "{count, plural, =1 {1 new} other {# new}}",
+    "selectConversation": "Select a conversation",
+    "selectConversationDesc": "Choose a conversation in the sidebar to start messaging",
+    "roleMentor": "Mentor",
+    "roleMentee": "Mentee"
   }
 }

@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/chat/ChatInterface"
 import { createClient } from "@/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
 interface Conversation {
   id: string
@@ -28,6 +29,7 @@ interface Conversation {
 }
 
 function MessagesContent() {
+  const t = useTranslations("messages")
   const { user, loading } = useAuth()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
@@ -55,7 +57,6 @@ function MessagesContent() {
           table: 'messages',
         },
         () => {
-          console.log('[MESSAGES] Nova mensagem via Realtime, recarregando conversas');
           loadConversations();
         }
       )
@@ -67,10 +68,8 @@ function MessagesContent() {
           table: 'messages',
         },
         (payload: any) => {
-          console.log('[MESSAGES] Mensagem atualizada via Realtime:', payload);
           // Recarregar se foi marcada como lida (para atualizar contador)
           if (payload.new.read_at !== payload.old.read_at) {
-            console.log('[MESSAGES] Mensagem marcada como lida, recarregando conversas');
             loadConversations();
           }
         }
@@ -98,46 +97,37 @@ function MessagesContent() {
           created_at
         `)
         .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`)
-        .order('last_message_at', { ascending: false, nullsFirst: false })
+        .order('last_message_at', { ascending: false })
 
       if (error) throw error
 
-      // Para cada conversa, buscar dados do outro usuário e contar não lidas
-      const conversationsWithUsers = await Promise.all(
-        (convs || []).map(async (conv: any) => {
-          // Determinar quem é o "outro usuário" (não é o usuário atual)
+      if (convs) {
+        // Para cada conversa, buscar o nome do outro usuário e contagem de não lidas
+        const conversationsWithDetails = await Promise.all(convs.map(async (conv) => {
           const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
-          const isMentor = conv.mentor_id === otherUserId
-
-          // Buscar perfil do outro usuário
-          const { data: profile } = await supabase
+          
+          const { data: otherUser } = await supabase
             .from('profiles')
-            .select('id, first_name, last_name, avatar_url')
+            .select('id, full_name, avatar_url, is_mentor')
             .eq('id', otherUserId)
             .single()
 
-          // Contar mensagens não lidas (mensagens que não são minhas e não foram lidas)
           const { count: unreadCount } = await supabase
             .from('messages')
             .select('*', { count: 'exact', head: true })
             .eq('conversation_id', conv.id)
-            .neq('sender_id', user.id)
+            .eq('receiver_id', user.id)
             .is('read_at', null)
 
           return {
             ...conv,
             unread_count: unreadCount || 0,
-            other_user: {
-              id: otherUserId,
-              full_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : 'Usuário',
-              avatar_url: profile?.avatar_url || null,
-              is_mentor: isMentor,
-            },
+            other_user: otherUser
           }
-        })
-      )
+        }))
 
-      setConversations(conversationsWithUsers)
+        setConversations(conversationsWithDetails as Conversation[])
+      }
     } catch (error) {
       console.error('Erro ao carregar conversas:', error)
     } finally {
@@ -145,60 +135,44 @@ function MessagesContent() {
     }
   }
 
-  const formatTimestamp = (timestamp: string | null) => {
-    if (!timestamp) return 'Agora'
+  const filteredConversations = conversations.filter(conv =>
+    conv.other_user?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
+  const formatTimestamp = (timestamp: string | null) => {
+    if (!timestamp) return ''
     const date = new Date(timestamp)
     const now = new Date()
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-
-    if (diffInHours < 24) {
-      return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
-    } else {
-      return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+    
+    if (date.toDateString() === now.toDateString()) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
+    return date.toLocaleDateString([], { day: '2-digit', month: '2-digit' })
   }
 
-  // Removido loading screen - mantém conversas visíveis durante carregamento
-
-  if (!user) {
+  if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h1 className="text-2xl font-bold mb-2">Acesso Restrito</h1>
-          <p className="text-muted-foreground mb-4">Você precisa estar logado para acessar suas mensagens.</p>
-          <Button onClick={() => (window.location.href = "/login")}>Fazer Login</Button>
-        </div>
+      <div className="container mx-auto py-8 px-4 h-[calc(100-4rem)]">
+        <Skeleton className="h-full w-full" />
       </div>
     )
   }
 
-  // Filtrar conversas pela busca
-  const filteredConversations = conversations.filter((conv) =>
-    conv.other_user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  if (!user) {
+    return null
+  }
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      <div className="max-w-7xl mx-auto h-[600px] border rounded-lg overflow-hidden flex bg-background shadow-sm">
+    <div className="container mx-auto py-4 md:py-8 px-0 md:px-4 h-[calc(100vh-4rem)] flex flex-col">
+      <div className="flex-1 flex overflow-hidden border rounded-lg bg-card shadow-sm">
         {/* Sidebar de Conversas */}
-        <div className="w-full md:w-96 border-r bg-background flex flex-col">
-          {/* Header da Sidebar */}
+        <div className={`w-full md:w-80 flex flex-col border-r ${selectedConversation ? 'hidden md:flex' : 'flex'}`}>
           <div className="p-4 border-b">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-2xl font-bold">Mensagens</h1>
-              {isLoading && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  Carregando...
-                </div>
-              )}
-            </div>
+            <h1 className="text-xl font-bold mb-4">{t("title")}</h1>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar conversas..."
+                placeholder={t("searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -212,12 +186,12 @@ function MessagesContent() {
               <div className="p-8 text-center">
                 <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="font-semibold mb-2">
-                  {searchTerm ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
+                  {searchTerm ? t("noConversationsFound") : t("noConversationsYet")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {searchTerm
-                    ? 'Tente buscar por outro nome'
-                    : 'Inicie uma conversa com um mentor!'}
+                    ? t("tryAnotherSearch")
+                    : t("startConversation")}
                 </p>
               </div>
             ) : (
@@ -254,11 +228,11 @@ function MessagesContent() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="text-xs">
-                            {conversation.other_user.is_mentor ? "Mentor" : "Mentorado"}
+                            {conversation.other_user.is_mentor ? t("roleMentor") : t("roleMentee")}
                           </Badge>
                           {conversation.unread_count > 0 && (
                             <span className="text-xs text-primary font-semibold">
-                              {conversation.unread_count} nova{conversation.unread_count > 1 ? 's' : ''}
+                              {t("newMessages", { count: conversation.unread_count })}
                             </span>
                           )}
                         </div>
@@ -285,9 +259,9 @@ function MessagesContent() {
             <div className="flex-1 flex items-center justify-center bg-muted/20">
               <div className="text-center">
                 <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Selecione uma conversa</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("selectConversation")}</h3>
                 <p className="text-muted-foreground">
-                  Escolha uma conversa na sidebar para começar a trocar mensagens
+                  {t("selectConversationDesc")}
                 </p>
               </div>
             </div>
@@ -314,7 +288,7 @@ function MessagesContent() {
               <div className="flex-1">
                 <h2 className="font-semibold">{selectedConversation.other_user.full_name}</h2>
                 <Badge variant="secondary" className="text-xs">
-                  {selectedConversation.other_user.is_mentor ? "Mentor" : "Mentorado"}
+                  {selectedConversation.other_user.is_mentor ? t("roleMentor") : t("roleMentee")}
                 </Badge>
               </div>
             </div>
@@ -333,6 +307,7 @@ function MessagesContent() {
     </div>
   )
 }
+
 export default function MessagesPage() {
   return <MessagesContent />
 }

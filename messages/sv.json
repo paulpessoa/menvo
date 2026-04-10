@@ -946,5 +946,18 @@
         "backToSite": "Tillbaka till webbplatsen"
       }
     }
+  },
+  "messages": {
+    "title": "Meddelanden",
+    "searchPlaceholder": "Sök konversationer...",
+    "noConversationsFound": "Inga konversationer hittades",
+    "noConversationsYet": "Inga konversationer ännu",
+    "tryAnotherSearch": "Försök söka efter ett annat namn",
+    "startConversation": "Starta en konversation med en mentor!",
+    "newMessages": "{count, plural, =1 {1 nytt} other {# nya}}",
+    "selectConversation": "Välj en konversation",
+    "selectConversationDesc": "Välj en konversation i sidofältet för att börja skicka meddelanden",
+    "roleMentor": "Mentor",
+    "roleMentee": "Mentee"
   }
 }
