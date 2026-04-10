@@ -1011,7 +1011,9 @@
       "expertisePlaceholder": "Type an area and press Enter",
       "topicsPlaceholder": "Type a topic and press Enter",
       "tagsPlaceholder": "Type a tag and press Enter"
-    }
+    },
+    "saving": "Saving...",
+    "loading": "Loading..."
   },
   "dashboard": {
     "greetings": {

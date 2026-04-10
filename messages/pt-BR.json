@@ -986,7 +986,9 @@
       "expertisePlaceholder": "Digite uma área e pressione Enter",
       "topicsPlaceholder": "Digite um tópico e pressione Enter",
       "tagsPlaceholder": "Digite uma tag e pressione Enter"
-    }
+    },
+    "saving": "Salvando...",
+    "loading": "Carregando..."
   },
   "dashboard": {
     "greetings": {

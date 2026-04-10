@@ -757,7 +757,9 @@
       "expertisePlaceholder": "Skriv ett område och tryck på Enter",
       "topicsPlaceholder": "Skriv ett ämne och tryck på Enter",
       "tagsPlaceholder": "Skriv en tagg och tryck på Enter"
-    }
+    },
+    "saving": "Sparar...",
+    "loading": "Laddar..."
   },
   "dashboard": {
     "greetings": {

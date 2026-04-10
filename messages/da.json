@@ -11,9 +11,9 @@
     "register": "Registrera",
     "logout": "Logga ut",
     "language": "Språk",
-    "english": "Engelska",
-    "portuguese": "Portugisiska",
-    "spanish": "Spanska",
+    "english": "Engelsk",
+    "portuguese": "Portugisisk",
+    "spanish": "Spansk",
     "cancel": "Avbryt",
     "continue": "Fortsätt",
     "submit": "Skicka",
@@ -1147,7 +1147,9 @@
       "expertisePlaceholder": "Skriv et område og tryk på Enter",
       "topicsPlaceholder": "Skriv et emne og tryk på Enter",
       "tagsPlaceholder": "Skriv et tag og tryk på Enter"
-    }
+    },
+    "saving": "Gemmer...",
+    "loading": "Indlæser..."
   },
   "settings": {
     "title": "Indstillinger",

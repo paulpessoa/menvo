@@ -1106,5 +1106,9 @@
         "subscribe": "Suscribirse"
       }
     }
+  },
+  "profile": {
+    "saving": "Saving...",
+    "loading": "Loading..."
   }
 }

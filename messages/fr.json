@@ -1131,5 +1131,9 @@
       "button": "Set password and continue",
       "agreement": "By setting your password, you agree to our"
     }
+  },
+  "profile": {
+    "saving": "Saving...",
+    "loading": "Loading..."
   }
 }
