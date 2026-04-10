@@ -1,6 +1,5 @@
 "use client"
 
-// Force rebuild to ensure translations are synced correctly
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -18,6 +17,17 @@ import { useSimpleImageUpload, useSimplePDFUpload } from "@/hooks/useSimpleUploa
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import Link from "next/link"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface ChipInputProps {
   value: string[]
@@ -102,8 +112,8 @@ function ChipInput({ value, onChange, placeholder, suggestions = [] }: ChipInput
 export default function ProfilePage() {
   const t = useTranslations("profile")
   const commonT = useTranslations("common")
-  const { user, refreshProfile, role } = useAuth()
-  const { profile, loading, isUpdating, updateProfile } = useProfile()
+  const { user, refreshProfile, role, loading: authLoading } = useAuth()
+  const { profile, loading: profileLoading, isUpdating, updateProfile } = useProfile()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cvInputRef = useRef<HTMLInputElement>(null)
@@ -155,7 +165,8 @@ export default function ProfilePage() {
   ]
 
   useEffect(() => {
-    if (!user) {
+    // Só redireciona se o carregamento da autenticação terminou e não há usuário
+    if (!authLoading && !user) {
       router.push("/login")
       return
     }
@@ -187,7 +198,7 @@ export default function ProfilePage() {
         cv_url: profile.cv_url || "",
       })
     }
-  }, [user, profile, router])
+  }, [user, profile, authLoading, router])
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -214,13 +225,13 @@ export default function ProfilePage() {
     if (!file) return
 
     if (file.type !== 'application/pdf') {
-      toast.error(t("form.cvErrorType", { defaultValue: "Apenas arquivos PDF são permitidos" }))
+      toast.error(commonT("error"), { description: "Apenas arquivos PDF são permitidos" })
       return
     }
 
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
-      toast.error(t("form.cvErrorSize", { defaultValue: "O arquivo deve ter no máximo 5MB" }))
+      toast.error(commonT("error"), { description: "O arquivo deve ter no máximo 5MB" })
       return
     }
 
@@ -248,7 +259,7 @@ export default function ProfilePage() {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session?.access_token) {
-        toast.error(commonT("sessionExpired", { defaultValue: "Sessão expirada. Faça login novamente." }))
+        toast.error(commonT("sessionExpired"))
         return
       }
 
@@ -262,6 +273,7 @@ export default function ProfilePage() {
       if (response.ok) {
         setFormData(prev => ({ ...prev, cv_url: "" }))
         toast.success(t("form.cvRemoveSuccess"))
+        await refreshProfile()
       } else {
         const errorData = await response.json()
         toast.error(errorData.error || t("form.updateError"))
@@ -290,11 +302,11 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading || !profile) {
+  if (authLoading || profileLoading || !profile) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
           <p className="text-lg font-medium">{commonT("loading")}</p>
         </div>
       </div>
@@ -403,7 +415,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="slug">{t("form.slug", { defaultValue: "Slug" })}</Label>
+                    <Label htmlFor="slug">{t("form.slug")}</Label>
                     <Input
                       id="slug"
                       value={formData.slug}
@@ -430,7 +442,7 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>{t("tabs.professional")}</CardTitle>
-                  <CardDescription>{t("form.professionalDescription", { defaultValue: "Suas informações de carreira e links profissionais" })}</CardDescription>
+                  <CardDescription>{t("form.professionalDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
@@ -515,7 +527,7 @@ export default function ProfilePage() {
                           <FileText className="h-5 w-5 text-green-600" />
                           <div>
                             <p className="font-medium text-green-800">{t("form.cvSuccess")}</p>
-                            <p className="text-sm text-green-600">{t("form.cvAvailable", { defaultValue: "Arquivo PDF salvo e disponível para visualização" })}</p>
+                            <p className="text-sm text-green-600">{t("form.cvAvailable")}</p>
                           </div>
                         </div>
                         <div className="flex space-x-2">
@@ -528,21 +540,40 @@ export default function ProfilePage() {
                             <Eye className="h-4 w-4 mr-2" />
                             {t("form.viewCV")}
                           </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handleCVRemove}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            {t("form.removeCV")}
-                          </Button>
+                          
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                {t("form.removeCV")}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>{commonT("confirmTitle", { defaultValue: "Você tem certeza?" })}</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {commonT("confirmDesc", { defaultValue: "Esta ação não pode ser desfeita. Isso removerá permanentemente seu currículo dos nossos servidores." })}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>{commonT("cancel")}</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleCVRemove} className="bg-red-600 hover:bg-red-700">
+                                  {commonT("confirmAction", { defaultValue: "Sim, remover" })}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     ) : (
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                         <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-sm text-gray-600 mb-4">{t("form.selectPDF", { defaultValue: "Selecionar arquivo PDF" })}</p>
+                        <p className="text-sm text-gray-600 mb-4">{commonT("selectPDF", { defaultValue: "Selecionar arquivo PDF" })}</p>
                         <Button
                           type="button"
                           variant="outline"
@@ -559,7 +590,7 @@ export default function ProfilePage() {
                           )}
                         </Button>
                         <p className="text-sm text-gray-500 mt-2">
-                          {t("form.cvErrorSize", { defaultValue: "Apenas arquivos PDF são aceitos (máximo 5MB)" })}
+                          {commonT("cvErrorSize", { defaultValue: "Apenas arquivos PDF são aceitos (máximo 5MB)" })}
                         </p>
                       </div>
                     )}
@@ -581,7 +612,7 @@ export default function ProfilePage() {
                 <CardHeader>
                   <CardTitle>{t("form.address")}</CardTitle>
                   <CardDescription>
-                    {t("form.locationDescription", { defaultValue: "Sua localização (endereço completo fica privado, apenas cidade/estado/país são públicos)" })}
+                    {t("form.locationDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -591,7 +622,7 @@ export default function ProfilePage() {
                       id="address"
                       value={formData.address}
                       onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder={t("form.addressPlaceholder", { defaultValue: "Rua, número, complemento" })}
+                      placeholder={commonT("addressPlaceholder", { defaultValue: "Rua, número, complemento" })}
                     />
                   </div>
 
@@ -633,7 +664,7 @@ export default function ProfilePage() {
                 <CardHeader>
                   <CardTitle>{t("tabs.mentorship")}</CardTitle>
                   <CardDescription>
-                    {t("form.mentorshipDescription", { defaultValue: "Configure seu perfil como mentor (todas as mentorias são gratuitas)" })}
+                    {t("form.mentorshipDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -736,14 +767,14 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>{t("tabs.settings")}</CardTitle>
-                  <CardDescription>{t("form.settingsDescription", { defaultValue: "Gerencie as configurações da sua conta" })}</CardDescription>
+                  <CardDescription>{t("form.settingsDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-12 text-muted-foreground">
                     <Target className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-lg font-semibold mb-2">{t("form.inDevelopment", { defaultValue: "Em Desenvolvimento" })}</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t("form.inDevelopment")}</h3>
                     <p className="text-sm max-w-md mx-auto">
-                      {t("form.settingsComingSoon", { defaultValue: "Em breve você poderá gerenciar notificações, privacidade e outras configurações de conta." })}
+                      {t("form.settingsComingSoon")}
                     </p>
                   </div>
                 </CardContent>

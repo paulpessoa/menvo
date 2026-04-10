@@ -1127,7 +1127,15 @@
       "cvRemoveSuccess": "CV fjernet korrekt!",
       "requiredFields": "Fornavn og efternavn er påkrævet",
       "updateSuccess": "Profil opdateret korrekt!",
-      "updateError": "Fejl ved opdatering af profil"
+      "updateError": "Fejl ved opdatering af profil",
+      "slug": "Slug",
+      "professionalDescription": "Dine karriereoplysninger og professionelle links",
+      "locationDescription": "Din placering (fuld adresse forbliver privat, kun by/stat/land er offentlige)",
+      "mentorshipDescription": "Konfigurer din profil som mentor (alle mentorsparringer er gratis)",
+      "cvAvailable": "PDF-fil gemt og tilgængelig til visning",
+      "settingsDescription": "Administrer dine kontoindstillinger",
+      "inDevelopment": "Under udvikling",
+      "settingsComingSoon": "Snart vil du kunne administrere meddelelser, privatliv og andre kontoindstillinger."
     }
   },
   "settings": {

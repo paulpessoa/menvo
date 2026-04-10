@@ -732,7 +732,15 @@
       "cvRemoveSuccess": "CV har tagits bort framgångsrikt!",
       "requiredFields": "Förnamn och efternamn är obligatoriska",
       "updateSuccess": "Profilen har uppdaterats framgångsrikt!",
-      "updateError": "Fel vid uppdatering av profil"
+      "updateError": "Fel vid uppdatering av profil",
+      "slug": "Slug",
+      "professionalDescription": "Din karriärinformation och professionella länkar",
+      "locationDescription": "Din plats (fullständig adress förblir privat, endast stad/stat/land är offentliga)",
+      "mentorshipDescription": "Konfigurera din profil som mentor (alla mentorskap är gratis)",
+      "cvAvailable": "PDF-fil sparad och tillgänglig för visning",
+      "settingsDescription": "Hantera dina kontoinställningar",
+      "inDevelopment": "Under utveckling",
+      "settingsComingSoon": "Snart kommer du att kunna hantera aviseringar, integritet och andra kontoinställningar."
     }
   },
   "dashboard": {

@@ -966,7 +966,15 @@
       "cvRemoveSuccess": "CV removido com sucesso!",
       "requiredFields": "Nome e sobrenome são obrigatórios",
       "updateSuccess": "Perfil atualizado com sucesso!",
-      "updateError": "Erro ao atualizar perfil"
+      "updateError": "Erro ao atualizar perfil",
+      "slug": "Slug",
+      "professionalDescription": "Suas informações de carreira e links profissionais",
+      "locationDescription": "Sua localização (endereço completo fica privado, apenas cidade/estado/país são públicos)",
+      "mentorshipDescription": "Configure seu perfil como mentor (todas as mentorias são gratuitas)",
+      "cvAvailable": "Arquivo PDF salvo e disponível para visualização",
+      "settingsDescription": "Gerencie as configurações da sua conta",
+      "inDevelopment": "Em Desenvolvimento",
+      "settingsComingSoon": "Em breve você poderá gerenciar notificações, privacidade e outras configurações de conta."
     }
   },
   "dashboard": {

@@ -991,7 +991,15 @@
       "cvRemoveSuccess": "CV removed successfully!",
       "requiredFields": "First and last name are required",
       "updateSuccess": "Profile updated successfully!",
-      "updateError": "Error updating profile"
+      "updateError": "Error updating profile",
+      "slug": "Slug",
+      "professionalDescription": "Your career information and professional links",
+      "locationDescription": "Your location (full address remains private, only city/state/country are public)",
+      "mentorshipDescription": "Configure your profile as a mentor (all mentorships are free)",
+      "cvAvailable": "PDF file saved and available for viewing",
+      "settingsDescription": "Manage your account settings",
+      "inDevelopment": "In Development",
+      "settingsComingSoon": "Soon you will be able to manage notifications, privacy, and other account settings."
     }
   },
   "dashboard": {
