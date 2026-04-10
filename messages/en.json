@@ -41,7 +41,7 @@
       "description": "Menvo is being built with care. We count on your feedback and suggestions to improve and reach more people!"
     },
     "administration": "Administration"
-    },
+  },
   "header": {
     "title": "MENVO - Volunteer Mentors",
     "subtitle": "Connecting mentors and mentees",
@@ -590,6 +590,21 @@
     "allRightsReserved": "All rights reserved."
   },
   "newsletter": {
+    "unsubscribe": {
+      "title": "Unsubscribe from newsletter",
+      "description": "We're sorry to see you go. Enter your email to unsubscribe.",
+      "successTitle": "Successfully unsubscribed",
+      "successDescription": "You have been removed from our newsletter list. We'll miss you!",
+      "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
+      "rejoinButton": "Subscribe again",
+      "considerTitle": "Before you cancel, consider:",
+      "considerItem1": "You will only receive relevant content about mentorship",
+      "considerItem2": "We send a maximum of 2 emails per week",
+      "considerItem3": "You can re-subscribe at any time",
+      "button": "Unsubscribe",
+      "cancelling": "Unsubscribing...",
+      "backToSite": "Back to site"
+    },
     "modal": {
       "success": {
         "title": "Thank you for joining our newsletter!",
@@ -615,25 +630,10 @@
         "marketingLabel": "Personalized marketing (optional)",
         "marketingInfo": "I agree to receive personalized offers and promotions based on my profile and interests.",
         "dataProtectionTitle": "Data Protection",
-        "dataProtectionInfo": "Your data is protected according to privacy laws. We do not share your information with third parties. You can request the deletion of your data at any time via email contato@menvo.com.br.",
+        "dataProtectionInfo": "Your data is protected according to privacy laws. We do not share your information with third parties.",
         "cancel": "Cancel",
         "subscribing": "Subscribing...",
         "subscribe": "Subscribe"
-      },
-      "unsubscribe": {
-        "title": "Unsubscribe from newsletter",
-        "description": "We're sorry to see you go. Enter your email to unsubscribe.",
-        "successTitle": "Successfully unsubscribed",
-        "successDescription": "You have been removed from our newsletter list. We'll miss you!",
-        "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
-        "rejoinButton": "Subscribe again",
-        "considerTitle": "Before you cancel, consider:",
-        "considerItem1": "You will only receive relevant content about mentorship",
-        "considerItem2": "We send a maximum of 2 emails per week",
-        "considerItem3": "You can re-subscribe at any time",
-        "button": "Unsubscribe",
-        "cancelling": "Unsubscribing...",
-        "backToSite": "Back to site"
       }
     }
   },
@@ -1140,23 +1140,6 @@
       "checkingSession": "Verifying invite...",
       "button": "Set password and continue",
       "agreement": "By setting your password, you agree to our"
-    }
-  },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Unsubscribe from newsletter",
-      "description": "We're sorry to see you go. Enter your email to unsubscribe.",
-      "successTitle": "Successfully unsubscribed",
-      "successDescription": "You have been removed from our newsletter list. We'll miss you!",
-      "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
-      "rejoinButton": "Subscribe again",
-      "considerTitle": "Before you cancel, consider:",
-      "considerItem1": "You will only receive relevant content about mentorship",
-      "considerItem2": "We send a maximum of 2 emails per week",
-      "considerItem3": "You can re-subscribe at any time",
-      "button": "Unsubscribe",
-      "cancelling": "Unsubscribing...",
-      "backToSite": "Back to site"
     }
   },
   "messages": {

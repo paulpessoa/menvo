@@ -615,25 +615,10 @@
         "marketingLabel": "Personaliseret markedsføring (valgfrit)",
         "marketingInfo": "Jeg accepterer at modtage personlige tilbud og kampagner baseret på min profil og interesser.",
         "dataProtectionTitle": "Databeskyttelse",
-        "dataProtectionInfo": "Dine data er beskyttet i henhold til privatlivslovgivningen. Vi deler ikke dine oplysninger med tredjeparter. Du kan til enhver tid anmode om sletning af dine data via email contato@menvo.com.br.",
+        "dataProtectionInfo": "Dine data er beskyttet i henhold til privatlivslovgivningen. Vi deler ikke dine oplysninger med tredjeparter.",
         "cancel": "Annuller",
         "subscribing": "Tilmelder...",
         "subscribe": "Tilmeld dig"
-      },
-      "unsubscribe": {
-        "title": "Afmeld nyhedsbrev",
-        "description": "Vi er kede af at se dig gå. Indtast din email for at afmelde dig.",
-        "successTitle": "Afmelding gennemført",
-        "successDescription": "Du er blevet fjernet fra vores nyhedsbrevsliste. Vi vil savne dig!",
-        "rejoinText": "Hvis du fortryder, kan du til enhver tid tilmelde dig igen via vores hjemmeside.",
-        "rejoinButton": "Tilmeld dig igen",
-        "considerTitle": "Før du afmelder dig, overvej venligst:",
-        "considerItem1": "Du vil kun modtage relevant indhold om mentorskab",
-        "considerItem2": "Vi sender højst 2 emails om ugen",
-        "considerItem3": "Du kan tilmelde dig igen til enhver tid",
-        "button": "Afmeld",
-        "cancelling": "Afmelder...",
-        "backToSite": "Tilbage til siden"
       }
     }
   },
@@ -1060,23 +1045,6 @@
       "checkingSession": "Verifierar inbjudan...",
       "button": "Sätt lösenord och fortsätt",
       "agreement": "Genom att ställa in ditt lösenord godkänner du våra"
-    }
-  },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Afmeld nyhedsbrev",
-      "description": "Vi er kede af at se dig gå. Indtast din email for at afmelde dig.",
-      "successTitle": "Afmelding gennemført",
-      "successDescription": "Du er blevet fjernet fra vores nyhedsbrevsliste. Vi vil savne dig!",
-      "rejoinText": "Hvis du fortryder, kan du til enhver tid tilmelde dig igen via vores hjemmeside.",
-      "rejoinButton": "Tilmeld dig igen",
-      "considerTitle": "Før du afmelder dig, overvej venligst:",
-      "considerItem1": "Du vil kun modtage relevant indhold om mentorskab",
-      "considerItem2": "Vi sender højst 2 emails om ugen",
-      "considerItem3": "Du kan tilmelde dig igen til enhver tid",
-      "button": "Afmeld",
-      "cancelling": "Afmelder...",
-      "backToSite": "Tilbage til siden"
     }
   },
   "messages": {

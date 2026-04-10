@@ -41,7 +41,7 @@
       "description": "O Menvo está sendo construído com carinho. Contamos com seu feedback e sugestões para melhorarmos cada vez mais!"
     },
     "administration": "Administração"
-    },
+  },
   "header": {
     "title": "MENVO - Mentores Voluntários",
     "subtitle": "Conectando mentores e mentees",
@@ -590,6 +590,21 @@
     "allRightsReserved": "Todos os direitos reservados."
   },
   "newsletter": {
+    "unsubscribe": {
+      "title": "Cancelar inscrição da newsletter",
+      "description": "Lamentamos que você queira sair. Digite seu email para cancelar a inscrição.",
+      "successTitle": "Inscrição cancelada com sucesso",
+      "successDescription": "Você foi removido da nossa lista de newsletter. Sentiremos sua falta!",
+      "rejoinText": "Se mudou de ideia, você pode se inscrever novamente a qualquer momento através do nosso site.",
+      "rejoinButton": "Inscrever novamente",
+      "considerTitle": "Antes de cancelar, considere:",
+      "considerItem1": "Você receberá apenas conteúdo relevante sobre mentoria",
+      "considerItem2": "Enviamos no máximo 2 e-mails por semana",
+      "considerItem3": "Você pode se reinscrever a qualquer momento",
+      "button": "Cancelar inscrição",
+      "cancelling": "Cancelando...",
+      "backToSite": "Voltar ao site"
+    },
     "modal": {
       "success": {
         "title": "Obrigado por se juntar à nossa newsletter!",
@@ -615,25 +630,10 @@
         "marketingLabel": "Marketing personalizado (opcional)",
         "marketingInfo": "Concordo em receber ofertas e promoções personalizadas baseadas no meu perfil e interesses.",
         "dataProtectionTitle": "Proteção de Dados",
-        "dataProtectionInfo": "Seus dados são protegidos conforme a LGPD. Não compartilhamos suas informações com terceiros. Você pode solicitar a exclusão dos seus dados a qualquer momento através do email contato@menvo.com.br.",
+        "dataProtectionInfo": "Seus dados são protegidos conforme a LGPD. Não compartilhamos suas informações com terceiros.",
         "cancel": "Cancelar",
         "subscribing": "Inscrevendo...",
         "subscribe": "Inscrever-se"
-      },
-      "unsubscribe": {
-        "title": "Cancelar assinatura da newsletter",
-        "description": "Lamentamos ver você partir. Digite seu e-mail para cancelar a assinatura.",
-        "successTitle": "Assinatura cancelada com sucesso",
-        "successDescription": "Você foi removido da nossa lista de newsletter. Sentiremos sua falta!",
-        "rejoinText": "Se você mudar de ideia, pode se inscrever novamente a qualquer momento através do nosso site.",
-        "rejoinButton": "Inscrever-se novamente",
-        "considerTitle": "Antes de cancelar, considere:",
-        "considerItem1": "Você só receberá conteúdo relevante sobre mentoria",
-        "considerItem2": "Enviamos no máximo 2 e-mails por semana",
-        "considerItem3": "Você pode se inscrever novamente a qualquer momento",
-        "button": "Cancelar assinatura",
-        "cancelling": "Cancelando assinatura...",
-        "backToSite": "Voltar para o site"
       }
     }
   },
@@ -1115,23 +1115,6 @@
       "checkingSession": "Verificando convite...",
       "button": "Definir senha e continuar",
       "agreement": "Ao definir sua senha, você concorda com nossos"
-    }
-  },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Cancelar inscrição da newsletter",
-      "description": "Lamentamos que você queira sair. Digite seu email para cancelar a inscrição.",
-      "successTitle": "Inscrição cancelada com sucesso",
-      "successDescription": "Você foi removido da nossa lista de newsletter. Sentiremos sua falta!",
-      "rejoinText": "Se mudou de ideia, você pode se inscrever novamente a qualquer momento através do nosso site.",
-      "rejoinButton": "Inscrever novamente",
-      "considerTitle": "Antes de cancelar, considere:",
-      "considerItem1": "Você receberá apenas conteúdo relevante sobre mentoria",
-      "considerItem2": "Enviamos no máximo 2 e-mails por semana",
-      "considerItem3": "Você pode se reinscrever a qualquer momento",
-      "button": "Cancelar inscrição",
-      "cancelling": "Cancelando...",
-      "backToSite": "Voltar ao site"
     }
   },
   "messages": {

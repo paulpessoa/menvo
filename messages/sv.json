@@ -929,25 +929,10 @@
         "marketingLabel": "Personlig marknadsföring (valfritt)",
         "marketingInfo": "Jag samtycker till att få personliga erbjudanden och kampanjer baserade på min profil och mina intressen.",
         "dataProtectionTitle": "Dataskydd",
-        "dataProtectionInfo": "Dina uppgifter skyddas enligt integritetslagar. Vi delar inte din information med tredje part. Du kan när som helst begära radering av dina uppgifter via e-post contato@menvo.com.br.",
+        "dataProtectionInfo": "Dina uppgifter skyddas enligt integritetslagar. Vi delar inte din information med tredje part.",
         "cancel": "Avbryt",
         "subscribing": "Prenumererar...",
         "subscribe": "Prenumerera"
-      },
-      "unsubscribe": {
-        "title": "Avsluta prenumeration på nyhetsbrev",
-        "description": "Vi är ledsna att se dig gå. Ange din e-post för att avsluta prenumerationen.",
-        "successTitle": "Prenumerationen avslutad",
-        "successDescription": "Du har tagits bort från vår nyhetsbrevslista. Vi kommer att sakna dig!",
-        "rejoinText": "Om du ändrar dig kan du prenumerera igen när som helst via vår webbplats.",
-        "rejoinButton": "Prenumerera igen",
-        "considerTitle": "Innan du avbryter, tänk på:",
-        "considerItem1": "Du kommer bara att få relevant innehåll om mentorskap",
-        "considerItem2": "Vi skickar högst 2 e-postmeddelanden per vecka",
-        "considerItem3": "Du kan prenumerera igen när som helst",
-        "button": "Avsluta prenumeration",
-        "cancelling": "Avslutar prenumeration...",
-        "backToSite": "Tillbaka till webbplatsen"
       }
     }
   },
