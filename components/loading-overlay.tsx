@@ -3,6 +3,7 @@
 import React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslations } from "next-intl"
 
 interface LoadingOverlayProps {
     isLoading: boolean
@@ -13,10 +14,13 @@ interface LoadingOverlayProps {
 
 export function LoadingOverlay({
     isLoading,
-    message = "Carregando...",
+    message,
     className,
     children
 }: LoadingOverlayProps) {
+    const t = useTranslations("common")
+    const displayMessage = message || t("loading")
+
     return (
         <div className={cn("relative", className)}>
             {children}
@@ -24,7 +28,7 @@ export function LoadingOverlay({
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
                     <div className="flex flex-col items-center space-y-2">
                         <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                        <p className="text-sm text-gray-600 font-medium">{message}</p>
+                        <p className="text-sm text-gray-600 font-medium">{displayMessage}</p>
                     </div>
                 </div>
             )}
@@ -40,12 +44,15 @@ interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export function LoadingButton({
     isLoading,
-    loadingText = "Carregando...",
+    loadingText,
     children,
     disabled,
     className,
     ...props
 }: LoadingButtonProps) {
+    const t = useTranslations("common")
+    const displayLoadingText = loadingText || t("loading")
+
     return (
         <button
             {...props}
@@ -59,7 +66,7 @@ export function LoadingButton({
             {isLoading ? (
                 <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {loadingText}
+                    {displayLoadingText}
                 </>
             ) : (
                 children
@@ -96,11 +103,12 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ progress, className, showPercentage = true }: ProgressBarProps) {
+    const t = useTranslations("common")
     return (
         <div className={cn("space-y-2", className)}>
             {showPercentage && (
                 <div className="flex justify-between text-sm text-gray-600">
-                    <span>Progresso</span>
+                    <span>{t("progress", { defaultValue: "Progresso" })}</span>
                     <span>{Math.round(progress)}%</span>
                 </div>
             )}
