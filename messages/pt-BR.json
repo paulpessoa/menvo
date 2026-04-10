@@ -32,12 +32,16 @@
     "languageSelector": {
       "title": "Escolha seu idioma",
       "description": "Selecione seu idioma para continuar",
-      "successTitle": "Idioma Definido!",
-      "successDescription": "Você pode alterar esta preferência a qualquer momento no menu de Configurações após o login.",
-      "button": "Começar a Navegar"
+      "successTitle": "Idioma definido!",
+      "successDescription": "Você pode alterar essa configuração a qualquer momento no menu de Configurações após o login.",
+      "button": "Começar a navegar"
+    },
+    "constructionWarning": {
+      "title": "Plataforma em Construção",
+      "description": "O Menvo está sendo construído com carinho. Contamos com seu feedback e sugestões para melhorarmos cada vez mais!"
     },
     "administration": "Administração"
-  },
+    },
   "header": {
     "title": "MENVO - Mentores Voluntários",
     "subtitle": "Conectando mentores e mentees",
@@ -1190,6 +1194,84 @@
       "light": "Claro",
       "dark": "Escuro",
       "system": "Sistema"
+    }
+  },
+  "availability": {
+    "title": "Configurar Disponibilidade",
+    "description": "Defina seus horários disponíveis para mentorias",
+    "loading": "Carregando disponibilidade...",
+    "saving": "Salvando...",
+    "saveButton": "Salvar Disponibilidade",
+    "addTime": "Adicionar Horário",
+    "availableHours": "Horários Disponíveis",
+    "availableHoursDesc": "Adicione os dias e horários em que você está disponível para mentorias",
+    "timeSlot": "Horário {number}",
+    "dayOfWeek": "Dia da Semana",
+    "startTime": "Horário de Início",
+    "endTime": "Horário de Fim",
+    "previewTitle": "Preview da Disponibilidade",
+    "previewDesc": "Como sua disponibilidade aparecerá para os mentees",
+    "noSchedule": "Nenhum horário configurado",
+    "addScheduleToPreview": "Adicione horários para ver o preview",
+    "success": "Disponibilidade salva com sucesso!",
+    "errorLoad": "Erro ao carregar disponibilidade",
+    "errorSave": "Erro ao salvar disponibilidade",
+    "invalidTime": "Horário inválido no {day}: início deve ser antes do fim",
+    "overlappingTime": "Horários sobrepostos em {day}",
+    "tips": {
+      "title": "Dicas",
+      "tip1": "Configure horários realistas que você pode manter consistentemente",
+      "tip2": "Deixe intervalos entre sessões para descanso",
+      "tip3": "Você pode atualizar sua disponibilidade a qualquer momento"
+    },
+    "days": {
+      "0": "Domingo",
+      "1": "Segunda-feira",
+      "2": "Terça-feira",
+      "3": "Quarta-feira",
+      "4": "Quinta-feira",
+      "5": "Sexta-feira",
+      "6": "Sábado"
+    }
+  },
+  "mentorship": {
+    "title": "Minhas Mentorias",
+    "description": "Gerencie todas as suas mentorias - recebidas e solicitadas",
+    "received": {
+      "title": "Mentorias Recebidas",
+      "asMentor": "(você como mentor)",
+      "pending": "Pedidos Recebidos",
+      "pendingDesc": "Solicitações de mentoria aguardando sua confirmação",
+      "confirmed": "Mentorias Agendadas",
+      "confirmedDesc": "Sessões confirmadas e agendadas. Após a mentoria, clique em \"Avaliar\" para deixar seu feedback.",
+      "completed": "Mentorias Avaliadas",
+      "completedDesc": "Sessões finalizadas com feedback registrado",
+      "cancelled": "Sessões Canceladas",
+      "cancelledDesc": "Mentorias que foram canceladas"
+    },
+    "requested": {
+      "title": "Mentorias Solicitadas",
+      "asMentee": "(você como mentee)",
+      "pending": "Aguardando Confirmação",
+      "pendingDesc": "Solicitações pendentes de confirmação dos mentores",
+      "confirmed": "Mentorias Agendadas",
+      "confirmedDesc": "Sessões confirmadas pelos mentores",
+      "completed": "Mentorias Avaliadas",
+      "completedDesc": "Sessões finalizadas com seu feedback",
+      "cancelled": "Sessões Canceladas",
+      "cancelledDesc": "Mentorias que foram canceladas"
+    },
+    "tabs": {
+      "pending": "Pendentes",
+      "confirmed": "Agendadas",
+      "completed": "Avaliadas",
+      "cancelled": "Canceladas"
+    },
+    "resources": {
+      "title": "Biblioteca de Recursos",
+      "description": "Compartilhe materiais e recursos com seus mentees",
+      "inDevelopment": "Em desenvolvimento",
+      "comingSoon": "Em breve: biblioteca de materiais, templates e recursos para compartilhar com mentees"
     }
   }
 }

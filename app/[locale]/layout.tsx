@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
 import Header from "@/components/header"
+import { ConstructionWarning } from "@/components/ConstructionWarning"
 import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer"
 import { FeedbackBanner } from "@/components/FeedbackBanner"
@@ -102,6 +103,7 @@ export default async function RootLayout({
             <div className="flex min-h-screen flex-col">
               <LanguageSelectorOverlay />
               <Header />
+              <ConstructionWarning />
               <main className="flex-1">{children}</main>
               <Footer />
               <FeedbackBanner />

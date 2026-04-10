@@ -30,14 +30,18 @@
     "close": "Close",
     "submitting": "Submitting...",
     "languageSelector": {
-      "title": "Choose your language",
-      "description": "Select your language to continue",
-      "successTitle": "Language Set!",
-      "successDescription": "You can change this preference at any time in the Settings menu after logging in.",
-      "button": "Start Browsing"
+      "title": "Select your language",
+      "description": "Choose your language to continue",
+      "successTitle": "Language set!",
+      "successDescription": "You can change this setting at any time in the Settings menu after logging in.",
+      "button": "Start browsing"
+    },
+    "constructionWarning": {
+      "title": "Platform Under Construction",
+      "description": "Menvo is being built with care. We count on your feedback and suggestions to improve and reach more people!"
     },
     "administration": "Administration"
-  },
+    },
   "header": {
     "title": "MENVO - Volunteer Mentors",
     "subtitle": "Connecting mentors and mentees",
@@ -1215,6 +1219,84 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    }
+  },
+  "availability": {
+    "title": "Setup Availability",
+    "description": "Define your available hours for mentorship",
+    "loading": "Loading availability...",
+    "saving": "Saving...",
+    "saveButton": "Save Availability",
+    "addTime": "Add Time Slot",
+    "availableHours": "Available Hours",
+    "availableHoursDesc": "Add the days and times when you are available for mentorships",
+    "timeSlot": "Slot {number}",
+    "dayOfWeek": "Day of the Week",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "previewTitle": "Availability Preview",
+    "previewDesc": "How your availability will appear to mentees",
+    "noSchedule": "No schedule configured",
+    "addScheduleToPreview": "Add time slots to see the preview",
+    "success": "Availability saved successfully!",
+    "errorLoad": "Error loading availability",
+    "errorSave": "Error saving availability",
+    "invalidTime": "Invalid time on {day}: start must be before end",
+    "overlappingTime": "Overlapping times on {day}",
+    "tips": {
+      "title": "Tips",
+      "tip1": "Set realistic hours that you can maintain consistently",
+      "tip2": "Leave gaps between sessions for rest",
+      "tip3": "You can update your availability at any time"
+    },
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    }
+  },
+  "mentorship": {
+    "title": "My Mentorships",
+    "description": "Manage all your mentorships - received and requested",
+    "received": {
+      "title": "Mentorships Received",
+      "asMentor": "(you as mentor)",
+      "pending": "Requests Received",
+      "pendingDesc": "Mentorship requests awaiting your confirmation",
+      "confirmed": "Scheduled Mentorships",
+      "confirmedDesc": "Confirmed and scheduled sessions. After the mentorship, click \"Evaluate\" to leave your feedback.",
+      "completed": "Evaluated Mentorships",
+      "completedDesc": "Finished sessions with registered feedback",
+      "cancelled": "Cancelled Sessions",
+      "cancelledDesc": "Mentorships that were cancelled"
+    },
+    "requested": {
+      "title": "Mentorships Requested",
+      "asMentee": "(you as mentee)",
+      "pending": "Awaiting Confirmation",
+      "pendingDesc": "Pending confirmation requests from mentors",
+      "confirmed": "Scheduled Mentorships",
+      "confirmedDesc": "Sessions confirmed by mentors",
+      "completed": "Evaluated Mentorships",
+      "completedDesc": "Finished sessions with your feedback",
+      "cancelled": "Cancelled Sessions",
+      "cancelledDesc": "Mentorships that were cancelled"
+    },
+    "tabs": {
+      "pending": "Pending",
+      "confirmed": "Scheduled",
+      "completed": "Evaluated",
+      "cancelled": "Cancelled"
+    },
+    "resources": {
+      "title": "Resource Library",
+      "description": "Share materials and resources with your mentees",
+      "inDevelopment": "In development",
+      "comingSoon": "Coming soon: library of materials, templates and resources to share with mentees"
     }
   }
 }

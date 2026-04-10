@@ -30,11 +30,15 @@
     "close": "Stäng",
     "submitting": "Skickar...",
     "languageSelector": {
-      "title": "Välj ditt språk",
-      "description": "Välj ditt språk för att fortsätta",
-      "successTitle": "Språk inställt!",
-      "successDescription": "Du kan ändra denna inställning när som helst i Inställningar-menyn efter att du loggat in.",
-      "button": "Börja Surfa"
+      "title": "Vælg dit sprog",
+      "description": "Vælg dit sprog for at fortsætte",
+      "successTitle": "Sprog indstillet!",
+      "successDescription": "Du kan til enhver tid ændre denne indstilling i menuen Indstillinger efter login.",
+      "button": "Begynd at browse"
+    },
+    "constructionWarning": {
+      "title": "Platform under opbygning",
+      "description": "Menvo bliver bygget med omhu. Vi regner med din feedback og dine forslag til at forbedre os og nå ud til flere mennesker!"
     },
     "administration": "Administration"
   },
@@ -1088,6 +1092,61 @@
     "roleMentor": "Mentor",
     "roleMentee": "Mentee"
   },
+  "profile": {
+    "title": "Min profil",
+    "description": "Administrer dine personlige og professionelle oplysninger",
+    "viewPublicProfile": "Se offentlig profil",
+    "saveChanges": "Gem ændringer",
+    "uploadPhoto": "Opdater foto",
+    "uploadPhotoSuccess": "Foto opdateret!",
+    "uploadPhotoError": "Fejl ved upload af billede",
+    "tabs": {
+      "personal": "Personlige oplysninger",
+      "professional": "Professionel",
+      "mentorship": "Mentorskab",
+      "documents": "Dokumenter",
+      "settings": "Indstillinger"
+    },
+    "form": {
+      "firstName": "Fornavn",
+      "firstNamePlaceholder": "Dit fornavn",
+      "lastName": "Efternavn",
+      "lastNamePlaceholder": "Dit efternavn",
+      "bio": "Bio",
+      "bioPlaceholder": "Fortæl lidt om dig selv...",
+      "jobTitle": "Stilling",
+      "jobTitlePlaceholder": "f.eks. Senior Software Engineer",
+      "company": "Virksomhed",
+      "companyPlaceholder": "f.eks. Google, Microsoft...",
+      "linkedin": "LinkedIn",
+      "website": "Hjemmeside",
+      "portfolio": "Portfolio",
+      "address": "Adresse",
+      "city": "By",
+      "state": "Stat/Region",
+      "country": "Land",
+      "languages": "Sprog",
+      "mentorshipApproach": "Mentortilgang",
+      "mentorshipApproachPlaceholder": "Hvordan plejer du at være mentor?",
+      "whatToExpect": "Hvad kan man forvente",
+      "whatToExpectPlaceholder": "Hvad kan en mentee forvente af dine sessioner?",
+      "idealMentee": "Ideel mentee",
+      "idealMenteePlaceholder": "Hvilken type person kan du hjælpe mest?",
+      "expertiseAreas": "Ekspertiseområder",
+      "mentorshipTopics": "Mentoremner",
+      "inclusiveTags": "Inkluderende tags",
+      "cvTitle": "CV (PDF)",
+      "cvDescription": "Upload dit opdaterede CV, så mentees bedre kan forstå din rejse.",
+      "uploadCV": "Upload CV",
+      "viewCV": "Vis",
+      "removeCV": "Fjern",
+      "cvSuccess": "CV uploadet korrekt!",
+      "cvRemoveSuccess": "CV fjernet korrekt!",
+      "requiredFields": "Fornavn og efternavn er påkrævet",
+      "updateSuccess": "Profil opdateret korrekt!",
+      "updateError": "Fejl ved opdatering af profil"
+    }
+  },
   "settings": {
     "title": "Indstillinger",
     "tabs": {
@@ -1135,6 +1194,84 @@
       "light": "Lys",
       "dark": "Mørk",
       "system": "System"
+    }
+  },
+  "availability": {
+    "title": "Indstil tilgængelighed",
+    "description": "Definer dine ledige tider til mentorsparring",
+    "loading": "Indlæser tilgængelighed...",
+    "saving": "Gemmer...",
+    "saveButton": "Gem tilgængelighed",
+    "addTime": "Tilføj tidsrum",
+    "availableHours": "Ledige tider",
+    "availableHoursDesc": "Tilføj de dage og tider, hvor du er tilgængelig for mentorsparring",
+    "timeSlot": "Tidsrum {number}",
+    "dayOfWeek": "Ugedag",
+    "startTime": "Starttidspunkt",
+    "endTime": "Sluttidspunkt",
+    "previewTitle": "Forhåndsvisning af tilgængelighed",
+    "previewDesc": "Hvordan din tilgængelighed vil se ud for mentees",
+    "noSchedule": "Ingen tidsplan konfigureret",
+    "addScheduleToPreview": "Tilføj tidsrum for at se forhåndsvisningen",
+    "success": "Tilgængelighed gemt korrekt!",
+    "errorLoad": "Fejl ved indlæsning af tilgængelighed",
+    "errorSave": "Fejl ved gemning af tilgængelighed",
+    "invalidTime": "Ugyldig tid på {day}: start skal være før slut",
+    "overlappingTime": "Overlappende tider på {day}",
+    "tips": {
+      "title": "Tips",
+      "tip1": "Indstil realistiske tider, som du kan overholde konsekvent",
+      "tip2": "Efterlad pauser mellem sessioner til hvile",
+      "tip3": "Du kan til enhver tid opdatere din tilgængelighed"
+    },
+    "days": {
+      "0": "Søndag",
+      "1": "Mandag",
+      "2": "Tirsdag",
+      "3": "Onsdag",
+      "4": "Torsdag",
+      "5": "Fredag",
+      "6": "Lørdag"
+    }
+  },
+  "mentorship": {
+    "title": "Mine mentorsparringer",
+    "description": "Administrer alle dine mentorsparringer - modtagne og anmodede",
+    "received": {
+      "title": "Modtagne mentorsparringer",
+      "asMentor": "(dig som mentor)",
+      "pending": "Modtagne anmodninger",
+      "pendingDesc": "Mentoranmodninger der afventer din bekræftelse",
+      "confirmed": "Planlagte mentorsparringer",
+      "confirmedDesc": "Bekræftede og planlagte sessioner. Efter mentorsparringen, klik på \"Vurder\" for at give din feedback.",
+      "completed": "Vurderede mentorsparringer",
+      "completedDesc": "Afsluttede sessioner med registreret feedback",
+      "cancelled": "Aflyste sessioner",
+      "cancelledDesc": "Mentorsparringer der er blevet aflyst"
+    },
+    "requested": {
+      "title": "Anmodede mentorsparringer",
+      "asMentee": "(dig som mentee)",
+      "pending": "Afventer bekræftelse",
+      "pendingDesc": "Afventende bekræftelsesanmodninger fra mentorer",
+      "confirmed": "Planlagte mentorsparringer",
+      "confirmedDesc": "Sessioner bekræftet af mentorer",
+      "completed": "Vurderede mentorsparringer",
+      "completedDesc": "Afsluttede sessioner med din feedback",
+      "cancelled": "Aflyste sessioner",
+      "cancelledDesc": "Mentorsparringer der er blevet aflyst"
+    },
+    "tabs": {
+      "pending": "Afventer",
+      "confirmed": "Planlagte",
+      "completed": "Vurderede",
+      "cancelled": "Aflyst"
+    },
+    "resources": {
+      "title": "Ressourcebibliotek",
+      "description": "Del materialer og ressourcer med dine mentees",
+      "inDevelopment": "Under udvikling",
+      "comingSoon": "Kommer snart: bibliotek med materialer, skabeloner og ressourcer til deling med mentees"
     }
   }
 }

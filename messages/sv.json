@@ -36,6 +36,10 @@
       "successDescription": "Du kan när som helst ändra denna inställning i menyn Inställningar efter inloggning.",
       "button": "Börja surfa"
     },
+    "constructionWarning": {
+      "title": "Plattform under uppbyggnad",
+      "description": "Menvo byggs med omsorg. Vi räknar med din feedback och dina förslag för att förbättra oss och nå fler människor!"
+    },
     "administration": "Administration"
   },
   "header": {
@@ -1007,6 +1011,84 @@
       "light": "Ljust",
       "dark": "Mörkt",
       "system": "System"
+    }
+  },
+  "availability": {
+    "title": "Ställ in tillgänglighet",
+    "description": "Definiera dina lediga tider för mentorskap",
+    "loading": "Laddar tillgänglighet...",
+    "saving": "Sparar...",
+    "saveButton": "Spara tillgänglighet",
+    "addTime": "Lägg till tidspass",
+    "availableHours": "Tillgängliga tider",
+    "availableHoursDesc": "Lägg till de dagar och tider då du är tillgänglig för mentorskap",
+    "timeSlot": "Pass {number}",
+    "dayOfWeek": "Veckodag",
+    "startTime": "Starttid",
+    "endTime": "Sluttid",
+    "previewTitle": "Förhandsgranskning av tillgänglighet",
+    "previewDesc": "Hur din tillgänglighet kommer att se ut för mentees",
+    "noSchedule": "Inget schema konfigurerat",
+    "addScheduleToPreview": "Lägg till tidspass för att se förhandsgranskningen",
+    "success": "Tillgängligheten har sparats framgångsrikt!",
+    "errorLoad": "Fel vid laddning av tillgänglighet",
+    "errorSave": "Fel vid sparande av tillgänglighet",
+    "invalidTime": "Ogiltig tid på {day}: starttiden måste vara före sluttiden",
+    "overlappingTime": "Överlappande tider på {day}",
+    "tips": {
+      "title": "Tips",
+      "tip1": "Ställ in realistiska tider som du kan hålla konsekvent",
+      "tip2": "Lämna luckor mellan sessionerna för vila",
+      "tip3": "Du kan uppdatera din tillgänglighet när som helst"
+    },
+    "days": {
+      "0": "Söndag",
+      "1": "Måndag",
+      "2": "Tisdag",
+      "3": "Onsdag",
+      "4": "Torsdag",
+      "5": "Fredag",
+      "6": "Lördag"
+    }
+  },
+  "mentorship": {
+    "title": "Mina mentorskap",
+    "description": "Hantera alla dina mentorskap - mottagna och begärda",
+    "received": {
+      "title": "Mottagna mentorskap",
+      "asMentor": "(du som mentor)",
+      "pending": "Mottagna förfrågningar",
+      "pendingDesc": "Mentorskapsförfrågningar som väntar på din bekräftelse",
+      "confirmed": "Bokade mentorskap",
+      "confirmedDesc": "Bekräftade och bokade sessioner. Efter mentorskapet, klicka på \"Utvärdera\" för att lämna din feedback.",
+      "completed": "Utvärderade mentorskap",
+      "completedDesc": "Avslutade sessioner med registrerad feedback",
+      "cancelled": "Avbokade sessioner",
+      "cancelledDesc": "Mentorskap som har avbokats"
+    },
+    "requested": {
+      "title": "Begärda mentorskap",
+      "asMentee": "(du som mentee)",
+      "pending": "Väntar på bekräftelse",
+      "pendingDesc": "Väntande bekräftelseförfrågningar från mentorer",
+      "confirmed": "Bokade mentorskap",
+      "confirmedDesc": "Sessioner bekräftade av mentorer",
+      "completed": "Utvärderade mentorskap",
+      "completedDesc": "Avslutade sessioner med din feedback",
+      "cancelled": "Avbokade sessioner",
+      "cancelledDesc": "Mentorskap som har avbokats"
+    },
+    "tabs": {
+      "pending": "Väntande",
+      "confirmed": "Bokade",
+      "completed": "Utvärderade",
+      "cancelled": "Avbokade"
+    },
+    "resources": {
+      "title": "Resursbibliotek",
+      "description": "Dela material och resurser med dina mentees",
+      "inDevelopment": "Under utveckling",
+      "comingSoon": "Kommer snart: bibliotek med material, mallar och resurser att dela med mentees"
     }
   }
 }

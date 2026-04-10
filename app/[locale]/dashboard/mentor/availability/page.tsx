@@ -27,6 +27,7 @@ import {
     Loader2
 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
+import { useTranslations } from "next-intl"
 
 interface AvailabilitySlot {
     id?: string
@@ -35,16 +36,6 @@ interface AvailabilitySlot {
     end_time: string
     timezone: string
 }
-
-const DAYS_OF_WEEK = [
-    { value: 0, label: 'Domingo' },
-    { value: 1, label: 'Segunda-feira' },
-    { value: 2, label: 'Terça-feira' },
-    { value: 3, label: 'Quarta-feira' },
-    { value: 4, label: 'Quinta-feira' },
-    { value: 5, label: 'Sexta-feira' },
-    { value: 6, label: 'Sábado' }
-]
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
     const hour = i.toString().padStart(2, '0')
@@ -55,8 +46,10 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
 }).flat()
 
 export default function MentorAvailabilityPage() {
+    const t = useTranslations("availability")
+    const commonT = useTranslations("common")
     const router = useRouter()
-    const { user, profile, role } = useAuth()
+    const { user, profile, role, loading: authLoading } = useAuth()
     const [availability, setAvailability] = useState<AvailabilitySlot[]>([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -64,23 +57,41 @@ export default function MentorAvailabilityPage() {
 
     const supabase = createClient()
 
+    const DAYS_OF_WEEK = [
+        { value: 0, label: t("days.0") },
+        { value: 1, label: t("days.1") },
+        { value: 2, label: t("days.2") },
+        { value: 3, label: t("days.3") },
+        { value: 4, label: t("days.4") },
+        { value: 5, label: t("days.5") },
+        { value: 6, label: t("days.6") }
+    ]
+
     useEffect(() => {
+        if (authLoading) return
+
+        if (!user) {
+            router.push('/login')
+            return
+        }
+
         if (role !== 'mentor') {
             router.push('/dashboard')
             return
         }
 
-        if (user?.id) {
-            fetchAvailability()
-        }
-    }, [user?.id, role, router])
+        fetchAvailability()
+    }, [user, role, authLoading, router])
 
     const fetchAvailability = async () => {
+        if (!user?.id) return
+        
         try {
+            setLoading(true)
             const { data, error } = await supabase
                 .from('mentor_availability')
                 .select('*')
-                .eq('mentor_id', user?.id)
+                .eq('mentor_id', user.id)
                 .order('day_of_week')
                 .order('start_time')
 
@@ -89,7 +100,7 @@ export default function MentorAvailabilityPage() {
             setAvailability(data || [])
         } catch (error) {
             console.error('Error fetching availability:', error)
-            setMessage({ type: 'error', text: 'Erro ao carregar disponibilidade' })
+            setMessage({ type: 'error', text: t("errorLoad") })
         } finally {
             setLoading(false)
         }
@@ -100,7 +111,7 @@ export default function MentorAvailabilityPage() {
             day_of_week: 1, // Monday by default
             start_time: '09:00:00',
             end_time: '17:00:00',
-            timezone: 'America/Sao_Paulo'
+            timezone: profile?.timezone || 'America/Sao_Paulo'
         }
         setAvailability([...availability, newSlot])
     }
@@ -122,7 +133,8 @@ export default function MentorAvailabilityPage() {
 
             // Check if start time is before end time
             if (slot.start_time >= slot.end_time) {
-                return `Horário inválido no ${DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label}: início deve ser antes do fim`
+                const dayLabel = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label
+                return t("invalidTime", { day: dayLabel })
             }
 
             // Check for overlapping slots on the same day
@@ -135,7 +147,8 @@ export default function MentorAvailabilityPage() {
                     const otherEnd = new Date(`2000-01-01T${otherSlot.end_time}`)
 
                     if ((slotStart < otherEnd && slotEnd > otherStart)) {
-                        return `Horários sobrepostos em ${DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label}`
+                        const dayLabel = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label
+                        return t("overlappingTime", { day: dayLabel })
                     }
                 }
             }
@@ -155,10 +168,12 @@ export default function MentorAvailabilityPage() {
 
         try {
             // Delete existing availability
-            await supabase
+            const { error: deleteError } = await supabase
                 .from('mentor_availability')
                 .delete()
                 .eq('mentor_id', user?.id)
+
+            if (deleteError) throw deleteError
 
             // Insert new availability
             if (availability.length > 0) {
@@ -170,35 +185,35 @@ export default function MentorAvailabilityPage() {
                     timezone: slot.timezone
                 }))
 
-                const { error } = await supabase
+                const { error: insertError } = await supabase
                     .from('mentor_availability')
                     .insert(slotsToInsert)
 
-                if (error) throw error
+                if (insertError) throw insertError
             }
 
-            setMessage({ type: 'success', text: 'Disponibilidade salva com sucesso!' })
+            setMessage({ type: 'success', text: t("success") })
 
             // Refresh data
             await fetchAvailability()
         } catch (error) {
             console.error('Error saving availability:', error)
-            setMessage({ type: 'error', text: 'Erro ao salvar disponibilidade' })
+            setMessage({ type: 'error', text: t("errorSave") })
         } finally {
             setSaving(false)
         }
     }
 
     const formatTime = (time: string) => {
-        return new Date(`2000-01-01T${time}`).toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit'
-        })
+        // Use a consistent locale for internal time formatting if needed, 
+        // but here we just want the HH:mm
+        const parts = time.split(':')
+        return `${parts[0]}:${parts[1]}`
     }
 
     const getAvailabilityPreview = () => {
         const grouped = availability.reduce((acc, slot) => {
-            const day = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label || 'Desconhecido'
+            const day = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label || '?'
             if (!acc[day]) acc[day] = []
             acc[day].push(`${formatTime(slot.start_time)} - ${formatTime(slot.end_time)}`)
             return acc
@@ -212,13 +227,13 @@ export default function MentorAvailabilityPage() {
         ))
     }
 
-    if (loading) {
+    if (loading || authLoading) {
         return (
             <div className="container mx-auto px-4 py-8">
                 <div className="flex items-center justify-center min-h-[400px]">
                     <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                        <p className="text-gray-600">Carregando disponibilidade...</p>
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                        <p className="text-gray-600">{t("loading")}</p>
                     </div>
                 </div>
             </div>
@@ -229,10 +244,10 @@ export default function MentorAvailabilityPage() {
         <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                    Configurar Disponibilidade
+                    {t("title")}
                 </h1>
                 <p className="text-gray-600">
-                    Defina seus horários disponíveis para mentorias
+                    {t("description")}
                 </p>
             </div>
 
@@ -243,17 +258,17 @@ export default function MentorAvailabilityPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Clock className="h-5 w-5 mr-2" />
-                                Horários Disponíveis
+                                {t("availableHours")}
                             </CardTitle>
                             <CardDescription>
-                                Adicione os dias e horários em que você está disponível para mentorias
+                                {t("availableHoursDesc")}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {availability.map((slot, index) => (
                                 <div key={index} className="p-4 border rounded-lg space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <h4 className="font-medium">Horário {index + 1}</h4>
+                                        <h4 className="font-medium">{t("timeSlot", { number: index + 1 })}</h4>
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -266,7 +281,7 @@ export default function MentorAvailabilityPage() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
-                                            <Label>Dia da Semana</Label>
+                                            <Label>{t("dayOfWeek")}</Label>
                                             <Select
                                                 value={slot.day_of_week.toString()}
                                                 onValueChange={(value) => updateSlot(index, 'day_of_week', parseInt(value))}
@@ -285,7 +300,7 @@ export default function MentorAvailabilityPage() {
                                         </div>
 
                                         <div>
-                                            <Label>Horário de Início</Label>
+                                            <Label>{t("startTime")}</Label>
                                             <Select
                                                 value={slot.start_time}
                                                 onValueChange={(value) => updateSlot(index, 'start_time', value)}
@@ -304,7 +319,7 @@ export default function MentorAvailabilityPage() {
                                         </div>
 
                                         <div>
-                                            <Label>Horário de Fim</Label>
+                                            <Label>{t("endTime")}</Label>
                                             <Select
                                                 value={slot.end_time}
                                                 onValueChange={(value) => updateSlot(index, 'end_time', value)}
@@ -331,7 +346,7 @@ export default function MentorAvailabilityPage() {
                                 className="w-full"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
-                                Adicionar Horário
+                                {t("addTime")}
                             </Button>
                         </CardContent>
                     </Card>
@@ -358,12 +373,12 @@ export default function MentorAvailabilityPage() {
                             {saving ? (
                                 <>
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Salvando...
+                                    {t("saving")}
                                 </>
                             ) : (
                                 <>
                                     <Save className="h-4 w-4 mr-2" />
-                                    Salvar Disponibilidade
+                                    {t("saveButton")}
                                 </>
                             )}
                         </Button>
@@ -376,10 +391,10 @@ export default function MentorAvailabilityPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center">
                                 <Calendar className="h-5 w-5 mr-2" />
-                                Preview da Disponibilidade
+                                {t("previewTitle")}
                             </CardTitle>
                             <CardDescription>
-                                Como sua disponibilidade aparecerá para os mentees
+                                {t("previewDesc")}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -390,8 +405,8 @@ export default function MentorAvailabilityPage() {
                             ) : (
                                 <div className="text-center py-8 text-gray-500">
                                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                    <p>Nenhum horário configurado</p>
-                                    <p className="text-sm">Adicione horários para ver o preview</p>
+                                    <p>{t("noSchedule")}</p>
+                                    <p className="text-sm">{t("addScheduleToPreview")}</p>
                                 </div>
                             )}
                         </CardContent>
@@ -399,20 +414,20 @@ export default function MentorAvailabilityPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Dicas</CardTitle>
+                            <CardTitle>{t("tips.title")}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm text-gray-600">
                             <div className="flex items-start space-x-2">
                                 <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                <p>Configure horários realistas que você pode manter consistentemente</p>
+                                <p>{t("tips.tip1")}</p>
                             </div>
                             <div className="flex items-start space-x-2">
                                 <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                <p>Deixe intervalos entre sessões para descanso</p>
+                                <p>{t("tips.tip2")}</p>
                             </div>
                             <div className="flex items-start space-x-2">
                                 <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                                <p>Você pode atualizar sua disponibilidade a qualquer momento</p>
+                                <p>{t("tips.tip3")}</p>
                             </div>
                         </CardContent>
                     </Card>

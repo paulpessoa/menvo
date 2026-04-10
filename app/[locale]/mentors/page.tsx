@@ -152,38 +152,43 @@ export default function MentorsPage() {
       // Apply Filters
       if (filters.search) {
         const searchTerm = `%${filters.search}%`
+        // Usar or com ilike de forma resiliente
         query = query.or(`full_name.ilike.${searchTerm},current_position.ilike.${searchTerm},current_company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
       }
 
-      if (filters.country !== 'all') {
+      if (filters.country && filters.country !== 'all') {
         query = query.eq('country', filters.country)
       }
-      if (filters.state !== 'all') {
+      if (filters.state && filters.state !== 'all') {
         query = query.eq('state', filters.state)
       }
       if (filters.city) {
         query = query.eq('city', filters.city)
       }
-      if (filters.availabilityStatus !== 'all') {
+      if (filters.availabilityStatus && filters.availabilityStatus !== 'all') {
         query = query.eq('availability_status', filters.availabilityStatus)
       }
 
-      if (filters.languages.length > 0) {
+      if (filters.languages && filters.languages.length > 0) {
         query = query.contains('languages', filters.languages)
       }
-      if (filters.topics.length > 0) {
+      if (filters.topics && filters.topics.length > 0) {
         query = query.contains('mentorship_topics', filters.topics)
       }
-      if (filters.inclusiveTags.length > 0) {
+      if (filters.inclusiveTags && filters.inclusiveTags.length > 0) {
         query = query.contains('inclusion_tags', filters.inclusiveTags)
       }
 
-      if (filters.experienceYears !== 'all') {
-        const [min, max] = filters.experienceYears.split('-').map(Number)
-        if (max) {
-          query = query.gte('experience_years', min).lte('experience_years', max)
-        } else {
+      if (filters.experienceYears && filters.experienceYears !== 'all') {
+        const parts = filters.experienceYears.split('-')
+        const min = parseInt(parts[0])
+        const max = parts[1] ? parseInt(parts[1]) : null
+        
+        if (!isNaN(min)) {
           query = query.gte('experience_years', min)
+        }
+        if (max && !isNaN(max)) {
+          query = query.lte('experience_years', max)
         }
       }
 
@@ -194,11 +199,15 @@ export default function MentorsPage() {
       query = query
         .order('rating', { ascending: false })
         .order('sessions', { ascending: false })
+        .order('id', { ascending: true }) // Deterministico
         .range(from, to)
 
       const { data, error, count } = await query
 
-      if (error) throw error
+      if (error) {
+        console.error('[MENTORS_FETCH_ERROR]', error)
+        throw error
+      }
 
       const mappedData = (data || []).map((mentor: any) => ({
         ...mentor,

@@ -7,9 +7,11 @@ import { ArrowLeft, Inbox, CheckCircle, Clock, XCircle, Send } from "lucide-reac
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import AppointmentsList from "@/components/appointments/AppointmentsList"
-import { BarChart } from "recharts"
+import { useTranslations } from "next-intl"
 
 export default function MentorMentorshipPage() {
+    const t = useTranslations("mentorship")
+
     return (
         <RequireRole roles={['mentor']}>
             <div className="container mx-auto px-4 py-8">
@@ -17,7 +19,7 @@ export default function MentorMentorshipPage() {
                     <Button variant="ghost" asChild>
                         <Link href="/dashboard/mentor">
                             <ArrowLeft className="h-4 w-4 mr-2" />
-                            Voltar ao Dashboard
+                            {t("received.confirmedDesc").includes("Avaliar") ? "Voltar ao Dashboard" : "Back to Dashboard"}
                         </Link>
                     </Button>
                 </div>
@@ -25,9 +27,9 @@ export default function MentorMentorshipPage() {
                 <div className="space-y-6">
                     {/* Header */}
                     <div>
-                        <h1 className="text-3xl font-bold">Minhas Mentorias</h1>
+                        <h1 className="text-3xl font-bold">{t("title")}</h1>
                         <p className="text-muted-foreground">
-                            Gerencie todas as suas mentorias - recebidas e solicitadas
+                            {t("description")}
                         </p>
                     </div>
 
@@ -35,27 +37,27 @@ export default function MentorMentorshipPage() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                             <Inbox className="h-5 w-5 text-indigo-600" />
-                            Mentorias Recebidas
-                            <span className="text-sm font-normal text-muted-foreground">(você como mentor)</span>
+                            {t("received.title")}
+                            <span className="text-sm font-normal text-muted-foreground">{t("received.asMentor")}</span>
                         </h2>
 
                         <Tabs defaultValue="pendentes" className="w-full">
                             <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="pendentes" className="flex items-center gap-2">
                                     <Inbox className="h-4 w-4" />
-                                    Pendentes
+                                    {t("tabs.pending")}
                                 </TabsTrigger>
                                 <TabsTrigger value="confirmadas" className="flex items-center gap-2">
                                     <CheckCircle className="h-4 w-4" />
-                                    Agendadas
+                                    {t("tabs.confirmed")}
                                 </TabsTrigger>
                                 <TabsTrigger value="avaliadas" className="flex items-center gap-2">
                                     <CheckCircle className="h-4 w-4" />
-                                    Avaliadas
+                                    {t("tabs.completed")}
                                 </TabsTrigger>
                                 <TabsTrigger value="canceladas" className="flex items-center gap-2">
                                     <XCircle className="h-4 w-4" />
-                                    Canceladas
+                                    {t("tabs.cancelled")}
                                 </TabsTrigger>
                             </TabsList>
 
@@ -63,9 +65,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="pendentes" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Pedidos Recebidos</CardTitle>
+                                        <CardTitle>{t("received.pending")}</CardTitle>
                                         <CardDescription>
-                                            Solicitações de mentoria aguardando sua confirmação
+                                            {t("received.pendingDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -78,9 +80,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="confirmadas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Mentorias Agendadas</CardTitle>
+                                        <CardTitle>{t("received.confirmed")}</CardTitle>
                                         <CardDescription>
-                                            Sessões confirmadas e agendadas. Após a mentoria, clique em "Avaliar" para deixar seu feedback.
+                                            {t("received.confirmedDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -93,9 +95,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="avaliadas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Mentorias Avaliadas</CardTitle>
+                                        <CardTitle>{t("received.completed")}</CardTitle>
                                         <CardDescription>
-                                            Sessões finalizadas com feedback registrado
+                                            {t("received.completedDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -108,9 +110,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="canceladas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Sessões Canceladas</CardTitle>
+                                        <CardTitle>{t("received.cancelled")}</CardTitle>
                                         <CardDescription>
-                                            Mentorias que foram canceladas
+                                            {t("received.cancelledDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -126,36 +128,36 @@ export default function MentorMentorshipPage() {
                     <div>
                         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                             <Send className="h-5 w-5 text-blue-600" />
-                            Mentorias Solicitadas
-                            <span className="text-sm font-normal text-muted-foreground">(você como mentee)</span>
+                            {t("requested.title")}
+                            <span className="text-sm font-normal text-muted-foreground">{t("requested.asMentee")}</span>
                         </h2>
 
                         <Tabs defaultValue="pendentes-solicitadas" className="w-full">
                             <TabsList className="grid w-full grid-cols-4">
                                 <TabsTrigger value="pendentes-solicitadas" className="flex items-center gap-2">
                                     <Clock className="h-4 w-4" />
-                                    Pendentes
+                                    {t("tabs.pending")}
                                 </TabsTrigger>
                                 <TabsTrigger value="confirmadas-solicitadas" className="flex items-center gap-2">
                                     <CheckCircle className="h-4 w-4" />
-                                    Agendadas
+                                    {t("tabs.confirmed")}
                                 </TabsTrigger>
                                 <TabsTrigger value="avaliadas-solicitadas" className="flex items-center gap-2">
                                     <CheckCircle className="h-4 w-4" />
-                                    Avaliadas
+                                    {t("tabs.completed")}
                                 </TabsTrigger>
                                 <TabsTrigger value="canceladas-solicitadas" className="flex items-center gap-2">
                                     <XCircle className="h-4 w-4" />
-                                    Canceladas
+                                    {t("tabs.cancelled")}
                                 </TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="pendentes-solicitadas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Aguardando Confirmação</CardTitle>
+                                        <CardTitle>{t("requested.pending")}</CardTitle>
                                         <CardDescription>
-                                            Solicitações pendentes de confirmação dos mentores
+                                            {t("requested.pendingDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -167,9 +169,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="confirmadas-solicitadas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Mentorias Agendadas</CardTitle>
+                                        <CardTitle>{t("requested.confirmed")}</CardTitle>
                                         <CardDescription>
-                                            Sessões confirmadas pelos mentores
+                                            {t("requested.confirmedDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -181,9 +183,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="avaliadas-solicitadas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Mentorias Avaliadas</CardTitle>
+                                        <CardTitle>{t("requested.completed")}</CardTitle>
                                         <CardDescription>
-                                            Sessões finalizadas com seu feedback
+                                            {t("requested.completedDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -195,9 +197,9 @@ export default function MentorMentorshipPage() {
                             <TabsContent value="canceladas-solicitadas" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Sessões Canceladas</CardTitle>
+                                        <CardTitle>{t("requested.cancelled")}</CardTitle>
                                         <CardDescription>
-                                            Mentorias que foram canceladas
+                                            {t("requested.cancelledDesc")}
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
@@ -208,20 +210,20 @@ export default function MentorMentorshipPage() {
                         </Tabs>
                     </div>
 
-                    {/* Recursos e Materiais - Em Desenvolvimento */}
+                    {/* Recursos e Materiais */}
                     <Card className="bg-muted/50">
                         <CardHeader>
-                            <CardTitle>Biblioteca de Recursos</CardTitle>
+                            <CardTitle>{t("resources.title")}</CardTitle>
                             <CardDescription>
-                                Compartilhe materiais e recursos com seus mentees
+                                {t("resources.description")}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="text-center py-8 text-muted-foreground">
                                 <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                <p className="text-sm italic">Em desenvolvimento</p>
+                                <p className="text-sm italic">{t("resources.inDevelopment")}</p>
                                 <p className="text-xs mt-2">
-                                    Em breve: biblioteca de materiais, templates e recursos para compartilhar com mentees
+                                    {t("resources.comingSoon")}
                                 </p>
                             </div>
                         </CardContent>
