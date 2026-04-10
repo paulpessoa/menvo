@@ -904,6 +904,21 @@
     "allRightsReserved": "Alla rättigheter förbehållna."
   },
   "newsletter": {
+    "unsubscribe": {
+      "title": "",
+      "description": "",
+      "successTitle": "",
+      "successDescription": "",
+      "rejoinText": "",
+      "rejoinButton": "",
+      "considerTitle": "",
+      "considerItem1": "",
+      "considerItem2": "",
+      "considerItem3": "",
+      "button": "",
+      "cancelling": "",
+      "backToSite": ""
+    },
     "modal": {
       "success": {
         "title": "Tack för att du gick med i vårt nyhetsbrev!",
