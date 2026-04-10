@@ -690,38 +690,38 @@
     }
   },
   "onboarding": {
-    "title": "Choose your profile",
-    "description": "Select how you would like to participate in our platform. You can change this later in settings.",
-    "configuringFor": "Configuring profile for:",
+    "title": "Välj din profil",
+    "description": "Välj hur du vill delta i vår plattform. Du kan ändra detta senare i inställningarna.",
+    "configuringFor": "Konfigurerar profil för:",
     "mentee": {
       "title": "Mentee",
-      "description": "I seek guidance and support to grow professionally",
+      "description": "Jag söker vägledning och stöd för att växa professionellt",
       "benefits": [
-        "Access to experienced mentors",
-        "Personalized mentorship sessions",
-        "Professional networking",
-        "Career development"
+        "Tillgång till erfarna mentorer",
+        "Personliga mentorskapssessioner",
+        "Professionellt nätverkande",
+        "Karriärutveckling"
       ],
-      "success": "Mentee profile successfully selected!"
+      "success": "Mentee-profil har valts framgångsrikt!"
     },
     "mentor": {
       "title": "Mentor",
-      "description": "I want to share knowledge and help other professionals",
+      "description": "Jag vill dela med mig av kunskap och hjälpa andra yrkesverksamma",
       "benefits": [
-        "Share experience",
-        "Impact careers",
-        "Expand networking",
-        "Develop leadership skills"
+        "Dela erfarenhet",
+        "Påverka karriärer",
+        "Utöka nätverk",
+        "Utveckla ledarskapsförmåga"
       ],
-      "success": "Mentor profile successfully selected!"
+      "success": "Mentor-profil har valts framgångsrikt!"
     },
-    "saving": "Saving your profile...",
-    "confirm": "Confirm Selection",
+    "saving": "Sparar din profil...",
+    "confirm": "Bekräfta val",
     "error": {
-      "notAuthenticated": "User not authenticated",
-      "sessionExpired": "Session expired. Please log in again.",
-      "saveError": "Error saving profile. Check your connection.",
-      "selectRequired": "Please select a profile"
+      "notAuthenticated": "Användaren är inte autentiserad",
+      "sessionExpired": "Sessionen har gått ut. Logga in igen.",
+      "saveError": "Fel vid sparande av profil. Kontrollera din anslutning.",
+      "selectRequired": "Vänligen välj en profil"
     }
   },
   "auth": {
