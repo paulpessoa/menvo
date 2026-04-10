@@ -44,7 +44,10 @@
     "progress": "Progresso",
     "confirmTitle": "Você tem certeza?",
     "confirmDesc": "Esta ação não pode ser desfeita.",
-    "confirmAction": "Sim, confirmar"
+    "confirmAction": "Sim, confirmar",
+    "french": "Francês",
+    "danish": "Dinamarquês",
+    "swedish": "Sueco"
   },
   "header": {
     "title": "MENVO - Mentores Voluntários",

@@ -44,7 +44,10 @@
     "progress": "Fremskridt",
     "confirmTitle": "Er du sikker?",
     "confirmDesc": "Denne handling kan ikke fortrydes.",
-    "confirmAction": "Ja, bekræft"
+    "confirmAction": "Ja, bekræft",
+    "french": "Fransk",
+    "danish": "Dansk",
+    "swedish": "Svensk"
   },
   "header": {
     "title": "MENVO - Frivillige Mentorer",

@@ -44,7 +44,10 @@
     "progress": "Progress",
     "confirmTitle": "Are you sure?",
     "confirmDesc": "This action cannot be undone.",
-    "confirmAction": "Yes, confirm"
+    "confirmAction": "Yes, confirm",
+    "french": "French",
+    "danish": "Danish",
+    "swedish": "Swedish"
   },
   "header": {
     "title": "MENVO - Volunteer Mentors",

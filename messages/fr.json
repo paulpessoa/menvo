@@ -36,7 +36,10 @@
       "successDescription": "Vous pouvez modifier cette préférence à tout moment dans le menu Paramètres après vous être connecté.",
       "button": "Commencer à naviguer"
     },
-    "administration": "Administration"
+    "administration": "Administration",
+    "french": "French",
+    "danish": "Danish",
+    "swedish": "Swedish"
   },
   "header": {
     "title": "MENVO - Mentors Bénévoles",

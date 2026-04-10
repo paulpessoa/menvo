@@ -36,7 +36,10 @@
       "successDescription": "Puedes cambiar esta preferencia en cualquier momento en el menú de Configuración tras iniciar sesión.",
       "button": "Empezar a Navegar"
     },
-    "administration": "Administración"
+    "administration": "Administración",
+    "french": "French",
+    "danish": "Danish",
+    "swedish": "Swedish"
   },
   "header": {
     "title": "MENVO - Mentores Voluntarios",
