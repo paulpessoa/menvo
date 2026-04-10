@@ -40,7 +40,17 @@
   },
   "header": {
     "title": "MENVO - Frivilliga Mentorer",
-    "subtitle": "Kopplar ihop mentorer och mentees"
+    "subtitle": "Kopplar ihop mentorer och mentees",
+    "userMenu": {
+      "dashboard": "Kontrollpanel",
+      "profile": "Profil",
+      "messages": "Meddelanden",
+      "settings": "Inställningar",
+      "adminPanel": "Administrativ panel",
+      "logout": "Logga ut",
+      "administration": "Administration",
+      "user": "Användare"
+    }
   },
   "home": {
     "badge": {

@@ -40,7 +40,17 @@
   },
   "header": {
     "title": "MENVO - Volunteer Mentors",
-    "subtitle": "Connecting mentors and mentees"
+    "subtitle": "Connecting mentors and mentees",
+    "userMenu": {
+      "dashboard": "Dashboard",
+      "profile": "Profile",
+      "messages": "Messages",
+      "settings": "Settings",
+      "adminPanel": "Admin Panel",
+      "logout": "Logout",
+      "administration": "Administration",
+      "user": "User"
+    }
   },
   "home": {
     "badge": {

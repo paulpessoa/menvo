@@ -39,8 +39,18 @@
     "administration": "Administration"
   },
   "header": {
-    "title": "MENVO - Volontärmentorer",
-    "subtitle": "Kopplar samman mentorer och adepter"
+    "title": "MENVO - Frivillige Mentorer",
+    "subtitle": "Forbinder mentorer og mentees",
+    "userMenu": {
+      "dashboard": "Kontrolpanel",
+      "profile": "Profil",
+      "messages": "Beskeder",
+      "settings": "Indstillinger",
+      "adminPanel": "Administrativt panel",
+      "logout": "Log ud",
+      "administration": "Administration",
+      "user": "Bruger"
+    }
   },
   "home": {
     "badge": {

@@ -68,19 +68,16 @@ export default function Header() {
   const userNavigation = isAuthenticated
     ? isAdmin
       ? [
-          { name: "Painel Administrativo", href: "/admin", icon: Shield },
-          { name: "Configurações", href: "/settings", icon: Settings }
+          { name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield },
+          { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
         ]
       : [
-          { name: "Dashboard", href: "/dashboard", icon: User },
-          { name: "Perfil", href: "/profile", icon: User },
-          { name: "Mensagens", href: "/messages", icon: MessageSquare },
-          { name: "Configurações", href: "/settings", icon: Settings }
+          { name: t("header.userMenu.dashboard"), href: "/dashboard", icon: User },
+          { name: t("header.userMenu.profile"), href: "/profile", icon: User },
+          { name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare },
+          { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
         ]
     : []
-
-  // Admin navigation removido - agora está na sidebar do /admin/layout.tsx
-  const adminNavigation: any[] = []
 
   const handleSignOut = async () => {
     await signOut()
@@ -164,7 +161,7 @@ export default function Header() {
                     <p className="font-medium">
                       {profile?.full_name ||
                         user?.user_metadata?.full_name ||
-                        "Usuário"}
+                        t("header.userMenu.user")}
                     </p>
                     <p className="w-[200px] truncate text-sm text-muted-foreground">
                       {user?.email}
@@ -188,32 +185,13 @@ export default function Header() {
                   </DropdownMenuItem>
                 ))}
 
-                {/* Admin Navigation */}
-                {adminNavigation.length > 0 && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Administração</DropdownMenuLabel>
-                    {adminNavigation.map((item) => (
-                      <DropdownMenuItem key={item.name} asChild>
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-2"
-                        >
-                          <item.icon className="h-4 w-4" />
-                          {item.name}
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </>
-                )}
-
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleSignOut}
                   className="flex items-center gap-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  Sair
+                  {t("header.userMenu.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -262,34 +240,13 @@ export default function Header() {
                         </Link>
                       ))}
 
-                      {adminNavigation.length > 0 && (
-                        <>
-                          <div className="border-t pt-2 mt-2">
-                            <p className="px-2 py-1 text-sm font-medium text-muted-foreground">
-                              Administração
-                            </p>
-                            {adminNavigation.map((item) => (
-                              <Link
-                                key={item.name}
-                                href={item.href}
-                                className="flex items-center gap-2 px-2 py-1 text-lg"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                <item.icon className="h-4 w-4" />
-                                {item.name}
-                              </Link>
-                            ))}
-                          </div>
-                        </>
-                      )}
-
                       <Button
                         variant="ghost"
                         onClick={handleSignOut}
                         className="flex items-center gap-2 px-2 py-1 text-lg justify-start mt-2"
                       >
                         <LogOut className="h-4 w-4" />
-                        {t("common.logout")}
+                        {t("header.userMenu.logout")}
                       </Button>
                     </div>
                   </>
