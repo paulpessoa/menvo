@@ -51,7 +51,17 @@
   },
   "header": {
     "title": "MENVO - Mentores Voluntarios",
-    "subtitle": "Conectando mentores y mentees"
+    "subtitle": "Conectando mentores y mentees",
+    "userMenu": {
+      "dashboard": "Panel de Control",
+      "profile": "Perfil",
+      "messages": "Mensajes",
+      "settings": "Configuración",
+      "adminPanel": "Panel Administrativo",
+      "logout": "Cerrar sesión",
+      "administration": "Administración",
+      "user": "Usuario"
+    }
   },
   "home": {
     "badge": {

@@ -51,7 +51,17 @@
   },
   "header": {
     "title": "MENVO - Mentors Bénévoles",
-    "subtitle": "Connecter mentors et mentorés"
+    "subtitle": "Connecter mentors et mentorés",
+    "userMenu": {
+      "dashboard": "Tableau de bord",
+      "profile": "Profil",
+      "messages": "Messages",
+      "settings": "Paramètres",
+      "adminPanel": "Panneau d'administration",
+      "logout": "Déconnexion",
+      "administration": "Administration",
+      "user": "Utilisateur"
+    }
   },
   "home": {
     "badge": {
