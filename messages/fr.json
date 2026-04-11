@@ -838,12 +838,12 @@
   "toast": {
     "suggestion": {
       "success": {
-        "title": "Suggestion sent!",
-        "description": "Thank you for your suggestion. Our team will analyze it and let you know about updates."
+        "title": "Suggestion envoyée !",
+        "description": "Merci pour votre suggestion. Notre équipe l'analysera et vous tiendra informé des mises à jour."
       },
       "error": {
-        "title": "Error sending suggestion",
-        "description": "Could not send your suggestion. Please try again later."
+        "title": "Erreur lors de l'envoi de la suggestion",
+        "description": "Impossible d'envoyer votre suggestion. Veuillez réessayer plus tard."
       }
     }
   },

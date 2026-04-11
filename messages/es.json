@@ -771,12 +771,12 @@
   "toast": {
     "suggestion": {
       "success": {
-        "title": "Suggestion sent!",
-        "description": "Thank you for your suggestion. Our team will analyze it and let you know about updates."
+        "title": "¡Sugerencia enviada!",
+        "description": "Gracias por tu sugerencia. Nuestro equipo la analizará y te informaremos sobre las novedades."
       },
       "error": {
-        "title": "Error sending suggestion",
-        "description": "Could not send your suggestion. Please try again later."
+        "title": "Error al enviar la sugerencia",
+        "description": "No se pudo enviar tu sugerencia. Por favor, inténtalo de nuevo más tarde."
       }
     }
   },
