@@ -4,14 +4,12 @@ import { useEffect } from "react"
 
 export function ConsoleEasterEgg() {
   useEffect(() => {
-    const isDevelopment = process.env.NODE_ENV === "development"
-    
-    // Design do Easter Egg
+    // Escaping backslashes for ASCII art stability
     const menvoLogo = `
    __  ___  _______  ____   ______
-  /  |/  / / __/ _ \\/ _ /  / __  /
+  /  |/  / / __/ _ \\\\/ _ /  / __  /
  / /|_/ / / _// / / / / / / /_/ / 
-/_/  /_/ /___/_/ /_/_/ /_/\\____/  
+/_/  /_/ /___/_/ /_/_/ /_/\\\\____/  
     `
 
     console.log(
@@ -29,14 +27,6 @@ export function ConsoleEasterEgg() {
       "%c✨ Desenvolvido com ❤️ pela equipe Menvo e voluntários apaixonados.",
       "color: #059669; font-size: 12px; font-weight: medium;"
     )
-
-    if (!isDevelopment) {
-      console.log(
-        "%c🔍 Interessado em como construímos isso? %cConfira nosso repositório ou mande um 'Oi' para contato@menvo.com.br",
-        "color: #d97706; font-size: 12px;",
-        "color: #64748b; font-size: 12px;"
-      )
-    }
 
     console.log(
       "%c----------------------------------------------------------------",
