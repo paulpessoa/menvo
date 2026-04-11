@@ -11,7 +11,8 @@ import {
     Menu,
     X,
     Home,
-    Building2
+    Building2,
+    MessageSquare
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"
@@ -44,6 +45,12 @@ const adminNavItems = [
         href: "/admin/users",
         icon: Users,
         description: "Gerenciar usuários da plataforma"
+    },
+    {
+        title: "Sugestões",
+        href: "/admin/suggestions",
+        icon: MessageSquare,
+        description: "Temas e áreas sugeridas"
     },
     {
         title: "Relatórios",

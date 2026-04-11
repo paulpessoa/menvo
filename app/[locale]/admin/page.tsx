@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Users, UserCheck, Clock, Shield, TrendingUp, AlertCircle, CheckCircle } from "lucide-react"
+import { Users, UserCheck, Clock, Shield, TrendingUp, AlertCircle, CheckCircle, MessageSquare } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
