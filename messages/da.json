@@ -1,34 +1,34 @@
 {
   "common": {
-    "welcome": "Välkommen",
-    "home": "Hem",
-    "findMentors": "Hitta Mentorer",
-    "events": "Evenemang",
-    "howItWorks": "Hur Det Fungerar",
-    "aboutUs": "Om Oss",
+    "welcome": "Velkommen",
+    "home": "Hjem",
+    "findMentors": "Find mentorer",
+    "events": "Begivenheder",
+    "howItWorks": "Sådan fungerer det",
+    "aboutUs": "Om os",
     "title": "Menvo",
-    "login": "Logga in",
-    "register": "Registrera",
-    "logout": "Logga ut",
-    "language": "Språk",
+    "login": "Log ind",
+    "register": "Registrer",
+    "logout": "Log ud",
+    "language": "Sprog",
     "english": "Engelsk",
     "portuguese": "Portugisisk",
     "spanish": "Spansk",
-    "cancel": "Avbryt",
-    "continue": "Fortsätt",
-    "submit": "Skicka",
-    "back": "Tillbaka",
-    "next": "Nästa",
-    "save": "Spara",
-    "email": "E-post",
-    "password": "Lösenord",
-    "name": "Namn",
-    "firstName": "Förnamn",
-    "lastName": "Efternamn",
-    "loading": "Laddar...",
-    "saving": "Sparar...",
-    "close": "Stäng",
-    "submitting": "Skickar...",
+    "cancel": "Annuller",
+    "continue": "Fortsæt",
+    "submit": "Indsend",
+    "back": "Tilbage",
+    "next": "Næste",
+    "save": "Gem",
+    "email": "E-mail",
+    "password": "Adgangskode",
+    "name": "Navn",
+    "firstName": "Fornavn",
+    "lastName": "Efternavn",
+    "loading": "Indlæser...",
+    "saving": "Gemmer...",
+    "close": "Luk",
+    "submitting": "Indsender...",
     "languageSelector": {
       "title": "Vælg dit sprog",
       "description": "Vælg dit sprog for at fortsætte",
@@ -65,267 +65,267 @@
   },
   "home": {
     "badge": {
-      "freeMentorship": "Plattform för Volontärmentorer"
+      "freeMentorship": "Platform for frivillige mentorer"
     },
     "hero": {
-      "title": "Koppla upp dig med Volontärmentorer",
-      "description": "Hitta vägledning, dela erfarenheter och väx med oss. Vår plattform kopplar ihop dig med volontärmentorer för gratis mentorskapssessioner.",
-      "findMentor": "Hitta en Mentor",
-      "becomeMentor": "Bli en Mentor"
+      "title": "Forbind dig med frivillige mentorer",
+      "description": "Find vejledning, del erfaringer og voks med os. Vores platform forbinder dig med frivillige mentorer til gratis mentorsessioner.",
+      "findMentor": "Find en mentor",
+      "becomeMentor": "Bliv mentor"
     },
     "testimonials": {
-      "title": "Berättelser som Inspirerar",
-      "description": "Liv transformerade genom mentorskap"
+      "title": "Historier der inspirerer",
+      "description": "Liv transformeret gennem mentorskab"
     },
     "howItWorks": {
-      "title": "Hur Det Fungerar",
-      "description": "Vår plattform gör det enkelt att koppla upp sig med mentorer och boka sessioner",
+      "title": "Sådan fungerer det",
+      "description": "Vores platform gør det nemt at komme i kontakt med mentorer og booke sessioner",
       "step1": {
-        "title": "Hitta en Mentor",
-        "description": "Utforska vårt mångsidiga community av volontärmentorer och hitta den perfekta matchningen för dina behov."
+        "title": "Find en mentor",
+        "description": "Udforsk vores mangfoldige fællesskab af frivillige mentorer og find det perfekte match til dine behov."
       },
       "step2": {
-        "title": "Boka en Session",
-        "description": "Boka en tid som fungerar för båda genom vårt inbyggda bokningssystem."
+        "title": "Book en session",
+        "description": "Book en tid, der passer jer begge, gennem vores indbyggede bookingsystem."
       },
       "step3": {
-        "title": "Koppla Upp & Väx",
-        "description": "Möt varandra virtuellt, dela erfarenheter och utveckla dina färdigheter med personlig vägledning."
+        "title": "Forbind og voks",
+        "description": "Mød hinanden virtuelt, del erfaringer og udvikl dine færdigheder med personlig vejledning."
       },
-      "learnMore": "Läs Mer"
+      "learnMore": "Læs mere"
     },
     "featuredMentors": {
-      "title": "Utvalda Mentorer",
-      "description": "Träffa några av våra engagerade volontärmentorer",
-      "viewAll": "Se Alla Mentorer"
+      "title": "Udvalgte mentorer",
+      "description": "Mød nogle af vores engagerede frivillige mentorer",
+      "viewAll": "Se alle mentorer"
     },
     "mentor": {
       "sampleName": "Sarah Johnson",
-      "field": "Mjukvaruteknik",
+      "field": "Softwareteknik",
       "tags": [
-        "Karriär",
+        "Karriere",
         "Teknik",
-        "Ledarskap"
+        "Ledelse"
       ],
-      "description": "Senior utvecklare med över 10 års erfarenhet av att hjälpa nya kodare att navigera i tech-branschen.",
-      "languages": "Engelska, Spanska",
-      "viewProfile": "Visa Profil"
+      "description": "Seniordev med over 10 års erfaring i at hjælpe nye kodere med at navigere i tech-branchen.",
+      "languages": "Engelsk, Spansk",
+      "viewProfile": "Vis profil"
     },
     "events": {
-      "title": "Kommande Evenemang",
-      "description": "Gå med i våra gemenskapsevenemang och gruppmentorskap",
+      "title": "Kommende begivenheder",
+      "description": "Deltag i vores fællesskabsbegivenheder og gruppementorskab",
       "card": {
-        "title": "Tech-karriärpanel: Hur man tar sig in i branschen",
-        "date": "15 Juni 2025",
+        "title": "Tech-karrierepanel: Sådan kommer du ind i branchen",
+        "date": "15. juni 2025",
         "time": "18:00 - 20:00",
-        "description": "Delta i vår panel av branschexperter och upptäck hur du startar och utvecklar din karriär inom tech.",
-        "attendees": "{count} deltagare",
-        "register": "Registrera dig"
+        "description": "Deltag i vores panel af brancheeksperter og opdag, hvordan du starter og udvikler din karriere inden for tech.",
+        "attendees": "{count} deltagere",
+        "register": "Tilmeld dig"
       },
-      "viewAll": "Se Alla Evenemang"
+      "viewAll": "Se alle begivenheder"
     },
     "cta": {
-      "title": "Redo att Börja?",
-      "description": "Gå med oss idag och koppla upp dig med personer som kan hjälpa dig nå dina mål",
-      "signup": "Registrera dig nu",
-      "learnMore": "Läs Mer"
+      "title": "Klar til at starte?",
+      "description": "Tilmeld dig i dag og forbind dig med personer, der kan hjælpe dig med at nå dine mål",
+      "signup": "Tilmeld dig nu",
+      "learnMore": "Læs mere"
     },
     "event": {
       "type": "Online"
     }
   },
   "about": {
-    "badge": "Om Oss",
+    "badge": "Om os",
     "ourMission": {
-      "title": "Vårt Uppdrag",
-      "description": "Att förenkla mentorskap i öppna konversationer. Vem som helst kan dela sin erfarenhet med den som söker vägledning — alltid gratis."
+      "title": "Vores mission",
+      "description": "At forenkle mentorskab i åbne samtaler. Enhver kan dele sin erfaring med dem, der søger vejledning — altid gratis."
     },
     "whyWeStarted": {
-      "title": "Varför Vi Började",
-      "paragraph1": "Menvo föddes ur en enkel idé: alla förtjänar tillgång till mentorskap, oavsett bakgrund eller ekonomisk situation. Vi tror att delande av kunskap och erfarenheter kan transformera liv och samhällen.",
-      "paragraph2": "Vår grundare upplevde själv den påverkan som ett bra mentorskap kan ha på personlig och professionell tillväxt. Dock insåg han också hur mentorskap ofta är begränsat till dem som redan har kontakter eller finansiella resurser.",
-      "paragraph3": "Därför skapade vi en plattform som gör mentorskap tillgängligt för alla, genom att koppla samman de som söker vägledning med dem som är villiga att dela sin erfarenhet — helt gratis."
+      "title": "Hvorfor vi startede",
+      "paragraph1": "Menvo blev født ud fra en enkel idé: alle fortjener adgang til mentorskab, uanset baggrund eller økonomisk situation. Vi tror på, at deling af viden og erfaringer kan transformere liv og samfund.",
+      "paragraph2": "Vores grundlægger oplevede selv den indflydelse, et godt mentorskab kan have på personlig og professionel vækst. Han indså dog også, hvordan mentorskab ofte er begrænset til dem, der allerede har kontakter eller finansielle ressourcer.",
+      "paragraph3": "Derfor skabte vi en platform, der gør mentorskab tilgængeligt for alle ved at forbinde dem, der søger vejledning, med dem, der er villige til at dele deres erfaring — helt gratis."
     },
-    "ourStoryImageAlt": "Illustration av vår historia",
+    "ourStoryImageAlt": "Illustration af vores historie",
     "values": {
       "community": {
-        "title": "Gemenskap",
-        "description": "Att bygga en välkomnande gemenskap, där kunskap delas fritt och kontakter skapas över gränser."
+        "title": "Fællesskab",
+        "description": "At bygge et imødekommende fællesskab, hvor viden deles frit og kontakter skabes på tværs af grænser."
       },
       "accessibility": {
-        "title": "Tillgänglighet",
-        "description": "Att göra mentorskap tillgängligt för alla, oavsett ekonomisk situation, plats eller bakgrund."
+        "title": "Tilgængelighed",
+        "description": "At gøre mentorskab tilgængeligt for alle, uanset økonomisk situation, sted eller baggrund."
       },
       "impact": {
-        "title": "Påverkan",
-        "description": "Att skapa positiva förändringar genom kunskapsdelning och meningsfulla kontakter som stärker människor."
+        "title": "Indvirkning",
+        "description": "At skabe positive forandringer gennem vidensdeling og meningsfulde forbindelser, der styrker mennesker."
       }
     },
     "sdg": {
-      "title": "Hållbara Utvecklingsmål",
-      "description": "Vår plattform är i linje med FN:s Hållbara Utvecklingsmål (SDG), med särskilt fokus på:",
+      "title": "Verdensmål for bæredygtig udvikling",
+      "description": "Vores platform er i tråd med FN's verdensmål (SDG), med særligt fokus på:",
       "goalNumber": "Mål {number}",
       "goals": {
-        "qualityEducation": "God Utbildning",
-        "genderEquality": "Jämställdhet",
-        "decentWork": "Anständiga Arbetsvillkor och Ekonomisk Tillväxt",
-        "reducedInequalities": "Minskad Ojämlikhet"
+        "qualityEducation": "Kvalitetsuddannelse",
+        "genderEquality": "Ligestilling mellem kønnene",
+        "decentWork": "Anstændige jobs og økonomisk vækst",
+        "reducedInequalities": "Mindre ulighed"
       }
     },
     "ourTeam": {
-      "title": "Vårt Team",
-      "paragraph1": "Vi är ett mångsidigt team av yrkesverksamma som brinner för att göra mentorskap tillgängligt för alla. Våra medlemmar kommer från olika bakgrunder och sektorer, vilket medför en rikedom av erfarenheter.",
-      "paragraph2": "Det som förenar oss är tron på mentorskapets kraft att förändra liv och åtagandet att bygga en plattform som underlättar meningsfulla relationer.",
-      "paragraph3": "Vi letar alltid efter passionerade personer att ansluta sig till vårt uppdrag. Om du vill bidra till Menvo, vill vi gärna höra från dig!",
-      "joinTeam": "Gå med i Vårt Team",
+      "title": "Vores team",
+      "paragraph1": "Vi er et mangfoldigt team af professionelle, der brænder for at gøre mentorskab tilgængeligt for alle. Vores medlemmer kommer fra forskellige baggrunde og sektorer, hvilket bringer en rigdom af erfaringer.",
+      "paragraph2": "Det, der forener os, er troen på mentorskabets kraft til at ændre liv og forpligtelsen til at bygge en platform, der letter meningsfulde relationer.",
+      "paragraph3": "Vi leder altid efter passionerede personer til at tilslutte sig vores mission. Hvis du vil bidrage til Menvo, hører vi gerne fra dig!",
+      "joinTeam": "Bliv en del af vores team",
       "viewMap": "Se teamkort"
     },
-    "ourTeamImageAlt": "Illustration av vårt team",
+    "ourTeamImageAlt": "Illustration af vores team",
     "ourImpact": {
-      "title": "Vår Påverkan",
+      "title": "Vores indvirkning",
       "volunteerMentors": {
-        "count": "1 000+",
-        "label": "Volontärmentorer"
+        "count": "1.000+",
+        "label": "Frivillige mentorer"
       },
       "mentorshipSessions": {
-        "count": "5 000+",
-        "label": "Mentorskapssessioner"
+        "count": "5.000+",
+        "label": "Mentorsessioner"
       },
       "countriesReached": {
         "count": "50+",
-        "label": "Länder Nådda"
+        "label": "Lande nået"
       },
-      "description": "Dessa siffror representerar riktiga människor vars liv har påverkats positivt av mentorrelationerna på vår plattform."
+      "description": "Disse tal repræsenterer rigtige mennesker, hvis liv er blevet positivt påvirket af mentorrelationerne på vores platform."
     },
     "ourPartners": {
-      "title": "Våra Partners",
-      "description": "Vi är stolta över att samarbeta med organisationer som delar vår vision om att göra mentorskap tillgängligt för alla.",
-      "partnerLogoAlt": "Partnerns Logotyp {number}"
+      "title": "Vores partnere",
+      "description": "Vi er stolte af at samarbejde med organisationer, der deler vores vision om at gøre mentorskab tilgængeligt for alle.",
+      "partnerLogoAlt": "Partnerens logo {number}"
     },
     "joinOurMission": {
-      "title": "Gå med i Vårt Uppdrag",
-      "description": "Oavsett om du vill dela din erfarenhet som mentor eller söka vägledning som adept, kan du vara en del av vårt uppdrag att göra mentorskap tillgängligt för alla.",
-      "signUpNow": "Registrera dig Nu",
-      "contactUs": "Kontakta Oss"
+      "title": "Tilslut dig vores mission",
+      "description": "Uanset om du vil dele din erfaring som mentor eller søge vejledning som mentee, kan du være en del af vores mission om at gøre mentorskab tilgængeligt for alle.",
+      "signUpNow": "Tilmeld dig nu",
+      "contactUs": "Kontakt os"
     }
   },
   "howItWorks": {
-    "title": "Hur Menvo Fungerar",
-    "description": "Vår plattform gör det enkelt att ansluta till mentorer och schemalägga gratis mentorskapssessioner.",
-    "forMentees": "För Adepter",
-    "forMentors": "För Mentorer",
-    "forNGOs": "För Ideella Organisationer",
-    "forCompanies": "För Företag",
+    "title": "Sådan fungerer Menvo",
+    "description": "Vores platform gør det nemt at oprette forbindelse til mentorer og planlægge gratis mentorsessioner.",
+    "forMentees": "For mentees",
+    "forMentors": "For mentorer",
+    "forNGOs": "For NGO'er",
+    "forCompanies": "For virksomheder",
     "mentees": {
       "step1": {
-        "title": "Skapa Din Profil",
-        "description": "Registrera dig och skapa din profil med information om din bakgrund, mål och intressen. Detta hjälper oss att matcha dig med de perfekta mentorerna.",
-        "feature1": "Ladda upp ditt CV",
-        "feature2": "Lägg till en profilbild",
-        "feature3": "Koppla till din LinkedIn-profil"
+        "title": "Opret din profil",
+        "description": "Tilmeld dig og opret din profil med information om din baggrund, mål og interesser. Dette hjælper os med at matche dig med de perfekte mentorer.",
+        "feature1": "Upload dit CV",
+        "feature2": "Tilføj et profilbillede",
+        "feature3": "Forbind til din LinkedIn-profil"
       },
       "step2": {
-        "title": "Hitta den Perfekta Mentorn",
-        "description": "Utforska vår mångfaldiga gemenskap av volontärmentorer. Använd filter för att söka efter mentorer via område, bransch, plats och mer.",
-        "feature1": "Filtrera efter ämnen och expertis",
-        "feature2": "Sök efter plats eller språk",
-        "feature3": "Läs recensioner från andra adepter"
+        "title": "Find den perfekte mentor",
+        "description": "Udforsk vores mangfoldige fællesskab af frivillige mentorer. Brug filtre til at søge efter mentorer via område, branche, sted og mere.",
+        "feature1": "Filtrer efter emner og ekspertise",
+        "feature2": "Søg efter sted eller sprog",
+        "feature3": "Læs anmeldelser fra andre mentees"
       },
       "step3": {
-        "title": "Boka en Session",
-        "description": "När du hittar en mentor som du vill koppla upp dig med, kolla deras tillgänglighet och boka en gratis 45-minuters session.",
-        "feature1": "Se mentorns kalender",
-        "feature2": "Välj den mest bekväma tiden",
-        "feature3": "Lägg till ämnen du vill diskutera"
+        "title": "Book en session",
+        "description": "Når du finder en mentor, du vil oprette forbindelse til, tjek deres tilgængelighed og book en gratis 45-minutters session.",
+        "feature1": "Se mentorens kalender",
+        "feature2": "Vælg det mest bekvemme tidspunkt",
+        "feature3": "Tilføj emner du vil diskutere"
       },
       "step4": {
-        "title": "Koppla Upp och Utvecklas",
-        "description": "Träffa din mentor via videosamtal. Dela dina utmaningar, ställ frågor och få personlig vägledning för att uppnå dina mål.",
-        "feature1": "Delta via videolänk",
-        "feature2": "Diskutera dina mål och utmaningar",
-        "feature3": "Få anpassad vägledning"
+        "title": "Forbind og udvikl dig",
+        "description": "Mød din mentor via videoopkald. Del dine udfordringer, stil spørgsmål og få personlig vejledning til at opnå dine mål.",
+        "feature1": "Deltag via videolink",
+        "feature2": "Diskuter dine mål og udfordringer",
+        "feature3": "Få tilpasset vejledning"
       },
-      "getStarted": "Kom Igång som Adept"
+      "getStarted": "Kom i gang som mentee"
     },
     "mentors": {
       "step1": {
-        "title": "Skapa Din Mentorprofil",
-        "description": "Registrera dig och skapa din mentorprofil med information om din erfarenhet, expertområden och ämnen du kan hjälpa till med.",
-        "feature1": "Framhäv din erfarenhet och expertis",
-        "feature2": "Ange ämnen du kan mentorera i",
-        "feature3": "Koppla ihop dina professionella profiler"
+        "title": "Opret din mentorprofil",
+        "description": "Tilmeld dig og opret din mentorprofil med information om din erfaring, ekspertområder og emner, du kan hjælpe med.",
+        "feature1": "Fremhæv din erfaring og ekspertise",
+        "feature2": "Angiv emner du kan mentore i",
+        "feature3": "Forbind dine professionelle profiler"
       },
       "step2": {
-        "title": "Slutför Verifiering",
-        "description": "För att säkerställa säkerheten i vårt community genomgår alla mentorer en verifieringsprocess, inklusive ett kort videosamtal med vårt team.",
-        "feature1": "Schemalägg ett verifieringssamtal",
-        "feature2": "Verifiera din identitet och kunskap",
-        "feature3": "Bli godkänd för att börja mentorera"
+        "title": "Gennemfør verificering",
+        "description": "For at sikre sikkerheden i vores fællesskab gennemgår alle mentorer en verificeringsproces, inklusive et kort videoopkald med vores team.",
+        "feature1": "Planlæg et verificeringsopkald",
+        "feature2": "Verificer din identitet og viden",
+        "feature3": "Bliv godkendt til at starte som mentor"
       },
       "step3": {
-        "title": "Bestäm Din Tillgänglighet",
-        "description": "Ställ in de tider då du är tillgänglig för att mentorera. Du har full kontroll över din agenda och kan uppdatera den när som helst.",
-        "feature1": "Konfigurera din veckovisa tillgänglighet",
-        "feature2": "Ställ in sessionslängd",
-        "feature3": "Uppdatera din kalender när det behövs"
+        "title": "Bestem din tilgængelighed",
+        "description": "Indstil de tider, hvor du er tilgængelig for at mentore. Du har fuld kontrol over din agenda og kan opdatere den når som herst.",
+        "feature1": "Konfigurer din ugentlige tilgængelighed",
+        "feature2": "Indstil sessionslængde",
+        "feature3": "Opdater din kalender når det er nødvendigt"
       },
       "step4": {
-        "title": "Utför Mentorskapssessioner",
-        "description": "Träffa adepter via videosamtal. Dela din kunskap, erbjuda vägledning och hjälp dem övervinna utmaningar.",
-        "feature1": "Ta emot bokningsförfrågningar",
-        "feature2": "Håll mentorskap via video",
-        "feature3": "Följ upp din påverkan och sessioner"
+        "title": "Gennemfør mentorsessioner",
+        "description": "Mød mentees via videoopkald. Del din viden, giv vejledning og hjælp dem med at overvinde udfordringer.",
+        "feature1": "Modtag bookinganmodninger",
+        "feature2": "Hold mentorskab via video",
+        "feature3": "Følg din indvirkning og sessioner"
       },
-      "becomeMentor": "Bli en Mentor"
+      "becomeMentor": "Bliv en mentor"
     },
     "ngos": {
       "step1": {
-        "title": "Registrera din Ideella Organisation Gratis",
-        "description": "NGOs och sociala organisationer kan registrera sig gratis för att koppla de unga de stödjer med volontärmentorer.",
-        "feature1": "100% gratis registrering för NGOs",
-        "feature2": "Obegränsad tillgång till plattformen",
-        "feature3": "Dedikerat stöd för organisationer"
+        "title": "Registrer din NGO gratis",
+        "description": "NGO'er og sociale organisationer kan registrere sig gratis for at forbinde de unge, de støtter, med frivillige mentorer.",
+        "feature1": "100% gratis registrering for NGO'er",
+        "feature2": "Ubegrænset adgang til platformen",
+        "feature3": "Dedikeret støtte til organisationer"
       },
       "step2": {
-        "title": "Koppla Ungdomar med Mentorer",
-        "description": "Registrera ungdomarna som får hjälp av din organisation och hjälp dem att hitta mentorer som kan vägleda dem på deras professionella och personliga resa.",
-        "feature1": "Registrera flera unga från organisationen",
-        "feature2": "Följ mentorskapsframsteg",
-        "feature3": "Ta emot sociala påverkansrapporter"
+        "title": "Forbind unge med mentorer",
+        "description": "Registrer de unge, der får hjælp af din organisation, og hjælp dem med at finde mentorer, der kan vejlede dem på deres professionelle og personlige rejse.",
+        "feature1": "Registrer flere unge fra organisationen",
+        "feature2": "Følg mentorskabsfremskridt",
+        "feature3": "Modtag sociale indvirkningsrapporter"
       },
-      "getStarted": "Registrera Min Ideella Organisation"
+      "getStarted": "Registrer min NGO"
     },
     "companies": {
       "step1": {
-        "title": "Företagsvolontärarbete via Mentorskap",
-        "description": "Utveckla volontärprogram för företag genom att låta dina anställda bli volontärmentorer, vilket stärker företagets syfte.",
-        "feature1": "Engagera anställda i sociala initiativ",
-        "feature2": "Utveckla ledare genom mentorskap",
-        "feature3": "Stärk företagskulturen"
+        "title": "Virksomhedsfrivillighed via mentorskab",
+        "description": "Udvikl frivilligprogrammer for virksomheder ved at lade dine ansatte blive frivillige mentorer, hvilket styrker virksomhedens formål.",
+        "feature1": "Engager medarbejdere i sociale initiativer",
+        "feature2": "Udvikl ledere gennem mentorskab",
+        "feature3": "Styrk virksomhedskulturen"
       },
       "step2": {
-        "title": "ESG-rapporter och Social Påverkan",
-        "description": "Få detaljerade rapporter om den sociala påverkan av de mentorskap som dina anställda bedriver, vilket stärker era ESG-mätvärden.",
-        "feature1": "Månatliga rapporter om social påverkan",
-        "feature2": "Mätvärden för ESG-rapportering",
-        "feature3": "Certifikat för företagsvolontärarbete"
+        "title": "ESG-rapporter og social indvirkning",
+        "description": "Få detaljerede rapporter om den sociale indvirkning af de mentorskaber, som dine ansatte udfører, hvilket styrker jeres ESG-målinger.",
+        "feature1": "Månedlige rapporter om social indvirkning",
+        "feature2": "Målinger til ESG-rapportering",
+        "feature3": "Certifikater for virksomhedsfrivillighed"
       },
       "step3": {
-        "title": "Incitament och Förmånspolicys",
-        "description": "Skapa incitament för mentorer bland anställda, såsom betald ledighet, internt erkännande och professionell utveckling.",
-        "feature1": "Tidbank för frivilligt mentorskap",
-        "feature2": "Internt erkännande och gamifiering",
-        "feature3": "Utveckling av mjuka färdigheter (soft skills)"
+        "title": "Incitamenter og personalepolitikker",
+        "description": "Skab incitamenter for mentorer blandt medarbejdere, såsom betalt fritid, intern anerkendelse og professionel udvikling.",
+        "feature1": "Tidsbank til frivilligt mentorskab",
+        "feature2": "Intern anerkendelse og gamificering",
+        "feature3": "Udvikling af bløde færdigheder (soft skills)"
       },
-      "getStarted": "Bli Företagspartner"
+      "getStarted": "Bliv virksomhedspartner"
     },
     "faq": {
       "title": "Ofte stillede spørgsmål",
       "description": "Find svar på de mest almindelige spørgsmål om platformen.",
       "viewAll": "Se alle spørgsmål",
       "q1": {
-        "question": "Är mentorskap verkligen gratis?",
-        "answer": "Ja, alla mentorsessioner på vår plattform är helt gratis. Våra mentorer dedikerar sin tid frivilligt för att hjälpa andra att växa."
+        "question": "Er mentorskab virkelig gratis?",
+        "answer": "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
       },
       "q2": {
         "question": "Hur lång är en mentorskapssession?",
@@ -353,51 +353,52 @@
     }
   },
   "faq": {
-    "title": "Vanliga Frågor",
-    "description": "Hitta svar på de vanligaste frågorna om Menvo-plattformen.",
+    "title": "Ofte stillede spørgsmål",
+    "description": "Find svar på de mest almindelige spørgsmål om platformen.",
+    "viewAll": "Se alle spørgsmål",
     "q1": {
-      "question": "Är mentorskap verkligen gratis?",
-      "answer": "Ja, alla mentorsessioner på vår plattform är helt gratis. Våra mentorer dedikerar sin tid frivilligt för att hjälpa andra att växa."
+      "question": "Er mentorskab virkelig gratis?",
+      "answer": "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
     },
     "q2": {
-      "question": "Hur lång är en mentorskapssession?",
-      "answer": "Standardtiden för en mentorskapssession är 45 minuter. Det är tillräckligt med tid för ett meningsfullt samtal, samtidigt som det respekterar allas scheman."
+      "question": "Hvor lang er en mentorsession?",
+      "answer": "Standardtiden for en mentorsession er 45 minutter. Det er tilstrækkelig tid til en meningsfuld samtale, samtidig med at det respekterer alles tidsplaner."
     },
     "q3": {
-      "question": "Hur ofta kan jag träffa en mentor?",
-      "answer": "Detta beror på mentorns tillgänglighet och preferenser. Vissa är öppna för regelbundna möten, medan andra föredrar engångsmöten."
+      "question": "Hvor ofte kan jeg mødes med en mentor?",
+      "answer": "Dette afhænger af mentorens tilgængelighed og præferencer. Nogle er åbne for regelmæssige møder, mens andre foretrækker engangsmøder."
     },
     "q4": {
-      "question": "Vad händer om jag behöver avboka?",
-      "answer": "Vi ber att avbokning sker minst 24 timmar i förväg, av respekt för mentorns tid. Du kan enkelt omboka via din panel."
+      "question": "Hvad sker der, hvis jeg har brug for at aflyse?",
+      "answer": "Vi beder om, at aflysning sker mindst 24 timer i forvejen af respekt for mentorens tid. Du kan nemt ombooke via dit panel."
     },
     "q5": {
-      "question": "Hur blir jag en verifierad mentor?",
-      "answer": "Efter att du skapat din mentorprofil måste du boka in ett kort verifieringssamtal med vårt team. Detta säkerställer kvaliteten och säkerheten i gemenskapen."
+      "question": "Hvordan bliver jeg en verificeret mentor?",
+      "answer": "Efter du har oprettet din mentorprofil, skal du booke et kort verificeringsopkald med vores team. Dette sikrer kvaliteten og sikkerheden i fællesskabet."
     },
     "q6": {
-      "question": "Är mina uppgifter säkra?",
-      "answer": "Ja, vi tar integritet och säkerhet på stort allvar. Din personliga information skyddas och delas bara med de personer du väljer att ansluta till."
+      "question": "Er mine data sikre?",
+      "answer": "Ja, vi tager privatliv og sikkerhed meget alvorligt. Dine personlige oplysninger beskyttes og deles kun med de personer, du vælger at oprette forbindelse til."
     },
     "q7": {
-      "question": "Hur fungerar det för ideella organisationer (NGOs)?",
-      "answer": "NGOs kan registrera sig gratis och koppla unga personer de assisterar med volontärmentorer. Det är ett sätt att öka organisationens sociala påverkan utan extra kostnad."
+      "question": "Hvordan fungerer det for NGO'er?",
+      "answer": "NGO'er kan registrere sig gratis og forbinde de unge, de hjælper, med frivillige mentorer. Det er en måde at øge organisationens sociale indvirkning på uden omkostninger."
     },
     "q8": {
-      "question": "Kan företag delta?",
-      "answer": "Ja! Företag kan utveckla företagsgemensamma volontärprogram genom mentorskap, erhålla ESG-rapporter och skapa policys som motiverar anställda mentorer."
+      "question": "Kan virksomheder deltage?",
+      "answer": "Ja! Virksomheder kan udvikle programmer for virksomhedsfrivillighed gennem mentorskab, modtage ESG-rapporter og skabe incitamentspolitikker for ansatte som mentorer."
     },
     "q9": {
-      "question": "Hur fungerar tillgång för rekryterare?",
-      "answer": "Denna funktion är under utveckling. Snart kommer rekryterare ha tillgång till kvalificerade talanger på plattformen, alltid med respekt för användarnas integritet."
+      "question": "Hvordan fungerer adgang for rekrutteringsfolk?",
+      "answer": "Denne funktion er under udvikling. Snart vil rekrutteringsfolk få adgang til kvalificerede talenter, der deltager på platformen, altid med respekt for brugernes privatliv."
     },
     "q10": {
-      "question": "Kan jag vara mentor och adept samtidigt?",
-      "answer": "Ja! Du kan ha båda profilerna på plattformen. Många söker vägledning inom specifika områden samtidigt som de mentorar inom sina egna expertisområden."
+      "question": "Kan jeg være både mentor og mentee på samme tid?",
+      "answer": "Ja! Du kan have begge profiler på platformen. Mange professionelle søger mentorskab inden for specifikke områder, samtidig med at de mentorerer inden for deres egen ekspertise."
     },
-    "stillHaveQuestions": "Har du fler frågor?",
-    "supportDescription": "Vårt supportteam finns här för att hjälpa dig med alla frågor du kan ha.",
-    "contactSupport": "Kontakta Support"
+    "stillHaveQuestions": "Har du flere spørgsmål?",
+    "supportDescription": "Vores supportteam er her for at hjælpe dig med alle spørgsmål, du måtte have.",
+    "contactSupport": "Kontakt support"
   },
   "login": {
     "title": "Välkommen tillbaka",
@@ -408,7 +409,7 @@
     "passwordPlaceholder": "Ange ditt lösenord",
     "forgotPassword": "Glömt lösenordet?",
     "loginButton": "Logga in",
-    "loggingIn": "Loggar in...",
+    "loggingIn": "Logger ind...",
     "noAccount": "Har du inget konto?",
     "signUp": "Registrera dig",
     "continueWith": "Fortsätt med",
@@ -423,7 +424,7 @@
       "invalidCredentials": "Fel e-post eller lösenord. Vänligen kontrollera dina uppgifter och försök igen.",
       "emailNotConfirmed": "E-post ej bekräftad. Vänligen kontrollera din inkorg och klicka på bekräftelselänken.",
       "tooManyAttempts": "För många inloggningsförsök. Vänta några minuter innan du försöker igen.",
-      "networkError": "Anslutningsfel. Kontrollera din internetuppkoppling och försök igen.",
+      "networkError": "Forbindelsesfejl. Tjek din internetforbindelse og prøv igen.",
       "unexpected": "Oväntat fel. Försök igen.",
       "loginFailed": "Inloggningen misslyckades. Försök igen."
     }
@@ -445,24 +446,24 @@
     "confirmPassword": "Bekräfta Lösenord",
     "confirmPasswordPlaceholder": "Ange lösenordet igen",
     "mentor": "Mentor",
-    "mentee": "Adept",
+    "mentee": "Mentee",
     "registerButton": "Registrera",
     "creatingAccount": "Skapar konto...",
     "alreadyHaveAccount": "Har du redan ett konto?",
     "signIn": "Logga in",
     "orContinueWith": "Eller fortsätt med e-post",
-    "success": "Kontot skapades framgångsrikt!",
+    "success": "Kontoen blev oprettet!",
     "confirmEmail": "Bekräfta din e-post",
     "confirmEmailDescription": "Ett bekräftelsemail har skickats till {email}. Gå till din inkorg och klicka på länken för att aktivera ditt konto.",
     "nextSteps": "Nästa steg:",
     "nextStepsList": [
-      "Kontrollera din inkorg (och skräppostmapp)",
-      "Klicka på bekräftelselänken i mailet",
-      "Välj din användartyp (mentor eller adept)",
-      "Fyll i din profil med din information",
-      "Vänta på godkännande från vårt team (endast för mentorer)"
+      "Tjek din indbakke (og spammappe)",
+      "Klik på bekræftelseslinket i e-mailen",
+      "Vælg din brugertype (mentor eller mentee)",
+      "Udfyld din profil med dine oplysninger",
+      "Vent på godkendelse fra vores team (kun mentorer)"
     ],
-    "afterConfirmation": "Efter att ha bekräftat din e-post kommer du att kunna välja om du vill vara mentor eller adept och fylla i din profil. Mentorer kommer att granskas av vårt team innan de publiceras.",
+    "afterConfirmation": "Når du har bekræftet din e-mail, vil du kunne vælge, om du vil være mentor eller mentee og udfylde din profil. Mentorer vil gennemgå en valideringsproces med vores team, før de bliver publiceret.",
     "didntReceiveEmail": "Fick du inget mail?",
     "checkSpam": "Kolla din skräppostmapp.",
     "emailExpired": "Har bekräftelselänken gått ut?",
@@ -516,9 +517,9 @@
     }
   },
   "mentors": {
-    "title": "Hitta en Mentor",
+    "title": "Find en mentor",
     "description": "Utforska vårt nätverk av volontärmentorer och hitta den perfekta matchningen för dina behov",
-    "searchPlaceholder": "Sök på namn, specialitet eller nyckelord...",
+    "searchPlaceholder": "Søg efter navn, speciale eller nøgleord...",
     "filtersTitle": "Filter",
     "applyFilters": "Använd Filter",
     "clearFilters": "Rensa",
@@ -823,7 +824,7 @@
   "mentorSuggestion": {
     "loginRequiredTitle": "Inloggning Krävs",
     "loginRequiredDescription": "Du måste vara inloggad för att föreslå ett mentorsämne eller område.",
-    "title": "Föreslå Ämne eller Område",
+    "title": "Foreslå emne eller område",
     "description": "Hittade du inte vad du letade efter? Föreslå nya ämnen eller expertområden som du gärna vill se på plattformen.",
     "observationLabel": "Vad letar du efter?",
     "observationPlaceholder": "Ex: Jag skulle vilja hitta mentorer specialiserade inom Produktdesign, speciellt med erfarenhet i UX Research och digital tillgänglighet...",
@@ -847,7 +848,7 @@
     }
   },
   "metadata": {
-    "title": "MENVO - Volontärmentorskap",
+    "title": "MENVO - Frivilligt mentorskab",
     "description": "Kopplar samman mentorer och adepter för gratis mentorskapssessioner",
     "keywords": [
       "mentorskap",
@@ -879,7 +880,7 @@
     "allCities": "Alla städer",
     "topics": "Mentorskapsämnen",
     "expertise": "Expertisområden",
-    "inclusiveTags": "Inkluderande Etiketter",
+    "inclusiveTags": "Inkluderende tags",
     "experience": "Erfarenhet",
     "experiencePlaceholder": "Års erfarenhet",
     "anyExperience": "Vilken erfarenhet som helst",
@@ -929,7 +930,7 @@
       "evening": "God kväll"
     },
     "mentor": {
-      "welcome": "Välkommen till din mentorpanel. Hantera dina mentorskap och hjälp andra professionella.",
+      "welcome": "Velkommen til dit mentorkontrolpanel. Administrer dine mentorskaber og hjælp andre professionelle.",
       "verification": {
         "pending": "Väntar på Verifiering",
         "approved": "Verifierad Profil",
@@ -1009,7 +1010,7 @@
     },
     "mentor": {
       "title": "Mentor",
-      "description": "Jag vill dela min kunskap och hjälpa andra yrkesverksamma",
+      "description": "Jeg vil dele min viden og hjælpe andre professionelle",
       "benefits": [
         "Dela erfarenheter",
         "Påverka andras karriärer",
