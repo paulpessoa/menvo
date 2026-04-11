@@ -328,24 +328,24 @@
         "answer": "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
       },
       "q2": {
-        "question": "Hur lång är en mentorskapssession?",
-        "answer": "Standardtiden för en mentorskapssession är 45 minuter. Det är tillräckligt med tid för ett meningsfullt samtal, samtidigt som det respekterar allas scheman."
+        "question": "Hvor lang er en mentorsession?",
+        "answer": "Standardtiden for en mentorsession er 45 minutter. Det er tilstrækkelig tid til en meningsfuld samtale, samtidig med at det respekterer alles tidsplaner."
       },
       "q3": {
-        "question": "Hur ofta kan jag träffa en mentor?",
-        "answer": "Detta beror på mentorns tillgänglighet och preferenser. Vissa är öppna för regelbundna möten, medan andra föredrar engångsmöten."
+        "question": "Hvor ofte kan jeg mødes med en mentor?",
+        "answer": "Dette afhænger af mentorens tilgængelighed og præferencer. Nogle er åbne for regelmæssige møder, mens andre foretrækker engangsmøder."
       },
       "q4": {
-        "question": "Vad händer om jag behöver avboka?",
-        "answer": "Vi ber att avbokning sker minst 24 timmar i förväg, av respekt för mentorns tid. Du kan enkelt omboka via din panel."
+        "question": "Hvad sker der, hvis jeg har brug for at aflyse?",
+        "answer": "Vi beder om, at aflysning sker mindst 24 timer i forvejen af respekt for mentorens tid. Du kan nemt ombooke via dit panel."
       },
       "q5": {
-        "question": "Hur blir jag en verifierad mentor?",
-        "answer": "Efter att du skapat din mentorprofil måste du boka in ett kort verifieringssamtal med vårt team. Detta säkerställer kvaliteten och säkerheten i gemenskapen."
+        "question": "Hvordan bliver jeg en verificeret mentor?",
+        "answer": "Efter du har oprettet din mentorprofil, skal du booke et kort verificeringsopkald med vores team. Dette sikrer kvaliteten og sikkerheden i fællesskabet."
       },
       "q6": {
-        "question": "Är mina uppgifter säkra?",
-        "answer": "Ja, vi tar integritet och säkerhet på stort allvar. Din personliga information skyddas och delas bara med de personer du väljer att ansluta till."
+        "question": "Er mine data sikre?",
+        "answer": "Ja, vi tager privatliv og sikkerhed meget alvorligt. Dine personlige oplysninger beskyttes og deles kun med de personer, du vælger at oprette forbindelse til."
       },
       "stillHaveQuestions": "Har du fler frågor?",
       "supportDescription": "Vårt supportteam finns här för att hjälpa dig med alla frågor du kan ha.",
