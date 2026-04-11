@@ -89,8 +89,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Fetch user profile and role
     const fetchUserProfile = useCallback(async (userId: string) => {
         try {
-            console.log('🔄 Fetching profile for user:', userId)
-
             // Get profile
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
@@ -103,7 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return
             }
 
-            console.log('✅ Profile fetched:', profileData)
             setProfile(profileData)
 
             // Get user role
@@ -118,14 +115,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .single()
 
             if (roleError) {
-                // User might not have a role yet (null is expected for new users)
-                console.log('ℹ️  No role found for user (expected for new users):', roleError.message)
                 setRole(null)
                 return
             }
 
             const roleName = roleData?.roles?.name as 'mentor' | 'mentee' | 'admin' | null
-            console.log('✅ User role found:', roleName)
             setRole(roleName)
 
         } catch (error) {
@@ -192,8 +186,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Sign out
     const signOut = useCallback(async () => {
         try {
-            console.log('🔄 Iniciando logout...')
-
             // Clear local state first
             setUser(null)
             setProfile(null)
@@ -206,8 +198,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 console.error('❌ Erro no logout:', error)
                 throw error
             }
-
-            console.log('✅ Logout realizado com sucesso')
 
             // Force redirect to home page
             if (typeof window !== 'undefined') {
@@ -234,8 +224,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             throw new Error('User not authenticated')
         }
 
-        console.log('🔄 Selecting role:', selectedRole, 'for user:', user.id)
-
         try {
             // Use API endpoint to avoid RLS issues
             const response = await fetch('/api/auth/select-role', {
@@ -255,16 +243,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 throw new Error(errorData.error || 'Failed to select role')
             }
 
-            const responseData = await response.json()
-            console.log('✅ Role selection API response:', responseData)
-
             // Update local state immediately
             setRole(selectedRole)
 
             // Refresh profile to get updated data
             await fetchUserProfile(user.id)
-
-            console.log('✅ Role selection completed successfully')
         } catch (error) {
             console.error('❌ Error in selectRole:', error)
             throw error
