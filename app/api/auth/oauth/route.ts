@@ -20,8 +20,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Tipo de usuário inválido" }, { status: 400 })
     }
 
-    console.log(`🔄 Iniciando OAuth com ${provider} para tipo: ${userType}`)
-
     const { data, error } = await supabaseAdmin.auth.signInWithOAuth({
       provider: provider as "google" | "linkedin_oidc",
       options: {
@@ -36,8 +34,6 @@ export async function POST(request: NextRequest) {
       console.error(`❌ Erro no OAuth ${provider}:`, error)
       return NextResponse.json({ error: "Erro na autenticação OAuth" }, { status: 500 })
     }
-
-    console.log(`✅ URL OAuth gerada para ${provider}`)
 
     return NextResponse.json({
       success: true,

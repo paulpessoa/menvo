@@ -14,11 +14,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password, firstName, lastName, userType } = body
 
-    console.log("📝 Dados recebidos:", { email, firstName, lastName, userType })
-
     // Validar entrada
     if (!email || !password || !firstName || !lastName || !userType) {
-      console.error("❌ Campos obrigatórios faltando")
       return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 })
     }
 
@@ -42,8 +39,6 @@ export async function POST(request: NextRequest) {
     const firstNameTrim = firstName.trim()
     const lastNameTrim = lastName.trim()
     const displayName = `${firstNameTrim} ${lastNameTrim}`
-
-    console.log("🔄 Tentando registrar usuário no Supabase Auth...")
 
     // Usar signUp normal que envia automaticamente o email de confirmação
     const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
@@ -83,15 +78,6 @@ export async function POST(request: NextRequest) {
       console.error("❌ Usuário não foi criado")
       return NextResponse.json({ error: "Falha ao criar usuário" }, { status: 500 })
     }
-
-    console.log("✅ Usuário criado no Auth:", authData.user.id)
-
-    console.log("✅ Perfil será criado automaticamente pelo trigger")
-
-    console.log("✅ Validation request será criada automaticamente pelo trigger se necessário")
-    console.log("✅ Email de confirmação será enviado automaticamente pelo Supabase")
-
-    console.log("🎉 Registro concluído com sucesso")
 
     return NextResponse.json({
       success: true,

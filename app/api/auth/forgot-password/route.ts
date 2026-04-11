@@ -21,8 +21,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email inválido" }, { status: 400 })
     }
 
-    console.log("🔄 Enviando email de recuperação para:", email)
-
     const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password`,
     })
@@ -31,8 +29,6 @@ export async function POST(request: NextRequest) {
       console.error("❌ Erro ao enviar email de recuperação:", error)
       return NextResponse.json({ error: "Erro ao enviar email de recuperação" }, { status: 500 })
     }
-
-    console.log("✅ Email de recuperação enviado")
 
     return NextResponse.json({
       success: true,

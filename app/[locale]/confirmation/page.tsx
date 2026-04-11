@@ -28,7 +28,6 @@ export default function ConfirmationPage() {
   useEffect(() => {
     const error = searchParams.get('error')
     const errorCode = searchParams.get('error_code')
-    const errorDescription = searchParams.get('error_description')
 
     // Verificar se é um erro de OTP expirado
     if (error === 'access_denied' && errorCode === 'otp_expired') {
@@ -41,8 +40,6 @@ export default function ConfirmationPage() {
 
     setIsSubmitting(true)
     try {
-      console.log("🎯 ConfirmationPage: Selecionando role:", selectedRole)
-
       // Atualizar role no JWT
       const { error: jwtError } = await supabase.auth.updateUser({
         data: { role: selectedRole }
@@ -61,7 +58,6 @@ export default function ConfirmationPage() {
       // Refresh da sessão para aplicar mudanças
       await supabase.auth.refreshSession()
 
-      console.log("✅ ConfirmationPage: Role definida no JWT com sucesso")
       toast({
         title: "Sucesso",
         description: "Tipo de usuário definido com sucesso!",
@@ -87,29 +83,6 @@ export default function ConfirmationPage() {
       setIsSubmitting(false)
     }
   }
-
-  // // Redirecionar usuários já logados
-  // useEffect(() => {
-  //   if (!loading && user) {
-  //     router.push('/')
-  //   }
-  // }, [user, loading, router])
-
-  // // Mostrar loading enquanto verifica autenticação
-  // if (loading) {
-  //   return (
-  //     <div className="container max-w-lg py-16 flex flex-col items-center text-center">
-  //       <div className="animate-pulse text-muted-foreground">
-  //         {t("common.loading")}
-  //       </div>
-  //     </div>
-  //   )
-  // }
-
-  // // Não renderizar se o usuário está logado
-  // if (user) {
-  //   return null
-  // }
 
   return (
     <div className="container max-w-lg py-16 flex flex-col items-center text-center">

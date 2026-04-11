@@ -82,14 +82,6 @@ export async function POST(request: NextRequest) {
     const actionToken = crypto.randomBytes(32).toString('hex');
 
     // Criar appointment no banco
-    console.log('[APPOINTMENT] Tentando criar agendamento:', {
-      mentor_id: mentorId,
-      mentee_id: user.id,
-      scheduled_at: scheduledAt,
-      duration_minutes: duration,
-      status: 'pending',
-    });
-
     const { data: appointment, error: insertError } = await supabase
       .from('appointments')
       .insert({
@@ -106,11 +98,9 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('[APPOINTMENT] Erro ao criar agendamento:', insertError);
-      console.error('[APPOINTMENT] Detalhes do erro:', JSON.stringify(insertError, null, 2));
       return NextResponse.json(
         { 
-          error: JSON.stringify(insertError),
-          // error: 'Erro ao criar agendamento',
+          error: 'Erro ao criar agendamento',
           details: insertError.message,
           code: insertError.code 
         },
@@ -128,7 +118,6 @@ export async function POST(request: NextRequest) {
         message,
         token: actionToken,
       });
-      console.log('[APPOINTMENT] ✅ Email enviado para o mentor');
     } catch (emailError) {
       console.error('[APPOINTMENT] ⚠️ Erro ao enviar email, mas agendamento foi criado:', emailError);
       // Não falhar a requisição se o email falhar

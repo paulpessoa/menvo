@@ -30,16 +30,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { appointmentId, reason } = body;
 
-    console.log('[CANCEL] Request body:', { appointmentId, reason, userId: user.id });
-
     if (!appointmentId || !reason) {
       return NextResponse.json(
         { error: 'appointmentId e reason são obrigatórios' },
         { status: 400 }
       );
     }
-
-    console.log('[CANCEL] Cancelando appointment:', appointmentId, 'Reason:', reason);
 
     // Buscar appointment
     const { data: appointment, error: fetchError } = await supabase
@@ -77,8 +73,6 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    console.log('[CANCEL] Update data:', updateData);
-
     const { error: updateError } = await supabase
       .from('appointments')
       .update(updateData)
@@ -86,14 +80,11 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('[CANCEL] Erro ao cancelar appointment:', updateError);
-      console.error('[CANCEL] Error details:', JSON.stringify(updateError, null, 2));
       return NextResponse.json(
         { error: 'Erro ao cancelar agendamento', details: updateError.message },
         { status: 500 }
       );
     }
-
-    console.log('[CANCEL] ✅ Appointment cancelado com sucesso');
 
     // TODO: Remover evento do Google Calendar se existir
     // TODO: Enviar email de notificação

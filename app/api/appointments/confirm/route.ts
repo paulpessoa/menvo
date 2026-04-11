@@ -9,15 +9,6 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    // Debug: Verificar variáveis de ambiente
-    console.log("🔍 [CONFIRM] Verificando env vars:", {
-      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      hasGoogleClientId: !!process.env.GOOGLE_CALENDAR_CLIENT_ID,
-      hasGoogleSecret: !!process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
-      hasGoogleRefreshToken: !!process.env.GOOGLE_CALENDAR_REFRESH_TOKEN
-    })
-
     // Usar Service Role para bypass RLS (chamada interna)
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,8 +21,6 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    console.log("✅ [CONFIRM] Using Service Role client")
-
     // Parse do body
     const body = await request.json()
     const { appointmentId: rawAppointmentId, token, mentorNotes } = body
@@ -42,7 +31,6 @@ export async function POST(request: NextRequest) {
 
     if (token) {
       // Buscar por token (fluxo do email)
-      console.log("🔍 [CONFIRM] Buscando appointment por token...")
       const result = await supabase
         .from("appointments")
         .select(
@@ -64,7 +52,6 @@ export async function POST(request: NextRequest) {
           ? parseInt(rawAppointmentId, 10)
           : rawAppointmentId
 
-      console.log("🔍 [CONFIRM] Buscando appointment por ID:", appointmentId)
       const result = await supabase
         .from("appointments")
         .select(
@@ -88,25 +75,14 @@ export async function POST(request: NextRequest) {
 
     if (fetchError) {
       console.error("❌ [CONFIRM] Erro ao buscar appointment:", fetchError)
-      console.error("   Details:", JSON.stringify(fetchError, null, 2))
     }
 
     if (!appointment) {
-      console.error("❌ [CONFIRM] Appointment não encontrado")
-      console.error("   Error:", fetchError)
-
       return NextResponse.json(
         { error: "Agendamento não encontrado ou token inválido" },
         { status: 404 }
       )
     }
-
-    console.log("✅ [CONFIRM] Appointment encontrado:", {
-      id: appointment.id,
-      mentor: appointment.mentor?.full_name,
-      mentee: appointment.mentee?.full_name,
-      status: appointment.status
-    })
 
     // Verificar se já está confirmado
     if (appointment.status === "confirmed") {
@@ -172,11 +148,6 @@ export async function POST(request: NextRequest) {
         const result = await createCalendarEvent(eventData)
         googleEventId = result.eventId
         googleMeetLink = result.meetLink
-
-        console.log("✅ [CONFIRM] Evento criado no Google Calendar:", {
-          eventId: googleEventId,
-          meetLink: googleMeetLink
-        })
       } catch (error) {
         console.error(
           "❌ [CONFIRM] Erro ao criar evento no Google Calendar:",
@@ -212,8 +183,6 @@ export async function POST(request: NextRequest) {
       updateData.notes_mentor = mentorNotes
     }
 
-    console.log("💾 [CONFIRM] Atualizando appointment no banco...", updateData)
-
     const { error: updateError } = await supabase
       .from("appointments")
       .update(updateData)
@@ -229,8 +198,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-
-    console.log("✅ [CONFIRM] Appointment atualizado com sucesso!")
 
     // Enviar email de confirmação
     try {

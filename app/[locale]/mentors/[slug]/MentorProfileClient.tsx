@@ -191,14 +191,12 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                 </Badge>
 
                                 <div className="flex items-center space-x-6 text-sm text-gray-600">
-                                    {mentor.total_sessions > 0 && (
-                                        <div className="flex items-center">
-                                            <MessageCircle className="h-4 w-4 mr-1" />
-                                            <span>{t("sessionsCount", { count: mentor.total_sessions })}</span>
-                                        </div>
-                                    )}
+                                    <div className="flex items-center">
+                                        <MessageCircle className="h-4 w-4 mr-1" />
+                                        <span>{t("sessionsCount", { count: mentor.total_sessions || 0 })}</span>
+                                    </div>
 
-                                    {mentor.experience_years && (
+                                    {mentor.experience_years !== null && (
                                         <div className="flex items-center">
                                             <Briefcase className="h-4 w-4 mr-1" />
                                             <span>{t("yearsExperienceCount", { count: mentor.experience_years })}</span>
@@ -340,7 +338,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         timezone={mentor.timezone || 'America/Sao_Paulo'}
                         showBookingButtons={true}
                         onBookSlot={(slot) => {
-                            console.log('Book slot:', slot)
+                            // Slot booking handled by modal
                         }}
                         compact={true}
                     />

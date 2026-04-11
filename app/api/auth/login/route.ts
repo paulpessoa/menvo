@@ -6,8 +6,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password } = body
 
-    console.log("🔐 Tentativa de login para:", email)
-
     // Validações
     if (!email || !password) {
       return NextResponse.json({ error: "Email e senha são obrigatórios" }, { status: 400 })
@@ -38,8 +36,6 @@ export async function POST(request: NextRequest) {
     if (!authData.user) {
       return NextResponse.json({ error: "Falha no login" }, { status: 500 })
     }
-
-    console.log("✅ Login bem-sucedido para:", authData.user.email)
 
     // Buscar perfil do usuário
     const { data: profile, error: profileError } = await supabase
