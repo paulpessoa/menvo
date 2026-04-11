@@ -1295,5 +1295,16 @@
     "cancelledAt": "Aflyst den {date}",
     "evaluate": "Vurder",
     "joinMeet": "Deltag i Meet"
+  },
+  "events": {
+    "title": "Begivenheder og læring",
+    "subtitle": "Oplev kurser, workshops og begivenheder for at fremskynde din vækst",
+    "searchPlaceholder": "Søg i begivenheder, kurser, workshops...",
+    "list": "Liste",
+    "map": "Kort",
+    "results": "Viser {count} begivenheder",
+    "noEvents": "Ingen begivenheder fundet",
+    "adjustFilters": "Prøv at justere dine filtre eller søgetermer",
+    "clearFilters": "Ryd alle filtre"
   }
 }

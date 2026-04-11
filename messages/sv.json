@@ -1145,5 +1145,16 @@
     "cancelledAt": "Avbokad den {date}",
     "evaluate": "Utvärdera",
     "joinMeet": "Gå med i Meet"
+  },
+  "events": {
+    "title": "Evenemang och lärande",
+    "subtitle": "Upptäck kurser, workshops och evenemang för att påskynda din tillväxt",
+    "searchPlaceholder": "Sök evenemang, kurser, workshops...",
+    "list": "Lista",
+    "map": "Karta",
+    "results": "Visar {count} evenemang",
+    "noEvents": "Inga evenemang hittades",
+    "adjustFilters": "Försök att justera dina filter eller söktermer",
+    "clearFilters": "Rensa alla filter"
   }
 }

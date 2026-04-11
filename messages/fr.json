@@ -1135,5 +1135,16 @@
   "profile": {
     "saving": "Saving...",
     "loading": "Loading..."
+  },
+  "events": {
+    "title": "Events & Learning",
+    "subtitle": "Discover courses, workshops, and events to accelerate your growth",
+    "searchPlaceholder": "Search events, courses, workshops...",
+    "list": "List",
+    "map": "Map",
+    "results": "Showing {count} events",
+    "noEvents": "No events found",
+    "adjustFilters": "Try adjusting your filters or search terms",
+    "clearFilters": "Clear all filters"
   }
 }

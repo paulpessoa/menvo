@@ -13,8 +13,11 @@ import EventMap from "@/components/events/event-map"
 import EventCard from "@/components/events/event-card"
 import EventCalendar from "@/components/events/event-calendar"
 import { mockEvents } from "@/data/mock-events"
+import { useTranslations } from "next-intl"
 
 export default function EventsPage() {
+  const t = useTranslations("events")
+  const commonT = useTranslations("common")
   const [viewMode, setViewMode] = useState<"list" | "map">("list")
   const [showFilters, setShowFilters] = useState(false)
   const [filters, setFilters] = useState<EventFiltersType>({
@@ -126,18 +129,18 @@ export default function EventsPage() {
   ].reduce((sum, count) => sum + count, 0)
 
   return (
-    <div className="container py-8 md:py-12">
+    <div className="container py-8 md:py-12 px-4">
       {/* Header */}
       <div className="flex flex-col space-y-4 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Events & Learning</h1>
-            <p className="text-muted-foreground">Discover courses, workshops, and events to accelerate your growth</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+            <p className="text-muted-foreground">{t("subtitle")}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="lg:hidden">
               <SlidersHorizontal className="h-4 w-4 mr-2" />
-              Filters
+              {commonT("filters")}
               {activeFiltersCount > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 w-5 p-0 text-xs">
                   {activeFiltersCount}
@@ -153,7 +156,7 @@ export default function EventsPage() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search events, courses, workshops..."
+              placeholder={t("searchPlaceholder")}
               className="pl-10"
               value={filters.search}
               onChange={(e) => handleFilterChange({ search: e.target.value })}
@@ -164,11 +167,11 @@ export default function EventsPage() {
               <TabsList>
                 <TabsTrigger value="list" className="flex items-center gap-2">
                   <Grid3X3 className="h-4 w-4" />
-                  <span className="hidden sm:inline">List</span>
+                  <span className="hidden sm:inline">{t("list")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="map" className="flex items-center gap-2">
                   <Map className="h-4 w-4" />
-                  <span className="hidden sm:inline">Map</span>
+                  <span className="hidden sm:inline">{t("map")}</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -178,10 +181,10 @@ export default function EventsPage() {
         {/* Results count */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {filteredEvents.length} events
+            {t("results", { count: filteredEvents.length })}
             {activeFiltersCount > 0 && (
               <Button variant="link" size="sm" onClick={clearFilters} className="ml-2 h-auto p-0">
-                Clear filters
+                {t("clearFilters")}
               </Button>
             )}
           </p>
@@ -214,9 +217,9 @@ export default function EventsPage() {
               {filteredEvents.length === 0 && (
                 <div className="text-center py-12">
                   <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No events found</h3>
-                  <p className="text-muted-foreground mb-4">Try adjusting your filters or search terms</p>
-                  <Button onClick={clearFilters}>Clear all filters</Button>
+                  <h3 className="text-lg font-medium mb-2">{t("noEvents")}</h3>
+                  <p className="text-muted-foreground mb-4">{t("adjustFilters")}</p>
+                  <Button onClick={clearFilters}>{t("clearFilters")}</Button>
                 </div>
               )}
             </TabsContent>

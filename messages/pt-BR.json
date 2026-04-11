@@ -1294,5 +1294,16 @@
     "cancelledAt": "Cancelado em {date}",
     "evaluate": "Avaliar",
     "joinMeet": "Entrar no Meet"
+  },
+  "events": {
+    "title": "Eventos e Aprendizado",
+    "subtitle": "Descubra cursos, workshops e eventos para acelerar seu crescimento",
+    "searchPlaceholder": "Buscar eventos, cursos, workshops...",
+    "list": "Lista",
+    "map": "Mapa",
+    "results": "Mostrando {count} eventos",
+    "noEvents": "Nenhum evento encontrado",
+    "adjustFilters": "Tente ajustar seus filtros ou termos de busca",
+    "clearFilters": "Limpar todos os filtros"
   }
 }
