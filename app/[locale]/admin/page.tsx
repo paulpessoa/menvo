@@ -18,6 +18,7 @@ interface AdminStats {
   totalMentees: number
   totalSessions: number
   recentSignups: number
+  pendingSuggestions: number
 }
 
 export default function AdminDashboard() {
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
     totalMentees: 0,
     totalSessions: 0,
     recentSignups: 0,
+    pendingSuggestions: 0,
   })
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
@@ -85,6 +87,12 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", sevenDaysAgo.toISOString())
 
+      // Sugestões pendentes
+      const { count: pendingSuggestions } = await supabase
+        .from('mentor_suggestions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+
       setStats({
         totalUsers: totalUsers || 0,
         totalMentors,
@@ -93,6 +101,7 @@ export default function AdminDashboard() {
         totalMentees: totalMentees || 0,
         totalSessions: totalSessions || 0,
         recentSignups: recentSignups || 0,
+        pendingSuggestions: pendingSuggestions || 0,
       })
     } catch (error) {
       console.error("Error fetching admin stats:", error)
@@ -102,6 +111,14 @@ export default function AdminDashboard() {
   }
 
   const quickActions = [
+    {
+      title: "Sugestões de Temas",
+      description: "Ver o que os usuários estão pedindo",
+      href: "/admin/suggestions",
+      icon: MessageSquare,
+      color: "bg-blue-600",
+      badge: stats.pendingSuggestions > 0 ? stats.pendingSuggestions : undefined,
+    },
     {
       title: "Gerenciar Mentores",
       description: "Visualizar e verificar todos os mentores",
