@@ -14,10 +14,21 @@ import {
   Briefcase,
   Mail,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  Linkedin,
+  FileText,
+  ExternalLink
 } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface MentorCardProps {
   mentor: {
@@ -35,6 +46,8 @@ interface MentorCardProps {
     location: string | null
     created_at: string
     profile_status?: string
+    linkedin_url?: string | null
+    cv_url?: string | null
   }
   onVerificationChange?: (mentorId: string, verified: boolean) => void
   showActions?: boolean
@@ -178,10 +191,36 @@ export function MentorCard({
               </div>
             )}
 
-            {/* Contact */}
-            <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-              <Mail className="h-4 w-4" />
-              <span className="truncate">{mentor.email}</span>
+            {/* Contact & Social */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Mail className="h-4 w-4" />
+                <span className="truncate">{mentor.email}</span>
+              </div>
+
+              {mentor.linkedin_url && (
+                <a 
+                  href={mentor.linkedin_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                >
+                  <Linkedin className="h-4 w-4" />
+                  LinkedIn
+                </a>
+              )}
+
+              {mentor.cv_url && (
+                <a 
+                  href={mentor.cv_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-sm text-green-600 hover:underline"
+                >
+                  <FileText className="h-4 w-4" />
+                  Currículo
+                </a>
+              )}
             </div>
 
             {/* Location */}
@@ -194,8 +233,8 @@ export function MentorCard({
 
             {/* Bio */}
             {mentor.bio && (
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                {mentor.bio}
+              <p className="text-sm text-muted-foreground mb-3 line-clamp-2 italic">
+                "{mentor.bio}"
               </p>
             )}
 
@@ -246,7 +285,7 @@ export function MentorCard({
 
             {/* Actions */}
             {showActions && (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {!mentor.verified ? (
                   <Button
                     size="sm"
@@ -282,10 +321,89 @@ export function MentorCard({
                   </Button>
                 )}
 
-                <Button size="sm" variant="outline">
-                  <Eye className="h-4 w-4 mr-1" />
-                  Ver Perfil
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline">
+                      <Eye className="h-4 w-4 mr-1" />
+                      Detalhes
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>{mentor.full_name}</DialogTitle>
+                      <DialogDescription>
+                        {mentor.current_position} {mentor.current_company && `@ ${mentor.current_company}`}
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-6 pt-4">
+                      <div className="flex gap-4">
+                        <Avatar className="h-20 w-20 border-2">
+                          <AvatarImage src={mentor.avatar_url || undefined} />
+                          <AvatarFallback className="text-xl">
+                            {getInitials(mentor.full_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            {mentor.linkedin_url && (
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={mentor.linkedin_url} target="_blank" rel="noopener noreferrer">
+                                  <Linkedin className="h-4 w-4 mr-2 text-blue-600" />
+                                  LinkedIn
+                                </a>
+                              </Button>
+                            )}
+                            {mentor.cv_url && (
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={mentor.cv_url} target="_blank" rel="noopener noreferrer">
+                                  <FileText className="h-4 w-4 mr-2 text-green-600" />
+                                  Currículo (PDF)
+                                </a>
+                              </Button>
+                            )}
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={`mailto:${mentor.email}`}>
+                                <Mail className="h-4 w-4 mr-2" />
+                                Enviar E-mail
+                              </a>
+                            </Button>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            ID: <code className="bg-muted px-1 rounded">{mentor.id}</code>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="font-semibold border-b pb-1">Sobre o Mentor</h4>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {mentor.bio || "Nenhuma biografia informada."}
+                        </p>
+                      </div>
+
+                      {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="font-semibold border-b pb-1">Áreas de Expertise</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {mentor.expertise_areas.map((area, index) => (
+                              <Badge key={index} variant="secondary">{area}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="pt-4 flex justify-end gap-2 border-t">
+                        <Button variant="ghost" asChild>
+                          <Link href={`/mentors/${mentor.slug || mentor.id}`} target="_blank">
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Ver Perfil Público
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             )}
           </div>
