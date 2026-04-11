@@ -13,7 +13,7 @@ import {
   User,
   ArrowLeft,
   Filter
-} from "lucide-center"
+} from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { mentorSuggestionService } from "@/services/mentors/suggestions"
