@@ -36,10 +36,18 @@
       "successDescription": "Vous pouvez modifier cette préférence à tout moment dans le menu Paramètres après vous être connecté.",
       "button": "Commencer à naviguer"
     },
+    "constructionWarning": {
+      "title": "Plateforme en Construction",
+      "description": "Menvo est construit avec soin. Nous comptons sur vos retours et suggestions pour nous améliorer et toucher plus de monde !"
+    },
     "administration": "Administration",
-    "french": "French",
-    "danish": "Danish",
-    "swedish": "Swedish"
+    "progress": "Progression",
+    "confirmTitle": "Êtes-vous sûr ?",
+    "confirmDesc": "Cette action ne peut pas être annulée.",
+    "confirmAction": "Oui, confirmer",
+    "french": "Français",
+    "danish": "Danois",
+    "swedish": "Suédois"
   },
   "header": {
     "title": "MENVO - Mentors Bénévoles",
