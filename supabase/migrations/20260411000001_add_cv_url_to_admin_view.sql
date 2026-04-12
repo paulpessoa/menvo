@@ -1,5 +1,8 @@
--- Atualizar mentors_admin_view para incluir cv_url
-CREATE OR REPLACE VIEW public.mentors_admin_view AS
+-- Remover a view existente para permitir alteração na ordem/estrutura das colunas
+DROP VIEW IF EXISTS public.mentors_admin_view;
+
+-- Recriar mentors_admin_view incluindo cv_url
+CREATE VIEW public.mentors_admin_view AS
  SELECT p.id,
     p.email,
     p.first_name,
