@@ -1,64 +1,33 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { RequireRole } from "@/lib/auth/auth-guard"
+import { adminReportsService, AdminStats } from "@/lib/services/admin-reports.service"
 import {
   Users,
   Building2,
   UserCheck,
   Clock,
   TrendingUp,
-  TrendingDown,
   Download,
   Calendar,
   Star,
   Target,
   Award,
   Activity,
-  BarChart3,
-  PieChart,
   XCircle,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from "lucide-react"
+import { toast } from "sonner"
 
-// Dados mockados para ilustrar o potencial
-const mockData = {
-  overview: {
-    totalUsers: 2847,
-    growthUsers: 12.5,
-    totalMentors: 342,
-    growthMentors: 8.3,
-    totalMentees: 1893,
-    growthMentees: 15.2,
-    totalCompanies: 127,
-    growthCompanies: 6.7,
-  },
-  mentorships: {
-    totalSessions: 1456,
-    completedSessions: 1289,
-    cancelledSessions: 167,
-    totalHours: 1089,
-    avgDuration: 45,
-    completionRate: 88.5,
-    cancellationRate: 11.5,
-  },
-  ratings: {
-    avgRating: 4.7,
-    totalReviews: 1156,
-    distribution: [
-      { stars: 5, count: 823, percentage: 71.2 },
-      { stars: 4, count: 245, percentage: 21.2 },
-      { stars: 3, count: 67, percentage: 5.8 },
-      { stars: 2, count: 15, percentage: 1.3 },
-      { stars: 1, count: 6, percentage: 0.5 },
-    ],
-    nps: 78,
-  },
+// Dados mockados para o que ainda não implementamos (Rankings e Crescimento)
+const mockRankingsData = {
   topMentors: [
     { name: "Maria Santos", sessions: 89, rating: 4.9, hours: 67 },
     { name: "João Silva", sessions: 76, rating: 4.8, hours: 57 },
@@ -93,29 +62,54 @@ const mockData = {
 
 export default function AdminReportsPage() {
   const [timeRange, setTimeRange] = useState("30")
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState<AdminStats | null>(null)
+
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    try {
+      const [overview, mentorships, ratings] = await Promise.all([
+        adminReportsService.getOverviewStats(),
+        adminReportsService.getMentorshipStats(),
+        adminReportsService.getRatingStats()
+      ])
+
+      setStats({ overview, mentorships, ratings })
+    } catch (error) {
+      console.error("Error loading reports:", error)
+      toast.error("Erro ao carregar dados do relatório")
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const exportReport = () => {
+    if (!stats) return
+
     const csvContent = `
 Relatório da Plataforma MENVO
 Gerado em: ${new Date().toLocaleString("pt-BR")}
 
 VISÃO GERAL
-Total de Usuários,${mockData.overview.totalUsers}
-Total de Mentores,${mockData.overview.totalMentors}
-Total de Mentees,${mockData.overview.totalMentees}
-Empresas Parceiras,${mockData.overview.totalCompanies}
+Total de Usuários,${stats.overview.totalUsers}
+Total de Mentores,${stats.overview.totalMentors}
+Total de Mentees,${stats.overview.totalMentees}
+Empresas Parceiras,${stats.overview.totalCompanies}
 
 MENTORIAS
-Total de Sessões,${mockData.mentorships.totalSessions}
-Sessões Completadas,${mockData.mentorships.completedSessions}
-Sessões Canceladas,${mockData.mentorships.cancelledSessions}
-Total de Horas,${mockData.mentorships.totalHours}
-Taxa de Conclusão,${mockData.mentorships.completionRate}%
+Total de Sessões,${stats.mentorships.totalSessions}
+Sessões Completadas,${stats.mentorships.completedSessions}
+Sessões Canceladas,${stats.mentorships.cancelledSessions}
+Total de Horas,${stats.mentorships.totalHours}
+Taxa de Conclusão,${stats.mentorships.completionRate}%
 
 AVALIAÇÕES
-Média de Avaliação,${mockData.ratings.avgRating}
-Total de Avaliações,${mockData.ratings.totalReviews}
-NPS,${mockData.ratings.nps}
+Média de Avaliação,${stats.ratings.avgRating}
+Total de Avaliações,${stats.ratings.totalReviews}
     `.trim()
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
@@ -127,6 +121,17 @@ NPS,${mockData.ratings.nps}
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  if (loading && !stats) {
+    return (
+      <RequireRole roles={['admin']}>
+        <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 font-medium">Carregando métricas reais...</span>
+        </div>
+      </RequireRole>
+    )
   }
 
   return (
@@ -151,7 +156,7 @@ NPS,${mockData.ratings.nps}
                   <SelectItem value="365">Último ano</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={exportReport}>
+              <Button onClick={exportReport} disabled={!stats}>
                 <Download className="h-4 w-4 mr-2" />
                 Exportar
               </Button>
@@ -170,118 +175,84 @@ NPS,${mockData.ratings.nps}
             {/* Visão Geral */}
             <TabsContent value="overview" className="space-y-6">
               {/* KPIs Principais */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.overview.totalUsers.toLocaleString()}</div>
-                    <div className="flex items-center text-xs text-green-600 mt-1">
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      +{mockData.overview.growthUsers}% vs mês anterior
-                    </div>
-                  </CardContent>
-                </Card>
+              {stats && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.overview.totalUsers.toLocaleString()}</div>
+                      <div className="flex items-center text-xs text-muted-foreground mt-1">
+                        Dados reais do sistema
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Mentores Ativos</CardTitle>
-                    <UserCheck className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.overview.totalMentors}</div>
-                    <div className="flex items-center text-xs text-green-600 mt-1">
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      +{mockData.overview.growthMentors}% vs mês anterior
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Mentores Ativos</CardTitle>
+                      <UserCheck className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.overview.totalMentors}</div>
+                      <div className="flex items-center text-xs text-muted-foreground mt-1">
+                        Mentores registrados
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Mentees</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.overview.totalMentees.toLocaleString()}</div>
-                    <div className="flex items-center text-xs text-green-600 mt-1">
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      +{mockData.overview.growthMentees}% vs mês anterior
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Mentees</CardTitle>
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.overview.totalMentees.toLocaleString()}</div>
+                      <div className="flex items-center text-xs text-muted-foreground mt-1">
+                        Mentorizados registrados
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Empresas Parceiras</CardTitle>
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.overview.totalCompanies}</div>
-                    <div className="flex items-center text-xs text-green-600 mt-1">
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      +{mockData.overview.growthCompanies}% vs mês anterior
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Empresas Parceiras</CardTitle>
+                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.overview.totalCompanies}</div>
+                      <div className="flex items-center text-xs text-muted-foreground mt-1">
+                        Com empresa no perfil
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
 
-              {/* Gráfico de Crescimento Mensal */}
+              {/* Gráfico de Crescimento Mensal (Ainda Mock) */}
               <Card>
                 <CardHeader>
                   <CardTitle>Crescimento Mensal</CardTitle>
-                  <CardDescription>Evolução de usuários, sessões e horas nos últimos 6 meses</CardDescription>
+                  <CardDescription>Evolução de usuários, sessões e horas nos últimos 6 meses (Projeção)</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {mockData.monthlyGrowth.map((month) => (
+                  <div className="space-y-4 text-muted-foreground">
+                    {mockRankingsData.monthlyGrowth.map((month) => (
                       <div key={month.month} className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-medium">{month.month}</span>
-                          <div className="flex gap-4 text-xs text-muted-foreground">
+                          <div className="flex gap-4 text-xs">
                             <span>{month.users} usuários</span>
                             <span>{month.sessions} sessões</span>
-                            <span>{month.hours}h</span>
                           </div>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-100 rounded-full h-2">
                           <div
-                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all"
+                            className="bg-primary/30 h-2 rounded-full transition-all"
                             style={{ width: `${(month.users / 3000) * 100}%` }}
                           />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tópicos Mais Populares */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Tópicos Mais Procurados</CardTitle>
-                  <CardDescription>Áreas de interesse mais solicitadas nas mentorias</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {mockData.topicsPopularity.map((topic, index) => (
-                      <div key={topic.topic} className="flex items-center gap-4">
-                        <Badge variant="outline" className="w-8 h-8 rounded-full flex items-center justify-center">
-                          {index + 1}
-                        </Badge>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium">{topic.topic}</span>
-                            <span className="text-sm text-muted-foreground">{topic.count} mentorias</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-indigo-600 h-2 rounded-full"
-                              style={{ width: `${(topic.count / 342) * 100}%` }}
-                            />
-                          </div>
                         </div>
                       </div>
                     ))}
@@ -292,213 +263,163 @@ NPS,${mockData.ratings.nps}
 
             {/* Mentorias */}
             <TabsContent value="mentorships" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total de Sessões</CardTitle>
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.mentorships.totalSessions.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {mockData.mentorships.completedSessions} completadas
-                    </p>
-                  </CardContent>
-                </Card>
+              {stats && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total de Sessões</CardTitle>
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.mentorships.totalSessions.toLocaleString()}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {stats.mentorships.completedSessions} completadas
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Horas de Mentoria</CardTitle>
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.mentorships.totalHours.toLocaleString()}h</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Média de {mockData.mentorships.avgDuration} min/sessão
-                    </p>
-                  </CardContent>
-                </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Horas de Mentoria</CardTitle>
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.mentorships.totalHours.toLocaleString()}h</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Baseado em sessões completadas
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Taxa de Conclusão</CardTitle>
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">{mockData.mentorships.completionRate}%</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {mockData.mentorships.completedSessions} de {mockData.mentorships.totalSessions}
-                    </p>
-                  </CardContent>
-                </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Taxa de Conclusão</CardTitle>
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">{stats.mentorships.completionRate}%</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {stats.mentorships.completedSessions} de {stats.mentorships.totalSessions}
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Taxa de Cancelamento</CardTitle>
-                    <XCircle className="h-4 w-4 text-red-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-red-600">{mockData.mentorships.cancellationRate}%</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {mockData.mentorships.cancelledSessions} canceladas
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Distribuição de Status */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Distribuição de Sessões</CardTitle>
-                  <CardDescription>Status das mentorias realizadas</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
-                        <span className="text-sm">Completadas</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{mockData.mentorships.completedSessions}</span>
-                        <span className="text-xs text-muted-foreground">
-                          ({mockData.mentorships.completionRate}%)
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <span className="text-sm">Canceladas</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{mockData.mentorships.cancelledSessions}</span>
-                        <span className="text-xs text-muted-foreground">
-                          ({mockData.mentorships.cancellationRate}%)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Taxa de Cancelamento</CardTitle>
+                      <XCircle className="h-4 w-4 text-red-600" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-red-600">{stats.mentorships.cancellationRate}%</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {stats.mentorships.cancelledSessions} canceladas
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </TabsContent>
 
             {/* Avaliações */}
             <TabsContent value="ratings" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {stats && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Avaliação Média</CardTitle>
+                      <Star className="h-4 w-4 text-yellow-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.ratings.avgRating}</div>
+                      <div className="flex items-center gap-1 mt-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-4 w-4 ${star <= stats.ratings.avgRating
+                                ? "fill-yellow-500 text-yellow-500"
+                                : "text-gray-300"
+                              }`}
+                          />
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total de Avaliações</CardTitle>
+                      <Activity className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{stats.ratings.totalReviews.toLocaleString()}</div>
+                      <p className="text-xs text-muted-foreground mt-1">Feedbacks reais</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">NPS</CardTitle>
+                      <Target className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">--</div>
+                      <p className="text-xs text-muted-foreground mt-1">Em breve</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {/* Distribuição de Avaliações */}
+              {stats && stats.ratings.distribution.length > 0 && (
                 <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Avaliação Média</CardTitle>
-                    <Star className="h-4 w-4 text-yellow-500" />
+                  <CardHeader>
+                    <CardTitle>Distribuição de Avaliações</CardTitle>
+                    <CardDescription>Como os usuários avaliam as mentorias reais</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{mockData.ratings.avgRating}</div>
-                    <div className="flex items-center gap-1 mt-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`h-4 w-4 ${star <= mockData.ratings.avgRating
-                              ? "fill-yellow-500 text-yellow-500"
-                              : "text-gray-300"
-                            }`}
-                        />
+                    <div className="space-y-4">
+                      {stats.ratings.distribution.map((item) => (
+                        <div key={item.stars} className="flex items-center gap-4">
+                          <div className="flex items-center gap-1 w-20">
+                            <span className="text-sm font-medium">{item.stars}</span>
+                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                              <div
+                                className="bg-yellow-500 h-3 rounded-full transition-all"
+                                style={{ width: `${item.percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="w-24 text-right">
+                            <span className="text-sm font-medium">{item.count}</span>
+                            <span className="text-xs text-muted-foreground ml-1">({item.percentage}%)</span>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </CardContent>
                 </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total de Avaliações</CardTitle>
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{mockData.ratings.totalReviews.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Feedbacks recebidos</p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">NPS</CardTitle>
-                    <Target className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">{mockData.ratings.nps}</div>
-                    <p className="text-xs text-muted-foreground mt-1">Net Promoter Score</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Distribuição de Avaliações */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Distribuição de Avaliações</CardTitle>
-                  <CardDescription>Como os usuários avaliam as mentorias</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {mockData.ratings.distribution.map((item) => (
-                      <div key={item.stars} className="flex items-center gap-4">
-                        <div className="flex items-center gap-1 w-20">
-                          <span className="text-sm font-medium">{item.stars}</span>
-                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="w-full bg-gray-200 rounded-full h-3">
-                            <div
-                              className="bg-yellow-500 h-3 rounded-full transition-all"
-                              style={{ width: `${item.percentage}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="w-24 text-right">
-                          <span className="text-sm font-medium">{item.count}</span>
-                          <span className="text-xs text-muted-foreground ml-1">({item.percentage}%)</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              )}
             </TabsContent>
 
-            {/* Crescimento */}
+            {/* Crescimento (Ainda Mock para MVP) */}
             <TabsContent value="growth" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Evolução da Plataforma</CardTitle>
-                  <CardDescription>Crescimento nos últimos 6 meses</CardDescription>
+                  <CardDescription>Crescimento nos últimos meses (Simulado)</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-8">
-                    {mockData.monthlyGrowth.map((month, index) => {
-                      const prevMonth = index > 0 ? mockData.monthlyGrowth[index - 1] : null
-                      const userGrowth = prevMonth
-                        ? ((month.users - prevMonth.users) / prevMonth.users) * 100
-                        : 0
-                      const sessionGrowth = prevMonth
-                        ? ((month.sessions - prevMonth.sessions) / prevMonth.sessions) * 100
-                        : 0
-
+                    {mockRankingsData.monthlyGrowth.map((month, index) => {
                       return (
                         <div key={month.month} className="space-y-3">
                           <div className="flex items-center justify-between">
                             <h4 className="font-semibold">{month.month}</h4>
-                            {prevMonth && (
-                              <div className="flex gap-4 text-xs">
-                                <span className="flex items-center gap-1 text-green-600">
-                                  <TrendingUp className="h-3 w-3" />
-                                  +{userGrowth.toFixed(1)}% usuários
-                                </span>
-                                <span className="flex items-center gap-1 text-blue-600">
-                                  <TrendingUp className="h-3 w-3" />
-                                  +{sessionGrowth.toFixed(1)}% sessões
-                                </span>
-                              </div>
-                            )}
                           </div>
-                          <div className="grid grid-cols-3 gap-4">
+                          <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                               <p className="text-xs text-muted-foreground">Usuários</p>
                               <p className="text-2xl font-bold">{month.users.toLocaleString()}</p>
@@ -506,10 +427,6 @@ NPS,${mockData.ratings.nps}
                             <div className="space-y-1">
                               <p className="text-xs text-muted-foreground">Sessões</p>
                               <p className="text-2xl font-bold">{month.sessions}</p>
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-xs text-muted-foreground">Horas</p>
-                              <p className="text-2xl font-bold">{month.hours}h</p>
                             </div>
                           </div>
                         </div>
@@ -520,7 +437,7 @@ NPS,${mockData.ratings.nps}
               </Card>
             </TabsContent>
 
-            {/* Rankings */}
+            {/* Rankings (Ainda Mock para MVP) */}
             <TabsContent value="rankings" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Top Mentores */}
@@ -528,13 +445,13 @@ NPS,${mockData.ratings.nps}
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Award className="h-5 w-5 text-yellow-500" />
-                      Top 5 Mentores
+                      Top 5 Mentores (Exemplo)
                     </CardTitle>
-                    <CardDescription>Mentores mais ativos e bem avaliados</CardDescription>
+                    <CardDescription>Mentores com mais sessões cadastradas</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {mockData.topMentors.map((mentor, index) => (
+                      {mockRankingsData.topMentors.map((mentor, index) => (
                         <div key={mentor.name} className="flex items-center gap-4">
                           <Badge
                             variant={index === 0 ? "default" : "outline"}
@@ -546,7 +463,6 @@ NPS,${mockData.ratings.nps}
                             <p className="font-medium text-sm">{mentor.name}</p>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                               <span>{mentor.sessions} sessões</span>
-                              <span>{mentor.hours}h</span>
                               <span className="flex items-center gap-1">
                                 <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                 {mentor.rating}
@@ -564,13 +480,13 @@ NPS,${mockData.ratings.nps}
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-blue-500" />
-                      Top 5 Empresas
+                      Top 5 Empresas (Exemplo)
                     </CardTitle>
-                    <CardDescription>Empresas com mais mentores ativos</CardDescription>
+                    <CardDescription>Empresas representadas na plataforma</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {mockData.topCompanies.map((company, index) => (
+                      {mockRankingsData.topCompanies.map((company, index) => (
                         <div key={company.name} className="flex items-center gap-4">
                           <Badge
                             variant={index === 0 ? "default" : "outline"}
@@ -582,7 +498,6 @@ NPS,${mockData.ratings.nps}
                             <p className="font-medium text-sm">{company.name}</p>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                               <span>{company.mentors} mentores</span>
-                              <span>{company.sessions} sessões</span>
                             </div>
                           </div>
                         </div>
