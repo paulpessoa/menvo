@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { MessagesBadge } from "@/components/MessagesBadge"
+import { LanguageSelector } from "@/components/LanguageSelector"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -126,6 +127,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSelector />
           {/* Messages Badge */}
           <MessagesBadge />
 

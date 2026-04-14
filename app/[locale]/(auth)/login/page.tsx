@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { signIn, signInWithProvider, user, role, loading } = useAuth()
+  const { signIn, signInWithProvider, user, role, loading, getDefaultRedirectPath } = useAuth()
 
   const isAuthenticated = !!user && !loading
   const needsRoleSelection = () => user && !role
@@ -32,10 +32,10 @@ export default function LoginPage() {
       if (needsRoleSelection()) {
         router.push("/auth/select-role")
       } else {
-        router.push("/dashboard")
+        router.push(getDefaultRedirectPath())
       }
     }
-  }, [isAuthenticated, needsRoleSelection, router])
+  }, [isAuthenticated, needsRoleSelection, router, getDefaultRedirectPath])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
