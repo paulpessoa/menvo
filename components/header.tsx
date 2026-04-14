@@ -45,12 +45,8 @@ export default function Header() {
     user,
     profile,
     role,
+    loading,
     signOut,
-    canAdminSystem,
-    canAdminUsers,
-    canAdminVerifications,
-    canValidateActivities,
-    canViewReports,
     isAdmin
   } = useAuth()
 
@@ -130,7 +126,11 @@ export default function Header() {
           {/* Messages Badge */}
           <MessagesBadge />
 
-          {isAuthenticated ? (
+          {loading ? (
+            <div className="h-9 w-9 flex items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
