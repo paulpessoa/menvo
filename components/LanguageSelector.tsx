@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Globe, Check } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter } from "@/i18n/routing"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { routing } from "@/i18n/routing"
 import { useLocale, useTranslations } from "next-intl"
 
 export function LanguageSelector() {
@@ -29,9 +28,8 @@ export function LanguageSelector() {
   ]
 
   const handleLanguageChange = (newLocale: string) => {
-    // Replaces the locale in the current pathname
-    const newPath = pathname.replace(`/${locale}`, `/${newLocale}`)
-    router.push(newPath)
+    // next-intl handling: router.replace keeps the same path but changes the locale
+    router.replace(pathname, { locale: newLocale as any })
   }
 
   return (
