@@ -15,7 +15,8 @@ import {
   UserCheck,
   BarChart3,
   Cog,
-  HeartHandshake
+  HeartHandshake,
+  Loader2
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { MessagesBadge } from "@/components/MessagesBadge"
