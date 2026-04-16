@@ -47,7 +47,8 @@
     "confirmAction": "Oui, confirmer",
     "french": "Français",
     "danish": "Danois",
-    "swedish": "Suédois"
+    "swedish": "Suédois",
+    "organizations": "Organisations"
   },
   "header": {
     "title": "MENVO - Mentors Bénévoles",
@@ -60,7 +61,8 @@
       "adminPanel": "Panneau d'administration",
       "logout": "Déconnexion",
       "administration": "Administration",
-      "user": "Utilisateur"
+      "user": "Utilisateur",
+      "createOrganization": "Créer une organisation"
     }
   },
   "home": {

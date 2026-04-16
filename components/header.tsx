@@ -65,19 +65,19 @@ export default function Header() {
   ]
 
   const userNavigation = isAuthenticated
-    ? isAdmin
-      ? [
-          { name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield },
-          { name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 },
-          { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
-        ]
-      : [
-          { name: t("header.userMenu.dashboard"), href: "/dashboard", icon: User },
-          { name: t("header.userMenu.profile"), href: "/profile", icon: User },
-          { name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 },
-          { name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare },
-          { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
-        ]
+    ? [
+        ...(isAdmin
+          ? [{ name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield }]
+          : [
+              { name: t("header.userMenu.dashboard"), href: "/dashboard", icon: User },
+              { name: t("header.userMenu.profile"), href: "/profile", icon: User }
+            ]),
+        ...((isAdmin || role === "mentor")
+          ? [{ name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 }]
+          : []),
+        { name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare },
+        { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
+      ]
     : []
 
   const handleSignOut = async () => {

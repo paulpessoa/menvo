@@ -47,7 +47,8 @@
     "confirmAction": "Ja, bekræft",
     "french": "Fransk",
     "danish": "Dansk",
-    "swedish": "Svensk"
+    "swedish": "Svensk",
+    "organizations": "Organisationer"
   },
   "header": {
     "title": "MENVO - Frivillige Mentorer",
@@ -60,7 +61,8 @@
       "adminPanel": "Administrativt panel",
       "logout": "Log ud",
       "administration": "Administration",
-      "user": "Bruger"
+      "user": "Bruger",
+      "createOrganization": "Opret organisation"
     }
   },
   "home": {

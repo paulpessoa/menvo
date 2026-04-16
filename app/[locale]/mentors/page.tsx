@@ -39,7 +39,7 @@ import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { createClient } from "@/utils/supabase/client"
-import { MentorCard } from "@/components/mentors/MentorCard"
+import { MentorCard } from "@/components/admin/MentorCard"
 
 interface MentorProfile {
   id: string

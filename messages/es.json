@@ -47,7 +47,8 @@
     "confirmAction": "Sí, confirmar",
     "french": "Francés",
     "danish": "Danés",
-    "swedish": "Sueco"
+    "swedish": "Sueco",
+    "organizations": "Organizaciones"
   },
   "header": {
     "title": "MENVO - Mentores Voluntarios",
@@ -59,8 +60,9 @@
       "settings": "Configuración",
       "adminPanel": "Panel Administrativo",
       "logout": "Cerrar sesión",
-      "administration": "Administración",
-      "user": "Usuario"
+      "administration": "Administration",
+      "user": "Usuario",
+      "createOrganization": "Crear Organización"
     }
   },
   "home": {
