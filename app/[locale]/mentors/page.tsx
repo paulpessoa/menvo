@@ -31,7 +31,8 @@ import {
   Briefcase,
   Heart,
   MessageCircle,
-  Loader2
+  Loader2,
+  Building2
 } from "lucide-react"
 
 import { useRouter } from "next/navigation"
@@ -62,6 +63,7 @@ interface MentorProfile {
   total_sessions: number
   experience_years: number | null
   slug: string | null
+  organization_ids: string[] | null
 }
 
 interface FilterState {
@@ -75,6 +77,7 @@ interface FilterState {
   priceRange: [number, number]
   availabilityStatus: string
   experienceYears: string
+  organizationId: string
 }
 
 const initialFilters: FilterState = {
@@ -87,7 +90,8 @@ const initialFilters: FilterState = {
   inclusiveTags: [],
   priceRange: [0, 500],
   availabilityStatus: "all",
-  experienceYears: "all"
+  experienceYears: "all",
+  organizationId: "all"
 }
 
 const ITEMS_PER_PAGE = 12
@@ -108,7 +112,8 @@ export default function MentorsPage() {
     cities: [] as string[],
     languages: [] as string[],
     topics: [] as string[],
-    inclusiveTags: [] as string[]
+    inclusiveTags: [] as string[],
+    organizations: [] as { id: string, name: string }[]
   })
 
   const supabase = createClient()
@@ -146,7 +151,8 @@ export default function MentorsPage() {
           reviews,
           sessions,
           experience_years,
-          slug
+          slug,
+          organization_ids
         `, { count: 'exact' })
 
       // Apply Filters
@@ -154,6 +160,10 @@ export default function MentorsPage() {
         const searchTerm = `%${filters.search}%`
         // Usar or com ilike de forma resiliente
         query = query.or(`full_name.ilike.${searchTerm},current_position.ilike.${searchTerm},current_company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
+      }
+
+      if (filters.organizationId && filters.organizationId !== 'all') {
+        query = query.contains('organization_ids', [filters.organizationId])
       }
 
       if (filters.country && filters.country !== 'all') {
@@ -280,21 +290,42 @@ export default function MentorsPage() {
         cities: Array.from(cities).sort(),
         languages: Array.from(languages).sort(),
         topics: Array.from(topics).sort(),
-        inclusiveTags: Array.from(inclusiveTags).sort()
+        inclusiveTags: Array.from(inclusiveTags).sort(),
+        organizations: availableFilters.organizations
       })
     } catch (error) {
       console.error('Error fetching filter options:', error)
     }
   }
 
+  const fetchOrganizations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('id, name')
+        .eq('status', 'active')
+        .order('name')
+      
+      if (error) throw error
+      
+      setAvailableFilters(prev => ({
+        ...prev,
+        organizations: data || []
+      }))
+    } catch (error) {
+      console.error('Error fetching organizations:', error)
+    }
+  }
+
   // Effect to handle initial load and filter changes
   useEffect(() => {
     fetchMentors(true)
-  }, [filters.search, filters.country, filters.state, filters.city, filters.languages, filters.topics, filters.inclusiveTags, filters.availabilityStatus, filters.experienceYears])
+  }, [filters.search, filters.country, filters.state, filters.city, filters.languages, filters.topics, filters.inclusiveTags, filters.availabilityStatus, filters.experienceYears, filters.organizationId])
 
   // Initial load of filter options
   useEffect(() => {
     fetchFilterOptions()
+    fetchOrganizations()
   }, [])
 
   const loadMore = () => {
@@ -326,6 +357,7 @@ export default function MentorsPage() {
     if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 500) count++
     if (filters.availabilityStatus !== 'all') count++
     if (filters.experienceYears !== 'all') count++
+    if (filters.organizationId !== 'all') count++
     return count
   }, [filters])
 
@@ -374,6 +406,26 @@ export default function MentorsPage() {
             </SheetHeader>
 
             <div className="mt-6 space-y-6">
+              <div className="space-y-3">
+                <h3 className="font-medium flex items-center">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  {t("organization")}
+                </h3>
+                <Select value={filters.organizationId} onValueChange={(value) =>
+                  setFilters(prev => ({ ...prev, organizationId: value }))
+                }>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("organizationPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t("allOrganizations")}</SelectItem>
+                    {availableFilters.organizations?.map(org => (
+                      <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <MapPin className="h-4 w-4 mr-2" />

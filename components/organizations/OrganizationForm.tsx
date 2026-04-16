@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Upload, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface OrganizationFormData {
     name: string
@@ -167,7 +168,7 @@ export function OrganizationForm({
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Ex: Universidade Federal de Pernambuco"
                 />
             </div>
@@ -183,7 +184,7 @@ export function OrganizationForm({
                     value={formData.type}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                     <option value="company">Empresa</option>
                     <option value="ngo">ONG/Sem fins lucrativos</option>
@@ -207,7 +208,7 @@ export function OrganizationForm({
                     required
                     rows={4}
                     maxLength={500}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Descreva sua organização e seus objetivos..."
                 />
                 <p className="mt-1 text-sm text-gray-500">
@@ -229,7 +230,7 @@ export function OrganizationForm({
                         />
                     )}
                     <div className="flex-1">
-                        <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-indigo-500 transition-colors">
+                        <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                             <div className="text-center">
                                 {uploadingLogo ? (
                                     <Loader2 className="w-6 h-6 text-gray-400 animate-spin mx-auto" />
@@ -266,7 +267,7 @@ export function OrganizationForm({
                     name="website"
                     value={formData.website}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="https://exemplo.com"
                 />
             </div>
@@ -282,7 +283,7 @@ export function OrganizationForm({
                     name="contact_email"
                     value={formData.contact_email}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="contato@exemplo.com"
                 />
             </div>
@@ -298,29 +299,30 @@ export function OrganizationForm({
                     name="contact_phone"
                     value={formData.contact_phone}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="+55 (81) 99999-9999"
                 />
             </div>
 
             {/* Botões */}
-            <div className="flex gap-3 pt-4">
-                <button
+            <div className="flex gap-4 pt-6">
+                <Button
                     type="button"
+                    variant="outline"
                     onClick={() => router.back()}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1"
                     disabled={loading}
                 >
                     Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                     type="submit"
                     disabled={loading || uploadingLogo}
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 gap-2"
                 >
                     {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                     {organizationId ? "Salvar Alterações" : "Criar Organização"}
-                </button>
+                </Button>
             </div>
 
             {!organizationId && (

@@ -47,7 +47,8 @@
     "confirmAction": "Yes, confirm",
     "french": "French",
     "danish": "Danish",
-    "swedish": "Swedish"
+    "swedish": "Swedish",
+    "organizations": "Organizations"
   },
   "header": {
     "title": "MENVO - Volunteer Mentors",
@@ -60,7 +61,8 @@
       "adminPanel": "Admin Panel",
       "logout": "Logout",
       "administration": "Administration",
-      "user": "User"
+      "user": "User",
+      "createOrganization": "Create Organization"
     }
   },
   "home": {
@@ -896,6 +898,9 @@
     "filters": "Filters",
     "sheetTitle": "Advanced Filters",
     "sheetDescription": "Refine your search to find the perfect mentor",
+    "organization": "Organization",
+    "organizationPlaceholder": "Filter by organization",
+    "allOrganizations": "All organizations",
     "state": "State/Province",
     "statePlaceholder": "Select state",
     "allStates": "All states",

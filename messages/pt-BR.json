@@ -47,7 +47,8 @@
     "confirmAction": "Sim, confirmar",
     "french": "Francês",
     "danish": "Dinamarquês",
-    "swedish": "Sueco"
+    "swedish": "Sueco",
+    "organizations": "Organizações"
   },
   "header": {
     "title": "MENVO - Mentores Voluntários",
@@ -871,6 +872,9 @@
     "filters": "Filtros",
     "sheetTitle": "Filtros Avançados",
     "sheetDescription": "Refine sua busca para encontrar o mentor perfeito",
+    "organization": "Organização",
+    "organizationPlaceholder": "Filtrar por organização",
+    "allOrganizations": "Todas as organizações",
     "state": "Estado",
     "statePlaceholder": "Selecione o estado",
     "allStates": "Todos os estados",

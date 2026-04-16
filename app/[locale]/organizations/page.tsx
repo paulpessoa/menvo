@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Building2, Search, Loader2, Plus } from "lucide-react"
 import { OrganizationCard } from "@/components/organizations/OrganizationCard"
 import { Organization } from "@/types/organizations"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 export default function OrganizationsPage() {
@@ -77,13 +78,15 @@ export default function OrganizationsPage() {
                                 Descubra organizações que oferecem programas de mentoria
                             </p>
                         </div>
-                        <Link
-                            href="/organizations/new"
-                            className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-                        >
-                            <Plus className="w-5 h-5" />
-                            Criar Organização
-                        </Link>
+                        <Button asChild>
+                            <Link
+                                href="/organizations/new"
+                                className="flex items-center gap-2"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Criar Organização
+                            </Link>
+                        </Button>
                     </div>
 
                     {/* Search and Filters */}
@@ -97,7 +100,7 @@ export default function OrganizationsPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             />
                         </div>
 
@@ -108,7 +111,7 @@ export default function OrganizationsPage() {
                                 setTypeFilter(e.target.value)
                                 setPage(1)
                             }}
-                            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
                         >
                             <option value="">Todos os tipos</option>
                             <option value="company">Empresa</option>
@@ -126,7 +129,7 @@ export default function OrganizationsPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {loading && page === 1 ? (
                     <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
                     </div>
                 ) : filteredOrganizations.length === 0 ? (
                     <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
@@ -139,13 +142,15 @@ export default function OrganizationsPage() {
                                 ? "Tente ajustar seus filtros de busca"
                                 : "Seja o primeiro a criar uma organização"}
                         </p>
-                        <Link
-                            href="/organizations/new"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-                        >
-                            <Plus className="w-5 h-5" />
-                            Criar Organização
-                        </Link>
+                        <Button asChild size="lg">
+                            <Link
+                                href="/organizations/new"
+                                className="inline-flex items-center gap-2"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Criar Organização
+                            </Link>
+                        </Button>
                     </div>
                 ) : (
                     <>
@@ -159,18 +164,18 @@ export default function OrganizationsPage() {
                         {/* Load More */}
                         {hasMore && !loading && (
                             <div className="mt-8 text-center">
-                                <button
+                                <Button
+                                    variant="outline"
                                     onClick={() => setPage((p) => p + 1)}
-                                    className="px-6 py-3 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     Carregar mais
-                                </button>
+                                </Button>
                             </div>
                         )}
 
                         {loading && page > 1 && (
                             <div className="mt-8 flex justify-center">
-                                <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
+                                <Loader2 className="w-6 h-6 text-primary-600 animate-spin" />
                             </div>
                         )}
                     </>

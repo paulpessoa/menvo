@@ -16,7 +16,8 @@ import {
   BarChart3,
   Cog,
   HeartHandshake,
-  Loader2
+  Loader2,
+  Building2
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { MessagesBadge } from "@/components/MessagesBadge"
@@ -58,6 +59,7 @@ export default function Header() {
   const navigation = [
     { name: t("common.home"), href: "/" },
     { name: t("common.findMentors"), href: "/mentors" },
+    { name: t("common.organizations"), href: "/organizations" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
     { name: t("common.aboutUs"), href: "/about" }
   ]
@@ -66,11 +68,13 @@ export default function Header() {
     ? isAdmin
       ? [
           { name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield },
+          { name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 },
           { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
         ]
       : [
           { name: t("header.userMenu.dashboard"), href: "/dashboard", icon: User },
           { name: t("header.userMenu.profile"), href: "/profile", icon: User },
+          { name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 },
           { name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare },
           { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
         ]
