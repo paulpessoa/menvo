@@ -116,7 +116,7 @@ function MessagesContent() {
             .from('messages')
             .select('*', { count: 'exact', head: true })
             .eq('conversation_id', conv.id)
-            .eq('receiver_id', user.id)
+            .neq('sender_id', user.id)
             .is('read_at', null)
 
           return {
@@ -206,7 +206,7 @@ function MessagesContent() {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <Avatar className="h-12 w-12">
-                          <AvatarImage src={conversation.other_user.avatar_url || "/placeholder.svg"} />
+                          <AvatarImage src={conversation.other_user?.avatar_url || "/placeholder.svg"} />
                           <AvatarFallback>
                             <User className="h-6 w-6" />
                           </AvatarFallback>
@@ -220,7 +220,7 @@ function MessagesContent() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <span className={`font-semibold truncate ${conversation.unread_count > 0 ? 'text-primary' : ''}`}>
-                            {conversation.other_user.full_name}
+                            {conversation.other_user?.full_name}
                           </span>
                           <span className="text-xs text-muted-foreground whitespace-nowrap">
                             {formatTimestamp(conversation.last_message_at)}
@@ -228,7 +228,7 @@ function MessagesContent() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="text-xs">
-                            {conversation.other_user.is_mentor ? t("roleMentor") : t("roleMentee")}
+                            {conversation.other_user?.is_mentor ? t("roleMentor") : t("roleMentee")}
                           </Badge>
                           {conversation.unread_count > 0 && (
                             <span className="text-xs text-primary font-semibold">
@@ -250,10 +250,10 @@ function MessagesContent() {
           {selectedConversation ? (
             <ChatInterface
               key={selectedConversation.id}
-              mentorId={selectedConversation.other_user.id}
+              mentorId={selectedConversation.other_user?.id}
               currentUserId={user.id}
-              mentorName={selectedConversation.other_user.full_name}
-              mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
+              mentorName={selectedConversation.other_user?.full_name}
+              mentorAvatar={selectedConversation.other_user?.avatar_url || undefined}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center bg-muted/20">
@@ -280,25 +280,25 @@ function MessagesContent() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <Avatar className="h-10 w-10">
-                <AvatarImage src={selectedConversation.other_user.avatar_url || "/placeholder.svg"} />
+                <AvatarImage src={selectedConversation.other_user?.avatar_url || "/placeholder.svg"} />
                 <AvatarFallback>
                   <User className="h-5 w-5" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <h2 className="font-semibold">{selectedConversation.other_user.full_name}</h2>
+                <h2 className="font-semibold">{selectedConversation.other_user?.full_name}</h2>
                 <Badge variant="secondary" className="text-xs">
-                  {selectedConversation.other_user.is_mentor ? t("roleMentor") : t("roleMentee")}
+                  {selectedConversation.other_user?.is_mentor ? t("roleMentor") : t("roleMentee")}
                 </Badge>
               </div>
             </div>
             <div className="flex-1 overflow-hidden">
               <ChatInterface
-                key={selectedConversation.id}
-                mentorId={selectedConversation.other_user.id}
+                key={`mobile-${selectedConversation.id}`}
+                mentorId={selectedConversation.other_user?.id}
                 currentUserId={user.id}
-                mentorName={selectedConversation.other_user.full_name}
-                mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
+                mentorName={selectedConversation.other_user?.full_name}
+                mentorAvatar={selectedConversation.other_user?.avatar_url || undefined}
               />
             </div>
           </div>

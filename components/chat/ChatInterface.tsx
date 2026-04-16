@@ -6,7 +6,7 @@ import { Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ChatInterfaceProps {
-    mentorId: string;
+    mentorId: string; // This is the ID of the person we are talking to
     currentUserId: string;
     mentorName: string;
     mentorAvatar?: string;
@@ -37,15 +37,18 @@ export function ChatInterface({
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const supabase = createClient();
 
-    // Carregar mensagens ao montar
+    // Reset state and load messages when mentorId changes
     useEffect(() => {
+        setMessages([]);
+        setConversationId(null);
+        setNewMessage('');
+        setIsTyping(false);
         loadMessages();
     }, [mentorId]);
 
-    // Scroll para o final quando carregar ou receber novas mensagens
+    // Scroll to bottom when messages update
     useEffect(() => {
         if (messages.length > 0) {
-            // Pequeno delay para garantir que o DOM foi atualizado
             const timer = setTimeout(() => {
                 scrollToBottom();
             }, 100);
@@ -53,17 +56,16 @@ export function ChatInterface({
         }
     }, [messages.length]);
 
-    // Subscrever ao Realtime quando conversationId estiver disponível
+    // Realtime subscription
     useEffect(() => {
         if (!conversationId) return;
 
-        console.log('[CHAT] 🔌 Subscrevendo ao Realtime para conversa:', conversationId);
+        console.log('[CHAT] 🔌 Subscribing to conversation:', conversationId);
 
-        // Criar subscription para novas mensagens e typing indicator
         const channel = supabase
             .channel(`conversation:${conversationId}`, {
                 config: {
-                    broadcast: { self: false }, // Não receber próprios eventos
+                    broadcast: { self: false },
                     presence: { key: currentUserId },
                 },
             })
@@ -76,88 +78,50 @@ export function ChatInterface({
                     filter: `conversation_id=eq.${conversationId}`,
                 },
                 (payload: any) => {
-                    console.log('[CHAT] 🔥 REALTIME DISPAROU! Nova mensagem:', payload);
                     const newMessage = payload.new as Message;
-
-                    // Evitar duplicatas
+                    
                     setMessages((prev) => {
-                        const exists = prev.some(m => m.id === newMessage.id);
-                        if (exists) {
-                            console.log('[CHAT] ⚠️ Mensagem duplicada, ignorando');
-                            return prev;
-                        }
-                        console.log('[CHAT] ✅ Adicionando mensagem ao estado');
-
-                        // Se a mensagem não é minha, marcar como lida
+                        if (prev.some(m => m.id === newMessage.id)) return prev;
+                        
                         if (newMessage.sender_id !== currentUserId) {
                             markAsRead(conversationId);
                         }
-
                         return [...prev, newMessage];
                     });
                 }
             )
-            .on('broadcast', { event: 'typing' }, (payload: any) => {
-                console.log('[CHAT] ✍️ Usuário está digitando:', payload);
+            .on('broadcast', { event: 'typing' }, () => {
                 setIsTyping(true);
-
-                // Limpar timeout anterior
-                if (typingTimeoutRef.current) {
-                    clearTimeout(typingTimeoutRef.current);
-                }
-
-                // Parar de mostrar "digitando" após 3 segundos
-                typingTimeoutRef.current = setTimeout(() => {
-                    setIsTyping(false);
-                }, 3000);
+                if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
             })
-            .subscribe((status: any, err: any) => {
-                console.log('[CHAT] 📡 Status da subscription:', status);
-                if (err) console.error('[CHAT] ❌ Erro:', err);
-
-                if (status === 'SUBSCRIBED') {
-                    console.log('[CHAT] ✅ REALTIME CONECTADO!');
-                    setRealtimeStatus('connected');
-                } else if (status === 'CLOSED') {
-                    console.log('[CHAT] ❌ REALTIME DESCONECTADO');
-                    setRealtimeStatus('disconnected');
-                } else {
-                    setRealtimeStatus('connecting');
-                }
+            .subscribe((status: string) => {
+                if (status === 'SUBSCRIBED') setRealtimeStatus('connected');
+                else if (status === 'CLOSED') setRealtimeStatus('disconnected');
             });
 
-        // Cleanup: unsubscribe ao desmontar
         return () => {
-            console.log('[CHAT] Removendo subscription');
-            if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
-            }
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
             supabase.removeChannel(channel);
         };
-    }, [conversationId]);
+    }, [conversationId, currentUserId, supabase]);
 
     const loadMessages = async () => {
         try {
             setLoading(true);
-            console.log('[CHAT] Carregando mensagens para mentorId:', mentorId, 'currentUserId:', currentUserId);
             const response = await fetch(`/api/chat/messages/${mentorId}`);
 
-            if (!response.ok) {
-                throw new Error('Erro ao carregar mensagens');
-            }
+            if (!response.ok) throw new Error('Erro ao carregar mensagens');
 
             const data = await response.json();
-            console.log('[CHAT] Dados recebidos:', data);
-            console.log('[CHAT] ConversationId:', data.conversationId);
             setMessages(data.messages || []);
             setConversationId(data.conversationId);
 
-            // Marcar mensagens como lidas após carregar
             if (data.conversationId) {
                 markAsRead(data.conversationId);
             }
         } catch (error) {
-            console.error('[CHAT] Erro ao carregar mensagens:', error);
+            console.error('[CHAT] Error loading messages:', error);
             toast.error('Erro ao carregar mensagens');
         } finally {
             setLoading(false);
@@ -166,24 +130,18 @@ export function ChatInterface({
 
     const markAsRead = async (convId: string) => {
         try {
-            const response = await fetch('/api/chat/mark-read', {
+            await fetch('/api/chat/mark-read', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ conversationId: convId }),
             });
-
-            if (response.ok) {
-                console.log('[CHAT] ✅ Mensagens marcadas como lidas');
-            }
         } catch (error) {
-            console.error('[CHAT] Erro ao marcar como lida:', error);
+            console.error('[CHAT] Error marking as read:', error);
         }
     };
 
     const handleTyping = () => {
         if (!conversationId) return;
-
-        // Enviar evento de "digitando" via broadcast
         supabase.channel(`conversation:${conversationId}`).send({
             type: 'broadcast',
             event: 'typing',
@@ -192,30 +150,22 @@ export function ChatInterface({
     };
 
     const scrollToBottom = () => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     };
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-
         if (!newMessage.trim() || sending) return;
 
-        const messageContent = newMessage.trim();
+        const content = newMessage.trim();
         setNewMessage('');
         setSending(true);
 
         try {
             const response = await fetch('/api/chat/send', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    mentorId,
-                    content: messageContent,
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mentorId, content }),
             });
 
             if (!response.ok) {
@@ -224,37 +174,28 @@ export function ChatInterface({
             }
 
             const data = await response.json();
-            console.log('[CHAT] Mensagem enviada:', data);
-
-            // Adicionar mensagem otimisticamente (fallback se Realtime falhar)
-            // O Realtime vai adicionar de novo, mas temos proteção contra duplicatas
             const optimisticMessage: Message = {
                 id: data.messageId,
                 conversation_id: data.conversationId,
                 sender_id: currentUserId,
-                content: messageContent,
+                content,
                 created_at: new Date().toISOString(),
             };
 
             setMessages((prev) => {
-                const exists = prev.some(m => m.id === optimisticMessage.id);
-                if (!exists) {
-                    return [...prev, optimisticMessage];
-                }
-                return prev;
+                if (prev.some(m => m.id === optimisticMessage.id)) return prev;
+                return [...prev, optimisticMessage];
             });
         } catch (error) {
-            console.error('[CHAT] Erro ao enviar mensagem:', error);
             toast.error(error instanceof Error ? error.message : 'Erro ao enviar mensagem');
-            setNewMessage(messageContent); // Restaurar mensagem
+            setNewMessage(content);
         } finally {
             setSending(false);
         }
     };
 
     const formatTime = (timestamp: string) => {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString('pt-BR', {
+        return new Date(timestamp).toLocaleTimeString('pt-BR', {
             hour: '2-digit',
             minute: '2-digit',
         });
@@ -263,34 +204,41 @@ export function ChatInterface({
     if (loading) {
         return (
             <div className="flex items-center justify-center h-96">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col h-[500px] bg-white rounded-lg">
+        <div className="flex flex-col h-full min-h-[500px] bg-white rounded-lg overflow-hidden border">
             {/* Header */}
-            <div className="flex items-center gap-3 p-4 border-b bg-indigo-50">
+            <div className="flex items-center gap-3 p-4 border-b bg-primary/5">
                 {mentorAvatar && (
                     <img
                         src={mentorAvatar}
                         alt={mentorName}
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 rounded-full object-cover border"
                     />
                 )}
                 <div>
                     <h3 className="font-semibold text-gray-900">{mentorName}</h3>
-                    {isTyping && (
-                        <p className="text-xs text-gray-500 italic">digitando...</p>
-                    )}
+                    <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${realtimeStatus === 'connected' ? 'bg-green-500' : 'bg-gray-300'}`} />
+                        <span className="text-xs text-gray-500">
+                            {realtimeStatus === 'connected' ? 'Online' : 'Conectando...'}
+                        </span>
+                        {isTyping && (
+                            <span className="text-xs text-primary animate-pulse ml-2 italic">digitando...</span>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30">
                 {messages.length === 0 ? (
-                    <div className="text-center text-gray-500 mt-8">
+                    <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-60">
+                        <Send className="w-12 h-12 mb-2" />
                         <p>Nenhuma mensagem ainda.</p>
                         <p className="text-sm">Envie uma mensagem para começar a conversa!</p>
                     </div>
@@ -303,14 +251,14 @@ export function ChatInterface({
                                 className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                             >
                                 <div
-                                    className={`max-w-[70%] rounded-lg px-4 py-2 ${isCurrentUser
-                                        ? 'bg-indigo-600 text-white'
-                                        : 'bg-gray-100 text-gray-900'
+                                    className={`max-w-[80%] rounded-2xl px-4 py-2 shadow-sm ${isCurrentUser
+                                        ? 'bg-primary text-primary-foreground rounded-tr-none'
+                                        : 'bg-white text-gray-900 border rounded-tl-none'
                                         }`}
                                 >
-                                    <p className="text-sm">{message.content}</p>
+                                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                                     <p
-                                        className={`text-xs mt-1 ${isCurrentUser ? 'text-indigo-200' : 'text-gray-500'
+                                        className={`text-[10px] mt-1 text-right ${isCurrentUser ? 'opacity-80' : 'text-gray-400'
                                             }`}
                                     >
                                         {formatTime(message.created_at)}
@@ -324,7 +272,7 @@ export function ChatInterface({
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t">
+            <form onSubmit={handleSendMessage} className="p-4 border-t bg-white">
                 <div className="flex gap-2">
                     <input
                         type="text"
@@ -335,12 +283,12 @@ export function ChatInterface({
                         }}
                         placeholder="Digite sua mensagem..."
                         disabled={sending}
-                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                        className="flex-1 px-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all disabled:opacity-50"
                     />
                     <button
                         type="submit"
                         disabled={!newMessage.trim() || sending}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {sending ? (
                             <Loader2 className="w-5 h-5 animate-spin" />

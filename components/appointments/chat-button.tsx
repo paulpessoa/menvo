@@ -55,10 +55,11 @@ export function ChatButton({ appointment, currentUserId, isMentor }: ChatButtonP
                     </DialogHeader>
                     <div className="px-6 pb-6">
                         <ChatInterface
-                            mentorId={appointment.mentor.id}
+                            key={`${otherPerson.id}-${appointment.id}`}
+                            mentorId={otherPerson.id}
                             currentUserId={currentUserId}
-                            mentorName={appointment.mentor.full_name}
-                            mentorAvatar={appointment.mentor.avatar_url}
+                            mentorName={otherPerson.full_name}
+                            mentorAvatar={otherPerson.avatar_url}
                         />
                     </div>
                 </DialogContent>
