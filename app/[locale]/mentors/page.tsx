@@ -1,19 +1,16 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { createClient } from "@/utils/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   Sheet,
   SheetContent,
@@ -41,6 +38,8 @@ import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
+import { createClient } from "@/utils/supabase/client"
+import { MentorCard } from "@/components/mentors/MentorCard"
 
 interface MentorProfile {
   id: string
@@ -117,18 +116,17 @@ export default function MentorsPage() {
   })
 
   const supabase = createClient()
-  const { user } = useAuth()
-  const { isModalOpen, openModal, closeModal, handleSubmit } = useMentorSuggestion()
 
-  const fetchMentors = useCallback(async (isReset = false) => {
-    const currentPage = isReset ? 0 : page
-    if (isReset) {
-      setLoading(true)
-    } else {
-      setLoadingMore(true)
-    }
-
+  const fetchMentors = async (isInitial = false) => {
     try {
+      const currentPage = isInitial ? 0 : page
+      if (isInitial) {
+        setLoading(true)
+        setPage(0)
+      } else {
+        setLoadingMore(true)
+      }
+
       let query = supabase
         .from('mentors_view')
         .select(`
@@ -136,8 +134,8 @@ export default function MentorsPage() {
           full_name,
           avatar_url,
           bio,
-          current_position,
-          current_company,
+          job_title,
+          company,
           city,
           state,
           country,
@@ -147,9 +145,9 @@ export default function MentorsPage() {
           expertise_areas,
           session_price_usd,
           availability_status,
-          rating,
-          reviews,
-          sessions,
+          average_rating,
+          total_reviews,
+          total_sessions,
           experience_years,
           slug,
           organization_ids
@@ -158,38 +156,42 @@ export default function MentorsPage() {
       // Apply Filters
       if (filters.search) {
         const searchTerm = `%${filters.search}%`
-        // Usar or com ilike de forma resiliente
-        query = query.or(`full_name.ilike.${searchTerm},current_position.ilike.${searchTerm},current_company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
+        query = query.or(`full_name.ilike.${searchTerm},job_title.ilike.${searchTerm},company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
       }
 
       if (filters.organizationId && filters.organizationId !== 'all') {
         query = query.contains('organization_ids', [filters.organizationId])
       }
 
-      if (filters.country && filters.country !== 'all') {
+      if (filters.country !== 'all') {
         query = query.eq('country', filters.country)
       }
-      if (filters.state && filters.state !== 'all') {
+
+      if (filters.state !== 'all') {
         query = query.eq('state', filters.state)
       }
+
       if (filters.city) {
-        query = query.eq('city', filters.city)
-      }
-      if (filters.availabilityStatus && filters.availabilityStatus !== 'all') {
-        query = query.eq('availability_status', filters.availabilityStatus)
+        query = query.ilike('city', `%${filters.city}%`)
       }
 
-      if (filters.languages && filters.languages.length > 0) {
+      if (filters.languages.length > 0) {
         query = query.contains('languages', filters.languages)
       }
-      if (filters.topics && filters.topics.length > 0) {
+
+      if (filters.topics.length > 0) {
         query = query.contains('mentorship_topics', filters.topics)
       }
-      if (filters.inclusiveTags && filters.inclusiveTags.length > 0) {
+
+      if (filters.inclusiveTags.length > 0) {
         query = query.contains('inclusion_tags', filters.inclusiveTags)
       }
 
-      if (filters.experienceYears && filters.experienceYears !== 'all') {
+      if (filters.availabilityStatus !== 'all') {
+        query = query.eq('availability_status', filters.availabilityStatus)
+      }
+
+      if (filters.experienceYears !== 'all') {
         const parts = filters.experienceYears.split('-')
         const min = parseInt(parts[0])
         const max = parts[1] ? parseInt(parts[1]) : null
@@ -207,63 +209,35 @@ export default function MentorsPage() {
       const to = from + ITEMS_PER_PAGE - 1
       
       query = query
-        .order('rating', { ascending: false })
-        .order('sessions', { ascending: false })
-        .order('id', { ascending: true }) // Deterministico
+        .order('average_rating', { ascending: false })
         .range(from, to)
 
       const { data, error, count } = await query
 
-      if (error) {
-        console.error('[MENTORS_FETCH_ERROR]', error)
-        throw error
-      }
+      if (error) throw error
 
-      const mappedData = (data || []).map((mentor: any) => ({
-        ...mentor,
-        job_title: mentor.current_position,
-        company: mentor.current_company,
-        inclusive_tags: mentor.inclusion_tags,
-        average_rating: mentor.rating,
-        total_reviews: mentor.reviews,
-        total_sessions: mentor.sessions
-      }))
-
-      if (isReset) {
-        setMentors(mappedData)
-        setPage(0)
+      if (isInitial) {
+        setMentors(data || [])
       } else {
-        setMentors(prev => [...prev, ...mappedData])
+        setMentors(prev => [...prev, ...(data || [])])
       }
 
       setTotalCount(count || 0)
-      setHasMore((count || 0) > (from + mappedData.length))
-      
+      setHasMore((count || 0) > (from + (data?.length || 0)))
     } catch (error) {
       console.error('Error fetching mentors:', error)
-      toast.error(t("errorFetchingMentors", { defaultValue: "Erro ao carregar mentores" }))
+      toast.error(t("errorLoadingMentors"))
     } finally {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [filters, page, supabase, t])
+  }
 
   const fetchFilterOptions = async () => {
     try {
-      // Fetch unique filter values - optimize by selecting only relevant columns
-      // For very large datasets, this should be a cached RPC or a separate table
       const { data, error } = await supabase
         .from('mentors_view')
-        .select(`
-          country,
-          state,
-          city,
-          languages,
-          mentorship_topics,
-          inclusion_tags,
-          expertise_areas
-        `)
-        .limit(1000) // Safety limit
+        .select('country, state, city, languages, mentorship_topics, inclusion_tags')
 
       if (error) throw error
 
@@ -274,15 +248,21 @@ export default function MentorsPage() {
       const topics = new Set<string>()
       const inclusiveTags = new Set<string>()
 
-      data?.forEach((mentor: any) => {
+      data?.forEach(mentor => {
         if (mentor.country) countries.add(mentor.country)
         if (mentor.state) states.add(mentor.state)
         if (mentor.city) cities.add(mentor.city)
-
-        mentor.languages?.forEach((lang: string) => languages.add(lang))
-        mentor.mentorship_topics?.forEach((topic: string) => topics.add(topic))
-        mentor.inclusion_tags?.forEach((tag: string) => inclusiveTags.add(tag))
+        mentor.languages?.forEach((l: string) => languages.add(l))
+        mentor.mentorship_topics?.forEach((t: string) => topics.add(t))
+        mentor.inclusion_tags?.forEach((t: string) => inclusiveTags.add(t))
       })
+
+      // Fetch active organizations
+      const { data: orgData } = await supabase
+        .from('organizations')
+        .select('id, name')
+        .eq('status', 'active')
+        .order('name')
 
       setAvailableFilters({
         countries: Array.from(countries).sort(),
@@ -291,59 +271,20 @@ export default function MentorsPage() {
         languages: Array.from(languages).sort(),
         topics: Array.from(topics).sort(),
         inclusiveTags: Array.from(inclusiveTags).sort(),
-        organizations: availableFilters.organizations
+        organizations: orgData || []
       })
     } catch (error) {
       console.error('Error fetching filter options:', error)
     }
   }
 
-  const fetchOrganizations = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('organizations')
-        .select('id, name')
-        .eq('status', 'active')
-        .order('name')
-      
-      if (error) throw error
-      
-      setAvailableFilters(prev => ({
-        ...prev,
-        organizations: data || []
-      }))
-    } catch (error) {
-      console.error('Error fetching organizations:', error)
-    }
-  }
-
-  // Effect to handle initial load and filter changes
-  useEffect(() => {
-    fetchMentors(true)
-  }, [filters.search, filters.country, filters.state, filters.city, filters.languages, filters.topics, filters.inclusiveTags, filters.availabilityStatus, filters.experienceYears, filters.organizationId])
-
-  // Initial load of filter options
   useEffect(() => {
     fetchFilterOptions()
-    fetchOrganizations()
   }, [])
 
-  const loadMore = () => {
-    if (!loadingMore && hasMore) {
-      setPage(prev => prev + 1)
-    }
-  }
-
-  // Trigger load more when page changes (except for reset)
   useEffect(() => {
-    if (page > 0) {
-      fetchMentors(false)
-    }
-  }, [page])
-
-  const clearFilters = () => {
-    setFilters(initialFilters)
-  }
+    fetchMentors(true)
+  }, [filters])
 
   const activeFiltersCount = useMemo(() => {
     let count = 0
@@ -354,12 +295,16 @@ export default function MentorsPage() {
     if (filters.languages.length > 0) count++
     if (filters.topics.length > 0) count++
     if (filters.inclusiveTags.length > 0) count++
-    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 500) count++
     if (filters.availabilityStatus !== 'all') count++
     if (filters.experienceYears !== 'all') count++
     if (filters.organizationId !== 'all') count++
     return count
   }, [filters])
+
+  const handleLoadMore = () => {
+    setPage(prev => prev + 1)
+    fetchMentors(false)
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -391,7 +336,7 @@ export default function MentorsPage() {
               <Filter className="h-4 w-4 mr-2" />
               {t("filters")}
               {activeFiltersCount > 0 && (
-                <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
+                <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground">
                   {activeFiltersCount}
                 </Badge>
               )}
@@ -405,10 +350,11 @@ export default function MentorsPage() {
               </SheetDescription>
             </SheetHeader>
 
-            <div className="mt-6 space-y-6">
+            <div className="mt-6 space-y-6 pb-8">
+              {/* Organization Filter */}
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
-                  <Building2 className="h-4 w-4 mr-2" />
+                  <Building2 className="h-4 w-4 mr-2 text-primary" />
                   {t("organization")}
                 </h3>
                 <Select value={filters.organizationId} onValueChange={(value) =>
@@ -428,7 +374,7 @@ export default function MentorsPage() {
 
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
-                  <MapPin className="h-4 w-4 mr-2" />
+                  <MapPin className="h-4 w-4 mr-2 text-primary" />
                   {t("state")}
                 </h3>
                 <Select value={filters.state} onValueChange={(value) =>
@@ -449,7 +395,7 @@ export default function MentorsPage() {
               {availableFilters.cities.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center">
-                    <MapPin className="h-4 w-4 mr-2" />
+                    <MapPin className="h-4 w-4 mr-2 text-primary" />
                     {t("city")}
                   </h3>
                   <Select value={filters.city || "all"} onValueChange={(value) =>
@@ -470,7 +416,7 @@ export default function MentorsPage() {
 
               <div className="space-y-3">
                 <h3 className="font-medium">{t("topics")}</h3>
-                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pt-1">
                   {availableFilters.topics.map(topic => (
                     <Badge
                       key={topic}
@@ -493,7 +439,7 @@ export default function MentorsPage() {
 
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
-                  <Heart className="h-4 w-4 mr-2" />
+                  <Heart className="h-4 w-4 mr-2 text-primary" />
                   {t("inclusiveTags")}
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -519,28 +465,7 @@ export default function MentorsPage() {
 
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
-                  <Briefcase className="h-4 w-4 mr-2" />
-                  {t("experience")}
-                </h3>
-                <Select value={filters.experienceYears} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, experienceYears: value }))
-                }>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("experiencePlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t("anyExperience")}</SelectItem>
-                    <SelectItem value="1-3">1-3 anos</SelectItem>
-                    <SelectItem value="3-5">3-5 anos</SelectItem>
-                    <SelectItem value="5-10">5-10 anos</SelectItem>
-                    <SelectItem value="10">10+ anos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <Clock className="h-4 w-4 mr-2" />
+                  <Clock className="h-4 w-4 mr-2 text-primary" />
                   {t("availability")}
                 </h3>
                 <Select value={filters.availabilityStatus} onValueChange={(value) =>
@@ -553,16 +478,35 @@ export default function MentorsPage() {
                     <SelectItem value="all">{t("anyStatus")}</SelectItem>
                     <SelectItem value="available">{t("status.available")}</SelectItem>
                     <SelectItem value="busy">{t("status.busy")}</SelectItem>
-                    <SelectItem value="unavailable">{t("status.unavailable")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="font-medium flex items-center">
+                  <Briefcase className="h-4 w-4 mr-2 text-primary" />
+                  {t("experience")}
+                </h3>
+                <Select value={filters.experienceYears} onValueChange={(value) =>
+                  setFilters(prev => ({ ...prev, experienceYears: value }))
+                }>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("experiencePlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t("anyExperience")}</SelectItem>
+                    <SelectItem value="0-2">0-2 anos</SelectItem>
+                    <SelectItem value="3-5">3-5 anos</SelectItem>
+                    <SelectItem value="6-10">6-10 anos</SelectItem>
+                    <SelectItem value="11+">10+ anos</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <Button
                 variant="outline"
-                onClick={clearFilters}
-                className="w-full"
-                disabled={activeFiltersCount === 0}
+                className="w-full mt-4"
+                onClick={() => setFilters(initialFilters)}
               >
                 {t("clearFilters")}
               </Button>
@@ -581,35 +525,47 @@ export default function MentorsPage() {
       {/* Mentors Grid or Loading State */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <SkeletonCard key={i} />
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-[400px] bg-gray-100 animate-pulse rounded-lg" />
           ))}
+        </div>
+      ) : mentors.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-lg border border-dashed">
+          <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900">{t("noMentorsTitle")}</h3>
+          <p className="text-gray-500 mt-2">{t("noMentorsDescription")}</p>
+          <Button
+            variant="link"
+            className="mt-4 text-primary"
+            onClick={() => setFilters(initialFilters)}
+          >
+            {t("clearFilters")}
+          </Button>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
+              <MentorCard key={mentor.id} mentor={mentor as any} />
             ))}
           </div>
 
-          {/* Load More Button */}
+          {/* Load More */}
           {hasMore && (
-            <div className="mt-12 flex justify-center">
-              <Button 
-                onClick={loadMore} 
-                disabled={loadingMore}
+            <div className="mt-12 text-center">
+              <Button
                 variant="outline"
                 size="lg"
-                className="min-w-[200px]"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
               >
                 {loadingMore ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t("loading")}
+                    {t("common.loading")}
                   </>
                 ) : (
-                  t("loadMore", { defaultValue: "Carregar Mais" })
+                  t("loadMore")
                 )}
               </Button>
             </div>
@@ -617,172 +573,16 @@ export default function MentorsPage() {
         </>
       )}
 
-      {/* Empty State */}
-      {mentors.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {t("noMentorsTitle")}
-          </h3>
-          <p className="text-gray-600 mb-4">
+      {/* Suggestion Modal */}
+      <div className="mt-20 border-t pt-12">
+        <div className="bg-primary/5 rounded-2xl p-8 text-center max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold mb-4">{t("suggestTopic")}</h2>
+          <p className="text-gray-600 mb-8">
             {t("noMentorsDescription")}
           </p>
-          <div className="flex justify-center gap-4">
-            <Button onClick={clearFilters} variant="outline">
-              {t("clearFilters")}
-            </Button>
-            <Button onClick={openModal}>
-              {t("suggestTopic")}
-            </Button>
-          </div>
+          <SuggestionModal />
         </div>
-      )}
-
-      <SuggestionModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSubmit={(suggestion) => handleSubmit(user?.id || "", suggestion)}
-        userId={user?.id || null}
-        availableInclusionTags={availableFilters.inclusiveTags}
-      />
+      </div>
     </div>
-  )
-}
-
-function SkeletonCard() {
-  return (
-    <Card className="animate-pulse">
-      <CardHeader>
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-32"></div>
-            <div className="h-3 bg-gray-200 rounded w-24"></div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded"></div>
-            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-          </div>
-          <div className="h-8 bg-gray-200 rounded w-full"></div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function MentorCard({ mentor }: { mentor: MentorProfile }) {
-  const t = useTranslations("mentorsPage")
-  const router = useRouter()
-  const { user } = useAuth()
-
-  const getAvailabilityColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'bg-green-100 text-green-800'
-      case 'busy': return 'bg-yellow-100 text-yellow-800'
-      case 'unavailable': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getAvailabilityText = (status: string) => {
-    switch (status) {
-      case 'available': return t("status.available")
-      case 'busy': return t("status.busy")
-      case 'unavailable': return t("status.unavailable")
-      default: return t("status.unknown")
-    }
-  }
-
-  const handleScheduleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    router.push(`/mentors/${mentor.slug || mentor.id}`)
-  }
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (!user) {
-      toast.info("Você deve estar logado para favoritar mentores")
-      return
-    }
-    toast.success("Mentor favoritado com sucesso!")
-  }
-
-  return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12 border">
-              <AvatarImage src={mentor.avatar_url || undefined} />
-              <AvatarFallback>
-                {mentor.full_name?.split(' ').map(n => n[0]).join('') || 'M'}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle className="text-lg line-clamp-1">{mentor.full_name}</CardTitle>
-              <CardDescription className="text-sm line-clamp-1">
-                {mentor.job_title}
-                {mentor.company && ` @ ${mentor.company}`}
-              </CardDescription>
-            </div>
-          </div>
-          <Badge className={`${getAvailabilityColor(mentor.availability_status)} whitespace-nowrap`}>
-            {getAvailabilityText(mentor.availability_status)}
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4 flex-1 flex flex-col">
-        {mentor.bio && (
-          <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
-            {mentor.bio}
-          </p>
-        )}
-
-        {(mentor.city || mentor.country) && (
-          <div className="flex items-center text-sm text-gray-500">
-            <MapPin className="h-3 w-3 mr-1 shrink-0" />
-            <span className="truncate">
-              {[mentor.city, mentor.state, mentor.country].filter(Boolean).join(', ')}
-            </span>
-          </div>
-        )}
-
-        {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-auto">
-            {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {topic}
-              </Badge>
-            ))}
-            {mentor.mentorship_topics.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{mentor.mentorship_topics.length - 3}
-              </Badge>
-            )}
-          </div>
-        )}
-
-        <div className="flex items-center text-sm text-gray-500">
-          <div className="flex items-center">
-            <MessageCircle className="h-3 w-3 mr-1" />
-            <span>{t("sessionsCount", { count: mentor.total_sessions || 0 })}</span>
-          </div>
-        </div>
-
-        <div className="flex space-x-2 pt-2 mt-auto">
-          <Button onClick={handleScheduleClick} className="flex-1">
-            {t("viewProfile")}
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleFavoriteClick}>
-            <Heart className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
   )
 }
