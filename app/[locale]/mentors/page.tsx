@@ -248,7 +248,7 @@ export default function MentorsPage() {
       const topics = new Set<string>()
       const inclusiveTags = new Set<string>()
 
-      data?.forEach(mentor => {
+      ;(data as any[])?.forEach(mentor => {
         if (mentor.country) countries.add(mentor.country)
         if (mentor.state) states.add(mentor.state)
         if (mentor.city) cities.add(mentor.city)

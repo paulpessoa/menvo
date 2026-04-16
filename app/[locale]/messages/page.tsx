@@ -122,7 +122,12 @@ function MessagesContent() {
           return {
             ...conv,
             unread_count: unreadCount || 0,
-            other_user: otherUser
+            other_user: otherUser || {
+              id: otherUserId,
+              full_name: 'Usuário Removido',
+              avatar_url: null,
+              is_mentor: false
+            }
           }
         }))
 
