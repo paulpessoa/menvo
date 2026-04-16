@@ -36,7 +36,9 @@ SELECT
   p.updated_at,
   
   -- Professional fields
+  p.job_title,
   p.job_title as current_position,
+  p.company,
   p.company as current_company,
   p.experience_years,
   p.linkedin_url,
@@ -123,7 +125,9 @@ SELECT
   p.verified_at,
   p.created_at,
   p.updated_at,
+  p.job_title,
   p.job_title as current_position,
+  p.company,
   p.company as current_company,
   p.experience_years,
   p.linkedin_url,

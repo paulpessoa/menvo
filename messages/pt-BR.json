@@ -61,7 +61,8 @@
       "adminPanel": "Painel Administrativo",
       "logout": "Sair",
       "administration": "Administração",
-      "user": "Usuário"
+      "user": "Usuário",
+      "createOrganization": "Criar Organização"
     }
   },
   "home": {
