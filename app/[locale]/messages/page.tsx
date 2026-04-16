@@ -141,7 +141,7 @@ function MessagesContent() {
   }
 
   const filteredConversations = conversations.filter(conv =>
-    conv.other_user?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    (conv.other_user?.full_name || '').toLowerCase().includes((searchTerm || '').toLowerCase())
   )
 
   const formatTimestamp = (timestamp: string | null) => {
