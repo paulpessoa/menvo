@@ -39,7 +39,8 @@ import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { createClient } from "@/utils/supabase/client"
-import { MentorCard } from "@/components/admin/MentorCard"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface MentorProfile {
   id: string
@@ -119,7 +120,6 @@ export default function MentorsPage() {
 
   const fetchMentors = async (isInitial = false) => {
     try {
-      console.log('[DEBUG] Fetching mentors with filters:', filters);
       const currentPage = isInitial ? 0 : page
       if (isInitial) {
         setLoading(true)
@@ -527,7 +527,7 @@ export default function MentorsPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-[400px] bg-gray-100 animate-pulse rounded-lg" />
+            <SkeletonCard key={i} />
           ))}
         </div>
       ) : mentors.length === 0 ? (
@@ -547,7 +547,7 @@ export default function MentorsPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor as any} />
+              <MentorCard key={mentor.id} mentor={mentor} />
             ))}
           </div>
 
@@ -585,5 +585,143 @@ export default function MentorsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function SkeletonCard({ key }: { key: number }) {
+  return (
+    <Card key={key} className="animate-pulse">
+      <CardHeader>
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="h-3 bg-gray-200 rounded w-24"></div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="h-3 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+          </div>
+          <div className="h-8 bg-gray-200 rounded w-full"></div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function MentorCard({ mentor }: { mentor: MentorProfile }) {
+  const t = useTranslations("mentorsPage")
+  const router = useRouter()
+  const { user } = useAuth()
+
+  const getAvailabilityColor = (status: string) => {
+    switch (status) {
+      case 'available': return 'bg-green-100 text-green-800'
+      case 'busy': return 'bg-yellow-100 text-yellow-800'
+      case 'unavailable': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getAvailabilityText = (status: string) => {
+    switch (status) {
+      case 'available': return t("status.available")
+      case 'busy': return t("status.busy")
+      case 'unavailable': return t("status.unavailable")
+      default: return t("status.unknown")
+    }
+  }
+
+  const handleScheduleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    router.push(`/mentors/${mentor.slug || mentor.id}`)
+  }
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!user) {
+      toast.info("Você deve estar logado para favoritar mentores")
+      return
+    }
+    toast.success("Mentor favoritado com sucesso!")
+  }
+
+  return (
+    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-12 w-12 border">
+              <AvatarImage src={mentor.avatar_url || undefined} />
+              <AvatarFallback>
+                {mentor.full_name?.split(' ').map(n => n[0]).join('') || 'M'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-lg line-clamp-1">{mentor.full_name}</CardTitle>
+              <CardDescription className="text-sm line-clamp-1">
+                {mentor.job_title}
+                {mentor.company && ` @ ${mentor.company}`}
+              </CardDescription>
+            </div>
+          </div>
+          <Badge className={`${getAvailabilityColor(mentor.availability_status)} whitespace-nowrap`}>
+            {getAvailabilityText(mentor.availability_status)}
+          </Badge>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4 flex-1 flex flex-col">
+        {mentor.bio && (
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+            {mentor.bio}
+          </p>
+        )}
+
+        {(mentor.city || mentor.country) && (
+          <div className="flex items-center text-sm text-gray-500">
+            <MapPin className="h-3 w-3 mr-1 shrink-0" />
+            <span className="truncate">
+              {[mentor.city, mentor.state, mentor.country].filter(Boolean).join(', ')}
+            </span>
+          </div>
+        )}
+
+        {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-auto">
+            {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {topic}
+              </Badge>
+            ))}
+            {mentor.mentorship_topics.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{mentor.mentorship_topics.length - 3}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-center text-sm text-gray-500">
+          <div className="flex items-center">
+            <MessageCircle className="h-3 w-3 mr-1" />
+            <span>{t("sessionsCount", { count: mentor.total_sessions || 0 })}</span>
+          </div>
+        </div>
+
+        <div className="flex space-x-2 pt-2 mt-auto">
+          <Button onClick={handleScheduleClick} className="flex-1">
+            {t("viewProfile")}
+          </Button>
+          <Button variant="outline" size="icon" onClick={handleFavoriteClick}>
+            <Heart className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
