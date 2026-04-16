@@ -119,6 +119,7 @@ export default function MentorsPage() {
 
   const fetchMentors = async (isInitial = false) => {
     try {
+      console.log('[DEBUG] Fetching mentors with filters:', filters);
       const currentPage = isInitial ? 0 : page
       if (isInitial) {
         setLoading(true)
@@ -154,8 +155,8 @@ export default function MentorsPage() {
         `, { count: 'exact' })
 
       // Apply Filters
-      if (filters.search) {
-        const searchTerm = `%${filters.search}%`
+      if (filters.search && filters.search.trim() !== '') {
+        const searchTerm = `%${filters.search.trim()}%`
         query = query.or(`full_name.ilike.${searchTerm},job_title.ilike.${searchTerm},company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
       }
 
@@ -163,16 +164,16 @@ export default function MentorsPage() {
         query = query.contains('organization_ids', [filters.organizationId])
       }
 
-      if (filters.country !== 'all') {
+      if (filters.country && filters.country !== 'all') {
         query = query.eq('country', filters.country)
       }
 
-      if (filters.state !== 'all') {
+      if (filters.state && filters.state !== 'all') {
         query = query.eq('state', filters.state)
       }
 
-      if (filters.city) {
-        query = query.ilike('city', `%${filters.city}%`)
+      if (filters.city && filters.city.trim() !== '') {
+        query = query.ilike('city', `%${filters.city.trim()}%`)
       }
 
       if (filters.languages.length > 0) {
