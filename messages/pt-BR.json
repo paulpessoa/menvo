@@ -1287,6 +1287,14 @@
     "loading": "Carregando agendamentos...",
     "empty": "Nenhum agendamento encontrado",
     "error": "Erro ao carregar agendamentos",
+    "roleMentee": "Mentorado",
+    "roleMentor": "Mentor",
+    "status": {
+      "pending": "Pendente",
+      "confirmed": "Confirmado",
+      "cancelled": "Cancelado",
+      "completed": "Concluído"
+    },
     "today": "Hoje",
     "expired": "Expirado",
     "minutes": "min",

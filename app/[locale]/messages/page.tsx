@@ -152,7 +152,7 @@ function MessagesContent() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4 h-[calc(100-4rem)]">
+      <div className="container mx-auto py-8 px-4 h-[calc(100vh-4rem)]">
         <Skeleton className="h-full w-full" />
       </div>
     )
@@ -175,14 +175,18 @@ function MessagesContent() {
                 placeholder={t("searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 focus:ring-primary focus:border-primary"
               />
             </div>
           </div>
 
           {/* Lista de Conversas */}
           <div className="flex-1 overflow-y-auto">
-            {filteredConversations.length === 0 ? (
+            {isLoading && conversations.length === 0 ? (
+                <div className="p-4 space-y-4">
+                    {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full" />)}
+                </div>
+            ) : filteredConversations.length === 0 ? (
               <div className="p-8 text-center">
                 <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="font-semibold mb-2">
@@ -195,43 +199,43 @@ function MessagesContent() {
                 </p>
               </div>
             ) : (
-              <div>
+              <div className="divide-y">
                 {filteredConversations.map((conversation) => (
                   <div
                     key={conversation.id}
-                    className={`p-4 border-b cursor-pointer transition-colors hover:bg-muted/50 ${selectedConversation?.id === conversation.id ? 'bg-muted' : ''
+                    className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${selectedConversation?.id === conversation.id ? 'bg-primary/5' : ''
                       } ${conversation.unread_count > 0 ? 'border-l-4 border-l-primary' : ''}`}
                     onClick={() => setSelectedConversation(conversation)}
                   >
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <Avatar className="h-12 w-12">
+                        <Avatar className="h-12 w-12 border">
                           <AvatarImage src={conversation.other_user?.avatar_url || "/placeholder.svg"} />
                           <AvatarFallback>
                             <User className="h-6 w-6" />
                           </AvatarFallback>
                         </Avatar>
                         {conversation.unread_count > 0 && (
-                          <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                          <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-sm ring-2 ring-background">
                             {conversation.unread_count > 9 ? '9+' : conversation.unread_count}
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className={`font-semibold truncate ${conversation.unread_count > 0 ? 'text-primary' : ''}`}>
+                          <span className={`font-semibold truncate text-sm ${conversation.unread_count > 0 ? 'text-primary' : 'text-gray-900'}`}>
                             {conversation.other_user?.full_name}
                           </span>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                             {formatTimestamp(conversation.last_message_at)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="outline" className="text-[10px] py-0 h-4 bg-muted/30">
                             {conversation.other_user?.is_mentor ? t("roleMentor") : t("roleMentee")}
                           </Badge>
                           {conversation.unread_count > 0 && (
-                            <span className="text-xs text-primary font-semibold">
+                            <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
                               {t("newMessages", { count: conversation.unread_count })}
                             </span>
                           )}
@@ -256,11 +260,13 @@ function MessagesContent() {
               mentorAvatar={selectedConversation.other_user?.avatar_url || undefined}
             />
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-muted/20">
-              <div className="text-center">
-                <MessageCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+            <div className="flex-1 flex items-center justify-center bg-muted/5">
+              <div className="text-center max-w-xs">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                    <MessageCircle className="h-8 w-8" />
+                </div>
                 <h3 className="text-lg font-semibold mb-2">{t("selectConversation")}</h3>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {t("selectConversationDesc")}
                 </p>
               </div>
@@ -271,7 +277,7 @@ function MessagesContent() {
         {/* Mobile: Chat em tela cheia quando selecionado */}
         {selectedConversation && (
           <div className="md:hidden fixed inset-0 bg-background z-50 flex flex-col">
-            <div className="p-4 border-b flex items-center gap-3">
+            <div className="p-3 border-b flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
@@ -279,17 +285,17 @@ function MessagesContent() {
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-8 w-8 border">
                 <AvatarImage src={selectedConversation.other_user?.avatar_url || "/placeholder.svg"} />
                 <AvatarFallback>
-                  <User className="h-5 w-5" />
+                  <User className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <h2 className="font-semibold">{selectedConversation.other_user?.full_name}</h2>
-                <Badge variant="secondary" className="text-xs">
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-sm truncate">{selectedConversation.other_user?.full_name}</h2>
+                <span className="text-[10px] text-muted-foreground block leading-none">
                   {selectedConversation.other_user?.is_mentor ? t("roleMentor") : t("roleMentee")}
-                </Badge>
+                </span>
               </div>
             </div>
             <div className="flex-1 overflow-hidden">

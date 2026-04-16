@@ -1313,6 +1313,14 @@
     "loading": "Loading appointments...",
     "empty": "No appointments found",
     "error": "Error loading appointments",
+    "roleMentee": "Mentee",
+    "roleMentor": "Mentor",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
     "today": "Today",
     "expired": "Expired",
     "minutes": "min",
