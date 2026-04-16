@@ -104,13 +104,17 @@ function MessagesContent() {
       if (convs) {
         // Para cada conversa, buscar o nome do outro usuário e contagem de não lidas
         const conversationsWithDetails = await Promise.all(convs.map(async (conv) => {
-          const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
+          // Lógica robusta para identificar o outro participante
+          // Se for uma conversa consigo mesmo (mentor_id == mentee_id), o otherUserId será o próprio ID
+          const otherUserId = conv.mentor_id === user.id 
+            ? (conv.mentee_id === user.id ? conv.mentor_id : conv.mentee_id)
+            : conv.mentor_id
           
-          const { data: otherUser } = await supabase
+          const { data: otherUser, error: profileError } = await supabase
             .from('profiles')
-            .select('id, full_name, avatar_url, is_mentor')
+            .select('id, full_name, avatar_url, job_title, company')
             .eq('id', otherUserId)
-            .single()
+            .maybeSingle()
 
           const { count: unreadCount } = await supabase
             .from('messages')
@@ -119,15 +123,18 @@ function MessagesContent() {
             .neq('sender_id', user.id)
             .is('read_at', null)
 
+          // Montar objeto amigável do outro usuário
+          const mappedOtherUser = {
+            id: otherUserId,
+            full_name: otherUser?.full_name || (otherUserId === user.id ? 'Você (Notas)' : 'Usuário'),
+            avatar_url: otherUser?.avatar_url || null,
+            is_mentor: !!otherUser?.job_title
+          }
+
           return {
             ...conv,
             unread_count: unreadCount || 0,
-            other_user: otherUser || {
-              id: otherUserId,
-              full_name: 'Usuário Removido',
-              avatar_url: null,
-              is_mentor: false
-            }
+            other_user: mappedOtherUser
           }
         }))
 

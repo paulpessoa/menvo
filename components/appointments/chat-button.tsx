@@ -45,19 +45,21 @@ export function ChatButton({ appointment, currentUserId, isMentor }: ChatButtonP
             </Button>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="max-w-2xl p-0 overflow-hidden border-none bg-transparent shadow-none">
+                <DialogContent className="max-w-2xl p-0 overflow-hidden border-none bg-transparent shadow-none max-h-[90vh] flex flex-col">
                     {/* 
                       Forçamos o remount do ChatInterface toda vez que o modal abre
                       usando isOpen no key, além de garantir que o ID seja o da outra pessoa.
                     */}
                     {isOpen && (
-                        <ChatInterface
-                            key={`${otherPerson.id}-${appointment.id}-${isOpen}`}
-                            mentorId={otherPerson.id}
-                            currentUserId={currentUserId}
-                            mentorName={otherPerson.full_name}
-                            mentorAvatar={otherPerson.avatar_url}
-                        />
+                        <div className="flex-1 overflow-hidden flex flex-col bg-white rounded-lg shadow-xl">
+                            <ChatInterface
+                                key={`${otherPerson.id}-${appointment.id}-${isOpen}`}
+                                mentorId={otherPerson.id}
+                                currentUserId={currentUserId}
+                                mentorName={otherPerson.full_name}
+                                mentorAvatar={otherPerson.avatar_url}
+                            />
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>
