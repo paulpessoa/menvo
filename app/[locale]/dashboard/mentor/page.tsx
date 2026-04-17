@@ -400,9 +400,3 @@ export default function MentorDashboard() {
         </RequireRole>
     )
 }
-             </div>
-                </div>
-            </div>
-        </RequireRole>
-    )
-}

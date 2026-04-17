@@ -176,11 +176,3 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </RequireRole>
     )
 }
--screen">
-                        {children}
-                    </main>
-                </div>
-            </div>
-        </RequireRole>
-    )
-}
