@@ -34,6 +34,7 @@ export function ChatInterface({
     const [realtimeStatus, setRealtimeStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const supabase = createClient();
 
@@ -45,6 +46,13 @@ export function ChatInterface({
         setIsTyping(false);
         loadMessages();
     }, [mentorId]);
+
+    // Focus input on initial load and when mentorId changes
+    useEffect(() => {
+        if (!loading) {
+            inputRef.current?.focus();
+        }
+    }, [loading, mentorId]);
 
     // Scroll to bottom when messages update
     useEffect(() => {
@@ -160,6 +168,9 @@ export function ChatInterface({
         const content = newMessage.trim();
         setNewMessage('');
         setSending(true);
+        
+        // Mantém o foco no input
+        inputRef.current?.focus();
 
         try {
             const response = await fetch('/api/chat/send', {
@@ -186,9 +197,14 @@ export function ChatInterface({
                 if (prev.some(m => m.id === optimisticMessage.id)) return prev;
                 return [...prev, optimisticMessage];
             });
+            
+            // Garante foco após renderizar mensagem otimista
+            setTimeout(() => inputRef.current?.focus(), 0);
+
         } catch (error) {
             toast.error(error instanceof Error ? error.message : 'Erro ao enviar mensagem');
             setNewMessage(content);
+            inputRef.current?.focus();
         } finally {
             setSending(false);
         }
@@ -275,6 +291,7 @@ export function ChatInterface({
             <form onSubmit={handleSendMessage} className="p-4 border-t bg-white">
                 <div className="flex gap-2">
                     <input
+                        ref={inputRef}
                         type="text"
                         value={newMessage}
                         onChange={(e) => {
