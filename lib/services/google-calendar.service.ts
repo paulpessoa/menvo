@@ -12,9 +12,9 @@ const { google } = require('googleapis');
 const getCalendarId = () => process.env.GOOGLE_CALENDAR_ID || 'primary';
 
 /**
- * Validar variáveis de ambiente em tempo de execução
+ * Obter variáveis faltando (para debug)
  */
-function getMissingEnvVars() {
+export function getMissingEnvVars() {
   const REQUIRED_ENV_VARS = [
     'GOOGLE_CALENDAR_CLIENT_ID',
     'GOOGLE_CALENDAR_CLIENT_SECRET',
