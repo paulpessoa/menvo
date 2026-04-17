@@ -3,7 +3,8 @@
     "welcome": "Velkommen",
     "home": "Hjem",
     "findMentors": "Find mentorer",
-    "events": "Begivenheder",
+    "hub": "Menvo Hub",
+    "events": "Menvo Hub",
     "howItWorks": "Sådan fungerer det",
     "aboutUs": "Om os",
     "title": "Menvo",
@@ -516,6 +517,31 @@
         "title": "Rekryterare",
         "description": "Jag söker kvalificerade proffs för möjligheter"
       }
+    }
+  },
+  "hub": {
+    "subtitle": "Oplev udvalgte begivenheder, kurser, værktøjer og rabatter for at fremskynde din rejse.",
+    "suggestBtn": "Foreslå ressource",
+    "searchPlaceholder": "Søg i hub...",
+    "viewMore": "Adgang",
+    "tabs": {
+      "all": "Alle",
+      "events": "Begivenheder",
+      "courses": "Kurser",
+      "tools": "Værktøjer",
+      "discounts": "Rabatter"
+    },
+    "types": {
+      "event": "Begivenhed",
+      "course": "Kursus",
+      "tool": "Værktøj",
+      "discount": "Rabat",
+      "job": "Job"
+    },
+    "noResults": {
+      "title": "Ingen ressourcer fundet",
+      "description": "Prøv at justere dine filtre eller søg efter andre termer.",
+      "clear": "Ryd filtre"
     }
   },
   "mentors": {

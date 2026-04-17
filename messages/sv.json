@@ -483,7 +483,32 @@
       },
       "getStarted": "Börja som mentee"
     },
-    "mentors": {
+    "hub": {
+    "subtitle": "Upptäck utvalda evenemang, kurser, verktyg och rabatter för att påskynda din resa.",
+    "suggestBtn": "Föreslå resurs",
+    "searchPlaceholder": "Sök i hubben...",
+    "viewMore": "Tillgång",
+    "tabs": {
+      "all": "Alla",
+      "events": "Evenemang",
+      "courses": "Kurser",
+      "tools": "Verktyg",
+      "discounts": "Rabatter"
+    },
+    "types": {
+      "event": "Evenemang",
+      "course": "Kurs",
+      "tool": "Verktyg",
+      "discount": "Rabat",
+      "job": "Jobb"
+    },
+    "noResults": {
+      "title": "Inga resurser hittades",
+      "description": "Försök att justera dina filter eller sök efter andra termer.",
+      "clear": "Rensa filter"
+    }
+  },
+  "mentors": {
       "step1": {
         "title": "Skapa din mentorprofil",
         "description": "Registrera dig och skapa din mentorprofil med information om din erfarenhet, kunskapsområden och ämnen du kan hjälpa till med.",

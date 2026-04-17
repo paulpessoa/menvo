@@ -3,7 +3,8 @@
     "welcome": "Bienvenue",
     "home": "Accueil",
     "findMentors": "Trouver des mentors",
-    "events": "Événements",
+    "hub": "Menvo Hub",
+    "events": "Menvo Hub",
     "howItWorks": "Comment ça marche",
     "aboutUs": "À propos de nous",
     "title": "Menvo",
@@ -517,8 +518,34 @@
       }
     }
   },
+  "hub": {
+    "subtitle": "Découvrez des événements, des cours, des outils et des réductions sélectionnés pour accélérer votre parcours.",
+    "suggestBtn": "Suggérer une ressource",
+    "searchPlaceholder": "Rechercher dans le hub...",
+    "viewMore": "Accéder",
+    "tabs": {
+      "all": "Tout",
+      "events": "Événements",
+      "courses": "Cours",
+      "tools": "Outils",
+      "discounts": "Réductions"
+    },
+    "types": {
+      "event": "Événement",
+      "course": "Cours",
+      "tool": "Outil",
+      "discount": "Réduction",
+      "job": "Emploi"
+    },
+    "noResults": {
+      "title": "Aucune ressource trouvée",
+      "description": "Essayez d'ajuster vos filtres ou de rechercher d'autres termes.",
+      "clear": "Effacer les filtres"
+    }
+  },
   "mentors": {
-    "title": "Trouvez un Mentor",
+    "title": "Trouver un mentor",
+
     "description": "Parcourez notre communauté de mentors bénévoles et trouvez le match parfait pour vos besoins",
     "searchPlaceholder": "Rechercher par nom, spécialité ou mots-clés...",
     "filtersTitle": "Filtres",
