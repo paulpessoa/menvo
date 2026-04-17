@@ -30,7 +30,8 @@ import {
   MessageCircle,
   Loader2,
   Building2,
-  Plus
+  Plus,
+  Star
 } from "lucide-react"
 
 import { useRouter } from "next/navigation"
