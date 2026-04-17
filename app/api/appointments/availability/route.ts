@@ -101,23 +101,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Iterate through each day in the range
-    for (
-      let date = new Date(start);
-      date <= end;
-      date.setDate(date.getDate() + 1)
-    ) {
-      // Usar a data formatada no fuso do Brasil para pegar o dia da semana correto
-      const dateString = date.toISOString().split('T')[0];
-      const [year, month, day] = dateString.split('-').map(Number);
+    const current = new Date(start);
+    console.log(`[AVAILABILITY] Iniciando loop de dias. De ${start.toISOString()} até ${end.toISOString()}`);
+    console.log(`[AVAILABILITY] Mentor possui ${availability.length} regras de disponibilidade.`);
+
+    while (current <= end) {
+      // Usar a data formatada ISO (YYYY-MM-DD) para evitar shifts de fuso no loop
+      const dateString = current.toISOString().split('T')[0];
       
-      // Criar uma data que represente o "hoje" no fuso do mentor (Brasília por padrão)
-      // 0 = Sunday, 1 = Monday...
-      const dayOfWeek = new Date(year, month - 1, day).getDay();
+      // Criar uma data ao meio-dia para garantir que o getDay() retorne o dia correto em qualquer fuso
+      const dayOfWeek = new Date(`${dateString}T12:00:00`).getDay();
 
       // Find availability for this day of week
       const dayAvailability = availability.filter(
-        (avail) => avail.day_of_week === dayOfWeek
+        (avail) => Number(avail.day_of_week) === dayOfWeek
       )
+
+      if (dayAvailability.length > 0) {
+          console.log(`[AVAILABILITY] Encontrada disponibilidade para ${dateString} (Dia ${dayOfWeek}): ${dayAvailability.length} períodos`);
+      }
 
       for (const avail of dayAvailability as any[]) {
         // Parse start and end times
@@ -150,9 +152,14 @@ export async function GET(request: NextRequest) {
               time: `${hourStr}:${minuteStr}`, // HH:MM
               datetime: slotDate.toISOString()
             })
+          } else {
+              console.log(`[AVAILABILITY] Slot ocupado ignorado: ${isoString}`);
           }
         }
       }
+      
+      // Incrementar um dia de forma segura
+      current.setDate(current.getDate() + 1);
     }
 
     // Sort slots by datetime
