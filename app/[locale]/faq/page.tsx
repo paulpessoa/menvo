@@ -11,19 +11,21 @@ export default function FAQPage() {
 
     // Add structured data for SEO
     useEffect(() => {
+        const faqs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => ({
+            "@type": "Question",
+            "name": t(`faq.q${i}.question`),
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": t(`faq.q${i}.answer`)
+            }
+        }))
+
         const script = document.createElement('script')
         script.type = 'application/ld+json'
         script.text = JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": Array.from({ length: 10 }, (_, i) => ({
-                "@type": "Question",
-                "name": t(`faq.q${i + 1}.question`),
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": t(`faq.q${i + 1}.answer`)
-                }
-            }))
+            "mainEntity": faqs
         })
         document.head.appendChild(script)
         return () => {
