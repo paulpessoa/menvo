@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,58 +12,17 @@ export function MessagesBadge() {
     const [unreadCount, setUnreadCount] = useState(0);
     const supabase = createClient();
 
-    useEffect(() => {
-        if (!isAuthenticated || !user) return;
-
-        loadUnreadCount();
-
-        // Subscrever ao Realtime para atualizar o contador
-        const channel = supabase
-            .channel('unread-messages-badge')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'messages',
-                },
-                () => {
-                    console.log('[BADGE] Nova mensagem via Realtime, recarregando contador');
-                    loadUnreadCount();
-                }
-            )
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'messages',
-                },
-                (payload: any) => {
-                    console.log('[BADGE] Mensagem atualizada via Realtime:', payload);
-                    // Recarregar apenas se foi marcada como lida (read_at mudou)
-                    if (payload.new.read_at !== payload.old.read_at) {
-                        console.log('[BADGE] Mensagem marcada como lida, recarregando contador');
-                        loadUnreadCount();
-                    }
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [isAuthenticated, user]);
-
-    const loadUnreadCount = async () => {
+    const loadUnreadCount = useCallback(async () => {
         if (!user) return;
 
         try {
-            // Buscar todas as conversas do usuário
-            const { data: conversations } = await supabase
+            // Buscar todas as conversas do usuário (ele pode ser mentor ou mentee)
+            const { data: conversations, error: convError } = await supabase
                 .from('conversations')
                 .select('id')
                 .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`);
+
+            if (convError) throw convError;
 
             if (!conversations || conversations.length === 0) {
                 setUnreadCount(0);
@@ -72,28 +31,59 @@ export function MessagesBadge() {
 
             const conversationIds = conversations.map((c: any) => c.id);
 
-            // Contar mensagens não lidas em todas as conversas
-            const { count } = await supabase
+            // Contar mensagens não lidas onde o usuário NÃO é o remetente
+            const { count, error: msgError } = await supabase
                 .from('messages')
                 .select('*', { count: 'exact', head: true })
                 .in('conversation_id', conversationIds)
                 .neq('sender_id', user.id)
                 .is('read_at', null);
 
+            if (msgError) throw msgError;
+
             setUnreadCount(count || 0);
         } catch (error) {
-            console.error('Erro ao carregar contador de não lidas:', error);
+            console.error('[BADGE] Erro ao carregar contador:', error);
         }
-    };
+    }, [user, supabase]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !user) return;
+
+        loadUnreadCount();
+
+        // Inscrição Realtime simplificada e robusta
+        // Escuta qualquer inserção ou update na tabela de mensagens
+        // O Supabase Realtime filtrará automaticamente baseado nas permissões de RLS do usuário
+        const channel = supabase
+            .channel('unread-badge-realtime')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*', // Escuta INSERT, UPDATE e DELETE
+                    schema: 'public',
+                    table: 'messages',
+                },
+                () => {
+                    // Recarrega o contador para garantir precisão
+                    loadUnreadCount();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [isAuthenticated, user, loadUnreadCount, supabase]);
 
     if (!isAuthenticated) return null;
 
     return (
-        <Button variant="ghost" size="icon" className="relative" asChild>
+        <Button variant="ghost" size="icon" className="relative" asChild title="Mensagens">
             <Link href="/messages">
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-sm ring-2 ring-background">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}

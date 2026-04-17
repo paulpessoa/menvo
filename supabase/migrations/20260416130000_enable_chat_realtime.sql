@@ -1,11 +1,12 @@
 -- =================================================================
--- ENABLE REALTIME FOR CHAT TABLES
+-- ENABLE REALTIME FOR CHAT TABLES - REPLICA IDENTITY
 -- Adds messages and conversations to the realtime publication
+-- and ensures updates are captured correctly
 -- =================================================================
 
 BEGIN;
 
--- Check if tables are already in publication to avoid errors
+-- 1. Enable Realtime for the tables
 DO $$
 BEGIN
     IF NOT EXISTS (
@@ -27,5 +28,10 @@ BEGIN
     END IF;
 END
 $$;
+
+-- 2. Set Replica Identity to FULL
+-- This is CRITICAL for UPDATE events to correctly broadcast changes in fields like 'read_at'
+ALTER TABLE public.messages REPLICA IDENTITY FULL;
+ALTER TABLE public.conversations REPLICA IDENTITY FULL;
 
 COMMIT;
