@@ -41,6 +41,7 @@ export function BookMentorshipModal({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [pendingEvaluation, setPendingEvaluation] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -51,6 +52,49 @@ export function BookMentorshipModal({
     const loadAvailability = async () => {
         try {
             setLoading(true);
+            setError('');
+
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                // Verificar se o usuário tem mentorias concluídas sem feedback
+                const { data: completedWithoutFeedback, error: evalError } = await supabase
+                    .from('appointments')
+                    .select('id')
+                    .eq('mentee_id', user.id)
+                    .eq('status', 'completed')
+                    .not('id', 'in', (
+                        supabase
+                            .from('appointment_feedbacks')
+                            .select('appointment_id')
+                            .eq('reviewer_id', user.id)
+                    ));
+                
+                // Nota: O Supabase JS não suporta subqueries complexas no 'not in' de forma nativa assim.
+                // Vamos simplificar: buscar completas e depois buscar feedbacks
+                const { data: completed } = await supabase
+                    .from('appointments')
+                    .select('id')
+                    .eq('mentee_id', user.id)
+                    .eq('status', 'completed');
+                
+                if (completed && completed.length > 0) {
+                    const { data: feedbacks } = await supabase
+                        .from('appointment_feedbacks')
+                        .select('appointment_id')
+                        .eq('reviewer_id', user.id);
+                    
+                    const feedbackIds = new Set(feedbacks?.map(f => f.appointment_id));
+                    const pending = completed.some(c => !feedbackIds.has(c.id));
+                    
+                    if (pending) {
+                        setPendingEvaluation(true);
+                        setLoading(false);
+                        return;
+                    }
+                }
+            }
 
             // Usar a API de availability que já filtra horários ocupados
             const startDate = new Date().toISOString().split('T')[0];
@@ -165,6 +209,22 @@ export function BookMentorshipModal({
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                    </div>
+                ) : pendingEvaluation ? (
+                    <div className="py-8 text-center space-y-4">
+                        <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-yellow-600">
+                            <Star className="w-8 h-8 fill-current" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900">Avaliação Pendente</h3>
+                        <p className="text-gray-600 max-w-sm mx-auto">
+                            Você tem uma mentoria concluída que ainda não foi avaliada. 
+                            Por favor, avalie sua última sessão para liberar novos agendamentos.
+                        </p>
+                        <Button asChild className="mt-4">
+                            <Link href="/mentorship/mentee">
+                                Ver minhas mentorias
+                            </Link>
+                        </Button>
                     </div>
                 ) : !selectedSlot ? (
                     // Mostrar horários disponíveis

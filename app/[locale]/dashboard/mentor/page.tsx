@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Users, Settings, Clock, CheckCircle, AlertCircle, TrendingUp, Star, MessageCircle } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Calendar, Users, Settings, Clock, CheckCircle, AlertCircle, TrendingUp, Star, MessageCircle, Heart, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
+import { useFavorites } from "@/hooks/useFavorites"
 
 interface MentorStats {
     totalAppointments: number
@@ -31,6 +33,16 @@ interface Appointment {
     }
 }
 
+interface FavoriteMentor {
+    id: string
+    full_name: string
+    avatar_url: string | null
+    job_title: string | null
+    company: string | null
+    average_rating: number
+    slug: string | null
+}
+
 export default function MentorDashboard() {
     const t = useTranslations("dashboard")
     const { user, profile, isVerified } = useAuth()
@@ -43,9 +55,12 @@ export default function MentorDashboard() {
         totalReviews: 0
     })
     const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([])
+    const [favoriteMentorsData, setFavoriteMentorsData] = useState<FavoriteMentor[]>([])
     const [loading, setLoading] = useState(true)
+    const [loadingFavorites, setLoadingFavorites] = useState(false)
 
     const supabase = createClient()
+    const { favorites } = useFavorites(user?.id)
 
     useEffect(() => {
         if (user?.id) {
@@ -53,6 +68,14 @@ export default function MentorDashboard() {
             fetchUpcomingAppointments()
         }
     }, [user?.id])
+
+    useEffect(() => {
+        if (user?.id && favorites.length > 0) {
+            fetchFavoriteMentorsDetails()
+        } else {
+            setFavoriteMentorsData([])
+        }
+    }, [user?.id, favorites])
 
     const fetchMentorStats = async () => {
         try {
@@ -134,39 +157,30 @@ export default function MentorDashboard() {
         }
     }
 
+    const fetchFavoriteMentorsDetails = async () => {
+        setLoadingFavorites(true)
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('id, full_name, avatar_url, job_title, company, average_rating, slug')
+                .in('id', favorites)
+                .limit(4)
+
+            if (error) throw error
+            setFavoriteMentorsData(data || [])
+        } catch (error) {
+            console.error('Error fetching favorite mentors details:', error)
+        } finally {
+            setLoadingFavorites(false)
+        }
+    }
+
     const getGreeting = () => {
         const hour = new Date().getHours()
         if (hour < 12) return t("greetings.morning")
         if (hour < 18) return t("greetings.afternoon")
         return t("greetings.evening")
     }
-
-    const quickActions = [
-        {
-            title: t("mentor.actions.availability"),
-            description: t("mentor.actions.availabilityDesc"),
-            href: "/dashboard/mentor/availability",
-            icon: Calendar,
-            color: "bg-blue-500",
-            disabled: !isVerified
-        },
-        {
-            title: t("mentor.actions.mentorships"),
-            description: t("mentor.actions.mentorshipsDesc"),
-            href: "/mentorship/mentor",
-            icon: Clock,
-            color: "bg-green-500",
-            disabled: !isVerified
-        },
-        {
-            title: t("mentor.actions.editProfile"),
-            description: t("mentor.actions.editProfileDesc"),
-            href: "/profile",
-            icon: Settings,
-            color: "bg-purple-500",
-            disabled: false
-        }
-    ]
 
     return (
         <RequireRole roles={['mentor']}>
@@ -267,72 +281,120 @@ export default function MentorDashboard() {
                         </Card>
                     </div>
 
-                    <div>
-                        <h2 className="text-2xl font-semibold mb-6">{t("mentor.actions.title")}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {quickActions.map((action, index) => (
-                                <Card key={index} className={`hover:shadow-md transition-shadow ${action.disabled ? 'opacity-50' : ''}`}>
-                                    <CardHeader>
-                                        <div className={`p-2 rounded-lg ${action.color} w-fit`}>
-                                            <action.icon className="h-6 w-6 text-white" />
-                                        </div>
-                                        <CardTitle className="text-lg">{action.title}</CardTitle>
-                                        <CardDescription>{action.description}</CardDescription>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Ações Rápidas */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <h2 className="text-2xl font-semibold">{t("mentor.actions.title")}</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Card className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg flex items-center gap-2">
+                                            <Calendar className="h-5 w-5 text-blue-500" />
+                                            Gerenciar Agenda
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <Button
-                                            asChild={!action.disabled}
-                                            className="w-full"
-                                            disabled={action.disabled}
-                                        >
-                                            {action.disabled ? (
-                                                <span>
-                                                    {t("mentor.actions.waitingVerification")}
-                                                </span>
-                                            ) : (
-                                                <Link href={action.href}>
-                                                    {t("mentor.actions.access")}
-                                                </Link>
-                                            )}
+                                        <p className="text-sm text-muted-foreground mb-4">Defina seus horários e fuso horário de atendimento</p>
+                                        <Button asChild variant="outline" size="sm" className="w-full" disabled={!isVerified}>
+                                            <Link href="/dashboard/mentor/availability">Configurar Agenda</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
-                            ))}
+
+                                <Card className="hover:shadow-md transition-shadow border-l-4 border-l-green-500">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg flex items-center gap-2">
+                                            <Clock className="h-5 w-5 text-green-500" />
+                                            Minhas Mentorias
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground mb-4">Acompanhe seus agendamentos confirmados e pendentes</p>
+                                        <Button asChild variant="outline" size="sm" className="w-full" disabled={!isVerified}>
+                                            <Link href="/mentorship/mentor">Ver Mentorias</Link>
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Mentores Favoritos */}
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between">
+                                    <div>
+                                        <CardTitle className="text-lg flex items-center gap-2">
+                                            <Heart className="h-5 w-5 text-red-500 fill-current" />
+                                            Meus Mentores Favoritos
+                                        </CardTitle>
+                                        <CardDescription>Acesso rápido aos mentores que você salvou para se inspirar ou consultar</CardDescription>
+                                    </div>
+                                    <Button variant="ghost" size="sm" asChild>
+                                        <Link href="/mentors">Ver todos</Link>
+                                    </Button>
+                                </CardHeader>
+                                <CardContent>
+                                    {loadingFavorites ? (
+                                        <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                                    ) : favoriteMentorsData.length === 0 ? (
+                                        <div className="text-center py-4 text-muted-foreground text-sm italic">
+                                            Você ainda não salvou nenhum mentor.
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {favoriteMentorsData.map(mentor => (
+                                                <Link key={mentor.id} href={`/mentors/${mentor.slug || mentor.id}`}>
+                                                    <div className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                                                        <Avatar className="h-10 w-10">
+                                                            <AvatarImage src={mentor.avatar_url || undefined} />
+                                                            <AvatarFallback>{mentor.full_name[0]}</AvatarFallback>
+                                                        </Avatar>
+                                                        <div className="min-w-0">
+                                                            <p className="text-sm font-medium truncate">{mentor.full_name}</p>
+                                                            <p className="text-xs text-muted-foreground truncate">{mentor.job_title}</p>
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Coluna Direita: Próximas Mentorias */}
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-semibold">Próximas Sessões</h2>
+                            {upcomingAppointments.length === 0 ? (
+                                <Card>
+                                    <CardContent className="py-8 text-center">
+                                        <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
+                                        <p className="text-sm text-muted-foreground">Nenhuma sessão agendada.</p>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="space-y-4">
+                                    {upcomingAppointments.map(appt => (
+                                        <Card key={appt.id}>
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarImage src={appt.mentee.avatar_url || undefined} />
+                                                        <AvatarFallback>{appt.mentee.full_name[0]}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="text-sm font-medium">{appt.mentee.full_name}</p>
+                                                        <p className="text-xs text-muted-foreground">{new Date(appt.scheduled_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                                                    </div>
+                                                </div>
+                                                <Button asChild size="sm" variant="secondary" className="w-full">
+                                                    <Link href="/mentorship/mentor">Ver Detalhes</Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
-
-                    {!isVerified && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>{t("gettingStarted.title")}</CardTitle>
-                                <CardDescription>
-                                    {t("gettingStarted.description")}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">{t("gettingStarted.step1")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">{t("gettingStarted.step2")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <AlertCircle className="h-5 w-5 text-yellow-600" />
-                                    <span className="text-sm">{t("gettingStarted.step3Mentor")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step4Mentor")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step5Mentor")}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
                 </div>
             </div>
         </RequireRole>

@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
+import { useFavorites } from "@/hooks/useFavorites"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { createClient } from "@/utils/supabase/client"
@@ -120,6 +121,7 @@ export default function MentorsPage() {
   const supabase = createClient()
   const { user } = useAuth()
   const { isModalOpen, openModal, closeModal, handleSubmit } = useMentorSuggestion()
+  const { favorites, toggleFavorite } = useFavorites(user?.id)
 
   const fetchMentors = async (isInitial = false) => {
     try {
@@ -563,7 +565,12 @@ export default function MentorsPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mentors.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
+              <MentorCard 
+                key={mentor.id} 
+                mentor={mentor} 
+                isFavorite={favorites.includes(mentor.id)}
+                onToggleFavorite={() => toggleFavorite(mentor.id)}
+              />
             ))}
           </div>
 
@@ -627,10 +634,17 @@ function SkeletonCard({ key }: { key: number }) {
   )
 }
 
-function MentorCard({ mentor }: { mentor: MentorProfile }) {
+function MentorCard({ 
+  mentor, 
+  isFavorite, 
+  onToggleFavorite 
+}: { 
+  mentor: MentorProfile, 
+  isFavorite: boolean,
+  onToggleFavorite: () => void 
+}) {
   const t = useTranslations("mentorsPage")
   const router = useRouter()
-  const { user } = useAuth()
 
   const getAvailabilityColor = (status: string) => {
     switch (status) {
@@ -655,17 +669,20 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
     router.push(`/mentors/${mentor.slug || mentor.id}`)
   }
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (!user) {
-      toast.info("Você deve estar logado para favoritar mentores")
-      return
-    }
-    toast.success("Mentor favoritado com sucesso!")
-  }
-
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
+    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full relative">
+      <button 
+        onClick={(e) => {
+          e.preventDefault();
+          onToggleFavorite();
+        }}
+        className={`absolute top-4 right-4 p-2 rounded-full shadow-sm transition-all z-10 ${
+          isFavorite ? 'bg-red-50 text-red-500' : 'bg-white/80 text-gray-400 hover:text-red-400'
+        }`}
+      >
+        <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+      </button>
+
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
@@ -676,20 +693,27 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg line-clamp-1">{mentor.full_name}</CardTitle>
+              <CardTitle className="text-lg line-clamp-1 pr-8">{mentor.full_name}</CardTitle>
               <CardDescription className="text-sm line-clamp-1">
                 {mentor.job_title}
                 {mentor.company && ` @ ${mentor.company}`}
               </CardDescription>
             </div>
           </div>
-          <Badge className={`${getAvailabilityColor(mentor.availability_status)} whitespace-nowrap`}>
-            {getAvailabilityText(mentor.availability_status)}
-          </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4 flex-1 flex flex-col">
+        <div className="flex justify-between items-center">
+            <Badge className={`${getAvailabilityColor(mentor.availability_status)} whitespace-nowrap`}>
+                {getAvailabilityText(mentor.availability_status)}
+            </Badge>
+            <div className="flex items-center text-xs text-muted-foreground">
+                <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
+                {mentor.average_rating.toFixed(1)} ({mentor.total_reviews})
+            </div>
+        </div>
+
         {mentor.bio && (
           <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
             {mentor.bio}
@@ -720,19 +744,19 @@ function MentorCard({ mentor }: { mentor: MentorProfile }) {
           </div>
         )}
 
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
           <div className="flex items-center">
             <MessageCircle className="h-3 w-3 mr-1" />
             <span>{t("sessionsCount", { count: mentor.total_sessions || 0 })}</span>
           </div>
+          {mentor.experience_years && (
+             <span>{mentor.experience_years} {t("years")}</span>
+          )}
         </div>
 
-        <div className="flex space-x-2 pt-2 mt-auto">
+        <div className="flex space-x-2 pt-2">
           <Button onClick={handleScheduleClick} className="flex-1">
             {t("viewProfile")}
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleFavoriteClick}>
-            <Heart className="h-4 w-4" />
           </Button>
         </div>
       </CardContent>

@@ -11,6 +11,7 @@ import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
+import { useFavorites } from "@/hooks/useFavorites"
 
 interface MenteeStats {
     totalAppointments: number
@@ -32,15 +33,13 @@ interface Appointment {
     }
 }
 
-interface FeaturedMentor {
+interface FavoriteMentor {
     id: string
     full_name: string
     avatar_url: string | null
     job_title: string | null
     company: string | null
     average_rating: number
-    total_reviews: number
-    mentorship_topics: string[] | null
     slug: string | null
 }
 
@@ -55,18 +54,27 @@ export default function MenteeDashboard() {
         totalHours: 0
     })
     const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([])
-    const [featuredMentors, setFeaturedMentors] = useState<FeaturedMentor[]>([])
+    const [favoriteMentorsData, setFavoriteMentorsData] = useState<FavoriteMentor[]>([])
     const [loading, setLoading] = useState(true)
+    const [loadingFavorites, setLoadingFavorites] = useState(false)
 
     const supabase = createClient()
+    const { favorites } = useFavorites(user?.id)
 
     useEffect(() => {
         if (user?.id) {
             fetchMenteeStats()
             fetchUpcomingAppointments()
-            fetchFeaturedMentors()
         }
     }, [user?.id])
+
+    useEffect(() => {
+        if (user?.id && favorites.length > 0) {
+            fetchFavoriteMentorsDetails()
+        } else {
+            setFavoriteMentorsData([])
+        }
+    }, [user?.id, favorites])
 
     const fetchMenteeStats = async () => {
         try {
@@ -145,34 +153,21 @@ export default function MenteeDashboard() {
         }
     }
 
-    const fetchFeaturedMentors = async () => {
+    const fetchFavoriteMentorsDetails = async () => {
+        setLoadingFavorites(true)
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select(`
-                    id,
-                    full_name,
-                    avatar_url,
-                    job_title,
-                    company,
-                    average_rating,
-                    total_reviews,
-                    mentorship_topics,
-                    slug,
-                    user_roles!inner(
-                        roles!inner(name)
-                    )
-                `)
-                .eq('verified', true)
-                .eq('user_roles.roles.name', 'mentor')
-                .order('average_rating', { ascending: false })
-                .limit(3)
+                .select('id, full_name, avatar_url, job_title, company, average_rating, slug')
+                .in('id', favorites)
+                .limit(4)
 
             if (error) throw error
-
-            setFeaturedMentors(data || [])
+            setFavoriteMentorsData(data || [])
         } catch (error) {
-            console.error('Error fetching featured mentors:', error)
+            console.error('Error fetching favorite mentors details:', error)
+        } finally {
+            setLoadingFavorites(false)
         }
     }
 
@@ -182,30 +177,6 @@ export default function MenteeDashboard() {
         if (hour < 18) return t("greetings.afternoon")
         return t("greetings.evening")
     }
-
-    const quickActions = [
-        {
-            title: t("mentor.actions.mentorships"),
-            description: t("mentee.actions.findDesc"),
-            href: "/mentorship/mentee",
-            icon: Calendar,
-            color: "bg-green-500"
-        },
-        {
-            title: t("mentee.actions.find"),
-            description: t("mentee.actions.findDesc"),
-            href: "/mentors",
-            icon: Search,
-            color: "bg-blue-500"
-        },
-        {
-            title: t("mentor.actions.editProfile"),
-            description: t("mentor.actions.editProfileDesc"),
-            href: "/profile",
-            icon: Users,
-            color: "bg-purple-500"
-        }
-    ]
 
     return (
         <RequireRole roles={['mentee']}>
@@ -282,80 +253,122 @@ export default function MenteeDashboard() {
                         </Card>
                     </div>
 
-                    <div>
-                        <h2 className="text-2xl font-semibold mb-6">{t("mentor.actions.title")}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {quickActions.map((action, index) => (
-                                <Card key={index} className="hover:shadow-md transition-shadow">
-                                    <CardHeader>
-                                        <div className={`p-2 rounded-lg ${action.color} w-fit`}>
-                                            <action.icon className="h-6 w-6 text-white" />
-                                        </div>
-                                        <CardTitle className="text-lg">{action.title}</CardTitle>
-                                        <CardDescription>{action.description}</CardDescription>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Ações Rápidas */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <h2 className="text-2xl font-semibold">{t("mentor.actions.title")}</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Card className="hover:shadow-md transition-shadow border-l-4 border-l-green-500">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg flex items-center gap-2">
+                                            <Calendar className="h-5 w-5 text-green-500" />
+                                            Minhas Mentorias
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <Button asChild className="w-full">
-                                            <Link href={action.href}>
-                                                {t("mentor.actions.access")}
-                                                <ArrowRight className="ml-2 h-4 w-4" />
-                                            </Link>
+                                        <p className="text-sm text-muted-foreground mb-4">Veja seus agendamentos e avalie sessões concluídas</p>
+                                        <Button asChild variant="outline" size="sm" className="w-full">
+                                            <Link href="/mentorship/mentee">Acessar Mentorias</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
-                            ))}
+
+                                <Card className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg flex items-center gap-2">
+                                            <Search className="h-5 w-5 text-blue-500" />
+                                            Buscar Mentores
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-muted-foreground mb-4">Encontre especialistas para acelerar sua carreira</p>
+                                        <Button asChild variant="outline" size="sm" className="w-full">
+                                            <Link href="/mentors">Ver Mentores</Link>
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Mentores Favoritos */}
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between">
+                                    <div>
+                                        <CardTitle className="text-lg flex items-center gap-2">
+                                            <Heart className="h-5 w-5 text-red-500 fill-current" />
+                                            Mentores Favoritos
+                                        </CardTitle>
+                                        <CardDescription>Acesso rápido aos mentores que você salvou</CardDescription>
+                                    </div>
+                                    <Button variant="ghost" size="sm" asChild>
+                                        <Link href="/mentors">Ver todos</Link>
+                                    </Button>
+                                </CardHeader>
+                                <CardContent>
+                                    {loadingFavorites ? (
+                                        <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                                    ) : favoriteMentorsData.length === 0 ? (
+                                        <div className="text-center py-4 text-muted-foreground text-sm italic">
+                                            Você ainda não salvou nenhum mentor.
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {favoriteMentorsData.map(mentor => (
+                                                <Link key={mentor.id} href={`/mentors/${mentor.slug || mentor.id}`}>
+                                                    <div className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                                                        <Avatar className="h-10 w-10">
+                                                            <AvatarImage src={mentor.avatar_url || undefined} />
+                                                            <AvatarFallback>{mentor.full_name[0]}</AvatarFallback>
+                                                        </Avatar>
+                                                        <div className="min-w-0">
+                                                            <p className="text-sm font-medium truncate">{mentor.full_name}</p>
+                                                            <p className="text-xs text-muted-foreground truncate">{mentor.job_title}</p>
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>{t("gettingStarted.title")}</CardTitle>
-                                <CardDescription>
-                                    {t("gettingStarted.description")}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">{t("gettingStarted.step1")}</span>
+                        {/* Coluna Direita: Próximas Mentorias */}
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-semibold">Próximas Sessões</h2>
+                            {upcomingAppointments.length === 0 ? (
+                                <Card>
+                                    <CardContent className="py-8 text-center">
+                                        <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
+                                        <p className="text-sm text-muted-foreground">Nenhuma sessão agendada.</p>
+                                        <Button asChild variant="link" className="mt-2">
+                                            <Link href="/mentors">Agendar agora</Link>
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            ) : (
+                                <div className="space-y-4">
+                                    {upcomingAppointments.map(appt => (
+                                        <Card key={appt.id}>
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarImage src={appt.mentor.avatar_url || undefined} />
+                                                        <AvatarFallback>{appt.mentor.full_name[0]}</AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="text-sm font-medium">{appt.mentor.full_name}</p>
+                                                        <p className="text-xs text-muted-foreground">{new Date(appt.scheduled_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                                                    </div>
+                                                </div>
+                                                <Button asChild size="sm" variant="secondary" className="w-full">
+                                                    <Link href="/mentorship/mentee">Ver Detalhes</Link>
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle className="h-5 w-5 text-green-600" />
-                                    <span className="text-sm">{t("gettingStarted.step2")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step3Mentee")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step4Mentee")}</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                                    <span className="text-sm text-muted-foreground">{t("gettingStarted.step5Mentee")}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>{t("mentee.progress.title")}</CardTitle>
-                                <CardDescription>
-                                    {t("mentee.progress.description")}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-center py-6 text-muted-foreground">
-                                    <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                    <p className="text-sm italic">{t("mentee.progress.inDevelopment")}</p>
-                                    <p className="text-xs mt-2">
-                                        {t("mentee.progress.comingSoon")}
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
