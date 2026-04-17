@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Loader2 } from 'lucide-react';
+import { X, Calendar, Clock, Loader2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -9,6 +9,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { createClient } from '@/utils/supabase/client';
+import Link from 'next/link';
 
 interface TimeSlot {
     day_of_week: number;
@@ -35,7 +37,7 @@ export function BookMentorshipModal({
     mentorName,
 }: BookMentorshipModalProps) {
     const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
     const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,26 +55,15 @@ export function BookMentorshipModal({
         try {
             setLoading(true);
             setError('');
+            setPendingEvaluation(false);
+            setAvailableSlots([]);
 
             const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { session } } = await supabase.auth.getSession();
+            const user = session?.user;
 
             if (user) {
                 // Verificar se o usuário tem mentorias concluídas sem feedback
-                const { data: completedWithoutFeedback, error: evalError } = await supabase
-                    .from('appointments')
-                    .select('id')
-                    .eq('mentee_id', user.id)
-                    .eq('status', 'completed')
-                    .not('id', 'in', (
-                        supabase
-                            .from('appointment_feedbacks')
-                            .select('appointment_id')
-                            .eq('reviewer_id', user.id)
-                    ));
-                
-                // Nota: O Supabase JS não suporta subqueries complexas no 'not in' de forma nativa assim.
-                // Vamos simplificar: buscar completas e depois buscar feedbacks
                 const { data: completed } = await supabase
                     .from('appointments')
                     .select('id')
@@ -130,8 +121,6 @@ export function BookMentorshipModal({
             setLoading(false);
         }
     };
-
-
 
     const handleBookSlot = (slot: TimeSlot) => {
         setSelectedSlot(slot);
@@ -199,164 +188,181 @@ export function BookMentorshipModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>
-                        Agendar Mentoria com {mentorName}
-                    </DialogTitle>
-                </DialogHeader>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 border-none">
+                <div className="bg-white rounded-lg overflow-hidden flex flex-col h-full">
+                    <DialogHeader className="p-6 border-b bg-gray-50">
+                        <DialogTitle className="text-2xl font-bold text-gray-900">
+                            Agendar Mentoria com {mentorName}
+                        </DialogTitle>
+                    </DialogHeader>
 
-                {loading ? (
-                    <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-                    </div>
-                ) : pendingEvaluation ? (
-                    <div className="py-8 text-center space-y-4">
-                        <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-yellow-600">
-                            <Star className="w-8 h-8 fill-current" />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900">Avaliação Pendente</h3>
-                        <p className="text-gray-600 max-w-sm mx-auto">
-                            Você tem uma mentoria concluída que ainda não foi avaliada. 
-                            Por favor, avalie sua última sessão para liberar novos agendamentos.
-                        </p>
-                        <Button asChild className="mt-4">
-                            <Link href="/mentorship/mentee">
-                                Ver minhas mentorias
-                            </Link>
-                        </Button>
-                    </div>
-                ) : !selectedSlot ? (
-                    // Mostrar horários disponíveis
-                    <div className="space-y-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
-                            <p className="text-sm text-blue-800">
-                                ℹ️ Todas as mentorias têm duração de <strong>45 minutos</strong>
-                            </p>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                            Selecione um horário disponível:
-                        </p>
-
-                        {availableSlots.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                                <p>Nenhum horário disponível no momento</p>
-                                <p className="text-sm mt-2">
-                                    O mentor ainda não configurou sua disponibilidade
+                    <div className="p-6 flex-1 overflow-y-auto">
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                                <p className="text-sm text-muted-foreground animate-pulse text-center">Buscando horários disponíveis do mentor...</p>
+                            </div>
+                        ) : pendingEvaluation ? (
+                            <div className="py-12 text-center space-y-4">
+                                <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-yellow-600">
+                                    <Star className="w-10 h-10 fill-current" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900">Avaliação Pendente</h3>
+                                <p className="text-gray-600 max-w-sm mx-auto">
+                                    Você tem uma mentoria concluída que ainda não foi avaliada. 
+                                    Por favor, avalie sua última sessão para liberar novos agendamentos.
                                 </p>
+                                <Button asChild className="mt-6">
+                                    <Link href="/mentorship/mentee">
+                                        Ver minhas mentorias
+                                    </Link>
+                                </Button>
                             </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto">
-                                {availableSlots.map((slot, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleBookSlot(slot)}
-                                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex flex-col items-center justify-center w-12 h-12 bg-indigo-100 rounded-lg">
-                                                <span className="text-xs font-medium text-indigo-600">
-                                                    {slot.formatted_date.split(',')[0]}
-                                                </span>
-                                                <span className="text-lg font-bold text-indigo-600">
-                                                    {slot.date.getDate()}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-gray-900">
-                                                    {DAYS_OF_WEEK[slot.day_of_week]}
-                                                </p>
-                                                <p className="text-sm text-gray-600 flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" />
-                                                    {slot.formatted_time} • 45min
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
-                                            Agendar
-                                        </span>
-                                    </button>
-                                ))}
+                        ) : error ? (
+                            <div className="py-12 text-center space-y-4">
+                                <div className="bg-red-50 text-red-700 p-4 rounded-lg inline-block">
+                                    {error}
+                                </div>
+                                <Button variant="outline" onClick={loadAvailability}>Tentar novamente</Button>
                             </div>
-                        )}
-                    </div>
-                ) : (
-                    // Confirmação do agendamento
-                    <div className="space-y-4">
-                        <div className="bg-indigo-50 p-4 rounded-lg">
-                            <p className="text-sm text-gray-600 mb-2">Horário selecionado:</p>
-                            <div className="flex items-center gap-3">
-                                <Calendar className="w-5 h-5 text-indigo-600" />
-                                <div>
-                                    <p className="font-semibold text-gray-900">
-                                        {DAYS_OF_WEEK[selectedSlot.day_of_week]}, {selectedSlot.formatted_date}
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        {selectedSlot.formatted_time}
-                                    </p>
-                                    <p className="text-xs text-indigo-600 font-medium mt-1">
-                                        Duração: 45 minutos
+                        ) : !selectedSlot ? (
+                            // Mostrar horários disponíveis
+                            <div className="space-y-6">
+                                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+                                    <div className="bg-blue-500 text-white rounded-full p-1 mt-0.5">
+                                        <Clock className="w-3 h-3" />
+                                    </div>
+                                    <p className="text-sm text-blue-800 leading-relaxed">
+                                        As mentorias do <strong>{mentorName}</strong> têm duração padrão de <strong>45 minutos</strong>. Selecione um horário abaixo para prosseguir.
                                     </p>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div>
-                            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                                Por que você quer esta mentoria? *
-                            </label>
-                            <textarea
-                                id="message"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                placeholder="Descreva suas dúvidas e o que você gostaria de discutir na mentoria..."
-                                rows={5}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                Mínimo de 20 caracteres ({message.length}/20)
-                            </p>
-                        </div>
-
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                                {error}
-                            </div>
-                        )}
-
-                        {success && (
-                            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
-                                ✅ Solicitação enviada com sucesso!
-                            </div>
-                        )}
-
-                        <div className="flex gap-3 pt-4">
-                            <Button
-                                variant="outline"
-                                onClick={() => setSelectedSlot(null)}
-                                disabled={isSubmitting}
-                                className="flex-1"
-                            >
-                                Voltar
-                            </Button>
-                            <Button
-                                onClick={handleConfirmBooking}
-                                disabled={isSubmitting || message.length < 20}
-                                className="flex-1"
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Enviando...
-                                    </>
+                                {availableSlots.length === 0 ? (
+                                    <div className="text-center py-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                                        <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                                        <h3 className="text-lg font-medium text-gray-900">Nenhum horário disponível</h3>
+                                        <p className="text-sm text-gray-500 mt-2 max-w-xs mx-auto">
+                                            Não encontramos horários livres nas próximas 2 semanas. Tente novamente mais tarde.
+                                        </p>
+                                    </div>
                                 ) : (
-                                    'Confirmar Agendamento'
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {availableSlots.map((slot, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handleBookSlot(slot)}
+                                                className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-primary hover:ring-1 hover:ring-primary hover:bg-primary/5 transition-all text-left group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex flex-col items-center justify-center w-14 h-14 bg-gray-100 rounded-xl group-hover:bg-primary/10 transition-colors">
+                                                        <span className="text-[10px] uppercase font-bold text-gray-500 group-hover:text-primary">
+                                                            {slot.formatted_date.split(',')[0]}
+                                                        </span>
+                                                        <span className="text-xl font-black text-gray-900 group-hover:text-primary">
+                                                            {slot.date.getDate()}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-bold text-gray-900 capitalize">
+                                                            {DAYS_OF_WEEK[slot.day_of_week]}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                                                            <Clock className="w-3.5 h-3.5" />
+                                                            {slot.formatted_time} • 45min
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="h-8 w-8 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-primary group-hover:bg-primary group-hover:text-white transition-all">
+                                                    <Plus className="w-4 h-4" />
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
-                            </Button>
-                        </div>
+                            </div>
+                        ) : (
+                            // Confirmação do agendamento
+                            <div className="space-y-6">
+                                <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                                        <Calendar className="w-20 h-20 text-primary" />
+                                    </div>
+                                    <p className="text-xs font-bold text-primary uppercase tracking-wider mb-4">Horário selecionado</p>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                                            <Calendar className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-900 text-lg capitalize">
+                                                {DAYS_OF_WEEK[selectedSlot.day_of_week]}, {selectedSlot.formatted_date}
+                                            </p>
+                                            <p className="text-primary font-medium">
+                                                Às {selectedSlot.formatted_time} (Duração: 45 min)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <label htmlFor="message" className="block text-sm font-bold text-gray-900">
+                                        O que você gostaria de discutir nessa mentoria? *
+                                    </label>
+                                    <textarea
+                                        id="message"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        placeholder="Ex: Gostaria de tirar dúvidas sobre arquitetura de software e receber dicas para o mercado internacional..."
+                                        rows={5}
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-sm"
+                                    />
+                                    <div className="flex justify-between items-center px-1">
+                                        <p className={`text-[10px] font-medium ${message.length < 20 ? 'text-red-500' : 'text-green-600'}`}>
+                                            Mínimo de 20 caracteres: {message.length}/20
+                                        </p>
+                                        <p className="text-[10px] text-gray-400">Campos marcados com * são obrigatórios</p>
+                                    </div>
+                                </div>
+
+                                {error && (
+                                    <div className="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl text-sm font-medium animate-shake">
+                                        ⚠️ {error}
+                                    </div>
+                                )}
+
+                                {success && (
+                                    <div className="bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2">
+                                        <CheckCircle className="w-5 h-5" /> Solicitação enviada! Redirecionando...
+                                    </div>
+                                )}
+
+                                <div className="flex gap-4 pt-4">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setSelectedSlot(null)}
+                                        disabled={isSubmitting}
+                                        className="flex-1 h-12 rounded-xl"
+                                    >
+                                        Escolher outro horário
+                                    </Button>
+                                    <Button
+                                        onClick={handleConfirmBooking}
+                                        disabled={isSubmitting || message.length < 20}
+                                        className="flex-1 h-12 rounded-xl shadow-lg shadow-primary/20"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Processando...
+                                            </>
+                                        ) : (
+                                            'Confirmar Agendamento'
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
             </DialogContent>
         </Dialog>
     );
