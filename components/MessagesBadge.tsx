@@ -16,7 +16,7 @@ export function MessagesBadge() {
         if (!user?.id) return;
 
         try {
-            // Buscar todas as conversas do usuário
+            // 1. Buscar todas as conversas onde o usuário participa
             const { data: conversations, error: convError } = await supabase
                 .from('conversations')
                 .select('id')
@@ -31,7 +31,7 @@ export function MessagesBadge() {
 
             const conversationIds = conversations.map((c: any) => c.id);
 
-            // Contar mensagens não lidas onde o usuário NÃO é o remetente
+            // 2. Contar mensagens não lidas enviadas por OUTRA pessoa
             const { count, error: msgError } = await supabase
                 .from('messages')
                 .select('*', { count: 'exact', head: true })
@@ -52,27 +52,49 @@ export function MessagesBadge() {
 
         loadUnreadCount();
 
-        // Inscrição Realtime com ID único para evitar conflitos
-        const channelName = `unread-badge-${user.id}`;
+        // 3. Subscrever ao Realtime de forma IDÊNTICA à página de mensagens
+        // O Supabase filtra automaticamente os eventos via RLS
         const channel = supabase
-            .channel(channelName)
+            .channel('unread-badge-sync')
             .on(
                 'postgres_changes',
                 {
-                    event: '*',
+                    event: 'INSERT',
                     schema: 'public',
-                    table: 'messages'
+                    table: 'messages',
                 },
-                (payload) => {
-                    console.log('[BADGE] Mudança detectada na tabela messages:', payload.eventType);
+                () => {
+                    console.log('[BADGE] Nova mensagem detectada');
                     loadUnreadCount();
                 }
             )
-            .subscribe((status) => {
-                if (status === 'SUBSCRIBED') {
-                    console.log('[BADGE] Realtime conectado com sucesso');
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'messages',
+                },
+                (payload: any) => {
+                    // Atualiza se o status de leitura mudou (importante para zerar o sino ao ler)
+                    if (payload.new.read_at !== payload.old.read_at) {
+                        console.log('[BADGE] Status de leitura alterado');
+                        loadUnreadCount();
+                    }
                 }
-            });
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'messages',
+                },
+                () => {
+                    loadUnreadCount();
+                }
+            )
+            .subscribe();
 
         return () => {
             supabase.removeChannel(channel);
