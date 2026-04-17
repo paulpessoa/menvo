@@ -515,7 +515,11 @@
         "description": "I'm seeking qualified professionals for opportunities"
       }
     },
-    "success": "Account created successfully!"
+    "success": "Account created successfully!",
+    "error": {
+      "requiredFields": "First and last name are required",
+      "unexpected": "An unexpected error occurred. Please try again."
+    }
   },
   "mentors": {
     "title": "Find a Mentor",
@@ -1050,13 +1054,22 @@
       "actions": {
         "title": "Quick Actions",
         "availability": "Setup Availability",
-        "availabilityDesc": "Set your available hours for mentorship",
+        "availabilityDesc": "Set your hours and timezone for sessions",
         "mentorships": "My Mentorships",
-        "mentorshipsDesc": "Manage your mentorship sessions",
+        "mentorshipsDesc": "Track your confirmed and pending appointments",
         "editProfile": "Edit Profile",
         "editProfileDesc": "Update your information and specialties",
         "access": "Access",
-        "waitingVerification": "Awaiting Verification"
+        "waitingVerification": "Awaiting Verification",
+        "manageAgenda": "Manage Agenda",
+        "viewMentorships": "View Mentorships"
+      },
+      "sections": {
+        "upcoming": "Upcoming Sessions",
+        "noSessions": "No sessions scheduled.",
+        "favorites": "My Favorite Mentors",
+        "favoritesDesc": "Quick access to mentors you saved for inspiration",
+        "viewAll": "View all"
       }
     },
     "mentee": {

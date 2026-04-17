@@ -262,13 +262,13 @@ export default function MenteeDashboard() {
                                     <CardHeader className="pb-2">
                                         <CardTitle className="text-lg flex items-center gap-2">
                                             <Calendar className="h-5 w-5 text-green-500" />
-                                            Minhas Mentorias
+                                            {t("mentee.actions.myMentorships")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-muted-foreground mb-4">Veja seus agendamentos e avalie sessões concluídas</p>
+                                        <p className="text-sm text-muted-foreground mb-4">{t("mentee.actions.myMentorshipsDesc")}</p>
                                         <Button asChild variant="outline" size="sm" className="w-full">
-                                            <Link href="/mentorship/mentee">Acessar Mentorias</Link>
+                                            <Link href="/mentorship/mentee">{t("mentee.actions.access")}</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -277,13 +277,13 @@ export default function MenteeDashboard() {
                                     <CardHeader className="pb-2">
                                         <CardTitle className="text-lg flex items-center gap-2">
                                             <Search className="h-5 w-5 text-blue-500" />
-                                            Buscar Mentores
+                                            {t("mentee.actions.find")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-muted-foreground mb-4">Encontre especialistas para acelerar sua carreira</p>
+                                        <p className="text-sm text-muted-foreground mb-4">{t("mentee.actions.findDesc")}</p>
                                         <Button asChild variant="outline" size="sm" className="w-full">
-                                            <Link href="/mentors">Ver Mentores</Link>
+                                            <Link href="/mentors">{t("mentee.actions.viewAll")}</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -295,12 +295,12 @@ export default function MenteeDashboard() {
                                     <div>
                                         <CardTitle className="text-lg flex items-center gap-2">
                                             <Heart className="h-5 w-5 text-red-500 fill-current" />
-                                            Mentores Favoritos
+                                            {t("mentee.sections.favorites")}
                                         </CardTitle>
-                                        <CardDescription>Acesso rápido aos mentores que você salvou</CardDescription>
+                                        <CardDescription>{t("mentee.sections.favoritesDesc")}</CardDescription>
                                     </div>
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href="/mentors">Ver todos</Link>
+                                        <Link href="/mentors">{t("mentor.sections.viewAll")}</Link>
                                     </Button>
                                 </CardHeader>
                                 <CardContent>
@@ -308,7 +308,7 @@ export default function MenteeDashboard() {
                                         <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
                                     ) : favoriteMentorsData.length === 0 ? (
                                         <div className="text-center py-4 text-muted-foreground text-sm italic">
-                                            Você ainda não salvou nenhum mentor.
+                                            {t("mentee.sections.noFavorites")}
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -334,14 +334,14 @@ export default function MenteeDashboard() {
 
                         {/* Coluna Direita: Próximas Mentorias */}
                         <div className="space-y-6">
-                            <h2 className="text-2xl font-semibold">Próximas Sessões</h2>
+                            <h2 className="text-2xl font-semibold">{t("mentee.sections.upcoming")}</h2>
                             {upcomingAppointments.length === 0 ? (
                                 <Card>
                                     <CardContent className="py-8 text-center">
                                         <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
-                                        <p className="text-sm text-muted-foreground">Nenhuma sessão agendada.</p>
+                                        <p className="text-sm text-muted-foreground">{t("mentee.sections.noSessions")}</p>
                                         <Button asChild variant="link" className="mt-2">
-                                            <Link href="/mentors">Agendar agora</Link>
+                                            <Link href="/mentors">{t("mentee.sections.bookNow")}</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -357,11 +357,11 @@ export default function MenteeDashboard() {
                                                     </Avatar>
                                                     <div>
                                                         <p className="text-sm font-medium">{appt.mentor.full_name}</p>
-                                                        <p className="text-xs text-muted-foreground">{new Date(appt.scheduled_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                                                        <p className="text-xs text-muted-foreground">{new Date(appt.scheduled_at).toLocaleDateString(locale === 'pt-BR' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                                                     </div>
                                                 </div>
                                                 <Button asChild size="sm" variant="secondary" className="w-full">
-                                                    <Link href="/mentorship/mentee">Ver Detalhes</Link>
+                                                    <Link href="/mentorship/mentee">{t("mentee.sections.viewDetails")}</Link>
                                                 </Button>
                                             </CardContent>
                                         </Card>

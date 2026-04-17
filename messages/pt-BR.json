@@ -515,6 +515,11 @@
         "title": "Recrutador",
         "description": "Busco profissionais qualificados para oportunidades"
       }
+    },
+    "success": "Conta criada com sucesso!",
+    "error": {
+      "requiredFields": "Nome e sobrenome são obrigatórios",
+      "unexpected": "Ocorreu um erro inesperado. Tente novamente."
     }
   },
   "mentors": {
@@ -1024,16 +1029,26 @@
       },
       "actions": {
         "title": "Ações Rápidas",
-        "availability": "Configurar Disponibilidade",
-        "availabilityDesc": "Defina seus horários disponíveis para mentoria",
+        "availability": "Configurar Agenda",
+        "availabilityDesc": "Defina seus horários e fuso horário de atendimento",
         "mentorships": "Minhas Mentorias",
-        "mentorshipsDesc": "Gerencie suas sessões de mentoria",
+        "mentorshipsDesc": "Acompanhe seus agendamentos confirmados e pendentes",
         "editProfile": "Editar Perfil",
         "editProfileDesc": "Atualize suas informações e especialidades",
         "access": "Acessar",
-        "waitingVerification": "Aguardando Verificação"
+        "waitingVerification": "Aguardando Verificação",
+        "manageAgenda": "Gerenciar Agenda",
+        "viewMentorships": "Ver Mentorias"
+      },
+      "sections": {
+        "upcoming": "Próximas Sessões",
+        "noSessions": "Nenhuma sessão agendada.",
+        "favorites": "Meus Mentores Favoritos",
+        "favoritesDesc": "Acesso rápido aos mentores que você salvou para se inspirar",
+        "viewAll": "Ver todos"
       }
-    },
+      },
+
     "mentee": {
       "welcome": "Bem-vindo ao seu dashboard. Encontre mentores e acelere seu crescimento profissional.",
       "stats": {

@@ -321,10 +321,10 @@ function SignupForm() {
 }
 
 export default function SignupPage() {
+  const t = useTranslations("common")
   return (
     <div className="relative">
-      {/* TODO: Adicionar tradução */}
-      <Suspense fallback={<div>Carregando...</div>}>
+      <Suspense fallback={<div>{t("loading")}</div>}>
         <SignupForm />
       </Suspense>
     </div>
