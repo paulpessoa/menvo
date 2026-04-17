@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       .lte("scheduled_at", end.toISOString())
 
     if (appointmentsError) {
-      console.error("Error fetching appointments:", appointmentsError)
+      console.error("[AVAILABILITY] Error fetching appointments:", appointmentsError)
       return NextResponse.json(
         { error: "Failed to fetch appointments" },
         { status: 500 }
@@ -83,7 +83,6 @@ export async function GET(request: NextRequest) {
     // Generate available time slots
     const availableSlots: AvailableTimeSlot[] = []
 
-    // Criar função para verificar se um horário está ocupado
     const isSlotBooked = (
       slotStart: Date,
       slotDuration: number = 45
@@ -94,71 +93,61 @@ export async function GET(request: NextRequest) {
           aptStart.getTime() + apt.duration_minutes * 60 * 1000
         )
         const slotEnd = new Date(slotStart.getTime() + slotDuration * 60 * 1000)
-
-        // Verifica se há sobreposição de horários
         return slotStart < aptEnd && slotEnd > aptStart
       })
     }
 
-    // Iterate through each day in the range
-    const current = new Date(start);
-    console.log(`[AVAILABILITY] Iniciando loop de dias. De ${start.toISOString()} até ${end.toISOString()}`);
-    console.log(`[AVAILABILITY] Mentor possui ${availability.length} regras de disponibilidade.`);
+    // Loop de geração de slots à prova de fusos
+    // Começamos do 'start' e vamos até 'end'
+    let current = new Date(start.getTime());
+    // Normalizar current para o início do dia local para o loop ser consistente
+    current.setHours(0, 0, 0, 0);
 
-    while (current <= end) {
-      // Usar a data formatada ISO (YYYY-MM-DD) para evitar shifts de fuso no loop
-      const dateString = current.toISOString().split('T')[0];
+    const safeEnd = new Date(end.getTime());
+    safeEnd.setHours(23, 59, 59, 999);
+
+    console.log(`[AVAILABILITY] Gerando slots de ${current.toISOString()} até ${safeEnd.toISOString()}`);
+
+    while (current <= safeEnd) {
+      // Pegar o dia da semana (0-6)
+      const dayOfWeek = current.getDay();
       
-      // Criar uma data ao meio-dia para garantir que o getDay() retorne o dia correto em qualquer fuso
-      const dayOfWeek = new Date(`${dateString}T12:00:00`).getDay();
-
-      // Find availability for this day of week
       const dayAvailability = availability.filter(
         (avail) => Number(avail.day_of_week) === dayOfWeek
-      )
+      );
 
       if (dayAvailability.length > 0) {
-          console.log(`[AVAILABILITY] Encontrada disponibilidade para ${dateString} (Dia ${dayOfWeek}): ${dayAvailability.length} períodos`);
-      }
+        const dateStr = current.toISOString().split('T')[0];
+        
+        for (const avail of dayAvailability as any[]) {
+          const [startHour, startMinute] = avail.start_time.split(":").map(Number);
+          const [endHour, endMinute] = avail.end_time.split(":").map(Number);
 
-      for (const avail of dayAvailability as any[]) {
-        // Parse start and end times
-        const [startHour, startMinute] = avail.start_time.split(":").map(Number)
-        const [endHour, endMinute] = avail.end_time.split(":").map(Number)
+          for (let hour = startHour; hour < endHour; hour++) {
+            // Ignorar se for o último slot e passar do minuto final
+            if (hour === endHour - 1 && startMinute > endMinute) continue;
 
-        // Generate 1-hour slots within the availability window
-        for (let hour = startHour; hour < endHour; hour++) {
-          // Skip if this would go past the end time
-          if (hour === endHour - 1 && startMinute > endMinute) {
-            continue
-          }
+            // Criar data do slot no fuso de Brasília (-03:00)
+            const h = hour.toString().padStart(2, '0');
+            const m = startMinute.toString().padStart(2, '0');
+            const slotIso = `${dateStr}T${h}:${m}:00-03:00`;
+            const slotDate = new Date(slotIso);
 
-          // Criar a data e hora correta considerando o fuso de Brasília (UTC-3)
-          // Montamos a string ISO manualmente para forçar o fuso correto
-          const hourStr = hour.toString().padStart(2, '0');
-          const minuteStr = startMinute.toString().padStart(2, '0');
-          const isoString = `${dateString}T${hourStr}:${minuteStr}:00-03:00`;
-          const slotDate = new Date(isoString);
-
-          // Skip past dates
-          if (slotDate <= new Date()) {
-            continue
-          }
-
-          // Check if slot is not booked (considerando duração de 45 minutos)
-          if (!isSlotBooked(slotDate, 45)) {
-            availableSlots.push({
-              date: dateString, // YYYY-MM-DD
-              time: `${hourStr}:${minuteStr}`, // HH:MM
-              datetime: slotDate.toISOString()
-            })
-          } else {
-              console.log(`[AVAILABILITY] Slot ocupado ignorado: ${isoString}`);
+            // Só adicionar se for no futuro
+            if (slotDate > new Date()) {
+              if (!isSlotBooked(slotDate, 45)) {
+                availableSlots.push({
+                  date: dateStr,
+                  time: `${h}:${m}`,
+                  datetime: slotDate.toISOString()
+                });
+              }
+            }
           }
         }
       }
       
-      // Incrementar um dia de forma segura
+      // Incrementar 1 dia
       current.setDate(current.getDate() + 1);
     }
 
