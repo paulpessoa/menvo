@@ -1,32 +1,27 @@
 /**
  * Google Calendar Service - Versão Unificada
  * Usa tokens globais de uma conta única para criar eventos
- * Baseado no script test-calendar-access.js que funcionou
  */
 
 const { google } = require('googleapis');
-
-// Validar variáveis de ambiente no startup
-const REQUIRED_ENV_VARS = [
-  'GOOGLE_CALENDAR_CLIENT_ID',
-  'GOOGLE_CALENDAR_CLIENT_SECRET',
-  'GOOGLE_CALENDAR_REFRESH_TOKEN',
-];
-
-const missingVars = REQUIRED_ENV_VARS.filter(varName => !process.env[varName]);
-if (missingVars.length > 0) {
-  console.warn('⚠️ Google Calendar não configurado. Variáveis faltando:', missingVars.join(', '));
-  // Disponibilizar globalmente para o log da API
-  if (typeof global !== 'undefined') {
-    (global as any).missingGoogleVars = missingVars.join(', ');
-  }
-}
 
 /**
  * ID da agenda do Google Calendar
  * Se não especificado, usa 'primary' (agenda principal)
  */
-const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'primary';
+const getCalendarId = () => process.env.GOOGLE_CALENDAR_ID || 'primary';
+
+/**
+ * Validar variáveis de ambiente em tempo de execução
+ */
+function getMissingEnvVars() {
+  const REQUIRED_ENV_VARS = [
+    'GOOGLE_CALENDAR_CLIENT_ID',
+    'GOOGLE_CALENDAR_CLIENT_SECRET',
+    'GOOGLE_CALENDAR_REFRESH_TOKEN',
+  ];
+  return REQUIRED_ENV_VARS.filter(varName => !process.env[varName]);
+}
 
 /**
  * Criar cliente OAuth2 autenticado
@@ -34,8 +29,9 @@ const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'primary';
 async function createAuthenticatedClient() {
   console.log('🔍 [CALENDAR] Criando cliente OAuth2...');
 
-  if (!process.env.GOOGLE_CALENDAR_CLIENT_ID || !process.env.GOOGLE_CALENDAR_CLIENT_SECRET) {
-      throw new Error('Credenciais do Google OAuth faltando no ambiente');
+  const missing = getMissingEnvVars();
+  if (missing.length > 0) {
+      throw new Error(`Configuração do Google Calendar incompleta. Faltando: ${missing.join(', ')}`);
   }
 
   const oauth2Client = new google.auth.OAuth2(
@@ -92,11 +88,6 @@ export async function createCalendarEvent(
   eventData: CalendarEventData
 ): Promise<CalendarEventResponse> {
   try {
-    // Validar configuração
-    if (missingVars.length > 0) {
-      throw new Error(`Configuração incompleta: ${missingVars.join(', ')}`);
-    }
-
     const oauth2Client = await createAuthenticatedClient();
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
@@ -136,7 +127,7 @@ export async function createCalendarEvent(
     console.log('🚀 [CALENDAR] Chamando insert no Google API...');
 
     const response = await calendar.events.insert({
-      calendarId: CALENDAR_ID,
+      calendarId: getCalendarId(),
       conferenceDataVersion: 1,
       requestBody: event,
     });
@@ -145,10 +136,6 @@ export async function createCalendarEvent(
 
     console.log('✅ [CALENDAR] Evento criado no Google. ID:', createdEvent.id);
     
-    if (!createdEvent.hangoutLink) {
-        console.warn('⚠️ [CALENDAR] Google não retornou hangoutLink. Verifique se o Meet está ativo para esta conta.');
-    }
-
     return {
       eventId: createdEvent.id || '',
       meetLink: createdEvent.hangoutLink || null,
@@ -170,14 +157,7 @@ export async function createCalendarEvent(
  * Verificar se Google Calendar está configurado
  */
 export function isGoogleCalendarConfigured(): boolean {
-  return missingVars.length === 0;
-}
-
-/**
- * Obter variáveis faltando (para debug)
- */
-export function getMissingEnvVars(): string[] {
-  return missingVars;
+  return getMissingEnvVars().length === 0;
 }
 
 // Manter outras funções vazias para não quebrar imports
