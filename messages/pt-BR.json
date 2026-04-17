@@ -898,6 +898,7 @@
     "suggestTopic": "Sugerir Tema ou Área",
     "viewProfile": "Ver Perfil",
     "sessionsCount": "{count, plural, =1 {1 sessão} other {# sessões}}",
+    "years": "anos",
     "status": {
       "available": "Disponível",
       "busy": "Ocupado",

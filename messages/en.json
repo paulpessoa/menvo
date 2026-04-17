@@ -923,6 +923,7 @@
     "suggestTopic": "Suggest Topic or Area",
     "viewProfile": "View Profile",
     "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
+    "years": "years",
     "status": {
       "available": "Available",
       "busy": "Busy",
