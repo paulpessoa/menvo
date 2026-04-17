@@ -13,7 +13,7 @@ import {
     SelectTrigger, 
     SelectValue 
 } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon, Send } from "lucide-react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
