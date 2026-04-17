@@ -13,10 +13,10 @@ export function MessagesBadge() {
     const supabase = createClient();
 
     const loadUnreadCount = useCallback(async () => {
-        if (!user) return;
+        if (!user?.id) return;
 
         try {
-            // Buscar todas as conversas do usuário (ele pode ser mentor ou mentee)
+            // Buscar todas as conversas do usuário
             const { data: conversations, error: convError } = await supabase
                 .from('conversations')
                 .select('id')
@@ -45,36 +45,39 @@ export function MessagesBadge() {
         } catch (error) {
             console.error('[BADGE] Erro ao carregar contador:', error);
         }
-    }, [user, supabase]);
+    }, [user?.id, supabase]);
 
     useEffect(() => {
-        if (!isAuthenticated || !user) return;
+        if (!isAuthenticated || !user?.id) return;
 
         loadUnreadCount();
 
-        // Inscrição Realtime simplificada e robusta
-        // Escuta qualquer inserção ou update na tabela de mensagens
-        // O Supabase Realtime filtrará automaticamente baseado nas permissões de RLS do usuário
+        // Inscrição Realtime com ID único para evitar conflitos
+        const channelName = `unread-badge-${user.id}`;
         const channel = supabase
-            .channel('unread-badge-realtime')
+            .channel(channelName)
             .on(
                 'postgres_changes',
                 {
-                    event: '*', // Escuta INSERT, UPDATE e DELETE
+                    event: '*',
                     schema: 'public',
-                    table: 'messages',
+                    table: 'messages'
                 },
-                () => {
-                    // Recarrega o contador para garantir precisão
+                (payload) => {
+                    console.log('[BADGE] Mudança detectada na tabela messages:', payload.eventType);
                     loadUnreadCount();
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log('[BADGE] Realtime conectado com sucesso');
+                }
+            });
 
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [isAuthenticated, user, loadUnreadCount, supabase]);
+    }, [isAuthenticated, user?.id, loadUnreadCount, supabase]);
 
     if (!isAuthenticated) return null;
 

@@ -29,7 +29,8 @@ import {
   Heart,
   MessageCircle,
   Loader2,
-  Building2
+  Building2,
+  Plus
 } from "lucide-react"
 
 import { useRouter } from "next/navigation"
@@ -117,6 +118,8 @@ export default function MentorsPage() {
   })
 
   const supabase = createClient()
+  const { user } = useAuth()
+  const { isModalOpen, openModal, closeModal, handleSubmit } = useMentorSuggestion()
 
   const fetchMentors = async (isInitial = false) => {
     try {
@@ -305,6 +308,14 @@ export default function MentorsPage() {
   const handleLoadMore = () => {
     setPage(prev => prev + 1)
     fetchMentors(false)
+  }
+
+  const handleSuggestClick = () => {
+    if (!user) {
+      toast.info("Você precisa estar logado para sugerir temas")
+      return
+    }
+    openModal()
   }
 
   return (
@@ -534,14 +545,19 @@ export default function MentorsPage() {
         <div className="text-center py-20 bg-white rounded-lg border border-dashed">
           <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           <h3 className="text-lg font-medium text-gray-900">{t("noMentorsTitle")}</h3>
-          <p className="text-gray-500 mt-2">{t("noMentorsDescription")}</p>
-          <Button
-            variant="link"
-            className="mt-4 text-primary"
-            onClick={() => setFilters(initialFilters)}
-          >
-            {t("clearFilters")}
-          </Button>
+          <p className="text-gray-600 mt-2 mb-6">{t("noMentorsDescription")}</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => setFilters(initialFilters)}
+            >
+              {t("clearFilters")}
+            </Button>
+            <Button onClick={handleSuggestClick} className="gap-2">
+              <Plus className="w-4 h-4" />
+              {t("suggestTopic")}
+            </Button>
+          </div>
         </div>
       ) : (
         <>
@@ -574,16 +590,14 @@ export default function MentorsPage() {
         </>
       )}
 
-      {/* Suggestion Modal */}
-      <div className="mt-20 border-t pt-12">
-        <div className="bg-primary/5 rounded-2xl p-8 text-center max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold mb-4">{t("suggestTopic")}</h2>
-          <p className="text-gray-600 mb-8">
-            {t("noMentorsDescription")}
-          </p>
-          <SuggestionModal />
-        </div>
-      </div>
+      {/* Suggestion Modal Triggered by Hook */}
+      <SuggestionModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSubmit={(suggestion) => handleSubmit(user?.id || "", suggestion)}
+        userId={user?.id || null}
+        availableInclusionTags={availableFilters.inclusiveTags}
+      />
     </div>
   )
 }
