@@ -9,6 +9,7 @@ import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
 interface AdminStats {
   totalUsers: number
@@ -22,6 +23,7 @@ interface AdminStats {
 }
 
 export default function AdminDashboard() {
+  const t = useTranslations("admin")
   const { user, profile } = useAuth()
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
@@ -112,38 +114,38 @@ export default function AdminDashboard() {
 
   const quickActions = [
     {
-      title: "Sugestões de Temas",
-      description: "Ver o que os usuários estão pedindo",
+      title: t("actions.suggestions"),
+      description: t("actions.suggestionsDesc"),
       href: "/admin/suggestions",
       icon: MessageSquare,
       color: "bg-blue-600",
       badge: stats.pendingSuggestions > 0 ? stats.pendingSuggestions : undefined,
     },
     {
-      title: "Gerenciar Mentores",
-      description: "Visualizar e verificar todos os mentores",
+      title: t("actions.manageMentors"),
+      description: t("actions.manageMentorsDesc"),
       href: "/admin/mentors",
       icon: CheckCircle,
       color: "bg-green-500",
     },
     {
-      title: "Verificar Mentores",
-      description: "Aprovar mentores aguardando verificação",
+      title: t("actions.verifyMentors"),
+      description: t("actions.verifyMentorsDesc"),
       href: "/admin/mentors/verify",
       icon: Clock,
       color: "bg-yellow-500",
       badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined,
     },
     {
-      title: "Gerenciar Usuários",
-      description: "Visualizar e gerenciar todos os usuários da plataforma",
+      title: t("actions.manageUsers"),
+      description: t("actions.manageUsersDesc"),
       href: "/admin/users",
       icon: Users,
       color: "bg-blue-500",
     },
     {
-      title: "Configurações",
-      description: "Configurações gerais do sistema",
+      title: t("actions.settings"),
+      description: t("actions.settingsDesc"),
       href: "/admin/settings",
       icon: Shield,
       color: "bg-purple-500",
@@ -165,10 +167,10 @@ export default function AdminDashboard() {
           {/* Header */}
           <div>
             <h1 className="text-3xl font-bold">
-              Bem-vindo, {profile?.full_name || "Admin"}!
+              {t("welcome", { name: profile?.full_name || "Admin" })}
             </h1>
             <p className="text-muted-foreground">
-              Gerencie mentores, usuários e monitore a plataforma Menvo
+              {t("description")}
             </p>
           </div>
 
@@ -176,54 +178,54 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("stats.totalUsers")}</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                <p className="text-xs text-muted-foreground">+{stats.recentSignups} nos últimos 7 dias</p>
+                <p className="text-xs text-muted-foreground">{t("stats.recentSignups", { count: stats.recentSignups })}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Mentores Verificados</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("stats.verifiedMentors")}</CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">{stats.verifiedMentors}</div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.totalMentors} mentores no total
+                  {t("stats.totalMentors", { count: stats.totalMentors })}
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Mentores Pendentes</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("stats.pendingMentors")}</CardTitle>
                 <Clock className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">{stats.pendingMentors}</div>
-                <p className="text-xs text-muted-foreground">Aguardando verificação</p>
+                <p className="text-xs text-muted-foreground">{t("stats.awaitingVerification")}</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Sessões Realizadas</CardTitle>
+                <CardTitle className="text-sm font-medium">{t("stats.totalSessions")}</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalSessions}</div>
-                <p className="text-xs text-muted-foreground">Total de mentorias realizadas</p>
+                <p className="text-xs text-muted-foreground">{t("stats.sessionsDesc")}</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Quick Actions */}
           <div>
-            <h2 className="text-2xl font-semibold mb-6">Ações Rápidas</h2>
+            <h2 className="text-2xl font-semibold mb-6">{t("actions.title")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {quickActions.map((action, index) => (
                 <Card key={index} className="hover:shadow-md transition-shadow">
@@ -239,7 +241,7 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <Button asChild className="w-full">
-                      <Link href={action.href}>Acessar</Link>
+                      <Link href={action.href}>{t("actions.access")}</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -253,16 +255,15 @@ export default function AdminDashboard() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-yellow-600" />
-                  <CardTitle className="text-yellow-800">Atenção: Mentores Pendentes</CardTitle>
+                  <CardTitle className="text-yellow-800">{t("alerts.pendingMentors")}</CardTitle>
                 </div>
                 <CardDescription className="text-yellow-700">
-                  Existem {stats.pendingMentors} mentores aguardando verificação. Revise e aprove os perfis para
-                  manter a qualidade da plataforma.
+                  {t("alerts.pendingMentorsDesc", { count: stats.pendingMentors })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Button asChild variant="outline">
-                  <Link href="/admin/mentors/verify">Verificar Agora</Link>
+                  <Link href="/admin/mentors/verify">{t("alerts.verifyNow")}</Link>
                 </Button>
               </CardContent>
             </Card>

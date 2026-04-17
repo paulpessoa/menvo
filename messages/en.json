@@ -1381,5 +1381,53 @@
     "noEvents": "No events found",
     "adjustFilters": "Try adjusting your filters or search terms",
     "clearFilters": "Clear all filters"
-  }
-}
+    },
+    "admin": {
+    "title": "Admin Panel",
+    "welcome": "Welcome, {name}!",
+    "description": "Manage mentors, users, and monitor the Menvo platform",
+    "stats": {
+      "totalUsers": "Total Users",
+      "recentSignups": "+{count} in the last 7 days",
+      "verifiedMentors": "Verified Mentors",
+      "totalMentors": "{count} mentors total",
+      "pendingMentors": "Pending Mentors",
+      "awaitingVerification": "Awaiting verification",
+      "totalSessions": "Sessions Conducted",
+      "sessionsDesc": "Total mentorships performed"
+    },
+    "actions": {
+      "title": "Quick Actions",
+      "suggestions": "Topic Suggestions",
+      "suggestionsDesc": "See what users are asking for",
+      "manageMentors": "Manage Mentors",
+      "manageMentorsDesc": "View and verify all mentors",
+      "verifyMentors": "Verify Mentors",
+      "verifyMentorsDesc": "Approve mentors awaiting verification",
+      "manageUsers": "Manage Users",
+      "manageUsersDesc": "View and manage all users",
+      "settings": "Settings",
+      "settingsDesc": "General system settings",
+      "access": "Access"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "dashboardDesc": "Platform overview",
+      "organizations": "Organizations",
+      "organizationsDesc": "Manage organizations",
+      "mentors": "Mentors",
+      "mentorsDesc": "Manage and verify mentors",
+      "users": "Users",
+      "usersDesc": "Manage platform users",
+      "suggestions": "Suggestions",
+      "suggestionsDesc": "Suggested topics and areas",
+      "reports": "Reports",
+      "reportsDesc": "Statistics and metrics"
+    },
+    "alerts": {
+      "pendingMentors": "Attention: Pending Mentors",
+      "pendingMentorsDesc": "There are {count} mentors awaiting verification. Review and approve profiles.",
+      "verifyNow": "Verify Now"
+    }
+    }
+    }

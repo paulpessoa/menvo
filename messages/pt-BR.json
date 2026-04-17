@@ -1358,5 +1358,53 @@
     "noEvents": "Nenhum evento encontrado",
     "adjustFilters": "Tente ajustar seus filtros ou termos de busca",
     "clearFilters": "Limpar todos os filtros"
-  }
-}
+    },
+    "admin": {
+    "title": "Painel Administrativo",
+    "welcome": "Bem-vindo, {name}!",
+    "description": "Gerencie mentores, usuários e monitore a plataforma Menvo",
+    "stats": {
+      "totalUsers": "Total de Usuários",
+      "recentSignups": "+{count} nos últimos 7 dias",
+      "verifiedMentors": "Mentores Verificados",
+      "totalMentors": "{count} mentores no total",
+      "pendingMentors": "Mentores Pendentes",
+      "awaitingVerification": "Aguardando verificação",
+      "totalSessions": "Sessões Realizadas",
+      "sessionsDesc": "Total de mentorias realizadas"
+    },
+    "actions": {
+      "title": "Ações Rápidas",
+      "suggestions": "Sugestões de Temas",
+      "suggestionsDesc": "Ver o que os usuários estão pedindo",
+      "manageMentors": "Gerenciar Mentores",
+      "manageMentorsDesc": "Visualizar e verificar todos os mentores",
+      "verifyMentors": "Verificar Mentores",
+      "verifyMentorsDesc": "Aprovar mentores aguardando verificação",
+      "manageUsers": "Gerenciar Usuários",
+      "manageUsersDesc": "Visualizar e gerenciar todos os usuários",
+      "settings": "Configurações",
+      "settingsDesc": "Configurações gerais do sistema",
+      "access": "Acessar"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "dashboardDesc": "Visão geral da plataforma",
+      "organizations": "Organizações",
+      "organizationsDesc": "Gerenciar organizações",
+      "mentors": "Mentores",
+      "mentorsDesc": "Gerenciar e verificar mentores",
+      "users": "Usuários",
+      "usersDesc": "Gerenciar usuários da plataforma",
+      "suggestions": "Sugestões",
+      "suggestionsDesc": "Temas e áreas sugeridas",
+      "reports": "Relatórios",
+      "reportsDesc": "Estatísticas e métricas"
+    },
+    "alerts": {
+      "pendingMentors": "Atenção: Mentores Pendentes",
+      "pendingMentorsDesc": "Existem {count} mentores aguardando verificação. Revise e aprove os perfis.",
+      "verifyNow": "Verificar Agora"
+    }
+    }
+    }

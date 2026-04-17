@@ -16,53 +16,55 @@ import {
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface AdminLayoutProps {
     children: React.ReactNode
 }
 
-const adminNavItems = [
-    {
-        title: "Dashboard",
-        href: "/admin",
-        icon: Home,
-        description: "Visão geral da plataforma"
-    },
-    {
-        title: "Organizações",
-        href: "/admin/organizations",
-        icon: Building2,
-        description: "Gerenciar organizações"
-    },
-    {
-        title: "Mentores",
-        href: "/admin/mentors",
-        icon: Users,
-        description: "Gerenciar e verificar mentores"
-    },
-    {
-        title: "Usuários",
-        href: "/admin/users",
-        icon: Users,
-        description: "Gerenciar usuários da plataforma"
-    },
-    {
-        title: "Sugestões",
-        href: "/admin/suggestions",
-        icon: MessageSquare,
-        description: "Temas e áreas sugeridas"
-    },
-    {
-        title: "Relatórios",
-        href: "/admin/reports",
-        icon: BarChart3,
-        description: "Estatísticas e métricas"
-    }
-]
-
 export default function AdminLayout({ children }: AdminLayoutProps) {
+    const t = useTranslations("admin")
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const pathname = usePathname()
+
+    const adminNavItems = [
+        {
+            title: t("nav.dashboard"),
+            href: "/admin",
+            icon: Home,
+            description: t("nav.dashboardDesc")
+        },
+        {
+            title: t("nav.organizations"),
+            href: "/admin/organizations",
+            icon: Building2,
+            description: t("nav.organizationsDesc")
+        },
+        {
+            title: t("nav.mentors"),
+            href: "/admin/mentors",
+            icon: Users,
+            description: t("nav.mentorsDesc")
+        },
+        {
+            title: t("nav.users"),
+            href: "/admin/users",
+            icon: Users,
+            description: t("nav.usersDesc")
+        },
+        {
+            title: t("nav.suggestions"),
+            href: "/admin/suggestions",
+            icon: MessageSquare,
+            description: t("nav.suggestionsDesc")
+        },
+        {
+            title: t("nav.reports"),
+            href: "/admin/reports",
+            icon: BarChart3,
+            description: t("nav.reportsDesc")
+        }
+    ]
 
     const isActive = (href: string) => {
         if (href === "/admin") {
@@ -92,7 +94,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         <div className="flex items-center justify-between p-4 border-b">
                             <div className="flex items-center gap-2">
                                 <Shield className="h-6 w-6 text-red-600" />
-                                <span className="font-semibold text-lg">Admin Panel</span>
+                                <span className="font-semibold text-lg">{t("title")}</span>
                             </div>
                             <Button
                                 variant="ghost"
@@ -134,11 +136,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                                     <div className="flex items-center gap-2 mb-1">
                                         <Shield className="h-4 w-4 text-red-600" />
                                         <span className="text-sm font-medium text-red-900">
-                                            Acesso Admin
+                                            {t("nav.dashboard")}
                                         </span>
                                     </div>
                                     <p className="text-xs text-red-700">
-                                        Você tem privilégios administrativos
+                                        {t("description")}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -159,7 +161,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         </Button>
                         <div className="flex items-center gap-2">
                             <Shield className="h-5 w-5 text-red-600" />
-                            <span className="font-semibold">Admin Panel</span>
+                            <span className="font-semibold">{t("title")}</span>
                         </div>
                         <div /> {/* Spacer */}
                     </div>
