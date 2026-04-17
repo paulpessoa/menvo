@@ -50,7 +50,11 @@ export function ChatInterface({
     // Focus input on initial load and when mentorId changes
     useEffect(() => {
         if (!loading) {
-            inputRef.current?.focus();
+            // Pequeno delay para garantir que o DOM renderizou o input
+            const timer = setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
+            return () => clearTimeout(timer);
         }
     }, [loading, mentorId]);
 
@@ -168,9 +172,6 @@ export function ChatInterface({
         const content = newMessage.trim();
         setNewMessage('');
         setSending(true);
-        
-        // Mantém o foco no input
-        inputRef.current?.focus();
 
         try {
             const response = await fetch('/api/chat/send', {
@@ -197,16 +198,17 @@ export function ChatInterface({
                 if (prev.some(m => m.id === optimisticMessage.id)) return prev;
                 return [...prev, optimisticMessage];
             });
-            
-            // Garante foco após renderizar mensagem otimista
-            setTimeout(() => inputRef.current?.focus(), 0);
 
         } catch (error) {
             toast.error(error instanceof Error ? error.message : 'Erro ao enviar mensagem');
             setNewMessage(content);
-            inputRef.current?.focus();
         } finally {
             setSending(false);
+            // IMPORTANTE: Só tenta focar quando o campo deixar de estar disabled
+            // O delay de 50ms garante que o React terminou de atualizar o DOM
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 50);
         }
     };
 

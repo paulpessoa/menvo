@@ -42,15 +42,8 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
 
-  const {
-    isAuthenticated,
-    user,
-    profile,
-    role,
-    loading,
-    signOut,
-    isAdmin
-  } = useAuth()
+  const { isAuthenticated, user, profile, role, loading, signOut, isAdmin } =
+    useAuth()
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
@@ -59,7 +52,6 @@ export default function Header() {
   const navigation = [
     { name: t("common.home"), href: "/" },
     { name: t("common.findMentors"), href: "/mentors" },
-    { name: t("common.organizations"), href: "/organizations" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
     { name: t("common.aboutUs"), href: "/about" }
   ]
@@ -67,16 +59,44 @@ export default function Header() {
   const userNavigation = isAuthenticated
     ? [
         ...(isAdmin
-          ? [{ name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield }]
+          ? [
+              {
+                name: t("header.userMenu.adminPanel"),
+                href: "/admin",
+                icon: Shield
+              }
+            ]
           : [
-              { name: t("header.userMenu.dashboard"), href: "/dashboard", icon: User },
-              { name: t("header.userMenu.profile"), href: "/profile", icon: User }
+              {
+                name: t("header.userMenu.dashboard"),
+                href: "/dashboard",
+                icon: User
+              },
+              {
+                name: t("header.userMenu.profile"),
+                href: "/profile",
+                icon: User
+              }
             ]),
-        ...((isAdmin || role === "mentor")
-          ? [{ name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 }]
+        ...(isAdmin || role === "mentor"
+          ? [
+              {
+                name: t("header.userMenu.createOrganization"),
+                href: "/organizations/new",
+                icon: Building2
+              }
+            ]
           : []),
-        { name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare },
-        { name: t("header.userMenu.settings"), href: "/settings", icon: Settings }
+        {
+          name: t("header.userMenu.messages"),
+          href: "/messages",
+          icon: MessageSquare
+        },
+        {
+          name: t("header.userMenu.settings"),
+          href: "/settings",
+          icon: Settings
+        }
       ]
     : []
 
@@ -268,10 +288,7 @@ export default function Header() {
                       </Link>
                     </Button>
                     <Button asChild className="w-full">
-                      <Link
-                        href="/signup"
-                        onClick={() => setIsOpen(false)}
-                      >
+                      <Link href="/signup" onClick={() => setIsOpen(false)}>
                         {t("common.register")}
                       </Link>
                     </Button>
