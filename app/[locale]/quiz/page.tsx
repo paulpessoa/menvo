@@ -90,8 +90,7 @@ export default function QuizPage() {
           {/* Hero Section */}
           <div className="text-center mb-12 space-y-6">
             <h1
-              className="text-3xl md:text-4xl font-bold"
-              style={{ color: "#007585" }}
+              className="text-3xl md:text-4xl font-bold text-primary-600"
             >
               {t('quiz_page.title')}
             </h1>

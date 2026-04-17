@@ -1267,6 +1267,28 @@
       "4": "Thursday",
       "5": "Friday",
       "6": "Saturday"
+    },
+    "daysShort": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "display": {
+      "timezone": "Timezone: {timezone}",
+      "noAvailability": "No availability configured",
+      "noAvailabilityDesc": "The mentor hasn't defined their available hours yet",
+      "status": {
+        "available": "Available",
+        "busy": "Busy",
+        "past": "Past"
+      },
+      "cardTitle": "Availability",
+      "cardDescription": "Available times for scheduling mentorships",
+      "book": "Book"
     }
   },
   "mentorship": {

@@ -1242,6 +1242,28 @@
       "4": "Quinta-feira",
       "5": "Sexta-feira",
       "6": "Sábado"
+    },
+    "daysShort": {
+      "0": "Dom",
+      "1": "Seg",
+      "2": "Ter",
+      "3": "Qua",
+      "4": "Qui",
+      "5": "Sex",
+      "6": "Sáb"
+    },
+    "display": {
+      "timezone": "Fuso horário: {timezone}",
+      "noAvailability": "Nenhuma disponibilidade configurada",
+      "noAvailabilityDesc": "O mentor ainda não definiu seus horários disponíveis",
+      "status": {
+        "available": "Disponível",
+        "busy": "Ocupado",
+        "past": "Passado"
+      },
+      "cardTitle": "Disponibilidade",
+      "cardDescription": "Horários disponíveis para agendamento de mentorias",
+      "book": "Agendar"
     }
   },
   "mentorship": {

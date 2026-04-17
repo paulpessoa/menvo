@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { useTranslations, useLocale } from "next-intl"
 import {
     Clock,
     Calendar,
@@ -31,16 +32,6 @@ interface AvailabilityDisplayProps {
     compact?: boolean
 }
 
-const DAYS_OF_WEEK = [
-    { value: 0, label: 'Domingo', short: 'Dom' },
-    { value: 1, label: 'Segunda-feira', short: 'Seg' },
-    { value: 2, label: 'Terça-feira', short: 'Ter' },
-    { value: 3, label: 'Quarta-feira', short: 'Qua' },
-    { value: 4, label: 'Quinta-feira', short: 'Qui' },
-    { value: 5, label: 'Sexta-feira', short: 'Sex' },
-    { value: 6, label: 'Sábado', short: 'Sáb' }
-]
-
 export default function AvailabilityDisplay({
     mentorId,
     availability,
@@ -49,7 +40,19 @@ export default function AvailabilityDisplay({
     onBookSlot,
     compact = false
 }: AvailabilityDisplayProps) {
+    const t = useTranslations("availability")
+    const locale = useLocale()
     const [groupedAvailability, setGroupedAvailability] = useState<Record<number, AvailabilitySlot[]>>({})
+
+    const DAYS_OF_WEEK = useMemo(() => [
+        { value: 0, label: t("days.0"), short: t("daysShort.0") },
+        { value: 1, label: t("days.1"), short: t("daysShort.1") },
+        { value: 2, label: t("days.2"), short: t("daysShort.2") },
+        { value: 3, label: t("days.3"), short: t("daysShort.3") },
+        { value: 4, label: t("days.4"), short: t("daysShort.4") },
+        { value: 5, label: t("days.5"), short: t("daysShort.5") },
+        { value: 6, label: t("days.6"), short: t("daysShort.6") }
+    ], [t])
 
     useEffect(() => {
         // Group availability by day of week
@@ -70,7 +73,9 @@ export default function AvailabilityDisplay({
     }, [availability])
 
     const formatTime = (time: string) => {
-        return new Date(`2000-01-01T${time}`).toLocaleTimeString('pt-BR', {
+        // Handle HH:mm:ss or HH:mm format
+        const timeString = time.includes(':') && time.split(':').length === 2 ? `${time}:00` : time
+        return new Date(`2000-01-01T${timeString}`).toLocaleTimeString(locale, {
             hour: '2-digit',
             minute: '2-digit'
         })
@@ -82,11 +87,11 @@ export default function AvailabilityDisplay({
                 icon: XCircle,
                 color: 'text-red-600',
                 bgColor: 'bg-red-100',
-                label: 'Ocupado'
+                label: t("display.status.busy")
             }
         }
 
-        // Check if slot is in the past (simplified - you might want more sophisticated logic)
+        // Check if slot is in the past (simplified)
         const now = new Date()
         const today = now.getDay()
         const currentTime = now.toTimeString().slice(0, 8)
@@ -96,7 +101,7 @@ export default function AvailabilityDisplay({
                 icon: AlertCircle,
                 color: 'text-gray-600',
                 bgColor: 'bg-gray-100',
-                label: 'Passado'
+                label: t("display.status.past")
             }
         }
 
@@ -104,7 +109,7 @@ export default function AvailabilityDisplay({
             icon: CheckCircle,
             color: 'text-green-600',
             bgColor: 'bg-green-100',
-            label: 'Disponível'
+            label: t("display.status.available")
         }
     }
 
@@ -115,7 +120,7 @@ export default function AvailabilityDisplay({
             return (
                 <div className="text-center py-4 text-gray-500">
                     <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Nenhuma disponibilidade configurada</p>
+                    <p className="text-sm">{t("display.noAvailability")}</p>
                 </div>
             )
         }
@@ -131,16 +136,16 @@ export default function AvailabilityDisplay({
                             <span className="font-medium text-sm">
                                 {compact ? dayData?.short : dayData?.label}
                             </span>
-                            <div className="flex flex-wrap gap-1">
+                            <div className="flex flex-wrap gap-1 justify-end">
                                 {slots.map((slot, index) => {
                                     const status = getAvailabilityStatus(slot)
                                     return (
                                         <Badge
                                             key={index}
                                             variant="outline"
-                                            className={`text-xs ${status.bgColor} ${status.color} border-current`}
+                                            className={`text-[10px] px-1.5 py-0 ${status.bgColor} ${status.color} border-current font-normal`}
                                         >
-                                            {formatTime(slot.start_time)} - {formatTime(slot.end_time)}
+                                            {formatTime(slot.start_time)}
                                         </Badge>
                                     )
                                 })}
@@ -150,9 +155,9 @@ export default function AvailabilityDisplay({
                 })}
 
                 {timezone && (
-                    <div className="flex items-center justify-center pt-2 text-xs text-gray-500">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        Fuso horário: {timezone}
+                    <div className="flex items-center justify-center pt-2 text-[10px] text-gray-400">
+                        <MapPin className="h-2.5 w-2.5 mr-1" />
+                        {t("display.timezone", { timezone })}
                     </div>
                 )}
             </div>
@@ -166,8 +171,8 @@ export default function AvailabilityDisplay({
             return (
                 <div className="text-center py-8 text-gray-500">
                     <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Nenhuma disponibilidade configurada</p>
-                    <p className="text-sm mt-2">O mentor ainda não definiu seus horários disponíveis</p>
+                    <p>{t("display.noAvailability")}</p>
+                    <p className="text-sm mt-2">{t("display.noAvailabilityDesc")}</p>
                 </div>
             )
         }
@@ -211,9 +216,9 @@ export default function AvailabilityDisplay({
                                                 <Button
                                                     size="sm"
                                                     onClick={() => onBookSlot(slot)}
-                                                    disabled={status.label === 'Passado'}
+                                                    disabled={status.label === t("display.status.past")}
                                                 >
-                                                    Agendar
+                                                    {t("display.book")}
                                                 </Button>
                                             )}
                                         </div>
@@ -227,7 +232,7 @@ export default function AvailabilityDisplay({
                 {timezone && (
                     <div className="flex items-center justify-center pt-4 text-sm text-gray-500 border-t">
                         <MapPin className="h-4 w-4 mr-2" />
-                        Todos os horários estão no fuso: {timezone}
+                        {t("display.timezone", { timezone })}
                     </div>
                 )}
             </div>
@@ -241,12 +246,12 @@ export default function AvailabilityDisplay({
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-lg">
                     <Clock className="h-5 w-5 mr-2" />
-                    Disponibilidade
+                    {t("display.cardTitle")}
                 </CardTitle>
                 <CardDescription>
-                    Horários disponíveis para agendamento de mentorias
+                    {t("display.cardDescription")}
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -254,41 +259,4 @@ export default function AvailabilityDisplay({
             </CardContent>
         </Card>
     )
-}
-
-// Hook para buscar disponibilidade de um mentor
-export function useAvailability(mentorId: string) {
-    const [availability, setAvailability] = useState<AvailabilitySlot[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-
-    useEffect(() => {
-        if (!mentorId) return
-
-        const fetchAvailability = async () => {
-            try {
-                setLoading(true)
-                setError(null)
-
-                // This would typically be a Supabase call
-                // For now, we'll simulate it
-                const response = await fetch(`/api/mentors/${mentorId}/availability`)
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch availability')
-                }
-
-                const data = await response.json()
-                setAvailability(data)
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Unknown error')
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchAvailability()
-    }, [mentorId])
-
-    return { availability, loading, error, refetch: () => fetchAvailability() }
 }
