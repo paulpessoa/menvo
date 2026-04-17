@@ -111,7 +111,6 @@ export async function POST(request: NextRequest) {
 
     if (isGoogleCalendarConfigured()) {
       try {
-        console.log("📅 [CONFIRM] Iniciando criação de evento no Google Calendar...");
         const startTime = new Date(appointment.scheduled_at)
         const endTime = new Date(
           startTime.getTime() + appointment.duration_minutes * 60 * 1000
@@ -146,17 +145,9 @@ export async function POST(request: NextRequest) {
           menteeName: appointment.mentee.full_name
         }
 
-        console.log("📤 [CONFIRM] Enviando dados para createCalendarEvent:", JSON.stringify({
-            summary: eventData.summary,
-            mentor: eventData.mentorEmail,
-            mentee: eventData.menteeEmail
-        }));
-
         const result = await createCalendarEvent(eventData)
         googleEventId = result.eventId
         googleMeetLink = result.meetLink
-        
-        console.log("✅ [CONFIRM] Evento criado com sucesso. ID:", googleEventId, "Link Meet:", googleMeetLink);
       } catch (error) {
         console.error(
           "❌ [CONFIRM] Erro ao criar evento no Google Calendar:",

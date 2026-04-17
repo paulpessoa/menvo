@@ -37,13 +37,13 @@ import {
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
+import { MentorCard } from "@/components/mentors/MentorCard"
+import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
 import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { useFavorites } from "@/hooks/useFavorites"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { createClient } from "@/utils/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface MentorProfile {
   id: string
@@ -541,7 +541,7 @@ export default function MentorsPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <SkeletonCard key={i} />
+            <MentorSkeletonCard key={i} />
           ))}
         </div>
       ) : mentors.length === 0 ? (
@@ -607,160 +607,5 @@ export default function MentorsPage() {
         availableInclusionTags={availableFilters.inclusiveTags}
       />
     </div>
-  )
-}
-
-function SkeletonCard({ key }: { key: number }) {
-  return (
-    <Card key={key} className="animate-pulse">
-      <CardHeader>
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded w-32"></div>
-            <div className="h-3 bg-gray-200 rounded w-24"></div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded"></div>
-            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-          </div>
-          <div className="h-8 bg-gray-200 rounded w-full"></div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function MentorCard({ 
-  mentor, 
-  isFavorite, 
-  onToggleFavorite 
-}: { 
-  mentor: MentorProfile, 
-  isFavorite: boolean,
-  onToggleFavorite: () => void 
-}) {
-  const t = useTranslations("mentorsPage")
-  const router = useRouter()
-
-  const getAvailabilityColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'bg-green-100 text-green-800'
-      case 'busy': return 'bg-yellow-100 text-yellow-800'
-      case 'unavailable': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getAvailabilityText = (status: string) => {
-    switch (status) {
-      case 'available': return t("status.available")
-      case 'busy': return t("status.busy")
-      case 'unavailable': return t("status.unavailable")
-      default: return t("status.unknown")
-    }
-  }
-
-  const handleScheduleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    router.push(`/mentors/${mentor.slug || mentor.id}`)
-  }
-
-  return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full relative">
-      <button 
-        onClick={(e) => {
-          e.preventDefault();
-          onToggleFavorite();
-        }}
-        className={`absolute top-4 right-4 p-2 rounded-full shadow-sm transition-all z-10 ${
-          isFavorite ? 'bg-red-50 text-red-500' : 'bg-white/80 text-gray-400 hover:text-red-400'
-        }`}
-      >
-        <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-      </button>
-
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12 border">
-              <AvatarImage src={mentor.avatar_url || undefined} />
-              <AvatarFallback>
-                {mentor.full_name?.split(' ').map(n => n[0]).join('') || 'M'}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle className="text-lg line-clamp-1 pr-8">{mentor.full_name}</CardTitle>
-              <CardDescription className="text-sm line-clamp-1">
-                {mentor.job_title}
-                {mentor.company && ` @ ${mentor.company}`}
-              </CardDescription>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4 flex-1 flex flex-col">
-        <div className="flex justify-between items-center">
-            <Badge className={`${getAvailabilityColor(mentor.availability_status)} whitespace-nowrap`}>
-                {getAvailabilityText(mentor.availability_status)}
-            </Badge>
-            <div className="flex items-center text-xs text-muted-foreground">
-                <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
-                {mentor.average_rating.toFixed(1)} ({mentor.total_reviews})
-            </div>
-        </div>
-
-        {mentor.bio && (
-          <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
-            {mentor.bio}
-          </p>
-        )}
-
-        {(mentor.city || mentor.country) && (
-          <div className="flex items-center text-sm text-gray-500">
-            <MapPin className="h-3 w-3 mr-1 shrink-0" />
-            <span className="truncate">
-              {[mentor.city, mentor.state, mentor.country].filter(Boolean).join(', ')}
-            </span>
-          </div>
-        )}
-
-        {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-auto">
-            {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {topic}
-              </Badge>
-            ))}
-            {mentor.mentorship_topics.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{mentor.mentorship_topics.length - 3}
-              </Badge>
-            )}
-          </div>
-        )}
-
-        <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
-          <div className="flex items-center">
-            <MessageCircle className="h-3 w-3 mr-1" />
-            <span>{t("sessionsCount", { count: mentor.total_sessions || 0 })}</span>
-          </div>
-          {mentor.experience_years && (
-             <span>{mentor.experience_years} {t("years")}</span>
-          )}
-        </div>
-
-        <div className="flex space-x-2 pt-2">
-          <Button onClick={handleScheduleClick} className="flex-1">
-            {t("viewProfile")}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
   )
 }
