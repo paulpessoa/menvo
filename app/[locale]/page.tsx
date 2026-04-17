@@ -212,7 +212,7 @@ export default function Home() {
                 className="bg-transparent"
                 asChild
               >
-                <Link href="/how-it-works">{t("cta.learnMore")}</Link>
+                <Link href="/hub">{t("cta.learnMore")}</Link>
               </Button>
             </div>
           </div>

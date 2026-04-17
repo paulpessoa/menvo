@@ -1,44 +1,51 @@
 # ❤️ HEARTBEAT - Single Source of Truth
 
-## 📅 Última Atualização: 01/04/2026
-**Status Atual:** Mentores i18n ✅ / Suécia Localizada ✅ / Onboarding de Idioma ✅ / Auth i18n (Pendente)
+## 📅 Última Atualização: 17/04/2026
+**Status Atual:** Mentores Modularizados ✅ / Dashboards i18n ✅ / Admin Premium ✅ / Verificação com Chat ✅
 
 ---
 
 ## 📍 Onde Paramos?
-- **Sessão Iniciada:** Configuração de persona Staff confirmada.
-- **Traduções:** Finalizada localização completa para Dinamarquês (da) e Francês (fr). Sincronia de chaves em todos os arquivos.
-- **Páginas Públicas:** Refatorada a página de listagem e perfil de mentores para usar `next-intl`.
-- **Onboarding:** Implementado `LanguageSelectorOverlay` para forçar escolha de idioma na primeira visita.
-- **Auditoria de Auth:** Mapeado que `login-form.tsx` e `register-form.tsx` ainda possuem textos hardcoded.
+- **Modularização de Mentores:** Extraímos `MentorCard` e `MentorSkeletonCard` para componentes reutilizáveis. A página de listagem agora está limpa e modular.
+- **Internacionalização (i18n):**
+  - Finalizada internacionalização completa do **Login**, **Signup**, **Dashboard Mentee**, **Dashboard Mentor** e **Admin Dashboard**.
+  - Página de **Doação** e **FAQ** 100% bilíngues e com SEO polido.
+  - O componente de **Disponibilidade** e o **Chat** agora falam múltiplos idiomas.
+- **Sistema de Verificação (MVP+):**
+  - Criado `VerificationService` e API `/api/admin/verify`.
+  - Admin agora pode aprovar/rejeitar perfis (Mentores/Organizações) com mensagens pré-definidas.
+  - **Notificação Automática:** O usuário recebe feedback instantâneo via Chat interno sobre o status do seu perfil.
+- **Limpeza de Código:** Removidos componentes obsoletos (`mentor-availability.tsx`, `mentor-filters.tsx`), códigos comentados na Home e logs verbosos de API.
 
 ---
 
 ## 🎯 Objetivos de Curto Prazo (P0)
-1. [x] **Fix:** Listagem de mentores internacionalizada.
-2. [x] **Feat:** Suporte completo a `da`, `fr`, `sv`.
-3. [ ] **Fix:** Internacionalizar componentes internos de Auth (Login/Registro).
-4. [ ] **Fix:** RLS Policy da tabela `conversations` (Validar em produção).
+1. [x] **Fix:** Internacionalizar Auth (Login/Registro) e Dashboards.
+2. [x] **Feat:** Sistema de verificação universal com feedback via Chat.
+3. [ ] **Fix:** Validar RLS de `conversations` (Pendência do Heartbeat anterior - Monitorar se o Admin enviando mensagens via Server resolveu os gargalos).
+4. [ ] **Feat:** Integrar seção de Eventos (hoje mockada) ao banco de dados.
 
 ---
 
 ## 🚧 Status das Funcionalidades
 - **Agendamento MVP:** ✅ Produção
-- **Chat Real-time:** 🚧 Buggy (RLS/Identity issues)
-- **Dashboard Mentor:** ✅ Funcional
-- **Parceiros/Assíncronas:** ⏳ Backlog
+- **Chat Real-time:** 🟢 Estável (Polido e Internacionalizado)
+- **Verificação Admin:** ✅ Premium (Com Chat e Canned Responses)
+- **Dashboards:** ✅ Mobile-First & Bilíngues
 
 ---
 
 ## 🛠️ Stack & Contexto Técnico
 - **Framework:** Next.js (App Router)
 - **Database:** Supabase (PostgreSQL)
-- **Auth:** Supabase Auth
+- **Auth:** Supabase Auth (SSR)
 - **UI:** Tailwind CSS + Radix/Shadcn
-- **Email:** Brevo
-- **Calendar:** Google Calendar API
+- **Internacionalização:** next-intl (da, en, es, fr, pt-BR, sv)
+- **Comunicação:** Supabase Realtime (Chat) + Server-side Verification
 
 ---
 
 ## 📝 Notas de Engenharia
-- Verificando se a view `mentors` ou a tabela de perfis está com RLS bloqueando a leitura pública ou se o filtro de `chat_enabled` está afetando a listagem geral.
+- A unificação da lógica de verificação via API Route (`/api/admin/verify`) permite que o Admin atue como facilitador sem precisar de permissões de escrita excessivamente abertas no client-side.
+- O foco em mobile-first nos dashboards melhorou significativamente a usabilidade em dispositivos pequenos.
+- Próximo mergulho: Auditar a tabela `events` para substituir os mocks da página pública.

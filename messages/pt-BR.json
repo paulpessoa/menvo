@@ -3,7 +3,8 @@
     "welcome": "Bem-vindo",
     "home": "Início",
     "findMentors": "Encontrar Mentores",
-    "events": "Eventos",
+    "hub": "Menvo Hub",
+    "events": "Menvo Hub",
     "howItWorks": "Como Funciona",
     "aboutUs": "Sobre Nós",
     "title": "Menvo",
@@ -520,6 +521,31 @@
     "error": {
       "requiredFields": "Nome e sobrenome são obrigatórios",
       "unexpected": "Ocorreu um erro inesperado. Tente novamente."
+    }
+  },
+  "hub": {
+    "subtitle": "Descubra eventos, cursos, ferramentas e descontos curados para acelerar sua jornada.",
+    "suggestBtn": "Sugerir Recurso",
+    "searchPlaceholder": "Buscar no hub...",
+    "viewMore": "Acessar",
+    "tabs": {
+      "all": "Tudo",
+      "events": "Eventos",
+      "courses": "Cursos",
+      "tools": "Ferramentas",
+      "discounts": "Descontos"
+    },
+    "types": {
+      "event": "Evento",
+      "course": "Curso",
+      "tool": "Ferramenta",
+      "discount": "Desconto",
+      "job": "Vaga"
+    },
+    "noResults": {
+      "title": "Nenhum recurso encontrado",
+      "description": "Tente ajustar seus filtros ou buscar por outros termos.",
+      "clear": "Limpar filtros"
     }
   },
   "mentors": {
@@ -1359,6 +1385,17 @@
     "adjustFilters": "Tente ajustar seus filtros ou termos de busca",
     "clearFilters": "Limpar todos os filtros"
     },
+    "chat": {
+    "online": "Online",
+    "connecting": "Conectando...",
+    "typing": "digitando...",
+    "placeholder": "Digite sua mensagem...",
+    "empty": "Nenhuma mensagem ainda.",
+    "startConversation": "Envie uma mensagem para começar a conversa!",
+    "errorLoad": "Erro ao carregar mensagens",
+    "errorSend": "Erro ao enviar mensagem"
+    },
+
     "admin": {
     "title": "Painel Administrativo",
     "welcome": "Bem-vindo, {name}!",

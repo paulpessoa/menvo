@@ -3,7 +3,8 @@
     "welcome": "Welcome",
     "home": "Home",
     "findMentors": "Find Mentors",
-    "events": "Events",
+    "hub": "Menvo Hub",
+    "events": "Menvo Hub",
     "howItWorks": "How It Works",
     "aboutUs": "About Us",
     "title": "Menvo",
@@ -519,6 +520,31 @@
     "error": {
       "requiredFields": "First and last name are required",
       "unexpected": "An unexpected error occurred. Please try again."
+    }
+  },
+  "hub": {
+    "subtitle": "Discover curated events, courses, tools, and discounts to accelerate your journey.",
+    "suggestBtn": "Suggest Resource",
+    "searchPlaceholder": "Search the hub...",
+    "viewMore": "Access",
+    "tabs": {
+      "all": "All",
+      "events": "Events",
+      "courses": "Courses",
+      "tools": "Tools",
+      "discounts": "Discounts"
+    },
+    "types": {
+      "event": "Event",
+      "course": "Course",
+      "tool": "Tool",
+      "discount": "Discount",
+      "job": "Job"
+    },
+    "noResults": {
+      "title": "No resources found",
+      "description": "Try adjusting your filters or searching for other terms.",
+      "clear": "Clear filters"
     }
   },
   "mentors": {
@@ -1382,6 +1408,17 @@
     "adjustFilters": "Try adjusting your filters or search terms",
     "clearFilters": "Clear all filters"
     },
+    "chat": {
+    "online": "Online",
+    "connecting": "Connecting...",
+    "typing": "typing...",
+    "placeholder": "Type your message...",
+    "empty": "No messages yet.",
+    "startConversation": "Send a message to start the conversation!",
+    "errorLoad": "Error loading messages",
+    "errorSend": "Error sending message"
+    },
+
     "admin": {
     "title": "Admin Panel",
     "welcome": "Welcome, {name}!",

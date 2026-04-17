@@ -12,7 +12,8 @@ import {
     X,
     Home,
     Building2,
-    MessageSquare
+    MessageSquare,
+    Link as LinkIcon
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"
@@ -168,6 +169,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
                     {/* Page content */}
                     <main className="min-h-screen">
+                        {children}
+                    </main>
+                </div>
+            </div>
+        </RequireRole>
+    )
+}
+-screen">
                         {children}
                     </main>
                 </div>

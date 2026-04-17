@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface ChatInterfaceProps {
     mentorId: string; // This is the ID of the person we are talking to
@@ -26,6 +27,8 @@ export function ChatInterface({
     mentorName,
     mentorAvatar,
 }: ChatInterfaceProps) {
+    const t = useTranslations("chat");
+    const locale = useLocale();
     const [messages, setMessages] = useState<Message[]>([]);
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [newMessage, setNewMessage] = useState('');
@@ -50,7 +53,6 @@ export function ChatInterface({
     // Focus input on initial load and when mentorId changes
     useEffect(() => {
         if (!loading) {
-            // Pequeno delay para garantir que o DOM renderizou o input
             const timer = setTimeout(() => {
                 inputRef.current?.focus();
             }, 100);
@@ -72,8 +74,6 @@ export function ChatInterface({
     useEffect(() => {
         if (!conversationId) return;
 
-        console.log('[CHAT] 🔌 Subscribing to conversation:', conversationId);
-
         const channel = supabase
             .channel(`conversation:${conversationId}`, {
                 config: {
@@ -90,15 +90,15 @@ export function ChatInterface({
                     filter: `conversation_id=eq.${conversationId}`,
                 },
                 (payload: any) => {
-                    const newMessage = payload.new as Message;
+                    const msg = payload.new as Message;
                     
                     setMessages((prev) => {
-                        if (prev.some(m => m.id === newMessage.id)) return prev;
+                        if (prev.some(m => m.id === msg.id)) return prev;
                         
-                        if (newMessage.sender_id !== currentUserId) {
+                        if (msg.sender_id !== currentUserId) {
                             markAsRead(conversationId);
                         }
-                        return [...prev, newMessage];
+                        return [...prev, msg];
                     });
                 }
             )
@@ -123,7 +123,7 @@ export function ChatInterface({
             setLoading(true);
             const response = await fetch(`/api/chat/messages/${mentorId}`);
 
-            if (!response.ok) throw new Error('Erro ao carregar mensagens');
+            if (!response.ok) throw new Error(t('errorLoad'));
 
             const data = await response.json();
             setMessages(data.messages || []);
@@ -134,7 +134,7 @@ export function ChatInterface({
             }
         } catch (error) {
             console.error('[CHAT] Error loading messages:', error);
-            toast.error('Erro ao carregar mensagens');
+            toast.error(t('errorLoad'));
         } finally {
             setLoading(false);
         }
@@ -148,7 +148,7 @@ export function ChatInterface({
                 body: JSON.stringify({ conversationId: convId }),
             });
         } catch (error) {
-            console.error('[CHAT] Error marking as read:', error);
+            // Silently ignore mark-read errors
         }
     };
 
@@ -182,7 +182,7 @@ export function ChatInterface({
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || 'Erro ao enviar mensagem');
+                throw new Error(data.error || t('errorSend'));
             }
 
             const data = await response.json();
@@ -199,13 +199,11 @@ export function ChatInterface({
                 return [...prev, optimisticMessage];
             });
 
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Erro ao enviar mensagem');
+        } catch (error: any) {
+            toast.error(error.message || t('errorSend'));
             setNewMessage(content);
         } finally {
             setSending(false);
-            // IMPORTANTE: Só tenta focar quando o campo deixar de estar disabled
-            // O delay de 50ms garante que o React terminou de atualizar o DOM
             setTimeout(() => {
                 inputRef.current?.focus();
             }, 50);
@@ -213,7 +211,7 @@ export function ChatInterface({
     };
 
     const formatTime = (timestamp: string) => {
-        return new Date(timestamp).toLocaleTimeString('pt-BR', {
+        return new Date(timestamp).toLocaleTimeString(locale === 'pt-BR' ? 'pt-BR' : 'en-US', {
             hour: '2-digit',
             minute: '2-digit',
         });
@@ -243,10 +241,10 @@ export function ChatInterface({
                     <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${realtimeStatus === 'connected' ? 'bg-green-500' : 'bg-gray-300'}`} />
                         <span className="text-xs text-gray-500">
-                            {realtimeStatus === 'connected' ? 'Online' : 'Conectando...'}
+                            {realtimeStatus === 'connected' ? t('online') : t('connecting')}
                         </span>
                         {isTyping && (
-                            <span className="text-xs text-primary animate-pulse ml-2 italic">digitando...</span>
+                            <span className="text-xs text-primary animate-pulse ml-2 italic">{t('typing')}</span>
                         )}
                     </div>
                 </div>
@@ -257,8 +255,8 @@ export function ChatInterface({
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-60">
                         <Send className="w-12 h-12 mb-2" />
-                        <p>Nenhuma mensagem ainda.</p>
-                        <p className="text-sm">Envie uma mensagem para começar a conversa!</p>
+                        <p>{t('empty')}</p>
+                        <p className="text-sm">{t('startConversation')}</p>
                     </div>
                 ) : (
                     messages.map((message) => {
@@ -300,7 +298,7 @@ export function ChatInterface({
                             setNewMessage(e.target.value);
                             handleTyping();
                         }}
-                        placeholder="Digite sua mensagem..."
+                        placeholder={t('placeholder')}
                         disabled={sending}
                         className="flex-1 px-4 py-2 bg-gray-100 border-none rounded-full text-sm focus:ring-2 focus:ring-primary focus:bg-white transition-all disabled:opacity-50"
                     />
