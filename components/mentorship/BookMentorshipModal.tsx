@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Loader2, Star } from 'lucide-react';
+import { X, Calendar, Clock, Loader2, Star, Plus, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
 } from '@/components/ui/dialog';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -194,6 +195,9 @@ export function BookMentorshipModal({
                         <DialogTitle className="text-2xl font-bold text-gray-900">
                             Agendar Mentoria com {mentorName}
                         </DialogTitle>
+                        <DialogDescription>
+                            Escolha um dos horários disponíveis abaixo para solicitar sua mentoria.
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="p-6 flex-1 overflow-y-auto">
@@ -330,7 +334,7 @@ export function BookMentorshipModal({
                                 )}
 
                                 {success && (
-                                    <div className="bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2">
+                                    <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2">
                                         <CheckCircle className="w-5 h-5" /> Solicitação enviada! Redirecionando...
                                     </div>
                                 )}
