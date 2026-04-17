@@ -41,7 +41,6 @@ export function MessagesBadge() {
 
             if (msgError) throw msgError;
 
-            console.log(`[BADGE] Contador atualizado: ${count} mensagens não lidas`);
             setUnreadCount(count || 0);
         } catch (error) {
             console.error('[BADGE] Erro ao carregar contador:', error);
@@ -53,27 +52,48 @@ export function MessagesBadge() {
 
         loadUnreadCount();
 
-        // 3. Subscrever ao Realtime de forma única para o Badge Global
+        // 3. Subscrever ao Realtime de forma IDÊNTICA à página de mensagens que funciona
         const channel = supabase
-            .channel('unread-badge-global-sync')
+            .channel('unread-badge-realtime-sync')
             .on(
                 'postgres_changes',
                 {
-                    event: '*', // Escuta tudo: INSERT, UPDATE, DELETE
+                    event: 'INSERT',
                     schema: 'public',
                     table: 'messages',
                 },
-                (payload) => {
-                    console.log('[BADGE] Evento Realtime recebido:', payload.eventType);
+                () => {
                     loadUnreadCount();
                 }
             )
-            .subscribe((status) => {
-                console.log('[BADGE] Status da subscrição Realtime:', status);
-            });
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'messages',
+                },
+                (payload: any) => {
+                    // Recarregar se o status de leitura mudou (read_at)
+                    if (payload.new.read_at !== payload.old.read_at) {
+                        loadUnreadCount();
+                    }
+                }
+            )
+            .on(
+                'postgres_changes',
+                {
+                    event: 'DELETE',
+                    schema: 'public',
+                    table: 'messages',
+                },
+                () => {
+                    loadUnreadCount();
+                }
+            )
+            .subscribe();
 
         return () => {
-            console.log('[BADGE] Limpando canal realtime');
             supabase.removeChannel(channel);
         };
     }, [isAuthenticated, user?.id, loadUnreadCount, supabase]);
