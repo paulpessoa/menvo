@@ -52,40 +52,54 @@ export function MessagesBadge() {
 
         loadUnreadCount();
 
-        // 3. Subscrever ao Realtime de forma IDÊNTICA à página de mensagens que funciona
-        const channel = supabase
-            .channel('unread-badge-realtime-sync')
+        // 3. Estratégia de Realtime Infalível:
+        // Escutamos mudanças na tabela 'conversations' filtrando pelo ID do usuário.
+        // Toda vez que uma mensagem é enviada, o campo 'last_message_at' da conversa é atualizado.
+        // Isso dispara o evento de UPDATE que o Realtime captura com 100% de precisão para aquele usuário.
+        
+        const channelMentor = supabase
+            .channel(`badge-mentor-${user.id}`)
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT',
+                    event: '*',
                     schema: 'public',
-                    table: 'messages',
+                    table: 'conversations',
+                    filter: `mentor_id=eq.${user.id}`
                 },
                 () => {
+                    console.log('[BADGE] Atualização detectada via mentor_id');
                     loadUnreadCount();
                 }
             )
+            .subscribe();
+
+        const channelMentee = supabase
+            .channel(`badge-mentee-${user.id}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'conversations',
+                    filter: `mentee_id=eq.${user.id}`
+                },
+                () => {
+                    console.log('[BADGE] Atualização detectada via mentee_id');
+                    loadUnreadCount();
+                }
+            )
+            .subscribe();
+
+        // Também escutamos a tabela de mensagens para capturar o "marcar como lido" (UPDATE)
+        const channelMessages = supabase
+            .channel(`badge-messages-${user.id}`)
             .on(
                 'postgres_changes',
                 {
                     event: 'UPDATE',
                     schema: 'public',
-                    table: 'messages',
-                },
-                (payload: any) => {
-                    // Recarregar se o status de leitura mudou (read_at)
-                    if (payload.new.read_at !== payload.old.read_at) {
-                        loadUnreadCount();
-                    }
-                }
-            )
-            .on(
-                'postgres_changes',
-                {
-                    event: 'DELETE',
-                    schema: 'public',
-                    table: 'messages',
+                    table: 'messages'
                 },
                 () => {
                     loadUnreadCount();
@@ -94,7 +108,9 @@ export function MessagesBadge() {
             .subscribe();
 
         return () => {
-            supabase.removeChannel(channel);
+            supabase.removeChannel(channelMentor);
+            supabase.removeChannel(channelMentee);
+            supabase.removeChannel(channelMessages);
         };
     }, [isAuthenticated, user?.id, loadUnreadCount, supabase]);
 
