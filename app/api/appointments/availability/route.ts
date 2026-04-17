@@ -106,7 +106,13 @@ export async function GET(request: NextRequest) {
       date <= end;
       date.setDate(date.getDate() + 1)
     ) {
-      const dayOfWeek = date.getDay() // 0 = Sunday, 1 = Monday, etc.
+      // Usar a data formatada no fuso do Brasil para pegar o dia da semana correto
+      const dateString = date.toISOString().split('T')[0];
+      const [year, month, day] = dateString.split('-').map(Number);
+      
+      // Criar uma data que represente o "hoje" no fuso do mentor (Brasília por padrão)
+      // 0 = Sunday, 1 = Monday...
+      const dayOfWeek = new Date(year, month - 1, day).getDay();
 
       // Find availability for this day of week
       const dayAvailability = availability.filter(
@@ -125,8 +131,12 @@ export async function GET(request: NextRequest) {
             continue
           }
 
-          const slotDate = new Date(date)
-          slotDate.setHours(hour, startMinute, 0, 0)
+          // Criar a data e hora correta considerando o fuso de Brasília (UTC-3)
+          // Montamos a string ISO manualmente para forçar o fuso correto
+          const hourStr = hour.toString().padStart(2, '0');
+          const minuteStr = startMinute.toString().padStart(2, '0');
+          const isoString = `${dateString}T${hourStr}:${minuteStr}:00-03:00`;
+          const slotDate = new Date(isoString);
 
           // Skip past dates
           if (slotDate <= new Date()) {
@@ -136,10 +146,8 @@ export async function GET(request: NextRequest) {
           // Check if slot is not booked (considerando duração de 45 minutos)
           if (!isSlotBooked(slotDate, 45)) {
             availableSlots.push({
-              date: slotDate.toISOString().split("T")[0], // YYYY-MM-DD
-              time: `${hour.toString().padStart(2, "0")}:${startMinute
-                .toString()
-                .padStart(2, "0")}`, // HH:MM
+              date: dateString, // YYYY-MM-DD
+              time: `${hourStr}:${minuteStr}`, // HH:MM
               datetime: slotDate.toISOString()
             })
           }
