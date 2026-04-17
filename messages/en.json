@@ -1315,6 +1315,8 @@
     "error": "Error loading appointments",
     "roleMentee": "Mentee",
     "roleMentor": "Mentor",
+    "roleAdmin": "Admin",
+    "roleUser": "User",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",

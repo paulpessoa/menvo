@@ -1290,6 +1290,8 @@
     "error": "Erro ao carregar agendamentos",
     "roleMentee": "Mentorado",
     "roleMentor": "Mentor",
+    "roleAdmin": "Administrador",
+    "roleUser": "Usuário",
     "status": {
       "pending": "Pendente",
       "confirmed": "Confirmado",

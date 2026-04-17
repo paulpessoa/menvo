@@ -24,7 +24,7 @@ interface Conversation {
     id: string
     full_name: string
     avatar_url: string | null
-    is_mentor: boolean
+    role_name: string
   }
 }
 
@@ -102,17 +102,25 @@ function MessagesContent() {
       if (error) throw error
 
       if (convs) {
-        // Para cada conversa, buscar o nome do outro usuário e contagem de não lidas
+        // Para cada conversa, buscar o nome do outro usuário, papel e contagem de não lidas
         const conversationsWithDetails = await Promise.all(convs.map(async (conv) => {
-          // Lógica robusta para identificar o outro participante
-          // Se for uma conversa consigo mesmo (mentor_id == mentee_id), o otherUserId será o próprio ID
           const otherUserId = conv.mentor_id === user.id 
             ? (conv.mentee_id === user.id ? conv.mentor_id : conv.mentee_id)
             : conv.mentor_id
           
-          const { data: otherUser, error: profileError } = await supabase
+          // Buscar perfil e papel do outro usuário
+          const { data: otherUser } = await supabase
             .from('profiles')
-            .select('id, full_name, avatar_url, job_title, company')
+            .select(`
+              id, 
+              full_name, 
+              avatar_url,
+              user_roles!inner (
+                roles!inner (
+                  name
+                )
+              )
+            `)
             .eq('id', otherUserId)
             .maybeSingle()
 
@@ -123,12 +131,19 @@ function MessagesContent() {
             .neq('sender_id', user.id)
             .is('read_at', null)
 
+          // Extrair o nome do papel (priorizando admin > mentor > mentee)
+          const roles = (otherUser as any)?.user_roles || []
+          const roleNames = roles.map((ur: any) => ur.roles.name)
+          let primaryRole = 'mentee'
+          if (roleNames.includes('admin')) primaryRole = 'admin'
+          else if (roleNames.includes('mentor')) primaryRole = 'mentor'
+
           // Montar objeto amigável do outro usuário
           const mappedOtherUser = {
             id: otherUserId,
             full_name: otherUser?.full_name || (otherUserId === user.id ? 'Você (Notas)' : 'Usuário'),
             avatar_url: otherUser?.avatar_url || null,
-            is_mentor: !!otherUser?.job_title
+            role_name: primaryRole
           }
 
           return {
@@ -160,6 +175,15 @@ function MessagesContent() {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
     return date.toLocaleDateString([], { day: '2-digit', month: '2-digit' })
+  }
+
+  const getRoleLabel = (roleName: string) => {
+    switch (roleName) {
+      case 'admin': return t("roleAdmin")
+      case 'mentor': return t("roleMentor")
+      case 'mentee': return t("roleMentee")
+      default: return t("roleUser")
+    }
   }
 
   if (loading) {
@@ -243,8 +267,11 @@ function MessagesContent() {
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-[10px] py-0 h-4 bg-muted/30">
-                            {conversation.other_user?.is_mentor ? t("roleMentor") : t("roleMentee")}
+                          <Badge 
+                            variant={conversation.other_user?.role_name === 'admin' ? "destructive" : "outline"} 
+                            className="text-[10px] py-0 h-4 bg-muted/30"
+                          >
+                            {getRoleLabel(conversation.other_user?.role_name)}
                           </Badge>
                           {conversation.unread_count > 0 && (
                             <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
@@ -305,9 +332,11 @@ function MessagesContent() {
               </Avatar>
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-sm truncate">{selectedConversation.other_user?.full_name}</h2>
-                <span className="text-[10px] text-muted-foreground block leading-none">
-                  {selectedConversation.other_user?.is_mentor ? t("roleMentor") : t("roleMentee")}
-                </span>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[9px] py-0 h-3">
+                    {getRoleLabel(selectedConversation.other_user?.role_name)}
+                  </Badge>
+                </div>
               </div>
             </div>
             <div className="flex-1 overflow-hidden">
