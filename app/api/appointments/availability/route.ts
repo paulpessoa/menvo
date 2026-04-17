@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { AvailableTimeSlot } from "@/types/appointments"
+import { createClient } from "@supabase/supabase-js"
 
 export async function GET(request: NextRequest) {
   try {
     // Usar Service Role para permitir leitura pública da disponibilidade
     // A disponibilidade dos mentores deve ser visível para todos
-    const { createClient: createServiceClient } = await import(
-      "@supabase/supabase-js"
-    )
-    const supabase = createServiceClient(
+    const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       {
@@ -106,8 +104,6 @@ export async function GET(request: NextRequest) {
     const safeEnd = new Date(end.getTime());
     safeEnd.setHours(23, 59, 59, 999);
 
-    console.log(`[AVAILABILITY] Gerando slots de ${current.toISOString()} até ${safeEnd.toISOString()}`);
-
     while (current <= safeEnd) {
       // Pegar o dia da semana (0-6)
       const dayOfWeek = current.getDay();
@@ -162,7 +158,7 @@ export async function GET(request: NextRequest) {
       totalSlots: availableSlots.length
     })
   } catch (error) {
-    console.error("Error fetching availability:", error)
+    console.error("[AVAILABILITY] Fatal error:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
