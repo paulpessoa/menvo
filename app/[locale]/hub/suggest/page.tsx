@@ -33,8 +33,8 @@ export default function HubSuggestPage() {
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
     
-    // Upload de Imagem
-    const imageUpload = useSimpleImageUpload('/api/upload/profile-photo') // Podemos reusar ou criar um específico
+    // Novo hook focado apenas no upload do HUB
+    const hubImageUpload = useSimpleImageUpload('/api/upload/hub-resource')
 
     const [formData, setFormData] = useState({
         title: "",
@@ -53,13 +53,13 @@ export default function HubSuggestPage() {
         const file = event.target.files?.[0]
         if (!file) return
 
-        const result = await imageUpload.upload(file)
+        const result = await hubImageUpload.upload(file)
 
         if (result.success) {
             setFormData(prev => ({ ...prev, image_url: result.data.url }))
-            toast.success("Imagem carregada!")
+            toast.success("Imagem carregada com sucesso!")
         } else {
-            toast.error("Erro no upload da imagem")
+            toast.error(result.error || "Erro no upload da imagem")
         }
     }
 
@@ -76,15 +76,15 @@ export default function HubSuggestPage() {
             await hubService.suggestResource({
                 ...formData,
                 user_id: user.id,
-                // Garantir campos vazios como null se necessário pelo Postgres
                 event_date: formData.event_date || null,
                 event_time: formData.event_time || null
             } as any)
+            
             setSubmitted(true)
             toast.success("Sugestão enviada com sucesso!")
         } catch (error) {
             console.error('Error suggesting resource:', error)
-            toast.error("Erro ao enviar sugestão. Tente novamente.")
+            toast.error("Erro ao salvar sua sugestão. Verifique os dados e tente novamente.")
         } finally {
             setLoading(false)
         }
@@ -159,7 +159,7 @@ export default function HubSuggestPage() {
                                         <p className="text-xs text-muted-foreground mt-1">Formatos sugeridos: JPG, PNG (Max 2MB)</p>
                                     </>
                                 )}
-                                {imageUpload.isUploading && (
+                                {hubImageUpload.isUploading && (
                                     <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
