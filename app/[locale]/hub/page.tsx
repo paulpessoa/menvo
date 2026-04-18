@@ -13,28 +13,27 @@ import { useTranslations } from "next-intl"
 import { hubService, type HubResource, type HubResourceType } from "@/services/hub/hub"
 
 export default function HubPage() {
-    const t = useTranslations("hub")
-    const common = useTranslations("common")
+    const tHub = useTranslations("hub")
+    const tCommon = useTranslations("common")
     const [resources, setResources] = useState<HubResource[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState("")
     const [activeTab, setActiveTab] = useState<string>("all")
 
     useEffect(() => {
+        const fetchResources = async () => {
+            setLoading(true)
+            try {
+                const data = await hubService.getPublishedResources(activeTab as HubResourceType)
+                setResources(data || [])
+            } catch (error) {
+                console.error('Error fetching hub resources:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
         fetchResources()
     }, [activeTab])
-
-    const fetchResources = async () => {
-        setLoading(true)
-        try {
-            const data = await hubService.getPublishedResources(activeTab as HubResourceType)
-            setResources(data)
-        } catch (error) {
-            console.error('Error fetching hub resources:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const filteredResources = resources.filter(res =>
         res.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -59,12 +58,12 @@ export default function HubPage() {
                 <div>
                     <h1 className="text-4xl font-bold tracking-tight mb-2">Menvo Hub</h1>
                     <p className="text-xl text-muted-foreground max-w-2xl">
-                        {t("subtitle")}
+                        {tHub("subtitle")}
                     </p>
                 </div>
                 <Button asChild size="lg" className="shadow-lg hover:shadow-xl transition-all">
                     <Link href="/hub/suggest">
-                        <Plus className="mr-2 h-5 w-5" /> {t("suggestBtn")}
+                        <Plus className="mr-2 h-5 w-5" /> {tHub("suggestBtn")}
                     </Link>
                 </Button>
             </div>
@@ -75,20 +74,20 @@ export default function HubPage() {
                     <div className="relative w-full md:w-96">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder={t("searchPlaceholder")}
-                            className="pl-10"
+                            placeholder={tHub("searchPlaceholder")}
+                            className="pl-10 h-11"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-                        <TabsList className="grid grid-cols-3 md:flex w-full">
-                            <TabsTrigger value="all">{t("tabs.all")}</TabsTrigger>
-                            <TabsTrigger value="event">{t("tabs.events")}</TabsTrigger>
-                            <TabsTrigger value="course">{t("tabs.courses")}</TabsTrigger>
-                            <TabsTrigger value="tool">{t("tabs.tools")}</TabsTrigger>
-                            <TabsTrigger value="discount" className="hidden md:flex">{t("tabs.discounts")}</TabsTrigger>
+                        <TabsList className="grid grid-cols-3 md:flex w-full h-auto p-1 bg-muted/50">
+                            <TabsTrigger value="all" className="py-2">{tHub("tabs.all")}</TabsTrigger>
+                            <TabsTrigger value="event" className="py-2">{tHub("tabs.events")}</TabsTrigger>
+                            <TabsTrigger value="course" className="py-2">{tHub("tabs.courses")}</TabsTrigger>
+                            <TabsTrigger value="tool" className="py-2">{tHub("tabs.tools")}</TabsTrigger>
+                            <TabsTrigger value="discount" className="hidden md:flex py-2">{tHub("tabs.discounts")}</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>
@@ -98,23 +97,23 @@ export default function HubPage() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                    <p className="text-muted-foreground animate-pulse">{common("loading")}</p>
+                    <p className="text-muted-foreground animate-pulse">{tCommon("loading")}</p>
                 </div>
             ) : filteredResources.length === 0 ? (
                 <div className="text-center py-24 bg-muted/30 rounded-2xl border-2 border-dashed">
-                    <Info className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold">{t("noResults.title")}</h3>
+                    <Info className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-30" />
+                    <h3 className="text-lg font-semibold">{tHub("noResults.title")}</h3>
                     <p className="text-muted-foreground max-w-sm mx-auto mt-2">
-                        {t("noResults.description")}
+                        {tHub("noResults.description")}
                     </p>
                     <Button variant="outline" className="mt-6" onClick={() => {setSearchTerm(""); setActiveTab("all")}}>
-                        {t("noResults.clear")}
+                        {tHub("noResults.clear")}
                     </Button>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredResources.map((item) => (
-                        <Card key={item.id} className="group hover:shadow-xl transition-all duration-300 flex flex-col border-2 hover:border-primary/20 overflow-hidden">
+                        <Card key={item.id} className="group hover:shadow-xl transition-all duration-300 flex flex-col border-2 hover:border-primary/20 overflow-hidden bg-white shadow-sm">
                             {item.image_url && (
                                 <div className="relative h-48 w-full overflow-hidden">
                                     <Image
@@ -122,37 +121,38 @@ export default function HubPage() {
                                         alt={item.title}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                     {item.badge_text && (
-                                        <Badge className="absolute top-4 right-4 shadow-md" variant="default">
+                                        <Badge className="absolute top-4 right-4 shadow-md bg-primary text-primary-foreground" variant="default">
                                             {item.badge_text}
                                         </Badge>
                                     )}
                                 </div>
                             )}
-                            <CardHeader className="flex-1">
+                            <CardHeader className="flex-1 px-6 pt-6">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <Badge variant="secondary" className="flex items-center gap-1.5 font-medium py-1">
+                                    <Badge variant="secondary" className="flex items-center gap-1.5 font-medium py-1 px-2">
                                         {getTypeIcon(item.type)}
-                                        {t(`types.${item.type}`)}
+                                        {tHub(`types.${item.type}`)}
                                     </Badge>
                                     {item.is_affiliate && (
-                                        <Badge variant="outline" className="text-[10px] uppercase tracking-wider opacity-60">
+                                        <Badge variant="outline" className="text-[10px] uppercase tracking-wider opacity-60 border-primary/30 text-primary">
                                             Partner
                                         </Badge>
                                     )}
                                 </div>
-                                <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+                                <CardTitle className="text-xl line-clamp-2 group-hover:text-primary transition-colors leading-tight">
                                     {item.title}
                                 </CardTitle>
-                                <CardDescription className="line-clamp-3 mt-2 text-sm leading-relaxed">
+                                <CardDescription className="line-clamp-3 mt-3 text-sm leading-relaxed text-gray-600">
                                     {item.description}
                                 </CardDescription>
                             </CardHeader>
                             <CardFooter className="pt-0 pb-6 px-6 mt-auto">
-                                <Button className="w-full font-semibold" asChild>
+                                <Button className="w-full font-bold shadow-sm" asChild>
                                     <a href={item.url} target="_blank" rel="noopener noreferrer">
-                                        {t("viewMore")} <ExternalLink className="ml-2 h-4 w-4" />
+                                        {tHub("viewMore")} <ExternalLink className="ml-2 h-4 w-4" />
                                     </a>
                                 </Button>
                             </CardFooter>
