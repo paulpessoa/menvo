@@ -58,7 +58,7 @@ export default function Header() {
 
   const userNavigation = isAuthenticated
     ? [
-        ...(isAdmin()
+        ...(isAdmin
           ? [
               {
                 name: t("header.userMenu.adminPanel"),
@@ -77,7 +77,7 @@ export default function Header() {
           href: "/profile",
           icon: User
         },
-        ...(isAdmin() || role === "mentor"
+        ...(isAdmin || role === "mentor"
           ? [
               {
                 name: t("header.userMenu.createOrganization"),

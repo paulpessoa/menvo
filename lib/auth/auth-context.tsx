@@ -27,9 +27,9 @@ interface AuthContextType {
     isInitializing: boolean
     loading: boolean
     isVerified: boolean
-    isAdmin: () => boolean
-    isMentor: () => boolean
-    isMentee: () => boolean
+    isAdmin: boolean
+    isMentor: boolean
+    isMentee: boolean
     hasAnyRole: (roles: string[]) => boolean
     needsRoleSelection: () => boolean
     signIn: (email: string, password: string) => Promise<void>
@@ -119,16 +119,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         initAuth()
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+            if (event === 'SIGNED_OUT') {
+                setUser(null)
+                setSession(null)
+                setProfile(null)
+                return
+            }
+
             setSession(newSession)
             const currentUser = newSession?.user ?? null
             setUser(currentUser)
 
-            if (currentUser) {
+            if (currentUser && event !== 'INITIAL_SESSION') {
                 const userProfile = await fetchProfile(currentUser.id)
                 setProfile(userProfile)
-            } else {
-                setProfile(null)
             }
         })
 
@@ -150,9 +155,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error
     }, [supabase])
 
-    const isAdmin = useCallback(() => profile?.roles?.includes('admin') ?? false, [profile])
-    const isMentor = useCallback(() => profile?.roles?.includes('mentor') ?? false, [profile])
-    const isMentee = useCallback(() => profile?.roles?.includes('mentee') ?? false, [profile])
+    // Flags de conveniência computadas
+    const isAdmin = useMemo(() => profile?.roles?.includes('admin') ?? false, [profile])
+    const isMentor = useMemo(() => profile?.roles?.includes('mentor') ?? false, [profile])
+    const isMentee = useMemo(() => profile?.roles?.includes('mentee') ?? false, [profile])
+
     const hasAnyRole = useCallback((roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false, [profile])
     const needsRoleSelection = useCallback(() => (profile?.roles?.length ?? 0) === 0, [profile])
 
