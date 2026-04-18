@@ -522,6 +522,27 @@
       "unexpected": "An unexpected error occurred. Please try again."
     }
   },
+  "community": {
+    "title": "Community Board",
+    "subtitle": "Meet people looking to learn and proactively offer your mentorship.",
+    "mentorTip": "Tip: Proactive mentors who help those seeking knowledge get 3x more visibility.",
+    "searchPlaceholder": "Search by name, goal, or interest...",
+    "seekingHelpWith": "Seeking help with:",
+    "noBioProvided": "This member hasn't described their goals in detail yet.",
+    "offerHelp": "Offer Help",
+    "noResults": "No members found with these terms.",
+    "clearSearch": "Clear search",
+    "loadMore": "Load more",
+    "errorLoading": "Error loading community profiles.",
+    "disclaimer": {
+      "title": "You are not a Mentor yet",
+      "description": "You can chat with {name} and share your social networks, but for them to schedule formal sessions with you, your profile must be set to Mentor.",
+      "whyTitle": "Why become a Mentor?",
+      "whyDescription": "As a verified mentor, you gain access to scheduling tools, synced calendar, and official reviews.",
+      "chatAnyway": "Just Chat",
+      "becomeMentor": "Become a Mentor"
+    }
+  },
   "hub": {
     "subtitle": "Discover curated events, courses, tools, and discounts to accelerate your journey.",
     "suggestBtn": "Suggest Resource",

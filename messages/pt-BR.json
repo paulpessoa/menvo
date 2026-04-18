@@ -523,6 +523,27 @@
       "unexpected": "Ocorreu um erro inesperado. Tente novamente."
     }
   },
+  "community": {
+    "title": "Mural da Comunidade",
+    "subtitle": "Conheça pessoas que estão buscando aprender e ofereça sua mentoria proativamente.",
+    "mentorTip": "Dica: Mentores proativos que ajudam quem está buscando conhecimento ganham 3x mais destaque.",
+    "searchPlaceholder": "Buscar por nome, objetivo ou interesse...",
+    "seekingHelpWith": "Buscando ajuda com:",
+    "noBioProvided": "Este membro ainda não descreveu seus objetivos detalhadamente.",
+    "offerHelp": "Oferecer Ajuda",
+    "noResults": "Nenhum membro encontrado com estes termos.",
+    "clearSearch": "Limpar busca",
+    "loadMore": "Carregar mais",
+    "errorLoading": "Erro ao carregar perfis da comunidade.",
+    "disclaimer": {
+      "title": "Você ainda não é um Mentor",
+      "description": "Você pode conversar com {name} e compartilhar suas redes sociais, mas para que ele possa agendar sessões formais com você, seu perfil precisa ser de Mentor.",
+      "whyTitle": "Por que ser Mentor?",
+      "whyDescription": "Como mentor verificado, você ganha acesso a ferramentas de agendamento, calendário sincronizado e avaliações oficiais.",
+      "chatAnyway": "Apenas Conversar",
+      "becomeMentor": "Tornar-se Mentor"
+    }
+  },
   "hub": {
     "subtitle": "Descubra eventos, cursos, ferramentas e descontos curados para acelerar sua jornada.",
     "suggestBtn": "Sugerir Recurso",

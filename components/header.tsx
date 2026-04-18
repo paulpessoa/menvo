@@ -52,6 +52,7 @@ export default function Header() {
   const navigation = [
     { name: t("common.home"), href: "/" },
     { name: t("common.findMentors"), href: "/mentors" },
+    { name: t("common.community"), href: "/community" },
     { name: t("common.hub"), href: "/hub" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
     { name: t("common.aboutUs"), href: "/about" }
