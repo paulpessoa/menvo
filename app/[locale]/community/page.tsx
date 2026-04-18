@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, Users, Loader2, MessageSquare, Info } from "lucide-react"
+import { Search, Users, Loader2, Info } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { MenteeCard } from "@/components/community/MenteeCard"
 import { createClient } from "@/utils/supabase/client"
 import { useAuth } from "@/lib/auth"
@@ -28,8 +27,8 @@ interface UserProfile {
 const ITEMS_PER_PAGE = 12
 
 export default function CommunityPage() {
-    const t = useTranslations("community")
-    const common = useTranslations("common")
+    const tCommunity = useTranslations("community")
+    const tCommon = useTranslations("common")
     const [profiles, setProfiles] = useState<UserProfile[]>([])
     const [loading, setLoading] = useState(true)
     const [loadingMore, setLoadingMore] = useState(false)
@@ -58,7 +57,6 @@ export default function CommunityPage() {
             const to = from + ITEMS_PER_PAGE - 1
 
             // Buscamos perfis que marcaram is_public = true
-            // Independente de ser mentor ou mentee, se ele quer aparecer na comunidade, ele aparece
             let query = supabase
                 .from('profiles')
                 .select(`
@@ -74,7 +72,7 @@ export default function CommunityPage() {
                     user_roles!inner(roles!inner(name))
                 `, { count: 'exact' })
                 .eq('is_public', true)
-                .not('bio', 'is', null) // Apenas quem preencheu algo
+                .not('bio', 'is', null)
             
             if (searchTerm) {
                 query = query.or(`full_name.ilike.%${searchTerm}%,bio.ilike.%${searchTerm}%,job_title.ilike.%${searchTerm}%`)
@@ -103,20 +101,20 @@ export default function CommunityPage() {
             setHasMore((count || 0) > (from + formattedData.length))
         } catch (error) {
             console.error('Error fetching community profiles:', error)
-            toast.error(t("errorLoading"))
+            toast.error(tCommunity("errorLoading"))
         } finally {
             setLoading(false)
             setLoadingMore(false)
         }
-    }, [searchTerm, page, supabase])
+    }, [searchTerm, page, supabase, tCommunity])
 
     useEffect(() => {
         fetchProfiles(true)
-    }, [searchTerm])
+    }, [searchTerm, fetchProfiles])
 
     const handleChat = (targetUserId: string) => {
         if (!user) {
-            toast.info(common("loginRequired"))
+            toast.info(tCommon("loginRequired"))
             router.push("/login")
             return
         }
@@ -128,15 +126,15 @@ export default function CommunityPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight mb-2">{t("title")}</h1>
+                    <h1 className="text-4xl font-bold tracking-tight mb-2">{tCommunity("title")}</h1>
                     <p className="text-xl text-muted-foreground max-w-2xl">
-                        {t("subtitle")}
+                        {tCommunity("subtitle")}
                     </p>
                 </div>
                 <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
                     <Info className="h-5 w-5 text-primary shrink-0" />
                     <p className="text-xs text-primary/80 leading-snug">
-                        {t("mentorTip")}
+                        {tCommunity("mentorTip")}
                     </p>
                 </div>
             </div>
@@ -145,8 +143,8 @@ export default function CommunityPage() {
             <div className="relative max-w-md mb-12">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                    placeholder={t("searchPlaceholder")}
-                    className="pl-10"
+                    placeholder={tCommunity("searchPlaceholder")}
+                    className="pl-10 h-11"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -156,15 +154,15 @@ export default function CommunityPage() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3, 4, 5, 6].map(i => (
-                        <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
+                        <div key={i} className="h-64 rounded-xl bg-muted animate-pulse border shadow-sm" />
                     ))}
                 </div>
             ) : profiles.length === 0 ? (
                 <div className="text-center py-24 bg-muted/20 rounded-2xl border-2 border-dashed">
                     <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
-                    <h3 className="text-lg font-semibold">{t("noResults")}</h3>
+                    <h3 className="text-lg font-semibold">{tCommunity("noResults")}</h3>
                     <Button variant="outline" className="mt-4" onClick={() => setSearchTerm("")}>
-                        {t("clearSearch")}
+                        {tCommunity("clearSearch")}
                     </Button>
                 </div>
             ) : (
@@ -187,9 +185,10 @@ export default function CommunityPage() {
                                 size="lg"
                                 onClick={() => {setPage(p => p + 1); fetchProfiles(false)}}
                                 disabled={loadingMore}
+                                className="px-8 shadow-sm"
                             >
                                 {loadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                {t("loadMore")}
+                                {tCommunity("loadMore")}
                             </Button>
                         </div>
                     )}
