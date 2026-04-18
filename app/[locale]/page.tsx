@@ -107,7 +107,7 @@ export default function Home() {
                   src={src}
                   width={550}
                   height={550}
-                  alt={t("home.hero.title")}
+                  alt={t("hero.title")}
                   className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
                     }`}
                 />
