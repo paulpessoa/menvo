@@ -244,7 +244,22 @@ export default function Header() {
                             </div>
                         </div>
                     ) : (
-                        <span className="text-2xl font-bold text-primary">Menvo</span>
+                        <div className="relative h-8 w-24">
+                            <Image
+                                src="/menvo-logo-light.png"
+                                alt="Menvo"
+                                fill
+                                className="object-contain dark:hidden"
+                                priority
+                            />
+                            <Image
+                                src="/menvo-logo-dark.png"
+                                alt="Menvo"
+                                fill
+                                className="object-contain hidden dark:block"
+                                priority
+                            />
+                        </div>
                     )}
                 </SheetTitle>
               </SheetHeader>
