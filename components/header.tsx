@@ -106,8 +106,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
-        <div className="flex items-center gap-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between gap-4">
+        {/* Bloco Esquerda: Logo */}
+        <div className="flex items-center shrink-0">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-10 w-32">
                 <Image
@@ -126,12 +127,15 @@ export default function Header() {
                 />
             </div>
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
+        </div>
+
+        {/* Bloco Centro: Navegação Centralizada */}
+        <nav className="hidden md:flex flex-1 justify-center items-center gap-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-sm font-medium transition-colors hover:text-primary whitespace-nowrap ${
                   pathname === item.href
                     ? "text-primary border-b-2 border-primary"
                     : "text-muted-foreground"
@@ -140,10 +144,10 @@ export default function Header() {
                 {item.name}
               </Link>
             ))}
-          </nav>
-        </div>
+        </nav>
 
-        <div className="flex items-center gap-2">
+        {/* Bloco Direita: Ferramentas */}
+        <div className="flex items-center gap-2 shrink-0">
           <LanguageSelector />
           <MessagesBadge />
 
