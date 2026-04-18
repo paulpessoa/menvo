@@ -15,12 +15,11 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon, Send, MapPin, Calendar, Clock, Camera, Upload } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon, Send, MapPin, Calendar, Clock, Camera, Upload, X } from "lucide-react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { hubService, type HubResourceType } from "@/services/hub/hub"
-import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 import { toast } from "sonner"
 
 export default function HubSuggestPage() {
@@ -33,8 +32,9 @@ export default function HubSuggestPage() {
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
     
-    // Novo hook focado apenas no upload do HUB
-    const hubImageUpload = useSimpleImageUpload('/api/upload/hub-resource')
+    // Estado local para o arquivo (não sobe para o storage imediatamente)
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
     const [formData, setFormData] = useState({
         title: "",
@@ -42,25 +42,50 @@ export default function HubSuggestPage() {
         type: "event" as HubResourceType,
         url: "",
         badge_text: "",
-        image_url: "",
         address: "",
         location_url: "",
         event_date: "",
         event_time: ""
     })
 
-    const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         if (!file) return
 
-        const result = await hubImageUpload.upload(file)
-
-        if (result.success) {
-            setFormData(prev => ({ ...prev, image_url: result.data.url }))
-            toast.success("Imagem carregada com sucesso!")
-        } else {
-            toast.error(result.error || "Erro no upload da imagem")
+        // Validar tamanho (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error("Arquivo muito grande. Máximo 2MB.")
+            return
         }
+
+        setSelectedFile(file)
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            setPreviewUrl(reader.result as string)
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const removeFile = () => {
+        setSelectedFile(null)
+        setPreviewUrl(null)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+
+    const uploadImage = async (): Promise<string | null> => {
+        if (!selectedFile) return null
+
+        const uploadData = new FormData()
+        uploadData.append("file", selectedFile)
+
+        const response = await fetch('/api/upload/hub-resource', {
+            method: 'POST',
+            body: uploadData
+        })
+
+        if (!response.ok) throw new Error("Falha no upload da imagem")
+        const data = await response.json()
+        return data.url
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -73,8 +98,16 @@ export default function HubSuggestPage() {
 
         setLoading(true)
         try {
+            // 1. Upload da imagem APENAS AGORA
+            let finalImageUrl = null
+            if (selectedFile) {
+                finalImageUrl = await uploadImage()
+            }
+
+            // 2. Salvar no Banco
             await hubService.suggestResource({
                 ...formData,
+                image_url: finalImageUrl,
                 user_id: user.id,
                 event_date: formData.event_date || null,
                 event_time: formData.event_time || null
@@ -84,7 +117,7 @@ export default function HubSuggestPage() {
             toast.success("Sugestão enviada com sucesso!")
         } catch (error) {
             console.error('Error suggesting resource:', error)
-            toast.error("Erro ao salvar sua sugestão. Verifique os dados e tente novamente.")
+            toast.error("Erro ao salvar sua sugestão. Tente novamente.")
         } finally {
             setLoading(false)
         }
@@ -107,7 +140,22 @@ export default function HubSuggestPage() {
                         <Button asChild className="w-full">
                             <Link href="/hub">Voltar para o Hub</Link>
                         </Button>
-                        <Button variant="ghost" className="w-full" onClick={() => setSubmitted(false)}>
+                        <Button variant="ghost" className="w-full" onClick={() => {
+                            setSubmitted(false)
+                            setSelectedFile(null)
+                            setPreviewUrl(null)
+                            setFormData({
+                                title: "",
+                                description: "",
+                                type: "event" as HubResourceType,
+                                url: "",
+                                badge_text: "",
+                                address: "",
+                                location_url: "",
+                                event_date: "",
+                                event_time: ""
+                            })
+                        }}>
                             Sugerir outro link
                         </Button>
                     </CardContent>
@@ -142,27 +190,31 @@ export default function HubSuggestPage() {
                         </CardHeader>
                         <CardContent>
                             <div 
-                                onClick={() => fileInputRef.current?.click()}
-                                className="border-2 border-dashed rounded-xl h-48 flex flex-col items-center justify-center bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors relative overflow-hidden"
+                                onClick={() => !previewUrl && fileInputRef.current?.click()}
+                                className={`border-2 border-dashed rounded-xl h-48 flex flex-col items-center justify-center transition-colors relative overflow-hidden ${
+                                    previewUrl ? 'border-primary/20 bg-primary/5' : 'bg-muted/30 hover:bg-muted/50 cursor-pointer'
+                                }`}
                             >
-                                {formData.image_url ? (
+                                {previewUrl ? (
                                     <>
-                                        <img src={formData.image_url} alt="Capa" className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-white">
-                                            Trocar Imagem
+                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); removeFile(); }}
+                                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[10px] py-1 text-center backdrop-blur-sm">
+                                            A imagem será salva ao enviar o formulário
                                         </div>
                                     </>
                                 ) : (
                                     <>
                                         <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                                        <p className="text-sm font-medium">Clique para fazer upload</p>
-                                        <p className="text-xs text-muted-foreground mt-1">Formatos sugeridos: JPG, PNG (Max 2MB)</p>
+                                        <p className="text-sm font-medium">Clique para selecionar imagem</p>
+                                        <p className="text-xs text-muted-foreground mt-1">Formatos: JPG, PNG (Max 2MB)</p>
                                     </>
-                                )}
-                                {hubImageUpload.isUploading && (
-                                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
-                                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                    </div>
                                 )}
                             </div>
                             <input 
@@ -170,13 +222,13 @@ export default function HubSuggestPage() {
                                 type="file" 
                                 className="hidden" 
                                 accept="image/*"
-                                onChange={handlePhotoUpload}
+                                onChange={handleFileSelect}
                             />
                         </CardContent>
                     </Card>
 
                     {/* Informações Básicas */}
-                    <Card className="border-2">
+                    <Card className="border-2 shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-lg">Detalhes do Recurso</CardTitle>
                         </CardHeader>
@@ -189,7 +241,7 @@ export default function HubSuggestPage() {
                                         id="url" 
                                         type="url" 
                                         placeholder="https://..." 
-                                        className="pl-10"
+                                        className="pl-10 h-11"
                                         required
                                         value={formData.url}
                                         onChange={(e) => setFormData({...formData, url: e.target.value})}
@@ -202,7 +254,8 @@ export default function HubSuggestPage() {
                                     <Label htmlFor="title">Título</Label>
                                     <Input 
                                         id="title" 
-                                        placeholder="Ex: Workshop de React" 
+                                        placeholder="Ex: Workshop de Next.js" 
+                                        className="h-11"
                                         required
                                         value={formData.title}
                                         onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -214,7 +267,7 @@ export default function HubSuggestPage() {
                                         value={formData.type} 
                                         onValueChange={(val: HubResourceType) => setFormData({...formData, type: val})}
                                     >
-                                        <SelectTrigger id="type">
+                                        <SelectTrigger id="type" className="h-11">
                                             <SelectValue placeholder="Selecione o tipo" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -233,7 +286,7 @@ export default function HubSuggestPage() {
                                 <Textarea 
                                     id="description" 
                                     placeholder="Conte mais sobre este recurso..." 
-                                    className="min-h-[100px]"
+                                    className="min-h-[120px] resize-none"
                                     required
                                     value={formData.description}
                                     onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -243,10 +296,10 @@ export default function HubSuggestPage() {
                     </Card>
 
                     {/* Localização e Data (Opcionais) */}
-                    <Card>
+                    <Card className="shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <MapPin className="h-5 w-5" /> Localização e Data <Badge variant="outline" className="font-normal text-[10px]">Opcional</Badge>
+                                <MapPin className="h-5 w-5" /> Localização e Data <Badge variant="secondary" className="font-normal text-[10px]">Opcional</Badge>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-6">
@@ -257,7 +310,7 @@ export default function HubSuggestPage() {
                                     <Input 
                                         id="address" 
                                         placeholder="Ex: Av. Paulista ou Online" 
-                                        className="pl-10"
+                                        className="pl-10 h-11"
                                         value={formData.address}
                                         onChange={(e) => setFormData({...formData, address: e.target.value})}
                                     />
@@ -265,10 +318,11 @@ export default function HubSuggestPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="location_url">Link do Maps (Opcional)</Label>
+                                <Label htmlFor="location_url">Link do Maps</Label>
                                 <Input 
                                     id="location_url" 
                                     placeholder="Cole o link do Google Maps aqui..." 
+                                    className="h-11"
                                     value={formData.location_url}
                                     onChange={(e) => setFormData({...formData, location_url: e.target.value})}
                                 />
@@ -279,6 +333,7 @@ export default function HubSuggestPage() {
                                     <Label className="flex items-center gap-2"><Calendar className="h-3 w-3" /> Data</Label>
                                     <Input 
                                         type="date" 
+                                        className="h-11"
                                         value={formData.event_date}
                                         onChange={(e) => setFormData({...formData, event_date: e.target.value})}
                                     />
@@ -287,6 +342,7 @@ export default function HubSuggestPage() {
                                     <Label className="flex items-center gap-2"><Clock className="h-3 w-3" /> Horário</Label>
                                     <Input 
                                         type="time" 
+                                        className="h-11"
                                         value={formData.event_time}
                                         onChange={(e) => setFormData({...formData, event_time: e.target.value})}
                                     />
@@ -296,9 +352,9 @@ export default function HubSuggestPage() {
                     </Card>
 
                     <CardFooter className="px-0">
-                        <Button type="submit" className="w-full h-12 text-lg shadow-lg" disabled={loading}>
+                        <Button type="submit" className="w-full h-14 text-lg shadow-xl hover:scale-[1.01] transition-transform" disabled={loading}>
                             {loading ? (
-                                <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Enviando...</>
+                                <><Loader2 className="mr-2 h-6 w-6 animate-spin" /> Processando...</>
                             ) : (
                                 <><Send className="mr-2 h-5 w-5" /> Enviar para Revisão</>
                             )}
