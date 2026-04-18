@@ -1,9 +1,8 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
-import { useRouter } from 'next/navigation'
 
 interface UserProfile {
     id: string
@@ -45,11 +44,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isInitializing, setIsInitializing] = useState(true)
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
-    const router = useRouter()
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
-            // Fetch profile and roles
             const { data, error } = await supabase
                 .from('profiles')
                 .select(`
@@ -76,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return null
             }
 
-            const roles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name) || []
+            const roles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
             
             return {
                 ...data,
@@ -98,24 +95,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const initAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            setSession(session)
-            const currentUser = session?.user ?? null
-            setUser(currentUser)
+            try {
+                const { data: { session: currentSession } } = await supabase.auth.getSession()
+                setSession(currentSession)
+                const currentUser = currentSession?.user ?? null
+                setUser(currentUser)
 
-            if (currentUser) {
-                const userProfile = await fetchProfile(currentUser.id)
-                setProfile(userProfile)
+                if (currentUser) {
+                    const userProfile = await fetchProfile(currentUser.id)
+                    setProfile(userProfile)
+                }
+            } catch (err) {
+                console.error('Auth initialization error:', err)
+            } finally {
+                setIsInitializing(false)
             }
-            
-            setIsInitializing(false)
         }
 
         initAuth()
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            setSession(session)
-            const currentUser = session?.user ?? null
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+            setSession(newSession)
+            const currentUser = newSession?.user ?? null
             setUser(currentUser)
 
             if (currentUser) {
@@ -129,18 +130,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [supabase, fetchProfile])
 
-    const isAdmin = () => profile?.roles?.includes('admin') ?? false
-    const isMentor = () => profile?.roles?.includes('mentor') ?? false
-    const isMentee = () => profile?.roles?.includes('mentee') ?? false
-    const hasAnyRole = (roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false
-    const needsRoleSelection = () => (profile?.roles?.length ?? 0) === 0
+    const isAdmin = useCallback(() => profile?.roles?.includes('admin') ?? false, [profile])
+    const isMentor = useCallback(() => profile?.roles?.includes('mentor') ?? false, [profile])
+    const isMentee = useCallback(() => profile?.roles?.includes('mentee') ?? false, [profile])
+    const hasAnyRole = useCallback((roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false, [profile])
+    const needsRoleSelection = useCallback(() => (profile?.roles?.length ?? 0) === 0, [profile])
 
     const signOut = async () => {
-        await supabase.auth.signOut()
-        router.push('/')
+        setLoading(true)
+        try {
+            await supabase.auth.signOut()
+            window.location.href = '/' // Uso window.location para um hard reset limpo no logout
+        } catch (err) {
+            console.error('Sign out error:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const value = {
+    const value = useMemo(() => ({
         user,
         session,
         profile,
@@ -156,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         needsRoleSelection,
         refreshProfile,
         signOut
-    }
+    }), [user, session, profile, isInitializing, loading, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, refreshProfile])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
