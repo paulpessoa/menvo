@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Users, Settings, Clock, CheckCircle, AlertCircle, TrendingUp, Star, MessageCircle, Heart, Loader2 } from "lucide-react"
+import { Calendar, Users, Settings, Clock, CheckCircle, AlertTriangle, AlertCircle, TrendingUp, Star, MessageSquare, Heart, Loader2, Edit } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
@@ -186,38 +186,62 @@ export default function MentorDashboard() {
         <RequireRole roles={['mentor']}>
             <div className="container mx-auto px-4 py-8">
                 <div className="space-y-8">
-                    <div>
-                        <h1 className="text-3xl font-bold">
-                            {getGreeting()}, {profile?.full_name || "Mentor"}!
-                        </h1>
-                        <p className="text-muted-foreground">
-                            {t("mentor.welcome")}
-                        </p>
-                    </div>
-
-                    <Card className={isVerified ? "border-green-200 bg-green-50" : "border-yellow-200 bg-yellow-50"}>
-                        <CardContent className="flex items-center gap-4 p-6">
-                            {isVerified ? (
-                                <CheckCircle className="h-8 w-8 text-green-600" />
-                            ) : (
-                                <AlertCircle className="h-8 w-8 text-yellow-600" />
+                    {/* Alerta de Verificação / Notas do Admin */}
+                    {profile && !profile.verified && (
+                        <Card className="border-yellow-200 bg-yellow-50 shadow-sm overflow-hidden">
+                            <CardHeader className="pb-3 border-b border-yellow-100 bg-yellow-100/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-yellow-500 rounded-full">
+                                        <AlertTriangle className="h-5 w-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-yellow-900 text-lg">
+                                            {profile.verification_status === 'rejected' ? "Ajustes Necessários no Perfil" : "Perfil em Análise"}
+                                        </CardTitle>
+                                        <CardDescription className="text-yellow-700">
+                                            {profile.verification_status === 'rejected' 
+                                                ? "Nossa equipe revisou seu perfil e solicitou alguns ajustes."
+                                                : "Seu perfil está em fila de análise. Logo ele será publicado!"}
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+                            {profile.verification_notes && (
+                                <CardContent className="pt-4">
+                                    <div className="bg-white p-4 rounded-lg border border-yellow-200 shadow-inner">
+                                        <p className="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-2">Mensagem do Administrador:</p>
+                                        <p className="text-sm text-gray-800 leading-relaxed font-medium italic">
+                                            "{profile.verification_notes}"
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex gap-3">
+                                        <Button asChild className="bg-yellow-600 hover:bg-yellow-700 text-white border-none">
+                                            <Link href="/profile/setup">
+                                                <Edit className="h-4 w-4 mr-2" /> Completar Perfil
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </CardContent>
                             )}
-                            <div className="flex-1">
-                                <h3 className="font-semibold">
-                                    {isVerified ? t("mentor.verification.approved") : t("mentor.verification.pending")}
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {isVerified
-                                        ? t("mentor.verification.approvedText")
-                                        : t("mentor.verification.pendingText")
-                                    }
-                                </p>
-                            </div>
-                            <Badge variant={isVerified ? "default" : "secondary"}>
-                                {isVerified ? t("mentor.verification.badgeApproved") : t("mentor.verification.badgePending")}
-                            </Badge>
-                        </CardContent>
-                    </Card>
+                        </Card>
+                    )}
+
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold">
+                                {getGreeting()}, {profile?.full_name || "Mentor"}!
+                            </h1>
+                            <p className="text-muted-foreground">
+                                {t("mentor.welcome")}
+                            </p>
+                        </div>
+                        <Button asChild variant="outline" size="sm">
+                            <Link href="/profile/setup">
+                                <Settings className="h-4 w-4 mr-2" /> {t("mentor.actions.editProfile")}
+                            </Link>
+                        </Button>
+                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <Card>
@@ -290,13 +314,13 @@ export default function MentorDashboard() {
                                     <CardHeader className="pb-2">
                                         <CardTitle className="text-lg flex items-center gap-2">
                                             <Calendar className="h-5 w-5 text-blue-500" />
-                                            Gerenciar Agenda
+                                            {t("mentor.actions.manageAgenda")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-muted-foreground mb-4">Defina seus horários e fuso horário de atendimento</p>
+                                        <p className="text-sm text-muted-foreground mb-4">{t("mentor.actions.availabilityDesc")}</p>
                                         <Button asChild variant="outline" size="sm" className="w-full" disabled={!isVerified}>
-                                            <Link href="/dashboard/mentor/availability">Configurar Agenda</Link>
+                                            <Link href="/dashboard/mentor/availability">{t("mentor.actions.manageAgenda")}</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -305,13 +329,13 @@ export default function MentorDashboard() {
                                     <CardHeader className="pb-2">
                                         <CardTitle className="text-lg flex items-center gap-2">
                                             <Clock className="h-5 w-5 text-green-500" />
-                                            Minhas Mentorias
+                                            {t("mentor.actions.mentorships")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-muted-foreground mb-4">Acompanhe seus agendamentos confirmados e pendentes</p>
+                                        <p className="text-sm text-muted-foreground mb-4">{t("mentor.actions.mentorshipsDesc")}</p>
                                         <Button asChild variant="outline" size="sm" className="w-full" disabled={!isVerified}>
-                                            <Link href="/mentorship/mentor">Ver Mentorias</Link>
+                                            <Link href="/mentorship/mentor">{t("mentor.actions.viewMentorships")}</Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -323,12 +347,12 @@ export default function MentorDashboard() {
                                     <div>
                                         <CardTitle className="text-lg flex items-center gap-2">
                                             <Heart className="h-5 w-5 text-red-500 fill-current" />
-                                            Meus Mentores Favoritos
+                                            {t("mentor.sections.favorites")}
                                         </CardTitle>
-                                        <CardDescription>Acesso rápido aos mentores que você salvou para se inspirar ou consultar</CardDescription>
+                                        <CardDescription>{t("mentor.sections.favoritesDesc")}</CardDescription>
                                     </div>
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href="/mentors">Ver todos</Link>
+                                        <Link href="/mentors">{t("mentor.sections.viewAll")}</Link>
                                     </Button>
                                 </CardHeader>
                                 <CardContent>
@@ -336,7 +360,7 @@ export default function MentorDashboard() {
                                         <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
                                     ) : favoriteMentorsData.length === 0 ? (
                                         <div className="text-center py-4 text-muted-foreground text-sm italic">
-                                            Você ainda não salvou nenhum mentor.
+                                            {t("mentee.sections.noFavorites")}
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -362,12 +386,12 @@ export default function MentorDashboard() {
 
                         {/* Coluna Direita: Próximas Mentorias */}
                         <div className="space-y-6">
-                            <h2 className="text-2xl font-semibold">Próximas Sessões</h2>
+                            <h2 className="text-2xl font-semibold">{t("mentor.sections.upcoming")}</h2>
                             {upcomingAppointments.length === 0 ? (
                                 <Card>
                                     <CardContent className="py-8 text-center">
                                         <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
-                                        <p className="text-sm text-muted-foreground">Nenhuma sessão agendada.</p>
+                                        <p className="text-sm text-muted-foreground">{t("mentor.sections.noSessions")}</p>
                                     </CardContent>
                                 </Card>
                             ) : (
@@ -382,11 +406,11 @@ export default function MentorDashboard() {
                                                     </Avatar>
                                                     <div>
                                                         <p className="text-sm font-medium">{appt.mentee.full_name}</p>
-                                                        <p className="text-xs text-muted-foreground">{new Date(appt.scheduled_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                                                        <p className="text-xs text-muted-foreground">{new Date(appt.scheduled_at).toLocaleDateString(locale === 'pt-BR' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
                                                     </div>
                                                 </div>
                                                 <Button asChild size="sm" variant="secondary" className="w-full">
-                                                    <Link href="/mentorship/mentor">Ver Detalhes</Link>
+                                                    <Link href="/mentorship/mentor">{t("mentee.sections.viewDetails")}</Link>
                                                 </Button>
                                             </CardContent>
                                         </Card>

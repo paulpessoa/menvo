@@ -23,6 +23,94 @@ interface AppointmentConfirmationData {
   mentorNotes?: string // Anotações do mentor
 }
 
+interface VerificationData {
+  userEmail: string
+  userName: string
+  status: 'approved' | 'rejected'
+  notes?: string
+}
+
+/**
+ * Envia notificação de status de verificação de perfil
+ */
+export async function sendVerificationNotification(
+  data: VerificationData
+): Promise<void> {
+  const { userEmail, userName, status, notes } = data
+  const isApproved = status === 'approved'
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: ${isApproved ? '#10B981' : '#F59E0B'}; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: #f9fafb; }
+        .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid ${isApproved ? '#10B981' : '#F59E0B'}; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>${isApproved ? 'Perfil Verificado!' : 'Ajustes Necessários no Perfil'}</h1>
+        </div>
+        <div class="content">
+          <p>Olá, <strong>${userName}</strong>!</p>
+          
+          <p>A equipe do Menvo analisou seu perfil.</p>
+          
+          <div class="info">
+            <p><strong>Status:</strong> ${isApproved ? 'Aprovado' : 'Aguardando Ajustes'}</p>
+            ${notes ? `<p><strong>Observações do Administrador:</strong></p><p>${notes}</p>` : ''}
+          </div>
+          
+          ${isApproved 
+            ? `<p>Parabéns! Seu perfil já está publicado e visível para a comunidade.</p>`
+            : `<p>Por favor, realize os ajustes solicitados para que possamos validar seu perfil o quanto antes.</p>`
+          }
+          
+          <div style="text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Acessar meu Dashboard</a>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Menvo - Plataforma de Mentoria Voluntária</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: { name: "Menvo", email: "contato@menvo.com.br" },
+        to: [{ email: userEmail, name: userName }],
+        subject: isApproved ? "🎉 Seu perfil no Menvo foi aprovado!" : "📢 Ajustes necessários no seu perfil Menvo",
+        htmlContent
+      })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(`Erro API Brevo: ${JSON.stringify(errorData)}`)
+    }
+  } catch (error) {
+    console.error("Erro ao enviar email de verificação:", error)
+  }
+}
+
 /**
  * Envia email de solicitação de agendamento ao mentor
  */
