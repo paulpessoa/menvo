@@ -53,7 +53,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: Users,
       description: t("nav.usersDesc")
     },
-
+    {
+      title: t("nav.suggestions"),
+      href: "/admin/suggestions",
+      icon: MessageSquare,
+      description: t("nav.suggestionsDesc")
+    },
+    {
+      title: "Feedbacks",
+      href: "/admin/feedbacks",
+      icon: Star,
+      description: "Voz da comunidade"
+    },
     {
       title: t("nav.reports"),
       href: "/admin/reports",

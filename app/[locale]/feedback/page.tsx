@@ -1,367 +1,180 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts"
-import { Star, TrendingUp, Users, MessageSquare, Search, Download } from "lucide-react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import { useFeedback, useFeedbackStats } from "@/hooks/api/use-feedback"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Star, Send, CheckCircle2, Loader2, ArrowLeft } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-
-const COLORS = ["#22c55e", "#eab308", "#ef4444"]
+import { toast } from "sonner"
+import Link from "next/link"
 
 export default function FeedbackPage() {
-  const { user } = useAuth()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [ratingFilter, setRatingFilter] = useState<string>("all")
-  const [sortBy, setSortBy] = useState<"date" | "rating">("date")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const t = useTranslations("feedback")
+  const common = useTranslations("common")
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
+  const router = useRouter()
+  
+  const [rating, setRating] = useState<number>(0)
+  const [comment, setComment] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
-  const isAdminOrModerator = user?.role === "admin" || user?.role === "moderator"
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!isAuthenticated) {
+      toast.error(common("loginRequired"))
+      router.push("/login")
+      return
+    }
 
-  const { data: feedback, isLoading } = useFeedback({
-    search: searchTerm,
-    rating: ratingFilter === "all" ? undefined : Number.parseInt(ratingFilter),
-    sortBy,
-    sortOrder,
-  })
+    if (rating === 0) {
+      toast.error("Por favor, selecione uma nota.")
+      return
+    }
 
-  const { data: stats } = useFeedbackStats()
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rating,
+          comment,
+          user_id: user?.id,
+          page_url: "/feedback"
+        }),
+      })
 
-  if (!isAdminOrModerator) {
+      if (!response.ok) throw new Error("Falha ao enviar feedback")
+
+      setSubmitted(true)
+      toast.success("Obrigado pelo seu feedback!")
+    } catch (error) {
+      console.error("Feedback error:", error)
+      toast.error("Ocorreu um erro ao enviar seu feedback.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (authLoading) {
+      return (
+          <div className="flex items-center justify-center min-h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+      )
+  }
+
+  if (!isAuthenticated) {
+      return (
+          <div className="container mx-auto px-4 py-24 flex items-center justify-center">
+              <Card className="max-w-md w-full text-center p-6 border-2">
+                  <CardHeader>
+                      <CardTitle className="text-2xl">Login Necessário</CardTitle>
+                      <CardDescription>
+                          Você precisa estar logado para enviar um feedback e nos ajudar a melhorar o Menvo.
+                      </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                      <Button asChild className="w-full h-12 text-lg">
+                          <Link href="/login">Fazer Login</Link>
+                      </Button>
+                      <Button variant="outline" asChild className="w-full h-12 text-lg">
+                          <Link href="/signup">Criar Conta Grátis</Link>
+                      </Button>
+                  </CardContent>
+              </Card>
+          </div>
+      )
+  }
+
+  if (submitted) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <Card>
-          <CardContent className="flex items-center justify-center h-64">
-            <p className="text-muted-foreground">Acesso restrito a administradores e moderadores.</p>
-          </CardContent>
+      <div className="container mx-auto px-4 py-24 flex items-center justify-center">
+        <Card className="max-w-md w-full text-center p-8 border-2 border-green-100 bg-green-50/30 shadow-xl">
+          <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600">
+            <CheckCircle2 className="h-12 w-12" />
+          </div>
+          <CardTitle className="text-3xl font-bold mb-4">Valeu!</CardTitle>
+          <CardDescription className="text-lg">
+            Seu feedback foi registrado. O Paulo e o time do Menvo agradecem sua colaboração para tornar esta plataforma incrível.
+          </CardDescription>
+          <Button asChild className="mt-8 w-full h-12" variant="outline">
+            <Link href="/dashboard">Voltar para o Dashboard</Link>
+          </Button>
         </Card>
-      </div>
-    )
-  }
-
-  const exportToCSV = () => {
-    if (!feedback) return
-
-    const csvContent = [
-      ["Data", "Usuário", "Email", "Avaliação", "Comentário", "Página"].join(","),
-      ...feedback.map((item: any) =>
-        [
-          format(new Date(item.created_at), "dd/MM/yyyy HH:mm"),
-          item.profiles ? `${item.profiles.first_name} ${item.profiles.last_name}` : "Anônimo",
-          item.email || item.profiles?.email || "",
-          item.rating,
-          `"${item.comment || ""}"`,
-          item.page_url || "",
-        ].join(","),
-      ),
-    ].join("\n")
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const link = document.createElement("a")
-    link.href = URL.createObjectURL(blob)
-    link.download = `feedback_${format(new Date(), "yyyy-MM-dd")}.csv`
-    link.click()
-  }
-
-  // Prepare chart data
-  const ratingDistribution = [
-    { name: "Promotores (9-10)", value: stats?.promoters || 0, color: "#22c55e" },
-    { name: "Neutros (7-8)", value: stats?.passives || 0, color: "#eab308" },
-    { name: "Detratores (1-6)", value: stats?.detractors || 0, color: "#ef4444" },
-  ]
-
-  const monthlyFeedback =
-    feedback?.reduce((acc: any, item: any) => {
-      const month = format(new Date(item.created_at), "MMM yyyy", { locale: ptBR })
-      const existing = acc.find((entry: any) => entry.month === month)
-      if (existing) {
-        existing.count += 1
-        existing.avgRating = (existing.avgRating * (existing.count - 1) + item.rating) / existing.count
-      } else {
-        acc.push({ month, count: 1, avgRating: item.rating })
-      }
-      return acc
-    }, []) || []
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Feedback dos Usuários</h1>
-          <p className="text-muted-foreground">Análise de satisfação e comentários da plataforma</p>
-        </div>
-        <Button onClick={exportToCSV} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Exportar CSV
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-2xl mx-auto space-y-8">
+        <Button variant="ghost" asChild className="mb-4">
+            <Link href="/dashboard">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao Painel
+            </Link>
         </Button>
-      </div>
 
-      {/* Statistics Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <MessageSquare className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total de Feedback</p>
-                  <p className="text-2xl font-bold">{stats.total_feedback}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Star className="h-5 w-5 text-yellow-500" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Avaliação Média</p>
-                  <p className="text-2xl font-bold">{stats.avg_rating?.toFixed(1)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">NPS Score</p>
-                  <p className="text-2xl font-bold">{stats.nps_score?.toFixed(0)}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5 text-purple-500" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Últimos 30 dias</p>
-                  <p className="text-2xl font-bold">{stats.feedback_last_30_days}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold tracking-tight">Sua opinião é vital</h1>
+          <p className="text-xl text-muted-foreground">
+            O que você está achando da experiência no Menvo até agora?
+          </p>
         </div>
-      )}
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* NPS Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribuição NPS</CardTitle>
-            <CardDescription>Classificação dos usuários por satisfação</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={ratingDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
+        <Card className="border-2 shadow-lg">
+          <form onSubmit={handleSubmit}>
+            <CardHeader className="text-center border-b bg-muted/20">
+              <CardTitle>Avaliação Geral</CardTitle>
+              <CardDescription>Clique nas estrelas para avaliar</CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 space-y-8">
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    className="transition-transform hover:scale-125 focus:outline-none"
                   >
-                    {ratingDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+                    <Star
+                      className={`h-12 w-12 ${
+                        star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
 
-        {/* Monthly Trend */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tendência Mensal</CardTitle>
-            <CardDescription>Evolução do feedback ao longo do tempo</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{}} className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyFeedback}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="count" stroke="#8884d8" name="Quantidade" />
-                  <Line type="monotone" dataKey="avgRating" stroke="#82ca9d" name="Avaliação Média" />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
+              <div className="space-y-3">
+                <Label htmlFor="comment" className="text-lg font-semibold">Comentários Adicionais</Label>
+                <Textarea
+                  id="comment"
+                  placeholder="Sugestões, críticas ou elogios... sinta-se à vontade!"
+                  className="min-h-[150px] text-lg p-4 resize-none"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="p-8 bg-muted/10 border-t">
+              <Button type="submit" className="w-full h-14 text-xl shadow-xl hover:scale-[1.01] transition-transform" disabled={isSubmitting || rating === 0}>
+                {isSubmitting ? (
+                  <><Loader2 className="mr-2 h-6 w-6 animate-spin" /> Enviando...</>
+                ) : (
+                  <><Send className="mr-2 h-5 w-5" /> Enviar Feedback</>
+                )}
+              </Button>
+            </CardFooter>
+          </form>
         </Card>
       </div>
-
-      {/* Feedback Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Todos os Feedbacks</CardTitle>
-              <CardDescription>Lista completa de comentários e avaliações</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Buscar por comentário, email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <Select value={ratingFilter} onValueChange={setRatingFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as avaliações</SelectItem>
-                <SelectItem value="5">5 estrelas</SelectItem>
-                <SelectItem value="4">4 estrelas</SelectItem>
-                <SelectItem value="3">3 estrelas</SelectItem>
-                <SelectItem value="2">2 estrelas</SelectItem>
-                <SelectItem value="1">1 estrela</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={sortBy} onValueChange={(value: "date" | "rating") => setSortBy(value)}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="date">Por Data</SelectItem>
-                <SelectItem value="rating">Por Avaliação</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Table */}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Usuário</TableHead>
-                  <TableHead>Avaliação</TableHead>
-                  <TableHead>Comentário</TableHead>
-                  <TableHead>Página</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {feedback && feedback.length > 0 ? (
-                  feedback.map((item: any) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{format(new Date(item.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}</TableCell>
-                      <TableCell>
-                        <div>
-                          {item.profiles ? (
-                            <>
-                              <p className="font-medium">
-                                {item.profiles.first_name} {item.profiles.last_name}
-                              </p>
-                              <p className="text-sm text-muted-foreground">{item.profiles.email}</p>
-                            </>
-                          ) : (
-                            <>
-                              <p className="font-medium">Anônimo</p>
-                              <p className="text-sm text-muted-foreground">{item.email}</p>
-                            </>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={item.rating >= 4 ? "default" : item.rating >= 3 ? "secondary" : "destructive"}
-                          >
-                            {item.rating}
-                          </Badge>
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`h-3 w-3 ${star <= item.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                                  }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {item.comment ? (
-                          <p className="text-sm max-w-xs truncate" title={item.comment}>
-                            {item.comment}
-                          </p>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {item.page_url ? (
-                          <code className="text-xs bg-muted px-1 py-0.5 rounded">{item.page_url}</code>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
-                      <p className="text-muted-foreground">Nenhum feedback encontrado.</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Results count */}
-          {feedback && feedback.length > 0 && (
-            <div className="mt-4 text-sm text-muted-foreground">
-              Mostrando {feedback.length} feedback{feedback.length !== 1 ? "s" : ""}
-              {searchTerm && ` para "${searchTerm}"`}
-              {ratingFilter !== "all" && ` com ${ratingFilter} estrela${ratingFilter !== "1" ? "s" : ""}`}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   )
 }
