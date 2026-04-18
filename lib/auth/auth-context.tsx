@@ -29,6 +29,8 @@ interface AuthContextType {
     isAdmin: () => boolean
     isMentor: () => boolean
     isMentee: () => boolean
+    hasAnyRole: (roles: string[]) => boolean
+    needsRoleSelection: () => boolean
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
 }
@@ -129,11 +131,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [supabase, fetchProfile])
 
+    // REGRAS DE PAPÉIS EXCLUSIVAS
     const isAdmin = useCallback(() => profile?.roles?.includes('admin') ?? false, [profile])
-    const isMentor = useCallback(() => profile?.roles?.includes('mentor') ?? false, [profile])
-    const isMentee = useCallback(() => profile?.roles?.includes('mentee') ?? false, [profile])
+    const isMentor = useCallback(() => {
+        if (isAdmin()) return false // Se é admin, não é tratado como mentor na UI
+        return profile?.roles?.includes('mentor') ?? false
+    }, [profile, isAdmin])
+    const isMentee = useCallback(() => {
+        if (isAdmin()) return false // Se é admin, não é tratado como mentee na UI
+        return profile?.roles?.includes('mentee') ?? false
+    }, [profile, isAdmin])
 
-    const effectiveRole = useMemo(() => {
+    const effectiveRole = useMemo((): 'admin' | 'mentor' | 'mentee' | null => {
         if (!profile?.roles) return null
         if (profile.roles.includes('admin')) return 'admin'
         if (profile.roles.includes('mentor')) return 'mentor'
@@ -141,12 +150,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null
     }, [profile])
 
+    const hasAnyRole = useCallback((roles: string[]) => {
+        if (!profile?.roles) return false
+        return profile.roles.some(r => roles.includes(r))
+    }, [profile])
+
+    const needsRoleSelection = useCallback(() => {
+        if (!profile || isInitializing) return false
+        if (isAdmin()) return false // Admin nunca precisa selecionar papel
+        return (profile.roles?.length ?? 0) === 0
+    }, [profile, isInitializing, isAdmin])
+
     const signOut = async () => {
         await supabase.auth.signOut()
         window.location.href = '/'
     }
 
-    const value = useMemo(() => ({
+    const value = {
         user,
         session,
         profile,
@@ -158,9 +178,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin,
         isMentor,
         isMentee,
+        hasAnyRole,
+        needsRoleSelection,
         refreshProfile,
         signOut
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, refreshProfile])
+    }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
