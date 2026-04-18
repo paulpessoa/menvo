@@ -58,58 +58,27 @@ export default function Header() {
     { name: t("common.findMentors"), href: "/mentors" },
     { name: t("common.community"), href: "/community" },
     { name: t("common.hub"), href: "/hub" },
-    { name: t("common.aboutUs"), href: "/about" }, // Restaurado
+    { name: t("common.aboutUs"), href: "/about" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
   ]
 
-  const userNavigation = isAuthenticated
-    ? [
-        ...(isAdmin()
-          ? [
-              {
-                name: t("header.userMenu.adminPanel"),
-                href: "/admin",
-                icon: Shield,
-                color: "text-red-600"
-              }
-            ]
-          : []),
-        {
-          name: t("header.userMenu.dashboard"),
-          href: "/dashboard",
-          icon: LayoutDashboard,
-          color: "text-primary"
-        },
-        {
-          name: t("header.userMenu.profile"),
-          href: "/profile",
-          icon: User,
-          color: "text-gray-700"
-        },
-        ...(isAdmin() || role === "mentor"
-          ? [
-              {
-                name: t("header.userMenu.createOrganization"),
-                href: "/organizations/new",
-                icon: Building2,
-                color: "text-gray-700"
-              }
-            ]
-          : []),
-        {
-          name: t("header.userMenu.messages"),
-          href: "/messages",
-          icon: MessageSquare,
-          color: "text-gray-700"
-        },
-        {
-          name: t("header.userMenu.settings"),
-          href: "/settings",
-          icon: Settings,
-          color: "text-gray-700"
-        }
-      ]
-    : []
+  // Montagem LINEAR e SEGURA do menu para evitar erros de iterabilidade
+  const userNavigation: any[] = []
+  
+  if (isAuthenticated && profile) {
+    if (isAdmin) {
+        userNavigation.push({ name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield, color: "text-red-600" })
+    }
+    userNavigation.push({ name: t("header.userMenu.dashboard"), href: "/dashboard", icon: LayoutDashboard, color: "text-primary" })
+    userNavigation.push({ name: t("header.userMenu.profile"), href: "/profile", icon: User, color: "text-gray-700" })
+    
+    if (isAdmin || role === "mentor") {
+        userNavigation.push({ name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2, color: "text-gray-700" })
+    }
+    
+    userNavigation.push({ name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare, color: "text-gray-700" })
+    userNavigation.push({ name: t("header.userMenu.settings"), href: "/settings", icon: Settings, color: "text-gray-700" })
+  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -189,7 +158,7 @@ export default function Header() {
                             <p className="text-sm font-bold leading-none">{profile?.full_name || t("header.userMenu.user")}</p>
                             <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                             <Badge variant="secondary" className="w-fit mt-2 text-[10px] uppercase tracking-wider">
-                                {role === 'admin' ? 'Administrador' : role === 'mentor' ? 'Mentor' : 'Mentorado'}
+                                {isAdmin ? 'Administrador' : role === 'mentor' ? 'Mentor' : 'Mentorado'}
                             </Badge>
                         </div>
                     </DropdownMenuLabel>
@@ -282,7 +251,7 @@ export default function Header() {
                     ))}
                 </div>
 
-                {isAuthenticated && (
+                {isAuthenticated && userNavigation.length > 0 && (
                     <>
                         <Separator className="my-2" />
                         <div className="p-4 space-y-1">
