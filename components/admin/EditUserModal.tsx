@@ -43,11 +43,11 @@ export function EditUserModal({ user, isOpen, onClose, onSuccess }: EditUserModa
             setFormData({
                 first_name: user.first_name || "",
                 last_name: user.last_name || "",
-                full_name: user.full_name || "",
                 bio: user.bio || "",
                 avatar_url: user.avatar_url || "",
                 verified: user.verified || false,
-                verification_notes: user.verification_notes || ""
+                verification_notes: user.verification_notes || "",
+                is_public: user.is_public || false
             })
             setSelectedRoles(user.roles || [])
         }

@@ -3,11 +3,11 @@ import { createClient } from '@/utils/supabase/client'
 export interface AdminUserUpdate {
     first_name?: string
     last_name?: string
-    full_name?: string
     bio?: string
     avatar_url?: string
     verified?: boolean
     verification_notes?: string
+    is_public?: boolean
 }
 
 class AdminService {
