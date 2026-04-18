@@ -29,13 +29,14 @@ interface UserMetricsProps {
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"]
 
-export function UserMetrics({ data, appointments = [] }: UserMetricsProps) {
+export function UserMetrics({ data = [], appointments = [] }: UserMetricsProps) {
   const [daysRange, setDaysRange] = useState("30")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
 
   const filteredData = useMemo(() => {
-    let result = data
+    if (!Array.isArray(data)) return []
+    let result = [...data]
 
     // Prioridade para filtro manual de data
     if (startDate || endDate) {
@@ -52,21 +53,23 @@ export function UserMetrics({ data, appointments = [] }: UserMetricsProps) {
     }
 
     // Fallback para presets
-    if (daysRange === "all") return data
+    if (daysRange === "all") return result
     const now = new Date()
     const cutoff = new Date()
     cutoff.setDate(now.getDate() - parseInt(daysRange))
-    return data.filter(user => new Date(user.created_at) >= cutoff)
+    return result.filter(user => new Date(user.created_at) >= cutoff)
   }, [data, daysRange, startDate, endDate])
 
   const roleDistribution = useMemo(() => {
     const roles: Record<string, number> = {}
-    data.forEach(user => {
-      user.roles?.forEach((role: string) => {
-        const label = role === 'mentor' ? 'Mentores' : role === 'mentee' ? 'Mentees' : role
-        roles[label] = (roles[label] || 0) + 1
-      })
-    })
+    if (Array.isArray(data)) {
+        data.forEach(user => {
+            user.roles?.forEach((role: string) => {
+                const label = role === 'mentor' ? 'Mentores' : role === 'mentee' ? 'Mentees' : role
+                roles[label] = (roles[label] || 0) + 1
+            })
+        })
+    }
     return Object.entries(roles).map(([name, value]) => ({ name, value }))
   }, [data])
 
@@ -89,20 +92,28 @@ export function UserMetrics({ data, appointments = [] }: UserMetricsProps) {
         end = new Date(endDate)
     }
 
-    // Inicializar os dias no range com zero
-    const temp = new Date(start)
-    while (temp <= end) {
-        const label = temp.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })
-        counts[label] = 0
-        temp.setDate(temp.getDate() + 1)
+    // Inicializar os dias no range com zero para continuidade
+    try {
+        const temp = new Date(start)
+        let safetyCounter = 0
+        while (temp <= end && safetyCounter < 1000) { // Safety break
+            const label = temp.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })
+            counts[label] = 0
+            temp.setDate(temp.getDate() + 1)
+            safetyCounter++
+        }
+    } catch (e) {
+        console.error("Date range error", e)
     }
 
-    filteredData.forEach(user => {
-      const date = new Date(user.created_at).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })
-      if (counts[date] !== undefined) {
-        counts[date] += 1
-      }
-    })
+    if (Array.isArray(filteredData)) {
+        filteredData.forEach(user => {
+            const date = new Date(user.created_at).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })
+            if (counts[date] !== undefined) {
+                counts[date] += 1
+            }
+        })
+    }
 
     return Object.entries(counts).map(([name, value]) => ({ name, value }))
   }, [filteredData, daysRange, startDate, endDate])
