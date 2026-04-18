@@ -74,6 +74,7 @@ export default function CommunityPage() {
                     user_roles!inner(roles!inner(name))
                 `, { count: 'exact' })
                 .eq('user_roles.roles.name', 'mentee')
+                .eq('is_public', true)
                 .not('bio', 'is', null) // Apenas quem preencheu algo
             
             if (searchTerm) {

@@ -147,6 +147,7 @@ export default function ProfilePage() {
     what_to_expect: "",
     ideal_mentee: "",
     cv_url: "",
+    is_public: false,
   })
 
   const expertiseAreasSuggestions = [
@@ -196,6 +197,7 @@ export default function ProfilePage() {
         what_to_expect: profile.what_to_expect || "",
         ideal_mentee: profile.ideal_mentee || "",
         cv_url: profile.cv_url || "",
+        is_public: profile.is_public || false,
       })
     }
   }, [user, profile, authLoading, router])
@@ -432,6 +434,21 @@ export default function ProfilePage() {
                       onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                       placeholder={t("form.bioPlaceholder")}
                       rows={4}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5 border-primary/20">
+                    <div className="space-y-0.5">
+                      <Label className="text-base font-semibold">Visibilidade na Comunidade</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Tornar meu perfil público para ser listado no Mural da Comunidade.
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      className="h-6 w-6 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                      checked={formData.is_public}
+                      onChange={(e) => setFormData(prev => ({ ...prev, is_public: e.target.checked }))}
                     />
                   </div>
                 </CardContent>
