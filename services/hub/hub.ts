@@ -14,6 +14,10 @@ export interface HubResource {
     is_affiliate: boolean
     status: HubResourceStatus
     user_id: string | null
+    address?: string | null
+    location_url?: string | null
+    event_date?: string | null
+    event_time?: string | null
     created_at: string
 }
 
@@ -21,7 +25,7 @@ class HubService {
     private supabase = createClient()
 
     /**
-     * Busca todos os recursos publicados no Hub
+     * Busca todos os recursos publicados no Hub (Público)
      */
     async getPublishedResources(type?: HubResourceType) {
         let query = this.supabase
@@ -35,6 +39,20 @@ class HubService {
         }
 
         const { data, error } = await query
+        if (error) throw error
+        return data as HubResource[]
+    }
+
+    /**
+     * Busca recursos por status (Apenas Admin)
+     */
+    async getAdminResources(status: HubResourceStatus) {
+        const { data, error } = await this.supabase
+            .from('hub_resources')
+            .select('*')
+            .eq('status', status)
+            .order('created_at', { ascending: status === 'pending' }) // Pendentes mostram os mais antigos primeiro
+
         if (error) throw error
         return data as HubResource[]
     }
@@ -54,20 +72,6 @@ class HubService {
 
         if (error) throw error
         return data as HubResource
-    }
-
-    /**
-     * Busca recursos pendentes (Apenas Admin)
-     */
-    async getPendingResources() {
-        const { data, error } = await this.supabase
-            .from('hub_resources')
-            .select('*')
-            .eq('status', 'pending')
-            .order('created_at', { ascending: true })
-
-        if (error) throw error
-        return data as HubResource[]
     }
 }
 
