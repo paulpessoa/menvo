@@ -57,8 +57,8 @@ export default function CommunityPage() {
             const from = currentPage * ITEMS_PER_PAGE
             const to = from + ITEMS_PER_PAGE - 1
 
-            // Buscamos perfis que tenham o papel mentee
-            // Nota: Filtramos por quem tem bio ou especialidades para garantir qualidade
+            // Buscamos perfis que marcaram is_public = true
+            // Independente de ser mentor ou mentee, se ele quer aparecer na comunidade, ele aparece
             let query = supabase
                 .from('profiles')
                 .select(`
@@ -73,7 +73,6 @@ export default function CommunityPage() {
                     expertise_areas,
                     user_roles!inner(roles!inner(name))
                 `, { count: 'exact' })
-                .eq('user_roles.roles.name', 'mentee')
                 .eq('is_public', true)
                 .not('bio', 'is', null) // Apenas quem preencheu algo
             
