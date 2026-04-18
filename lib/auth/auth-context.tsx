@@ -1,9 +1,8 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
-import { useRouter } from 'next/navigation'
 
 interface UserProfile {
     id: string
@@ -27,16 +26,13 @@ interface AuthContextType {
     isInitializing: boolean
     loading: boolean
     isVerified: boolean
-    isAdmin: boolean
-    isMentor: boolean
-    isMentee: boolean
+    isAdmin: () => boolean
+    isMentor: () => boolean
+    isMentee: () => boolean
     hasAnyRole: (roles: string[]) => boolean
     needsRoleSelection: () => boolean
-    signIn: (email: string, password: string) => Promise<void>
-    signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
-    getDefaultRedirectPath: () => string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -48,7 +44,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isInitializing, setIsInitializing] = useState(true)
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
-    const router = useRouter()
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
@@ -73,19 +68,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', userId)
                 .single()
 
-            if (error) {
-                console.error('Error fetching profile:', error)
-                return null
-            }
+            if (error) return null
 
-            const roles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
+            const roles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name) || []
             
             return {
                 ...data,
                 roles
             } as UserProfile
         } catch (error) {
-            console.error('Unexpected error fetching profile:', error)
             return null
         }
     }, [supabase])
@@ -100,128 +91,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const initAuth = async () => {
-            try {
-                const { data: { session: currentSession } } = await supabase.auth.getSession()
-                setSession(currentSession)
-                const currentUser = currentSession?.user ?? null
-                setUser(currentUser)
+            const { data: { session: currentSession } } = await supabase.auth.getSession()
+            setSession(currentSession)
+            const currentUser = currentSession?.user ?? null
+            setUser(currentUser)
 
-                if (currentUser) {
-                    const userProfile = await fetchProfile(currentUser.id)
-                    setProfile(userProfile)
-                }
-            } catch (err) {
-                console.error('Auth initialization error:', err)
-            } finally {
-                setIsInitializing(false)
+            if (currentUser) {
+                const userProfile = await fetchProfile(currentUser.id)
+                setProfile(userProfile)
             }
+            
+            setIsInitializing(false)
         }
 
         initAuth()
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-            if (event === 'SIGNED_OUT') {
-                setUser(null)
-                setSession(null)
+            setSession(newSession)
+            const currentUser = newSession?.user ?? null
+            setUser(currentUser)
+
+            if (currentUser) {
+                const userProfile = await fetchProfile(currentUser.id)
+                setProfile(userProfile)
+            } else {
                 setProfile(null)
-                return
-            }
-
-            if (newSession) {
-                setSession(newSession)
-                const currentUser = newSession.user
-                setUser(currentUser)
-
-                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-                    const userProfile = await fetchProfile(currentUser.id)
-                    setProfile(userProfile)
-                }
             }
         })
 
         return () => subscription.unsubscribe()
     }, [supabase, fetchProfile])
 
-    const signIn = useCallback(async (email: string, password: string) => {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw error
-    }, [supabase])
-
-    const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider,
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        })
-        if (error) throw error
-    }, [supabase])
-
-    // Flags de conveniência estáveis
-    const isAdmin = useMemo(() => profile?.roles?.includes('admin') ?? false, [profile])
-    const isMentor = useMemo(() => profile?.roles?.includes('mentor') ?? false, [profile])
-    const isMentee = useMemo(() => profile?.roles?.includes('mentee') ?? false, [profile])
-
-    const hasAnyRole = useCallback((roles: string[]) => {
-        if (!profile?.roles) return false
-        return profile.roles.some(r => roles.includes(r))
-    }, [profile])
-
-    const needsRoleSelection = useCallback(() => {
-        if (!profile) return false // Ainda carregando ou anônimo
-        if (isAdmin) return false // Admin nunca precisa selecionar papel
-        return (profile.roles?.length ?? 0) === 0
-    }, [profile, isAdmin])
-
-    // Role principal para decisão de redirecionamento (Prioridade Admin)
-    const effectiveRole = useMemo(() => {
-        if (!profile?.roles) return null
-        if (profile.roles.includes('admin')) return 'admin'
-        if (profile.roles.includes('mentor')) return 'mentor'
-        if (profile.roles.includes('mentee')) return 'mentee'
-        return null
-    }, [profile])
-
-    const getDefaultRedirectPath = useCallback(() => {
-        if (!profile) return '/dashboard'
-        if (isAdmin) return '/admin'
-        if (isMentor) return '/dashboard/mentor'
-        if (isMentee) return '/dashboard/mentee'
-        return '/dashboard'
-    }, [profile, isAdmin, isMentor, isMentee])
+    const isAdmin = () => profile?.roles?.includes('admin') ?? false
+    const isMentor = () => profile?.roles?.includes('mentor') ?? false
+    const isMentee = () => profile?.roles?.includes('mentee') ?? false
+    const hasAnyRole = (roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false
+    const needsRoleSelection = () => (profile?.roles?.length ?? 0) === 0
 
     const signOut = async () => {
-        setLoading(true)
-        try {
-            await supabase.auth.signOut()
-            window.location.href = '/'
-        } catch (err) {
-            console.error('Sign out error:', err)
-        } finally {
-            setLoading(false)
-        }
+        await supabase.auth.signOut()
+        window.location.href = '/'
     }
 
-    const value = useMemo(() => ({
+    const value = {
         user,
         session,
         profile,
-        role: effectiveRole,
+        role: profile?.roles?.[0] || null,
         isAuthenticated: !!user,
         isInitializing,
-        loading: loading || isInitializing,
+        loading,
         isVerified: profile?.verified ?? false,
         isAdmin,
         isMentor,
         isMentee,
         hasAnyRole,
         needsRoleSelection,
-        signIn,
-        signInWithProvider,
         refreshProfile,
-        signOut,
-        getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, isAdmin, isMentor, isMentee, effectiveRole, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
+        signOut
+    }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
