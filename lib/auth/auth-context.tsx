@@ -127,13 +127,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return
             }
 
-            setSession(newSession)
-            const currentUser = newSession?.user ?? null
-            setUser(currentUser)
+            if (newSession) {
+                setSession(newSession)
+                const currentUser = newSession.user
+                setUser(currentUser)
 
-            if (currentUser && event !== 'INITIAL_SESSION') {
-                const userProfile = await fetchProfile(currentUser.id)
-                setProfile(userProfile)
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                    const userProfile = await fetchProfile(currentUser.id)
+                    setProfile(userProfile)
+                }
             }
         })
 
@@ -155,20 +157,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error
     }, [supabase])
 
-    // Flags de conveniência computadas
+    // Flags de conveniência estáveis
     const isAdmin = useMemo(() => profile?.roles?.includes('admin') ?? false, [profile])
     const isMentor = useMemo(() => profile?.roles?.includes('mentor') ?? false, [profile])
     const isMentee = useMemo(() => profile?.roles?.includes('mentee') ?? false, [profile])
 
-    const hasAnyRole = useCallback((roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false, [profile])
-    const needsRoleSelection = useCallback(() => (profile?.roles?.length ?? 0) === 0, [profile])
+    const hasAnyRole = useCallback((roles: string[]) => {
+        if (!profile?.roles) return false
+        return profile.roles.some(r => roles.includes(r))
+    }, [profile])
+
+    const needsRoleSelection = useCallback(() => {
+        if (!profile) return false // Ainda carregando ou anônimo
+        if (isAdmin) return false // Admin nunca precisa selecionar papel
+        return (profile.roles?.length ?? 0) === 0
+    }, [profile, isAdmin])
+
+    // Role principal para decisão de redirecionamento (Prioridade Admin)
+    const effectiveRole = useMemo(() => {
+        if (!profile?.roles) return null
+        if (profile.roles.includes('admin')) return 'admin'
+        if (profile.roles.includes('mentor')) return 'mentor'
+        if (profile.roles.includes('mentee')) return 'mentee'
+        return null
+    }, [profile])
 
     const getDefaultRedirectPath = useCallback(() => {
         if (!profile) return '/dashboard'
-        if (profile.roles.includes('admin')) return '/admin'
-        if (profile.roles.includes('mentor')) return '/dashboard/mentor'
-        return '/dashboard/mentee'
-    }, [profile])
+        if (isAdmin) return '/admin'
+        if (isMentor) return '/dashboard/mentor'
+        if (isMentee) return '/dashboard/mentee'
+        return '/dashboard'
+    }, [profile, isAdmin, isMentor, isMentee])
 
     const signOut = async () => {
         setLoading(true)
@@ -186,10 +206,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         session,
         profile,
-        role: profile?.roles?.[0] || null,
+        role: effectiveRole,
         isAuthenticated: !!user,
         isInitializing,
-        loading,
+        loading: loading || isInitializing,
         isVerified: profile?.verified ?? false,
         isAdmin,
         isMentor,
@@ -201,7 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshProfile,
         signOut,
         getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
+    }), [user, session, profile, isInitializing, loading, isAdmin, isMentor, isMentee, effectiveRole, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
