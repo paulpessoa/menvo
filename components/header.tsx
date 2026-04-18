@@ -40,7 +40,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { LanguageSelector } from "./LanguageSelector"
 import { MessagesBadge } from "./MessagesBadge"
 
-export function Header() {
+export default function Header() {
   const { user, profile, isAuthenticated, loading, role, isAdmin, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()

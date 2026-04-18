@@ -142,21 +142,21 @@ export function EditUserModal({ user, isOpen, onClose, onSuccess }: EditUserModa
                         </div>
                         <div className="flex-1 space-y-3 w-full text-center sm:text-left">
                             <Label className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Foto de Perfil</Label>
-                            <div className="flex gap-2">
-                                <Input 
-                                    value={formData.avatar_url} 
-                                    onChange={e => setFormData({...formData, avatar_url: e.target.value})}
-                                    placeholder="URL da imagem..."
-                                    className="flex-1"
-                                />
+                            <div className="flex justify-center sm:justify-start gap-4 items-center">
                                 <Button 
                                     variant="outline" 
-                                    size="icon" 
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={imageUpload.isUploading}
+                                    className="gap-2"
                                 >
                                     {imageUpload.isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                    Fazer Upload de Nova Foto
                                 </Button>
+                                {formData.avatar_url && (
+                                    <Button variant="ghost" size="sm" className="text-red-600 h-8 text-xs" onClick={() => setFormData({...formData, avatar_url: ""})}>
+                                        Remover
+                                    </Button>
+                                )}
                             </div>
                             <input 
                                 ref={fileInputRef}
@@ -165,7 +165,7 @@ export function EditUserModal({ user, isOpen, onClose, onSuccess }: EditUserModa
                                 accept="image/*"
                                 onChange={handlePhotoUpload}
                             />
-                            <p className="text-[10px] text-muted-foreground italic">Dica: Você pode colar uma URL ou fazer o upload de um arquivo.</p>
+                            <p className="text-[10px] text-muted-foreground italic">Dica: A imagem será salva automaticamente no armazenamento seguro.</p>
                         </div>
                     </div>
 
