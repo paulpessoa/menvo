@@ -51,12 +51,10 @@ export default function AdminDashboard() {
   const fetchStats = async () => {
     if (!supabase) return
     try {
-      // Total de usuários
       const { count: totalUsers } = await supabase
         .from("profiles")
         .select("*", { count: "exact", head: true })
 
-      // Estatísticas de mentores usando a nova estrutura
       const { data: mentorRoles, error: mentorError } = await supabase
         .from('user_roles')
         .select(`
@@ -71,18 +69,15 @@ export default function AdminDashboard() {
       const verifiedMentors = mentorRoles?.filter(role => role.profiles?.verified).length || 0
       const pendingMentorsCount = totalMentors - verifiedMentors
 
-      // Mentees
       const { count: totalMentees } = await supabase
         .from('user_roles')
         .select('*', { count: 'exact', head: true })
         .eq('roles.name', 'mentee')
 
-      // Sessões (appointments)
       const { count: totalSessions } = await supabase
         .from('appointments')
         .select('*', { count: 'exact', head: true })
 
-      // Cadastros recentes (últimos 7 dias)
       const sevenDaysAgo = new Date()
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
@@ -91,13 +86,11 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", sevenDaysAgo.toISOString())
 
-      // Sugestões de Temas pendentes
       const { count: pendingSuggestions } = await supabase
         .from('mentor_suggestions')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'pending')
 
-      // Recursos do Hub pendentes
       const { count: pendingHub } = await supabase
         .from('hub_resources')
         .select('*', { count: 'exact', head: true })
@@ -139,26 +132,19 @@ export default function AdminDashboard() {
       badge: stats.pendingSuggestions > 0 ? stats.pendingSuggestions : undefined,
     },
     {
-      title: t("actions.manageMentors"),
-      description: t("actions.manageMentorsDesc"),
-      href: "/admin/mentors",
-      icon: CheckCircle,
-      color: "bg-green-500",
+      title: "Gestão Global",
+      description: "Gerenciar todos os usuários e permissões",
+      href: "/admin/users",
+      icon: Users,
+      color: "bg-primary",
     },
     {
       title: t("actions.verifyMentors"),
       description: t("actions.verifyMentorsDesc"),
-      href: "/admin/verifications",
+      href: "/admin/users?tab=pending",
       icon: Clock,
       color: "bg-yellow-500",
       badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined,
-    },
-    {
-      title: t("actions.manageUsers"),
-      description: t("actions.manageUsersDesc"),
-      href: "/admin/users",
-      icon: Users,
-      color: "bg-blue-500",
     },
     {
       title: t("actions.settings"),
@@ -181,7 +167,6 @@ export default function AdminDashboard() {
     <RequireRole roles={['admin']}>
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          {/* Header */}
           <div>
             <h1 className="text-3xl font-bold">
               {t("welcome", { name: profile?.full_name || "Admin" })}
@@ -191,7 +176,6 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -240,7 +224,6 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
-          {/* Quick Actions */}
           <div>
             <h2 className="text-2xl font-semibold mb-6">{t("actions.title")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -266,7 +249,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Alerts */}
           {(stats.pendingMentors > 0 || stats.pendingHubResources > 0) && (
             <Card className="border-yellow-200 bg-yellow-50">
               <CardHeader>
@@ -281,7 +263,7 @@ export default function AdminDashboard() {
               <CardContent className="flex gap-4">
                 {stats.pendingMentors > 0 && (
                   <Button asChild variant="outline">
-                    <Link href="/admin/verifications">Verificar Mentores</Link>
+                    <Link href="/admin/users?tab=pending">Verificar Mentores</Link>
                   </Button>
                 )}
                 {stats.pendingHubResources > 0 && (

@@ -1,16 +1,23 @@
 "use client"
 
-import { RequireRole } from "@/lib/auth/auth-guard"
-import { MentorManagementPanel } from "@/components/admin/MentorManagementPanel"
-import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Loader2 } from "lucide-react"
 
-export default function AdminMentorsPage() {
+export default function AdminMentorsRedirect() {
+    const router = useRouter()
+
+    useEffect(() => {
+        // Redireciona para a central unificada com o filtro de mentores ativo
+        router.replace("/admin/users?tab=mentors")
+    }, [router])
+
     return (
-        <RequireRole roles={['admin']}>
-            <div className="container mx-auto px-4 py-8">
-                <AdminBreadcrumb />
-                <MentorManagementPanel />
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center space-y-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
+                <p className="text-muted-foreground font-medium">Redirecionando para a Central de Gestão...</p>
             </div>
-        </RequireRole>
+        </div>
     )
 }
