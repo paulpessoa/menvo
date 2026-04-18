@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Link, usePathname } from "@/i18n/routing"
+import { Link, usePathname, useRouter } from "@/i18n/routing"
 import {
   Menu,
   User,
@@ -13,41 +13,39 @@ import {
   Users,
   Shield,
   UserCheck,
-  BarChart3,
-  Cog,
-  HeartHandshake,
-  Loader2,
-  Building2
+  LayoutDashboard,
+  Building2,
+  Plus,
+  Search,
+  Bell,
+  Loader2
 } from "lucide-react"
-import { useLanguage } from "@/hooks/useLanguage"
-import { MessagesBadge } from "@/components/MessagesBadge"
-import { LanguageSelector } from "@/components/LanguageSelector"
-
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
-import Image from "next/image"
-import { useAuth } from "@/lib/auth"
-import { useTranslations } from "next-intl"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useAuth } from "@/hooks/useAuth"
+import { LanguageSelector } from "./LanguageSelector"
+import { MessagesBadge } from "./MessagesBadge"
 
-export default function Header() {
+export function Header() {
+  const { user, profile, isAuthenticated, loading, role, isAdmin, signOut } = useAuth()
+  const router = useRouter()
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
-
-  const { isAuthenticated, user, profile, role, loading, signOut, isAdmin } =
-    useAuth()
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const pathname = usePathname()
-  const { currentLanguage, changeLanguage } = useLanguage()
 
   const navigation = [
     { name: t("common.home"), href: "/" },
@@ -55,12 +53,11 @@ export default function Header() {
     { name: t("common.community"), href: "/community" },
     { name: t("common.hub"), href: "/hub" },
     { name: t("common.howItWorks"), href: "/how-it-works" },
-    { name: t("common.aboutUs"), href: "/about" }
   ]
 
   const userNavigation = isAuthenticated
     ? [
-        ...(isAdmin
+        ...(isAdmin()
           ? [
               {
                 name: t("header.userMenu.adminPanel"),
@@ -68,19 +65,18 @@ export default function Header() {
                 icon: Shield
               }
             ]
-          : [
-              {
-                name: t("header.userMenu.dashboard"),
-                href: "/dashboard",
-                icon: User
-              },
-              {
-                name: t("header.userMenu.profile"),
-                href: "/profile",
-                icon: User
-              }
-            ]),
-        ...(isAdmin || role === "mentor"
+          : []),
+        {
+          name: t("header.userMenu.dashboard"),
+          href: "/dashboard",
+          icon: LayoutDashboard
+        },
+        {
+          name: t("header.userMenu.profile"),
+          href: "/profile",
+          icon: User
+        },
+        ...(isAdmin() || role === "mentor"
           ? [
               {
                 name: t("header.userMenu.createOrganization"),
@@ -109,48 +105,35 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+        <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/menvo-logo-light.png"
-              alt="MENVO"
-              width={120}
-              height={40}
-              priority
-              className="dark:hidden"
-            />
-            <Image
-              src="/menvo-logo-dark.png"
-              alt="MENVO"
-              width={120}
-              height={40}
-              priority
-              className="hidden dark:block"
-            />
+            <div className="bg-primary p-1.5 rounded-lg shadow-sm">
+                <Shield className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-primary">
+              {t("common.title")}
+            </span>
           </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  pathname === item.href
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
         </div>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-primary-600 ${
-                pathname === item.href
-                  ? "text-primary-600"
-                  : "text-foreground/60"
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
-        </nav>
 
         <div className="flex items-center gap-2">
           <LanguageSelector />
-          {/* Messages Badge */}
           <MessagesBadge />
 
           {loading ? (
@@ -160,66 +143,37 @@ export default function Header() {
           ) : isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full p-0"
-                >
-                  <Avatar>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Avatar className="h-8 w-8 border">
                     <AvatarImage
-                      src={
-                        user?.user_metadata?.avatar_url ||
-                        user?.user_metadata?.picture ||
-                        profile?.avatar_url
-                      }
-                      alt={profile?.full_name || user?.email || "User"}
+                      src={user?.user_metadata?.avatar_url || profile?.avatar_url}
+                      alt={profile?.full_name || "User"}
                     />
-                    <AvatarFallback>
-                      {profile?.full_name?.[0]?.toUpperCase() ||
-                        user?.user_metadata?.full_name?.[0]?.toUpperCase() ||
-                        user?.email?.[0]?.toUpperCase() ||
-                        "U"}
+                    <AvatarFallback className="bg-primary/5 text-primary font-bold">
+                      {profile?.full_name?.[0]?.toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">
-                      {profile?.full_name ||
-                        user?.user_metadata?.full_name ||
-                        t("header.userMenu.user")}
-                    </p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user?.email}
-                    </p>
-                    {role && (
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {role}
-                      </p>
-                    )}
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profile?.full_name || t("header.userMenu.user")}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                   </div>
-                </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
-                {/* User Navigation */}
                 {userNavigation.map((item) => (
                   <DropdownMenuItem key={item.name} asChild>
-                    <Link href={item.href} className="flex items-center gap-2">
+                    <Link href={item.href} className="flex items-center gap-2 cursor-pointer">
                       <item.icon className="h-4 w-4" />
                       {item.name}
                     </Link>
                   </DropdownMenuItem>
                 ))}
-
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  {t("header.userMenu.logout")}
+                <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600 cursor-pointer">
+                  <LogOut className="h-4 w-4 mr-2" /> {t("header.userMenu.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -237,65 +191,42 @@ export default function Header() {
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col gap-4">
+            <SheetContent side="right">
+              <nav className="flex flex-col gap-4 mt-8">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="block px-2 py-1 text-lg"
+                    className="text-lg font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     {item.name}
                   </Link>
                 ))}
-
-                {isAuthenticated ? (
-                  <>
-                    <div className="border-t pt-4">
-                      {userNavigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className="flex items-center gap-2 px-2 py-1 text-lg"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <item.icon className="h-4 w-4" />
-                          {item.name}
-                        </Link>
-                      ))}
-
-                      <Button
-                        variant="ghost"
-                        onClick={handleSignOut}
-                        className="flex items-center gap-2 px-2 py-1 text-lg justify-start mt-2"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        {t("header.userMenu.logout")}
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="border-t pt-4 space-y-2">
-                    <Button
-                      variant="ghost"
-                      asChild
-                      className="w-full justify-start"
+                <div className="border-t pt-4 mt-2">
+                  {userNavigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className="flex items-center gap-3 py-2 text-lg font-medium"
+                      onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/login" onClick={() => setIsOpen(false)}>
-                        {t("common.login")}
-                      </Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                      <Link href="/signup" onClick={() => setIsOpen(false)}>
-                        {t("common.register")}
-                      </Link>
-                    </Button>
-                  </div>
-                )}
+                      <item.icon className="h-5 w-5" />
+                      {item.name}
+                    </Link>
+                  ))}
+                  {isAuthenticated && (
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 py-2 text-lg font-medium text-red-600"
+                    >
+                      <LogOut className="h-5 w-5" /> {t("header.userMenu.logout")}
+                    </button>
+                  )}
+                </div>
               </nav>
             </SheetContent>
           </Sheet>

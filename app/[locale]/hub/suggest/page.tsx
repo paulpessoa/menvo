@@ -14,7 +14,7 @@ import {
     SelectValue 
 } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon, Send, MapPin, Calendar, Clock, Camera } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon, Send, MapPin, Calendar, Clock, Camera, Upload } from "lucide-react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
