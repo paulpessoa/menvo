@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
 
@@ -21,16 +21,14 @@ interface AuthContextType {
     user: User | null
     session: Session | null
     profile: UserProfile | null
-    role: string | null
+    role: 'admin' | 'mentor' | 'mentee' | null
     isAuthenticated: boolean
     isInitializing: boolean
     loading: boolean
     isVerified: boolean
-    isAdmin: () => boolean
-    isMentor: () => boolean
-    isMentee: () => boolean
-    hasAnyRole: (roles: string[]) => boolean
-    needsRoleSelection: () => boolean
+    isAdmin: boolean
+    isMentor: boolean
+    isMentee: boolean
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
 }
@@ -70,11 +68,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (error) return null
 
-            const roles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name) || []
+            const rawRoles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
             
             return {
                 ...data,
-                roles
+                roles: rawRoles
             } as UserProfile
         } catch (error) {
             return null
@@ -107,6 +105,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         initAuth()
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+            if (event === 'SIGNED_OUT') {
+                setUser(null)
+                setSession(null)
+                setProfile(null)
+                return
+            }
+            
             setSession(newSession)
             const currentUser = newSession?.user ?? null
             setUser(currentUser)
@@ -114,19 +119,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (currentUser) {
                 const userProfile = await fetchProfile(currentUser.id)
                 setProfile(userProfile)
-            } else {
-                setProfile(null)
             }
         })
 
         return () => subscription.unsubscribe()
     }, [supabase, fetchProfile])
 
-    const isAdmin = () => profile?.roles?.includes('admin') ?? false
-    const isMentor = () => profile?.roles?.includes('mentor') ?? false
-    const isMentee = () => profile?.roles?.includes('mentee') ?? false
-    const hasAnyRole = (roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false
-    const needsRoleSelection = () => (profile?.roles?.length ?? 0) === 0
+    // LÓGICA DE ROLE SIMPLIFICADA E EXCLUSIVA
+    const effectiveRole = useMemo(() => {
+        if (!profile?.roles || profile.roles.length === 0) return null
+        // Hierarquia rígida: Admin > Mentor > Mentee
+        if (profile.roles.includes('admin')) return 'admin'
+        if (profile.roles.includes('mentor')) return 'mentor'
+        return 'mentee'
+    }, [profile])
+
+    const isAdmin = effectiveRole === 'admin'
+    const isMentor = effectiveRole === 'mentor'
+    const isMentee = effectiveRole === 'mentee'
 
     const signOut = async () => {
         await supabase.auth.signOut()
@@ -137,16 +147,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         session,
         profile,
-        role: profile?.roles?.[0] || null,
+        role: effectiveRole,
         isAuthenticated: !!user,
         isInitializing,
-        loading,
+        loading: loading || isInitializing,
         isVerified: profile?.verified ?? false,
         isAdmin,
         isMentor,
         isMentee,
-        hasAnyRole,
-        needsRoleSelection,
         refreshProfile,
         signOut
     }
