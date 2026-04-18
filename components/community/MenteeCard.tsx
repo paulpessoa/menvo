@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { MessageCircle, Linkedin, Github, ExternalLink, AlertCircle } from "lucide-react"
+import { MessageCircle, Linkedin, Github, AlertCircle } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -16,6 +16,8 @@ import {
     DialogTitle 
 } from "@/components/ui/dialog"
 import Link from "next/link"
+import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
+import { useAuth } from "@/lib/auth"
 
 interface UserProfile {
     id: string
@@ -38,9 +40,16 @@ interface MenteeCardProps {
 
 export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
     const t = useTranslations("community")
+    const { isAuthenticated } = useAuth()
     const [showDisclaimer, setShowDisclaimer] = useState(false)
+    const [showLoginModal, setShowLoginModal] = useState(false)
 
     const handleHelpClick = () => {
+        if (!isAuthenticated) {
+            setShowLoginModal(true)
+            return
+        }
+
         if (!isMentor) {
             setShowDisclaimer(true)
         } else {
@@ -107,7 +116,13 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                 </CardContent>
             </Card>
 
-            {/* Disclaimer Modal */}
+            {/* Modal de Login Necessário */}
+            <LoginRequiredModal 
+                isOpen={showLoginModal} 
+                onClose={() => setShowLoginModal(false)} 
+            />
+
+            {/* Disclaimer Modal (Para usuários logados que não são mentores) */}
             <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
                 <DialogContent>
                     <DialogHeader>
@@ -123,8 +138,8 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                         <p className="font-semibold">{t("disclaimer.whyTitle")}</p>
                         <p>{t("disclaimer.whyDescription")}</p>
                     </div>
-                    <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                        <Button variant="outline" className="sm:flex-1" onClick={() => onChat(profile.id)}>
+                    <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
+                        <Button variant="outline" className="sm:flex-1" onClick={() => { setShowDisclaimer(false); onChat(profile.id); }}>
                             {t("disclaimer.chatAnyway")}
                         </Button>
                         <Button className="sm:flex-1 bg-green-600 hover:bg-green-700" asChild>
