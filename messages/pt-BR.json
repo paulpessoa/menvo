@@ -1095,8 +1095,7 @@
         "favoritesDesc": "Acesso rápido aos mentores que você salvou para se inspirar",
         "viewAll": "Ver todos"
       }
-      },
-
+    },
     "mentee": {
       "welcome": "Bem-vindo ao seu dashboard. Encontre mentores e acelere seu crescimento profissional.",
       "stats": {
@@ -1106,14 +1105,21 @@
         "mentorsDesc": "Mentores conectados"
       },
       "actions": {
-        "find": "Encontrar Mentores",
-        "findDesc": "Busque mentores verificados em sua área de interesse"
+        "find": "Buscar Mentores",
+        "findDesc": "Encontre especialistas para acelerar sua carreira",
+        "myMentorships": "Minhas Mentorias",
+        "myMentorshipsDesc": "Veja seus agendamentos e avalie sessões concluídas",
+        "access": "Acessar Mentorias",
+        "viewAll": "Ver Mentores"
       },
-      "progress": {
-        "title": "Meu Progresso",
-        "description": "Acompanhe seu desenvolvimento profissional",
-        "inDevelopment": "Em desenvolvimento",
-        "comingSoon": "Em breve: gráficos de progresso, metas alcançadas, certificados e recursos de aprendizado"
+      "sections": {
+        "upcoming": "Próximas Sessões",
+        "noSessions": "Nenhuma sessão agendada.",
+        "bookNow": "Agendar agora",
+        "favorites": "Mentores Favoritos",
+        "favoritesDesc": "Acesso rápido aos mentores salvos",
+        "noFavorites": "Você ainda não salvou nenhum mentor.",
+        "viewDetails": "Ver Detalhes"
       }
     },
     "gettingStarted": {

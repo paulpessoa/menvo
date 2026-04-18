@@ -1,457 +1,160 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react"
-import type { User } from "@supabase/supabase-js"
-import { createClient } from "@/utils/supabase/client"
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import { User, Session } from '@supabase/supabase-js'
 
-// Simplified types for MVP
-export interface Profile {
+interface UserProfile {
     id: string
-    email: string
-    first_name: string | null
-    last_name: string | null
     full_name: string | null
     avatar_url: string | null
-    slug: string | null
     verified: boolean
-    is_volunteer: boolean | null
-    created_at: string
-    updated_at: string
+    roles: string[]
+    average_rating: number
+    total_reviews: number
+    verification_status: string
+    verification_notes: string | null
 }
 
-export type UserRoleType = "pending" | "mentee" | "mentor" | "admin" | "volunteer" | "moderator"
-
-export type Permission =
-    | "view_mentors"
-    | "book_sessions"
-    | "provide_mentorship"
-    | "manage_availability"
-    | "admin_users"
-    | "admin_verifications"
-    | "admin_system"
-    | "validate_activities"
-    | "moderate_content"
-
-export interface AuthContextType {
-    // State
+interface AuthContextType {
     user: User | null
-    profile: Profile | null
-    role: 'mentor' | 'mentee' | 'admin' | null
-    isVerified: boolean
+    session: Session | null
+    profile: UserProfile | null
+    role: string | null
     isAuthenticated: boolean
+    isInitializing: boolean
     loading: boolean
-    isVolunteer: boolean
-
-    // Auth operations
-    signIn: (email: string, password: string) => Promise<void>
-    signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
-    signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
-    signOut: () => Promise<void>
-    selectRole: (role: 'mentor' | 'mentee') => Promise<void>
-    refreshProfile: () => Promise<void>
-    getRoleDashboardPath: (userRole: string | null) => string
-
-    // Permission helpers
-    hasPermission: (permission: Permission) => boolean
-    hasRole: (roleToCheck: UserRoleType) => boolean
-    hasAnyPermission: (perms: Permission[]) => boolean
-    isAdmin: boolean
-    isMentor: boolean
-    isMentee: boolean
-    canAdminSystem: boolean
-    canAdminUsers: boolean
-    canAdminVerifications: boolean
-    canValidateActivities: boolean
-    canViewReports: boolean
-
-    // Additional helpers
+    isVerified: boolean
+    isAdmin: () => boolean
+    isMentor: () => boolean
+    isMentee: () => boolean
     hasAnyRole: (roles: string[]) => boolean
     needsRoleSelection: () => boolean
-    needsVerification: () => boolean
-    canAccessMentorFeatures: () => boolean
-    canAccessAdminFeatures: () => boolean
-    handleAuthError: (error: any) => string
-    isInitializing: boolean
-    isReady: boolean
-    getDefaultRedirectPath: () => string
+    refreshProfile: () => Promise<void>
+    signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
-    const [profile, setProfile] = useState<Profile | null>(null)
-    const [role, setRole] = useState<'mentor' | 'mentee' | 'admin' | null>(null)
-    const [loading, setLoading] = useState(true)
-
+    const [session, setSession] = useState<Session | null>(null)
+    const [profile, setProfile] = useState<UserProfile | null>(null)
+    const [isInitializing, setIsInitializing] = useState(true)
+    const [loading, setLoading] = useState(false)
     const supabase = createClient()
 
-    // Fetch user profile and role
-    const fetchUserProfile = useCallback(async (userId: string) => {
+    const fetchProfile = useCallback(async (userId: string) => {
         try {
-            // Get profile
-            const { data: profileData, error: profileError } = await supabase
+            // Fetch profile and roles
+            const { data, error } = await supabase
                 .from('profiles')
-                .select('*')
+                .select(`
+                    id,
+                    full_name,
+                    avatar_url,
+                    verified,
+                    verification_status,
+                    verification_notes,
+                    average_rating,
+                    total_reviews,
+                    user_roles (
+                        roles (
+                            name
+                        )
+                    )
+                `)
                 .eq('id', userId)
                 .single()
 
-            if (profileError) {
-                console.error('❌ Error fetching profile:', profileError)
-                return
-            }
-
-            setProfile(profileData)
-
-            // Get user role
-            const { data: roleData, error: roleError } = await supabase
-                .from('user_roles')
-                .select(`
-          roles (
-            name
-          )
-        `)
-                .eq('user_id', userId)
-                .single()
-
-            if (roleError) {
-                setRole(null)
-                return
-            }
-
-            const roleName = roleData?.roles?.name as 'mentor' | 'mentee' | 'admin' | null
-            setRole(roleName)
-
-        } catch (error) {
-            console.error('❌ Error in fetchUserProfile:', error)
-        }
-    }, [supabase])
-
-    // Refresh profile data
-    const refreshProfile = useCallback(async () => {
-        if (!user?.id) return
-        await fetchUserProfile(user.id)
-    }, [user?.id, fetchUserProfile])
-
-    // Sign in with email/password
-    const signIn = useCallback(async (email: string, password: string) => {
-        const { error } = await supabase.auth.signInWithPassword({
-            email: email.toLowerCase().trim(),
-            password
-        })
-
-        if (error) {
-            throw error
-        }
-    }, [supabase])
-
-    // Sign up with email/password
-    const signUp = useCallback(async (
-        email: string,
-        password: string,
-        firstName: string,
-        lastName: string
-    ) => {
-        const { error } = await supabase.auth.signUp({
-            email: email.toLowerCase().trim(),
-            password,
-            options: {
-                data: {
-                    first_name: firstName,
-                    last_name: lastName,
-                    full_name: `${firstName} ${lastName}`
-                }
-            }
-        })
-
-        if (error) {
-            throw error
-        }
-    }, [supabase])
-
-    // Sign in with OAuth provider
-    const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
-        // Import the fixed OAuth function
-        const { signInWithOAuthProvider } = await import('./oauth-provider-fixes')
-
-        const result = await signInWithOAuthProvider(supabase, provider, {
-            redirectTo: `${window.location.origin}/auth/callback`
-        })
-
-        if (result.error) {
-            throw result.error
-        }
-    }, [supabase])
-
-    // Sign out
-    const signOut = useCallback(async () => {
-        try {
-            // Clear local state first
-            setUser(null)
-            setProfile(null)
-            setRole(null)
-
-            // Sign out from Supabase
-            const { error } = await supabase.auth.signOut()
-
             if (error) {
-                console.error('❌ Erro no logout:', error)
-                throw error
+                console.error('Error fetching profile:', error)
+                return null
             }
 
-            // Force redirect to home page
-            if (typeof window !== 'undefined') {
-                window.location.href = '/'
-            }
+            const roles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name) || []
+            
+            return {
+                ...data,
+                roles
+            } as UserProfile
         } catch (error) {
-            console.error('❌ Erro durante logout:', error)
-            // Even if there's an error, clear local state and redirect
-            setUser(null)
-            setProfile(null)
-            setRole(null)
-
-            if (typeof window !== 'undefined') {
-                window.location.href = '/'
-            }
-
-            throw error
+            console.error('Unexpected error fetching profile:', error)
+            return null
         }
     }, [supabase])
 
-    // Select role (mentor or mentee)
-    const selectRole = useCallback(async (selectedRole: 'mentor' | 'mentee') => {
-        if (!user?.id) {
-            throw new Error('User not authenticated')
-        }
+    const refreshProfile = useCallback(async () => {
+        if (!user) return
+        setLoading(true)
+        const updatedProfile = await fetchProfile(user.id)
+        setProfile(updatedProfile)
+        setLoading(false)
+    }, [user, fetchProfile])
 
-        try {
-            // Use API endpoint to avoid RLS issues
-            const response = await fetch('/api/auth/select-role', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: user.id,
-                    role: selectedRole
-                })
-            })
-
-            if (!response.ok) {
-                const errorData = await response.json()
-                console.error('❌ API error selecting role:', errorData)
-                throw new Error(errorData.error || 'Failed to select role')
-            }
-
-            // Update local state immediately
-            setRole(selectedRole)
-
-            // Refresh profile to get updated data
-            await fetchUserProfile(user.id)
-        } catch (error) {
-            console.error('❌ Error in selectRole:', error)
-            throw error
-        }
-    }, [user?.id, fetchUserProfile])
-
-    // Get role-based dashboard path
-    const getRoleDashboardPath = useCallback((userRole: string | null) => {
-        switch (userRole) {
-            case 'admin':
-                return '/admin'
-            case 'mentor':
-                return '/dashboard/mentor'
-            case 'mentee':
-                return '/dashboard/mentee'
-            default:
-                return '/dashboard'
-        }
-    }, [])
-
-    // Permission checking functions
-    const hasPermission = useCallback((permission: Permission): boolean => {
-        if (loading) return false
-
-        // Simple role-based permissions for MVP
-        switch (role) {
-            case 'admin':
-                return true // Admin has all permissions
-            case 'mentor':
-                return ['view_mentors', 'provide_mentorship', 'manage_availability'].includes(permission)
-            case 'mentee':
-                return ['view_mentors', 'book_sessions'].includes(permission)
-            default:
-                return false
-        }
-    }, [role, loading])
-
-    const hasRole = useCallback((roleToCheck: UserRoleType): boolean => {
-        if (loading) return false
-        return role === roleToCheck
-    }, [role, loading])
-
-    const hasAnyPermission = useCallback((perms: Permission[]): boolean => {
-        if (loading) return false
-        return perms.some((p) => hasPermission(p))
-    }, [hasPermission, loading])
-
-    // Helper computed values
-    const isAdmin = hasRole("admin")
-    const isMentor = hasRole("mentor")
-    const isMentee = hasRole("mentee")
-
-    const canAdminSystem = isAdmin
-    const canAdminUsers = isAdmin
-    const canAdminVerifications = isAdmin
-    const canValidateActivities = isAdmin
-    const canViewReports = isAdmin
-
-    // Additional helper functions
-    const hasAnyRole = useCallback((roles: string[]): boolean => {
-        return roles.includes(role || '')
-    }, [role])
-
-    const needsRoleSelection = useCallback((): boolean => {
-        return !!user && !role
-    }, [user, role])
-
-    const needsVerification = useCallback((): boolean => {
-        return role === 'mentor' && !profile?.verified
-    }, [role, profile?.verified])
-
-    const canAccessMentorFeatures = useCallback((): boolean => {
-        return role === 'mentor' && !!profile?.verified
-    }, [role, profile?.verified])
-
-    const canAccessAdminFeatures = useCallback((): boolean => {
-        return role === 'admin'
-    }, [role])
-
-    const handleAuthError = useCallback((error: any): string => {
-        console.error('Auth error:', error)
-
-        // Common error messages mapping
-        const errorMessages: Record<string, string> = {
-            'Email not confirmed': 'Por favor, confirme seu email antes de fazer login.',
-            'Invalid login credentials': 'Email ou senha incorretos.',
-            'Email link is invalid or has expired': 'Link expirado. Solicite um novo email.',
-            'Email address already confirmed': 'Email já confirmado. Faça login normalmente.',
-            'Password recovery requires email confirmation': 'Confirme seu email antes de recuperar a senha.',
-            'Email change requires confirmation': 'Verifique seu email para confirmar a alteração.'
-        }
-
-        return errorMessages[error.message] || 'Erro inesperado. Tente novamente.'
-    }, [])
-
-    const isInitializing = loading
-    const isReady = !loading
-    const getDefaultRedirectPath = useCallback(() => {
-        return getRoleDashboardPath(role)
-    }, [role, getRoleDashboardPath])
-
-    // Initialize auth state
     useEffect(() => {
-        let mounted = true
+        const initAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            setSession(session)
+            const currentUser = session?.user ?? null
+            setUser(currentUser)
 
-        const initializeAuth = async () => {
-            try {
-                // Get current session
-                const { data: { session } } = await supabase.auth.getSession()
-
-                if (mounted) {
-                    if (session?.user) {
-                        setUser(session.user)
-                        await fetchUserProfile(session.user.id)
-                    }
-                    setLoading(false)
-                }
-
-                // Listen for auth changes
-                const { data: { subscription } } = supabase.auth.onAuthStateChange(
-                    async (event, session) => {
-                        if (mounted) {
-                            if (session?.user) {
-                                setUser(session.user)
-                                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                                    await fetchUserProfile(session.user.id)
-                                }
-                            } else {
-                                setUser(null)
-                                setProfile(null)
-                                setRole(null)
-                            }
-                            setLoading(false)
-                        }
-                    }
-                )
-
-                return () => {
-                    subscription.unsubscribe()
-                }
-            } catch (error) {
-                console.error('Error initializing auth:', error)
-                if (mounted) {
-                    setLoading(false)
-                }
+            if (currentUser) {
+                const userProfile = await fetchProfile(currentUser.id)
+                setProfile(userProfile)
             }
+            
+            setIsInitializing(false)
         }
 
-        initializeAuth()
+        initAuth()
 
-        return () => {
-            mounted = false
-        }
-    }, [supabase, fetchUserProfile])
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            setSession(session)
+            const currentUser = session?.user ?? null
+            setUser(currentUser)
 
-    const value: AuthContextType = {
-        // State
+            if (currentUser) {
+                const userProfile = await fetchProfile(currentUser.id)
+                setProfile(userProfile)
+            } else {
+                setProfile(null)
+            }
+        })
+
+        return () => subscription.unsubscribe()
+    }, [supabase, fetchProfile])
+
+    const isAdmin = () => profile?.roles?.includes('admin') ?? false
+    const isMentor = () => profile?.roles?.includes('mentor') ?? false
+    const isMentee = () => profile?.roles?.includes('mentee') ?? false
+    const hasAnyRole = (roles: string[]) => profile?.roles?.some(r => roles.includes(r)) ?? false
+    const needsRoleSelection = () => (profile?.roles?.length ?? 0) === 0
+
+    const signOut = async () => {
+        await supabase.auth.signOut()
+        router.push('/')
+    }
+
+    const value = {
         user,
+        session,
         profile,
-        role,
-        isVerified: profile?.verified || false,
-        isAuthenticated: !!user && !loading,
+        role: profile?.roles?.[0] || null,
+        isAuthenticated: !!user,
+        isInitializing,
         loading,
-        isVolunteer: profile?.is_volunteer || false,
-
-        // Operations
-        signIn,
-        signUp,
-        signInWithProvider,
-        signOut,
-        selectRole,
-        refreshProfile,
-        getRoleDashboardPath,
-
-        // Permissions
-        hasPermission,
-        hasRole,
-        hasAnyPermission,
+        isVerified: profile?.verified ?? false,
         isAdmin,
         isMentor,
         isMentee,
-        canAdminSystem,
-        canAdminUsers,
-        canAdminVerifications,
-        canValidateActivities,
-        canViewReports,
-
-        // Additional helpers
         hasAnyRole,
         needsRoleSelection,
-        needsVerification,
-        canAccessMentorFeatures,
-        canAccessAdminFeatures,
-        handleAuthError,
-        isInitializing,
-        isReady,
-        getDefaultRedirectPath,
+        refreshProfile,
+        signOut
     }
 
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    )
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {

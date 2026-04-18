@@ -1130,13 +1130,20 @@
       },
       "actions": {
         "find": "Find Mentors",
-        "findDesc": "Search for verified mentors in your area of interest"
+        "findDesc": "Find experts to accelerate your career",
+        "myMentorships": "My Mentorships",
+        "myMentorshipsDesc": "View your appointments and evaluate completed sessions",
+        "access": "Access Mentorships",
+        "viewAll": "View Mentors"
       },
-      "progress": {
-        "title": "My Progress",
-        "description": "Track your professional development",
-        "inDevelopment": "In development",
-        "comingSoon": "Coming soon: progress charts, goals achieved, certificates and learning resources"
+      "sections": {
+        "upcoming": "Upcoming Sessions",
+        "noSessions": "No sessions scheduled.",
+        "bookNow": "Book now",
+        "favorites": "Favorite Mentors",
+        "favoritesDesc": "Quick access to saved mentors",
+        "noFavorites": "You haven't saved any mentors yet.",
+        "viewDetails": "View Details"
       }
     },
     "gettingStarted": {

@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, Save, Trash2, Shield, User, Star, Camera, Upload } from "lucide-react"
+
 import { adminService, type AdminUserUpdate } from "@/services/admin/admin"
 import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 import { toast } from "sonner"
