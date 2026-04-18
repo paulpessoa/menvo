@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
+import { useRouter } from 'next/navigation'
 
 interface UserProfile {
     id: string
@@ -14,6 +15,7 @@ interface UserProfile {
     total_reviews: number
     verification_status: string
     verification_notes: string | null
+    is_public: boolean
 }
 
 interface AuthContextType {
@@ -43,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isInitializing, setIsInitializing] = useState(true)
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
+    const router = useRouter()
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
@@ -58,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     verification_notes,
                     average_rating,
                     total_reviews,
+                    is_public,
                     user_roles (
                         roles (
                             name
