@@ -56,48 +56,23 @@ export default function Header() {
     { name: t("common.howItWorks"), href: "/how-it-works" },
   ]
 
-  const userNavigation = isAuthenticated
-    ? [
-        ...(isAdmin()
-          ? [
-              {
-                name: t("header.userMenu.adminPanel"),
-                href: "/admin",
-                icon: Shield
-              }
-            ]
-          : []),
-        {
-          name: t("header.userMenu.dashboard"),
-          href: "/dashboard",
-          icon: LayoutDashboard
-        },
-        {
-          name: t("header.userMenu.profile"),
-          href: "/profile",
-          icon: User
-        },
-        ...(isAdmin() || role === "mentor"
-          ? [
-              {
-                name: t("header.userMenu.createOrganization"),
-                href: "/organizations/new",
-                icon: Building2
-              }
-            ]
-          : []),
-        {
-          name: t("header.userMenu.messages"),
-          href: "/messages",
-          icon: MessageSquare
-        },
-        {
-          name: t("header.userMenu.settings"),
-          href: "/settings",
-          icon: Settings
-        }
-      ]
-    : []
+  // Montagem estável do menu de usuário para evitar erros de iterabilidade
+  const userNavigation = []
+  
+  if (isAuthenticated && profile) {
+    if (isAdmin()) {
+        userNavigation.push({ name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield })
+    }
+    userNavigation.push({ name: t("header.userMenu.dashboard"), href: "/dashboard", icon: LayoutDashboard })
+    userNavigation.push({ name: t("header.userMenu.profile"), href: "/profile", icon: User })
+    
+    if (isAdmin() || role === "mentor") {
+        userNavigation.push({ name: t("header.userMenu.createOrganization"), href: "/organizations/new", icon: Building2 })
+    }
+    
+    userNavigation.push({ name: t("header.userMenu.messages"), href: "/messages", icon: MessageSquare })
+    userNavigation.push({ name: t("header.userMenu.settings"), href: "/settings", icon: Settings })
+  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -107,7 +82,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
-        {/* Lado Esquerdo: Logo */}
+        {/* Esquerda: Logo */}
         <div className="w-1/4 flex justify-start">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-10 w-32">
@@ -129,7 +104,7 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Centro: Navegação */}
+        {/* Centro: Navegação Centralizada */}
         <nav className="hidden md:flex w-2/4 justify-center items-center gap-8">
             {navigation.map((item) => (
               <Link
@@ -146,7 +121,7 @@ export default function Header() {
             ))}
         </nav>
 
-        {/* Lado Direito: Ferramentas */}
+        {/* Direita: Ferramentas */}
         <div className="w-1/4 flex justify-end items-center gap-2">
           <LanguageSelector />
           <MessagesBadge />

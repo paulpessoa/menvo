@@ -26,9 +26,9 @@ interface AuthContextType {
     isInitializing: boolean
     loading: boolean
     isVerified: boolean
-    isAdmin: boolean
-    isMentor: boolean
-    isMentee: boolean
+    isAdmin: () => boolean
+    isMentor: () => boolean
+    isMentee: () => boolean
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
 }
@@ -89,17 +89,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const initAuth = async () => {
-            const { data: { session: currentSession } } = await supabase.auth.getSession()
-            setSession(currentSession)
-            const currentUser = currentSession?.user ?? null
-            setUser(currentUser)
+            try {
+                const { data: { session: currentSession } } = await supabase.auth.getSession()
+                setSession(currentSession)
+                const currentUser = currentSession?.user ?? null
+                setUser(currentUser)
 
-            if (currentUser) {
-                const userProfile = await fetchProfile(currentUser.id)
-                setProfile(userProfile)
+                if (currentUser) {
+                    const userProfile = await fetchProfile(currentUser.id)
+                    setProfile(userProfile)
+                }
+            } catch (err) {
+                console.error('Auth init error:', err)
+            } finally {
+                setIsInitializing(false)
             }
-            
-            setIsInitializing(false)
         }
 
         initAuth()
@@ -116,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const currentUser = newSession?.user ?? null
             setUser(currentUser)
 
-            if (currentUser) {
+            if (currentUser && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
                 const userProfile = await fetchProfile(currentUser.id)
                 setProfile(userProfile)
             }
@@ -125,25 +129,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [supabase, fetchProfile])
 
-    // LÓGICA DE ROLE SIMPLIFICADA E EXCLUSIVA
+    const isAdmin = useCallback(() => profile?.roles?.includes('admin') ?? false, [profile])
+    const isMentor = useCallback(() => profile?.roles?.includes('mentor') ?? false, [profile])
+    const isMentee = useCallback(() => profile?.roles?.includes('mentee') ?? false, [profile])
+
     const effectiveRole = useMemo(() => {
-        if (!profile?.roles || profile.roles.length === 0) return null
-        // Hierarquia rígida: Admin > Mentor > Mentee
+        if (!profile?.roles) return null
         if (profile.roles.includes('admin')) return 'admin'
         if (profile.roles.includes('mentor')) return 'mentor'
-        return 'mentee'
+        if (profile.roles.includes('mentee')) return 'mentee'
+        return null
     }, [profile])
-
-    const isAdmin = effectiveRole === 'admin'
-    const isMentor = effectiveRole === 'mentor'
-    const isMentee = effectiveRole === 'mentee'
 
     const signOut = async () => {
         await supabase.auth.signOut()
         window.location.href = '/'
     }
 
-    const value = {
+    const value = useMemo(() => ({
         user,
         session,
         profile,
@@ -157,7 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isMentee,
         refreshProfile,
         signOut
-    }
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, refreshProfile])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
