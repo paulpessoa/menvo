@@ -42,10 +42,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             description: t("nav.organizationsDesc")
         },
         {
-            title: t("nav.mentors"),
-            href: "/admin/mentors",
-            icon: Users,
-            description: t("nav.mentorsDesc")
+            title: "Menvo Hub",
+            href: "/admin/hub",
+            icon: LinkIcon,
+            description: "Moderar sugestões e afiliados"
         },
         {
             title: t("nav.users"),
@@ -53,12 +53,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             icon: Users,
             description: t("nav.usersDesc")
         },
-        {
-            title: t("nav.suggestions"),
-            href: "/admin/suggestions",
-            icon: MessageSquare,
-            description: t("nav.suggestionsDesc")
-        },
+
         {
             title: t("nav.reports"),
             href: "/admin/reports",

@@ -278,7 +278,12 @@ export default function AdminUsersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => window.open(`/mentors/${user.id}`, '_blank')}>
+                              <DropdownMenuItem onClick={() => {
+                                const isMentor = user.roles.includes('mentor');
+                                const path = isMentor ? 'mentors' : 'mentee';
+                                const identifier = user.slug || user.id;
+                                window.open(`/${path}/${identifier}`, '_blank');
+                              }}>
                                 <ExternalLink className="mr-2 h-4 w-4" /> Perfil Público
                               </DropdownMenuItem>
                             </DropdownMenuContent>
