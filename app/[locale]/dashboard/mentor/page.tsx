@@ -45,6 +45,7 @@ interface FavoriteMentor {
 
 export default function MentorDashboard() {
     const t = useTranslations("dashboard")
+    const locale = useLocale()
     const { user, profile, isVerified } = useAuth()
     const [stats, setStats] = useState<MentorStats>({
         totalAppointments: 0,

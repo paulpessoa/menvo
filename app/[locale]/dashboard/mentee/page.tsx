@@ -45,6 +45,7 @@ interface FavoriteMentor {
 
 export default function MenteeDashboard() {
     const t = useTranslations("dashboard")
+    const locale = useLocale()
     const { user, profile } = useAuth()
     const [stats, setStats] = useState<MenteeStats>({
         totalAppointments: 0,
