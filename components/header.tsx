@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Link, usePathname, useRouter } from "@/i18n/routing"
+import Image from "next/image"
 import {
   Menu,
   User,
@@ -108,12 +109,22 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-primary p-1.5 rounded-lg shadow-sm">
-                <Shield className="h-6 w-6 text-primary-foreground" />
+            <div className="relative h-10 w-32">
+                <Image
+                    src="/menvo-logo-light.png"
+                    alt="Menvo"
+                    fill
+                    className="object-contain dark:hidden"
+                    priority
+                />
+                <Image
+                    src="/menvo-logo-dark.png"
+                    alt="Menvo"
+                    fill
+                    className="object-contain hidden dark:block"
+                    priority
+                />
             </div>
-            <span className="text-xl font-bold tracking-tight text-primary">
-              {t("common.title")}
-            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             {navigation.map((item) => (
