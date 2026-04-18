@@ -4,8 +4,8 @@
     "home": "Home",
     "findMentors": "Find Mentors",
     "community": "Community",
-    "hub": "Menvo Hub",
-    "events": "Menvo Hub",
+    "hub": "Hub",
+    "events": "Events",
     "howItWorks": "How It Works",
     "aboutUs": "About Us",
     "title": "Menvo",
@@ -1436,8 +1436,8 @@
     "noEvents": "No events found",
     "adjustFilters": "Try adjusting your filters or search terms",
     "clearFilters": "Clear all filters"
-    },
-    "chat": {
+  },
+  "chat": {
     "online": "Online",
     "connecting": "Connecting...",
     "typing": "typing...",
@@ -1446,9 +1446,8 @@
     "startConversation": "Send a message to start the conversation!",
     "errorLoad": "Error loading messages",
     "errorSend": "Error sending message"
-    },
-
-    "admin": {
+  },
+  "admin": {
     "title": "Admin Panel",
     "welcome": "Welcome, {name}!",
     "description": "Manage mentors, users, and monitor the Menvo platform",
@@ -1495,5 +1494,5 @@
       "pendingMentorsDesc": "There are {count} mentors awaiting verification. Review and approve profiles.",
       "verifyNow": "Verify Now"
     }
-    }
-    }
+  }
+}

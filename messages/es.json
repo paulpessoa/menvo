@@ -4,8 +4,8 @@
     "home": "Inicio",
     "findMentors": "Encontrar Mentores",
     "community": "Comunidad",
-    "hub": "Menvo Hub",
-    "events": "Menvo Hub",
+    "hub": "Hub",
+    "events": "Eventos",
     "howItWorks": "Cómo Funciona",
     "aboutUs": "Sobre Nosotros",
     "title": "Menvo",
@@ -546,7 +546,6 @@
   },
   "mentors": {
     "title": "Encontrar un Mentor",
-
     "description": "Navega por nuestra comunidad de mentores voluntarios y encuentra el emparejamiento perfecto para tus necesidades",
     "searchPlaceholder": "Buscar por nombre, especialidad o palabras clave...",
     "filtersTitle": "Filtros",

@@ -1,9 +1,25 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Users, UserCheck, Clock, Shield, TrendingUp, AlertCircle, CheckCircle, MessageSquare, Link as LinkIcon } from "lucide-react"
+import {
+  Users,
+  UserCheck,
+  Clock,
+  Shield,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  MessageSquare,
+  Link as LinkIcon
+} from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
@@ -35,7 +51,7 @@ export default function AdminDashboard() {
     totalSessions: 0,
     recentSignups: 0,
     pendingSuggestions: 0,
-    pendingHubResources: 0,
+    pendingHubResources: 0
   })
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
@@ -56,27 +72,30 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
 
       const { data: mentorRoles, error: mentorError } = await supabase
-        .from('user_roles')
-        .select(`
+        .from("user_roles")
+        .select(
+          `
           profiles!inner(id, verified),
           roles!inner(name)
-        `)
-        .eq('roles.name', 'mentor')
+        `
+        )
+        .eq("roles.name", "mentor")
 
       if (mentorError) throw mentorError
 
       const totalMentors = mentorRoles?.length || 0
-      const verifiedMentors = mentorRoles?.filter(role => role.profiles?.verified).length || 0
+      const verifiedMentors =
+        mentorRoles?.filter((role) => role.profiles?.verified).length || 0
       const pendingMentorsCount = totalMentors - verifiedMentors
 
       const { count: totalMentees } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .eq('roles.name', 'mentee')
+        .from("user_roles")
+        .select("*", { count: "exact", head: true })
+        .eq("roles.name", "mentee")
 
       const { count: totalSessions } = await supabase
-        .from('appointments')
-        .select('*', { count: 'exact', head: true })
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
 
       const sevenDaysAgo = new Date()
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
@@ -87,14 +106,14 @@ export default function AdminDashboard() {
         .gte("created_at", sevenDaysAgo.toISOString())
 
       const { count: pendingSuggestions } = await supabase
-        .from('mentor_suggestions')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
+        .from("mentor_suggestions")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending")
 
       const { count: pendingHub } = await supabase
-        .from('hub_resources')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
+        .from("hub_resources")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending")
 
       setStats({
         totalUsers: totalUsers || 0,
@@ -105,7 +124,7 @@ export default function AdminDashboard() {
         totalSessions: totalSessions || 0,
         recentSignups: recentSignups || 0,
         pendingSuggestions: pendingSuggestions || 0,
-        pendingHubResources: pendingHub || 0,
+        pendingHubResources: pendingHub || 0
       })
     } catch (error) {
       console.error("Error fetching admin stats:", error)
@@ -116,12 +135,13 @@ export default function AdminDashboard() {
 
   const quickActions = [
     {
-      title: "Menvo Hub",
+      title: "Hub",
       description: "Moderar sugestões de recursos e afiliados",
       href: "/admin/hub",
       icon: LinkIcon,
       color: "bg-orange-500",
-      badge: stats.pendingHubResources > 0 ? stats.pendingHubResources : undefined,
+      badge:
+        stats.pendingHubResources > 0 ? stats.pendingHubResources : undefined
     },
     {
       title: t("actions.suggestions"),
@@ -129,14 +149,14 @@ export default function AdminDashboard() {
       href: "/admin/suggestions",
       icon: MessageSquare,
       color: "bg-blue-600",
-      badge: stats.pendingSuggestions > 0 ? stats.pendingSuggestions : undefined,
+      badge: stats.pendingSuggestions > 0 ? stats.pendingSuggestions : undefined
     },
     {
       title: "Gestão Global",
       description: "Gerenciar todos os usuários e permissões",
       href: "/admin/users",
       icon: Users,
-      color: "bg-primary",
+      color: "bg-primary"
     },
     {
       title: t("actions.verifyMentors"),
@@ -144,15 +164,15 @@ export default function AdminDashboard() {
       href: "/admin/users?tab=pending",
       icon: Clock,
       color: "bg-yellow-500",
-      badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined,
+      badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
     },
     {
       title: t("actions.settings"),
       description: t("actions.settingsDesc"),
       href: "/admin/settings",
       icon: Shield,
-      color: "bg-purple-500",
-    },
+      color: "bg-purple-500"
+    }
   ]
 
   if (loading) {
@@ -164,37 +184,43 @@ export default function AdminDashboard() {
   }
 
   return (
-    <RequireRole roles={['admin']}>
+    <RequireRole roles={["admin"]}>
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-bold">
               {t("welcome", { name: profile?.full_name || "Admin" })}
             </h1>
-            <p className="text-muted-foreground">
-              {t("description")}
-            </p>
+            <p className="text-muted-foreground">{t("description")}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("stats.totalUsers")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("stats.totalUsers")}
+                </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                <p className="text-xs text-muted-foreground">{t("stats.recentSignups", { count: stats.recentSignups })}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("stats.recentSignups", { count: stats.recentSignups })}
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("stats.verifiedMentors")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("stats.verifiedMentors")}
+                </CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.verifiedMentors}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.verifiedMentors}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {t("stats.totalMentors", { count: stats.totalMentors })}
                 </p>
@@ -203,29 +229,41 @@ export default function AdminDashboard() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("stats.pendingMentors")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("stats.pendingMentors")}
+                </CardTitle>
                 <Clock className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">{stats.pendingMentors}</div>
-                <p className="text-xs text-muted-foreground">{t("stats.awaitingVerification")}</p>
+                <div className="text-2xl font-bold text-yellow-600">
+                  {stats.pendingMentors}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("stats.awaitingVerification")}
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t("stats.totalSessions")}</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  {t("stats.totalSessions")}
+                </CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalSessions}</div>
-                <p className="text-xs text-muted-foreground">{t("stats.sessionsDesc")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("stats.sessionsDesc")}
+                </p>
               </CardContent>
             </Card>
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold mb-6">{t("actions.title")}</h2>
+            <h2 className="text-2xl font-semibold mb-6">
+              {t("actions.title")}
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {quickActions.map((action, index) => (
                 <Card key={index} className="hover:shadow-md transition-shadow">
@@ -234,7 +272,9 @@ export default function AdminDashboard() {
                       <div className={`p-2 rounded-lg ${action.color}`}>
                         <action.icon className="h-6 w-6 text-white" />
                       </div>
-                      {action.badge && <Badge variant="destructive">{action.badge}</Badge>}
+                      {action.badge && (
+                        <Badge variant="destructive">{action.badge}</Badge>
+                      )}
                     </div>
                     <CardTitle className="text-lg">{action.title}</CardTitle>
                     <CardDescription>{action.description}</CardDescription>
@@ -254,16 +294,22 @@ export default function AdminDashboard() {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-yellow-600" />
-                  <CardTitle className="text-yellow-800">Pendências de Verificação</CardTitle>
+                  <CardTitle className="text-yellow-800">
+                    Pendências de Verificação
+                  </CardTitle>
                 </div>
                 <CardDescription className="text-yellow-700">
-                  Existem {stats.pendingMentors} mentores e {stats.pendingHubResources} recursos do Hub aguardando sua revisão.
+                  Existem {stats.pendingMentors} mentores e{" "}
+                  {stats.pendingHubResources} recursos do Hub aguardando sua
+                  revisão.
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex gap-4">
                 {stats.pendingMentors > 0 && (
                   <Button asChild variant="outline">
-                    <Link href="/admin/users?tab=pending">Verificar Mentores</Link>
+                    <Link href="/admin/users?tab=pending">
+                      Verificar Mentores
+                    </Link>
                   </Button>
                 )}
                 {stats.pendingHubResources > 0 && (

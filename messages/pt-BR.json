@@ -4,8 +4,8 @@
     "home": "Início",
     "findMentors": "Encontrar Mentores",
     "community": "Comunidade",
-    "hub": "Menvo Hub",
-    "events": "Menvo Hub",
+    "hub": "Hub",
+    "events": "Eventos",
     "howItWorks": "Como Funciona",
     "aboutUs": "Sobre Nós",
     "title": "Menvo",
@@ -1412,8 +1412,8 @@
     "noEvents": "Nenhum evento encontrado",
     "adjustFilters": "Tente ajustar seus filtros ou termos de busca",
     "clearFilters": "Limpar todos os filtros"
-    },
-    "chat": {
+  },
+  "chat": {
     "online": "Online",
     "connecting": "Conectando...",
     "typing": "digitando...",
@@ -1422,9 +1422,8 @@
     "startConversation": "Envie uma mensagem para começar a conversa!",
     "errorLoad": "Erro ao carregar mensagens",
     "errorSend": "Erro ao enviar mensagem"
-    },
-
-    "admin": {
+  },
+  "admin": {
     "title": "Painel Administrativo",
     "welcome": "Bem-vindo, {name}!",
     "description": "Gerencie mentores, usuários e monitore a plataforma Menvo",
@@ -1471,5 +1470,5 @@
       "pendingMentorsDesc": "Existem {count} mentores aguardando verificação. Revise e aprove os perfis.",
       "verifyNow": "Verificar Agora"
     }
-    }
-    }
+  }
+}
