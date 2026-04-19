@@ -140,11 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [supabase])
 
     const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
-        const supabaseProvider = provider === 'linkedin' ? 'linkedin_oidc' : provider
         const { error } = await supabase.auth.signInWithOAuth({
-            provider: supabaseProvider as any,
+            provider: provider as any,
             options: {
-                redirectTo: `${window.location.origin}/callback`, // Aponta para a raiz limpa
+                redirectTo: `${window.location.origin}/callback`, // Rota correta baseada no seu novo /(auth)
             },
         })
         if (error) throw error
