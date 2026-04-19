@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
         verifyResult = await supabase.auth.exchangeCodeForSession(code)
       }
 
-      if (verifyResult.error) throw verifyResult.error
+      if (verifyResult?.error) throw verifyResult.error
 
       return NextResponse.redirect(new URL(redirectPath, request.url))
     } catch (error) {
@@ -44,14 +44,17 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
-        console.error("❌ Error exchanging code for session:", error)
-        // Se falhar o exchange, manda para o login com erro amigável
-        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_error`, request.url))
+        console.error("❌ OAuth Exchange Error:", error)
+        
+        // ESTRATÉGIA DE RESGATE: Se a troca no servidor falhou (erro 4/0A), 
+        // redirecionamos para uma rota de cliente que possa tentar novamente 
+        // usando a biblioteca do navegador que tem acesso ao PKCE verifier.
+        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_mismatch&code=${code}`, request.url))
       }
 
       if (data.user) {
         // Aguarda um momento para o trigger de banco (perfil)
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 800))
 
         const { data: roleData } = await supabase
           .from("user_roles")
@@ -67,9 +70,10 @@ export async function GET(request: NextRequest) {
         }
 
         // Lógica de redirecionamento por papel
-        let target = `/${locale}/dashboard/mentee`
+        let target = `/${locale}/dashboard`
         if (roleName === 'admin') target = `/${locale}/admin`
         if (roleName === 'mentor') target = `/${locale}/dashboard/mentor`
+        if (roleName === 'mentee') target = `/${locale}/dashboard/mentee`
 
         return NextResponse.redirect(new URL(target, request.url))
       }

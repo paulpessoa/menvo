@@ -11,11 +11,12 @@ export default function TestAuthPage() {
     const supabase = createClient()
 
     const handleOAuth = async (provider: 'google' | 'linkedin') => {
-        setStatus(`Iniciando login com ${provider}...`)
+        const supabaseProvider = provider === 'linkedin' ? 'linkedin_oidc' : provider
+        setStatus(`Iniciando login com ${supabaseProvider}...`)
         const { error } = await supabase.auth.signInWithOAuth({
-            provider: provider as any,
+            provider: supabaseProvider as any,
             options: {
-                redirectTo: `${window.location.origin}/api/auth/callback`,
+                redirectTo: `${window.location.origin}/callback`,
             }
         })
 
