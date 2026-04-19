@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
   // Detectar idioma preferido (padrão para pt-BR)
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
-  const origin = requestUrl.origin
 
   // 1. Handle Email Verifications/OTP
   if (type && (tokenHash || code)) {
@@ -46,12 +45,13 @@ export async function GET(request: NextRequest) {
 
       if (error) {
         console.error("❌ Error exchanging code for session:", error)
+        // Se falhar o exchange, manda para o login com erro amigável
         return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_error`, request.url))
       }
 
       if (data.user) {
-        // Aguarda o trigger de perfil
-        await new Promise((resolve) => setTimeout(resolve, 800))
+        // Aguarda um momento para o trigger de banco (perfil)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
 
         const { data: roleData } = await supabase
           .from("user_roles")
