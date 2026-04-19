@@ -18,6 +18,7 @@ import {
   AlertCircle,
   CheckCircle,
   MessageSquare,
+  Star,
   Link as LinkIcon
 } from "lucide-react"
 import Link from "next/link"
