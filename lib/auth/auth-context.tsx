@@ -29,8 +29,13 @@ interface AuthContextType {
     isAdmin: boolean
     isMentor: boolean
     isMentee: boolean
+    hasAnyRole: (roles: string[]) => boolean
+    needsRoleSelection: () => boolean
+    signIn: (email: string, password: string) => Promise<void>
+    signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
+    getDefaultRedirectPath: () => string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -129,9 +134,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe()
     }, [supabase, fetchProfile])
 
+    const signIn = useCallback(async (email: string, password: string) => {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+    }, [supabase])
+
+    const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+            },
+        })
+        if (error) throw error
+    }, [supabase])
+
     const isAdmin = useMemo(() => profile?.roles?.includes('admin') ?? false, [profile])
-    const isMentor = useMemo(() => profile?.roles?.includes('mentor') ?? false, [profile])
-    const isMentee = useMemo(() => profile?.roles?.includes('mentee') ?? false, [profile])
+    const isMentor = useMemo(() => {
+        if (isAdmin) return false
+        return profile?.roles?.includes('mentor') ?? false
+    }, [profile, isAdmin])
+    const isMentee = useMemo(() => {
+        if (isAdmin) return false
+        return profile?.roles?.includes('mentee') ?? false
+    }, [profile, isAdmin])
 
     const effectiveRole = useMemo((): 'admin' | 'mentor' | 'mentee' | null => {
         if (!profile?.roles) return null
@@ -141,9 +167,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null
     }, [profile])
 
+    const hasAnyRole = useCallback((roles: string[]) => {
+        if (!profile?.roles) return false
+        return profile.roles.some(r => roles.includes(r))
+    }, [profile])
+
+    const needsRoleSelection = useCallback(() => {
+        if (!profile || isInitializing) return false
+        if (isAdmin) return false
+        return (profile.roles?.length ?? 0) === 0
+    }, [profile, isInitializing, isAdmin])
+
+    const getDefaultRedirectPath = useCallback(() => {
+        if (!profile) return '/dashboard'
+        if (isAdmin) return '/admin'
+        if (isMentor) return '/dashboard/mentor'
+        if (isMentee) return '/dashboard/mentee'
+        return '/dashboard'
+    }, [profile, isAdmin, isMentor, isMentee])
+
     const signOut = async () => {
-        await supabase.auth.signOut()
-        window.location.href = '/'
+        setLoading(true)
+        try {
+            await supabase.auth.signOut()
+            window.location.href = '/'
+        } catch (err) {
+            console.error('Sign out error:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     const value = useMemo(() => ({
@@ -158,9 +210,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin,
         isMentor,
         isMentee,
+        hasAnyRole,
+        needsRoleSelection,
+        signIn,
+        signInWithProvider,
         refreshProfile,
-        signOut
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, refreshProfile])
+        signOut,
+        getDefaultRedirectPath
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
