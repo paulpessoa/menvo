@@ -8,18 +8,17 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type")
   const tokenHash = requestUrl.searchParams.get("token_hash")
   
-  // Detectar idioma via cookie ou padrão
+  // Detectar idioma preferido (padrão para pt-BR)
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
-  
-  console.log(`[AUTH CALLBACK] Type: ${type}, Locale detected: ${locale}`)
 
-  // 1. Handle Email Verifications (type=signup, recovery, etc)
+  // 1. Handle Email Verifications/OTP
   if (type && (tokenHash || code)) {
     try {
       const supabase = await createClient()
       let verifyResult: any
-      
+      let redirectPath = `/${locale}/dashboard`
+
       if (tokenHash) {
         verifyResult = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
@@ -31,9 +30,9 @@ export async function GET(request: NextRequest) {
 
       if (verifyResult?.error) throw verifyResult.error
 
-      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
+      return NextResponse.redirect(new URL(redirectPath, request.url))
     } catch (error) {
-      console.error(`[AUTH CALLBACK] Email error:`, error)
+      console.error(`Email callback error:`, error)
       return NextResponse.redirect(new URL(`/${locale}/login?error=auth_error`, request.url))
     }
   }
@@ -45,12 +44,16 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
-        console.error("[AUTH CALLBACK] OAuth exchange error:", error)
-        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_error`, request.url))
+        console.error("❌ OAuth Exchange Error:", error)
+        
+        // ESTRATÉGIA DE RESGATE: Se a troca no servidor falhou (erro 4/0A), 
+        // redirecionamos para uma rota de cliente que possa tentar novamente 
+        // usando a biblioteca do navegador que tem acesso ao PKCE verifier.
+        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_mismatch&code=${code}`, request.url))
       }
 
       if (data.user) {
-        // Aguarda o trigger de perfil se necessário
+        // Aguarda um momento para o trigger de banco (perfil)
         await new Promise((resolve) => setTimeout(resolve, 800))
 
         const { data: roleData } = await supabase
@@ -61,20 +64,25 @@ export async function GET(request: NextRequest) {
 
         const roleName = (roleData?.roles as any)?.name
 
+        // Se não tiver papel, vai para seleção de papel
+        if (!roleName) {
+          return NextResponse.redirect(new URL(`/${locale}/select-role`, request.url))
+        }
+
+        // Lógica de redirecionamento por papel
         let target = `/${locale}/dashboard`
-        if (!roleName) target = `/${locale}/select-role`
-        else if (roleName === 'admin') target = `/${locale}/admin`
-        else if (roleName === 'mentor') target = `/${locale}/dashboard/mentor`
-        else if (roleName === 'mentee') target = `/${locale}/dashboard/mentee`
+        if (roleName === 'admin') target = `/${locale}/admin`
+        if (roleName === 'mentor') target = `/${locale}/dashboard/mentor`
+        if (roleName === 'mentee') target = `/${locale}/dashboard/mentee`
 
         return NextResponse.redirect(new URL(target, request.url))
       }
     } catch (error) {
-      console.error("[AUTH CALLBACK] Unexpected error:", error)
+      console.error("OAuth callback error:", error)
       return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url))
     }
   }
 
-  // Fallback
+  // Fallback para login
   return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
 }
