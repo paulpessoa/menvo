@@ -33,7 +33,7 @@ interface AuthContextType {
     needsRoleSelection: () => boolean
     signIn: (email: string, password: string) => Promise<void>
     signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
-    signInWithGoogleNew: () => Promise<void> // NOVO MÉTODO
+    signInWithGoogleNew: () => Promise<void>
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
     getDefaultRedirectPath: () => string
@@ -94,27 +94,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user, fetchProfile])
 
     useEffect(() => {
+        let mounted = true
+        
+        // TIMEOUT DE SEGURANÇA: Nunca deixa o app em loading infinito
+        const timeout = setTimeout(() => {
+            if (mounted && isInitializing) {
+                console.warn("[AUTH] Initializing timeout reached. Forcing ready state.")
+                setIsInitializing(false)
+            }
+        }, 5000)
+
         const initAuth = async () => {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession()
+                if (!mounted) return
+                
                 setSession(currentSession)
                 setUser(currentSession?.user ?? null)
 
                 if (currentSession?.user) {
                     const userProfile = await fetchProfile(currentSession.user.id)
-                    setProfile(userProfile)
+                    if (mounted) setProfile(userProfile)
                 }
             } catch (err) {
                 console.error('Auth initialization error:', err)
             } finally {
-                // GARANTIA: Nunca deixa o app em loading infinito
-                setIsInitializing(false)
+                if (mounted) {
+                    setIsInitializing(false)
+                    clearTimeout(timeout)
+                }
             }
         }
 
         initAuth()
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+            if (!mounted) return
+
             if (event === 'SIGNED_OUT') {
                 setUser(null)
                 setSession(null)
@@ -127,17 +143,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setSession(newSession)
                 setUser(newSession.user)
                 
-                // Se o perfil já existe, não refetch no loop
-                if (!profile || event === 'SIGNED_IN') {
+                if (event === 'SIGNED_IN' || !profile) {
                     const userProfile = await fetchProfile(newSession.user.id)
-                    setProfile(userProfile)
+                    if (mounted) setProfile(userProfile)
                 }
-                setIsInitializing(false)
+                if (mounted) setIsInitializing(false)
             }
         })
 
-        return () => subscription.unsubscribe()
-    }, [supabase, fetchProfile, profile])
+        return () => {
+            mounted = false
+            clearTimeout(timeout)
+            subscription.unsubscribe()
+        }
+    }, [supabase, fetchProfile]) // Removido 'profile' da dependência para evitar loops
 
     const signIn = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -155,7 +174,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error
     }, [supabase])
 
-    // NOVO MÉTODO: BASEADO NO SCRIPT DE SUCESSO DO USUÁRIO
     const signInWithGoogleNew = useCallback(async () => {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
