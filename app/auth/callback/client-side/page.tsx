@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2, ShieldCheck, AlertCircle } from "lucide-react"
 
-export default function ClientSideCallback() {
+function ClientSideCallbackContent() {
     const [status, setStatus] = useState("Finalizando sua autenticação...")
     const [error, setError] = useState<string | null>(null)
     const supabase = createClient()
@@ -31,10 +31,9 @@ export default function ClientSideCallback() {
 
                 if (data.user) {
                     setStatus("Sucesso! Redirecionando...")
-                    // Esperar perfil
-                    await new Promise(r => setTimeout(r, 500))
+                    // Pequeno delay para garantir sincronia do perfil
+                    await new Promise(r => setTimeout(r, 800))
                     
-                    // Buscar role para redirecionar corretamente
                     const { data: roleData } = await supabase
                         .from("user_roles")
                         .select(`roles (name)`)
@@ -88,5 +87,17 @@ export default function ClientSideCallback() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function ClientSideCallback() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto" />
+            </div>
+        }>
+            <ClientSideCallbackContent />
+        </Suspense>
     )
 }
