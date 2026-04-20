@@ -18,7 +18,6 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, {
                 ...options,
-                domain: '.menvo.com.br',
                 path: '/'
               })
             })
@@ -27,10 +26,6 @@ export async function createClient() {
           }
         },
       },
-      cookieOptions: {
-        domain: '.menvo.com.br',
-        path: '/',
-      }
     },
   )
 }

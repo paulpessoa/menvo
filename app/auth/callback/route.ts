@@ -8,11 +8,19 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type")
   const tokenHash = requestUrl.searchParams.get("token_hash")
   
-  // FIX 20-04-26: Detectar locale via cookie NEXT_LOCALE ou padrão pt-BR
+  // LOG DE DEPURAÇÃO: Ver o que está chegando
   const cookieStore = await cookies()
+  const allCookies = cookieStore.getAll()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
-
-  console.log(`[AUTH CALLBACK] Processing code: ${!!code}, type: ${type}, locale: ${locale}`)
+  
+  console.log(`[AUTH DEBUG] Callback Path: ${requestUrl.pathname}`)
+  console.log(`[AUTH DEBUG] Full URL: ${request.url}`)
+  console.log(`[AUTH DEBUG] Total Cookies: ${allCookies.length}`)
+  console.log(`[AUTH DEBUG] Cookies Names: ${allCookies.map(c => c.name).join(', ')}`)
+  
+  // Procurar especificamente pelo verifier do PKCE
+  const hasVerifier = allCookies.some(c => c.name.includes('code-verifier'))
+  console.log(`[AUTH DEBUG] PKCE Verifier Found: ${hasVerifier}`)
 
   // 1. Handle Email Verifications / Recovery
   if (type && (tokenHash || code)) {
@@ -31,7 +39,6 @@ export async function GET(request: NextRequest) {
 
       if (verifyResult?.error) throw verifyResult.error
 
-      // Se for recuperação de senha, mandamos para o formulário de update localizado
       const target = type === 'recovery' ? `/${locale}/update-password` : `/${locale}/dashboard`
       return NextResponse.redirect(new URL(target, request.url))
     } catch (error) {
@@ -48,12 +55,11 @@ export async function GET(request: NextRequest) {
 
       if (error) {
         console.error("[AUTH CALLBACK] OAuth exchange error:", error)
-        // Redirecionamento amigável com locale em caso de falha de troca de código
-        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_error`, request.url))
+        // Se falhar a troca no servidor, mandamos para o cliente tentar o resgate
+        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_exchange_failed&code=${code}`, request.url))
       }
 
       if (data.user) {
-        // Delay para garantir triggers de banco (profiles)
         await new Promise((resolve) => setTimeout(resolve, 800))
 
         const { data: roleData } = await supabase
@@ -64,7 +70,6 @@ export async function GET(request: NextRequest) {
 
         const roleName = (roleData?.roles as any)?.name
 
-        // Lógica de redirecionamento por papel com prefixo de locale
         let target = `/${locale}/dashboard`
         if (!roleName) target = `/${locale}/select-role`
         else if (roleName === 'admin') target = `/${locale}/admin`
@@ -79,6 +84,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Fallback para login localizado
   return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
 }

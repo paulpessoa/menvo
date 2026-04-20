@@ -11,10 +11,10 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookieOptions: {
-        domain: '.menvo.com.br',
         path: '/',
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 dias
+        maxAge: 60 * 60 * 24 * 7,
+        // REMOVIDO: domain hardcoded para deixar o browser decidir (resolve conflitos www)
       }
     }
   )
