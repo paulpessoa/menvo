@@ -13,7 +13,8 @@ import {
   Home,
   Building2,
   MessageSquare,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Star
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"

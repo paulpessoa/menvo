@@ -17,9 +17,6 @@ import {
   Search,
   Clock,
   CheckCircle,
-  ArrowRight,
-  Star,
-  MessageCircle,
   Heart,
   Loader2
 } from "lucide-react"

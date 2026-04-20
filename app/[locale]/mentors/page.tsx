@@ -6,7 +6,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -27,14 +27,11 @@ import {
   Users,
   Briefcase,
   Heart,
-  MessageCircle,
   Loader2,
   Building2,
-  Plus,
-  Star
+  Plus
 } from "lucide-react"
 
-import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 import { MentorCard } from "@/components/mentors/MentorCard"
@@ -107,7 +104,7 @@ export default function MentorsPage() {
   const [page, setPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
-  
+
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [availableFilters, setAvailableFilters] = useState({
     countries: [] as string[],
@@ -116,12 +113,13 @@ export default function MentorsPage() {
     languages: [] as string[],
     topics: [] as string[],
     inclusiveTags: [] as string[],
-    organizations: [] as { id: string, name: string }[]
+    organizations: [] as { id: string; name: string }[]
   })
 
   const supabase = createClient()
   const { user } = useAuth()
-  const { isModalOpen, openModal, closeModal, handleSubmit } = useMentorSuggestion()
+  const { isModalOpen, openModal, closeModal, handleSubmit } =
+    useMentorSuggestion()
   const { favorites, toggleFavorite } = useFavorites(user?.id)
 
   const fetchMentors = async (isInitial = false) => {
@@ -134,9 +132,8 @@ export default function MentorsPage() {
         setLoadingMore(true)
       }
 
-      let query = supabase
-        .from('mentors_view')
-        .select(`
+      let query = supabase.from("mentors_view").select(
+        `
           id,
           full_name,
           avatar_url,
@@ -158,65 +155,69 @@ export default function MentorsPage() {
           experience_years,
           slug,
           organization_ids
-        `, { count: 'exact' })
+        `,
+        { count: "exact" }
+      )
 
       // Apply Filters
-      if (filters.search && filters.search.trim() !== '') {
+      if (filters.search && filters.search.trim() !== "") {
         const searchTerm = `%${filters.search.trim()}%`
-        query = query.or(`full_name.ilike.${searchTerm},job_title.ilike.${searchTerm},company.ilike.${searchTerm},bio.ilike.${searchTerm}`)
+        query = query.or(
+          `full_name.ilike.${searchTerm},job_title.ilike.${searchTerm},company.ilike.${searchTerm},bio.ilike.${searchTerm}`
+        )
       }
 
-      if (filters.organizationId && filters.organizationId !== 'all') {
-        query = query.contains('organization_ids', [filters.organizationId])
+      if (filters.organizationId && filters.organizationId !== "all") {
+        query = query.contains("organization_ids", [filters.organizationId])
       }
 
-      if (filters.country && filters.country !== 'all') {
-        query = query.eq('country', filters.country)
+      if (filters.country && filters.country !== "all") {
+        query = query.eq("country", filters.country)
       }
 
-      if (filters.state && filters.state !== 'all') {
-        query = query.eq('state', filters.state)
+      if (filters.state && filters.state !== "all") {
+        query = query.eq("state", filters.state)
       }
 
-      if (filters.city && filters.city.trim() !== '') {
-        query = query.ilike('city', `%${filters.city.trim()}%`)
+      if (filters.city && filters.city.trim() !== "") {
+        query = query.ilike("city", `%${filters.city.trim()}%`)
       }
 
       if (filters.languages.length > 0) {
-        query = query.contains('languages', filters.languages)
+        query = query.contains("languages", filters.languages)
       }
 
       if (filters.topics.length > 0) {
-        query = query.contains('mentorship_topics', filters.topics)
+        query = query.contains("mentorship_topics", filters.topics)
       }
 
       if (filters.inclusiveTags.length > 0) {
-        query = query.contains('inclusion_tags', filters.inclusiveTags)
+        query = query.contains("inclusion_tags", filters.inclusiveTags)
       }
 
-      if (filters.availabilityStatus !== 'all') {
-        query = query.eq('availability_status', filters.availabilityStatus)
+      if (filters.availabilityStatus !== "all") {
+        query = query.eq("availability_status", filters.availabilityStatus)
       }
 
-      if (filters.experienceYears !== 'all') {
-        const parts = filters.experienceYears.split('-')
+      if (filters.experienceYears !== "all") {
+        const parts = filters.experienceYears.split("-")
         const min = parseInt(parts[0])
         const max = parts[1] ? parseInt(parts[1]) : null
-        
+
         if (!isNaN(min)) {
-          query = query.gte('experience_years', min)
+          query = query.gte("experience_years", min)
         }
         if (max && !isNaN(max)) {
-          query = query.lte('experience_years', max)
+          query = query.lte("experience_years", max)
         }
       }
 
       // Pagination
       const from = currentPage * ITEMS_PER_PAGE
       const to = from + ITEMS_PER_PAGE - 1
-      
+
       query = query
-        .order('average_rating', { ascending: false })
+        .order("average_rating", { ascending: false })
         .range(from, to)
 
       const { data, error, count } = await query
@@ -226,13 +227,13 @@ export default function MentorsPage() {
       if (isInitial) {
         setMentors(data || [])
       } else {
-        setMentors(prev => [...prev, ...(data || [])])
+        setMentors((prev) => [...prev, ...(data || [])])
       }
 
       setTotalCount(count || 0)
-      setHasMore((count || 0) > (from + (data?.length || 0)))
+      setHasMore((count || 0) > from + (data?.length || 0))
     } catch (error) {
-      console.error('Error fetching mentors:', error)
+      console.error("Error fetching mentors:", error)
       toast.error(t("errorLoadingMentors"))
     } finally {
       setLoading(false)
@@ -243,8 +244,10 @@ export default function MentorsPage() {
   const fetchFilterOptions = async () => {
     try {
       const { data, error } = await supabase
-        .from('mentors_view')
-        .select('country, state, city, languages, mentorship_topics, inclusion_tags')
+        .from("mentors_view")
+        .select(
+          "country, state, city, languages, mentorship_topics, inclusion_tags"
+        )
 
       if (error) throw error
 
@@ -255,7 +258,7 @@ export default function MentorsPage() {
       const topics = new Set<string>()
       const inclusiveTags = new Set<string>()
 
-      ;(data as any[])?.forEach(mentor => {
+      ;(data as any[])?.forEach((mentor) => {
         if (mentor.country) countries.add(mentor.country)
         if (mentor.state) states.add(mentor.state)
         if (mentor.city) cities.add(mentor.city)
@@ -266,10 +269,10 @@ export default function MentorsPage() {
 
       // Fetch active organizations
       const { data: orgData } = await supabase
-        .from('organizations')
-        .select('id, name')
-        .eq('status', 'active')
-        .order('name')
+        .from("organizations")
+        .select("id, name")
+        .eq("status", "active")
+        .order("name")
 
       setAvailableFilters({
         countries: Array.from(countries).sort(),
@@ -281,7 +284,7 @@ export default function MentorsPage() {
         organizations: orgData || []
       })
     } catch (error) {
-      console.error('Error fetching filter options:', error)
+      console.error("Error fetching filter options:", error)
     }
   }
 
@@ -296,20 +299,20 @@ export default function MentorsPage() {
   const activeFiltersCount = useMemo(() => {
     let count = 0
     if (filters.search) count++
-    if (filters.country !== 'all') count++
-    if (filters.state !== 'all') count++
+    if (filters.country !== "all") count++
+    if (filters.state !== "all") count++
     if (filters.city) count++
     if (filters.languages.length > 0) count++
     if (filters.topics.length > 0) count++
     if (filters.inclusiveTags.length > 0) count++
-    if (filters.availabilityStatus !== 'all') count++
-    if (filters.experienceYears !== 'all') count++
-    if (filters.organizationId !== 'all') count++
+    if (filters.availabilityStatus !== "all") count++
+    if (filters.experienceYears !== "all") count++
+    if (filters.organizationId !== "all") count++
     return count
   }, [filters])
 
   const handleLoadMore = () => {
-    setPage(prev => prev + 1)
+    setPage((prev) => prev + 1)
     fetchMentors(false)
   }
 
@@ -325,12 +328,8 @@ export default function MentorsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          {t("title")}
-        </h1>
-        <p className="text-gray-600">
-          {t("subtitle")}
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("title")}</h1>
+        <p className="text-gray-600">{t("subtitle")}</p>
       </div>
 
       {/* Search and Filter Bar */}
@@ -340,7 +339,9 @@ export default function MentorsPage() {
           <Input
             placeholder={t("searchPlaceholder")}
             value={filters.search}
-            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, search: e.target.value }))
+            }
             className="pl-10"
           />
         </div>
@@ -360,9 +361,7 @@ export default function MentorsPage() {
           <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>{t("sheetTitle")}</SheetTitle>
-              <SheetDescription>
-                {t("sheetDescription")}
-              </SheetDescription>
+              <SheetDescription>{t("sheetDescription")}</SheetDescription>
             </SheetHeader>
 
             <div className="mt-6 space-y-6 pb-8">
@@ -372,16 +371,21 @@ export default function MentorsPage() {
                   <Building2 className="h-4 w-4 mr-2 text-primary" />
                   {t("organization")}
                 </h3>
-                <Select value={filters.organizationId} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, organizationId: value }))
-                }>
+                <Select
+                  value={filters.organizationId}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, organizationId: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder={t("organizationPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t("allOrganizations")}</SelectItem>
-                    {availableFilters.organizations?.map(org => (
-                      <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
+                    {availableFilters.organizations?.map((org) => (
+                      <SelectItem key={org.id} value={org.id}>
+                        {org.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -392,16 +396,21 @@ export default function MentorsPage() {
                   <MapPin className="h-4 w-4 mr-2 text-primary" />
                   {t("state")}
                 </h3>
-                <Select value={filters.state} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, state: value }))
-                }>
+                <Select
+                  value={filters.state}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, state: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder={t("statePlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t("allStates")}</SelectItem>
-                    {availableFilters.states.map(state => (
-                      <SelectItem key={state} value={state}>{state}</SelectItem>
+                    {availableFilters.states.map((state) => (
+                      <SelectItem key={state} value={state}>
+                        {state}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -413,16 +422,24 @@ export default function MentorsPage() {
                     <MapPin className="h-4 w-4 mr-2 text-primary" />
                     {t("city")}
                   </h3>
-                  <Select value={filters.city || "all"} onValueChange={(value) =>
-                    setFilters(prev => ({ ...prev, city: value === "all" ? "" : value }))
-                  }>
+                  <Select
+                    value={filters.city || "all"}
+                    onValueChange={(value) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        city: value === "all" ? "" : value
+                      }))
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder={t("cityPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">{t("allCities")}</SelectItem>
-                      {availableFilters.cities.map(city => (
-                        <SelectItem key={city} value={city}>{city}</SelectItem>
+                      {availableFilters.cities.map((city) => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -432,16 +449,18 @@ export default function MentorsPage() {
               <div className="space-y-3">
                 <h3 className="font-medium">{t("topics")}</h3>
                 <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pt-1">
-                  {availableFilters.topics.map(topic => (
+                  {availableFilters.topics.map((topic) => (
                     <Badge
                       key={topic}
-                      variant={filters.topics.includes(topic) ? "default" : "outline"}
+                      variant={
+                        filters.topics.includes(topic) ? "default" : "outline"
+                      }
                       className="cursor-pointer"
                       onClick={() => {
-                        setFilters(prev => ({
+                        setFilters((prev) => ({
                           ...prev,
                           topics: prev.topics.includes(topic)
-                            ? prev.topics.filter(t => t !== topic)
+                            ? prev.topics.filter((t) => t !== topic)
                             : [...prev.topics, topic]
                         }))
                       }}
@@ -458,16 +477,20 @@ export default function MentorsPage() {
                   {t("inclusiveTags")}
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {availableFilters.inclusiveTags.map(tag => (
+                  {availableFilters.inclusiveTags.map((tag) => (
                     <Badge
                       key={tag}
-                      variant={filters.inclusiveTags.includes(tag) ? "default" : "outline"}
+                      variant={
+                        filters.inclusiveTags.includes(tag)
+                          ? "default"
+                          : "outline"
+                      }
                       className="cursor-pointer"
                       onClick={() => {
-                        setFilters(prev => ({
+                        setFilters((prev) => ({
                           ...prev,
                           inclusiveTags: prev.inclusiveTags.includes(tag)
-                            ? prev.inclusiveTags.filter(t => t !== tag)
+                            ? prev.inclusiveTags.filter((t) => t !== tag)
                             : [...prev.inclusiveTags, tag]
                         }))
                       }}
@@ -483,15 +506,23 @@ export default function MentorsPage() {
                   <Clock className="h-4 w-4 mr-2 text-primary" />
                   {t("availability")}
                 </h3>
-                <Select value={filters.availabilityStatus} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, availabilityStatus: value }))
-                }>
+                <Select
+                  value={filters.availabilityStatus}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      availabilityStatus: value
+                    }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder={t("availabilityPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t("anyStatus")}</SelectItem>
-                    <SelectItem value="available">{t("status.available")}</SelectItem>
+                    <SelectItem value="available">
+                      {t("status.available")}
+                    </SelectItem>
                     <SelectItem value="busy">{t("status.busy")}</SelectItem>
                   </SelectContent>
                 </Select>
@@ -502,9 +533,12 @@ export default function MentorsPage() {
                   <Briefcase className="h-4 w-4 mr-2 text-primary" />
                   {t("experience")}
                 </h3>
-                <Select value={filters.experienceYears} onValueChange={(value) =>
-                  setFilters(prev => ({ ...prev, experienceYears: value }))
-                }>
+                <Select
+                  value={filters.experienceYears}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, experienceYears: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder={t("experiencePlaceholder")} />
                   </SelectTrigger>
@@ -547,7 +581,9 @@ export default function MentorsPage() {
       ) : mentors.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-lg border border-dashed">
           <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">{t("noMentorsTitle")}</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            {t("noMentorsTitle")}
+          </h3>
           <p className="text-gray-600 mt-2 mb-6">{t("noMentorsDescription")}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
@@ -566,9 +602,9 @@ export default function MentorsPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mentors.map((mentor) => (
-              <MentorCard 
-                key={mentor.id} 
-                mentor={mentor} 
+              <MentorCard
+                key={mentor.id}
+                mentor={mentor}
                 isFavorite={favorites.includes(mentor.id)}
                 onToggleFavorite={() => toggleFavorite(mentor.id)}
               />

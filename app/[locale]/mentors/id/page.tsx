@@ -6,17 +6,20 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
-  BookOpen,
   Briefcase,
   Calendar,
   Clock,
-  ExternalLink,
   Flag,
-  Globe,
   GraduationCap,
   Heart,
   Linkedin,
@@ -52,13 +55,19 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
     return (
       <div className="container flex flex-col items-center justify-center min-h-[60vh] py-12">
         <Shield className="h-12 w-12 text-primary mb-4" />
-        <h2 className="text-2xl font-bold mb-2">{t("mentors.loginRequired.title")}</h2>
+        <h2 className="text-2xl font-bold mb-2">
+          {t("mentors.loginRequired.title")}
+        </h2>
         <p className="text-muted-foreground mb-6 max-w-md text-center">
           {t("mentors.loginRequired.descriptionWithName", { mentorName: "" })}
         </p>
         <div className="flex gap-4">
-          <Button onClick={() => setShowLoginModal(true)}>{t("mentors.loginRequired.login")}</Button>
-          <Button variant="outline" onClick={() => setShowLoginModal(true)}>{t("mentors.loginRequired.signUp")}</Button>
+          <Button onClick={() => setShowLoginModal(true)}>
+            {t("mentors.loginRequired.login")}
+          </Button>
+          <Button variant="outline" onClick={() => setShowLoginModal(true)}>
+            {t("mentors.loginRequired.signUp")}
+          </Button>
         </div>
         <LoginRequiredModal
           isOpen={showLoginModal}
@@ -114,7 +123,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
       await navigator.share({
         title: `${mentor.first_name} ${mentor.last_name} - Mentor na Menvo`,
         text: mentor.bio || "Conheça este mentor incrível!",
-        url: window.location.href,
+        url: window.location.href
       })
     } catch (error) {
       // Fallback for browsers that don't support Web Share API
@@ -138,7 +147,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
   const formatExperience = () => {
     if (!mentor.years_experience) return null
     const years = mentor.years_experience
-    return `${years} ${years === 1 ? 'ano' : 'anos'} de experiência`
+    return `${years} ${years === 1 ? "ano" : "anos"} de experiência`
   }
 
   const formatLanguages = () => {
@@ -148,26 +157,26 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
 
   const getAvailabilityStatus = () => {
     switch (mentor.availability) {
-      case 'available':
+      case "available":
         return {
-          text: 'Disponível',
-          variant: 'default' as const,
+          text: "Disponível",
+          variant: "default" as const,
           icon: CheckCircle,
-          color: 'text-green-600'
+          color: "text-green-600"
         }
-      case 'busy':
+      case "busy":
         return {
-          text: 'Ocupado',
-          variant: 'secondary' as const,
+          text: "Ocupado",
+          variant: "secondary" as const,
           icon: Clock,
-          color: 'text-yellow-600'
+          color: "text-yellow-600"
         }
       default:
         return {
-          text: 'Indisponível',
-          variant: 'outline' as const,
+          text: "Indisponível",
+          variant: "outline" as const,
           icon: Clock,
-          color: 'text-gray-600'
+          color: "text-gray-600"
         }
     }
   }
@@ -202,7 +211,10 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     {mentor.first_name} {mentor.last_name}
                   </h1>
                   {mentor.verified_at && (
-                    <Badge variant="outline" className="flex items-center gap-1 border-blue-200 text-blue-700">
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1 border-blue-200 text-blue-700"
+                    >
                       <Shield className="h-3 w-3" />
                       Verificado
                     </Badge>
@@ -215,7 +227,8 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                       <Briefcase className="h-4 w-4" />
                       <span>
                         {mentor.current_position}
-                        {mentor.current_company && ` na ${mentor.current_company}`}
+                        {mentor.current_company &&
+                          ` na ${mentor.current_company}`}
                       </span>
                     </div>
                   )}
@@ -285,17 +298,36 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                 <Calendar className="h-4 w-4" />
                 <span>Agendar Sessão</span>
               </Button>
-              <Button variant="outline" onClick={handleSendMessage} className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleSendMessage}
+                className="flex gap-2"
+              >
                 <MessageSquare className="h-4 w-4" />
                 <span>Enviar Mensagem</span>
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleSaveToFavorites} aria-label="Salvar nos favoritos">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSaveToFavorites}
+                aria-label="Salvar nos favoritos"
+              >
                 <Heart className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleShare} aria-label="Compartilhar perfil">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleShare}
+                aria-label="Compartilhar perfil"
+              >
                 <Share2 className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleReport} aria-label="Denunciar">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleReport}
+                aria-label="Denunciar"
+              >
                 <Flag className="h-5 w-5" />
               </Button>
             </div>
@@ -322,13 +354,19 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
 
                 {mentor.current_position && (
                   <div>
-                    <h2 className="text-xl font-semibold mb-3">Experiência Profissional</h2>
+                    <h2 className="text-xl font-semibold mb-3">
+                      Experiência Profissional
+                    </h2>
                     <div className="flex gap-3">
                       <Briefcase className="h-5 w-5 text-muted-foreground mt-0.5" />
                       <div>
-                        <h3 className="font-medium">{mentor.current_position}</h3>
+                        <h3 className="font-medium">
+                          {mentor.current_position}
+                        </h3>
                         {mentor.current_company && (
-                          <p className="text-muted-foreground">{mentor.current_company}</p>
+                          <p className="text-muted-foreground">
+                            {mentor.current_company}
+                          </p>
                         )}
                         {mentor.years_experience && (
                           <p className="text-sm text-muted-foreground">
@@ -346,7 +384,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     <div className="flex gap-3">
                       <GraduationCap className="h-5 w-5 text-muted-foreground mt-0.5" />
                       <div>
-                        <h3 className="font-medium">{mentor.education_level}</h3>
+                        <h3 className="font-medium">
+                          {mentor.education_level}
+                        </h3>
                       </div>
                     </div>
                   </div>
@@ -358,7 +398,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     <div className="flex gap-3">
                       <Languages className="h-5 w-5 text-muted-foreground mt-0.5" />
                       <div>
-                        <p className="text-muted-foreground">{formatLanguages()}</p>
+                        <p className="text-muted-foreground">
+                          {formatLanguages()}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -368,10 +410,16 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
               <TabsContent value="expertise" className="space-y-6 pt-4">
                 {mentor.mentor_skills.length > 0 && (
                   <div>
-                    <h2 className="text-xl font-semibold mb-3">Áreas de Especialidade</h2>
+                    <h2 className="text-xl font-semibold mb-3">
+                      Áreas de Especialidade
+                    </h2>
                     <div className="flex flex-wrap gap-2">
                       {mentor.mentor_skills.map((skill) => (
-                        <Badge key={skill} variant="secondary" className="text-sm py-1 px-3">
+                        <Badge
+                          key={skill}
+                          variant="secondary"
+                          className="text-sm py-1 px-3"
+                        >
                           {skill}
                         </Badge>
                       ))}
@@ -380,7 +428,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                 )}
 
                 <div>
-                  <h2 className="text-xl font-semibold mb-3">Como posso ajudar</h2>
+                  <h2 className="text-xl font-semibold mb-3">
+                    Como posso ajudar
+                  </h2>
                   <div className="bg-muted/50 p-4 rounded-lg">
                     <p className="text-muted-foreground">
                       Este mentor pode ajudar você com conhecimentos em{" "}
@@ -389,7 +439,11 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                       </span>
                       {mentor.mentor_skills.length > 3 && " e mais"}.
                       {mentor.years_experience && (
-                        <> Com {formatExperience()}, posso compartilhar experiências práticas e orientação personalizada.</>
+                        <>
+                          {" "}
+                          Com {formatExperience()}, posso compartilhar
+                          experiências práticas e orientação personalizada.
+                        </>
                       )}
                     </p>
                   </div>
@@ -399,7 +453,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
               <TabsContent value="availability" className="pt-4">
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-xl font-semibold mb-2">Disponibilidade</h2>
+                    <h2 className="text-xl font-semibold mb-2">
+                      Disponibilidade
+                    </h2>
                     <p className="text-muted-foreground">
                       Agende uma sessão de mentoria gratuita de 45 minutos.
                     </p>
@@ -409,23 +465,32 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     <Card>
                       <CardContent className="p-6">
                         <div className="flex items-center gap-3 mb-4">
-                          <availabilityStatus.icon className={`h-5 w-5 ${availabilityStatus.color}`} />
-                          <span className="font-medium">Status: {availabilityStatus.text}</span>
+                          <availabilityStatus.icon
+                            className={`h-5 w-5 ${availabilityStatus.color}`}
+                          />
+                          <span className="font-medium">
+                            Status: {availabilityStatus.text}
+                          </span>
                         </div>
 
-                        {mentor.availability === 'available' ? (
+                        {mentor.availability === "available" ? (
                           <div className="space-y-4">
                             <p className="text-muted-foreground">
-                              Este mentor está disponível para novas sessões de mentoria.
+                              Este mentor está disponível para novas sessões de
+                              mentoria.
                             </p>
-                            <Button onClick={handleScheduleSession} className="w-full">
+                            <Button
+                              onClick={handleScheduleSession}
+                              className="w-full"
+                            >
                               Ver Horários Disponíveis
                             </Button>
                           </div>
                         ) : (
                           <div className="space-y-4">
                             <p className="text-muted-foreground">
-                              Este mentor está temporariamente indisponível para novas sessões.
+                              Este mentor está temporariamente indisponível para
+                              novas sessões.
                             </p>
                             <Button disabled className="w-full">
                               Indisponível
@@ -445,7 +510,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                       <li>• Sessões de 45 minutos</li>
                       <li>• Realizadas por videochamada</li>
                       <li>• Completamente gratuitas</li>
-                      <li>• Cancelamentos devem ser feitos com 24h de antecedência</li>
+                      <li>
+                        • Cancelamentos devem ser feitos com 24h de antecedência
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -458,7 +525,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Agendar Sessão</CardTitle>
-                <CardDescription>Reserve uma sessão gratuita de mentoria</CardDescription>
+                <CardDescription>
+                  Reserve uma sessão gratuita de mentoria
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
@@ -471,16 +540,21 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Disponibilidade</span>
-                  <Badge variant={availabilityStatus.variant} className={availabilityStatus.color}>
+                  <Badge
+                    variant={availabilityStatus.variant}
+                    className={availabilityStatus.color}
+                  >
                     {availabilityStatus.text}
                   </Badge>
                 </div>
                 <Button
                   onClick={handleScheduleSession}
-                  disabled={mentor.availability !== 'available'}
+                  disabled={mentor.availability !== "available"}
                   className="w-full"
                 >
-                  {mentor.availability === 'available' ? 'Verificar Disponibilidade' : 'Indisponível'}
+                  {mentor.availability === "available"
+                    ? "Verificar Disponibilidade"
+                    : "Indisponível"}
                 </Button>
               </CardContent>
             </Card>
@@ -490,7 +564,11 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                 <CardTitle>Informações de Contato</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" onClick={handleSendMessage} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={handleSendMessage}
+                  className="w-full"
+                >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Enviar Mensagem
                 </Button>
@@ -504,7 +582,9 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
               <CardContent className="space-y-3">
                 {mentor.total_sessions && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Sessões realizadas</span>
+                    <span className="text-muted-foreground">
+                      Sessões realizadas
+                    </span>
                     <span className="font-medium">{mentor.total_sessions}</span>
                   </div>
                 )}
@@ -513,14 +593,19 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
                     <span className="text-muted-foreground">Avaliação</span>
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{mentor.rating.toFixed(1)}</span>
+                      <span className="font-medium">
+                        {mentor.rating.toFixed(1)}
+                      </span>
                     </div>
                   </div>
                 )}
                 {mentor.verified_at && (
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Status</span>
-                    <Badge variant="outline" className="border-blue-200 text-blue-700">
+                    <Badge
+                      variant="outline"
+                      className="border-blue-200 text-blue-700"
+                    >
                       <Shield className="h-3 w-3 mr-1" />
                       Verificado
                     </Badge>
