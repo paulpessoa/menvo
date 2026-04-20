@@ -66,7 +66,25 @@ export default function SettingsPage() {
 
     setIsChangingPassword(true)
     try {
-      // Implementar lógica de mudança de senha via Supabase
+      const supabase = createClient()
+      
+      // 1. Re-autenticar o usuário com a senha atual para validar a troca (Padrão de Segurança)
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || "",
+        password: currentPassword,
+      })
+
+      if (signInError) {
+        throw new Error(t("security.invalidCurrentPassword" ? t("security.invalidCurrentPassword") : "Senha atual incorreta"))
+      }
+
+      // 2. Atualizar para a nova senha
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (updateError) throw updateError
+
       toast({
         title: commonT("success"),
         description: t("security.success"),
@@ -74,10 +92,10 @@ export default function SettingsPage() {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: commonT("error"),
-        description: t("security.error"),
+        description: error.message || t("security.error"),
         variant: "destructive",
       })
     } finally {
