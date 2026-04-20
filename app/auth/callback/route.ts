@@ -8,19 +8,10 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type")
   const tokenHash = requestUrl.searchParams.get("token_hash")
   
-  // LOG DE DEPURAÇÃO: Ver o que está chegando
   const cookieStore = await cookies()
-  const allCookies = cookieStore.getAll()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
   
-  console.log(`[AUTH DEBUG] Callback Path: ${requestUrl.pathname}`)
-  console.log(`[AUTH DEBUG] Full URL: ${request.url}`)
-  console.log(`[AUTH DEBUG] Total Cookies: ${allCookies.length}`)
-  console.log(`[AUTH DEBUG] Cookies Names: ${allCookies.map(c => c.name).join(', ')}`)
-  
-  // Procurar especificamente pelo verifier do PKCE
-  const hasVerifier = allCookies.some(c => c.name.includes('code-verifier'))
-  console.log(`[AUTH DEBUG] PKCE Verifier Found: ${hasVerifier}`)
+  console.log(`[AUTH DEBUG] Code present: ${!!code}, Type: ${type}, Locale: ${locale}`)
 
   // 1. Handle Email Verifications / Recovery
   if (type && (tokenHash || code)) {
@@ -54,9 +45,12 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
-        console.error("[AUTH CALLBACK] OAuth exchange error:", error)
-        // Se falhar a troca no servidor, mandamos para o cliente tentar o resgate
-        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_exchange_failed&code=${code}`, request.url))
+        console.error("❌ [AUTH CALLBACK] Server exchange failed, triggering Client Rescue:", error.message)
+        
+        // ESTRATÉGIA DE RESGATE FINAL: Se o servidor falhou (erro 4/0A), 
+        // mandamos para o CLIENTE trocar o código. O navegador tem acesso 
+        // garantido ao cookie de PKCE verifier que o servidor não conseguiu ler.
+        return NextResponse.redirect(new URL(`/auth/callback/client-side?code=${code}`, request.url))
       }
 
       if (data.user) {
@@ -80,7 +74,7 @@ export async function GET(request: NextRequest) {
       }
     } catch (error) {
       console.error("[AUTH CALLBACK] Unexpected error:", error)
-      return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url))
+      return NextResponse.redirect(new URL(`/auth/callback/client-side?code=${code}`, request.url))
     }
   }
 
