@@ -33,6 +33,7 @@ interface AuthContextType {
     needsRoleSelection: () => boolean
     signIn: (email: string, password: string) => Promise<void>
     signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
+    signInWithGoogleNew: () => Promise<void> // NOVO MÉTODO
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
     getDefaultRedirectPath: () => string
@@ -106,6 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } catch (err) {
                 console.error('Auth initialization error:', err)
             } finally {
+                // GARANTIA: Nunca deixa o app em loading infinito
                 setIsInitializing(false)
             }
         }
@@ -125,16 +127,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setSession(newSession)
                 setUser(newSession.user)
                 
-                if (event === 'SIGNED_IN' || !profile) {
+                // Se o perfil já existe, não refetch no loop
+                if (!profile || event === 'SIGNED_IN') {
                     const userProfile = await fetchProfile(newSession.user.id)
                     setProfile(userProfile)
-                    setIsInitializing(false)
                 }
+                setIsInitializing(false)
             }
         })
 
         return () => subscription.unsubscribe()
-    }, [supabase, fetchProfile])
+    }, [supabase, fetchProfile, profile])
 
     const signIn = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -143,13 +146,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
         const supabaseProvider = provider === 'linkedin' ? 'linkedin_oidc' : provider
-        
-        // Uso de redirectTo direto e sem frescuras
         const { error } = await supabase.auth.signInWithOAuth({
             provider: supabaseProvider as any,
             options: {
                 redirectTo: `${window.location.origin}/auth/callback`,
             },
+        })
+        if (error) throw error
+    }, [supabase])
+
+    // NOVO MÉTODO: BASEADO NO SCRIPT DE SUCESSO DO USUÁRIO
+    const signInWithGoogleNew = useCallback(async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: `${window.location.origin}/auth/callback`,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent'
+                }
+            }
         })
         if (error) throw error
     }, [supabase])
@@ -219,10 +235,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         needsRoleSelection,
         signIn,
         signInWithProvider,
+        signInWithGoogleNew,
         refreshProfile,
         signOut,
         getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, signInWithGoogleNew, refreshProfile, getDefaultRedirectPath])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
