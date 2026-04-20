@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type")
   const tokenHash = requestUrl.searchParams.get("token_hash")
   
-  // Detectar idioma preferido via cookie ou padrão pt-BR
+  // FIX 20-04-26: Detectar locale via cookie NEXT_LOCALE ou padrão pt-BR
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
 
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
       if (verifyResult?.error) throw verifyResult.error
 
-      // Se for recuperação de senha, mandamos para o formulário de update
+      // Se for recuperação de senha, mandamos para o formulário de update localizado
       const target = type === 'recovery' ? `/${locale}/update-password` : `/${locale}/dashboard`
       return NextResponse.redirect(new URL(target, request.url))
     } catch (error) {
@@ -48,8 +48,8 @@ export async function GET(request: NextRequest) {
 
       if (error) {
         console.error("[AUTH CALLBACK] OAuth exchange error:", error)
-        // Tentativa de resgate PKCE via redirecionamento de cliente se falhar no servidor
-        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_mismatch&code=${code}`, request.url))
+        // Redirecionamento amigável com locale em caso de falha de troca de código
+        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_error`, request.url))
       }
 
       if (data.user) {
@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
 
         const roleName = (roleData?.roles as any)?.name
 
+        // Lógica de redirecionamento por papel com prefixo de locale
         let target = `/${locale}/dashboard`
         if (!roleName) target = `/${locale}/select-role`
         else if (roleName === 'admin') target = `/${locale}/admin`
@@ -78,6 +79,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Fallback para login
+  // Fallback para login localizado
   return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
 }

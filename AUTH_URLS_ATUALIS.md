@@ -1,91 +1,56 @@
-GOOGLE:
+# 🕵️ REVISÃO FINAL DE URLs (20-04-2026)
 
-Origens JavaScript autorizadas
-Para usar com solicitações de um navegador
+Este documento identifica o que deve ser mantido ou removido nos painéis externos baseado na nova arquitetura blindada.
 
-https://menvo.com.br
-https://evxrzmzkghshjmmyegxu.supabase.co
-http://localhost:3000
+---
 
-URIs de redirecionamento autorizados
-https://menvo.com.br/auth/userinfo.email
-https://menvo.com.br
-https://evxrzmzkghshjmmyegxu.supabase.co
-https://menvo.com.br/auth/userinfo.profile
-https://evxrzmzkghshjmmyegxu.supabase.co/auth/v1/callback
-https://menvo.com.br/api/auth/google-calendar/callback
-http://localhost:3000/api/auth/google-calendar/callback
-https://menvo.com.br/setup/google-calendar/callback
-http://localhost:3000/setup/google-calendar/callback
-https://menvo.com.br/auth/callback
-https://menvo.com.br/callback
+## 🔵 GOOGLE CLOUD CONSOLE
 
-LINKEDIN
-OAuth 2.0 settings
+### Origens JavaScript autorizadas
+* `https://menvo.com.br` -> **MANTER**
+* `http://localhost:3000` -> **MANTER**
+* `https://evxrzmzkghshjmmyegxu.supabase.co` -> **REMOVER** (Google não precisa disso aqui)
 
-Authorized redirect URLs for your app
+### URIs de redirecionamento autorizados
+* `https://evxrzmzkghshjmmyegxu.supabase.co/auth/v1/callback` -> **MANTER (O MAIS IMPORTANTE)**
+* `https://menvo.com.br/api/auth/google-calendar/callback` -> **MANTER** (Para integração de agenda)
+* `http://localhost:3000/api/auth/google-calendar/callback` -> **MANTER**
+* `https://menvo.com.br/auth/callback` -> **REMOVER** (Google não fala direto com o Menvo no login)
+* `https://menvo.com.br` -> **REMOVER**
+* `https://menvo.com.br/auth/userinfo.email` -> **REMOVER** (Isso é escopo, não URL)
 
-https://www.linkedin.com/developers/tools/oauth/redirect
-https://evxrzmzkghshjmmyegxu.supabase.co/auth/v1/callback
-https://menvo.com.br/auth/callback
-http://localhost:3000/auth/callback
-http://localhost:3000/
-https://v0-volunteer-mentor-platform.vercel.app/api/auth/linkedin
-https://menvo.com.br/auth/auth/v1/callback
-https://www.menvo.com.br/auth/auth/v1/callback
-https://www.menvo.com.br/auth/callback
-https://menvo.com.br
-https://www.menvo.com.br
-https://www.menvo.com.br/api/auth/callback
-https://menvo.com.br/api/auth/callback
+---
 
-Widgets
-Domains:
-https://menvo.com.br/auth/callback
-https://menvo.com.br
-https://www.menvo.com.br/auth/callback
-https://www.menvo.com.br
-https://menvo.com.br/aí/auth/callback
-https://www.menvo.com.br/api/auth/callback
-https://menvo.com.br/callback
-https://www.menvo.com.br/callback
+## 🔗 LINKEDIN DEVELOPERS
 
-SUPABASE:
+### Authorized redirect URLs
+* `https://evxrzmzkghshjmmyegxu.supabase.co/auth/v1/callback` -> **MANTER (O MAIS IMPORTANTE)**
+* `https://www.menvo.com.br/auth/callback` -> **REMOVER** (LinkedIn fala apenas com o Supabase)
+* `https://www.menvo.com.br/api/auth/callback` -> **REMOVER**
+* Todas as URLs `vercel.app` -> **REMOVER** (Use apenas o domínio oficial e o Supabase)
 
-Site URL:
-https://menvo.com.br/
+---
 
-Redirect URLs
-URLs that auth providers are permitted to redirect to post authentication. Wildcards are allowed, for example, https://\*.domain.com
+## ⚡ SUPABASE DASHBOARD
 
-https://v0-volunteer-mentor-platform-paul-pessoas-projects.vercel.app/
-https://v0-volunteer-mentor-platform-paul-pessoas-projects.vercel.app/**
-https://v0-_-volunteer-mentor-platform-paul-pessoas-projects.vercel.app
-https://v0-_-volunteer-mentor-platform-paul-pessoas-projects.vercel.app/**
-http://localhost:3000/
-http://localhost:3000/**
-https://menvo.com.br/**
-https://menvo-paul-pessoas-projects.vercel.app/
-https://menvo-paul-pessoas-projects.vercel.app/**
-https://menvo-_-paul-pessoas-projects.vercel.app
-https://menvo-_-paul-pessoas-projects.vercel.app/**
-https://menvo-paul-pessoa.vercel.app/
-https://menvo-paul-pessoa.vercel.app/**
-https://menvo-_-paul-pessoa.vercel.app
-https://menvo-_-paul-pessoa.vercel.app/**
-http://localhost:3000/update-password
-https://menvo.com.br/update-password
-https://menvo-r7h8f0juo-paul-pessoas-projects.vercel.app/*
-https://menvo.com.br/reset-password
-http://localhost:3000/reset-password
-https://www.menvo.com.br/auth/reset-password
-http://localhost:3000/auth/reset-password
-https://menvo.com.br/auth/reset-password
-https://menvo.com.br/auth/callback?type=recovery
-http://localhost:3000/auth/callback?type=recovery
-https://menvo.com.br/api/auth/google-calendar/callback
-https://menvo.com.br/auth/callback
-http://localhost:3000/auth/callback
-https://menvo.com.br/callback
-http://localhost:3000/callback
-https://www.menvo.com.br/callback
+### Site URL
+* `https://menvo.com.br/` -> **MANTER**
+
+### Redirect URLs
+* `https://www.menvo.com.br/auth/callback` -> **MANTER (ÚNICA NECESSÁRIA PARA O AUTH NOVO)**
+* `https://menvo.com.br/**` -> **MANTER** (Curinga de segurança)
+* `http://localhost:3000/**` -> **MANTER**
+* `https://menvo.com.br/reset-password` -> **MANTER**
+* `https://menvo.com.br/update-password` -> **MANTER**
+* Qualquer URL com `/api/auth/callback` -> **REMOVER** (Mudamos para `/auth/callback` sem o `api`)
+* Qualquer URL com `/pt-BR/` ou outro idioma -> **REMOVER** (O middleware novo lida com isso)
+
+---
+
+## 🧠 RESUMO STAFF
+O fluxo agora é:
+1. Usuário clica no Menvo.
+2. Vai para o Google/LinkedIn.
+3. Google/LinkedIn devolve para o **Supabase**.
+4. Supabase devolve para o Menvo em **`/auth/callback`**.
+5. O Menvo detecta o idioma e joga para o **Dashboard**.

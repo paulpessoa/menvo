@@ -35,6 +35,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(cleanPath, request.url))
   }
 
+  // FIX 20-04-26: Antes de qualquer coisa — deixar o callback do Supabase passar sem i18n
+  if (pathname === '/auth/callback' || pathname.startsWith('/auth/callback')) {
+    return NextResponse.next()
+  }
+
   // 2. Handle i18n routing
   const response = handleI18nRouting(request)
 
