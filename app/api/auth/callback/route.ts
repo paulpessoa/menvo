@@ -6,75 +6,56 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
   const type = requestUrl.searchParams.get("type")
-  const tokenHash = requestUrl.searchParams.get("token_hash")
+  const next = requestUrl.searchParams.get("next") || "/dashboard"
   
   // Detectar locale via cookie ou padrão pt-BR
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
 
-  console.log(`[AUTH CALLBACK] Final Exchange - Code: ${!!code}, Type: ${type}, Locale: ${locale}`)
+  console.log(`[AUTH CALLBACK] Iniciando troca de código. Code: ${!!code}, Locale: ${locale}`)
 
-  // 1. Handle Email Verifications / Recovery
-  if (type && (tokenHash || code)) {
-    try {
-      const supabase = await createClient()
-      let verifyResult: any
-      
-      if (tokenHash) {
-        verifyResult = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: type as any
-        })
-      } else if (code) {
-        verifyResult = await supabase.auth.exchangeCodeForSession(code)
-      }
-
-      if (verifyResult?.error) throw verifyResult.error
-
-      const target = type === 'recovery' ? `/${locale}/update-password` : `/${locale}/dashboard`
-      return NextResponse.redirect(new URL(target, request.url))
-    } catch (error) {
-      console.error(`[AUTH CALLBACK] Email error:`, error)
-      return NextResponse.redirect(new URL(`/${locale}/login?error=auth_error`, request.url))
-    }
-  }
-
-  // 2. Handle OAuth callback (Google/LinkedIn)
   if (code) {
-    try {
-      const supabase = await createClient()
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    const supabase = await createClient()
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
-      if (error) {
-        console.error("[AUTH CALLBACK] Server exchange failed:", error.message)
-        // Redireciona para o login com o código para tentar o resgate no cliente se necessário
-        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_failed`, request.url))
-      }
+    if (!error && data.user) {
+      // SUCESSO: O código foi trocado por uma sessão real
+      console.log(`[AUTH CALLBACK] Troca bem-sucedida para o usuário: ${data.user.id}`)
 
-      if (data.user) {
-        await new Promise((resolve) => setTimeout(resolve, 800))
-
+      // 1. Verificar se o perfil e a role já existem (triggers do Supabase podem levar milissegundos)
+      let roleName = null
+      let attempts = 0
+      
+      while (!roleName && attempts < 3) {
         const { data: roleData } = await supabase
           .from("user_roles")
           .select(`roles (name)`)
           .eq("user_id", data.user.id)
           .single()
-
-        const roleName = (roleData?.roles as any)?.name
-
-        let target = `/${locale}/dashboard`
-        if (!roleName) target = `/${locale}/select-role`
-        else if (roleName === 'admin') target = `/${locale}/admin`
-        else if (roleName === 'mentor') target = `/${locale}/dashboard/mentor`
-        else if (roleName === 'mentee') target = `/${locale}/dashboard/mentee`
-
-        return NextResponse.redirect(new URL(target, request.url))
+        
+        roleName = (roleData?.roles as any)?.name
+        if (!roleName) {
+            console.log(`[AUTH CALLBACK] Role não encontrada, tentativa ${attempts + 1}...`)
+            await new Promise(resolve => setTimeout(resolve, 500))
+            attempts++
+        }
       }
-    } catch (error) {
-      console.error("[AUTH CALLBACK] Unexpected error:", error)
-      return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url))
+
+      // 2. Definir destino com base na role
+      let targetPath = `/${locale}/dashboard`
+      if (!roleName) targetPath = `/${locale}/select-role`
+      else if (roleName === 'admin') targetPath = `/${locale}/admin`
+      else if (roleName === 'mentor') targetPath = `/${locale}/dashboard/mentor`
+      else if (roleName === 'mentee') targetPath = `/${locale}/dashboard/mentee`
+
+      console.log(`[AUTH CALLBACK] Redirecionando para: ${targetPath}`)
+      return NextResponse.redirect(new URL(targetPath, request.url))
+    } else {
+      console.error("[AUTH CALLBACK] Erro na troca de código:", error?.message)
     }
   }
 
-  return NextResponse.redirect(new URL(`/${locale}/login`, request.url))
+  // Se chegou aqui sem sucesso ou sem código, volta para o login com erro limpo
+  console.log("[AUTH CALLBACK] Falha total, voltando para o login.")
+  return NextResponse.redirect(new URL(`/${locale}/login?error=auth_failed`, request.url))
 }

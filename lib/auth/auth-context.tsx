@@ -141,11 +141,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setSession(newSession)
                 setUser(newSession.user)
                 
-                if (event === 'SIGNED_IN' || !profile) {
-                    const userProfile = await fetchProfile(newSession.user.id)
-                    if (mounted) setProfile(userProfile)
-                }
-                if (mounted) setIsInitializing(false)
+                // Busca perfil de forma assíncrona sem travar o estado do usuário
+                fetchProfile(newSession.user.id).then(userProfile => {
+                    if (mounted) {
+                        setProfile(userProfile)
+                        setIsInitializing(false)
+                    }
+                })
+            } else {
+                setIsInitializing(false)
             }
         })
 
