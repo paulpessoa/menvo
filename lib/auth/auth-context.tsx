@@ -34,6 +34,8 @@ interface AuthContextType {
     signIn: (email: string, password: string) => Promise<void>
     signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
     signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
+    selectRole: (role: 'mentor' | 'mentee') => Promise<void>
+    getRoleDashboardPath: (roleName?: string) => string
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
     getDefaultRedirectPath: () => string
@@ -141,7 +143,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setSession(newSession)
                 setUser(newSession.user)
                 
-                // Busca perfil de forma assíncrona sem travar o estado do usuário
                 fetchProfile(newSession.user.id).then(userProfile => {
                     if (mounted) {
                         setProfile(userProfile)
@@ -195,6 +196,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
         if (error) throw error
     }, [supabase])
+
+    const selectRole = useCallback(async (roleName: 'mentor' | 'mentee') => {
+        if (!user) throw new Error('User not authenticated')
+        
+        // 1. Buscar o ID da role
+        const { data: roleData, error: roleError } = await supabase
+            .from('roles')
+            .select('id')
+            .eq('name', roleName)
+            .single()
+        
+        if (roleError) throw roleError
+
+        // 2. Inserir na user_roles
+        const { error: insertError } = await supabase
+            .from('user_roles')
+            .insert({
+                user_id: user.id,
+                role_id: roleData.id
+            })
+        
+        if (insertError) throw insertError
+
+        await refreshProfile()
+    }, [user, supabase, refreshProfile])
+
+    const getRoleDashboardPath = useCallback((roleName?: string) => {
+        const r = roleName || profile?.roles?.[0]
+        if (r === 'admin') return '/admin'
+        if (r === 'mentor') return '/dashboard/mentor'
+        if (r === 'mentee') return '/dashboard/mentee'
+        return '/dashboard'
+    }, [profile])
 
     const isAdmin = useMemo(() => profile?.roles?.includes('admin') ?? false, [profile])
     const isMentor = useMemo(() => {
@@ -262,10 +296,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signInWithProvider,
+        selectRole,
+        getRoleDashboardPath,
         refreshProfile,
         signOut,
         getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, refreshProfile, getDefaultRedirectPath])
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, selectRole, getRoleDashboardPath, refreshProfile, getDefaultRedirectPath])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
