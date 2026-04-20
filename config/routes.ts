@@ -5,16 +5,16 @@ export const publicRoutes = [
   "/login",
   "/signup",
   "/forgot-password",
-  "/reset-password",
+  "/update-password",
   "/unauthorized",
   "/confirmation",
   "/auth/callback",
   "/auth/confirmed",
   "/auth/error",
   "/auth/resend-confirmation",
-  "/test-callback", // Para debug
+  "/test-callback",
   "/mentors",
-  "/organizations" // Public listing of organizations
+  "/organizations"
 ]
 
 export const protectedRoutes = [
@@ -44,5 +44,5 @@ export const authRoutes = [
   "/login",
   "/signup",
   "/forgot-password",
-  "/reset-password"
+  "/update-password"
 ]
