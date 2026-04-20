@@ -93,33 +93,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user, fetchProfile])
 
     useEffect(() => {
-        let mounted = true
-
         const initAuth = async () => {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession()
-                if (!mounted) return
-                
                 setSession(currentSession)
-                const currentUser = currentSession?.user ?? null
-                setUser(currentUser)
+                setUser(currentSession?.user ?? null)
 
-                if (currentUser) {
-                    const userProfile = await fetchProfile(currentUser.id)
-                    if (mounted) setProfile(userProfile)
+                if (currentSession?.user) {
+                    const userProfile = await fetchProfile(currentSession.user.id)
+                    setProfile(userProfile)
                 }
             } catch (err) {
                 console.error('Auth initialization error:', err)
             } finally {
-                if (mounted) setIsInitializing(false)
+                setIsInitializing(false)
             }
         }
 
         initAuth()
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-            if (!mounted) return
-
             if (event === 'SIGNED_OUT') {
                 setUser(null)
                 setSession(null)
@@ -132,22 +125,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setSession(newSession)
                 setUser(newSession.user)
                 
-                // Só busca perfil se não tiver ou se for login novo
                 if (event === 'SIGNED_IN' || !profile) {
                     const userProfile = await fetchProfile(newSession.user.id)
-                    if (mounted) {
-                        setProfile(userProfile)
-                        setIsInitializing(false)
-                    }
+                    setProfile(userProfile)
+                    setIsInitializing(false)
                 }
             }
         })
 
-        return () => {
-            mounted = false
-            subscription.unsubscribe()
-        }
-    }, [supabase, fetchProfile, profile])
+        return () => subscription.unsubscribe()
+    }, [supabase, fetchProfile])
 
     const signIn = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -157,12 +144,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
         const supabaseProvider = provider === 'linkedin' ? 'linkedin_oidc' : provider
         
-        // Limpeza de cookies antigos antes de iniciar novo OAuth para evitar erro 4/0A
+        // Uso de redirectTo direto e sem frescuras
         const { error } = await supabase.auth.signInWithOAuth({
             provider: supabaseProvider as any,
             options: {
                 redirectTo: `${window.location.origin}/auth/callback`,
-                skipBrowserRedirect: false
             },
         })
         if (error) throw error
