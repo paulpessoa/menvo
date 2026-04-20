@@ -6,28 +6,20 @@ let _client: ReturnType<typeof createBrowserClient<Database>> | null = null
 export function createClient() {
   if (_client) return _client
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn(
-      "⚠️ Supabase environment variables are missing. Some features may not work:\n" +
-        "- NEXT_PUBLIC_SUPABASE_URL\n" +
-        "- NEXT_PUBLIC_SUPABASE_ANON_KEY\n\n" +
-        "You can find these values at: https://supabase.com/dashboard/project/_/settings/api",
-    )
-    // Return a mock client to prevent crashes
-    return null as any
-  }
-
-  _client = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, {
-    global: {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    },
-  })
+  _client = createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        // Forçamos o domínio e o caminho para garantir que o PKCE funcione no www e non-www
+        name: 'menvo-auth-token',
+        lifetime: 60 * 60 * 24 * 7, // 7 dias
+        domain: '.menvo.com.br', // O ponto no início permite que funcione em subdomínios (www)
+        path: '/',
+        sameSite: 'lax',
+      }
+    }
+  )
   return _client
 }
 
