@@ -161,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             provider: 'google',
             options: {
                 redirectTo: `${window.location.origin}/auth/callback`,
+                scopes: 'email profile openid',
                 queryParams: {
                     access_type: 'offline',
                     prompt: 'consent'
