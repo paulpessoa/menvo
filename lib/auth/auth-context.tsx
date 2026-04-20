@@ -32,6 +32,7 @@ interface AuthContextType {
     hasAnyRole: (roles: string[]) => boolean
     needsRoleSelection: () => boolean
     signIn: (email: string, password: string) => Promise<void>
+    signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
     signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
@@ -160,12 +161,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) throw error
     }, [supabase])
 
+    const signUp = useCallback(async (email: string, password: string, firstName: string, lastName: string) => {
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    first_name: firstName,
+                    last_name: lastName,
+                    full_name: `${firstName} ${lastName}`
+                },
+                emailRedirectTo: `${window.location.origin}/api/auth/callback`
+            }
+        })
+        if (error) throw error
+    }, [supabase])
+
     const signInWithProvider = useCallback(async (provider: 'google' | 'linkedin') => {
         const supabaseProvider = provider === 'linkedin' ? 'linkedin_oidc' : provider
         const { error } = await supabase.auth.signInWithOAuth({
             provider: supabaseProvider as any,
             options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
+                redirectTo: `${window.location.origin}/api/auth/callback`,
                 queryParams: provider === 'google' ? {
                     access_type: 'offline',
                     prompt: 'consent'
@@ -239,11 +256,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         hasAnyRole,
         needsRoleSelection,
         signIn,
+        signUp,
         signInWithProvider,
         refreshProfile,
         signOut,
         getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, refreshProfile, getDefaultRedirectPath])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

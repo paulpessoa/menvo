@@ -8,10 +8,11 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type")
   const tokenHash = requestUrl.searchParams.get("token_hash")
   
+  // Detectar locale via cookie ou padrão pt-BR
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
-  
-  console.log(`[AUTH DEBUG] Code present: ${!!code}, Type: ${type}, Locale: ${locale}`)
+
+  console.log(`[AUTH CALLBACK] Final Exchange - Code: ${!!code}, Type: ${type}, Locale: ${locale}`)
 
   // 1. Handle Email Verifications / Recovery
   if (type && (tokenHash || code)) {
@@ -45,12 +46,9 @@ export async function GET(request: NextRequest) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
-        console.error("❌ [AUTH CALLBACK] Server exchange failed, triggering Client Rescue:", error.message)
-        
-        // ESTRATÉGIA DE RESGATE FINAL: Se o servidor falhou (erro 4/0A), 
-        // mandamos para o CLIENTE trocar o código. O navegador tem acesso 
-        // garantido ao cookie de PKCE verifier que o servidor não conseguiu ler.
-        return NextResponse.redirect(new URL(`/auth/callback/client-side?code=${code}`, request.url))
+        console.error("[AUTH CALLBACK] Server exchange failed:", error.message)
+        // Redireciona para o login com o código para tentar o resgate no cliente se necessário
+        return NextResponse.redirect(new URL(`/${locale}/login?error=oauth_failed`, request.url))
       }
 
       if (data.user) {
@@ -74,7 +72,7 @@ export async function GET(request: NextRequest) {
       }
     } catch (error) {
       console.error("[AUTH CALLBACK] Unexpected error:", error)
-      return NextResponse.redirect(new URL(`/auth/callback/client-side?code=${code}`, request.url))
+      return NextResponse.redirect(new URL(`/${locale}/login?error=callback_error`, request.url))
     }
   }
 
