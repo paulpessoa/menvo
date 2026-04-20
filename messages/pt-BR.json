@@ -38,10 +38,6 @@
       "successDescription": "Você pode alterar essa configuração a qualquer momento no menu de Configurações após o login.",
       "button": "Começar a navegar"
     },
-    "constructionWarning": {
-      "title": "Plataforma em Construção",
-      "description": "O Menvo está sendo construído com carinho. Contamos com seu feedback e sugestões para melhorarmos cada vez mais!"
-    },
     "administration": "Administração",
     "progress": "Progresso",
     "confirmTitle": "Você tem certeza?",

@@ -38,10 +38,6 @@
       "successDescription": "Du kan när som helst ändra denna inställning i menyn Inställningar efter inloggning.",
       "button": "Börja surfa"
     },
-    "constructionWarning": {
-      "title": "Plattform under uppbyggnad",
-      "description": "Menvo byggs med omsorg. Vi räknar med din feedback och dina förslag för att förbättra oss och nå fler människor!"
-    },
     "administration": "Administration",
     "progress": "Framsteg",
     "confirmTitle": "Är du säker?",

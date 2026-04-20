@@ -38,10 +38,6 @@
       "successDescription": "You can change this setting at any time in the Settings menu after logging in.",
       "button": "Start browsing"
     },
-    "constructionWarning": {
-      "title": "Platform Under Construction",
-      "description": "Menvo is being built with care. We count on your feedback and suggestions to improve and reach more people!"
-    },
     "administration": "Administration",
     "progress": "Progress",
     "confirmTitle": "Are you sure?",
