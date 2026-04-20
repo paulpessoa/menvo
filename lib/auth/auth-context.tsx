@@ -33,7 +33,6 @@ interface AuthContextType {
     needsRoleSelection: () => boolean
     signIn: (email: string, password: string) => Promise<void>
     signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
-    signInWithGoogleNew: () => Promise<void>
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
     getDefaultRedirectPath: () => string
@@ -96,10 +95,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         let mounted = true
         
-        // TIMEOUT DE SEGURANÇA: Nunca deixa o app em loading infinito
         const timeout = setTimeout(() => {
             if (mounted && isInitializing) {
-                console.warn("[AUTH] Initializing timeout reached. Forcing ready state.")
                 setIsInitializing(false)
             }
         }, 5000)
@@ -156,7 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             clearTimeout(timeout)
             subscription.unsubscribe()
         }
-    }, [supabase, fetchProfile]) // Removido 'profile' da dependência para evitar loops
+    }, [supabase, fetchProfile])
 
     const signIn = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -169,22 +166,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             provider: supabaseProvider as any,
             options: {
                 redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        })
-        if (error) throw error
-    }, [supabase])
-
-    const signInWithGoogleNew = useCallback(async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-                scopes: 'email profile openid',
-                queryParams: {
+                queryParams: provider === 'google' ? {
                     access_type: 'offline',
                     prompt: 'consent'
-                }
-            }
+                } : undefined
+            },
         })
         if (error) throw error
     }, [supabase])
@@ -254,11 +240,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         needsRoleSelection,
         signIn,
         signInWithProvider,
-        signInWithGoogleNew,
         refreshProfile,
         signOut,
         getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, signInWithGoogleNew, refreshProfile, getDefaultRedirectPath])
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signInWithProvider, refreshProfile, getDefaultRedirectPath])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
