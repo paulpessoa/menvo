@@ -10,7 +10,6 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        name: 'menvo-auth-token',
         getAll() {
           return cookieStore.getAll()
         },
@@ -28,6 +27,10 @@ export async function createClient() {
           }
         },
       },
+      cookieOptions: {
+        domain: '.menvo.com.br',
+        path: '/',
+      }
     },
   )
 }
