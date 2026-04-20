@@ -1,1494 +1,1494 @@
 {
-  "common": {
-    "welcome": "Welcome",
-    "home": "Home",
-    "findMentors": "Find Mentors",
-    "community": "Community",
-    "hub": "Hub",
-    "events": "Events",
-    "howItWorks": "How It Works",
-    "aboutUs": "About Us",
-    "title": "Menvo",
-    "login": "Sign In",
-    "register": "Sign Up",
-    "logout": "Sign Out",
-    "language": "Language",
-    "english": "English",
-    "portuguese": "Portuguese",
-    "spanish": "Spanish",
-    "cancel": "Cancel",
-    "continue": "Continue",
-    "submit": "Submit",
-    "back": "Back",
-    "next": "Next",
-    "save": "Save",
-    "email": "Email",
-    "password": "Password",
-    "name": "Name",
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "loading": "Loading...",
-    "saving": "Saving...",
-    "close": "Close",
-    "submitting": "Submitting...",
-    "languageSelector": {
-      "title": "Select your language",
-      "description": "Choose your language to continue",
-      "successTitle": "Language set!",
-      "successDescription": "You can change this setting at any time in the Settings menu after logging in.",
-      "button": "Start browsing"
-    },
-    "administration": "Administration",
-    "progress": "Progress",
-    "confirmTitle": "Are you sure?",
-    "confirmDesc": "This action cannot be undone.",
-    "confirmAction": "Yes, confirm",
-    "french": "French",
-    "danish": "Danish",
-    "swedish": "Swedish",
-    "organizations": "Organizations"
-  },
-  "header": {
-    "title": "MENVO - Volunteer Mentors",
-    "subtitle": "Connecting mentors and mentees",
-    "userMenu": {
-      "dashboard": "Dashboard",
-      "profile": "Profile",
-      "messages": "Messages",
-      "settings": "Settings",
-      "adminPanel": "Admin Panel",
-      "logout": "Logout",
-      "administration": "Administration",
-      "user": "User",
-      "createOrganization": "Create Organization"
-    }
-  },
-  "home": {
-    "badge": {
-      "freeMentorship": "Volunteer Mentorship Platform"
-    },
-    "hero": {
-      "title": "Connect with Volunteer Mentors",
-      "description": "Find guidance, share experiences, and grow together. Our platform connects you with volunteer mentors for free mentorship sessions.",
-      "findMentor": "Find a Mentor",
-      "becomeMentor": "Become a Mentor"
-    },
-    "testimonials": {
-      "title": "Stories That Inspire",
-      "description": "Lives transformed through mentorship"
-    },
-    "howItWorks": {
-      "title": "How It Works",
-      "description": "Our platform makes it easy to connect with mentors and schedule sessions",
-      "step1": {
-        "title": "Find a Mentor",
-        "description": "Browse our diverse community of volunteer mentors and find the perfect match for your needs."
-      },
-      "step2": {
-        "title": "Schedule a Session",
-        "description": "Book a time that works for both of you using our integrated scheduling system."
-      },
-      "step3": {
-        "title": "Connect & Grow",
-        "description": "Meet virtually, share experiences, and develop your skills with personalized guidance."
-      },
-      "learnMore": "Learn More"
-    },
-    "featuredMentors": {
-      "title": "Featured Mentors",
-      "description": "Meet some of our dedicated volunteer mentors",
-      "viewAll": "View All Mentors"
-    },
-    "mentor": {
-      "sampleName": "Sarah Johnson",
-      "field": "Software Engineering",
-      "tags": [
-        "Career",
-        "Tech",
-        "Leadership"
-      ],
-      "description": "Senior Developer with 10+ years of experience helping new programmers navigate the tech industry.",
-      "languages": "English, Spanish",
-      "viewProfile": "View Profile"
-    },
-    "events": {
-      "title": "Upcoming Events",
-      "description": "Join our community events and group mentorship sessions",
-      "card": {
-        "title": "Tech Career Panel: Breaking Into the Industry",
-        "date": "June 15, 2025",
-        "time": "6:00 PM - 8:00 PM",
-        "description": "Join our panel of industry experts as they share insights on how to start and grow your career in technology.",
-        "attendees": "{count} attendees",
-        "register": "Register"
-      },
-      "viewAll": "View All Events"
-    },
-    "cta": {
-      "title": "Ready to Get Started?",
-      "description": "Join us today and connect with people who can help you achieve your goals",
-      "signup": "Sign Up Now",
-      "learnMore": "Learn More"
-    },
-    "event": {
-      "type": "Online"
-    }
-  },
-  "about": {
-    "badge": "About Us",
-    "ourMission": {
-      "title": "Our Mission",
-      "description": "Simplifying mentorship into open conversations. Anyone can share their experience with those seeking it, always for free."
-    },
-    "whyWeStarted": {
-      "title": "Why We Started",
-      "paragraph1": "Menvo was born from a simple idea: everyone deserves access to mentorship, regardless of their background or financial situation. We believe that sharing knowledge and experiences can transform lives and communities.",
-      "paragraph2": "Our founder experienced firsthand the impact that good mentorship can have on personal and professional growth. However, they also saw how mentorship opportunities were often limited to those with existing connections or financial resources.",
-      "paragraph3": "That's why we created a platform that makes mentorship accessible to all, connecting those who seek guidance with those willing to share their experience – completely free of charge."
-    },
-    "ourStoryImageAlt": "Our story illustration",
-    "values": {
-      "community": {
-        "title": "Community",
-        "description": "Building a supportive community where knowledge is freely shared and connections are made across backgrounds and borders."
-      },
-      "accessibility": {
-        "title": "Accessibility",
-        "description": "Making mentorship accessible to everyone, regardless of their financial situation, location, or background."
-      },
-      "impact": {
-        "title": "Impact",
-        "description": "Creating positive change by empowering individuals through knowledge sharing and meaningful connections."
-      }
-    },
-    "sdg": {
-      "title": "Sustainable Development Goals",
-      "description": "Our platform aligns with the United Nations' Sustainable Development Goals (SDGs), particularly focusing on:",
-      "goalNumber": "SDG {number}",
-      "goals": {
-        "qualityEducation": "Quality Education",
-        "genderEquality": "Gender Equality",
-        "decentWork": "Decent Work and Economic Growth",
-        "reducedInequalities": "Reduced Inequalities"
-      }
-    },
-    "ourTeam": {
-      "title": "Our Team",
-      "paragraph1": "We're a diverse team of professionals passionate about making mentorship accessible to everyone. Our team members come from various backgrounds and industries, bringing together a wealth of experience and perspectives.",
-      "paragraph2": "What unites us is our belief in the power of mentorship to transform lives and our commitment to creating a platform that facilitates meaningful connections.",
-      "paragraph3": "We're always looking for passionate individuals to join our mission. If you're interested in contributing to Menvo, we'd love to hear from you!",
-      "joinTeam": "Join Our Team",
-      "viewMap": "View Team Map"
-    },
-    "ourTeamImageAlt": "Our team illustration",
-    "ourImpact": {
-      "title": "Our Impact",
-      "volunteerMentors": {
-        "count": "1,000+",
-        "label": "Volunteer Mentors"
-      },
-      "mentorshipSessions": {
-        "count": "5,000+",
-        "label": "Mentorship Sessions"
-      },
-      "countriesReached": {
-        "count": "50+",
-        "label": "Countries Reached"
-      },
-      "description": "These numbers represent real people whose lives have been positively impacted through mentorship connections on our platform."
-    },
-    "ourPartners": {
-      "title": "Our Partners",
-      "description": "We're proud to collaborate with organizations that share our vision of making mentorship accessible to all.",
-      "partnerLogoAlt": "Partner {number} logo"
-    },
-    "joinOurMission": {
-      "title": "Join Our Mission",
-      "description": "Whether you're looking to share your expertise as a mentor or seeking guidance as a mentee, you can be part of our mission to make mentorship accessible to all.",
-      "signUpNow": "Sign Up Now",
-      "contactUs": "Contact Us"
-    }
-  },
-  "howItWorks": {
-    "title": "How Menvo Works",
-    "description": "Our platform makes it easy to connect with mentors and schedule free mentorship sessions",
-    "forMentees": "For Mentees",
-    "forMentors": "For Mentors",
-    "forNGOs": "For NGOs",
-    "forCompanies": "For Companies",
-    "mentees": {
-      "step1": {
-        "title": "Create Your Profile",
-        "description": "Sign up and create your profile with details about your background, goals, and interests. This helps us match you with the right mentors.",
-        "feature1": "Upload your resume",
-        "feature2": "Add your profile picture",
-        "feature3": "Connect your LinkedIn profile"
-      },
-      "step2": {
-        "title": "Find the Right Mentor",
-        "description": "Browse our diverse community of volunteer mentors. Use filters to find mentors based on expertise, industry, location, and more.",
-        "feature1": "Filter by topics and expertise",
-        "feature2": "Search by location or language",
-        "feature3": "Read reviews from other mentees"
-      },
-      "step3": {
-        "title": "Schedule a Session",
-        "description": "Once you find a mentor you'd like to connect with, view their availability and schedule a free 45-minute mentorship session.",
-        "feature1": "View mentor's calendar",
-        "feature2": "Select a convenient time slot",
-        "feature3": "Add topics you'd like to discuss"
-      },
-      "step4": {
-        "title": "Connect and Grow",
-        "description": "Meet with your mentor via video call. Share your challenges, ask questions, and receive personalized guidance to help you achieve your goals.",
-        "feature1": "Join via video call link",
-        "feature2": "Discuss your goals and challenges",
-        "feature3": "Receive personalized guidance"
-      },
-      "getStarted": "Get Started as a Mentee"
-    },
-    "mentors": {
-      "step1": {
-        "title": "Create Your Mentor Profile",
-        "description": "Sign up and create your mentor profile with details about your expertise, experience, and the topics you can help with.",
-        "feature1": "Highlight your expertise and experience",
-        "feature2": "Specify topics you can mentor on",
-        "feature3": "Connect your professional profiles"
-      },
-      "step2": {
-        "title": "Complete Verification",
-        "description": "For the safety of our community, all mentors go through a verification process. This includes a brief video call with our team.",
-        "feature1": "Schedule a verification call",
-        "feature2": "Verify your identity and expertise",
-        "feature3": "Get approved to start mentoring"
-      },
-      "step3": {
-        "title": "Set Your Availability",
-        "description": "Define when you're available to mentor. You have full control over your schedule and can update it anytime.",
-        "feature1": "Set your weekly availability",
-        "feature2": "Specify session duration",
-        "feature3": "Update your calendar as needed"
-      },
-      "step4": {
-        "title": "Conduct Mentorship Sessions",
-        "description": "Connect with mentees via video calls. Share your knowledge, provide guidance, and help them navigate their challenges.",
-        "feature1": "Receive session requests",
-        "feature2": "Conduct video mentorship sessions",
-        "feature3": "Track your impact and sessions"
-      },
-      "becomeMentor": "Become a Mentor"
-    },
-    "ngos": {
-      "step1": {
-        "title": "Register Your NGO for Free",
-        "description": "NGOs and social organizations can register for free on the platform to connect the youth they serve with volunteer mentors.",
-        "feature1": "100% free registration for NGOs",
-        "feature2": "Unlimited access to the platform",
-        "feature3": "Dedicated support for organizations"
-      },
-      "step2": {
-        "title": "Connect Youth with Mentors",
-        "description": "Register the young people served by your organization and help them find mentors who can guide them in their professional and personal journeys.",
-        "feature1": "Register multiple youth from your organization",
-        "feature2": "Track mentorship progress",
-        "feature3": "Receive social impact reports"
-      },
-      "getStarted": "Register My NGO"
-    },
-    "companies": {
-      "step1": {
-        "title": "Corporate Volunteering through Mentorship",
-        "description": "Develop corporate volunteering programs by allowing your employees to become volunteer mentors, strengthening the company's purpose.",
-        "feature1": "Engage employees in social actions",
-        "feature2": "Develop leadership through mentorship",
-        "feature3": "Strengthen organizational culture"
-      },
-      "step2": {
-        "title": "ESG Reports and Social Impact",
-        "description": "Receive detailed reports on the social impact of mentorships conducted by your employees, strengthening your ESG metrics.",
-        "feature1": "Monthly social impact reports",
-        "feature2": "Metrics for ESG reporting",
-        "feature3": "Corporate volunteering certificates"
-      },
-      "step3": {
-        "title": "Incentive Policies and Benefits",
-        "description": "Create incentive policies for mentor employees, such as paid time off, internal recognition, and career development.",
-        "feature1": "Time bank for volunteer mentoring",
-        "feature2": "Recognition and internal gamification",
-        "feature3": "Soft skills development"
-      },
-      "getStarted": "Become a Corporate Partner"
-    },
-    "faq": {
-      "title": "Frequently Asked Questions",
-      "description": "Find answers to the most common questions about the platform.",
-      "viewAll": "View all questions",
-      "q1": {
-        "question": "Is mentorship really free?",
-        "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow and develop."
-      },
-      "q2": {
-        "question": "How long are mentorship sessions?",
-        "answer": "Standard mentorship sessions are 45 minutes long. This provides enough time for meaningful conversation while respecting everyone's schedules."
-      },
-      "q3": {
-        "question": "How often can I meet with a mentor?",
-        "answer": "This depends on the mentor's availability and preferences. Some mentors are open to regular sessions, while others may prefer one-time meetings."
-      },
-      "q4": {
-        "question": "What happens if I need to cancel?",
-        "answer": "We ask that you cancel at least 24 hours in advance out of respect for the mentor's time. You can easily reschedule through your dashboard."
-      },
-      "q5": {
-        "question": "How do I become a verified mentor?",
-        "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
-      },
-      "q6": {
-        "question": "Is my information secure?",
-        "answer": "Yes, we take privacy and security seriously. Your personal information is protected and only shared with those you choose to connect with."
-      },
-      "stillHaveQuestions": "Still have questions?",
-      "supportDescription": "Our support team is here to help you with any questions you may have.",
-      "contactSupport": "Contact Support"
-    }
-  },
-  "faq": {
-    "title": "Frequently Asked Questions",
-    "description": "Find answers to the most common questions about the Menvo platform.",
-    "q1": {
-      "question": "Is mentorship really free?",
-      "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow."
-    },
-    "q2": {
-      "question": "How long are mentorship sessions?",
-      "answer": "Standard mentorship sessions last 45 minutes. This provides enough time for a meaningful conversation while respecting everyone's schedule."
-    },
-    "q3": {
-      "question": "How often can I meet with a mentor?",
-      "answer": "This depends on the mentor's availability and preferences. Some mentors are open to regular sessions, while others prefer one-time meetings."
-    },
-    "q4": {
-      "question": "What happens if I need to cancel?",
-      "answer": "We ask that you cancel at least 24 hours in advance out of respect for the mentor's time. You can easily reschedule through your dashboard."
-    },
-    "q5": {
-      "question": "How do I become a verified mentor?",
-      "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
-    },
-    "q6": {
-      "question": "Is my information safe?",
-      "answer": "Yes, we take privacy and security very seriously. Your personal information is protected and only shared with those you choose to connect with."
-    },
-    "q7": {
-      "question": "How does it work for NGOs?",
-      "answer": "NGOs can register for free and connect the youth they serve with volunteer mentors. It's a way to expand the organization's social impact at no cost."
-    },
-    "q8": {
-      "question": "Can companies participate?",
-      "answer": "Yes! Companies can develop corporate volunteering programs through mentorship, receive ESG reports, and create incentive policies for mentor employees."
-    },
-    "q9": {
-      "question": "How does recruiter access work?",
-      "answer": "This feature is under development. Soon, recruiters will have access to qualified talent participating on the platform, always respecting user privacy."
-    },
-    "q10": {
-      "question": "Can I be both a mentor and mentee?",
-      "answer": "Yes! You can have both profiles on the platform. Many professionals seek mentorship in specific areas while mentoring in their areas of expertise."
-    },
-    "stillHaveQuestions": "Still have questions?",
-    "supportDescription": "Our support team is here to help you with any questions you may have.",
-    "contactSupport": "Contact Support"
-  },
-  "login": {
-    "title": "Welcome back",
-    "description": "Sign in to your account to access the platform",
-    "email": "Email",
-    "emailPlaceholder": "name@example.com",
-    "password": "Password",
-    "passwordPlaceholder": "Enter your password",
-    "forgotPassword": "Forgot password?",
-    "loginButton": "Log in",
-    "loggingIn": "Logging in...",
-    "noAccount": "Don't have an account?",
-    "signUp": "Sign up",
-    "continueWith": "Continue with",
-    "google": "Google",
-    "linkedin": "LinkedIn",
-    "connecting": "Connecting...",
-    "emailNotConfirmedInfo": "Check your inbox to verify your email.",
-    "dontHaveAccount": "Don't have an account?",
-    "error": {
-      "invalidCredentials": "Invalid email or password. Please check your credentials and try again.",
-      "emailNotConfirmed": "Email not confirmed. Check your inbox and click the confirmation link.",
-      "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
-      "networkError": "Connection error. Please check your internet and try again.",
-      "unexpected": "Unexpected error. Please try again.",
-      "loginFailed": "Error signing in. Please try again."
-    },
-    "orContinueWith": "or continue with",
-    "success": "Login successful!"
-  },
-  "register": {
-    "title": "Join Menvo",
-    "subtitle": "Connect with volunteer mentors and develop your career for free",
-    "signupTitle": "Create Account",
-    "description": "Fill in your details to start your journey",
-    "firstName": "First Name",
-    "firstNamePlaceholder": "Enter your first name",
-    "lastName": "Last Name",
-    "lastNamePlaceholder": "Enter your last name",
-    "email": "Email",
-    "emailPlaceholder": "Enter your email",
-    "emailInvalid": "Invalid email",
-    "password": "Password",
-    "passwordPlaceholder": "Create a password",
-    "confirmPassword": "Confirm Password",
-    "confirmPasswordPlaceholder": "Enter password again",
-    "mentor": "Mentor",
-    "mentee": "Mentee",
-    "registerButton": "Register",
-    "creatingAccount": "Creating account...",
-    "alreadyHaveAccount": "Already have an account?",
-    "signIn": "Sign In",
-    "orContinueWith": "Or continue with",
-    "confirmEmail": "Confirm your email",
-    "confirmEmailDescription": "A confirmation email was sent to {email}. Please access your inbox and click the link to activate your account.",
-    "nextSteps": "Next steps:",
-    "nextStepsList": [
-      "Check your inbox (and spam folder)",
-      "Click the confirmation link in the email",
-      "Choose your user type (mentor or mentee)",
-      "Complete your profile with your information",
-      "Wait for our team validation (mentors only)"
-    ],
-    "afterConfirmation": "After confirming your email, you'll be able to choose whether you want to be a mentor or mentee and complete your profile. Mentors will go through a validation process with our team before being published.",
-    "didntReceiveEmail": "Didn't receive the email?",
-    "checkSpam": "Check your spam folder.",
-    "emailExpired": "Confirmation link expired?",
-    "emailExpiredDescription": "If the confirmation link expired (24 hours), you can use the 'Forgot my password' option to reset and confirm your account.",
-    "resendEmail": "Resend email",
-    "emailExpiredAction": "Link expired? Reset password",
-    "tryAgain": "Try again",
-    "emailConfirmed": "Email Confirmed!",
-    "emailConfirmedDescription": "Your email has been confirmed successfully. Now choose how you want to use the platform.",
-    "selectRoleDescription": "Choose how you want to use the platform:",
-    "menteeDescription": "I seek guidance and professional development",
-    "mentorDescription": "I want to share knowledge and guide other professionals",
-    "continue": "Continue",
-    "welcome": {
-      "title": "Welcome to Menvo!",
-      "description": "Your account has been confirmed successfully. Now choose how you want to use the platform.",
-      "selectRoleDescription": "Choose how you want to use the platform:",
-      "continue": "Continue"
-    },
-    "goToLogin": "Go to Login",
-    "passwordValidation": {
-      "passwordsDontMatch": "Passwords don't match",
-      "passwordTooShort": "Password must be at least 6 characters long",
-      "passwordStrength": "Password strength:",
-      "passwordTooWeak": "Password too weak",
-      "passwordMedium": "Medium password",
-      "passwordStrong": "Strong password",
-      "passwordsMatch": "✓ Passwords match",
-      "passwordsDontMatchError": "Passwords don't match"
-    },
-    "goToHome": "Back to Home",
-    "goToVerification": "Go to verification page",
-    "userType": {
-      "title": "How do you want to participate?",
-      "mentee": {
-        "title": "Mentee",
-        "description": "I seek guidance to develop my career"
-      },
-      "mentor": {
-        "title": "Mentor",
-        "description": "I want to share my experience and help others"
-      },
-      "company": {
-        "title": "Company",
-        "description": "I want to enroll professionals from our company"
-      },
-      "recruiter": {
-        "title": "Recruiter",
-        "description": "I'm seeking qualified professionals for opportunities"
-      }
-    },
-    "success": "Account created successfully!",
-    "error": {
-      "requiredFields": "First and last name are required",
-      "unexpected": "An unexpected error occurred. Please try again."
-    }
-  },
-  "community": {
-    "title": "Community Board",
-    "subtitle": "Meet people looking to learn and proactively offer your mentorship.",
-    "mentorTip": "Tip: Proactive mentors who help those seeking knowledge get 3x more visibility.",
-    "searchPlaceholder": "Search by name, goal, or interest...",
-    "seekingHelpWith": "Seeking help with:",
-    "noBioProvided": "This member hasn't described their goals in detail yet.",
-    "offerHelp": "Offer Help",
-    "noResults": "No members found with these terms.",
-    "clearSearch": "Clear search",
-    "loadMore": "Load more",
-    "errorLoading": "Error loading community profiles.",
-    "disclaimer": {
-      "title": "You are not a Mentor yet",
-      "description": "You can chat with {name} and share your social networks, but for them to schedule formal sessions with you, your profile must be set to Mentor.",
-      "whyTitle": "Why become a Mentor?",
-      "whyDescription": "As a verified mentor, you gain access to scheduling tools, synced calendar, and official reviews.",
-      "chatAnyway": "Just Chat",
-      "becomeMentor": "Become a Mentor"
-    }
-  },
-  "hub": {
-    "subtitle": "Discover curated events, courses, tools, and discounts to accelerate your journey.",
-    "suggestBtn": "Suggest Resource",
-    "searchPlaceholder": "Search the hub...",
-    "viewMore": "Access",
-    "tabs": {
-      "all": "All",
-      "events": "Events",
-      "courses": "Courses",
-      "tools": "Tools",
-      "discounts": "Discounts"
-    },
-    "types": {
-      "event": "Event",
-      "course": "Course",
-      "tool": "Tool",
-      "discount": "Discount",
-      "job": "Job"
-    },
-    "noResults": {
-      "title": "No resources found",
-      "description": "Try adjusting your filters or searching for other terms.",
-      "clear": "Clear filters"
-    }
-  },
-  "mentors": {
-    "title": "Find a Mentor",
-    "description": "Browse our community of volunteer mentors and find the perfect match for your needs",
-    "searchPlaceholder": "Search by name, expertise, or keywords...",
-    "filtersTitle": "Filters",
-    "applyFilters": "Apply Filters",
-    "clearFilters": "Clear",
-    "showingResults": "{count} mentors found",
-    "sortBy": "Sort by",
-    "sortOptions": {
-      "relevance": "Relevance",
-      "name": "Name",
-      "experience": "Experience",
-      "rating": "Rating"
-    },
-    "noMentorsFound": "No mentors found",
-    "noMentorsDescription": "Try adjusting your filters or search terms",
-    "clearFiltersButton": "Clear Filters",
-    "loadMore": "Load More",
-    "filterOptions": {
-      "topics": "Topics",
-      "languages": "Languages",
-      "experience": "Experience",
-      "inclusionTags": "Inclusion Tags",
-      "education": "Education Level",
-      "location": "Location",
-      "city": "City",
-      "country": "Country",
-      "availability": "Availability",
-      "rating": "Rating",
-      "all": "All",
-      "available": "Available",
-      "busy": "Busy",
-      "aboveRating": "{rating}+ stars"
-    },
-    "mentorCard": {
-      "available": "Available",
-      "busy": "Busy",
-      "specialties": "Specialties:",
-      "viewProfile": "View Profile",
-      "scheduleSession": "Schedule"
-    },
-    "loginRequired": {
-      "title": "Login Required",
-      "description": "You need to be logged in to view mentor profiles and schedule sessions.",
-      "descriptionWithName": "You need to be logged in to view {mentorName}'s profile and schedule sessions.",
-      "benefits": {
-        "title": "What you can do after logging in:",
-        "item1": "View detailed mentor profiles",
-        "item2": "Schedule free mentorship sessions",
-        "item3": "Message mentors directly",
-        "item4": "Access your mentorship history"
-      },
-      "signUp": "Sign Up",
-      "login": "Login"
-    },
-    "pagination": {
-      "previous": "Previous",
-      "next": "Next",
-      "page": "Page {current} of {total}"
-    }
-  },
-  "footer": {
-    "description": "Simplifying mentorship into open conversations. Anyone can share their experience with those seeking it, always for free.",
-    "platform": "Platform",
-    "findMentors": "Find Mentors",
-    "events": "Events & Courses",
-    "howItWorks": "How It Works",
-    "store": "Store",
-    "company": "Company",
-    "aboutUs": "About Us",
-    "mission": "Our Mission",
-    "team": "Our Team",
-    "partners": "Partners",
-    "contact": "Contact",
-    "subscribe": "Subscribe",
-    "newsletter": "Stay updated with our newsletter",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "cookiePolicy": "Cookie Policy",
-    "allRightsReserved": "All rights reserved."
-  },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Unsubscribe from newsletter",
-      "description": "We're sorry to see you go. Enter your email to unsubscribe.",
-      "successTitle": "Successfully unsubscribed",
-      "successDescription": "You have been removed from our newsletter list. We'll miss you!",
-      "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
-      "rejoinButton": "Subscribe again",
-      "considerTitle": "Before you cancel, consider:",
-      "considerItem1": "You will only receive relevant content about mentorship",
-      "considerItem2": "We send a maximum of 2 emails per week",
-      "considerItem3": "You can re-subscribe at any time",
-      "button": "Unsubscribe",
-      "cancelling": "Unsubscribing...",
-      "backToSite": "Back to site"
-    },
-    "modal": {
-      "success": {
-        "title": "Thank you for joining our newsletter!",
-        "receive": "What you will receive:",
-        "news": "✨ News about mentorships and opportunities",
-        "tips": "💡 Exclusive professional development tips",
-        "features": "🚀 First information about new features",
-        "whatsapp": "📱 Important updates via WhatsApp",
-        "madeWithLove": "Made with love by the Menvo team",
-        "continue": "Continue Exploring"
-      },
-      "form": {
-        "title": "Menvo Newsletter",
-        "emailLabel": "Email *",
-        "emailPlaceholder": "your@email.com",
-        "nameLabel": "Name (optional)",
-        "namePlaceholder": "Your name",
-        "whatsappLabel": "WhatsApp (optional)",
-        "whatsappPlaceholder": "+55 11 99999-9999",
-        "whatsappInfo": "Receive updates via WhatsApp",
-        "consentLabel": "Mandatory consent *",
-        "consentInfo": "I agree to receive emails from Menvo with news, updates, and relevant content.",
-        "marketingLabel": "Personalized marketing (optional)",
-        "marketingInfo": "I agree to receive personalized offers and promotions based on my profile and interests.",
-        "dataProtectionTitle": "Data Protection",
-        "dataProtectionInfo": "Your data is protected according to privacy laws. We do not share your information with third parties.",
-        "cancel": "Cancel",
-        "subscribing": "Subscribing...",
-        "subscribe": "Subscribe"
-      }
-    }
-  },
-  "privacy": {
-    "badge": "Privacy",
-    "title": "Privacy Policy",
-    "intro": "Your privacy is important to us. This policy explains how we collect, use, and protect your data at Menvo.",
-    "dataCollection": {
-      "title": "Data Collection",
-      "text": "We collect information you provide when creating an account, such as name, email, profile photo, and professional details. We also collect social login data (Google, LinkedIn) if you choose to authenticate with these platforms."
-    },
-    "email": {
-      "title": "Emails & Communication",
-      "text": "We use your email for essential communications, mentorship notifications, and updates. Emails are sent via Brevo, respecting your privacy and opt-out preferences."
-    },
-    "photos": {
-      "title": "Photos & Visual Content",
-      "text": "Profile photos and uploaded images are securely stored in Supabase and used only for identification and profile personalization."
-    },
-    "storage": {
-      "title": "Data Storage",
-      "text": "All data is securely stored in Supabase, with access restricted to the Menvo team and following best security practices."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar API",
-      "text": "We use the Google Calendar API exclusively to create mentorship events when a session is confirmed by the mentor. We create the event in our own calendar and send email invitations to both mentor and mentee. We do NOT access, read, or modify your personal Google Calendar. You only receive an email invitation that you can freely accept or decline. The data used is only: date, time, session duration, and participants' emails."
-    },
-    "dataSharing": {
-      "title": "Data Sharing",
-      "text": "We do not share your personal data with third parties for commercial or marketing purposes. Data is shared only with essential services for platform operation: Supabase (secure storage), Brevo (transactional email delivery), Google (OAuth authentication and calendar event creation), and LinkedIn (OAuth authentication). Each service processes data only for the specific purposes described in this policy."
-    },
-    "dataUsage": {
-      "title": "Data Usage",
-      "text": "Your data is used exclusively to: (1) Authenticate and manage your account; (2) Facilitate connections between mentors and mentees; (3) Create mentorship events in Google Calendar; (4) Send notifications and communications related to your mentorships; (5) Improve platform experience and security. We never use your data for AI/ML model training or purposes unrelated to mentorship."
-    },
-    "mentorship": {
-      "title": "Mentorship & Interactions",
-      "text": "Information about mentorship sessions, reviews, and messages is used to improve the experience and ensure community safety."
-    },
-    "thirdParty": {
-      "title": "Third-Party Services",
-      "text": "We use third-party services such as Google (OAuth login and Calendar API), LinkedIn (OAuth login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy and processes data only for the specific purposes described in this policy."
-    },
-    "rights": {
-      "title": "Your Rights",
-      "text": "You may request access, correction, or deletion of your data at any time. To exercise your rights or revoke Google Calendar access permissions, contact us at contato@menvo.com.br."
-    },
-    "contact": {
-      "title": "Contact",
-      "text": "Questions about privacy? Contact us at contato@menvo.com.br."
-    },
-    "links": {
-      "cookies": "Cookie Policy",
-      "terms": "Terms of Service"
-    }
-  },
-  "cookies": {
-    "badge": "Cookies",
-    "title": "Cookie Policy",
-    "intro": "We use cookies to enhance your experience, ensure essential features, and analyze platform usage.",
-    "essential": {
-      "title": "Essential Cookies",
-      "text": "Required for site operation, authentication, and security. Cannot be disabled."
-    },
-    "social": {
-      "title": "Social Login",
-      "text": "Cookies may be used for authentication via Google and LinkedIn, enabling secure login."
-    },
-    "preferences": {
-      "title": "Preferences",
-      "text": "We store your language and settings preferences to personalize your experience."
-    },
-    "analytics": {
-      "title": "Analytics & Performance",
-      "text": "We use cookies and analytics tools like Microsoft Clarity to understand how the platform is used and improve our services. Clarity helps us visualize how users interact with the site through session recordings and heatmaps. For users from the European Union (EEA), United Kingdom, and Switzerland, we request your explicit consent before activating these analytics tools."
-    },
-    "clarity": {
-      "title": "Microsoft Clarity",
-      "text": "We use Microsoft Clarity to understand how you use our website through behavioral metrics, heatmaps, and session recordings. Data collected by Clarity is processed according to Microsoft's Privacy Policy. For users from the EEA, UK, and Switzerland, Clarity will only be activated after your explicit consent through the cookie banner."
-    },
-    "links": {
-      "privacy": "Privacy Policy",
-      "terms": "Terms of Service"
-    }
-  },
-  "cookieConsent": {
-    "title": "We use cookies",
-    "description": "We use essential cookies for site functionality and analytics cookies to improve your experience. You can choose which cookies to accept.",
-    "learnMore": "Learn more",
-    "acceptAll": "Accept All",
-    "acceptNecessary": "Necessary Only",
-    "customize": "Customize",
-    "savePreferences": "Save Preferences",
-    "settings": {
-      "title": "Cookie Settings",
-      "description": "Choose which types of cookies you want to accept. Necessary cookies cannot be disabled.",
-      "alwaysActive": "Always Active",
-      "necessary": {
-        "title": "Necessary Cookies",
-        "description": "Essential for basic site functionality, including authentication, security, and navigation."
-      },
-      "analytics": {
-        "title": "Analytics Cookies",
-        "description": "Help us understand how you use the site to improve your experience.",
-        "tools": "Tools: Microsoft Clarity (session recordings, heatmaps)"
-      },
-      "functional": {
-        "title": "Functional Cookies",
-        "description": "Enable advanced features like language preferences and personalization."
-      }
-    }
-  },
-  "terms": {
-    "badge": "Terms",
-    "title": "Terms of Service",
-    "intro": "By using Menvo, you agree to these terms. Please read carefully to understand your rights and responsibilities.",
-    "usage": {
-      "title": "Platform Usage",
-      "text": "Menvo connects mentors and mentees for free sessions. Use must be respectful and in accordance with applicable laws."
-    },
-    "account": {
-      "title": "Account & Social Login",
-      "text": "You may create an account via email or social login (Google, LinkedIn). Keep your credentials secure and do not share your account."
-    },
-    "security": {
-      "title": "Security",
-      "text": "We take measures to protect your data, but you are also responsible for keeping your password secure."
-    },
-    "content": {
-      "title": "Content & Photos",
-      "text": "You are responsible for content you upload (photos, text). Do not upload offensive or copyrighted content without permission."
-    },
-    "communication": {
-      "title": "Communication & Emails",
-      "text": "We will send important communications about mentorships and updates. You may opt out of promotional emails."
-    },
-    "storage": {
-      "title": "Storage & Third Parties",
-      "text": "Data is stored in Supabase and emails are sent via Brevo. We use third-party social login."
-    },
-    "rights": {
-      "title": "Rights & Responsibilities",
-      "text": "You may access and delete your data. Misuse of the platform may result in account suspension."
-    },
-    "contact": {
-      "title": "Contact",
-      "text": "Questions? Contact us at contato@menvo.com."
-    },
-    "links": {
-      "privacy": "Privacy Policy",
-      "cookies": "Cookie Policy"
-    },
-    "warning": {
-      "title": "Attention",
-      "message": "The platform is currently under development. We're very happy to receive your feedback and opinion on what you've seen so far!",
-      "dismiss": "Got it",
-      "giveFeedback": "Give Feedback"
-    },
-    "feedback": {
-      "title": "What did you think of Menvo?",
-      "description": "Your opinion is very important to us! Tell us what you thought of the platform.",
-      "openFeedback": "Open Feedback",
-      "helpUsImprove": "Help us improve the platform",
-      "commentPlaceholder": "Tell us what you thought of the platform...",
-      "emailPlaceholder": "Your email (optional)",
-      "submit": "Submit Feedback",
-      "thankYou": "Thank you for your feedback!",
-      "error": "Error submitting feedback. Please try again.",
-      "ratingRequired": "Please select a rating.",
-      "rateStars": "Rate with {count} stars"
-    }
-  },
-  "metadata": {
-    "title": "MENVO - Volunteer Mentoring Platform",
-    "description": "Connecting mentors and mentees for free mentoring sessions",
-    "keywords": [
-      "mentoring",
-      "volunteer mentoring",
-      "professional development",
-      "career",
-      "learning",
-      "mentors",
-      "mentees",
-      "education",
-      "personal development"
-    ],
-    "og": {
-      "title": "MENVO - Volunteer Mentoring Platform",
-      "description": "Connecting mentors and mentees for free mentoring sessions",
-      "siteName": "MENVO"
-    },
-    "twitter": {
-      "title": "MENVO - Volunteer Mentoring Platform",
-      "description": "Connecting mentors and mentees for free mentoring sessions"
-    }
-  },
-  "waitingList": {
-    "title": "Join the Waiting List",
-    "description": "Thank you for your interest! Please fill out the form below.",
-    "nameLabel": "Name",
-    "namePlaceholder": "Enter your full name",
-    "emailPlaceholder": "your@email.com",
-    "whatsappLabel": "WhatsApp (optional)",
-    "whatsappPlaceholder": "Your WhatsApp number",
-    "reasonLabel": "Why do you want to be part?",
-    "reasonPlaceholder": "Tell us why you want to join",
-    "successMessage": "Thank you for your interest!",
-    "errorMessage": "Error submitting form"
-  },
-  "feedback": {
-    "title": "Feedback",
-    "description": "Your opinion is very important to us. How can we improve?",
-    "helpUsImprove": "Help us improve",
-    "ratingRequired": "Please select a rating",
-    "commentPlaceholder": "Tell us about your experience... (optional)",
-    "emailPlaceholder": "Your email (for anonymous feedback)",
-    "submit": "Submit Feedback",
-    "thankYou": "Thank you for your feedback!",
-    "error": "Error submitting feedback. Please try again.",
-    "rateStars": "Rate with {count} stars"
-  },
-  "mentorSuggestion": {
-    "loginRequiredTitle": "Login Required",
-    "loginRequiredDescription": "You need to be logged in to suggest a topic or mentorship area.",
-    "title": "Suggest Topic or Area",
-    "description": "Didn't find what you were looking for? Suggest new topics or knowledge areas you would like to find on the platform.",
-    "observationLabel": "What are you looking for?",
-    "observationPlaceholder": "e.g., I would like to find mentors specialized in Product Design, especially with experience in UX Research and digital accessibility. It would also be interesting to have mentors who work with Design Systems...",
-    "freeTopicsLabel": "Topics or Areas (Optional)",
-    "freeTopicsDescription": "Add keywords related to your suggestion",
-    "freeTopicsPlaceholder": "e.g., Design Thinking, Rapid Prototyping...",
-    "addTopic": "Add",
-    "inclusionTagsLabel": "Inclusion Tags (Optional)",
-    "inclusionTagsDescription": "Select relevant diversity and inclusion tags"
-  },
-  "toast": {
-    "suggestion": {
-      "success": {
-        "title": "Suggestion sent!",
-        "description": "Thank you for your suggestion. Our team will analyze it and let you know about updates."
-      },
-      "error": {
-        "title": "Error sending suggestion",
-        "description": "Could not send your suggestion. Please try again later."
-      }
-    }
-  },
-  "mentorsPage": {
-    "title": "Find your Ideal Mentor",
-    "subtitle": "Connect with verified mentors and accelerate your career",
-    "searchPlaceholder": "Search by name, specialty, company...",
-    "filters": "Filters",
-    "sheetTitle": "Advanced Filters",
-    "sheetDescription": "Refine your search to find the perfect mentor",
-    "organization": "Organization",
-    "organizationPlaceholder": "Filter by organization",
-    "allOrganizations": "All organizations",
-    "state": "State/Province",
-    "statePlaceholder": "Select state",
-    "allStates": "All states",
-    "city": "City",
-    "cityPlaceholder": "Select city",
-    "allCities": "All cities",
-    "topics": "Mentorship Topics",
-    "expertise": "Expertise Areas",
-    "inclusiveTags": "Inclusive Tags",
-    "experience": "Experience",
-    "experiencePlaceholder": "Years of experience",
-    "anyExperience": "Any experience",
-    "availability": "Availability",
-    "availabilityPlaceholder": "Availability status",
-    "anyStatus": "Any status",
-    "clearFilters": "Clear Filters",
-    "resultsFound": "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
-    "noMentorsTitle": "No mentors found",
-    "noMentorsDescription": "Try adjusting your filters to find more mentors.",
-    "suggestTopic": "Suggest Topic or Area",
-    "viewProfile": "View Profile",
-    "sessionsCount": "{count, plural, =1 {1 session} other {# sessions}}",
-    "years": "years",
-    "status": {
-      "available": "Available",
-      "busy": "Busy",
-      "unavailable": "Unavailable",
-      "unknown": "Unknown status"
-    },
-    "backToMentors": "Back to Mentors",
-    "about": "About",
-    "specialties": "Specialties",
-    "languagesAndInclusion": "Languages and Inclusion",
-    "languages": "Languages",
-    "scheduleSession": "Schedule Session",
-    "freeMentorships": "100% free mentorships",
-    "ownProfileMessage": "This is your mentor profile",
-    "bookMentorship": "Book Mentorship",
-    "fullSchedule": "Full Schedule",
-    "links": "Links",
-    "yearsExperienceCount": "{count, plural, =1 {1 year of experience} other {# years of experience}}",
-    "loginRequired": {
-      "title": "Login Required",
-      "description": "You need to be logged in to book a mentorship or use the chat."
-    },
-    "share": {
-      "title": "{name} - Mentor at Menvo",
-      "text": "Meet {name}, mentor specialized in {topics}",
-      "success": "Shared successfully!",
-      "copySuccess": "Link copied to clipboard!"
-    }
-  },
-  "profile": {
-    "title": "My Profile",
-    "description": "Manage your personal and professional information",
-    "viewPublicProfile": "View Public Profile",
-    "saveChanges": "Save Changes",
-    "uploadPhoto": "Update Photo",
-    "uploadPhotoSuccess": "Photo updated successfully!",
-    "uploadPhotoError": "Error uploading image",
-    "tabs": {
-      "personal": "Personal Info",
-      "professional": "Professional",
-      "mentorship": "Mentorship",
-      "documents": "Documents",
-      "settings": "Settings"
-    },
-    "form": {
-      "firstName": "First Name",
-      "firstNamePlaceholder": "Your first name",
-      "lastName": "Last Name",
-      "lastNamePlaceholder": "Your last name",
-      "bio": "Bio",
-      "bioPlaceholder": "Tell us a bit about yourself...",
-      "jobTitle": "Job Title",
-      "jobTitlePlaceholder": "e.g. Senior Software Engineer",
-      "company": "Company",
-      "companyPlaceholder": "e.g. Google, Microsoft...",
-      "linkedin": "LinkedIn",
-      "website": "Website",
-      "portfolio": "Portfolio",
-      "address": "Address",
-      "city": "City",
-      "state": "State",
-      "country": "Country",
-      "languages": "Languages",
-      "mentorshipApproach": "Mentorship Approach",
-      "mentorshipApproachPlaceholder": "How do you usually mentor?",
-      "whatToExpect": "What to Expect",
-      "whatToExpectPlaceholder": "What can a mentee expect from your sessions?",
-      "idealMentee": "Ideal Mentee",
-      "idealMenteePlaceholder": "What kind of person can you help the most?",
-      "expertiseAreas": "Expertise Areas",
-      "mentorshipTopics": "Mentorship Topics",
-      "inclusiveTags": "Inclusion Tags",
-      "cvTitle": "Resume (PDF)",
-      "cvDescription": "Upload your updated resume so mentees can better understand your journey.",
-      "uploadCV": "Upload CV",
-      "viewCV": "View",
-      "removeCV": "Remove",
-      "cvSuccess": "CV uploaded successfully!",
-      "cvRemoveSuccess": "CV removed successfully!",
-      "requiredFields": "First and last name are required",
-      "updateSuccess": "Profile updated successfully!",
-      "updateError": "Error updating profile",
-      "slug": "Slug",
-      "professionalDescription": "Your career information and professional links",
-      "locationDescription": "Your location (full address remains private, only city/state/country are public)",
-      "mentorshipDescription": "Configure your profile as a mentor (all mentorships are free)",
-      "cvAvailable": "PDF file saved and available for viewing",
-      "settingsDescription": "Manage your account settings",
-      "inDevelopment": "In Development",
-      "settingsComingSoon": "Soon you will be able to manage notifications, privacy, and other account settings.",
-      "expertisePlaceholder": "Type an area and press Enter",
-      "topicsPlaceholder": "Type a topic and press Enter",
-      "tagsPlaceholder": "Type a tag and press Enter"
-    },
-    "saving": "Saving...",
-    "loading": "Loading..."
-  },
-  "dashboard": {
-    "greetings": {
-      "morning": "Good morning",
-      "afternoon": "Good afternoon",
-      "evening": "Good evening"
-    },
-    "mentor": {
-      "welcome": "Welcome to your mentor dashboard. Manage your mentorships and help other professionals.",
-      "verification": {
-        "pending": "Verification Pending",
-        "approved": "Profile Verified",
-        "pendingText": "Your profile is awaiting verification. You will receive an email once approved.",
-        "approvedText": "Your profile has been verified! You can now receive bookings from mentees.",
-        "badgePending": "Pending",
-        "badgeApproved": "Verified"
-      },
-      "stats": {
-        "upcoming": "Upcoming Sessions",
-        "upcomingDesc": "Confirmed bookings",
-        "mentees": "Total Mentees",
-        "menteesDesc": "People mentored",
-        "completed": "Completed Sessions",
-        "completedDesc": "Mentorships conducted",
-        "rating": "Rating",
-        "reviews": "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
-      },
-      "actions": {
-        "title": "Quick Actions",
-        "availability": "Setup Availability",
-        "availabilityDesc": "Set your hours and timezone for sessions",
-        "mentorships": "My Mentorships",
-        "mentorshipsDesc": "Track your confirmed and pending appointments",
-        "editProfile": "Edit Profile",
-        "editProfileDesc": "Update your information and specialties",
-        "access": "Access",
-        "waitingVerification": "Awaiting Verification",
-        "manageAgenda": "Manage Agenda",
-        "viewMentorships": "View Mentorships"
-      },
-      "sections": {
-        "upcoming": "Upcoming Sessions",
-        "noSessions": "No sessions scheduled.",
-        "favorites": "My Favorite Mentors",
-        "favoritesDesc": "Quick access to mentors you saved for inspiration",
-        "viewAll": "View all"
-      }
-    },
-    "mentee": {
-      "welcome": "Welcome to your dashboard. Find mentors and accelerate your professional growth.",
-      "stats": {
-        "hours": "Mentorship Hours",
-        "hoursDesc": "Total learning",
-        "mentors": "Mentors",
-        "mentorsDesc": "Connected mentors"
-      },
-      "actions": {
-        "find": "Find Mentors",
-        "findDesc": "Find experts to accelerate your career",
-        "myMentorships": "My Mentorships",
-        "myMentorshipsDesc": "View your appointments and evaluate completed sessions",
-        "access": "Access Mentorships",
-        "viewAll": "View Mentors"
-      },
-      "sections": {
-        "upcoming": "Upcoming Sessions",
-        "noSessions": "No sessions scheduled.",
-        "bookNow": "Book now",
-        "favorites": "Favorite Mentors",
-        "favoritesDesc": "Quick access to saved mentors",
-        "noFavorites": "You haven't saved any mentors yet.",
-        "viewDetails": "View Details"
-      }
-    },
-    "gettingStarted": {
-      "title": "First Steps",
-      "description": "Complete these steps to make the most of the platform",
-      "step1": "Registration completed",
-      "step2": "Role selected",
-      "step3Mentor": "Awaiting profile verification",
-      "step3Mentee": "Complete your profile",
-      "step4Mentor": "Setup availability",
-      "step4Mentee": "Find your first mentor",
-      "step5Mentor": "Receive first booking",
-      "step5Mentee": "Schedule your first session"
-    }
-  },
-  "onboarding": {
-    "title": "Choose your profile",
-    "description": "Select how you would like to participate in our platform. You can change this later in settings.",
-    "configuringFor": "Configuring profile for:",
-    "mentee": {
-      "title": "Mentee",
-      "description": "I seek guidance and support to grow professionally",
-      "benefits": [
-        "Access to experienced mentors",
-        "Personalized mentorship sessions",
-        "Professional networking",
-        "Career development"
-      ],
-      "success": "Mentee profile successfully selected!"
-    },
-    "mentor": {
-      "title": "Mentor",
-      "description": "I want to share knowledge and help other professionals",
-      "benefits": [
-        "Share experience",
-        "Impact careers",
-        "Expand networking",
-        "Develop leadership skills"
-      ],
-      "success": "Mentor profile successfully selected!"
-    },
-    "saving": "Saving your profile...",
-    "confirm": "Confirm Selection",
-    "error": {
-      "notAuthenticated": "User not authenticated",
-      "sessionExpired": "Session expired. Please log in again.",
-      "saveError": "Error saving profile. Check your connection.",
-      "selectRequired": "Please select a profile"
-    }
-  },
-  "auth": {
-    "confirmed": {
-      "title": "Email Confirmed!",
-      "description": "Your account has been successfully activated. Welcome to Menvo!",
-      "redirecting": "Automatically redirecting in {count} seconds...",
-      "continueNow": "Continue Now",
-      "help": "Need help? Contact us.",
-      "messages": {
-        "role": "You will be redirected to select your account type",
-        "profile": "You will be redirected to complete your profile",
-        "dashboard": "You will be redirected to the dashboard"
-      }
-    },
-    "forgotPassword": {
-      "title": "Forgot Password?",
-      "description": "Enter your email and we'll send you a link to reset your password.",
-      "sendLink": "Send Recovery Link",
-      "backToLogin": "Back to Login",
-      "success": "Link sent! Check your email."
-    },
-    "resend": {
-      "title": "Resend Confirmation",
-      "description": "Enter your email to receive a new confirmation link",
-      "successTitle": "Email Resent!",
-      "successDescription": "Check your inbox and spam folder.",
-      "sentTo": "We've sent a new confirmation email to",
-      "otherEmail": "Send to Another Email",
-      "button": "Resend Email",
-      "error": "Error resending email. Please check if the email is correct."
-    },
-    "setPassword": {
-      "title": "Set your password",
-      "description": "You have been invited to the platform. Set your password to continue.",
-      "successTitle": "Password set!",
-      "successDescription": "Your account has been successfully configured",
-      "redirecting": "Redirecting to role selection...",
-      "invalidInvite": "Invalid Invite",
-      "invalidInviteDesc": "The invite link has expired or is invalid",
-      "checkingSession": "Verifying invite...",
-      "button": "Set password and continue",
-      "agreement": "By setting your password, you agree to our"
-    }
-  },
-  "messages": {
-    "title": "Messages",
-    "searchPlaceholder": "Search conversations...",
-    "noConversationsFound": "No conversations found",
-    "noConversationsYet": "No conversations yet",
-    "tryAnotherSearch": "Try searching for another name",
-    "startConversation": "Start a conversation with a mentor!",
-    "newMessages": "{count, plural, =1 {1 new} other {# new}}",
-    "selectConversation": "Select a conversation",
-    "selectConversationDesc": "Choose a conversation in the sidebar to start messaging",
-    "roleMentor": "Mentor",
-    "roleMentee": "Mentee"
-  },
-  "settings": {
-    "title": "Settings",
-    "tabs": {
-      "general": "General",
-      "security": "Security",
-      "appearance": "Appearance"
-    },
-    "language": {
-      "title": "Language",
-      "description": "Choose your preferred language"
-    },
-    "account": {
-      "title": "Account Information",
-      "description": "Your login details",
-      "email": "Email",
-      "verified": "Verified"
-    },
-    "security": {
-      "title": "Change Password",
-      "description": "Update your access password",
-      "currentPassword": "Current Password",
-      "currentPasswordPlaceholder": "Enter your current password",
-      "newPassword": "New Password",
-      "newPasswordPlaceholder": "Enter your new password",
-      "confirmPassword": "Confirm New Password",
-      "confirmPasswordPlaceholder": "Confirm your new password",
-      "changing": "Changing...",
-      "success": "Password changed successfully",
-      "error": "Could not change password",
-      "mismatch": "Passwords do not match",
-      "minLength": "Password must be at least 6 characters long"
-    },
-    "dangerZone": {
-      "title": "Danger Zone",
-      "description": "Irreversible actions on your account",
-      "deleteButton": "Delete Account",
-      "confirmTitle": "Are you absolutely sure?",
-      "confirmDesc": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers.",
-      "cancel": "Cancel",
-      "confirmAction": "Yes, delete my account"
-    },
-    "appearance": {
-      "title": "Theme",
-      "description": "Choose the interface theme",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
-    }
-  },
-  "availability": {
-    "title": "Setup Availability",
-    "description": "Define your available hours for mentorship",
-    "loading": "Loading availability...",
-    "saving": "Saving...",
-    "saveButton": "Save Availability",
-    "addTime": "Add Time Slot",
-    "availableHours": "Available Hours",
-    "availableHoursDesc": "Add the days and times when you are available for mentorships",
-    "timeSlot": "Slot {number}",
-    "dayOfWeek": "Day of the Week",
-    "startTime": "Start Time",
-    "endTime": "End Time",
-    "previewTitle": "Availability Preview",
-    "previewDesc": "How your availability will appear to mentees",
-    "noSchedule": "No schedule configured",
-    "addScheduleToPreview": "Add time slots to see the preview",
-    "success": "Availability saved successfully!",
-    "errorLoad": "Error loading availability",
-    "errorSave": "Error saving availability",
-    "invalidTime": "Invalid time on {day}: start must be before end",
-    "overlappingTime": "Overlapping times on {day}",
-    "tips": {
-      "title": "Tips",
-      "tip1": "Set realistic hours that you can maintain consistently",
-      "tip2": "Leave gaps between sessions for rest",
-      "tip3": "You can update your availability at any time"
-    },
-    "days": {
-      "0": "Sunday",
-      "1": "Monday",
-      "2": "Tuesday",
-      "3": "Wednesday",
-      "4": "Thursday",
-      "5": "Friday",
-      "6": "Saturday"
-    },
-    "daysShort": {
-      "0": "Sun",
-      "1": "Mon",
-      "2": "Tue",
-      "3": "Wed",
-      "4": "Thu",
-      "5": "Fri",
-      "6": "Sat"
-    },
-    "display": {
-      "timezone": "Timezone: {timezone}",
-      "noAvailability": "No availability configured",
-      "noAvailabilityDesc": "The mentor hasn't defined their available hours yet",
-      "status": {
-        "available": "Available",
-        "busy": "Busy",
-        "past": "Past"
-      },
-      "cardTitle": "Availability",
-      "cardDescription": "Available times for scheduling mentorships",
-      "book": "Book"
-    }
-  },
-  "mentorship": {
-    "title": "My Mentorships",
-    "description": "Manage all your mentorships - received and requested",
-    "received": {
-      "title": "Mentorships Received",
-      "asMentor": "(you as mentor)",
-      "pending": "Requests Received",
-      "pendingDesc": "Mentorship requests awaiting your confirmation",
-      "confirmed": "Scheduled Mentorships",
-      "confirmedDesc": "Confirmed and scheduled sessions. After the mentorship, click \"Evaluate\" to leave your feedback.",
-      "completed": "Evaluated Mentorships",
-      "completedDesc": "Finished sessions with registered feedback",
-      "cancelled": "Cancelled Sessions",
-      "cancelledDesc": "Mentorships that were cancelled"
-    },
-    "requested": {
-      "title": "Mentorships Requested",
-      "asMentee": "(you as mentee)",
-      "pending": "Awaiting Confirmation",
-      "pendingDesc": "Pending confirmation requests from mentors",
-      "confirmed": "Scheduled Mentorships",
-      "confirmedDesc": "Sessions confirmed by mentors",
-      "completed": "Evaluated Mentorships",
-      "completedDesc": "Finished sessions with your feedback",
-      "cancelled": "Cancelled Sessions",
-      "cancelledDesc": "Mentorships that were cancelled"
-    },
-    "tabs": {
-      "pending": "Pending",
-      "confirmed": "Scheduled",
-      "completed": "Evaluated",
-      "cancelled": "Cancelled"
-    },
-    "resources": {
-      "title": "Resource Library",
-      "description": "Share materials and resources with your mentees",
-      "inDevelopment": "In development",
-      "comingSoon": "Coming soon: library of materials, templates and resources to share with mentees"
-    }
-  },
-  "appointments": {
-    "title": "Appointments",
-    "loading": "Loading appointments...",
-    "empty": "No appointments found",
-    "error": "Error loading appointments",
-    "roleMentee": "Mentee",
-    "roleMentor": "Mentor",
-    "roleAdmin": "Admin",
-    "roleUser": "User",
-    "status": {
-      "pending": "Pending",
-      "confirmed": "Confirmed",
-      "cancelled": "Cancelled",
-      "completed": "Completed"
-    },
-    "today": "Today",
-    "expired": "Expired",
-    "minutes": "min",
-    "menteeComments": "Mentee Comments:",
-    "mentorNotes": "Mentor Notes:",
-    "cancelledBy": "Cancelled by {name}",
-    "you": "you",
-    "reason": "Reason:",
-    "cancelledAt": "Cancelled on {date}",
-    "evaluate": "Evaluate",
-    "joinMeet": "Join Meet"
-  },
-  "events": {
-    "title": "Events & Learning",
-    "subtitle": "Discover courses, workshops, and events to accelerate your growth",
-    "searchPlaceholder": "Search events, courses, workshops...",
-    "list": "List",
-    "map": "Map",
-    "results": "Showing {count} events",
-    "noEvents": "No events found",
-    "adjustFilters": "Try adjusting your filters or search terms",
-    "clearFilters": "Clear all filters"
-  },
-  "chat": {
-    "online": "Online",
-    "connecting": "Connecting...",
-    "typing": "typing...",
-    "placeholder": "Type your message...",
-    "empty": "No messages yet.",
-    "startConversation": "Send a message to start the conversation!",
-    "errorLoad": "Error loading messages",
-    "errorSend": "Error sending message"
-  },
-  "admin": {
-    "title": "Admin Panel",
-    "welcome": "Welcome, {name}!",
-    "description": "Manage mentors, users, and monitor the Menvo platform",
-    "stats": {
-      "totalUsers": "Total Users",
-      "recentSignups": "+{count} in the last 7 days",
-      "verifiedMentors": "Verified Mentors",
-      "totalMentors": "{count} mentors total",
-      "pendingMentors": "Pending Mentors",
-      "awaitingVerification": "Awaiting verification",
-      "totalSessions": "Sessions Conducted",
-      "sessionsDesc": "Total mentorships performed"
-    },
-    "actions": {
-      "title": "Quick Actions",
-      "suggestions": "Topic Suggestions",
-      "suggestionsDesc": "See what users are asking for",
-      "manageMentors": "Manage Mentors",
-      "manageMentorsDesc": "View and verify all mentors",
-      "verifyMentors": "Verify Mentors",
-      "verifyMentorsDesc": "Approve mentors awaiting verification",
-      "manageUsers": "Manage Users",
-      "manageUsersDesc": "View and manage all users",
-      "settings": "Settings",
-      "settingsDesc": "General system settings",
-      "access": "Access"
-    },
-    "nav": {
-      "dashboard": "Dashboard",
-      "dashboardDesc": "Platform overview",
-      "organizations": "Organizations",
-      "organizationsDesc": "Manage organizations",
-      "mentors": "Mentors",
-      "mentorsDesc": "Manage and verify mentors",
-      "users": "Users",
-      "usersDesc": "Manage platform users",
-      "suggestions": "Suggestions",
-      "suggestionsDesc": "Suggested topics and areas",
-      "reports": "Reports",
-      "reportsDesc": "Statistics and metrics"
-    },
-    "alerts": {
-      "pendingMentors": "Attention: Pending Mentors",
-      "pendingMentorsDesc": "There are {count} mentors awaiting verification. Review and approve profiles.",
-      "verifyNow": "Verify Now"
-    }
-  }
+    "common":  {
+                   "welcome":  "Welcome",
+                   "home":  "Home",
+                   "findMentors":  "Find Mentors",
+                   "community":  "Community",
+                   "hub":  "Hub",
+                   "events":  "Events",
+                   "howItWorks":  "How It Works",
+                   "aboutUs":  "About Us",
+                   "title":  "Menvo",
+                   "login":  "Sign In",
+                   "register":  "Sign Up",
+                   "logout":  "Sign Out",
+                   "language":  "Language",
+                   "english":  "English",
+                   "portuguese":  "Portuguese",
+                   "spanish":  "Spanish",
+                   "cancel":  "Cancel",
+                   "continue":  "Continue",
+                   "submit":  "Submit",
+                   "back":  "Back",
+                   "next":  "Next",
+                   "save":  "Save",
+                   "email":  "Email",
+                   "password":  "Password",
+                   "name":  "Name",
+                   "firstName":  "First Name",
+                   "lastName":  "Last Name",
+                   "loading":  "Loading...",
+                   "saving":  "Saving...",
+                   "close":  "Close",
+                   "submitting":  "Submitting...",
+                   "languageSelector":  {
+                                            "title":  "Select your language",
+                                            "description":  "Choose your language to continue",
+                                            "successTitle":  "Language set!",
+                                            "successDescription":  "You can change this setting at any time in the Settings menu after logging in.",
+                                            "button":  "Start browsing"
+                                        },
+                   "administration":  "Administration",
+                   "progress":  "Progress",
+                   "confirmTitle":  "Are you sure?",
+                   "confirmDesc":  "This action cannot be undone.",
+                   "confirmAction":  "Yes, confirm",
+                   "french":  "French",
+                   "danish":  "Danish",
+                   "swedish":  "Swedish",
+                   "organizations":  "Organizations"
+               },
+    "header":  {
+                   "title":  "MENVO - Volunteer Mentors",
+                   "subtitle":  "Connecting mentors and mentees",
+                   "userMenu":  {
+                                    "dashboard":  "Dashboard",
+                                    "profile":  "Profile",
+                                    "messages":  "Messages",
+                                    "settings":  "Settings",
+                                    "adminPanel":  "Admin Panel",
+                                    "logout":  "Logout",
+                                    "administration":  "Administration",
+                                    "user":  "User",
+                                    "createOrganization":  "Create Organization"
+                                }
+               },
+    "home":  {
+                 "badge":  {
+                               "freeMentorship":  "Volunteer Mentorship Platform"
+                           },
+                 "hero":  {
+                              "title":  "Connect with Volunteer Mentors",
+                              "description":  "Find guidance, share experiences, and grow together. Our platform connects you with volunteer mentors for free mentorship sessions.",
+                              "findMentor":  "Find a Mentor",
+                              "becomeMentor":  "Become a Mentor"
+                          },
+                 "testimonials":  {
+                                      "title":  "Stories That Inspire",
+                                      "description":  "Lives transformed through mentorship"
+                                  },
+                 "howItWorks":  {
+                                    "title":  "How It Works",
+                                    "description":  "Our platform makes it easy to connect with mentors and schedule sessions",
+                                    "step1":  {
+                                                  "title":  "Find a Mentor",
+                                                  "description":  "Browse our diverse community of volunteer mentors and find the perfect match for your needs."
+                                              },
+                                    "step2":  {
+                                                  "title":  "Schedule a Session",
+                                                  "description":  "Book a time that works for both of you using our integrated scheduling system."
+                                              },
+                                    "step3":  {
+                                                  "title":  "Connect \u0026 Grow",
+                                                  "description":  "Meet virtually, share experiences, and develop your skills with personalized guidance."
+                                              },
+                                    "learnMore":  "Learn More"
+                                },
+                 "featuredMentors":  {
+                                         "title":  "Featured Mentors",
+                                         "description":  "Meet some of our dedicated volunteer mentors",
+                                         "viewAll":  "View All Mentors"
+                                     },
+                 "mentor":  {
+                                "sampleName":  "Sarah Johnson",
+                                "field":  "Software Engineering",
+                                "tags":  [
+                                             "Career",
+                                             "Tech",
+                                             "Leadership"
+                                         ],
+                                "description":  "Senior Developer with 10+ years of experience helping new programmers navigate the tech industry.",
+                                "languages":  "English, Spanish",
+                                "viewProfile":  "View Profile"
+                            },
+                 "events":  {
+                                "title":  "Upcoming Events",
+                                "description":  "Join our community events and group mentorship sessions",
+                                "card":  {
+                                             "title":  "Tech Career Panel: Breaking Into the Industry",
+                                             "date":  "June 15, 2025",
+                                             "time":  "6:00 PM - 8:00 PM",
+                                             "description":  "Join our panel of industry experts as they share insights on how to start and grow your career in technology.",
+                                             "attendees":  "{count} attendees",
+                                             "register":  "Register"
+                                         },
+                                "viewAll":  "View All Events"
+                            },
+                 "cta":  {
+                             "title":  "Ready to Get Started?",
+                             "description":  "Join us today and connect with people who can help you achieve your goals",
+                             "signup":  "Sign Up Now",
+                             "learnMore":  "Learn More"
+                         },
+                 "event":  {
+                               "type":  "Online"
+                           }
+             },
+    "about":  {
+                  "badge":  "About Us",
+                  "ourMission":  {
+                                     "title":  "Our Mission",
+                                     "description":  "Simplifying mentorship into open conversations. Anyone can share their experience with those seeking it, always for free."
+                                 },
+                  "whyWeStarted":  {
+                                       "title":  "Why We Started",
+                                       "paragraph1":  "Menvo was born from a simple idea: everyone deserves access to mentorship, regardless of their background or financial situation. We believe that sharing knowledge and experiences can transform lives and communities.",
+                                       "paragraph2":  "Our founder experienced firsthand the impact that good mentorship can have on personal and professional growth. However, they also saw how mentorship opportunities were often limited to those with existing connections or financial resources.",
+                                       "paragraph3":  "That\u0027s why we created a platform that makes mentorship accessible to all, connecting those who seek guidance with those willing to share their experience – completely free of charge."
+                                   },
+                  "ourStoryImageAlt":  "Our story illustration",
+                  "values":  {
+                                 "community":  {
+                                                   "title":  "Community",
+                                                   "description":  "Building a supportive community where knowledge is freely shared and connections are made across backgrounds and borders."
+                                               },
+                                 "accessibility":  {
+                                                       "title":  "Accessibility",
+                                                       "description":  "Making mentorship accessible to everyone, regardless of their financial situation, location, or background."
+                                                   },
+                                 "impact":  {
+                                                "title":  "Impact",
+                                                "description":  "Creating positive change by empowering individuals through knowledge sharing and meaningful connections."
+                                            }
+                             },
+                  "sdg":  {
+                              "title":  "Sustainable Development Goals",
+                              "description":  "Our platform aligns with the United Nations\u0027 Sustainable Development Goals (SDGs), particularly focusing on:",
+                              "goalNumber":  "SDG {number}",
+                              "goals":  {
+                                            "qualityEducation":  "Quality Education",
+                                            "genderEquality":  "Gender Equality",
+                                            "decentWork":  "Decent Work and Economic Growth",
+                                            "reducedInequalities":  "Reduced Inequalities"
+                                        }
+                          },
+                  "ourTeam":  {
+                                  "title":  "Our Team",
+                                  "paragraph1":  "We\u0027re a diverse team of professionals passionate about making mentorship accessible to everyone. Our team members come from various backgrounds and industries, bringing together a wealth of experience and perspectives.",
+                                  "paragraph2":  "What unites us is our belief in the power of mentorship to transform lives and our commitment to creating a platform that facilitates meaningful connections.",
+                                  "paragraph3":  "We\u0027re always looking for passionate individuals to join our mission. If you\u0027re interested in contributing to Menvo, we\u0027d love to hear from you!",
+                                  "joinTeam":  "Join Our Team",
+                                  "viewMap":  "View Team Map"
+                              },
+                  "ourTeamImageAlt":  "Our team illustration",
+                  "ourImpact":  {
+                                    "title":  "Our Impact",
+                                    "volunteerMentors":  {
+                                                             "count":  "1,000+",
+                                                             "label":  "Volunteer Mentors"
+                                                         },
+                                    "mentorshipSessions":  {
+                                                               "count":  "5,000+",
+                                                               "label":  "Mentorship Sessions"
+                                                           },
+                                    "countriesReached":  {
+                                                             "count":  "50+",
+                                                             "label":  "Countries Reached"
+                                                         },
+                                    "description":  "These numbers represent real people whose lives have been positively impacted through mentorship connections on our platform."
+                                },
+                  "ourPartners":  {
+                                      "title":  "Our Partners",
+                                      "description":  "We\u0027re proud to collaborate with organizations that share our vision of making mentorship accessible to all.",
+                                      "partnerLogoAlt":  "Partner {number} logo"
+                                  },
+                  "joinOurMission":  {
+                                         "title":  "Join Our Mission",
+                                         "description":  "Whether you\u0027re looking to share your expertise as a mentor or seeking guidance as a mentee, you can be part of our mission to make mentorship accessible to all.",
+                                         "signUpNow":  "Sign Up Now",
+                                         "contactUs":  "Contact Us"
+                                     }
+              },
+    "howItWorks":  {
+                       "title":  "How Menvo Works",
+                       "description":  "Our platform makes it easy to connect with mentors and schedule free mentorship sessions",
+                       "forMentees":  "For Mentees",
+                       "forMentors":  "For Mentors",
+                       "forNGOs":  "For NGOs",
+                       "forCompanies":  "For Companies",
+                       "mentees":  {
+                                       "step1":  {
+                                                     "title":  "Create Your Profile",
+                                                     "description":  "Sign up and create your profile with details about your background, goals, and interests. This helps us match you with the right mentors.",
+                                                     "feature1":  "Upload your resume",
+                                                     "feature2":  "Add your profile picture",
+                                                     "feature3":  "Connect your LinkedIn profile"
+                                                 },
+                                       "step2":  {
+                                                     "title":  "Find the Right Mentor",
+                                                     "description":  "Browse our diverse community of volunteer mentors. Use filters to find mentors based on expertise, industry, location, and more.",
+                                                     "feature1":  "Filter by topics and expertise",
+                                                     "feature2":  "Search by location or language",
+                                                     "feature3":  "Read reviews from other mentees"
+                                                 },
+                                       "step3":  {
+                                                     "title":  "Schedule a Session",
+                                                     "description":  "Once you find a mentor you\u0027d like to connect with, view their availability and schedule a free 45-minute mentorship session.",
+                                                     "feature1":  "View mentor\u0027s calendar",
+                                                     "feature2":  "Select a convenient time slot",
+                                                     "feature3":  "Add topics you\u0027d like to discuss"
+                                                 },
+                                       "step4":  {
+                                                     "title":  "Connect and Grow",
+                                                     "description":  "Meet with your mentor via video call. Share your challenges, ask questions, and receive personalized guidance to help you achieve your goals.",
+                                                     "feature1":  "Join via video call link",
+                                                     "feature2":  "Discuss your goals and challenges",
+                                                     "feature3":  "Receive personalized guidance"
+                                                 },
+                                       "getStarted":  "Get Started as a Mentee"
+                                   },
+                       "mentors":  {
+                                       "step1":  {
+                                                     "title":  "Create Your Mentor Profile",
+                                                     "description":  "Sign up and create your mentor profile with details about your expertise, experience, and the topics you can help with.",
+                                                     "feature1":  "Highlight your expertise and experience",
+                                                     "feature2":  "Specify topics you can mentor on",
+                                                     "feature3":  "Connect your professional profiles"
+                                                 },
+                                       "step2":  {
+                                                     "title":  "Complete Verification",
+                                                     "description":  "For the safety of our community, all mentors go through a verification process. This includes a brief video call with our team.",
+                                                     "feature1":  "Schedule a verification call",
+                                                     "feature2":  "Verify your identity and expertise",
+                                                     "feature3":  "Get approved to start mentoring"
+                                                 },
+                                       "step3":  {
+                                                     "title":  "Set Your Availability",
+                                                     "description":  "Define when you\u0027re available to mentor. You have full control over your schedule and can update it anytime.",
+                                                     "feature1":  "Set your weekly availability",
+                                                     "feature2":  "Specify session duration",
+                                                     "feature3":  "Update your calendar as needed"
+                                                 },
+                                       "step4":  {
+                                                     "title":  "Conduct Mentorship Sessions",
+                                                     "description":  "Connect with mentees via video calls. Share your knowledge, provide guidance, and help them navigate their challenges.",
+                                                     "feature1":  "Receive session requests",
+                                                     "feature2":  "Conduct video mentorship sessions",
+                                                     "feature3":  "Track your impact and sessions"
+                                                 },
+                                       "becomeMentor":  "Become a Mentor"
+                                   },
+                       "ngos":  {
+                                    "step1":  {
+                                                  "title":  "Register Your NGO for Free",
+                                                  "description":  "NGOs and social organizations can register for free on the platform to connect the youth they serve with volunteer mentors.",
+                                                  "feature1":  "100% free registration for NGOs",
+                                                  "feature2":  "Unlimited access to the platform",
+                                                  "feature3":  "Dedicated support for organizations"
+                                              },
+                                    "step2":  {
+                                                  "title":  "Connect Youth with Mentors",
+                                                  "description":  "Register the young people served by your organization and help them find mentors who can guide them in their professional and personal journeys.",
+                                                  "feature1":  "Register multiple youth from your organization",
+                                                  "feature2":  "Track mentorship progress",
+                                                  "feature3":  "Receive social impact reports"
+                                              },
+                                    "getStarted":  "Register My NGO"
+                                },
+                       "companies":  {
+                                         "step1":  {
+                                                       "title":  "Corporate Volunteering through Mentorship",
+                                                       "description":  "Develop corporate volunteering programs by allowing your employees to become volunteer mentors, strengthening the company\u0027s purpose.",
+                                                       "feature1":  "Engage employees in social actions",
+                                                       "feature2":  "Develop leadership through mentorship",
+                                                       "feature3":  "Strengthen organizational culture"
+                                                   },
+                                         "step2":  {
+                                                       "title":  "ESG Reports and Social Impact",
+                                                       "description":  "Receive detailed reports on the social impact of mentorships conducted by your employees, strengthening your ESG metrics.",
+                                                       "feature1":  "Monthly social impact reports",
+                                                       "feature2":  "Metrics for ESG reporting",
+                                                       "feature3":  "Corporate volunteering certificates"
+                                                   },
+                                         "step3":  {
+                                                       "title":  "Incentive Policies and Benefits",
+                                                       "description":  "Create incentive policies for mentor employees, such as paid time off, internal recognition, and career development.",
+                                                       "feature1":  "Time bank for volunteer mentoring",
+                                                       "feature2":  "Recognition and internal gamification",
+                                                       "feature3":  "Soft skills development"
+                                                   },
+                                         "getStarted":  "Become a Corporate Partner"
+                                     },
+                       "faq":  {
+                                   "title":  "Frequently Asked Questions",
+                                   "description":  "Find answers to the most common questions about the platform.",
+                                   "viewAll":  "View all questions",
+                                   "q1":  {
+                                              "question":  "Is mentorship really free?",
+                                              "answer":  "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow and develop."
+                                          },
+                                   "q2":  {
+                                              "question":  "How long are mentorship sessions?",
+                                              "answer":  "Standard mentorship sessions are 45 minutes long. This provides enough time for meaningful conversation while respecting everyone\u0027s schedules."
+                                          },
+                                   "q3":  {
+                                              "question":  "How often can I meet with a mentor?",
+                                              "answer":  "This depends on the mentor\u0027s availability and preferences. Some mentors are open to regular sessions, while others may prefer one-time meetings."
+                                          },
+                                   "q4":  {
+                                              "question":  "What happens if I need to cancel?",
+                                              "answer":  "We ask that you cancel at least 24 hours in advance out of respect for the mentor\u0027s time. You can easily reschedule through your dashboard."
+                                          },
+                                   "q5":  {
+                                              "question":  "How do I become a verified mentor?",
+                                              "answer":  "After creating your mentor profile, you\u0027ll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
+                                          },
+                                   "q6":  {
+                                              "question":  "Is my information secure?",
+                                              "answer":  "Yes, we take privacy and security seriously. Your personal information is protected and only shared with those you choose to connect with."
+                                          },
+                                   "stillHaveQuestions":  "Still have questions?",
+                                   "supportDescription":  "Our support team is here to help you with any questions you may have.",
+                                   "contactSupport":  "Contact Support"
+                               }
+                   },
+    "faq":  {
+                "title":  "Frequently Asked Questions",
+                "description":  "Find answers to the most common questions about the Menvo platform.",
+                "q1":  {
+                           "question":  "Is mentorship really free?",
+                           "answer":  "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow."
+                       },
+                "q2":  {
+                           "question":  "How long are mentorship sessions?",
+                           "answer":  "Standard mentorship sessions last 45 minutes. This provides enough time for a meaningful conversation while respecting everyone\u0027s schedule."
+                       },
+                "q3":  {
+                           "question":  "How often can I meet with a mentor?",
+                           "answer":  "This depends on the mentor\u0027s availability and preferences. Some mentors are open to regular sessions, while others prefer one-time meetings."
+                       },
+                "q4":  {
+                           "question":  "What happens if I need to cancel?",
+                           "answer":  "We ask that you cancel at least 24 hours in advance out of respect for the mentor\u0027s time. You can easily reschedule through your dashboard."
+                       },
+                "q5":  {
+                           "question":  "How do I become a verified mentor?",
+                           "answer":  "After creating your mentor profile, you\u0027ll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
+                       },
+                "q6":  {
+                           "question":  "Is my information safe?",
+                           "answer":  "Yes, we take privacy and security very seriously. Your personal information is protected and only shared with those you choose to connect with."
+                       },
+                "q7":  {
+                           "question":  "How does it work for NGOs?",
+                           "answer":  "NGOs can register for free and connect the youth they serve with volunteer mentors. It\u0027s a way to expand the organization\u0027s social impact at no cost."
+                       },
+                "q8":  {
+                           "question":  "Can companies participate?",
+                           "answer":  "Yes! Companies can develop corporate volunteering programs through mentorship, receive ESG reports, and create incentive policies for mentor employees."
+                       },
+                "q9":  {
+                           "question":  "How does recruiter access work?",
+                           "answer":  "This feature is under development. Soon, recruiters will have access to qualified talent participating on the platform, always respecting user privacy."
+                       },
+                "q10":  {
+                            "question":  "Can I be both a mentor and mentee?",
+                            "answer":  "Yes! You can have both profiles on the platform. Many professionals seek mentorship in specific areas while mentoring in their areas of expertise."
+                        },
+                "stillHaveQuestions":  "Still have questions?",
+                "supportDescription":  "Our support team is here to help you with any questions you may have.",
+                "contactSupport":  "Contact Support"
+            },
+    "login":  {
+                  "title":  "Welcome back",
+                  "description":  "Sign in to your account to access the platform",
+                  "email":  "Email",
+                  "emailPlaceholder":  "name@example.com",
+                  "password":  "Password",
+                  "passwordPlaceholder":  "Enter your password",
+                  "forgotPassword":  "Forgot password?",
+                  "loginButton":  "Log in",
+                  "loggingIn":  "Logging in...",
+                  "noAccount":  "Don\u0027t have an account?",
+                  "signUp":  "Sign up",
+                  "continueWith":  "Continue with",
+                  "google":  "Google",
+                  "linkedin":  "LinkedIn",
+                  "connecting":  "Connecting...",
+                  "emailNotConfirmedInfo":  "Check your inbox to verify your email.",
+                  "dontHaveAccount":  "Don\u0027t have an account?",
+                  "error":  {
+                                "invalidCredentials":  "Invalid email or password. Please check your credentials and try again.",
+                                "emailNotConfirmed":  "Email not confirmed. Check your inbox and click the confirmation link.",
+                                "tooManyAttempts":  "Too many login attempts. Please wait a few minutes before trying again.",
+                                "networkError":  "Connection error. Please check your internet and try again.",
+                                "unexpected":  "Unexpected error. Please try again.",
+                                "loginFailed":  "Error signing in. Please try again."
+                            },
+                  "orContinueWith":  "or continue with",
+                  "success":  "Login successful!"
+              },
+    "register":  {
+                     "title":  "Join Menvo",
+                     "subtitle":  "Connect with volunteer mentors and develop your career for free",
+                     "signupTitle":  "Create Account",
+                     "description":  "Fill in your details to start your journey",
+                     "firstName":  "First Name",
+                     "firstNamePlaceholder":  "Enter your first name",
+                     "lastName":  "Last Name",
+                     "lastNamePlaceholder":  "Enter your last name",
+                     "email":  "Email",
+                     "emailPlaceholder":  "Enter your email",
+                     "emailInvalid":  "Invalid email",
+                     "password":  "Password",
+                     "passwordPlaceholder":  "Create a password",
+                     "confirmPassword":  "Confirm Password",
+                     "confirmPasswordPlaceholder":  "Enter password again",
+                     "mentor":  "Mentor",
+                     "mentee":  "Mentee",
+                     "registerButton":  "Register",
+                     "creatingAccount":  "Creating account...",
+                     "alreadyHaveAccount":  "Already have an account?",
+                     "signIn":  "Sign In",
+                     "orContinueWith":  "Or continue with",
+                     "confirmEmail":  "Confirm your email",
+                     "confirmEmailDescription":  "A confirmation email was sent to {email}. Please access your inbox and click the link to activate your account.",
+                     "nextSteps":  "Next steps:",
+                     "nextStepsList":  [
+                                           "Check your inbox (and spam folder)",
+                                           "Click the confirmation link in the email",
+                                           "Choose your user type (mentor or mentee)",
+                                           "Complete your profile with your information",
+                                           "Wait for our team validation (mentors only)"
+                                       ],
+                     "afterConfirmation":  "After confirming your email, you\u0027ll be able to choose whether you want to be a mentor or mentee and complete your profile. Mentors will go through a validation process with our team before being published.",
+                     "didntReceiveEmail":  "Didn\u0027t receive the email?",
+                     "checkSpam":  "Check your spam folder.",
+                     "emailExpired":  "Confirmation link expired?",
+                     "emailExpiredDescription":  "If the confirmation link expired (24 hours), you can use the \u0027Forgot my password\u0027 option to reset and confirm your account.",
+                     "resendEmail":  "Resend email",
+                     "emailExpiredAction":  "Link expired? Reset password",
+                     "tryAgain":  "Try again",
+                     "emailConfirmed":  "Email Confirmed!",
+                     "emailConfirmedDescription":  "Your email has been confirmed successfully. Now choose how you want to use the platform.",
+                     "selectRoleDescription":  "Choose how you want to use the platform:",
+                     "menteeDescription":  "I seek guidance and professional development",
+                     "mentorDescription":  "I want to share knowledge and guide other professionals",
+                     "continue":  "Continue",
+                     "welcome":  {
+                                     "title":  "Welcome to Menvo!",
+                                     "description":  "Your account has been confirmed successfully. Now choose how you want to use the platform.",
+                                     "selectRoleDescription":  "Choose how you want to use the platform:",
+                                     "continue":  "Continue"
+                                 },
+                     "goToLogin":  "Go to Login",
+                     "passwordValidation":  {
+                                                "passwordsDontMatch":  "Passwords don\u0027t match",
+                                                "passwordTooShort":  "Password must be at least 6 characters long",
+                                                "passwordStrength":  "Password strength:",
+                                                "passwordTooWeak":  "Password too weak",
+                                                "passwordMedium":  "Medium password",
+                                                "passwordStrong":  "Strong password",
+                                                "passwordsMatch":  "✓ Passwords match",
+                                                "passwordsDontMatchError":  "Passwords don\u0027t match"
+                                            },
+                     "goToHome":  "Back to Home",
+                     "goToVerification":  "Go to verification page",
+                     "userType":  {
+                                      "title":  "How do you want to participate?",
+                                      "mentee":  {
+                                                     "title":  "Mentee",
+                                                     "description":  "I seek guidance to develop my career"
+                                                 },
+                                      "mentor":  {
+                                                     "title":  "Mentor",
+                                                     "description":  "I want to share my experience and help others"
+                                                 },
+                                      "company":  {
+                                                      "title":  "Company",
+                                                      "description":  "I want to enroll professionals from our company"
+                                                  },
+                                      "recruiter":  {
+                                                        "title":  "Recruiter",
+                                                        "description":  "I\u0027m seeking qualified professionals for opportunities"
+                                                    }
+                                  },
+                     "success":  "Account created successfully!",
+                     "error":  {
+                                   "requiredFields":  "First and last name are required",
+                                   "unexpected":  "An unexpected error occurred. Please try again."
+                               }
+                 },
+    "community":  {
+                      "title":  "Community Board",
+                      "subtitle":  "Meet people looking to learn and proactively offer your mentorship.",
+                      "mentorTip":  "Tip: Proactive mentors who help those seeking knowledge get 3x more visibility.",
+                      "searchPlaceholder":  "Search by name, goal, or interest...",
+                      "seekingHelpWith":  "Seeking help with:",
+                      "noBioProvided":  "This member hasn\u0027t described their goals in detail yet.",
+                      "offerHelp":  "Offer Help",
+                      "noResults":  "No members found with these terms.",
+                      "clearSearch":  "Clear search",
+                      "loadMore":  "Load more",
+                      "errorLoading":  "Error loading community profiles.",
+                      "disclaimer":  {
+                                         "title":  "You are not a Mentor yet",
+                                         "description":  "You can chat with {name} and share your social networks, but for them to schedule formal sessions with you, your profile must be set to Mentor.",
+                                         "whyTitle":  "Why become a Mentor?",
+                                         "whyDescription":  "As a verified mentor, you gain access to scheduling tools, synced calendar, and official reviews.",
+                                         "chatAnyway":  "Just Chat",
+                                         "becomeMentor":  "Become a Mentor"
+                                     }
+                  },
+    "hub":  {
+                "subtitle":  "Discover curated events, courses, tools, and discounts to accelerate your journey.",
+                "suggestBtn":  "Suggest Resource",
+                "searchPlaceholder":  "Search the hub...",
+                "viewMore":  "Access",
+                "tabs":  {
+                             "all":  "All",
+                             "events":  "Events",
+                             "courses":  "Courses",
+                             "tools":  "Tools",
+                             "discounts":  "Discounts"
+                         },
+                "types":  {
+                              "event":  "Event",
+                              "course":  "Course",
+                              "tool":  "Tool",
+                              "discount":  "Discount",
+                              "job":  "Job"
+                          },
+                "noResults":  {
+                                  "title":  "No resources found",
+                                  "description":  "Try adjusting your filters or searching for other terms.",
+                                  "clear":  "Clear filters"
+                              }
+            },
+    "mentors":  {
+                    "title":  "Find a Mentor",
+                    "description":  "Browse our community of volunteer mentors and find the perfect match for your needs",
+                    "searchPlaceholder":  "Search by name, expertise, or keywords...",
+                    "filtersTitle":  "Filters",
+                    "applyFilters":  "Apply Filters",
+                    "clearFilters":  "Clear",
+                    "showingResults":  "{count} mentors found",
+                    "sortBy":  "Sort by",
+                    "sortOptions":  {
+                                        "relevance":  "Relevance",
+                                        "name":  "Name",
+                                        "experience":  "Experience",
+                                        "rating":  "Rating"
+                                    },
+                    "noMentorsFound":  "No mentors found",
+                    "noMentorsDescription":  "Try adjusting your filters or search terms",
+                    "clearFiltersButton":  "Clear Filters",
+                    "loadMore":  "Load More",
+                    "filterOptions":  {
+                                          "topics":  "Topics",
+                                          "languages":  "Languages",
+                                          "experience":  "Experience",
+                                          "inclusionTags":  "Inclusion Tags",
+                                          "education":  "Education Level",
+                                          "location":  "Location",
+                                          "city":  "City",
+                                          "country":  "Country",
+                                          "availability":  "Availability",
+                                          "rating":  "Rating",
+                                          "all":  "All",
+                                          "available":  "Available",
+                                          "busy":  "Busy",
+                                          "aboveRating":  "{rating}+ stars"
+                                      },
+                    "mentorCard":  {
+                                       "available":  "Available",
+                                       "busy":  "Busy",
+                                       "specialties":  "Specialties:",
+                                       "viewProfile":  "View Profile",
+                                       "scheduleSession":  "Schedule"
+                                   },
+                    "loginRequired":  {
+                                          "title":  "Login Required",
+                                          "description":  "You need to be logged in to view mentor profiles and schedule sessions.",
+                                          "descriptionWithName":  "You need to be logged in to view {mentorName}\u0027s profile and schedule sessions.",
+                                          "benefits":  {
+                                                           "title":  "What you can do after logging in:",
+                                                           "item1":  "View detailed mentor profiles",
+                                                           "item2":  "Schedule free mentorship sessions",
+                                                           "item3":  "Message mentors directly",
+                                                           "item4":  "Access your mentorship history"
+                                                       },
+                                          "signUp":  "Sign Up",
+                                          "login":  "Login"
+                                      },
+                    "pagination":  {
+                                       "previous":  "Previous",
+                                       "next":  "Next",
+                                       "page":  "Page {current} of {total}"
+                                   }
+                },
+    "footer":  {
+                   "description":  "Simplifying mentorship into open conversations. Anyone can share their experience with those seeking it, always for free.",
+                   "platform":  "Platform",
+                   "findMentors":  "Find Mentors",
+                   "events":  "Events \u0026 Courses",
+                   "howItWorks":  "How It Works",
+                   "store":  "Store",
+                   "company":  "Company",
+                   "aboutUs":  "About Us",
+                   "mission":  "Our Mission",
+                   "team":  "Our Team",
+                   "partners":  "Partners",
+                   "contact":  "Contact",
+                   "subscribe":  "Subscribe",
+                   "newsletter":  "Stay updated with our newsletter",
+                   "privacyPolicy":  "Privacy Policy",
+                   "termsOfService":  "Terms of Service",
+                   "cookiePolicy":  "Cookie Policy",
+                   "allRightsReserved":  "All rights reserved."
+               },
+    "newsletter":  {
+                       "unsubscribe":  {
+                                           "title":  "Unsubscribe from newsletter",
+                                           "description":  "We\u0027re sorry to see you go. Enter your email to unsubscribe.",
+                                           "successTitle":  "Successfully unsubscribed",
+                                           "successDescription":  "You have been removed from our newsletter list. We\u0027ll miss you!",
+                                           "rejoinText":  "If you change your mind, you can subscribe again at any time through our website.",
+                                           "rejoinButton":  "Subscribe again",
+                                           "considerTitle":  "Before you cancel, consider:",
+                                           "considerItem1":  "You will only receive relevant content about mentorship",
+                                           "considerItem2":  "We send a maximum of 2 emails per week",
+                                           "considerItem3":  "You can re-subscribe at any time",
+                                           "button":  "Unsubscribe",
+                                           "cancelling":  "Unsubscribing...",
+                                           "backToSite":  "Back to site"
+                                       },
+                       "modal":  {
+                                     "success":  {
+                                                     "title":  "Thank you for joining our newsletter!",
+                                                     "receive":  "What you will receive:",
+                                                     "news":  "✨ News about mentorships and opportunities",
+                                                     "tips":  "💡 Exclusive professional development tips",
+                                                     "features":  "🚀 First information about new features",
+                                                     "whatsapp":  "📱 Important updates via WhatsApp",
+                                                     "madeWithLove":  "Made with love by the Menvo team",
+                                                     "continue":  "Continue Exploring"
+                                                 },
+                                     "form":  {
+                                                  "title":  "Menvo Newsletter",
+                                                  "emailLabel":  "Email *",
+                                                  "emailPlaceholder":  "your@email.com",
+                                                  "nameLabel":  "Name (optional)",
+                                                  "namePlaceholder":  "Your name",
+                                                  "whatsappLabel":  "WhatsApp (optional)",
+                                                  "whatsappPlaceholder":  "+55 11 99999-9999",
+                                                  "whatsappInfo":  "Receive updates via WhatsApp",
+                                                  "consentLabel":  "Mandatory consent *",
+                                                  "consentInfo":  "I agree to receive emails from Menvo with news, updates, and relevant content.",
+                                                  "marketingLabel":  "Personalized marketing (optional)",
+                                                  "marketingInfo":  "I agree to receive personalized offers and promotions based on my profile and interests.",
+                                                  "dataProtectionTitle":  "Data Protection",
+                                                  "dataProtectionInfo":  "Your data is protected according to privacy laws. We do not share your information with third parties.",
+                                                  "cancel":  "Cancel",
+                                                  "subscribing":  "Subscribing...",
+                                                  "subscribe":  "Subscribe"
+                                              }
+                                 }
+                   },
+    "privacy":  {
+                    "badge":  "Privacy",
+                    "title":  "Privacy Policy",
+                    "intro":  "Your privacy is important to us. This policy explains how we collect, use, and protect your data at Menvo.",
+                    "dataCollection":  {
+                                           "title":  "Data Collection",
+                                           "text":  "We collect information you provide when creating an account, such as name, email, profile photo, and professional details. We also collect social login data (Google, LinkedIn) if you choose to authenticate with these platforms."
+                                       },
+                    "email":  {
+                                  "title":  "Emails \u0026 Communication",
+                                  "text":  "We use your email for essential communications, mentorship notifications, and updates. Emails are sent via Brevo, respecting your privacy and opt-out preferences."
+                              },
+                    "photos":  {
+                                   "title":  "Photos \u0026 Visual Content",
+                                   "text":  "Profile photos and uploaded images are securely stored in Supabase and used only for identification and profile personalization."
+                               },
+                    "storage":  {
+                                    "title":  "Data Storage",
+                                    "text":  "All data is securely stored in Supabase, with access restricted to the Menvo team and following best security practices."
+                                },
+                    "googleCalendar":  {
+                                           "title":  "Google Calendar API",
+                                           "text":  "We use the Google Calendar API exclusively to create mentorship events when a session is confirmed by the mentor. We create the event in our own calendar and send email invitations to both mentor and mentee. We do NOT access, read, or modify your personal Google Calendar. You only receive an email invitation that you can freely accept or decline. The data used is only: date, time, session duration, and participants\u0027 emails."
+                                       },
+                    "dataSharing":  {
+                                        "title":  "Data Sharing",
+                                        "text":  "We do not share your personal data with third parties for commercial or marketing purposes. Data is shared only with essential services for platform operation: Supabase (secure storage), Brevo (transactional email delivery), Google (OAuth authentication and calendar event creation), and LinkedIn (OAuth authentication). Each service processes data only for the specific purposes described in this policy."
+                                    },
+                    "dataUsage":  {
+                                      "title":  "Data Usage",
+                                      "text":  "Your data is used exclusively to: (1) Authenticate and manage your account; (2) Facilitate connections between mentors and mentees; (3) Create mentorship events in Google Calendar; (4) Send notifications and communications related to your mentorships; (5) Improve platform experience and security. We never use your data for AI/ML model training or purposes unrelated to mentorship."
+                                  },
+                    "mentorship":  {
+                                       "title":  "Mentorship \u0026 Interactions",
+                                       "text":  "Information about mentorship sessions, reviews, and messages is used to improve the experience and ensure community safety."
+                                   },
+                    "thirdParty":  {
+                                       "title":  "Third-Party Services",
+                                       "text":  "We use third-party services such as Google (OAuth login and Calendar API), LinkedIn (OAuth login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy and processes data only for the specific purposes described in this policy."
+                                   },
+                    "rights":  {
+                                   "title":  "Your Rights",
+                                   "text":  "You may request access, correction, or deletion of your data at any time. To exercise your rights or revoke Google Calendar access permissions, contact us at contato@menvo.com.br."
+                               },
+                    "contact":  {
+                                    "title":  "Contact",
+                                    "text":  "Questions about privacy? Contact us at contato@menvo.com.br."
+                                },
+                    "links":  {
+                                  "cookies":  "Cookie Policy",
+                                  "terms":  "Terms of Service"
+                              }
+                },
+    "cookies":  {
+                    "badge":  "Cookies",
+                    "title":  "Cookie Policy",
+                    "intro":  "We use cookies to enhance your experience, ensure essential features, and analyze platform usage.",
+                    "essential":  {
+                                      "title":  "Essential Cookies",
+                                      "text":  "Required for site operation, authentication, and security. Cannot be disabled."
+                                  },
+                    "social":  {
+                                   "title":  "Social Login",
+                                   "text":  "Cookies may be used for authentication via Google and LinkedIn, enabling secure login."
+                               },
+                    "preferences":  {
+                                        "title":  "Preferences",
+                                        "text":  "We store your language and settings preferences to personalize your experience."
+                                    },
+                    "analytics":  {
+                                      "title":  "Analytics \u0026 Performance",
+                                      "text":  "We use cookies and analytics tools like Microsoft Clarity to understand how the platform is used and improve our services. Clarity helps us visualize how users interact with the site through session recordings and heatmaps. For users from the European Union (EEA), United Kingdom, and Switzerland, we request your explicit consent before activating these analytics tools."
+                                  },
+                    "clarity":  {
+                                    "title":  "Microsoft Clarity",
+                                    "text":  "We use Microsoft Clarity to understand how you use our website through behavioral metrics, heatmaps, and session recordings. Data collected by Clarity is processed according to Microsoft\u0027s Privacy Policy. For users from the EEA, UK, and Switzerland, Clarity will only be activated after your explicit consent through the cookie banner."
+                                },
+                    "links":  {
+                                  "privacy":  "Privacy Policy",
+                                  "terms":  "Terms of Service"
+                              }
+                },
+    "cookieConsent":  {
+                          "title":  "We use cookies",
+                          "description":  "We use essential cookies for site functionality and analytics cookies to improve your experience. You can choose which cookies to accept.",
+                          "learnMore":  "Learn more",
+                          "acceptAll":  "Accept All",
+                          "acceptNecessary":  "Necessary Only",
+                          "customize":  "Customize",
+                          "savePreferences":  "Save Preferences",
+                          "settings":  {
+                                           "title":  "Cookie Settings",
+                                           "description":  "Choose which types of cookies you want to accept. Necessary cookies cannot be disabled.",
+                                           "alwaysActive":  "Always Active",
+                                           "necessary":  {
+                                                             "title":  "Necessary Cookies",
+                                                             "description":  "Essential for basic site functionality, including authentication, security, and navigation."
+                                                         },
+                                           "analytics":  {
+                                                             "title":  "Analytics Cookies",
+                                                             "description":  "Help us understand how you use the site to improve your experience.",
+                                                             "tools":  "Tools: Microsoft Clarity (session recordings, heatmaps)"
+                                                         },
+                                           "functional":  {
+                                                              "title":  "Functional Cookies",
+                                                              "description":  "Enable advanced features like language preferences and personalization."
+                                                          }
+                                       }
+                      },
+    "terms":  {
+                  "badge":  "Terms",
+                  "title":  "Terms of Service",
+                  "intro":  "By using Menvo, you agree to these terms. Please read carefully to understand your rights and responsibilities.",
+                  "usage":  {
+                                "title":  "Platform Usage",
+                                "text":  "Menvo connects mentors and mentees for free sessions. Use must be respectful and in accordance with applicable laws."
+                            },
+                  "account":  {
+                                  "title":  "Account \u0026 Social Login",
+                                  "text":  "You may create an account via email or social login (Google, LinkedIn). Keep your credentials secure and do not share your account."
+                              },
+                  "security":  {
+                                   "title":  "Security",
+                                   "text":  "We take measures to protect your data, but you are also responsible for keeping your password secure."
+                               },
+                  "content":  {
+                                  "title":  "Content \u0026 Photos",
+                                  "text":  "You are responsible for content you upload (photos, text). Do not upload offensive or copyrighted content without permission."
+                              },
+                  "communication":  {
+                                        "title":  "Communication \u0026 Emails",
+                                        "text":  "We will send important communications about mentorships and updates. You may opt out of promotional emails."
+                                    },
+                  "storage":  {
+                                  "title":  "Storage \u0026 Third Parties",
+                                  "text":  "Data is stored in Supabase and emails are sent via Brevo. We use third-party social login."
+                              },
+                  "rights":  {
+                                 "title":  "Rights \u0026 Responsibilities",
+                                 "text":  "You may access and delete your data. Misuse of the platform may result in account suspension."
+                             },
+                  "contact":  {
+                                  "title":  "Contact",
+                                  "text":  "Questions? Contact us at contato@menvo.com."
+                              },
+                  "links":  {
+                                "privacy":  "Privacy Policy",
+                                "cookies":  "Cookie Policy"
+                            },
+                  "warning":  {
+                                  "title":  "Attention",
+                                  "message":  "The platform is currently under development. We\u0027re very happy to receive your feedback and opinion on what you\u0027ve seen so far!",
+                                  "dismiss":  "Got it",
+                                  "giveFeedback":  "Give Feedback"
+                              },
+                  "feedback":  {
+                                   "title":  "What did you think of Menvo?",
+                                   "description":  "Your opinion is very important to us! Tell us what you thought of the platform.",
+                                   "openFeedback":  "Open Feedback",
+                                   "helpUsImprove":  "Help us improve the platform",
+                                   "commentPlaceholder":  "Tell us what you thought of the platform...",
+                                   "emailPlaceholder":  "Your email (optional)",
+                                   "submit":  "Submit Feedback",
+                                   "thankYou":  "Thank you for your feedback!",
+                                   "error":  "Error submitting feedback. Please try again.",
+                                   "ratingRequired":  "Please select a rating.",
+                                   "rateStars":  "Rate with {count} stars"
+                               }
+              },
+    "metadata":  {
+                     "title":  "MENVO - Volunteer Mentoring Platform",
+                     "description":  "Connecting mentors and mentees for free mentoring sessions",
+                     "keywords":  [
+                                      "mentoring",
+                                      "volunteer mentoring",
+                                      "professional development",
+                                      "career",
+                                      "learning",
+                                      "mentors",
+                                      "mentees",
+                                      "education",
+                                      "personal development"
+                                  ],
+                     "og":  {
+                                "title":  "MENVO - Volunteer Mentoring Platform",
+                                "description":  "Connecting mentors and mentees for free mentoring sessions",
+                                "siteName":  "MENVO"
+                            },
+                     "twitter":  {
+                                     "title":  "MENVO - Volunteer Mentoring Platform",
+                                     "description":  "Connecting mentors and mentees for free mentoring sessions"
+                                 }
+                 },
+    "waitingList":  {
+                        "title":  "Join the Waiting List",
+                        "description":  "Thank you for your interest! Please fill out the form below.",
+                        "nameLabel":  "Name",
+                        "namePlaceholder":  "Enter your full name",
+                        "emailPlaceholder":  "your@email.com",
+                        "whatsappLabel":  "WhatsApp (optional)",
+                        "whatsappPlaceholder":  "Your WhatsApp number",
+                        "reasonLabel":  "Why do you want to be part?",
+                        "reasonPlaceholder":  "Tell us why you want to join",
+                        "successMessage":  "Thank you for your interest!",
+                        "errorMessage":  "Error submitting form"
+                    },
+    "feedback":  {
+                     "title":  "Feedback",
+                     "description":  "Your opinion is very important to us. How can we improve?",
+                     "helpUsImprove":  "Help us improve",
+                     "ratingRequired":  "Please select a rating",
+                     "commentPlaceholder":  "Tell us about your experience... (optional)",
+                     "emailPlaceholder":  "Your email (for anonymous feedback)",
+                     "submit":  "Submit Feedback",
+                     "thankYou":  "Thank you for your feedback!",
+                     "error":  "Error submitting feedback. Please try again.",
+                     "rateStars":  "Rate with {count} stars"
+                 },
+    "mentorSuggestion":  {
+                             "loginRequiredTitle":  "Login Required",
+                             "loginRequiredDescription":  "You need to be logged in to suggest a topic or mentorship area.",
+                             "title":  "Suggest Topic or Area",
+                             "description":  "Didn\u0027t find what you were looking for? Suggest new topics or knowledge areas you would like to find on the platform.",
+                             "observationLabel":  "What are you looking for?",
+                             "observationPlaceholder":  "e.g., I would like to find mentors specialized in Product Design, especially with experience in UX Research and digital accessibility. It would also be interesting to have mentors who work with Design Systems...",
+                             "freeTopicsLabel":  "Topics or Areas (Optional)",
+                             "freeTopicsDescription":  "Add keywords related to your suggestion",
+                             "freeTopicsPlaceholder":  "e.g., Design Thinking, Rapid Prototyping...",
+                             "addTopic":  "Add",
+                             "inclusionTagsLabel":  "Inclusion Tags (Optional)",
+                             "inclusionTagsDescription":  "Select relevant diversity and inclusion tags"
+                         },
+    "toast":  {
+                  "suggestion":  {
+                                     "success":  {
+                                                     "title":  "Suggestion sent!",
+                                                     "description":  "Thank you for your suggestion. Our team will analyze it and let you know about updates."
+                                                 },
+                                     "error":  {
+                                                   "title":  "Error sending suggestion",
+                                                   "description":  "Could not send your suggestion. Please try again later."
+                                               }
+                                 }
+              },
+    "mentorsPage":  {
+                        "title":  "Find your Ideal Mentor",
+                        "subtitle":  "Connect with verified mentors and accelerate your career",
+                        "searchPlaceholder":  "Search by name, specialty, company...",
+                        "filters":  "Filters",
+                        "sheetTitle":  "Advanced Filters",
+                        "sheetDescription":  "Refine your search to find the perfect mentor",
+                        "organization":  "Organization",
+                        "organizationPlaceholder":  "Filter by organization",
+                        "allOrganizations":  "All organizations",
+                        "state":  "State/Province",
+                        "statePlaceholder":  "Select state",
+                        "allStates":  "All states",
+                        "city":  "City",
+                        "cityPlaceholder":  "Select city",
+                        "allCities":  "All cities",
+                        "topics":  "Mentorship Topics",
+                        "expertise":  "Expertise Areas",
+                        "inclusiveTags":  "Inclusive Tags",
+                        "experience":  "Experience",
+                        "experiencePlaceholder":  "Years of experience",
+                        "anyExperience":  "Any experience",
+                        "availability":  "Availability",
+                        "availabilityPlaceholder":  "Availability status",
+                        "anyStatus":  "Any status",
+                        "clearFilters":  "Clear Filters",
+                        "resultsFound":  "{count, plural, =0 {No mentors found} =1 {1 mentor found} other {# mentors found}}",
+                        "noMentorsTitle":  "No mentors found",
+                        "noMentorsDescription":  "Try adjusting your filters to find more mentors.",
+                        "suggestTopic":  "Suggest Topic or Area",
+                        "viewProfile":  "View Profile",
+                        "sessionsCount":  "{count, plural, =1 {1 session} other {# sessions}}",
+                        "years":  "years",
+                        "status":  {
+                                       "available":  "Available",
+                                       "busy":  "Busy",
+                                       "unavailable":  "Unavailable",
+                                       "unknown":  "Unknown status"
+                                   },
+                        "backToMentors":  "Back to Mentors",
+                        "about":  "About",
+                        "specialties":  "Specialties",
+                        "languagesAndInclusion":  "Languages and Inclusion",
+                        "languages":  "Languages",
+                        "scheduleSession":  "Schedule Session",
+                        "freeMentorships":  "100% free mentorships",
+                        "ownProfileMessage":  "This is your mentor profile",
+                        "bookMentorship":  "Book Mentorship",
+                        "fullSchedule":  "Full Schedule",
+                        "links":  "Links",
+                        "yearsExperienceCount":  "{count, plural, =1 {1 year of experience} other {# years of experience}}",
+                        "loginRequired":  {
+                                              "title":  "Login Required",
+                                              "description":  "You need to be logged in to book a mentorship or use the chat."
+                                          },
+                        "share":  {
+                                      "title":  "{name} - Mentor at Menvo",
+                                      "text":  "Meet {name}, mentor specialized in {topics}",
+                                      "success":  "Shared successfully!",
+                                      "copySuccess":  "Link copied to clipboard!"
+                                  }
+                    },
+    "profile":  {
+                    "title":  "My Profile",
+                    "description":  "Manage your personal and professional information",
+                    "viewPublicProfile":  "View Public Profile",
+                    "saveChanges":  "Save Changes",
+                    "uploadPhoto":  "Update Photo",
+                    "uploadPhotoSuccess":  "Photo updated successfully!",
+                    "uploadPhotoError":  "Error uploading image",
+                    "tabs":  {
+                                 "personal":  "Personal Info",
+                                 "professional":  "Professional",
+                                 "mentorship":  "Mentorship",
+                                 "documents":  "Documents",
+                                 "settings":  "Settings"
+                             },
+                    "form":  {
+                                 "firstName":  "First Name",
+                                 "firstNamePlaceholder":  "Your first name",
+                                 "lastName":  "Last Name",
+                                 "lastNamePlaceholder":  "Your last name",
+                                 "bio":  "Bio",
+                                 "bioPlaceholder":  "Tell us a bit about yourself...",
+                                 "jobTitle":  "Job Title",
+                                 "jobTitlePlaceholder":  "e.g. Senior Software Engineer",
+                                 "company":  "Company",
+                                 "companyPlaceholder":  "e.g. Google, Microsoft...",
+                                 "linkedin":  "LinkedIn",
+                                 "website":  "Website",
+                                 "portfolio":  "Portfolio",
+                                 "address":  "Address",
+                                 "city":  "City",
+                                 "state":  "State",
+                                 "country":  "Country",
+                                 "languages":  "Languages",
+                                 "mentorshipApproach":  "Mentorship Approach",
+                                 "mentorshipApproachPlaceholder":  "How do you usually mentor?",
+                                 "whatToExpect":  "What to Expect",
+                                 "whatToExpectPlaceholder":  "What can a mentee expect from your sessions?",
+                                 "idealMentee":  "Ideal Mentee",
+                                 "idealMenteePlaceholder":  "What kind of person can you help the most?",
+                                 "expertiseAreas":  "Expertise Areas",
+                                 "mentorshipTopics":  "Mentorship Topics",
+                                 "inclusiveTags":  "Inclusion Tags",
+                                 "cvTitle":  "Resume (PDF)",
+                                 "cvDescription":  "Upload your updated resume so mentees can better understand your journey.",
+                                 "uploadCV":  "Upload CV",
+                                 "viewCV":  "View",
+                                 "removeCV":  "Remove",
+                                 "cvSuccess":  "CV uploaded successfully!",
+                                 "cvRemoveSuccess":  "CV removed successfully!",
+                                 "requiredFields":  "First and last name are required",
+                                 "updateSuccess":  "Profile updated successfully!",
+                                 "updateError":  "Error updating profile",
+                                 "slug":  "Slug",
+                                 "professionalDescription":  "Your career information and professional links",
+                                 "locationDescription":  "Your location (full address remains private, only city/state/country are public)",
+                                 "mentorshipDescription":  "Configure your profile as a mentor (all mentorships are free)",
+                                 "cvAvailable":  "PDF file saved and available for viewing",
+                                 "settingsDescription":  "Manage your account settings",
+                                 "inDevelopment":  "In Development",
+                                 "settingsComingSoon":  "Soon you will be able to manage notifications, privacy, and other account settings.",
+                                 "expertisePlaceholder":  "Type an area and press Enter",
+                                 "topicsPlaceholder":  "Type a topic and press Enter",
+                                 "tagsPlaceholder":  "Type a tag and press Enter"
+                             },
+                    "saving":  "Saving...",
+                    "loading":  "Loading..."
+                },
+    "dashboard":  {
+                      "greetings":  {
+                                        "morning":  "Good morning",
+                                        "afternoon":  "Good afternoon",
+                                        "evening":  "Good evening"
+                                    },
+                      "mentor":  {
+                                     "welcome":  "Welcome to your mentor dashboard. Manage your mentorships and help other professionals.",
+                                     "verification":  {
+                                                          "pending":  "Verification Pending",
+                                                          "approved":  "Profile Verified",
+                                                          "pendingText":  "Your profile is awaiting verification. You will receive an email once approved.",
+                                                          "approvedText":  "Your profile has been verified! You can now receive bookings from mentees.",
+                                                          "badgePending":  "Pending",
+                                                          "badgeApproved":  "Verified"
+                                                      },
+                                     "stats":  {
+                                                   "upcoming":  "Upcoming Sessions",
+                                                   "upcomingDesc":  "Confirmed bookings",
+                                                   "mentees":  "Total Mentees",
+                                                   "menteesDesc":  "People mentored",
+                                                   "completed":  "Completed Sessions",
+                                                   "completedDesc":  "Mentorships conducted",
+                                                   "rating":  "Rating",
+                                                   "reviews":  "{count, plural, =0 {No reviews} =1 {1 review} other {# reviews}}"
+                                               },
+                                     "actions":  {
+                                                     "title":  "Quick Actions",
+                                                     "availability":  "Setup Availability",
+                                                     "availabilityDesc":  "Set your hours and timezone for sessions",
+                                                     "mentorships":  "My Mentorships",
+                                                     "mentorshipsDesc":  "Track your confirmed and pending appointments",
+                                                     "editProfile":  "Edit Profile",
+                                                     "editProfileDesc":  "Update your information and specialties",
+                                                     "access":  "Access",
+                                                     "waitingVerification":  "Awaiting Verification",
+                                                     "manageAgenda":  "Manage Agenda",
+                                                     "viewMentorships":  "View Mentorships"
+                                                 },
+                                     "sections":  {
+                                                      "upcoming":  "Upcoming Sessions",
+                                                      "noSessions":  "No sessions scheduled.",
+                                                      "favorites":  "My Favorite Mentors",
+                                                      "favoritesDesc":  "Quick access to mentors you saved for inspiration",
+                                                      "viewAll":  "View all"
+                                                  }
+                                 },
+                      "mentee":  {
+                                     "welcome":  "Welcome to your dashboard. Find mentors and accelerate your professional growth.",
+                                     "stats":  {
+                                                   "hours":  "Mentorship Hours",
+                                                   "hoursDesc":  "Total learning",
+                                                   "mentors":  "Mentors",
+                                                   "mentorsDesc":  "Connected mentors"
+                                               },
+                                     "actions":  {
+                                                     "find":  "Find Mentors",
+                                                     "findDesc":  "Find experts to accelerate your career",
+                                                     "myMentorships":  "My Mentorships",
+                                                     "myMentorshipsDesc":  "View your appointments and evaluate completed sessions",
+                                                     "access":  "Access Mentorships",
+                                                     "viewAll":  "View Mentors"
+                                                 },
+                                     "sections":  {
+                                                      "upcoming":  "Upcoming Sessions",
+                                                      "noSessions":  "No sessions scheduled.",
+                                                      "bookNow":  "Book now",
+                                                      "favorites":  "Favorite Mentors",
+                                                      "favoritesDesc":  "Quick access to saved mentors",
+                                                      "noFavorites":  "You haven\u0027t saved any mentors yet.",
+                                                      "viewDetails":  "View Details"
+                                                  }
+                                 },
+                      "gettingStarted":  {
+                                             "title":  "First Steps",
+                                             "description":  "Complete these steps to make the most of the platform",
+                                             "step1":  "Registration completed",
+                                             "step2":  "Role selected",
+                                             "step3Mentor":  "Awaiting profile verification",
+                                             "step3Mentee":  "Complete your profile",
+                                             "step4Mentor":  "Setup availability",
+                                             "step4Mentee":  "Find your first mentor",
+                                             "step5Mentor":  "Receive first booking",
+                                             "step5Mentee":  "Schedule your first session"
+                                         }
+                  },
+    "onboarding":  {
+                       "title":  "Choose your profile",
+                       "description":  "Select how you would like to participate in our platform. You can change this later in settings.",
+                       "configuringFor":  "Configuring profile for:",
+                       "mentee":  {
+                                      "title":  "Mentee",
+                                      "description":  "I seek guidance and support to grow professionally",
+                                      "benefits":  [
+                                                       "Access to experienced mentors",
+                                                       "Personalized mentorship sessions",
+                                                       "Professional networking",
+                                                       "Career development"
+                                                   ],
+                                      "success":  "Mentee profile successfully selected!"
+                                  },
+                       "mentor":  {
+                                      "title":  "Mentor",
+                                      "description":  "I want to share knowledge and help other professionals",
+                                      "benefits":  [
+                                                       "Share experience",
+                                                       "Impact careers",
+                                                       "Expand networking",
+                                                       "Develop leadership skills"
+                                                   ],
+                                      "success":  "Mentor profile successfully selected!"
+                                  },
+                       "saving":  "Saving your profile...",
+                       "confirm":  "Confirm Selection",
+                       "error":  {
+                                     "notAuthenticated":  "User not authenticated",
+                                     "sessionExpired":  "Session expired. Please log in again.",
+                                     "saveError":  "Error saving profile. Check your connection.",
+                                     "selectRequired":  "Please select a profile"
+                                 }
+                   },
+    "auth":  {
+                 "confirmed":  {
+                                   "title":  "Email Confirmed!",
+                                   "description":  "Your account has been successfully activated. Welcome to Menvo!",
+                                   "redirecting":  "Automatically redirecting in {count} seconds...",
+                                   "continueNow":  "Continue Now",
+                                   "help":  "Need help? Contact us.",
+                                   "messages":  {
+                                                    "role":  "You will be redirected to select your account type",
+                                                    "profile":  "You will be redirected to complete your profile",
+                                                    "dashboard":  "You will be redirected to the dashboard"
+                                                }
+                               },
+                 "forgotPassword":  {
+                                        "title":  "Forgot Password?",
+                                        "description":  "Enter your email and we\u0027ll send you a link to reset your password.",
+                                        "sendLink":  "Send Recovery Link",
+                                        "backToLogin":  "Back to Login",
+                                        "success":  "Link sent! Check your email."
+                                    },
+                 "resend":  {
+                                "title":  "Resend Confirmation",
+                                "description":  "Enter your email to receive a new confirmation link",
+                                "successTitle":  "Email Resent!",
+                                "successDescription":  "Check your inbox and spam folder.",
+                                "sentTo":  "We\u0027ve sent a new confirmation email to",
+                                "otherEmail":  "Send to Another Email",
+                                "button":  "Resend Email",
+                                "error":  "Error resending email. Please check if the email is correct."
+                            },
+                 "setPassword":  {
+                                     "title":  "Set your password",
+                                     "description":  "You have been invited to the platform. Set your password to continue.",
+                                     "successTitle":  "Password set!",
+                                     "successDescription":  "Your account has been successfully configured",
+                                     "redirecting":  "Redirecting to role selection...",
+                                     "invalidInvite":  "Invalid Invite",
+                                     "invalidInviteDesc":  "The invite link has expired or is invalid",
+                                     "checkingSession":  "Verifying invite...",
+                                     "button":  "Set password and continue",
+                                     "agreement":  "By setting your password, you agree to our"
+                                 }
+             },
+    "messages":  {
+                     "title":  "Messages",
+                     "searchPlaceholder":  "Search conversations...",
+                     "noConversationsFound":  "No conversations found",
+                     "noConversationsYet":  "No conversations yet",
+                     "tryAnotherSearch":  "Try searching for another name",
+                     "startConversation":  "Start a conversation with a mentor!",
+                     "newMessages":  "{count, plural, =1 {1 new} other {# new}}",
+                     "selectConversation":  "Select a conversation",
+                     "selectConversationDesc":  "Choose a conversation in the sidebar to start messaging",
+                     "roleMentor":  "Mentor",
+                     "roleMentee":  "Mentee"
+                 },
+    "settings":  {
+                     "title":  "Settings",
+                     "tabs":  {
+                                  "general":  "General",
+                                  "security":  "Security",
+                                  "appearance":  "Appearance"
+                              },
+                     "language":  {
+                                      "title":  "Language",
+                                      "description":  "Choose your preferred language"
+                                  },
+                     "account":  {
+                                     "title":  "Account Information",
+                                     "description":  "Your login details",
+                                     "email":  "Email",
+                                     "verified":  "Verified"
+                                 },
+                     "security":  {
+                                      "title":  "Change Password",
+                                      "description":  "Update your access password",
+                                      "currentPassword":  "Current Password",
+                                      "currentPasswordPlaceholder":  "Enter your current password",
+                                      "newPassword":  "New Password",
+                                      "newPasswordPlaceholder":  "Enter your new password",
+                                      "confirmPassword":  "Confirm New Password",
+                                      "confirmPasswordPlaceholder":  "Confirm your new password",
+                                      "changing":  "Changing...",
+                                      "success":  "Password changed successfully",
+                                      "error":  "Could not change password",
+                                      "mismatch":  "Passwords do not match",
+                                      "minLength":  "Password must be at least 6 characters long"
+                                  },
+                     "dangerZone":  {
+                                        "title":  "Danger Zone",
+                                        "description":  "Irreversible actions on your account",
+                                        "deleteButton":  "Delete Account",
+                                        "confirmTitle":  "Are you absolutely sure?",
+                                        "confirmDesc":  "This action cannot be undone. This will permanently delete your account and remove all your data from our servers.",
+                                        "cancel":  "Cancel",
+                                        "confirmAction":  "Yes, delete my account"
+                                    },
+                     "appearance":  {
+                                        "title":  "Theme",
+                                        "description":  "Choose the interface theme",
+                                        "light":  "Light",
+                                        "dark":  "Dark",
+                                        "system":  "System"
+                                    }
+                 },
+    "availability":  {
+                         "title":  "Setup Availability",
+                         "description":  "Define your available hours for mentorship",
+                         "loading":  "Loading availability...",
+                         "saving":  "Saving...",
+                         "saveButton":  "Save Availability",
+                         "addTime":  "Add Time Slot",
+                         "availableHours":  "Available Hours",
+                         "availableHoursDesc":  "Add the days and times when you are available for mentorships",
+                         "timeSlot":  "Slot {number}",
+                         "dayOfWeek":  "Day of the Week",
+                         "startTime":  "Start Time",
+                         "endTime":  "End Time",
+                         "previewTitle":  "Availability Preview",
+                         "previewDesc":  "How your availability will appear to mentees",
+                         "noSchedule":  "No schedule configured",
+                         "addScheduleToPreview":  "Add time slots to see the preview",
+                         "success":  "Availability saved successfully!",
+                         "errorLoad":  "Error loading availability",
+                         "errorSave":  "Error saving availability",
+                         "invalidTime":  "Invalid time on {day}: start must be before end",
+                         "overlappingTime":  "Overlapping times on {day}",
+                         "tips":  {
+                                      "title":  "Tips",
+                                      "tip1":  "Set realistic hours that you can maintain consistently",
+                                      "tip2":  "Leave gaps between sessions for rest",
+                                      "tip3":  "You can update your availability at any time"
+                                  },
+                         "days":  {
+                                      "0":  "Sunday",
+                                      "1":  "Monday",
+                                      "2":  "Tuesday",
+                                      "3":  "Wednesday",
+                                      "4":  "Thursday",
+                                      "5":  "Friday",
+                                      "6":  "Saturday"
+                                  },
+                         "daysShort":  {
+                                           "0":  "Sun",
+                                           "1":  "Mon",
+                                           "2":  "Tue",
+                                           "3":  "Wed",
+                                           "4":  "Thu",
+                                           "5":  "Fri",
+                                           "6":  "Sat"
+                                       },
+                         "display":  {
+                                         "timezone":  "Timezone: {timezone}",
+                                         "noAvailability":  "No availability configured",
+                                         "noAvailabilityDesc":  "The mentor hasn\u0027t defined their available hours yet",
+                                         "status":  {
+                                                        "available":  "Available",
+                                                        "busy":  "Busy",
+                                                        "past":  "Past"
+                                                    },
+                                         "cardTitle":  "Availability",
+                                         "cardDescription":  "Available times for scheduling mentorships",
+                                         "book":  "Book"
+                                     }
+                     },
+    "mentorship":  {
+                       "title":  "My Mentorships",
+                       "description":  "Manage all your mentorships - received and requested",
+                       "received":  {
+                                        "title":  "Mentorships Received",
+                                        "asMentor":  "(you as mentor)",
+                                        "pending":  "Requests Received",
+                                        "pendingDesc":  "Mentorship requests awaiting your confirmation",
+                                        "confirmed":  "Scheduled Mentorships",
+                                        "confirmedDesc":  "Confirmed and scheduled sessions. After the mentorship, click \"Evaluate\" to leave your feedback.",
+                                        "completed":  "Evaluated Mentorships",
+                                        "completedDesc":  "Finished sessions with registered feedback",
+                                        "cancelled":  "Cancelled Sessions",
+                                        "cancelledDesc":  "Mentorships that were cancelled"
+                                    },
+                       "requested":  {
+                                         "title":  "Mentorships Requested",
+                                         "asMentee":  "(you as mentee)",
+                                         "pending":  "Awaiting Confirmation",
+                                         "pendingDesc":  "Pending confirmation requests from mentors",
+                                         "confirmed":  "Scheduled Mentorships",
+                                         "confirmedDesc":  "Sessions confirmed by mentors",
+                                         "completed":  "Evaluated Mentorships",
+                                         "completedDesc":  "Finished sessions with your feedback",
+                                         "cancelled":  "Cancelled Sessions",
+                                         "cancelledDesc":  "Mentorships that were cancelled"
+                                     },
+                       "tabs":  {
+                                    "pending":  "Pending",
+                                    "confirmed":  "Scheduled",
+                                    "completed":  "Evaluated",
+                                    "cancelled":  "Cancelled"
+                                },
+                       "resources":  {
+                                         "title":  "Resource Library",
+                                         "description":  "Share materials and resources with your mentees",
+                                         "inDevelopment":  "In development",
+                                         "comingSoon":  "Coming soon: library of materials, templates and resources to share with mentees"
+                                     }
+                   },
+    "appointments":  {
+                         "title":  "Appointments",
+                         "loading":  "Loading appointments...",
+                         "empty":  "No appointments found",
+                         "error":  "Error loading appointments",
+                         "roleMentee":  "Mentee",
+                         "roleMentor":  "Mentor",
+                         "roleAdmin":  "Admin",
+                         "roleUser":  "User",
+                         "status":  {
+                                        "pending":  "Pending",
+                                        "confirmed":  "Confirmed",
+                                        "cancelled":  "Cancelled",
+                                        "completed":  "Completed"
+                                    },
+                         "today":  "Today",
+                         "expired":  "Expired",
+                         "minutes":  "min",
+                         "menteeComments":  "Mentee Comments:",
+                         "mentorNotes":  "Mentor Notes:",
+                         "cancelledBy":  "Cancelled by {name}",
+                         "you":  "you",
+                         "reason":  "Reason:",
+                         "cancelledAt":  "Cancelled on {date}",
+                         "evaluate":  "Evaluate",
+                         "joinMeet":  "Join Meet"
+                     },
+    "events":  {
+                   "title":  "Events \u0026 Learning",
+                   "subtitle":  "Discover courses, workshops, and events to accelerate your growth",
+                   "searchPlaceholder":  "Search events, courses, workshops...",
+                   "list":  "List",
+                   "map":  "Map",
+                   "results":  "Showing {count} events",
+                   "noEvents":  "No events found",
+                   "adjustFilters":  "Try adjusting your filters or search terms",
+                   "clearFilters":  "Clear all filters"
+               },
+    "chat":  {
+                 "online":  "Online",
+                 "connecting":  "Connecting...",
+                 "typing":  "typing...",
+                 "placeholder":  "Type your message...",
+                 "empty":  "No messages yet.",
+                 "startConversation":  "Send a message to start the conversation!",
+                 "errorLoad":  "Error loading messages",
+                 "errorSend":  "Error sending message"
+             },
+    "admin":  {
+                  "title":  "Admin Panel",
+                  "welcome":  "Welcome, {name}!",
+                  "description":  "Manage mentors, users, and monitor the Menvo platform",
+                  "stats":  {
+                                "totalUsers":  "Total Users",
+                                "recentSignups":  "+{count} in the last 7 days",
+                                "verifiedMentors":  "Verified Mentors",
+                                "totalMentors":  "{count} mentors total",
+                                "pendingMentors":  "Pending Mentors",
+                                "awaitingVerification":  "Awaiting verification",
+                                "totalSessions":  "Sessions Conducted",
+                                "sessionsDesc":  "Total mentorships performed"
+                            },
+                  "actions":  {
+                                  "title":  "Quick Actions",
+                                  "suggestions":  "Topic Suggestions",
+                                  "suggestionsDesc":  "See what users are asking for",
+                                  "manageMentors":  "Manage Mentors",
+                                  "manageMentorsDesc":  "View and verify all mentors",
+                                  "verifyMentors":  "Verify Mentors",
+                                  "verifyMentorsDesc":  "Approve mentors awaiting verification",
+                                  "manageUsers":  "Manage Users",
+                                  "manageUsersDesc":  "View and manage all users",
+                                  "settings":  "Settings",
+                                  "settingsDesc":  "General system settings",
+                                  "access":  "Access"
+                              },
+                  "nav":  {
+                              "dashboard":  "Dashboard",
+                              "dashboardDesc":  "Platform overview",
+                              "organizations":  "Organizations",
+                              "organizationsDesc":  "Manage organizations",
+                              "mentors":  "Mentors",
+                              "mentorsDesc":  "Manage and verify mentors",
+                              "users":  "Users",
+                              "usersDesc":  "Manage platform users",
+                              "suggestions":  "Suggestions",
+                              "suggestionsDesc":  "Suggested topics and areas",
+                              "reports":  "Reports",
+                              "reportsDesc":  "Statistics and metrics"
+                          },
+                  "alerts":  {
+                                 "pendingMentors":  "Attention: Pending Mentors",
+                                 "pendingMentorsDesc":  "There are {count} mentors awaiting verification. Review and approve profiles.",
+                                 "verifyNow":  "Verify Now"
+                             }
+              }
 }

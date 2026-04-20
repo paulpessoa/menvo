@@ -1,1335 +1,1335 @@
 {
-  "common": {
-    "welcome": "Velkommen",
-    "home": "Hjem",
-    "findMentors": "Find mentorer",
-    "community": "Fællesskab",
-    "hub": "Hub",
-    "events": "Begivenheder",
-    "howItWorks": "Sådan fungerer det",
-    "aboutUs": "Om os",
-    "title": "Menvo",
-    "login": "Log ind",
-    "register": "Registrer",
-    "logout": "Log ud",
-    "language": "Sprog",
-    "english": "Engelsk",
-    "portuguese": "Portugisisk",
-    "spanish": "Spansk",
-    "cancel": "Annuller",
-    "continue": "Fortsæt",
-    "submit": "Indsend",
-    "back": "Tilbage",
-    "next": "Næste",
-    "save": "Gem",
-    "email": "E-mail",
-    "password": "Adgangskode",
-    "name": "Navn",
-    "firstName": "Fornavn",
-    "lastName": "Efternavn",
-    "loading": "Indlæser...",
-    "saving": "Gemmer...",
-    "close": "Luk",
-    "submitting": "Indsender...",
-    "languageSelector": {
-      "title": "Vælg dit sprog",
-      "description": "Vælg dit sprog for at fortsætte",
-      "successTitle": "Sprog indstillet!",
-      "successDescription": "Du kan til enhver tid ændre denne indstilling i menuen Indstillinger efter login.",
-      "button": "Begynd at browse"
-    },
-    "administration": "Administration",
-    "progress": "Fremskridt",
-    "confirmTitle": "Er du sikker?",
-    "confirmDesc": "Denne handling kan ikke fortrydes.",
-    "confirmAction": "Ja, bekræft",
-    "french": "Fransk",
-    "danish": "Dansk",
-    "swedish": "Svensk",
-    "organizations": "Organisationer"
-  },
-  "header": {
-    "title": "MENVO - Frivillige Mentorer",
-    "subtitle": "Forbinder mentorer og mentees",
-    "userMenu": {
-      "dashboard": "Kontrolpanel",
-      "profile": "Profil",
-      "messages": "Beskeder",
-      "settings": "Indstillinger",
-      "adminPanel": "Administrativt panel",
-      "logout": "Log ud",
-      "administration": "Administration",
-      "user": "Bruger",
-      "createOrganization": "Opret organisation"
-    }
-  },
-  "home": {
-    "badge": {
-      "freeMentorship": "Platform for frivillige mentorer"
-    },
-    "hero": {
-      "title": "Forbind dig med frivillige mentorer",
-      "description": "Find vejledning, del erfaringer og voks med os. Vores platform forbinder dig med frivillige mentorer til gratis mentorsessioner.",
-      "findMentor": "Find en mentor",
-      "becomeMentor": "Bliv mentor"
-    },
-    "testimonials": {
-      "title": "Historier der inspirerer",
-      "description": "Liv transformeret gennem mentorskab"
-    },
-    "howItWorks": {
-      "title": "Sådan fungerer det",
-      "description": "Vores platform gør det nemt at komme i kontakt med mentorer og booke sessioner",
-      "step1": {
-        "title": "Find en mentor",
-        "description": "Udforsk vores mangfoldige fællesskab af frivillige mentorer og find det perfekte match til dine behov."
-      },
-      "step2": {
-        "title": "Book en session",
-        "description": "Book en tid, der passer jer begge, gennem vores indbyggede bookingsystem."
-      },
-      "step3": {
-        "title": "Forbind og voks",
-        "description": "Mød hinanden virtuelt, del erfaringer og udvikl dine færdigheder med personlig vejledning."
-      },
-      "learnMore": "Læs mere"
-    },
-    "featuredMentors": {
-      "title": "Udvalgte mentorer",
-      "description": "Mød nogle af vores engagerede frivillige mentorer",
-      "viewAll": "Se alle mentorer"
-    },
-    "mentor": {
-      "sampleName": "Sarah Johnson",
-      "field": "Softwareteknik",
-      "tags": [
-        "Karriere",
-        "Teknik",
-        "Ledelse"
-      ],
-      "description": "Seniordev med over 10 års erfaring i at hjælpe nye kodere med at navigere i tech-branchen.",
-      "languages": "Engelsk, Spansk",
-      "viewProfile": "Vis profil"
-    },
-    "events": {
-      "title": "Kommende begivenheder",
-      "description": "Deltag i vores fællesskabsbegivenheder og gruppementorskab",
-      "card": {
-        "title": "Tech-karrierepanel: Sådan kommer du ind i branchen",
-        "date": "15. juni 2025",
-        "time": "18:00 - 20:00",
-        "description": "Deltag i vores panel af brancheeksperter og opdag, hvordan du starter og udvikler din karriere inden for tech.",
-        "attendees": "{count} deltagere",
-        "register": "Tilmeld dig"
-      },
-      "viewAll": "Se alle begivenheder"
-    },
-    "cta": {
-      "title": "Klar til at starte?",
-      "description": "Tilmeld dig i dag og forbind dig med personer, der kan hjælpe dig med at nå dine mål",
-      "signup": "Tilmeld dig nu",
-      "learnMore": "Læs mere"
-    },
-    "event": {
-      "type": "Online"
-    }
-  },
-  "about": {
-    "badge": "Om os",
-    "ourMission": {
-      "title": "Vores mission",
-      "description": "At forenkle mentorskab i åbne samtaler. Enhver kan dele sin erfaring med dem, der søger vejledning — altid gratis."
-    },
-    "whyWeStarted": {
-      "title": "Hvorfor vi startede",
-      "paragraph1": "Menvo blev født ud fra en enkel idé: alle fortjener adgang til mentorskab, uanset baggrund eller økonomisk situation. Vi tror på, at deling af viden og erfaringer kan transformere liv og samfund.",
-      "paragraph2": "Vores grundlægger oplevede selv den indflydelse, et godt mentorskab kan have på personlig og professionel vækst. Han indså dog også, hvordan mentorskab ofte er begrænset til dem, der allerede har kontakter eller finansielle ressourcer.",
-      "paragraph3": "Derfor skabte vi en platform, der gør mentorskab tilgængeligt for alle ved at forbinde dem, der søger vejledning, med dem, der er villige til at dele deres erfaring — helt gratis."
-    },
-    "ourStoryImageAlt": "Illustration af vores historie",
-    "values": {
-      "community": {
-        "title": "Fællesskab",
-        "description": "At bygge et imødekommende fællesskab, hvor viden deles frit og kontakter skabes på tværs af grænser."
-      },
-      "accessibility": {
-        "title": "Tilgængelighed",
-        "description": "At gøre mentorskab tilgængeligt for alle, uanset økonomisk situation, sted eller baggrund."
-      },
-      "impact": {
-        "title": "Indvirkning",
-        "description": "At skabe positive forandringer gennem vidensdeling og meningsfulde forbindelser, der styrker mennesker."
-      }
-    },
-    "sdg": {
-      "title": "Verdensmål for bæredygtig udvikling",
-      "description": "Vores platform er i tråd med FN's verdensmål (SDG), med særligt fokus på:",
-      "goalNumber": "Mål {number}",
-      "goals": {
-        "qualityEducation": "Kvalitetsuddannelse",
-        "genderEquality": "Ligestilling mellem kønnene",
-        "decentWork": "Anstændige jobs og økonomisk vækst",
-        "reducedInequalities": "Mindre ulighed"
-      }
-    },
-    "ourTeam": {
-      "title": "Vores team",
-      "paragraph1": "Vi er et mangfoldigt team af professionelle, der brænder for at gøre mentorskab tilgængeligt for alle. Vores medlemmer kommer fra forskellige baggrunde og sektorer, hvilket bringer en rigdom af erfaringer.",
-      "paragraph2": "Det, der forener os, er troen på mentorskabets kraft til at ændre liv og forpligtelsen til at bygge en platform, der letter meningsfulde relationer.",
-      "paragraph3": "Vi leder altid efter passionerede personer til at tilslutte sig vores mission. Hvis du vil bidrage til Menvo, hører vi gerne fra dig!",
-      "joinTeam": "Bliv en del af vores team",
-      "viewMap": "Se teamkort"
-    },
-    "ourTeamImageAlt": "Illustration af vores team",
-    "ourImpact": {
-      "title": "Vores indvirkning",
-      "volunteerMentors": {
-        "count": "1.000+",
-        "label": "Frivillige mentorer"
-      },
-      "mentorshipSessions": {
-        "count": "5.000+",
-        "label": "Mentorsessioner"
-      },
-      "countriesReached": {
-        "count": "50+",
-        "label": "Lande nået"
-      },
-      "description": "Disse tal repræsenterer rigtige mennesker, hvis liv er blevet positivt påvirket af mentorrelationerne på vores platform."
-    },
-    "ourPartners": {
-      "title": "Vores partnere",
-      "description": "Vi er stolte af at samarbejde med organisationer, der deler vores vision om at gøre mentorskab tilgængeligt for alle.",
-      "partnerLogoAlt": "Partnerens logo {number}"
-    },
-    "joinOurMission": {
-      "title": "Tilslut dig vores mission",
-      "description": "Uanset om du vil dele din erfaring som mentor eller søge vejledning som mentee, kan du være en del af vores mission om at gøre mentorskab tilgængeligt for alle.",
-      "signUpNow": "Tilmeld dig nu",
-      "contactUs": "Kontakt os"
-    }
-  },
-  "howItWorks": {
-    "title": "Sådan fungerer Menvo",
-    "description": "Vores platform gør det nemt at oprette forbindelse til mentorer og planlægge gratis mentorsessioner.",
-    "forMentees": "For mentees",
-    "forMentors": "For mentorer",
-    "forNGOs": "For NGO'er",
-    "forCompanies": "For virksomheder",
-    "mentees": {
-      "step1": {
-        "title": "Opret din profil",
-        "description": "Tilmeld dig og opret din profil med information om din baggrund, mål og interesser. Dette hjælper os med at matche dig med de perfekte mentorer.",
-        "feature1": "Upload dit CV",
-        "feature2": "Tilføj et profilbillede",
-        "feature3": "Forbind til din LinkedIn-profil"
-      },
-      "step2": {
-        "title": "Find den perfekte mentor",
-        "description": "Udforsk vores mangfoldige fællesskab af frivillige mentorer. Brug filtre til at søge efter mentorer via område, branche, sted og mere.",
-        "feature1": "Filtrer efter emner og ekspertise",
-        "feature2": "Søg efter sted eller sprog",
-        "feature3": "Læs anmeldelser fra andre mentees"
-      },
-      "step3": {
-        "title": "Book en session",
-        "description": "Når du finder en mentor, du vil oprette forbindelse til, tjek deres tilgængelighed og book en gratis 45-minutters session.",
-        "feature1": "Se mentorens kalender",
-        "feature2": "Vælg det mest bekvemme tidspunkt",
-        "feature3": "Tilføj emner du vil diskutere"
-      },
-      "step4": {
-        "title": "Forbind og udvikl dig",
-        "description": "Mød din mentor via videoopkald. Del dine udfordringer, stil spørgsmål og få personlig vejledning til at opnå dine mål.",
-        "feature1": "Deltag via videolink",
-        "feature2": "Diskuter dine mål og udfordringer",
-        "feature3": "Få tilpasset vejledning"
-      },
-      "getStarted": "Kom i gang som mentee"
-    },
-    "mentors": {
-      "step1": {
-        "title": "Opret din mentorprofil",
-        "description": "Tilmeld dig og opret din mentorprofil med information om din erfaring, ekspertområder og emner, du kan hjælpe med.",
-        "feature1": "Fremhæv din erfaring og ekspertise",
-        "feature2": "Angiv emner du kan mentore i",
-        "feature3": "Forbind dine professionelle profiler"
-      },
-      "step2": {
-        "title": "Gennemfør verificering",
-        "description": "For at sikre sikkerheden i vores fællesskab gennemgår alle mentorer en verificeringsproces, inklusive et kort videoopkald med vores team.",
-        "feature1": "Planlæg et verificeringsopkald",
-        "feature2": "Verificer din identitet og viden",
-        "feature3": "Bliv godkendt til at starte som mentor"
-      },
-      "step3": {
-        "title": "Bestem din tilgængelighed",
-        "description": "Indstil de tider, hvor du er tilgængelig for at mentore. Du har fuld kontrol over din agenda og kan opdatere den når som herst.",
-        "feature1": "Konfigurer din ugentlige tilgængelighed",
-        "feature2": "Indstil sessionslængde",
-        "feature3": "Opdater din kalender når det er nødvendigt"
-      },
-      "step4": {
-        "title": "Gennemfør mentorsessioner",
-        "description": "Mød mentees via videoopkald. Del din viden, giv vejledning og hjælp dem med at overvinde udfordringer.",
-        "feature1": "Modtag bookinganmodninger",
-        "feature2": "Hold mentorskab via video",
-        "feature3": "Følg din indvirkning og sessioner"
-      },
-      "becomeMentor": "Bliv en mentor"
-    },
-    "ngos": {
-      "step1": {
-        "title": "Registrer din NGO gratis",
-        "description": "NGO'er og sociale organisationer kan registrere sig gratis for at forbinde de unge, de støtter, med frivillige mentorer.",
-        "feature1": "100% gratis registrering for NGO'er",
-        "feature2": "Ubegrænset adgang til platformen",
-        "feature3": "Dedikeret støtte til organisationer"
-      },
-      "step2": {
-        "title": "Forbind unge med mentorer",
-        "description": "Registrer de unge, der får hjælp af din organisation, og hjælp dem med at finde mentorer, der kan vejlede dem på deres professionelle og personlige rejse.",
-        "feature1": "Registrer flere unge fra organisationen",
-        "feature2": "Følg mentorskabsfremskridt",
-        "feature3": "Modtag sociale indvirkningsrapporter"
-      },
-      "getStarted": "Registrer min NGO"
-    },
-    "companies": {
-      "step1": {
-        "title": "Virksomhedsfrivillighed via mentorskab",
-        "description": "Udvikl frivilligprogrammer for virksomheder ved at lade dine ansatte blive frivillige mentorer, hvilket styrker virksomhedens formål.",
-        "feature1": "Engager medarbejdere i sociale initiativer",
-        "feature2": "Udvikl ledere gennem mentorskab",
-        "feature3": "Styrk virksomhedskulturen"
-      },
-      "step2": {
-        "title": "ESG-rapporter og social indvirkning",
-        "description": "Få detaljerede rapporter om den sociale indvirkning af de mentorskaber, som dine ansatte udfører, hvilket styrker jeres ESG-målinger.",
-        "feature1": "Månedlige rapporter om social indvirkning",
-        "feature2": "Målinger til ESG-rapportering",
-        "feature3": "Certifikater for virksomhedsfrivillighed"
-      },
-      "step3": {
-        "title": "Incitamenter og personalepolitikker",
-        "description": "Skab incitamenter for mentorer blandt medarbejdere, såsom betalt fritid, intern anerkendelse og professionel udvikling.",
-        "feature1": "Tidsbank til frivilligt mentorskab",
-        "feature2": "Intern anerkendelse og gamificering",
-        "feature3": "Udvikling af bløde færdigheder (soft skills)"
-      },
-      "getStarted": "Bliv virksomhedspartner"
-    },
-    "faq": {
-      "title": "Ofte stillede spørgsmål",
-      "description": "Find svar på de mest almindelige spørgsmål om platformen.",
-      "viewAll": "Se alle spørgsmål",
-      "q1": {
-        "question": "Er mentorskab virkelig gratis?",
-        "answer": "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
-      },
-      "q2": {
-        "question": "Hvor lang er en mentorsession?",
-        "answer": "Standardtiden for en mentorsession er 45 minutter. Det er tilstrækkelig tid til en meningsfuld samtale, samtidig med at det respekterer alles tidsplaner."
-      },
-      "q3": {
-        "question": "Hvor ofte kan jeg mødes med en mentor?",
-        "answer": "Dette afhænger af mentorens tilgængelighed og præferencer. Nogle er åbne for regelmæssige møder, mens andre foretrækker engangsmøder."
-      },
-      "q4": {
-        "question": "Hvad sker der, hvis jeg har brug for at aflyse?",
-        "answer": "Vi beder om, at aflysning sker mindst 24 timer i forvejen af respekt for mentorens tid. Du kan nemt ombooke via dit panel."
-      },
-      "q5": {
-        "question": "Hvordan bliver jeg en verificeret mentor?",
-        "answer": "Efter du har oprettet din mentorprofil, skal du booke et kort verificeringsopkald med vores team. Dette sikrer kvaliteten og sikkerheden i fællesskabet."
-      },
-      "q6": {
-        "question": "Er mine data sikre?",
-        "answer": "Ja, vi tager privatliv og sikkerhed meget alvorligt. Dine personlige oplysninger beskyttes og deles kun med de personer, du vælger at oprette forbindelse til."
-      },
-      "stillHaveQuestions": "Har du fler frågor?",
-      "supportDescription": "Vårt supportteam finns här för att hjälpa dig med alla frågor du kan ha.",
-      "contactSupport": "Kontakta Support"
-    }
-  },
-  "faq": {
-    "title": "Ofte stillede spørgsmål",
-    "description": "Find svar på de mest almindelige spørgsmål om platformen.",
-    "viewAll": "Se alle spørgsmål",
-    "q1": {
-      "question": "Er mentorskab virkelig gratis?",
-      "answer": "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
-    },
-    "q2": {
-      "question": "Hvor lang er en mentorsession?",
-      "answer": "Standardtiden for en mentorsession er 45 minutter. Det er tilstrækkelig tid til en meningsfuld samtale, samtidig med at det respekterer alles tidsplaner."
-    },
-    "q3": {
-      "question": "Hvor ofte kan jeg mødes med en mentor?",
-      "answer": "Dette afhænger af mentorens tilgængelighed og præferencer. Nogle er åbne for regelmæssige møder, mens andre foretrækker engangsmøder."
-    },
-    "q4": {
-      "question": "Hvad sker der, hvis jeg har brug for at aflyse?",
-      "answer": "Vi beder om, at aflysning sker mindst 24 timer i forvejen af respekt for mentorens tid. Du kan nemt ombooke via dit panel."
-    },
-    "q5": {
-      "question": "Hvordan bliver jeg en verificeret mentor?",
-      "answer": "Efter du har oprettet din mentorprofil, skal du booke et kort verificeringsopkald med vores team. Dette sikrer kvaliteten og sikkerheden i fællesskabet."
-    },
-    "q6": {
-      "question": "Er mine data sikre?",
-      "answer": "Ja, vi tager privatliv og sikkerhed meget alvorligt. Dine personlige oplysninger beskyttes og deles kun med de personer, du vælger at oprette forbindelse til."
-    },
-    "q7": {
-      "question": "Hvordan fungerer det for NGO'er?",
-      "answer": "NGO'er kan registrere sig gratis og forbinde de unge, de hjælper, med frivillige mentorer. Det er en måde at øge organisationens sociale indvirkning på uden omkostninger."
-    },
-    "q8": {
-      "question": "Kan virksomheder deltage?",
-      "answer": "Ja! Virksomheder kan udvikle programmer for virksomhedsfrivillighed gennem mentorskab, modtage ESG-rapporter og skabe incitamentspolitikker for ansatte som mentorer."
-    },
-    "q9": {
-      "question": "Hvordan fungerer adgang for rekrutteringsfolk?",
-      "answer": "Denne funktion er under udvikling. Snart vil rekrutteringsfolk få adgang til kvalificerede talenter, der deltager på platformen, altid med respekt for brugernes privatliv."
-    },
-    "q10": {
-      "question": "Kan jeg være både mentor og mentee på samme tid?",
-      "answer": "Ja! Du kan have begge profiler på platformen. Mange professionelle søger mentorskab inden for specifikke områder, samtidig med at de mentorerer inden for deres egen ekspertise."
-    },
-    "stillHaveQuestions": "Har du flere spørgsmål?",
-    "supportDescription": "Vores supportteam er her for at hjælpe dig med alle spørgsmål, du måtte have.",
-    "contactSupport": "Kontakt support"
-  },
-  "login": {
-    "title": "Välkommen tillbaka",
-    "description": "Logga in på ditt konto för att få tillgång till plattformen",
-    "email": "E-post",
-    "emailPlaceholder": "namn@exempel.com",
-    "password": "Lösenord",
-    "passwordPlaceholder": "Ange ditt lösenord",
-    "forgotPassword": "Glömt lösenordet?",
-    "loginButton": "Logga in",
-    "loggingIn": "Logger ind...",
-    "noAccount": "Har du inget konto?",
-    "signUp": "Registrera dig",
-    "continueWith": "Fortsätt med",
-    "orContinueWith": "eller fortsätt med",
-    "google": "Google",
-    "linkedin": "LinkedIn",
-    "connecting": "Ansluter...",
-    "success": "Inloggningen lyckades!",
-    "emailNotConfirmedInfo": "Kontrollera din inkorg för att bekräfta din e-post.",
-    "dontHaveAccount": "Har du inget konto?",
-    "error": {
-      "invalidCredentials": "Fel e-post eller lösenord. Vänligen kontrollera dina uppgifter och försök igen.",
-      "emailNotConfirmed": "E-post ej bekräftad. Vänligen kontrollera din inkorg och klicka på bekräftelselänken.",
-      "tooManyAttempts": "För många inloggningsförsök. Vänta några minuter innan du försöker igen.",
-      "networkError": "Forbindelsesfejl. Tjek din internetforbindelse og prøv igen.",
-      "unexpected": "Oväntat fel. Försök igen.",
-      "loginFailed": "Inloggningen misslyckades. Försök igen."
-    }
-  },
-  "register": {
-    "title": "Gå med i Menvo",
-    "subtitle": "Anslut dig till volontärmentorer och utveckla din karriär helt gratis",
-    "signupTitle": "Skapa Konto",
-    "description": "Fyll i dina uppgifter för att påbörja din resa",
-    "firstName": "Förnamn",
-    "firstNamePlaceholder": "Ange ditt förnamn",
-    "lastName": "Efternamn",
-    "lastNamePlaceholder": "Ange ditt efternamn",
-    "email": "E-post",
-    "emailPlaceholder": "Ange din e-postadress",
-    "emailInvalid": "Ogiltig e-postadress",
-    "password": "Lösenord",
-    "passwordPlaceholder": "Skapa ett lösenord",
-    "confirmPassword": "Bekräfta Lösenord",
-    "confirmPasswordPlaceholder": "Ange lösenordet igen",
-    "mentor": "Mentor",
-    "mentee": "Mentee",
-    "registerButton": "Registrera",
-    "creatingAccount": "Skapar konto...",
-    "alreadyHaveAccount": "Har du redan ett konto?",
-    "signIn": "Logga in",
-    "orContinueWith": "Eller fortsätt med e-post",
-    "success": "Kontoen blev oprettet!",
-    "confirmEmail": "Bekräfta din e-post",
-    "confirmEmailDescription": "Ett bekräftelsemail har skickats till {email}. Gå till din inkorg och klicka på länken för att aktivera ditt konto.",
-    "nextSteps": "Nästa steg:",
-    "nextStepsList": [
-      "Tjek din indbakke (og spammappe)",
-      "Klik på bekræftelseslinket i e-mailen",
-      "Vælg din brugertype (mentor eller mentee)",
-      "Udfyld din profil med dine oplysninger",
-      "Vent på godkendelse fra vores team (kun mentorer)"
-    ],
-    "afterConfirmation": "Når du har bekræftet din e-mail, vil du kunne vælge, om du vil være mentor eller mentee og udfylde din profil. Mentorer vil gennemgå en valideringsproces med vores team, før de bliver publiceret.",
-    "didntReceiveEmail": "Fick du inget mail?",
-    "checkSpam": "Kolla din skräppostmapp.",
-    "emailExpired": "Har bekräftelselänken gått ut?",
-    "emailExpiredDescription": "Om bekräftelselänken har löpt ut (24 timmar), kan du använda 'Glömt lösenordet' för att återställa och bekräfta ditt konto.",
-    "resendEmail": "Skicka mail igen",
-    "emailExpiredAction": "Länk utgången? Återställ lösenord",
-    "tryAgain": "Försök igen",
-    "emailConfirmed": "E-post Bekräftad!",
-    "emailConfirmedDescription": "Din e-postadress har bekräftats framgångsrikt. Välj nu hur du vill använda plattformen.",
-    "selectRoleDescription": "Välj hur du vill använda plattformen:",
-    "menteeDescription": "Jag söker vägledning och professionell utveckling",
-    "mentorDescription": "Jag vill dela med mig av min kunskap och vägleda andra proffs",
-    "continue": "Fortsätt",
-    "welcome": {
-      "title": "Välkommen till Menvo!",
-      "description": "Ditt konto har bekräftats. Välj nu hur du vill använda plattformen.",
-      "selectRoleDescription": "Välj hur du vill använda plattformen:",
-      "continue": "Fortsätt"
-    },
-    "goToLogin": "Gå till Inloggning",
-    "goToHome": "Tillbaka till Startsidan",
-    "goToVerification": "Gå till verifieringssidan",
-    "passwordValidation": {
-      "passwordsDontMatch": "Lösenorden matchar inte",
-      "passwordTooShort": "Lösenordet måste ha minst 6 tecken",
-      "passwordStrength": "Lösenordsstyrka:",
-      "passwordTooWeak": "För kort lösenord",
-      "passwordMedium": "Medelstarkt lösenord",
-      "passwordStrong": "Starkt lösenord",
-      "passwordsMatch": "✓ Lösenorden matchar",
-      "passwordsDontMatchError": "Lösenorden matchar inte"
-    },
-    "userType": {
-      "title": "Hur vill du delta?",
-      "mentee": {
-        "title": "Adept",
-        "description": "Jag söker vägledning för att utveckla min karriär"
-      },
-      "mentor": {
-        "title": "Mentor",
-        "description": "Jag vill dela min erfarenhet och hjälpa andra"
-      },
-      "company": {
-        "title": "Företag",
-        "description": "Jag vill rekommendera proffs från vårt företag"
-      },
-      "recruiter": {
-        "title": "Rekryterare",
-        "description": "Jag söker kvalificerade proffs för möjligheter"
-      }
-    }
-  },
-  "hub": {
-    "subtitle": "Oplev udvalgte begivenheder, kurser, værktøjer og rabatter for at fremskynde din rejse.",
-    "suggestBtn": "Foreslå ressource",
-    "searchPlaceholder": "Søg i hub...",
-    "viewMore": "Adgang",
-    "tabs": {
-      "all": "Alle",
-      "events": "Begivenheder",
-      "courses": "Kurser",
-      "tools": "Værktøjer",
-      "discounts": "Rabatter"
-    },
-    "types": {
-      "event": "Begivenhed",
-      "course": "Kursus",
-      "tool": "Værktøj",
-      "discount": "Rabat",
-      "job": "Job"
-    },
-    "noResults": {
-      "title": "Ingen ressourcer fundet",
-      "description": "Prøv at justere dine filtre eller søg efter andre termer.",
-      "clear": "Ryd filtre"
-    }
-  },
-  "mentors": {
-    "title": "Find en mentor",
-    "description": "Utforska vårt nätverk av volontärmentorer och hitta den perfekta matchningen för dina behov",
-    "searchPlaceholder": "Søg efter navn, speciale eller nøgleord...",
-    "filtersTitle": "Filter",
-    "applyFilters": "Använd Filter",
-    "clearFilters": "Rensa",
-    "showingResults": "{count} mentorer hittades",
-    "sortBy": "Sortera efter",
-    "sortOptions": {
-      "relevance": "Relevans",
-      "name": "Namn",
-      "experience": "Erfarenhet",
-      "rating": "Betyg"
-    },
-    "noMentorsFound": "Inga mentorer hittades",
-    "noMentorsDescription": "Försök att justera filtren eller söktermerna",
-    "clearFiltersButton": "Rensa Filter",
-    "loadMore": "Ladda Mer",
-    "filterOptions": {
-      "topics": "Ämnen",
-      "languages": "Språk",
-      "experience": "Erfarenhet",
-      "inclusionTags": "Inkluderingsetiketter",
-      "education": "Utbildningsnivå",
-      "location": "Plats",
-      "city": "Stad",
-      "country": "Land",
-      "availability": "Tillgänglighet",
-      "rating": "Betyg",
-      "all": "Alla",
-      "available": "Tillgänglig",
-      "busy": "Upptagen",
-      "aboveRating": "{rating}+ stjärnor"
-    },
-    "mentorCard": {
-      "available": "Tillgänglig",
-      "busy": "Upptagen",
-      "specialties": "Specialiteter:",
-      "viewProfile": "Visa Profil",
-      "scheduleSession": "Boka tid"
-    },
-    "loginRequired": {
-      "title": "Inloggning Krävs",
-      "description": "Du måste vara inloggad för att se mentorprofiler och boka sessioner.",
-      "descriptionWithName": "Du måste vara inloggad för att se {mentorName}s profil och boka sessioner.",
-      "benefits": {
-        "title": "Vad du kan göra efter inloggning:",
-        "item1": "Se detaljerade profiler för mentorer",
-        "item2": "Boka gratis mentorskapssessioner",
-        "item3": "Skicka direktmeddelanden till mentorer",
-        "item4": "Få tillgång till din mentorskapshistorik"
-      },
-      "signUp": "Registrera dig",
-      "login": "Logga in"
-    },
-    "pagination": {
-      "previous": "Föregående",
-      "next": "Nästa",
-      "page": "Sida {current} av {total}"
-    }
-  },
-  "footer": {
-    "description": "Forenkling af mentorskab gennem åbne samtaler. Enhver kan dele sin erfaring med dem, der søger den — altid gratis.",
-    "platform": "Platform",
-    "findMentors": "Find mentorer",
-    "events": "Begivenheder & kurser",
-    "howItWorks": "Sådan fungerer det",
-    "store": "Butik",
-    "company": "Virksomhed",
-    "aboutUs": "Om os",
-    "mission": "Vores mission",
-    "team": "Vores team",
-    "partners": "Partnere",
-    "contact": "Kontakt",
-    "subscribe": "Abonner",
-    "newsletter": "Hold dig opdateret med vores nyhedsbrev",
-    "privacyPolicy": "Privatlivspolitik",
-    "termsOfService": "Servicevilkår",
-    "cookiePolicy": "Cookiepolitik",
-    "allRightsReserved": "Alle rettigheder forbeholdes."
-  },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Afmeld nyhedsbrev",
-      "description": "Vi er kede af at se dig gå. Indtast din email for at afmelde dig.",
-      "successTitle": "Afmelding gennemført",
-      "successDescription": "Du er blevet fjernet fra vores nyhedsbrevsliste. Vi vil savne dig!",
-      "rejoinText": "Hvis du fortryder, kan du til enhver tid tilmelde dig igen via vores hjemmeside.",
-      "rejoinButton": "Tilmeld dig igen",
-      "considerTitle": "Før du afmelder dig, overvej venligst:",
-      "considerItem1": "Du vil kun modtage relevant indhold om mentorskab",
-      "considerItem2": "Vi sender højst 2 emails om ugen",
-      "considerItem3": "Du kan tilmelde dig igen til enhver tid",
-      "button": "Afmeld",
-      "cancelling": "Afmelder...",
-      "backToSite": "Tilbage til siden"
-    },
-    "modal": {
-      "success": {
-        "title": "Tak fordi du tilmeldte dig vores nyhedsbrev!",
-        "receive": "Hvad du vil modtage:",
-        "news": "✨ Nyheder om mentorskaber og muligheder",
-        "tips": "💡 Eksklusive tips til professionel udvikling",
-        "features": "🚀 Første information om nye funktioner",
-        "whatsapp": "📱 Vigtige opdateringer via WhatsApp",
-        "madeWithLove": "Skabt med kærlighed af Menvo-teamet",
-        "continue": "Fortsæt med at udforske"
-      },
-      "form": {
-        "title": "Menvo Nyhedsbrev",
-        "emailLabel": "Email *",
-        "emailPlaceholder": "din@email.dk",
-        "nameLabel": "Navn (valgfrit)",
-        "namePlaceholder": "Dit navn",
-        "whatsappLabel": "WhatsApp (valgfrit)",
-        "whatsappPlaceholder": "+45 12 34 56 78",
-        "whatsappInfo": "Modtag opdateringer via WhatsApp",
-        "consentLabel": "Obligatorisk samtykke *",
-        "consentInfo": "Jeg accepterer at modtage emails fra Menvo med nyheder, opdateringer og relevant indhold.",
-        "marketingLabel": "Personaliseret markedsføring (valgfrit)",
-        "marketingInfo": "Jeg accepterer at modtage personlige tilbud og kampagner baseret på min profil og interesser.",
-        "dataProtectionTitle": "Databeskyttelse",
-        "dataProtectionInfo": "Dine data er beskyttet i henhold til privatlivslovgivningen. Vi deler ikke dine oplysninger med tredjeparter. Du kan til enhver tid anmode om sletning af dine data via email contato@menvo.com.br.",
-        "cancel": "Annuller",
-        "subscribing": "Tilmelder...",
-        "subscribe": "Tilmeld dig"
-      }
-    }
-  },
-  "privacy": {
-    "badge": "Integritet",
-    "title": "Integritetspolicy",
-    "intro": "Din integritet är viktig för oss. Denna policy förklarar hur vi samlar in, använder och skyddar dina data på Menvo.",
-    "dataCollection": {
-      "title": "Datainsamling",
-      "text": "Vi samlar in information som du anger när du skapar ett konto, såsom namn, e-post, profilbild och professionella uppgifter. Vi samlar också in data för social inloggning (Google, LinkedIn) om du väljer att autentisera dig via dessa plattformar."
-    },
-    "email": {
-      "title": "E-post och Kommunikation",
-      "text": "Vi använder din e-post för väsentlig kommunikation, mentorskapsnotiser och uppdateringar. E-postmeddelanden skickas via Brevo, med respekt för din integritet och dina val."
-    },
-    "photos": {
-      "title": "Foton och Visuellt Innehåll",
-      "text": "Profilbilder och uppladdade bilder lagras säkert i Supabase och används enbart för identifiering och profilpersonalisering."
-    },
-    "storage": {
-      "title": "Datalagring",
-      "text": "All data lagras säkert i Supabase, med begränsad åtkomst för Menvos team, och följer bästa praxis för säkerhet."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar API",
-      "text": "Vi använder Google Calendar API uteslutande för att skapa mentorskapshändelser när en mentor bekräftar en session. Vi skapar evenemanget i vår egen kalender och skickar kalenderinbjudningar via e-post till mentorn och adepten. Vi har INGEN åtkomst till, läser inte och modifierar inte din personliga Google-kalender. Du får bara en inbjudan via e-post som du fritt kan acceptera eller avböja. De data som används är endast: datum, tid, sessionens längd och deltagarnas e-postadresser."
-    },
-    "dataSharing": {
-      "title": "Datadelning",
-      "text": "Vi delar inte dina personuppgifter med tredje part för kommersiella syften eller marknadsföring. Data delas enbart med de tjänster som är nödvändiga för plattformens drift: Supabase (säker lagring), Brevo (transaktionell e-posthantering), Google (OAuth och kalenderhändelser) och LinkedIn (OAuth-inloggning). Varje tjänst behandlar data enbart för de specifika ändamål som beskrivs i denna policy."
-    },
-    "dataUsage": {
-      "title": "Användning av Data",
-      "text": "Dina uppgifter används exklusivt för att: (1) Autentisera och hantera konton; (2) Förenkla kopplingar mellan mentorer och adepter; (3) Skapa mentorskapshändelser i Google Calendar; (4) Skicka meddelanden och uppdateringar gällande dina mentorskap; (5) Förbättra upplevelsen och säkerheten på plattformen. Vi använder aldrig din data för AI/ML-träning eller ändamål som inte är relaterade till mentorskap."
-    },
-    "mentorship": {
-      "title": "Mentorskap och Interaktioner",
-      "text": "Information om mentorskapssessioner, omdömen och meddelanden används för att förbättra användarupplevelsen och trygga vår gemenskap."
-    },
-    "thirdParty": {
-      "title": "Tredjepartstjänster",
-      "text": "Vi använder tredjepartstjänster som Google (OAuth-inloggning och Calendar API), LinkedIn (OAuth-inloggning), Supabase (lagring) och Brevo (e-post). Varje tjänst har sin egen integritetspolicy och bearbetar data bara för de syften som beskrivs i denna policy."
-    },
-    "rights": {
-      "title": "Dina Rättigheter",
-      "text": "Du kan när som helst begära tillgång, rättelse eller radering av dina uppgifter. För att utöva dina rättigheter eller återkalla åtkomst till Google Calendar, kontakta oss på contato@menvo.com.br."
-    },
-    "contact": {
-      "title": "Kontakt",
-      "text": "Har du frågor kring integritet? Kontakta oss på contato@menvo.com.br."
-    },
-    "links": {
-      "cookies": "Cookiepolicy",
-      "terms": "Användarvillkor"
-    }
-  },
-  "cookies": {
-    "badge": "Cookies",
-    "title": "Cookiepolicy",
-    "intro": "Vi använder cookies för att förbättra din upplevelse, säkerställa viktiga funktioner och analysera användningen av plattformen.",
-    "essential": {
-      "title": "Nödvändiga Cookies",
-      "text": "Dessa krävs för att webbplatsen ska fungera, t.ex. inloggning och säkerhet. De kan inte stängas av."
-    },
-    "social": {
-      "title": "Social Inloggning",
-      "text": "Cookies kan användas för autentisering via Google och LinkedIn för en säker inloggning."
-    },
-    "preferences": {
-      "title": "Preferenser",
-      "text": "Vi sparar dina språk- och konfigurationsval för att anpassa din upplevelse."
-    },
-    "analytics": {
-      "title": "Analys och Prestanda",
-      "text": "Vi använder cookies och analysverktyg som Microsoft Clarity för att förstå hur plattformen används och för att förbättra våra tjänster. Clarity hjälper oss visualisera hur användare interagerar med sidan via sessionsinspelningar och heatmaps. För användare i EU (EES), Storbritannien och Schweiz ber vi om ditt uttryckliga samtycke innan vi aktiverar dessa analysverktyg."
-    },
-    "clarity": {
-      "title": "Microsoft Clarity",
-      "text": "Vi använder Microsoft Clarity för att se hur du använder vår webbplats via beteendemätvärden, heatmaps och sessionsåterspelning. Den insamlade informationen från Clarity bearbetas enligt Microsofts Integritetspolicy. För användare i EES, Storbritannien och Schweiz aktiveras Clarity enbart när du gett ditt tydliga samtycke i vår cookiebanner."
-    },
-    "links": {
-      "privacy": "Integritetspolicy",
-      "terms": "Användarvillkor"
-    }
-  },
-  "cookieConsent": {
-    "title": "Vi använder cookies",
-    "description": "Vi använder nödvändiga cookies för att vår sajt ska fungera och analytiska cookies för att förbättra din upplevelse. Du kan välja vilka du vill acceptera.",
-    "learnMore": "Läs mer",
-    "acceptAll": "Acceptera Alla",
-    "acceptNecessary": "Endast Nödvändiga",
-    "customize": "Anpassa",
-    "savePreferences": "Spara Inställningar",
-    "settings": {
-      "title": "Cookie-inställningar",
-      "description": "Välj vilka typer av cookies du godkänner. Nödvändiga cookies kan inte inaktiveras.",
-      "alwaysActive": "Alltid Aktiva",
-      "necessary": {
-        "title": "Nödvändiga Cookies",
-        "description": "Krävs för att webbplatsen ska fungera, inklusive säker inloggning och navigering."
-      },
-      "analytics": {
-        "title": "Analytiska Cookies",
-        "description": "Hjälper oss att förstå hur du interagerar med webbplatsen för att förbättra din upplevelse.",
-        "tools": "Verktyg: Microsoft Clarity (sessionsinspelningar, heatmaps)"
-      },
-      "functional": {
-        "title": "Funktionella Cookies",
-        "description": "Möjliggör avancerade funktioner som att spara språkval."
-      }
-    }
-  },
-  "terms": {
-    "badge": "Villkor",
-    "title": "Användarvillkor",
-    "intro": "När du använder Menvo godkänner du dessa villkor. Läs noggrant för att förstå dina rättigheter och skyldigheter.",
-    "usage": {
-      "title": "Användning av Plattformen",
-      "text": "Menvo kopplar samman mentorer och adepter för gratis sessioner. All användning måste vara respektfull och i enlighet med gällande lagstiftning."
-    },
-    "account": {
-      "title": "Konto och Social Inloggning",
-      "text": "Du kan skapa ett konto via e-post eller sociala nätverk (Google, LinkedIn). Håll dina inloggningsuppgifter säkra och dela dem inte."
-    },
-    "security": {
-      "title": "Säkerhet",
-      "text": "Vi vidtar säkerhetsåtgärder för att skydda din data, men det är även ditt ansvar att hålla ditt lösenord hemligt."
-    },
-    "content": {
-      "title": "Innehåll och Bilder",
-      "text": "Du är ansvarig för materialet du laddar upp (foton, text). Ladda inte upp kränkande eller upphovsrättsskyddat innehåll utan tillstånd."
-    },
-    "communication": {
-      "title": "Kommunikation och E-post",
-      "text": "Vi skickar viktig information gällande dina mentorskap. Du kan välja att avregistrera dig från marknadsföringsmail."
-    },
-    "storage": {
-      "title": "Lagring och Tredjepartstjänster",
-      "text": "Data lagras i Supabase och e-post skickas via Brevo. Vi erbjuder tredjepartsinloggning via sociala nätverk."
-    },
-    "rights": {
-      "title": "Rättigheter och Skyldigheter",
-      "text": "Du kan begära tillgång, rättelse eller borttagning av dina uppgifter. Missbruk av plattformen kan leda till att kontot stängs av."
-    },
-    "contact": {
-      "title": "Kontakt",
-      "text": "Frågor? Kontakta oss via contato@menvo.com."
-    },
-    "links": {
-      "privacy": "Integritetspolicy",
-      "cookies": "Cookiepolicy"
-    }
-  },
-  "waitingList": {
-    "title": "Gå med i Väntelistan",
-    "description": "Tack för ditt intresse! Vänligen fyll i formuläret nedan.",
-    "nameLabel": "Namn",
-    "namePlaceholder": "Ange ditt fullständiga namn",
-    "emailPlaceholder": "din@email.com",
-    "whatsappLabel": "WhatsApp (valfritt)",
-    "whatsappPlaceholder": "Ditt WhatsApp-nummer",
-    "reasonLabel": "Varför vill du gå med?",
-    "reasonPlaceholder": "Berätta varför du vill delta",
-    "successMessage": "Tack för ditt intresse!",
-    "errorMessage": "Fel vid skickande av formulär"
-  },
-  "feedback": {
-    "title": "Feedback",
-    "description": "Din åsikt är viktig för oss. Hur kan vi förbättras?",
-    "helpUsImprove": "Hjälp oss bli bättre",
-    "ratingRequired": "Vänligen välj ett betyg",
-    "commentPlaceholder": "Berätta om din upplevelse... (valfritt)",
-    "emailPlaceholder": "Din e-postadress (för anonym feedback)",
-    "submit": "Skicka Feedback",
-    "thankYou": "Tack för din feedback!",
-    "error": "Fel vid inlämning av feedback. Vänligen försök igen.",
-    "rateStars": "Betygsätt {count} stjärnor"
-  },
-  "mentorSuggestion": {
-    "loginRequiredTitle": "Inloggning Krävs",
-    "loginRequiredDescription": "Du måste vara inloggad för att föreslå ett mentorsämne eller område.",
-    "title": "Foreslå emne eller område",
-    "description": "Hittade du inte vad du letade efter? Föreslå nya ämnen eller expertområden som du gärna vill se på plattformen.",
-    "observationLabel": "Vad letar du efter?",
-    "observationPlaceholder": "Ex: Jag skulle vilja hitta mentorer specialiserade inom Produktdesign, speciellt med erfarenhet i UX Research och digital tillgänglighet...",
-    "freeTopicsLabel": "Ämnen eller Områden (Valfritt)",
-    "freeTopicsDescription": "Lägg till nyckelord relaterade till ditt förslag",
-    "freeTopicsPlaceholder": "Ex: Design Thinking, Rapid Prototyping...",
-    "addTopic": "Lägg till",
-    "inclusionTagsLabel": "Inkluderingsetiketter (Valfritt)",
-    "inclusionTagsDescription": "Välj relevanta mångfalds- och inkluderingsetiketter"
-  },
-  "toast": {
-    "suggestion": {
-      "success": {
-        "title": "Forslag sendt!",
-        "description": "Tak for dit forslag. Vores team vil analysere det og give dig besked om opdateringer."
-      },
-      "error": {
-        "title": "Fejl ved afsendelse af forslag",
-        "description": "Kunne ikke sende dit forslag. Prøv venligst igen senere."
-      }
-    }
-  },
-  "metadata": {
-    "title": "MENVO - Frivilligt mentorskab",
-    "description": "Kopplar samman mentorer och adepter för gratis mentorskapssessioner",
-    "keywords": [
-      "mentorskap",
-      "volontärarbete",
-      "karriär"
-    ],
-    "og": {
-      "title": "MENVO - Volontärmentorskap",
-      "description": "Kopplar samman mentorer och adepter för gratis mentorskapssessioner",
-      "siteName": "MENVO"
-    },
-    "twitter": {
-      "title": "MENVO - Volontärmentorskap",
-      "description": "Kopplar samman mentorer och adepter för gratis mentorskapssessioner"
-    }
-  },
-  "mentorsPage": {
-    "title": "Hitta din Ideala Mentor",
-    "subtitle": "Koppla samman med verifierade mentorer och accelerera din karriär",
-    "searchPlaceholder": "Sök efter namn, expertis, företag...",
-    "filters": "Filter",
-    "sheetTitle": "Avancerade Filter",
-    "sheetDescription": "Förfina din sökning för att hitta den perfekta mentorn",
-    "state": "Region/Län",
-    "statePlaceholder": "Välj region",
-    "allStates": "Alla regioner",
-    "city": "Stad",
-    "cityPlaceholder": "Välj stad",
-    "allCities": "Alla städer",
-    "topics": "Mentorskapsämnen",
-    "expertise": "Expertisområden",
-    "inclusiveTags": "Inkluderende tags",
-    "experience": "Erfarenhet",
-    "experiencePlaceholder": "Års erfarenhet",
-    "anyExperience": "Vilken erfarenhet som helst",
-    "availability": "Tillgänglighet",
-    "availabilityPlaceholder": "Tillgänglighetsstatus",
-    "anyStatus": "Vilken status som helst",
-    "clearFilters": "Rensa Filter",
-    "resultsFound": "{count, plural, =0 {Inga mentorer hittades} =1 {1 mentor hittades} other {# mentorer hittades}}",
-    "noMentorsTitle": "Inga mentorer hittades",
-    "noMentorsDescription": "Försök justera dina filter för att hitta fler mentorer.",
-    "suggestTopic": "Föreslå Ämne eller Område",
-    "viewProfile": "Visa Profil",
-    "sessionsCount": "{count, plural, =1 {1 session} other {# sessioner}}",
-    "status": {
-      "available": "Tillgänglig",
-      "busy": "Upptagen",
-      "unavailable": "Otillgänglig",
-      "unknown": "Okänd status"
-    },
-    "backToMentors": "Tillbaka till Mentorer",
-    "about": "Om",
-    "specialties": "Specialiteter",
-    "languagesAndInclusion": "Språk och Inkludering",
-    "languages": "Språk",
-    "scheduleSession": "Boka Session",
-    "freeMentorships": "100% Gratis Mentorskap",
-    "ownProfileMessage": "Detta är din mentorprofil",
-    "bookMentorship": "Boka Mentorskap",
-    "fullSchedule": "Fullbokad",
-    "links": "Länkar",
-    "yearsExperienceCount": "{count, plural, =1 {1 års erfarenhet} other {# års erfarenhet}}",
-    "loginRequired": {
-      "title": "Inloggning Krävs",
-      "description": "Du måste vara inloggad för att boka mentorskap eller använda chatten."
-    },
-    "share": {
-      "title": "{name} - Mentor på Menvo",
-      "text": "Lär känna {name}, mentor specialiserad på {topics}",
-      "success": "Delning lyckades!",
-      "copySuccess": "Länken har kopierats till urklipp!"
-    }
-  },
-  "dashboard": {
-    "greetings": {
-      "morning": "God morgon",
-      "afternoon": "God eftermiddag",
-      "evening": "God kväll"
-    },
-    "mentor": {
-      "welcome": "Velkommen til dit mentorkontrolpanel. Administrer dine mentorskaber og hjælp andre professionelle.",
-      "verification": {
-        "pending": "Väntar på Verifiering",
-        "approved": "Verifierad Profil",
-        "pendingText": "Din profil väntar på verifiering. Du kommer att få ett mejl när den är godkänd.",
-        "approvedText": "Din profil är verifierad! Du kan nu ta emot bokningar från adepter.",
-        "badgePending": "Väntande",
-        "badgeApproved": "Verifierad"
-      },
-      "stats": {
-        "upcoming": "Kommande Sessioner",
-        "upcomingDesc": "Bekräftade bokningar",
-        "mentees": "Totalt antal Adepter",
-        "menteesDesc": "Mentorerade personer",
-        "completed": "Slutförda Sessioner",
-        "completedDesc": "Genomförda mentorskap",
-        "rating": "Betyg",
-        "reviews": "{count, plural, =0 {Inga recensioner} =1 {1 recension} other {# recensioner}}"
-      },
-      "actions": {
-        "title": "Snabbval",
-        "availability": "Ställ in Tillgänglighet",
-        "availabilityDesc": "Bestäm vilka tider du kan ha mentorsessioner",
-        "mentorships": "Mina Mentorskap",
-        "mentorshipsDesc": "Hantera dina mentorsessioner",
-        "editProfile": "Redigera Profil",
-        "editProfileDesc": "Uppdatera din information och specialitet",
-        "access": "Få åtkomst",
-        "waitingVerification": "Inväntar Verifiering"
-      }
-    },
-    "mentee": {
-      "welcome": "Välkommen till din panel. Hitta mentorer och påskynda din professionella tillväxt.",
-      "stats": {
-        "hours": "Mentorskapstimmar",
-        "hoursDesc": "Total tid av lärande",
-        "mentors": "Mentorer",
-        "mentorsDesc": "Anslutna mentorer"
-      },
-      "actions": {
-        "find": "Hitta Mentorer",
-        "findDesc": "Sök efter verifierade mentorer inom dina intresseområden"
-      },
-      "progress": {
-        "title": "Mina Framsteg",
-        "description": "Följ din yrkesmässiga utveckling",
-        "inDevelopment": "Under utveckling",
-        "comingSoon": "Kommer snart: framstegsdiagram, uppnådda mål, certifikat och lärresurser"
-      }
-    },
-    "gettingStarted": {
-      "title": "Kom Igång",
-      "description": "Genomför dessa steg för att få ut det mesta av plattformen",
-      "step1": "Kontoregistrering klar",
-      "step2": "Vald roll",
-      "step3Mentor": "Väntar på profilverifiering",
-      "step3Mentee": "Slutför din profil",
-      "step4Mentor": "Konfigurera tillgänglighet",
-      "step4Mentee": "Hitta din första mentor",
-      "step5Mentor": "Få din första bokning",
-      "step5Mentee": "Boka din första session"
-    }
-  },
-  "onboarding": {
-    "title": "Välj din profil",
-    "description": "Välj hur du skulle vilja delta i vår plattform. Du kommer att kunna ändra detta senare i inställningarna.",
-    "configuringFor": "Konfigurerar profil för:",
-    "mentee": {
-      "title": "Adept",
-      "description": "Jag söker vägledning och uppföljning för min professionella utveckling",
-      "benefits": [
-        "Tillgång till erfarna mentorer",
-        "Anpassade mentorskapssessioner",
-        "Professionellt nätverkande",
-        "Karriärutveckling"
-      ],
-      "success": "Adeptprofil valdes framgångsrikt!"
-    },
-    "mentor": {
-      "title": "Mentor",
-      "description": "Jeg vil dele min viden og hjælpe andre professionelle",
-      "benefits": [
-        "Dela erfarenheter",
-        "Påverka andras karriärer",
-        "Utöka kontaktnätet",
-        "Utveckla ledarskapsförmåga"
-      ],
-      "success": "Mentorprofil valdes framgångsrikt!"
-    },
-    "saving": "Sparar din profil...",
-    "confirm": "Bekräfta Val",
-    "error": {
-      "notAuthenticated": "Användaren är inte autentiserad",
-      "sessionExpired": "Sessionen har gått ut. Vänligen logga in igen.",
-      "saveError": "Fel när profilen skulle sparas. Kolla din internetuppkoppling.",
-      "selectRequired": "Vänligen välj en profil"
-    }
-  },
-  "auth": {
-    "confirmed": {
-      "title": "E-post Bekräftad!",
-      "description": "Ditt konto har aktiverats. Välkommen till Menvo!",
-      "redirecting": "Omdirigerar automatiskt om {count} sekunder...",
-      "continueNow": "Fortsätt Nu",
-      "help": "Behöver du hjälp? Kontakta oss.",
-      "messages": {
-        "role": "Du kommer att omdirigeras för att välja din kontotyp",
-        "profile": "Du kommer att omdirigeras för att slutföra din profil",
-        "dashboard": "Du kommer att omdirigeras till panelen"
-      }
-    },
-    "forgotPassword": {
-      "title": "Glömt lösenordet?",
-      "description": "Ange din e-post så skickar vi en länk för att återställa lösenordet.",
-      "sendLink": "Skicka Återställningslänk",
-      "backToLogin": "Tillbaka till inloggning",
-      "success": "Länk skickad! Kolla din e-post."
-    },
-    "resend": {
-      "title": "Skicka Bekräftelse Igen",
-      "description": "Skriv in din e-post för att få en ny bekräftelselänk",
-      "successTitle": "E-post Skickad!",
-      "successDescription": "Kolla din inkorg och skräppostmapp.",
-      "sentTo": "Vi skickade ett nytt bekräftelsemail till",
-      "otherEmail": "Skicka till en annan E-post",
-      "button": "Skicka E-post Igen",
-      "error": "Fel när e-post skulle skickas om. Kontrollera att e-posten är korrekt."
-    },
-    "setPassword": {
-      "title": "Sätt ditt lösenord",
-      "description": "Du har blivit inbjuden till plattformen. Ställ in ditt lösenord för att fortsätta.",
-      "successTitle": "Lösenord inställt!",
-      "successDescription": "Ditt konto har ställts in",
-      "redirecting": "Omdirigerar till val av roll...",
-      "invalidInvite": "Ogiltig Inbjudan",
-      "invalidInviteDesc": "Inbjudningslänken har löpt ut eller är ogiltig",
-      "checkingSession": "Verifierar inbjudan...",
-      "button": "Sätt lösenord och fortsätt",
-      "agreement": "Genom att ställa in ditt lösenord godkänner du våra"
-    }
-  },
-  "messages": {
-    "title": "Beskeder",
-    "searchPlaceholder": "Søg i samtaler...",
-    "noConversationsFound": "Ingen samtaler fundet",
-    "noConversationsYet": "Ingen samtaler endnu",
-    "tryAnotherSearch": "Prøv at søge efter et andet navn",
-    "startConversation": "Start en samtale med en mentor!",
-    "newMessages": "{count, plural, =1 {1 ny} other {# nye}}",
-    "selectConversation": "Vælg en samtale",
-    "selectConversationDesc": "Vælg en samtale i sidebjælken for at begynde at sende beskeder",
-    "roleMentor": "Mentor",
-    "roleMentee": "Mentee"
-  },
-  "profile": {
-    "title": "Min profil",
-    "description": "Administrer dine personlige og professionelle oplysninger",
-    "viewPublicProfile": "Se offentlig profil",
-    "saveChanges": "Gem ændringer",
-    "uploadPhoto": "Opdater foto",
-    "uploadPhotoSuccess": "Foto opdateret!",
-    "uploadPhotoError": "Fejl ved upload af billede",
-    "tabs": {
-      "personal": "Personlige oplysninger",
-      "professional": "Professionel",
-      "mentorship": "Mentorskab",
-      "documents": "Dokumenter",
-      "settings": "Indstillinger"
-    },
-    "form": {
-      "firstName": "Fornavn",
-      "firstNamePlaceholder": "Dit fornavn",
-      "lastName": "Efternavn",
-      "lastNamePlaceholder": "Dit efternavn",
-      "bio": "Bio",
-      "bioPlaceholder": "Fortæl lidt om dig selv...",
-      "jobTitle": "Stilling",
-      "jobTitlePlaceholder": "f.eks. Senior Software Engineer",
-      "company": "Virksomhed",
-      "companyPlaceholder": "f.eks. Google, Microsoft...",
-      "linkedin": "LinkedIn",
-      "website": "Hjemmeside",
-      "portfolio": "Portfolio",
-      "address": "Adresse",
-      "city": "By",
-      "state": "Stat/Region",
-      "country": "Land",
-      "languages": "Sprog",
-      "mentorshipApproach": "Mentortilgang",
-      "mentorshipApproachPlaceholder": "Hvordan plejer du at være mentor?",
-      "whatToExpect": "Hvad kan man forvente",
-      "whatToExpectPlaceholder": "Hvad kan en mentee forvente af dine sessioner?",
-      "idealMentee": "Ideel mentee",
-      "idealMenteePlaceholder": "Hvilken type person kan du hjælpe mest?",
-      "expertiseAreas": "Ekspertiseområder",
-      "mentorshipTopics": "Mentoremner",
-      "inclusiveTags": "Inkluderende tags",
-      "cvTitle": "CV (PDF)",
-      "cvDescription": "Upload dit opdaterede CV, så mentees bedre kan forstå din rejse.",
-      "uploadCV": "Upload CV",
-      "viewCV": "Vis",
-      "removeCV": "Fjern",
-      "cvSuccess": "CV uploadet korrekt!",
-      "cvRemoveSuccess": "CV fjernet korrekt!",
-      "requiredFields": "Fornavn og efternavn er påkrævet",
-      "updateSuccess": "Profil opdateret korrekt!",
-      "updateError": "Fejl ved opdatering af profil",
-      "slug": "Slug",
-      "professionalDescription": "Dine karriereoplysninger og professionelle links",
-      "locationDescription": "Din placering (fuld adresse forbliver privat, kun by/stat/land er offentlige)",
-      "mentorshipDescription": "Konfigurer din profil som mentor (alle mentorsparringer er gratis)",
-      "cvAvailable": "PDF-fil gemt og tilgængelig til visning",
-      "settingsDescription": "Administrer dine kontoindstillinger",
-      "inDevelopment": "Under udvikling",
-      "settingsComingSoon": "Snart vil du kunne administrere meddelelser, privatliv og andre kontoindstillinger.",
-      "expertisePlaceholder": "Skriv et område og tryk på Enter",
-      "topicsPlaceholder": "Skriv et emne og tryk på Enter",
-      "tagsPlaceholder": "Skriv et tag og tryk på Enter"
-    },
-    "saving": "Gemmer...",
-    "loading": "Indlæser..."
-  },
-  "settings": {
-    "title": "Indstillinger",
-    "tabs": {
-      "general": "Generelt",
-      "security": "Sikkerhed",
-      "appearance": "Udseende"
-    },
-    "language": {
-      "title": "Sprog",
-      "description": "Vælg dit foretrukne sprog"
-    },
-    "account": {
-      "title": "Kontooplysninger",
-      "description": "Dine loginoplysninger",
-      "email": "E-mail",
-      "verified": "Verificeret"
-    },
-    "security": {
-      "title": "Skift adgangskode",
-      "description": "Opdater din adgangskode",
-      "currentPassword": "Nuværende adgangskode",
-      "currentPasswordPlaceholder": "Indtast din nuværende adgangskode",
-      "newPassword": "Ny adgangskode",
-      "newPasswordPlaceholder": "Indtast din nye adgangskode",
-      "confirmPassword": "Bekræft ny adgangskode",
-      "confirmPasswordPlaceholder": "Bekræft din nye adgangskode",
-      "changing": "Ændrer...",
-      "success": "Adgangskode ændret korrekt",
-      "error": "Kunne ikke ændre adgangskode",
-      "mismatch": "Adgangskoderne stemmer ikke overens",
-      "minLength": "Adgangskoden skal være på mindst 6 tegn"
-    },
-    "dangerZone": {
-      "title": "Farezone",
-      "description": "Handlinger der ikke kan fortrydes på din konto",
-      "deleteButton": "Slet konto",
-      "confirmTitle": "Er du helt sikker?",
-      "confirmDesc": "Denne handling kan ikke fortrydes. Dette vil slette din konto permanent og fjerne alle dine data fra vores servere.",
-      "cancel": "Annuller",
-      "confirmAction": "Ja, slet min konto"
-    },
-    "appearance": {
-      "title": "Tema",
-      "description": "Vælg tema for brugerfladen",
-      "light": "Lys",
-      "dark": "Mørk",
-      "system": "System"
-    }
-  },
-  "availability": {
-    "title": "Indstil tilgængelighed",
-    "description": "Definer dine ledige tider til mentorsparring",
-    "loading": "Indlæser tilgængelighed...",
-    "saving": "Gemmer...",
-    "saveButton": "Gem tilgængelighed",
-    "addTime": "Tilføj tidsrum",
-    "availableHours": "Ledige tider",
-    "availableHoursDesc": "Tilføj de dage og tider, hvor du er tilgængelig for mentorsparring",
-    "timeSlot": "Tidsrum {number}",
-    "dayOfWeek": "Ugedag",
-    "startTime": "Starttidspunkt",
-    "endTime": "Sluttidspunkt",
-    "previewTitle": "Forhåndsvisning af tilgængelighed",
-    "previewDesc": "Hvordan din tilgængelighed vil se ud for mentees",
-    "noSchedule": "Ingen tidsplan konfigureret",
-    "addScheduleToPreview": "Tilføj tidsrum for at se forhåndsvisningen",
-    "success": "Tilgængelighed gemt korrekt!",
-    "errorLoad": "Fejl ved indlæsning af tilgængelighed",
-    "errorSave": "Fejl ved gemning af tilgængelighed",
-    "invalidTime": "Ugyldig tid på {day}: start skal være før slut",
-    "overlappingTime": "Overlappende tider på {day}",
-    "tips": {
-      "title": "Tips",
-      "tip1": "Indstil realistiske tider, som du kan overholde konsekvent",
-      "tip2": "Efterlad pauser mellem sessioner til hvile",
-      "tip3": "Du kan til enhver tid opdatere din tilgængelighed"
-    },
-    "days": {
-      "0": "Søndag",
-      "1": "Mandag",
-      "2": "Tirsdag",
-      "3": "Onsdag",
-      "4": "Torsdag",
-      "5": "Fredag",
-      "6": "Lørdag"
-    }
-  },
-  "mentorship": {
-    "title": "Mine mentorsparringer",
-    "description": "Administrer alle dine mentorsparringer - modtagne og anmodede",
-    "received": {
-      "title": "Modtagne mentorsparringer",
-      "asMentor": "(dig som mentor)",
-      "pending": "Modtagne anmodninger",
-      "pendingDesc": "Mentoranmodninger der afventer din bekræftelse",
-      "confirmed": "Planlagte mentorsparringer",
-      "confirmedDesc": "Bekræftede og planlagte sessioner. Efter mentorsparringen, klik på \"Vurder\" for at give din feedback.",
-      "completed": "Vurderede mentorsparringer",
-      "completedDesc": "Afsluttede sessioner med registreret feedback",
-      "cancelled": "Aflyste sessioner",
-      "cancelledDesc": "Mentorsparringer der er blevet aflyst"
-    },
-    "requested": {
-      "title": "Anmodede mentorsparringer",
-      "asMentee": "(dig som mentee)",
-      "pending": "Afventer bekræftelse",
-      "pendingDesc": "Afventende bekræftelsesanmodninger fra mentorer",
-      "confirmed": "Planlagte mentorsparringer",
-      "confirmedDesc": "Sessioner bekræftet af mentorer",
-      "completed": "Vurderede mentorsparringer",
-      "completedDesc": "Afsluttede sessioner med din feedback",
-      "cancelled": "Aflyste sessioner",
-      "cancelledDesc": "Mentorsparringer der er blevet aflyst"
-    },
-    "tabs": {
-      "pending": "Afventer",
-      "confirmed": "Planlagte",
-      "completed": "Vurderede",
-      "cancelled": "Aflyst"
-    },
-    "resources": {
-      "title": "Ressourcebibliotek",
-      "description": "Del materialer og ressourcer med dine mentees",
-      "inDevelopment": "Under udvikling",
-      "comingSoon": "Kommer snart: bibliotek med materialer, skabeloner og ressourcer til deling med mentees"
-    }
-  },
-  "appointments": {
-    "title": "Aftaler",
-    "loading": "Indlæser aftaler...",
-    "empty": "Ingen aftaler fundet",
-    "error": "Fejl ved indlæsning af aftaler",
-    "today": "I dag",
-    "expired": "Udløbet",
-    "minutes": "min",
-    "menteeComments": "Mentees kommentarer:",
-    "mentorNotes": "Mentors noter:",
-    "cancelledBy": "Aflyst af {name}",
-    "you": "dig",
-    "reason": "Årsag:",
-    "cancelledAt": "Aflyst den {date}",
-    "evaluate": "Vurder",
-    "joinMeet": "Deltag i Meet"
-  },
-  "events": {
-    "title": "Begivenheder og læring",
-    "subtitle": "Oplev kurser, workshops og begivenheder for at fremskynde din vækst",
-    "searchPlaceholder": "Søg i begivenheder, kurser, workshops...",
-    "list": "Liste",
-    "map": "Kort",
-    "results": "Viser {count} begivenheder",
-    "noEvents": "Ingen begivenheder fundet",
-    "adjustFilters": "Prøv at justere dine filtre eller søgetermer",
-    "clearFilters": "Ryd alle filtre"
-  }
+    "common":  {
+                   "welcome":  "Velkommen",
+                   "home":  "Hjem",
+                   "findMentors":  "Find mentorer",
+                   "community":  "Fællesskab",
+                   "hub":  "Hub",
+                   "events":  "Begivenheder",
+                   "howItWorks":  "Sådan fungerer det",
+                   "aboutUs":  "Om os",
+                   "title":  "Menvo",
+                   "login":  "Log ind",
+                   "register":  "Registrer",
+                   "logout":  "Log ud",
+                   "language":  "Sprog",
+                   "english":  "Engelsk",
+                   "portuguese":  "Portugisisk",
+                   "spanish":  "Spansk",
+                   "cancel":  "Annuller",
+                   "continue":  "Fortsæt",
+                   "submit":  "Indsend",
+                   "back":  "Tilbage",
+                   "next":  "Næste",
+                   "save":  "Gem",
+                   "email":  "E-mail",
+                   "password":  "Adgangskode",
+                   "name":  "Navn",
+                   "firstName":  "Fornavn",
+                   "lastName":  "Efternavn",
+                   "loading":  "Indlæser...",
+                   "saving":  "Gemmer...",
+                   "close":  "Luk",
+                   "submitting":  "Indsender...",
+                   "languageSelector":  {
+                                            "title":  "Vælg dit sprog",
+                                            "description":  "Vælg dit sprog for at fortsætte",
+                                            "successTitle":  "Sprog indstillet!",
+                                            "successDescription":  "Du kan til enhver tid ændre denne indstilling i menuen Indstillinger efter login.",
+                                            "button":  "Begynd at browse"
+                                        },
+                   "administration":  "Administration",
+                   "progress":  "Fremskridt",
+                   "confirmTitle":  "Er du sikker?",
+                   "confirmDesc":  "Denne handling kan ikke fortrydes.",
+                   "confirmAction":  "Ja, bekræft",
+                   "french":  "Fransk",
+                   "danish":  "Dansk",
+                   "swedish":  "Svensk",
+                   "organizations":  "Organisationer"
+               },
+    "header":  {
+                   "title":  "MENVO - Frivillige Mentorer",
+                   "subtitle":  "Forbinder mentorer og mentees",
+                   "userMenu":  {
+                                    "dashboard":  "Kontrolpanel",
+                                    "profile":  "Profil",
+                                    "messages":  "Beskeder",
+                                    "settings":  "Indstillinger",
+                                    "adminPanel":  "Administrativt panel",
+                                    "logout":  "Log ud",
+                                    "administration":  "Administration",
+                                    "user":  "Bruger",
+                                    "createOrganization":  "Opret organisation"
+                                }
+               },
+    "home":  {
+                 "badge":  {
+                               "freeMentorship":  "Platform for frivillige mentorer"
+                           },
+                 "hero":  {
+                              "title":  "Forbind dig med frivillige mentorer",
+                              "description":  "Find vejledning, del erfaringer og voks med os. Vores platform forbinder dig med frivillige mentorer til gratis mentorsessioner.",
+                              "findMentor":  "Find en mentor",
+                              "becomeMentor":  "Bliv mentor"
+                          },
+                 "testimonials":  {
+                                      "title":  "Historier der inspirerer",
+                                      "description":  "Liv transformeret gennem mentorskab"
+                                  },
+                 "howItWorks":  {
+                                    "title":  "Sådan fungerer det",
+                                    "description":  "Vores platform gør det nemt at komme i kontakt med mentorer og booke sessioner",
+                                    "step1":  {
+                                                  "title":  "Find en mentor",
+                                                  "description":  "Udforsk vores mangfoldige fællesskab af frivillige mentorer og find det perfekte match til dine behov."
+                                              },
+                                    "step2":  {
+                                                  "title":  "Book en session",
+                                                  "description":  "Book en tid, der passer jer begge, gennem vores indbyggede bookingsystem."
+                                              },
+                                    "step3":  {
+                                                  "title":  "Forbind og voks",
+                                                  "description":  "Mød hinanden virtuelt, del erfaringer og udvikl dine færdigheder med personlig vejledning."
+                                              },
+                                    "learnMore":  "Læs mere"
+                                },
+                 "featuredMentors":  {
+                                         "title":  "Udvalgte mentorer",
+                                         "description":  "Mød nogle af vores engagerede frivillige mentorer",
+                                         "viewAll":  "Se alle mentorer"
+                                     },
+                 "mentor":  {
+                                "sampleName":  "Sarah Johnson",
+                                "field":  "Softwareteknik",
+                                "tags":  [
+                                             "Karriere",
+                                             "Teknik",
+                                             "Ledelse"
+                                         ],
+                                "description":  "Seniordev med over 10 års erfaring i at hjælpe nye kodere med at navigere i tech-branchen.",
+                                "languages":  "Engelsk, Spansk",
+                                "viewProfile":  "Vis profil"
+                            },
+                 "events":  {
+                                "title":  "Kommende begivenheder",
+                                "description":  "Deltag i vores fællesskabsbegivenheder og gruppementorskab",
+                                "card":  {
+                                             "title":  "Tech-karrierepanel: Sådan kommer du ind i branchen",
+                                             "date":  "15. juni 2025",
+                                             "time":  "18:00 - 20:00",
+                                             "description":  "Deltag i vores panel af brancheeksperter og opdag, hvordan du starter og udvikler din karriere inden for tech.",
+                                             "attendees":  "{count} deltagere",
+                                             "register":  "Tilmeld dig"
+                                         },
+                                "viewAll":  "Se alle begivenheder"
+                            },
+                 "cta":  {
+                             "title":  "Klar til at starte?",
+                             "description":  "Tilmeld dig i dag og forbind dig med personer, der kan hjælpe dig med at nå dine mål",
+                             "signup":  "Tilmeld dig nu",
+                             "learnMore":  "Læs mere"
+                         },
+                 "event":  {
+                               "type":  "Online"
+                           }
+             },
+    "about":  {
+                  "badge":  "Om os",
+                  "ourMission":  {
+                                     "title":  "Vores mission",
+                                     "description":  "At forenkle mentorskab i åbne samtaler. Enhver kan dele sin erfaring med dem, der søger vejledning — altid gratis."
+                                 },
+                  "whyWeStarted":  {
+                                       "title":  "Hvorfor vi startede",
+                                       "paragraph1":  "Menvo blev født ud fra en enkel idé: alle fortjener adgang til mentorskab, uanset baggrund eller økonomisk situation. Vi tror på, at deling af viden og erfaringer kan transformere liv og samfund.",
+                                       "paragraph2":  "Vores grundlægger oplevede selv den indflydelse, et godt mentorskab kan have på personlig og professionel vækst. Han indså dog også, hvordan mentorskab ofte er begrænset til dem, der allerede har kontakter eller finansielle ressourcer.",
+                                       "paragraph3":  "Derfor skabte vi en platform, der gør mentorskab tilgængeligt for alle ved at forbinde dem, der søger vejledning, med dem, der er villige til at dele deres erfaring — helt gratis."
+                                   },
+                  "ourStoryImageAlt":  "Illustration af vores historie",
+                  "values":  {
+                                 "community":  {
+                                                   "title":  "Fællesskab",
+                                                   "description":  "At bygge et imødekommende fællesskab, hvor viden deles frit og kontakter skabes på tværs af grænser."
+                                               },
+                                 "accessibility":  {
+                                                       "title":  "Tilgængelighed",
+                                                       "description":  "At gøre mentorskab tilgængeligt for alle, uanset økonomisk situation, sted eller baggrund."
+                                                   },
+                                 "impact":  {
+                                                "title":  "Indvirkning",
+                                                "description":  "At skabe positive forandringer gennem vidensdeling og meningsfulde forbindelser, der styrker mennesker."
+                                            }
+                             },
+                  "sdg":  {
+                              "title":  "Verdensmål for bæredygtig udvikling",
+                              "description":  "Vores platform er i tråd med FN\u0027s verdensmål (SDG), med særligt fokus på:",
+                              "goalNumber":  "Mål {number}",
+                              "goals":  {
+                                            "qualityEducation":  "Kvalitetsuddannelse",
+                                            "genderEquality":  "Ligestilling mellem kønnene",
+                                            "decentWork":  "Anstændige jobs og økonomisk vækst",
+                                            "reducedInequalities":  "Mindre ulighed"
+                                        }
+                          },
+                  "ourTeam":  {
+                                  "title":  "Vores team",
+                                  "paragraph1":  "Vi er et mangfoldigt team af professionelle, der brænder for at gøre mentorskab tilgængeligt for alle. Vores medlemmer kommer fra forskellige baggrunde og sektorer, hvilket bringer en rigdom af erfaringer.",
+                                  "paragraph2":  "Det, der forener os, er troen på mentorskabets kraft til at ændre liv og forpligtelsen til at bygge en platform, der letter meningsfulde relationer.",
+                                  "paragraph3":  "Vi leder altid efter passionerede personer til at tilslutte sig vores mission. Hvis du vil bidrage til Menvo, hører vi gerne fra dig!",
+                                  "joinTeam":  "Bliv en del af vores team",
+                                  "viewMap":  "Se teamkort"
+                              },
+                  "ourTeamImageAlt":  "Illustration af vores team",
+                  "ourImpact":  {
+                                    "title":  "Vores indvirkning",
+                                    "volunteerMentors":  {
+                                                             "count":  "1.000+",
+                                                             "label":  "Frivillige mentorer"
+                                                         },
+                                    "mentorshipSessions":  {
+                                                               "count":  "5.000+",
+                                                               "label":  "Mentorsessioner"
+                                                           },
+                                    "countriesReached":  {
+                                                             "count":  "50+",
+                                                             "label":  "Lande nået"
+                                                         },
+                                    "description":  "Disse tal repræsenterer rigtige mennesker, hvis liv er blevet positivt påvirket af mentorrelationerne på vores platform."
+                                },
+                  "ourPartners":  {
+                                      "title":  "Vores partnere",
+                                      "description":  "Vi er stolte af at samarbejde med organisationer, der deler vores vision om at gøre mentorskab tilgængeligt for alle.",
+                                      "partnerLogoAlt":  "Partnerens logo {number}"
+                                  },
+                  "joinOurMission":  {
+                                         "title":  "Tilslut dig vores mission",
+                                         "description":  "Uanset om du vil dele din erfaring som mentor eller søge vejledning som mentee, kan du være en del af vores mission om at gøre mentorskab tilgængeligt for alle.",
+                                         "signUpNow":  "Tilmeld dig nu",
+                                         "contactUs":  "Kontakt os"
+                                     }
+              },
+    "howItWorks":  {
+                       "title":  "Sådan fungerer Menvo",
+                       "description":  "Vores platform gør det nemt at oprette forbindelse til mentorer og planlægge gratis mentorsessioner.",
+                       "forMentees":  "For mentees",
+                       "forMentors":  "For mentorer",
+                       "forNGOs":  "For NGO\u0027er",
+                       "forCompanies":  "For virksomheder",
+                       "mentees":  {
+                                       "step1":  {
+                                                     "title":  "Opret din profil",
+                                                     "description":  "Tilmeld dig og opret din profil med information om din baggrund, mål og interesser. Dette hjælper os med at matche dig med de perfekte mentorer.",
+                                                     "feature1":  "Upload dit CV",
+                                                     "feature2":  "Tilføj et profilbillede",
+                                                     "feature3":  "Forbind til din LinkedIn-profil"
+                                                 },
+                                       "step2":  {
+                                                     "title":  "Find den perfekte mentor",
+                                                     "description":  "Udforsk vores mangfoldige fællesskab af frivillige mentorer. Brug filtre til at søge efter mentorer via område, branche, sted og mere.",
+                                                     "feature1":  "Filtrer efter emner og ekspertise",
+                                                     "feature2":  "Søg efter sted eller sprog",
+                                                     "feature3":  "Læs anmeldelser fra andre mentees"
+                                                 },
+                                       "step3":  {
+                                                     "title":  "Book en session",
+                                                     "description":  "Når du finder en mentor, du vil oprette forbindelse til, tjek deres tilgængelighed og book en gratis 45-minutters session.",
+                                                     "feature1":  "Se mentorens kalender",
+                                                     "feature2":  "Vælg det mest bekvemme tidspunkt",
+                                                     "feature3":  "Tilføj emner du vil diskutere"
+                                                 },
+                                       "step4":  {
+                                                     "title":  "Forbind og udvikl dig",
+                                                     "description":  "Mød din mentor via videoopkald. Del dine udfordringer, stil spørgsmål og få personlig vejledning til at opnå dine mål.",
+                                                     "feature1":  "Deltag via videolink",
+                                                     "feature2":  "Diskuter dine mål og udfordringer",
+                                                     "feature3":  "Få tilpasset vejledning"
+                                                 },
+                                       "getStarted":  "Kom i gang som mentee"
+                                   },
+                       "mentors":  {
+                                       "step1":  {
+                                                     "title":  "Opret din mentorprofil",
+                                                     "description":  "Tilmeld dig og opret din mentorprofil med information om din erfaring, ekspertområder og emner, du kan hjælpe med.",
+                                                     "feature1":  "Fremhæv din erfaring og ekspertise",
+                                                     "feature2":  "Angiv emner du kan mentore i",
+                                                     "feature3":  "Forbind dine professionelle profiler"
+                                                 },
+                                       "step2":  {
+                                                     "title":  "Gennemfør verificering",
+                                                     "description":  "For at sikre sikkerheden i vores fællesskab gennemgår alle mentorer en verificeringsproces, inklusive et kort videoopkald med vores team.",
+                                                     "feature1":  "Planlæg et verificeringsopkald",
+                                                     "feature2":  "Verificer din identitet og viden",
+                                                     "feature3":  "Bliv godkendt til at starte som mentor"
+                                                 },
+                                       "step3":  {
+                                                     "title":  "Bestem din tilgængelighed",
+                                                     "description":  "Indstil de tider, hvor du er tilgængelig for at mentore. Du har fuld kontrol over din agenda og kan opdatere den når som herst.",
+                                                     "feature1":  "Konfigurer din ugentlige tilgængelighed",
+                                                     "feature2":  "Indstil sessionslængde",
+                                                     "feature3":  "Opdater din kalender når det er nødvendigt"
+                                                 },
+                                       "step4":  {
+                                                     "title":  "Gennemfør mentorsessioner",
+                                                     "description":  "Mød mentees via videoopkald. Del din viden, giv vejledning og hjælp dem med at overvinde udfordringer.",
+                                                     "feature1":  "Modtag bookinganmodninger",
+                                                     "feature2":  "Hold mentorskab via video",
+                                                     "feature3":  "Følg din indvirkning og sessioner"
+                                                 },
+                                       "becomeMentor":  "Bliv en mentor"
+                                   },
+                       "ngos":  {
+                                    "step1":  {
+                                                  "title":  "Registrer din NGO gratis",
+                                                  "description":  "NGO\u0027er og sociale organisationer kan registrere sig gratis for at forbinde de unge, de støtter, med frivillige mentorer.",
+                                                  "feature1":  "100% gratis registrering for NGO\u0027er",
+                                                  "feature2":  "Ubegrænset adgang til platformen",
+                                                  "feature3":  "Dedikeret støtte til organisationer"
+                                              },
+                                    "step2":  {
+                                                  "title":  "Forbind unge med mentorer",
+                                                  "description":  "Registrer de unge, der får hjælp af din organisation, og hjælp dem med at finde mentorer, der kan vejlede dem på deres professionelle og personlige rejse.",
+                                                  "feature1":  "Registrer flere unge fra organisationen",
+                                                  "feature2":  "Følg mentorskabsfremskridt",
+                                                  "feature3":  "Modtag sociale indvirkningsrapporter"
+                                              },
+                                    "getStarted":  "Registrer min NGO"
+                                },
+                       "companies":  {
+                                         "step1":  {
+                                                       "title":  "Virksomhedsfrivillighed via mentorskab",
+                                                       "description":  "Udvikl frivilligprogrammer for virksomheder ved at lade dine ansatte blive frivillige mentorer, hvilket styrker virksomhedens formål.",
+                                                       "feature1":  "Engager medarbejdere i sociale initiativer",
+                                                       "feature2":  "Udvikl ledere gennem mentorskab",
+                                                       "feature3":  "Styrk virksomhedskulturen"
+                                                   },
+                                         "step2":  {
+                                                       "title":  "ESG-rapporter og social indvirkning",
+                                                       "description":  "Få detaljerede rapporter om den sociale indvirkning af de mentorskaber, som dine ansatte udfører, hvilket styrker jeres ESG-målinger.",
+                                                       "feature1":  "Månedlige rapporter om social indvirkning",
+                                                       "feature2":  "Målinger til ESG-rapportering",
+                                                       "feature3":  "Certifikater for virksomhedsfrivillighed"
+                                                   },
+                                         "step3":  {
+                                                       "title":  "Incitamenter og personalepolitikker",
+                                                       "description":  "Skab incitamenter for mentorer blandt medarbejdere, såsom betalt fritid, intern anerkendelse og professionel udvikling.",
+                                                       "feature1":  "Tidsbank til frivilligt mentorskab",
+                                                       "feature2":  "Intern anerkendelse og gamificering",
+                                                       "feature3":  "Udvikling af bløde færdigheder (soft skills)"
+                                                   },
+                                         "getStarted":  "Bliv virksomhedspartner"
+                                     },
+                       "faq":  {
+                                   "title":  "Ofte stillede spørgsmål",
+                                   "description":  "Find svar på de mest almindelige spørgsmål om platformen.",
+                                   "viewAll":  "Se alle spørgsmål",
+                                   "q1":  {
+                                              "question":  "Er mentorskab virkelig gratis?",
+                                              "answer":  "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
+                                          },
+                                   "q2":  {
+                                              "question":  "Hvor lang er en mentorsession?",
+                                              "answer":  "Standardtiden for en mentorsession er 45 minutter. Det er tilstrækkelig tid til en meningsfuld samtale, samtidig med at det respekterer alles tidsplaner."
+                                          },
+                                   "q3":  {
+                                              "question":  "Hvor ofte kan jeg mødes med en mentor?",
+                                              "answer":  "Dette afhænger af mentorens tilgængelighed og præferencer. Nogle er åbne for regelmæssige møder, mens andre foretrækker engangsmøder."
+                                          },
+                                   "q4":  {
+                                              "question":  "Hvad sker der, hvis jeg har brug for at aflyse?",
+                                              "answer":  "Vi beder om, at aflysning sker mindst 24 timer i forvejen af respekt for mentorens tid. Du kan nemt ombooke via dit panel."
+                                          },
+                                   "q5":  {
+                                              "question":  "Hvordan bliver jeg en verificeret mentor?",
+                                              "answer":  "Efter du har oprettet din mentorprofil, skal du booke et kort verificeringsopkald med vores team. Dette sikrer kvaliteten og sikkerheden i fællesskabet."
+                                          },
+                                   "q6":  {
+                                              "question":  "Er mine data sikre?",
+                                              "answer":  "Ja, vi tager privatliv og sikkerhed meget alvorligt. Dine personlige oplysninger beskyttes og deles kun med de personer, du vælger at oprette forbindelse til."
+                                          },
+                                   "stillHaveQuestions":  "Har du fler frågor?",
+                                   "supportDescription":  "Vårt supportteam finns här för att hjälpa dig med alla frågor du kan ha.",
+                                   "contactSupport":  "Kontakta Support"
+                               }
+                   },
+    "faq":  {
+                "title":  "Ofte stillede spørgsmål",
+                "description":  "Find svar på de mest almindelige spørgsmål om platformen.",
+                "viewAll":  "Se alle spørgsmål",
+                "q1":  {
+                           "question":  "Er mentorskab virkelig gratis?",
+                           "answer":  "Ja, alle mentorsessioner på vores platform er helt gratis. Vores mentorer dedikerer deres tid frivilligt for at hjælpe andre med at vokse."
+                       },
+                "q2":  {
+                           "question":  "Hvor lang er en mentorsession?",
+                           "answer":  "Standardtiden for en mentorsession er 45 minutter. Det er tilstrækkelig tid til en meningsfuld samtale, samtidig med at det respekterer alles tidsplaner."
+                       },
+                "q3":  {
+                           "question":  "Hvor ofte kan jeg mødes med en mentor?",
+                           "answer":  "Dette afhænger af mentorens tilgængelighed og præferencer. Nogle er åbne for regelmæssige møder, mens andre foretrækker engangsmøder."
+                       },
+                "q4":  {
+                           "question":  "Hvad sker der, hvis jeg har brug for at aflyse?",
+                           "answer":  "Vi beder om, at aflysning sker mindst 24 timer i forvejen af respekt for mentorens tid. Du kan nemt ombooke via dit panel."
+                       },
+                "q5":  {
+                           "question":  "Hvordan bliver jeg en verificeret mentor?",
+                           "answer":  "Efter du har oprettet din mentorprofil, skal du booke et kort verificeringsopkald med vores team. Dette sikrer kvaliteten og sikkerheden i fællesskabet."
+                       },
+                "q6":  {
+                           "question":  "Er mine data sikre?",
+                           "answer":  "Ja, vi tager privatliv og sikkerhed meget alvorligt. Dine personlige oplysninger beskyttes og deles kun med de personer, du vælger at oprette forbindelse til."
+                       },
+                "q7":  {
+                           "question":  "Hvordan fungerer det for NGO\u0027er?",
+                           "answer":  "NGO\u0027er kan registrere sig gratis og forbinde de unge, de hjælper, med frivillige mentorer. Det er en måde at øge organisationens sociale indvirkning på uden omkostninger."
+                       },
+                "q8":  {
+                           "question":  "Kan virksomheder deltage?",
+                           "answer":  "Ja! Virksomheder kan udvikle programmer for virksomhedsfrivillighed gennem mentorskab, modtage ESG-rapporter og skabe incitamentspolitikker for ansatte som mentorer."
+                       },
+                "q9":  {
+                           "question":  "Hvordan fungerer adgang for rekrutteringsfolk?",
+                           "answer":  "Denne funktion er under udvikling. Snart vil rekrutteringsfolk få adgang til kvalificerede talenter, der deltager på platformen, altid med respekt for brugernes privatliv."
+                       },
+                "q10":  {
+                            "question":  "Kan jeg være både mentor og mentee på samme tid?",
+                            "answer":  "Ja! Du kan have begge profiler på platformen. Mange professionelle søger mentorskab inden for specifikke områder, samtidig med at de mentorerer inden for deres egen ekspertise."
+                        },
+                "stillHaveQuestions":  "Har du flere spørgsmål?",
+                "supportDescription":  "Vores supportteam er her for at hjælpe dig med alle spørgsmål, du måtte have.",
+                "contactSupport":  "Kontakt support"
+            },
+    "login":  {
+                  "title":  "Välkommen tillbaka",
+                  "description":  "Logga in på ditt konto för att få tillgång till plattformen",
+                  "email":  "E-post",
+                  "emailPlaceholder":  "namn@exempel.com",
+                  "password":  "Lösenord",
+                  "passwordPlaceholder":  "Ange ditt lösenord",
+                  "forgotPassword":  "Glömt lösenordet?",
+                  "loginButton":  "Logga in",
+                  "loggingIn":  "Logger ind...",
+                  "noAccount":  "Har du inget konto?",
+                  "signUp":  "Registrera dig",
+                  "continueWith":  "Fortsätt med",
+                  "orContinueWith":  "eller fortsätt med",
+                  "google":  "Google",
+                  "linkedin":  "LinkedIn",
+                  "connecting":  "Ansluter...",
+                  "success":  "Inloggningen lyckades!",
+                  "emailNotConfirmedInfo":  "Kontrollera din inkorg för att bekräfta din e-post.",
+                  "dontHaveAccount":  "Har du inget konto?",
+                  "error":  {
+                                "invalidCredentials":  "Fel e-post eller lösenord. Vänligen kontrollera dina uppgifter och försök igen.",
+                                "emailNotConfirmed":  "E-post ej bekräftad. Vänligen kontrollera din inkorg och klicka på bekräftelselänken.",
+                                "tooManyAttempts":  "För många inloggningsförsök. Vänta några minuter innan du försöker igen.",
+                                "networkError":  "Forbindelsesfejl. Tjek din internetforbindelse og prøv igen.",
+                                "unexpected":  "Oväntat fel. Försök igen.",
+                                "loginFailed":  "Inloggningen misslyckades. Försök igen."
+                            }
+              },
+    "register":  {
+                     "title":  "Gå med i Menvo",
+                     "subtitle":  "Anslut dig till volontärmentorer och utveckla din karriär helt gratis",
+                     "signupTitle":  "Skapa Konto",
+                     "description":  "Fyll i dina uppgifter för att påbörja din resa",
+                     "firstName":  "Förnamn",
+                     "firstNamePlaceholder":  "Ange ditt förnamn",
+                     "lastName":  "Efternamn",
+                     "lastNamePlaceholder":  "Ange ditt efternamn",
+                     "email":  "E-post",
+                     "emailPlaceholder":  "Ange din e-postadress",
+                     "emailInvalid":  "Ogiltig e-postadress",
+                     "password":  "Lösenord",
+                     "passwordPlaceholder":  "Skapa ett lösenord",
+                     "confirmPassword":  "Bekräfta Lösenord",
+                     "confirmPasswordPlaceholder":  "Ange lösenordet igen",
+                     "mentor":  "Mentor",
+                     "mentee":  "Mentee",
+                     "registerButton":  "Registrera",
+                     "creatingAccount":  "Skapar konto...",
+                     "alreadyHaveAccount":  "Har du redan ett konto?",
+                     "signIn":  "Logga in",
+                     "orContinueWith":  "Eller fortsätt med e-post",
+                     "success":  "Kontoen blev oprettet!",
+                     "confirmEmail":  "Bekräfta din e-post",
+                     "confirmEmailDescription":  "Ett bekräftelsemail har skickats till {email}. Gå till din inkorg och klicka på länken för att aktivera ditt konto.",
+                     "nextSteps":  "Nästa steg:",
+                     "nextStepsList":  [
+                                           "Tjek din indbakke (og spammappe)",
+                                           "Klik på bekræftelseslinket i e-mailen",
+                                           "Vælg din brugertype (mentor eller mentee)",
+                                           "Udfyld din profil med dine oplysninger",
+                                           "Vent på godkendelse fra vores team (kun mentorer)"
+                                       ],
+                     "afterConfirmation":  "Når du har bekræftet din e-mail, vil du kunne vælge, om du vil være mentor eller mentee og udfylde din profil. Mentorer vil gennemgå en valideringsproces med vores team, før de bliver publiceret.",
+                     "didntReceiveEmail":  "Fick du inget mail?",
+                     "checkSpam":  "Kolla din skräppostmapp.",
+                     "emailExpired":  "Har bekräftelselänken gått ut?",
+                     "emailExpiredDescription":  "Om bekräftelselänken har löpt ut (24 timmar), kan du använda \u0027Glömt lösenordet\u0027 för att återställa och bekräfta ditt konto.",
+                     "resendEmail":  "Skicka mail igen",
+                     "emailExpiredAction":  "Länk utgången? Återställ lösenord",
+                     "tryAgain":  "Försök igen",
+                     "emailConfirmed":  "E-post Bekräftad!",
+                     "emailConfirmedDescription":  "Din e-postadress har bekräftats framgångsrikt. Välj nu hur du vill använda plattformen.",
+                     "selectRoleDescription":  "Välj hur du vill använda plattformen:",
+                     "menteeDescription":  "Jag söker vägledning och professionell utveckling",
+                     "mentorDescription":  "Jag vill dela med mig av min kunskap och vägleda andra proffs",
+                     "continue":  "Fortsätt",
+                     "welcome":  {
+                                     "title":  "Välkommen till Menvo!",
+                                     "description":  "Ditt konto har bekräftats. Välj nu hur du vill använda plattformen.",
+                                     "selectRoleDescription":  "Välj hur du vill använda plattformen:",
+                                     "continue":  "Fortsätt"
+                                 },
+                     "goToLogin":  "Gå till Inloggning",
+                     "goToHome":  "Tillbaka till Startsidan",
+                     "goToVerification":  "Gå till verifieringssidan",
+                     "passwordValidation":  {
+                                                "passwordsDontMatch":  "Lösenorden matchar inte",
+                                                "passwordTooShort":  "Lösenordet måste ha minst 6 tecken",
+                                                "passwordStrength":  "Lösenordsstyrka:",
+                                                "passwordTooWeak":  "För kort lösenord",
+                                                "passwordMedium":  "Medelstarkt lösenord",
+                                                "passwordStrong":  "Starkt lösenord",
+                                                "passwordsMatch":  "✓ Lösenorden matchar",
+                                                "passwordsDontMatchError":  "Lösenorden matchar inte"
+                                            },
+                     "userType":  {
+                                      "title":  "Hur vill du delta?",
+                                      "mentee":  {
+                                                     "title":  "Adept",
+                                                     "description":  "Jag söker vägledning för att utveckla min karriär"
+                                                 },
+                                      "mentor":  {
+                                                     "title":  "Mentor",
+                                                     "description":  "Jag vill dela min erfarenhet och hjälpa andra"
+                                                 },
+                                      "company":  {
+                                                      "title":  "Företag",
+                                                      "description":  "Jag vill rekommendera proffs från vårt företag"
+                                                  },
+                                      "recruiter":  {
+                                                        "title":  "Rekryterare",
+                                                        "description":  "Jag söker kvalificerade proffs för möjligheter"
+                                                    }
+                                  }
+                 },
+    "hub":  {
+                "subtitle":  "Oplev udvalgte begivenheder, kurser, værktøjer og rabatter for at fremskynde din rejse.",
+                "suggestBtn":  "Foreslå ressource",
+                "searchPlaceholder":  "Søg i hub...",
+                "viewMore":  "Adgang",
+                "tabs":  {
+                             "all":  "Alle",
+                             "events":  "Begivenheder",
+                             "courses":  "Kurser",
+                             "tools":  "Værktøjer",
+                             "discounts":  "Rabatter"
+                         },
+                "types":  {
+                              "event":  "Begivenhed",
+                              "course":  "Kursus",
+                              "tool":  "Værktøj",
+                              "discount":  "Rabat",
+                              "job":  "Job"
+                          },
+                "noResults":  {
+                                  "title":  "Ingen ressourcer fundet",
+                                  "description":  "Prøv at justere dine filtre eller søg efter andre termer.",
+                                  "clear":  "Ryd filtre"
+                              }
+            },
+    "mentors":  {
+                    "title":  "Find en mentor",
+                    "description":  "Utforska vårt nätverk av volontärmentorer och hitta den perfekta matchningen för dina behov",
+                    "searchPlaceholder":  "Søg efter navn, speciale eller nøgleord...",
+                    "filtersTitle":  "Filter",
+                    "applyFilters":  "Använd Filter",
+                    "clearFilters":  "Rensa",
+                    "showingResults":  "{count} mentorer hittades",
+                    "sortBy":  "Sortera efter",
+                    "sortOptions":  {
+                                        "relevance":  "Relevans",
+                                        "name":  "Namn",
+                                        "experience":  "Erfarenhet",
+                                        "rating":  "Betyg"
+                                    },
+                    "noMentorsFound":  "Inga mentorer hittades",
+                    "noMentorsDescription":  "Försök att justera filtren eller söktermerna",
+                    "clearFiltersButton":  "Rensa Filter",
+                    "loadMore":  "Ladda Mer",
+                    "filterOptions":  {
+                                          "topics":  "Ämnen",
+                                          "languages":  "Språk",
+                                          "experience":  "Erfarenhet",
+                                          "inclusionTags":  "Inkluderingsetiketter",
+                                          "education":  "Utbildningsnivå",
+                                          "location":  "Plats",
+                                          "city":  "Stad",
+                                          "country":  "Land",
+                                          "availability":  "Tillgänglighet",
+                                          "rating":  "Betyg",
+                                          "all":  "Alla",
+                                          "available":  "Tillgänglig",
+                                          "busy":  "Upptagen",
+                                          "aboveRating":  "{rating}+ stjärnor"
+                                      },
+                    "mentorCard":  {
+                                       "available":  "Tillgänglig",
+                                       "busy":  "Upptagen",
+                                       "specialties":  "Specialiteter:",
+                                       "viewProfile":  "Visa Profil",
+                                       "scheduleSession":  "Boka tid"
+                                   },
+                    "loginRequired":  {
+                                          "title":  "Inloggning Krävs",
+                                          "description":  "Du måste vara inloggad för att se mentorprofiler och boka sessioner.",
+                                          "descriptionWithName":  "Du måste vara inloggad för att se {mentorName}s profil och boka sessioner.",
+                                          "benefits":  {
+                                                           "title":  "Vad du kan göra efter inloggning:",
+                                                           "item1":  "Se detaljerade profiler för mentorer",
+                                                           "item2":  "Boka gratis mentorskapssessioner",
+                                                           "item3":  "Skicka direktmeddelanden till mentorer",
+                                                           "item4":  "Få tillgång till din mentorskapshistorik"
+                                                       },
+                                          "signUp":  "Registrera dig",
+                                          "login":  "Logga in"
+                                      },
+                    "pagination":  {
+                                       "previous":  "Föregående",
+                                       "next":  "Nästa",
+                                       "page":  "Sida {current} av {total}"
+                                   }
+                },
+    "footer":  {
+                   "description":  "Forenkling af mentorskab gennem åbne samtaler. Enhver kan dele sin erfaring med dem, der søger den — altid gratis.",
+                   "platform":  "Platform",
+                   "findMentors":  "Find mentorer",
+                   "events":  "Begivenheder \u0026 kurser",
+                   "howItWorks":  "Sådan fungerer det",
+                   "store":  "Butik",
+                   "company":  "Virksomhed",
+                   "aboutUs":  "Om os",
+                   "mission":  "Vores mission",
+                   "team":  "Vores team",
+                   "partners":  "Partnere",
+                   "contact":  "Kontakt",
+                   "subscribe":  "Abonner",
+                   "newsletter":  "Hold dig opdateret med vores nyhedsbrev",
+                   "privacyPolicy":  "Privatlivspolitik",
+                   "termsOfService":  "Servicevilkår",
+                   "cookiePolicy":  "Cookiepolitik",
+                   "allRightsReserved":  "Alle rettigheder forbeholdes."
+               },
+    "newsletter":  {
+                       "unsubscribe":  {
+                                           "title":  "Afmeld nyhedsbrev",
+                                           "description":  "Vi er kede af at se dig gå. Indtast din email for at afmelde dig.",
+                                           "successTitle":  "Afmelding gennemført",
+                                           "successDescription":  "Du er blevet fjernet fra vores nyhedsbrevsliste. Vi vil savne dig!",
+                                           "rejoinText":  "Hvis du fortryder, kan du til enhver tid tilmelde dig igen via vores hjemmeside.",
+                                           "rejoinButton":  "Tilmeld dig igen",
+                                           "considerTitle":  "Før du afmelder dig, overvej venligst:",
+                                           "considerItem1":  "Du vil kun modtage relevant indhold om mentorskab",
+                                           "considerItem2":  "Vi sender højst 2 emails om ugen",
+                                           "considerItem3":  "Du kan tilmelde dig igen til enhver tid",
+                                           "button":  "Afmeld",
+                                           "cancelling":  "Afmelder...",
+                                           "backToSite":  "Tilbage til siden"
+                                       },
+                       "modal":  {
+                                     "success":  {
+                                                     "title":  "Tak fordi du tilmeldte dig vores nyhedsbrev!",
+                                                     "receive":  "Hvad du vil modtage:",
+                                                     "news":  "✨ Nyheder om mentorskaber og muligheder",
+                                                     "tips":  "💡 Eksklusive tips til professionel udvikling",
+                                                     "features":  "🚀 Første information om nye funktioner",
+                                                     "whatsapp":  "📱 Vigtige opdateringer via WhatsApp",
+                                                     "madeWithLove":  "Skabt med kærlighed af Menvo-teamet",
+                                                     "continue":  "Fortsæt med at udforske"
+                                                 },
+                                     "form":  {
+                                                  "title":  "Menvo Nyhedsbrev",
+                                                  "emailLabel":  "Email *",
+                                                  "emailPlaceholder":  "din@email.dk",
+                                                  "nameLabel":  "Navn (valgfrit)",
+                                                  "namePlaceholder":  "Dit navn",
+                                                  "whatsappLabel":  "WhatsApp (valgfrit)",
+                                                  "whatsappPlaceholder":  "+45 12 34 56 78",
+                                                  "whatsappInfo":  "Modtag opdateringer via WhatsApp",
+                                                  "consentLabel":  "Obligatorisk samtykke *",
+                                                  "consentInfo":  "Jeg accepterer at modtage emails fra Menvo med nyheder, opdateringer og relevant indhold.",
+                                                  "marketingLabel":  "Personaliseret markedsføring (valgfrit)",
+                                                  "marketingInfo":  "Jeg accepterer at modtage personlige tilbud og kampagner baseret på min profil og interesser.",
+                                                  "dataProtectionTitle":  "Databeskyttelse",
+                                                  "dataProtectionInfo":  "Dine data er beskyttet i henhold til privatlivslovgivningen. Vi deler ikke dine oplysninger med tredjeparter. Du kan til enhver tid anmode om sletning af dine data via email contato@menvo.com.br.",
+                                                  "cancel":  "Annuller",
+                                                  "subscribing":  "Tilmelder...",
+                                                  "subscribe":  "Tilmeld dig"
+                                              }
+                                 }
+                   },
+    "privacy":  {
+                    "badge":  "Integritet",
+                    "title":  "Integritetspolicy",
+                    "intro":  "Din integritet är viktig för oss. Denna policy förklarar hur vi samlar in, använder och skyddar dina data på Menvo.",
+                    "dataCollection":  {
+                                           "title":  "Datainsamling",
+                                           "text":  "Vi samlar in information som du anger när du skapar ett konto, såsom namn, e-post, profilbild och professionella uppgifter. Vi samlar också in data för social inloggning (Google, LinkedIn) om du väljer att autentisera dig via dessa plattformar."
+                                       },
+                    "email":  {
+                                  "title":  "E-post och Kommunikation",
+                                  "text":  "Vi använder din e-post för väsentlig kommunikation, mentorskapsnotiser och uppdateringar. E-postmeddelanden skickas via Brevo, med respekt för din integritet och dina val."
+                              },
+                    "photos":  {
+                                   "title":  "Foton och Visuellt Innehåll",
+                                   "text":  "Profilbilder och uppladdade bilder lagras säkert i Supabase och används enbart för identifiering och profilpersonalisering."
+                               },
+                    "storage":  {
+                                    "title":  "Datalagring",
+                                    "text":  "All data lagras säkert i Supabase, med begränsad åtkomst för Menvos team, och följer bästa praxis för säkerhet."
+                                },
+                    "googleCalendar":  {
+                                           "title":  "Google Calendar API",
+                                           "text":  "Vi använder Google Calendar API uteslutande för att skapa mentorskapshändelser när en mentor bekräftar en session. Vi skapar evenemanget i vår egen kalender och skickar kalenderinbjudningar via e-post till mentorn och adepten. Vi har INGEN åtkomst till, läser inte och modifierar inte din personliga Google-kalender. Du får bara en inbjudan via e-post som du fritt kan acceptera eller avböja. De data som används är endast: datum, tid, sessionens längd och deltagarnas e-postadresser."
+                                       },
+                    "dataSharing":  {
+                                        "title":  "Datadelning",
+                                        "text":  "Vi delar inte dina personuppgifter med tredje part för kommersiella syften eller marknadsföring. Data delas enbart med de tjänster som är nödvändiga för plattformens drift: Supabase (säker lagring), Brevo (transaktionell e-posthantering), Google (OAuth och kalenderhändelser) och LinkedIn (OAuth-inloggning). Varje tjänst behandlar data enbart för de specifika ändamål som beskrivs i denna policy."
+                                    },
+                    "dataUsage":  {
+                                      "title":  "Användning av Data",
+                                      "text":  "Dina uppgifter används exklusivt för att: (1) Autentisera och hantera konton; (2) Förenkla kopplingar mellan mentorer och adepter; (3) Skapa mentorskapshändelser i Google Calendar; (4) Skicka meddelanden och uppdateringar gällande dina mentorskap; (5) Förbättra upplevelsen och säkerheten på plattformen. Vi använder aldrig din data för AI/ML-träning eller ändamål som inte är relaterade till mentorskap."
+                                  },
+                    "mentorship":  {
+                                       "title":  "Mentorskap och Interaktioner",
+                                       "text":  "Information om mentorskapssessioner, omdömen och meddelanden används för att förbättra användarupplevelsen och trygga vår gemenskap."
+                                   },
+                    "thirdParty":  {
+                                       "title":  "Tredjepartstjänster",
+                                       "text":  "Vi använder tredjepartstjänster som Google (OAuth-inloggning och Calendar API), LinkedIn (OAuth-inloggning), Supabase (lagring) och Brevo (e-post). Varje tjänst har sin egen integritetspolicy och bearbetar data bara för de syften som beskrivs i denna policy."
+                                   },
+                    "rights":  {
+                                   "title":  "Dina Rättigheter",
+                                   "text":  "Du kan när som helst begära tillgång, rättelse eller radering av dina uppgifter. För att utöva dina rättigheter eller återkalla åtkomst till Google Calendar, kontakta oss på contato@menvo.com.br."
+                               },
+                    "contact":  {
+                                    "title":  "Kontakt",
+                                    "text":  "Har du frågor kring integritet? Kontakta oss på contato@menvo.com.br."
+                                },
+                    "links":  {
+                                  "cookies":  "Cookiepolicy",
+                                  "terms":  "Användarvillkor"
+                              }
+                },
+    "cookies":  {
+                    "badge":  "Cookies",
+                    "title":  "Cookiepolicy",
+                    "intro":  "Vi använder cookies för att förbättra din upplevelse, säkerställa viktiga funktioner och analysera användningen av plattformen.",
+                    "essential":  {
+                                      "title":  "Nödvändiga Cookies",
+                                      "text":  "Dessa krävs för att webbplatsen ska fungera, t.ex. inloggning och säkerhet. De kan inte stängas av."
+                                  },
+                    "social":  {
+                                   "title":  "Social Inloggning",
+                                   "text":  "Cookies kan användas för autentisering via Google och LinkedIn för en säker inloggning."
+                               },
+                    "preferences":  {
+                                        "title":  "Preferenser",
+                                        "text":  "Vi sparar dina språk- och konfigurationsval för att anpassa din upplevelse."
+                                    },
+                    "analytics":  {
+                                      "title":  "Analys och Prestanda",
+                                      "text":  "Vi använder cookies och analysverktyg som Microsoft Clarity för att förstå hur plattformen används och för att förbättra våra tjänster. Clarity hjälper oss visualisera hur användare interagerar med sidan via sessionsinspelningar och heatmaps. För användare i EU (EES), Storbritannien och Schweiz ber vi om ditt uttryckliga samtycke innan vi aktiverar dessa analysverktyg."
+                                  },
+                    "clarity":  {
+                                    "title":  "Microsoft Clarity",
+                                    "text":  "Vi använder Microsoft Clarity för att se hur du använder vår webbplats via beteendemätvärden, heatmaps och sessionsåterspelning. Den insamlade informationen från Clarity bearbetas enligt Microsofts Integritetspolicy. För användare i EES, Storbritannien och Schweiz aktiveras Clarity enbart när du gett ditt tydliga samtycke i vår cookiebanner."
+                                },
+                    "links":  {
+                                  "privacy":  "Integritetspolicy",
+                                  "terms":  "Användarvillkor"
+                              }
+                },
+    "cookieConsent":  {
+                          "title":  "Vi använder cookies",
+                          "description":  "Vi använder nödvändiga cookies för att vår sajt ska fungera och analytiska cookies för att förbättra din upplevelse. Du kan välja vilka du vill acceptera.",
+                          "learnMore":  "Läs mer",
+                          "acceptAll":  "Acceptera Alla",
+                          "acceptNecessary":  "Endast Nödvändiga",
+                          "customize":  "Anpassa",
+                          "savePreferences":  "Spara Inställningar",
+                          "settings":  {
+                                           "title":  "Cookie-inställningar",
+                                           "description":  "Välj vilka typer av cookies du godkänner. Nödvändiga cookies kan inte inaktiveras.",
+                                           "alwaysActive":  "Alltid Aktiva",
+                                           "necessary":  {
+                                                             "title":  "Nödvändiga Cookies",
+                                                             "description":  "Krävs för att webbplatsen ska fungera, inklusive säker inloggning och navigering."
+                                                         },
+                                           "analytics":  {
+                                                             "title":  "Analytiska Cookies",
+                                                             "description":  "Hjälper oss att förstå hur du interagerar med webbplatsen för att förbättra din upplevelse.",
+                                                             "tools":  "Verktyg: Microsoft Clarity (sessionsinspelningar, heatmaps)"
+                                                         },
+                                           "functional":  {
+                                                              "title":  "Funktionella Cookies",
+                                                              "description":  "Möjliggör avancerade funktioner som att spara språkval."
+                                                          }
+                                       }
+                      },
+    "terms":  {
+                  "badge":  "Villkor",
+                  "title":  "Användarvillkor",
+                  "intro":  "När du använder Menvo godkänner du dessa villkor. Läs noggrant för att förstå dina rättigheter och skyldigheter.",
+                  "usage":  {
+                                "title":  "Användning av Plattformen",
+                                "text":  "Menvo kopplar samman mentorer och adepter för gratis sessioner. All användning måste vara respektfull och i enlighet med gällande lagstiftning."
+                            },
+                  "account":  {
+                                  "title":  "Konto och Social Inloggning",
+                                  "text":  "Du kan skapa ett konto via e-post eller sociala nätverk (Google, LinkedIn). Håll dina inloggningsuppgifter säkra och dela dem inte."
+                              },
+                  "security":  {
+                                   "title":  "Säkerhet",
+                                   "text":  "Vi vidtar säkerhetsåtgärder för att skydda din data, men det är även ditt ansvar att hålla ditt lösenord hemligt."
+                               },
+                  "content":  {
+                                  "title":  "Innehåll och Bilder",
+                                  "text":  "Du är ansvarig för materialet du laddar upp (foton, text). Ladda inte upp kränkande eller upphovsrättsskyddat innehåll utan tillstånd."
+                              },
+                  "communication":  {
+                                        "title":  "Kommunikation och E-post",
+                                        "text":  "Vi skickar viktig information gällande dina mentorskap. Du kan välja att avregistrera dig från marknadsföringsmail."
+                                    },
+                  "storage":  {
+                                  "title":  "Lagring och Tredjepartstjänster",
+                                  "text":  "Data lagras i Supabase och e-post skickas via Brevo. Vi erbjuder tredjepartsinloggning via sociala nätverk."
+                              },
+                  "rights":  {
+                                 "title":  "Rättigheter och Skyldigheter",
+                                 "text":  "Du kan begära tillgång, rättelse eller borttagning av dina uppgifter. Missbruk av plattformen kan leda till att kontot stängs av."
+                             },
+                  "contact":  {
+                                  "title":  "Kontakt",
+                                  "text":  "Frågor? Kontakta oss via contato@menvo.com."
+                              },
+                  "links":  {
+                                "privacy":  "Integritetspolicy",
+                                "cookies":  "Cookiepolicy"
+                            }
+              },
+    "waitingList":  {
+                        "title":  "Gå med i Väntelistan",
+                        "description":  "Tack för ditt intresse! Vänligen fyll i formuläret nedan.",
+                        "nameLabel":  "Namn",
+                        "namePlaceholder":  "Ange ditt fullständiga namn",
+                        "emailPlaceholder":  "din@email.com",
+                        "whatsappLabel":  "WhatsApp (valfritt)",
+                        "whatsappPlaceholder":  "Ditt WhatsApp-nummer",
+                        "reasonLabel":  "Varför vill du gå med?",
+                        "reasonPlaceholder":  "Berätta varför du vill delta",
+                        "successMessage":  "Tack för ditt intresse!",
+                        "errorMessage":  "Fel vid skickande av formulär"
+                    },
+    "feedback":  {
+                     "title":  "Feedback",
+                     "description":  "Din åsikt är viktig för oss. Hur kan vi förbättras?",
+                     "helpUsImprove":  "Hjälp oss bli bättre",
+                     "ratingRequired":  "Vänligen välj ett betyg",
+                     "commentPlaceholder":  "Berätta om din upplevelse... (valfritt)",
+                     "emailPlaceholder":  "Din e-postadress (för anonym feedback)",
+                     "submit":  "Skicka Feedback",
+                     "thankYou":  "Tack för din feedback!",
+                     "error":  "Fel vid inlämning av feedback. Vänligen försök igen.",
+                     "rateStars":  "Betygsätt {count} stjärnor"
+                 },
+    "mentorSuggestion":  {
+                             "loginRequiredTitle":  "Inloggning Krävs",
+                             "loginRequiredDescription":  "Du måste vara inloggad för att föreslå ett mentorsämne eller område.",
+                             "title":  "Foreslå emne eller område",
+                             "description":  "Hittade du inte vad du letade efter? Föreslå nya ämnen eller expertområden som du gärna vill se på plattformen.",
+                             "observationLabel":  "Vad letar du efter?",
+                             "observationPlaceholder":  "Ex: Jag skulle vilja hitta mentorer specialiserade inom Produktdesign, speciellt med erfarenhet i UX Research och digital tillgänglighet...",
+                             "freeTopicsLabel":  "Ämnen eller Områden (Valfritt)",
+                             "freeTopicsDescription":  "Lägg till nyckelord relaterade till ditt förslag",
+                             "freeTopicsPlaceholder":  "Ex: Design Thinking, Rapid Prototyping...",
+                             "addTopic":  "Lägg till",
+                             "inclusionTagsLabel":  "Inkluderingsetiketter (Valfritt)",
+                             "inclusionTagsDescription":  "Välj relevanta mångfalds- och inkluderingsetiketter"
+                         },
+    "toast":  {
+                  "suggestion":  {
+                                     "success":  {
+                                                     "title":  "Forslag sendt!",
+                                                     "description":  "Tak for dit forslag. Vores team vil analysere det og give dig besked om opdateringer."
+                                                 },
+                                     "error":  {
+                                                   "title":  "Fejl ved afsendelse af forslag",
+                                                   "description":  "Kunne ikke sende dit forslag. Prøv venligst igen senere."
+                                               }
+                                 }
+              },
+    "metadata":  {
+                     "title":  "MENVO - Frivilligt mentorskab",
+                     "description":  "Kopplar samman mentorer och adepter för gratis mentorskapssessioner",
+                     "keywords":  [
+                                      "mentorskap",
+                                      "volontärarbete",
+                                      "karriär"
+                                  ],
+                     "og":  {
+                                "title":  "MENVO - Volontärmentorskap",
+                                "description":  "Kopplar samman mentorer och adepter för gratis mentorskapssessioner",
+                                "siteName":  "MENVO"
+                            },
+                     "twitter":  {
+                                     "title":  "MENVO - Volontärmentorskap",
+                                     "description":  "Kopplar samman mentorer och adepter för gratis mentorskapssessioner"
+                                 }
+                 },
+    "mentorsPage":  {
+                        "title":  "Hitta din Ideala Mentor",
+                        "subtitle":  "Koppla samman med verifierade mentorer och accelerera din karriär",
+                        "searchPlaceholder":  "Sök efter namn, expertis, företag...",
+                        "filters":  "Filter",
+                        "sheetTitle":  "Avancerade Filter",
+                        "sheetDescription":  "Förfina din sökning för att hitta den perfekta mentorn",
+                        "state":  "Region/Län",
+                        "statePlaceholder":  "Välj region",
+                        "allStates":  "Alla regioner",
+                        "city":  "Stad",
+                        "cityPlaceholder":  "Välj stad",
+                        "allCities":  "Alla städer",
+                        "topics":  "Mentorskapsämnen",
+                        "expertise":  "Expertisområden",
+                        "inclusiveTags":  "Inkluderende tags",
+                        "experience":  "Erfarenhet",
+                        "experiencePlaceholder":  "Års erfarenhet",
+                        "anyExperience":  "Vilken erfarenhet som helst",
+                        "availability":  "Tillgänglighet",
+                        "availabilityPlaceholder":  "Tillgänglighetsstatus",
+                        "anyStatus":  "Vilken status som helst",
+                        "clearFilters":  "Rensa Filter",
+                        "resultsFound":  "{count, plural, =0 {Inga mentorer hittades} =1 {1 mentor hittades} other {# mentorer hittades}}",
+                        "noMentorsTitle":  "Inga mentorer hittades",
+                        "noMentorsDescription":  "Försök justera dina filter för att hitta fler mentorer.",
+                        "suggestTopic":  "Föreslå Ämne eller Område",
+                        "viewProfile":  "Visa Profil",
+                        "sessionsCount":  "{count, plural, =1 {1 session} other {# sessioner}}",
+                        "status":  {
+                                       "available":  "Tillgänglig",
+                                       "busy":  "Upptagen",
+                                       "unavailable":  "Otillgänglig",
+                                       "unknown":  "Okänd status"
+                                   },
+                        "backToMentors":  "Tillbaka till Mentorer",
+                        "about":  "Om",
+                        "specialties":  "Specialiteter",
+                        "languagesAndInclusion":  "Språk och Inkludering",
+                        "languages":  "Språk",
+                        "scheduleSession":  "Boka Session",
+                        "freeMentorships":  "100% Gratis Mentorskap",
+                        "ownProfileMessage":  "Detta är din mentorprofil",
+                        "bookMentorship":  "Boka Mentorskap",
+                        "fullSchedule":  "Fullbokad",
+                        "links":  "Länkar",
+                        "yearsExperienceCount":  "{count, plural, =1 {1 års erfarenhet} other {# års erfarenhet}}",
+                        "loginRequired":  {
+                                              "title":  "Inloggning Krävs",
+                                              "description":  "Du måste vara inloggad för att boka mentorskap eller använda chatten."
+                                          },
+                        "share":  {
+                                      "title":  "{name} - Mentor på Menvo",
+                                      "text":  "Lär känna {name}, mentor specialiserad på {topics}",
+                                      "success":  "Delning lyckades!",
+                                      "copySuccess":  "Länken har kopierats till urklipp!"
+                                  }
+                    },
+    "dashboard":  {
+                      "greetings":  {
+                                        "morning":  "God morgon",
+                                        "afternoon":  "God eftermiddag",
+                                        "evening":  "God kväll"
+                                    },
+                      "mentor":  {
+                                     "welcome":  "Velkommen til dit mentorkontrolpanel. Administrer dine mentorskaber og hjælp andre professionelle.",
+                                     "verification":  {
+                                                          "pending":  "Väntar på Verifiering",
+                                                          "approved":  "Verifierad Profil",
+                                                          "pendingText":  "Din profil väntar på verifiering. Du kommer att få ett mejl när den är godkänd.",
+                                                          "approvedText":  "Din profil är verifierad! Du kan nu ta emot bokningar från adepter.",
+                                                          "badgePending":  "Väntande",
+                                                          "badgeApproved":  "Verifierad"
+                                                      },
+                                     "stats":  {
+                                                   "upcoming":  "Kommande Sessioner",
+                                                   "upcomingDesc":  "Bekräftade bokningar",
+                                                   "mentees":  "Totalt antal Adepter",
+                                                   "menteesDesc":  "Mentorerade personer",
+                                                   "completed":  "Slutförda Sessioner",
+                                                   "completedDesc":  "Genomförda mentorskap",
+                                                   "rating":  "Betyg",
+                                                   "reviews":  "{count, plural, =0 {Inga recensioner} =1 {1 recension} other {# recensioner}}"
+                                               },
+                                     "actions":  {
+                                                     "title":  "Snabbval",
+                                                     "availability":  "Ställ in Tillgänglighet",
+                                                     "availabilityDesc":  "Bestäm vilka tider du kan ha mentorsessioner",
+                                                     "mentorships":  "Mina Mentorskap",
+                                                     "mentorshipsDesc":  "Hantera dina mentorsessioner",
+                                                     "editProfile":  "Redigera Profil",
+                                                     "editProfileDesc":  "Uppdatera din information och specialitet",
+                                                     "access":  "Få åtkomst",
+                                                     "waitingVerification":  "Inväntar Verifiering"
+                                                 }
+                                 },
+                      "mentee":  {
+                                     "welcome":  "Välkommen till din panel. Hitta mentorer och påskynda din professionella tillväxt.",
+                                     "stats":  {
+                                                   "hours":  "Mentorskapstimmar",
+                                                   "hoursDesc":  "Total tid av lärande",
+                                                   "mentors":  "Mentorer",
+                                                   "mentorsDesc":  "Anslutna mentorer"
+                                               },
+                                     "actions":  {
+                                                     "find":  "Hitta Mentorer",
+                                                     "findDesc":  "Sök efter verifierade mentorer inom dina intresseområden"
+                                                 },
+                                     "progress":  {
+                                                      "title":  "Mina Framsteg",
+                                                      "description":  "Följ din yrkesmässiga utveckling",
+                                                      "inDevelopment":  "Under utveckling",
+                                                      "comingSoon":  "Kommer snart: framstegsdiagram, uppnådda mål, certifikat och lärresurser"
+                                                  }
+                                 },
+                      "gettingStarted":  {
+                                             "title":  "Kom Igång",
+                                             "description":  "Genomför dessa steg för att få ut det mesta av plattformen",
+                                             "step1":  "Kontoregistrering klar",
+                                             "step2":  "Vald roll",
+                                             "step3Mentor":  "Väntar på profilverifiering",
+                                             "step3Mentee":  "Slutför din profil",
+                                             "step4Mentor":  "Konfigurera tillgänglighet",
+                                             "step4Mentee":  "Hitta din första mentor",
+                                             "step5Mentor":  "Få din första bokning",
+                                             "step5Mentee":  "Boka din första session"
+                                         }
+                  },
+    "onboarding":  {
+                       "title":  "Välj din profil",
+                       "description":  "Välj hur du skulle vilja delta i vår plattform. Du kommer att kunna ändra detta senare i inställningarna.",
+                       "configuringFor":  "Konfigurerar profil för:",
+                       "mentee":  {
+                                      "title":  "Adept",
+                                      "description":  "Jag söker vägledning och uppföljning för min professionella utveckling",
+                                      "benefits":  [
+                                                       "Tillgång till erfarna mentorer",
+                                                       "Anpassade mentorskapssessioner",
+                                                       "Professionellt nätverkande",
+                                                       "Karriärutveckling"
+                                                   ],
+                                      "success":  "Adeptprofil valdes framgångsrikt!"
+                                  },
+                       "mentor":  {
+                                      "title":  "Mentor",
+                                      "description":  "Jeg vil dele min viden og hjælpe andre professionelle",
+                                      "benefits":  [
+                                                       "Dela erfarenheter",
+                                                       "Påverka andras karriärer",
+                                                       "Utöka kontaktnätet",
+                                                       "Utveckla ledarskapsförmåga"
+                                                   ],
+                                      "success":  "Mentorprofil valdes framgångsrikt!"
+                                  },
+                       "saving":  "Sparar din profil...",
+                       "confirm":  "Bekräfta Val",
+                       "error":  {
+                                     "notAuthenticated":  "Användaren är inte autentiserad",
+                                     "sessionExpired":  "Sessionen har gått ut. Vänligen logga in igen.",
+                                     "saveError":  "Fel när profilen skulle sparas. Kolla din internetuppkoppling.",
+                                     "selectRequired":  "Vänligen välj en profil"
+                                 }
+                   },
+    "auth":  {
+                 "confirmed":  {
+                                   "title":  "E-post Bekräftad!",
+                                   "description":  "Ditt konto har aktiverats. Välkommen till Menvo!",
+                                   "redirecting":  "Omdirigerar automatiskt om {count} sekunder...",
+                                   "continueNow":  "Fortsätt Nu",
+                                   "help":  "Behöver du hjälp? Kontakta oss.",
+                                   "messages":  {
+                                                    "role":  "Du kommer att omdirigeras för att välja din kontotyp",
+                                                    "profile":  "Du kommer att omdirigeras för att slutföra din profil",
+                                                    "dashboard":  "Du kommer att omdirigeras till panelen"
+                                                }
+                               },
+                 "forgotPassword":  {
+                                        "title":  "Glömt lösenordet?",
+                                        "description":  "Ange din e-post så skickar vi en länk för att återställa lösenordet.",
+                                        "sendLink":  "Skicka Återställningslänk",
+                                        "backToLogin":  "Tillbaka till inloggning",
+                                        "success":  "Länk skickad! Kolla din e-post."
+                                    },
+                 "resend":  {
+                                "title":  "Skicka Bekräftelse Igen",
+                                "description":  "Skriv in din e-post för att få en ny bekräftelselänk",
+                                "successTitle":  "E-post Skickad!",
+                                "successDescription":  "Kolla din inkorg och skräppostmapp.",
+                                "sentTo":  "Vi skickade ett nytt bekräftelsemail till",
+                                "otherEmail":  "Skicka till en annan E-post",
+                                "button":  "Skicka E-post Igen",
+                                "error":  "Fel när e-post skulle skickas om. Kontrollera att e-posten är korrekt."
+                            },
+                 "setPassword":  {
+                                     "title":  "Sätt ditt lösenord",
+                                     "description":  "Du har blivit inbjuden till plattformen. Ställ in ditt lösenord för att fortsätta.",
+                                     "successTitle":  "Lösenord inställt!",
+                                     "successDescription":  "Ditt konto har ställts in",
+                                     "redirecting":  "Omdirigerar till val av roll...",
+                                     "invalidInvite":  "Ogiltig Inbjudan",
+                                     "invalidInviteDesc":  "Inbjudningslänken har löpt ut eller är ogiltig",
+                                     "checkingSession":  "Verifierar inbjudan...",
+                                     "button":  "Sätt lösenord och fortsätt",
+                                     "agreement":  "Genom att ställa in ditt lösenord godkänner du våra"
+                                 }
+             },
+    "messages":  {
+                     "title":  "Beskeder",
+                     "searchPlaceholder":  "Søg i samtaler...",
+                     "noConversationsFound":  "Ingen samtaler fundet",
+                     "noConversationsYet":  "Ingen samtaler endnu",
+                     "tryAnotherSearch":  "Prøv at søge efter et andet navn",
+                     "startConversation":  "Start en samtale med en mentor!",
+                     "newMessages":  "{count, plural, =1 {1 ny} other {# nye}}",
+                     "selectConversation":  "Vælg en samtale",
+                     "selectConversationDesc":  "Vælg en samtale i sidebjælken for at begynde at sende beskeder",
+                     "roleMentor":  "Mentor",
+                     "roleMentee":  "Mentee"
+                 },
+    "profile":  {
+                    "title":  "Min profil",
+                    "description":  "Administrer dine personlige og professionelle oplysninger",
+                    "viewPublicProfile":  "Se offentlig profil",
+                    "saveChanges":  "Gem ændringer",
+                    "uploadPhoto":  "Opdater foto",
+                    "uploadPhotoSuccess":  "Foto opdateret!",
+                    "uploadPhotoError":  "Fejl ved upload af billede",
+                    "tabs":  {
+                                 "personal":  "Personlige oplysninger",
+                                 "professional":  "Professionel",
+                                 "mentorship":  "Mentorskab",
+                                 "documents":  "Dokumenter",
+                                 "settings":  "Indstillinger"
+                             },
+                    "form":  {
+                                 "firstName":  "Fornavn",
+                                 "firstNamePlaceholder":  "Dit fornavn",
+                                 "lastName":  "Efternavn",
+                                 "lastNamePlaceholder":  "Dit efternavn",
+                                 "bio":  "Bio",
+                                 "bioPlaceholder":  "Fortæl lidt om dig selv...",
+                                 "jobTitle":  "Stilling",
+                                 "jobTitlePlaceholder":  "f.eks. Senior Software Engineer",
+                                 "company":  "Virksomhed",
+                                 "companyPlaceholder":  "f.eks. Google, Microsoft...",
+                                 "linkedin":  "LinkedIn",
+                                 "website":  "Hjemmeside",
+                                 "portfolio":  "Portfolio",
+                                 "address":  "Adresse",
+                                 "city":  "By",
+                                 "state":  "Stat/Region",
+                                 "country":  "Land",
+                                 "languages":  "Sprog",
+                                 "mentorshipApproach":  "Mentortilgang",
+                                 "mentorshipApproachPlaceholder":  "Hvordan plejer du at være mentor?",
+                                 "whatToExpect":  "Hvad kan man forvente",
+                                 "whatToExpectPlaceholder":  "Hvad kan en mentee forvente af dine sessioner?",
+                                 "idealMentee":  "Ideel mentee",
+                                 "idealMenteePlaceholder":  "Hvilken type person kan du hjælpe mest?",
+                                 "expertiseAreas":  "Ekspertiseområder",
+                                 "mentorshipTopics":  "Mentoremner",
+                                 "inclusiveTags":  "Inkluderende tags",
+                                 "cvTitle":  "CV (PDF)",
+                                 "cvDescription":  "Upload dit opdaterede CV, så mentees bedre kan forstå din rejse.",
+                                 "uploadCV":  "Upload CV",
+                                 "viewCV":  "Vis",
+                                 "removeCV":  "Fjern",
+                                 "cvSuccess":  "CV uploadet korrekt!",
+                                 "cvRemoveSuccess":  "CV fjernet korrekt!",
+                                 "requiredFields":  "Fornavn og efternavn er påkrævet",
+                                 "updateSuccess":  "Profil opdateret korrekt!",
+                                 "updateError":  "Fejl ved opdatering af profil",
+                                 "slug":  "Slug",
+                                 "professionalDescription":  "Dine karriereoplysninger og professionelle links",
+                                 "locationDescription":  "Din placering (fuld adresse forbliver privat, kun by/stat/land er offentlige)",
+                                 "mentorshipDescription":  "Konfigurer din profil som mentor (alle mentorsparringer er gratis)",
+                                 "cvAvailable":  "PDF-fil gemt og tilgængelig til visning",
+                                 "settingsDescription":  "Administrer dine kontoindstillinger",
+                                 "inDevelopment":  "Under udvikling",
+                                 "settingsComingSoon":  "Snart vil du kunne administrere meddelelser, privatliv og andre kontoindstillinger.",
+                                 "expertisePlaceholder":  "Skriv et område og tryk på Enter",
+                                 "topicsPlaceholder":  "Skriv et emne og tryk på Enter",
+                                 "tagsPlaceholder":  "Skriv et tag og tryk på Enter"
+                             },
+                    "saving":  "Gemmer...",
+                    "loading":  "Indlæser..."
+                },
+    "settings":  {
+                     "title":  "Indstillinger",
+                     "tabs":  {
+                                  "general":  "Generelt",
+                                  "security":  "Sikkerhed",
+                                  "appearance":  "Udseende"
+                              },
+                     "language":  {
+                                      "title":  "Sprog",
+                                      "description":  "Vælg dit foretrukne sprog"
+                                  },
+                     "account":  {
+                                     "title":  "Kontooplysninger",
+                                     "description":  "Dine loginoplysninger",
+                                     "email":  "E-mail",
+                                     "verified":  "Verificeret"
+                                 },
+                     "security":  {
+                                      "title":  "Skift adgangskode",
+                                      "description":  "Opdater din adgangskode",
+                                      "currentPassword":  "Nuværende adgangskode",
+                                      "currentPasswordPlaceholder":  "Indtast din nuværende adgangskode",
+                                      "newPassword":  "Ny adgangskode",
+                                      "newPasswordPlaceholder":  "Indtast din nye adgangskode",
+                                      "confirmPassword":  "Bekræft ny adgangskode",
+                                      "confirmPasswordPlaceholder":  "Bekræft din nye adgangskode",
+                                      "changing":  "Ændrer...",
+                                      "success":  "Adgangskode ændret korrekt",
+                                      "error":  "Kunne ikke ændre adgangskode",
+                                      "mismatch":  "Adgangskoderne stemmer ikke overens",
+                                      "minLength":  "Adgangskoden skal være på mindst 6 tegn"
+                                  },
+                     "dangerZone":  {
+                                        "title":  "Farezone",
+                                        "description":  "Handlinger der ikke kan fortrydes på din konto",
+                                        "deleteButton":  "Slet konto",
+                                        "confirmTitle":  "Er du helt sikker?",
+                                        "confirmDesc":  "Denne handling kan ikke fortrydes. Dette vil slette din konto permanent og fjerne alle dine data fra vores servere.",
+                                        "cancel":  "Annuller",
+                                        "confirmAction":  "Ja, slet min konto"
+                                    },
+                     "appearance":  {
+                                        "title":  "Tema",
+                                        "description":  "Vælg tema for brugerfladen",
+                                        "light":  "Lys",
+                                        "dark":  "Mørk",
+                                        "system":  "System"
+                                    }
+                 },
+    "availability":  {
+                         "title":  "Indstil tilgængelighed",
+                         "description":  "Definer dine ledige tider til mentorsparring",
+                         "loading":  "Indlæser tilgængelighed...",
+                         "saving":  "Gemmer...",
+                         "saveButton":  "Gem tilgængelighed",
+                         "addTime":  "Tilføj tidsrum",
+                         "availableHours":  "Ledige tider",
+                         "availableHoursDesc":  "Tilføj de dage og tider, hvor du er tilgængelig for mentorsparring",
+                         "timeSlot":  "Tidsrum {number}",
+                         "dayOfWeek":  "Ugedag",
+                         "startTime":  "Starttidspunkt",
+                         "endTime":  "Sluttidspunkt",
+                         "previewTitle":  "Forhåndsvisning af tilgængelighed",
+                         "previewDesc":  "Hvordan din tilgængelighed vil se ud for mentees",
+                         "noSchedule":  "Ingen tidsplan konfigureret",
+                         "addScheduleToPreview":  "Tilføj tidsrum for at se forhåndsvisningen",
+                         "success":  "Tilgængelighed gemt korrekt!",
+                         "errorLoad":  "Fejl ved indlæsning af tilgængelighed",
+                         "errorSave":  "Fejl ved gemning af tilgængelighed",
+                         "invalidTime":  "Ugyldig tid på {day}: start skal være før slut",
+                         "overlappingTime":  "Overlappende tider på {day}",
+                         "tips":  {
+                                      "title":  "Tips",
+                                      "tip1":  "Indstil realistiske tider, som du kan overholde konsekvent",
+                                      "tip2":  "Efterlad pauser mellem sessioner til hvile",
+                                      "tip3":  "Du kan til enhver tid opdatere din tilgængelighed"
+                                  },
+                         "days":  {
+                                      "0":  "Søndag",
+                                      "1":  "Mandag",
+                                      "2":  "Tirsdag",
+                                      "3":  "Onsdag",
+                                      "4":  "Torsdag",
+                                      "5":  "Fredag",
+                                      "6":  "Lørdag"
+                                  }
+                     },
+    "mentorship":  {
+                       "title":  "Mine mentorsparringer",
+                       "description":  "Administrer alle dine mentorsparringer - modtagne og anmodede",
+                       "received":  {
+                                        "title":  "Modtagne mentorsparringer",
+                                        "asMentor":  "(dig som mentor)",
+                                        "pending":  "Modtagne anmodninger",
+                                        "pendingDesc":  "Mentoranmodninger der afventer din bekræftelse",
+                                        "confirmed":  "Planlagte mentorsparringer",
+                                        "confirmedDesc":  "Bekræftede og planlagte sessioner. Efter mentorsparringen, klik på \"Vurder\" for at give din feedback.",
+                                        "completed":  "Vurderede mentorsparringer",
+                                        "completedDesc":  "Afsluttede sessioner med registreret feedback",
+                                        "cancelled":  "Aflyste sessioner",
+                                        "cancelledDesc":  "Mentorsparringer der er blevet aflyst"
+                                    },
+                       "requested":  {
+                                         "title":  "Anmodede mentorsparringer",
+                                         "asMentee":  "(dig som mentee)",
+                                         "pending":  "Afventer bekræftelse",
+                                         "pendingDesc":  "Afventende bekræftelsesanmodninger fra mentorer",
+                                         "confirmed":  "Planlagte mentorsparringer",
+                                         "confirmedDesc":  "Sessioner bekræftet af mentorer",
+                                         "completed":  "Vurderede mentorsparringer",
+                                         "completedDesc":  "Afsluttede sessioner med din feedback",
+                                         "cancelled":  "Aflyste sessioner",
+                                         "cancelledDesc":  "Mentorsparringer der er blevet aflyst"
+                                     },
+                       "tabs":  {
+                                    "pending":  "Afventer",
+                                    "confirmed":  "Planlagte",
+                                    "completed":  "Vurderede",
+                                    "cancelled":  "Aflyst"
+                                },
+                       "resources":  {
+                                         "title":  "Ressourcebibliotek",
+                                         "description":  "Del materialer og ressourcer med dine mentees",
+                                         "inDevelopment":  "Under udvikling",
+                                         "comingSoon":  "Kommer snart: bibliotek med materialer, skabeloner og ressourcer til deling med mentees"
+                                     }
+                   },
+    "appointments":  {
+                         "title":  "Aftaler",
+                         "loading":  "Indlæser aftaler...",
+                         "empty":  "Ingen aftaler fundet",
+                         "error":  "Fejl ved indlæsning af aftaler",
+                         "today":  "I dag",
+                         "expired":  "Udløbet",
+                         "minutes":  "min",
+                         "menteeComments":  "Mentees kommentarer:",
+                         "mentorNotes":  "Mentors noter:",
+                         "cancelledBy":  "Aflyst af {name}",
+                         "you":  "dig",
+                         "reason":  "Årsag:",
+                         "cancelledAt":  "Aflyst den {date}",
+                         "evaluate":  "Vurder",
+                         "joinMeet":  "Deltag i Meet"
+                     },
+    "events":  {
+                   "title":  "Begivenheder og læring",
+                   "subtitle":  "Oplev kurser, workshops og begivenheder for at fremskynde din vækst",
+                   "searchPlaceholder":  "Søg i begivenheder, kurser, workshops...",
+                   "list":  "Liste",
+                   "map":  "Kort",
+                   "results":  "Viser {count} begivenheder",
+                   "noEvents":  "Ingen begivenheder fundet",
+                   "adjustFilters":  "Prøv at justere dine filtre eller søgetermer",
+                   "clearFilters":  "Ryd alle filtre"
+               }
 }

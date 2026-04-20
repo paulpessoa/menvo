@@ -1134,6 +1134,7 @@
   "onboarding": {
     "title": "Escolha seu perfil",
     "description": "Selecione como você gostaria de participar da nossa plataforma. Você poderá alterar isso depois nas configurações.",
+    "benefitsLabel": "Benefícios:",
     "configuringFor": "Configurando perfil para:",
     "mentee": {
       "title": "Mentorado",

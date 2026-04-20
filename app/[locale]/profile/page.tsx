@@ -210,6 +210,10 @@ export default function ProfilePage() {
 
     if (result.success) {
       const avatarUrl = result.data.url + '?t=' + Date.now()
+      
+      // AUTO-SAVE: Salva imediatamente na tabela profiles para persistência
+      await updateProfile({ ...formData, avatar_url: avatarUrl })
+      
       setFormData(prev => ({ ...prev, avatar_url: avatarUrl }))
       await refreshProfile()
       toast.success(t("uploadPhotoSuccess"))
@@ -344,7 +348,6 @@ export default function ProfilePage() {
               {isMentor && (
                 <TabsTrigger value="mentorship">{t("tabs.mentorship")}</TabsTrigger>
               )}
-              <TabsTrigger value="settings">{t("tabs.settings")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">

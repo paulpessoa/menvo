@@ -134,8 +134,9 @@ export default function SelectRolePage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-2">
-                                        <p className="text-sm font-medium">{t("mentee.benefits" ? "Benefícios:" : "")}</p>
+                                        <p className="text-sm font-medium">{t("benefitsLabel")}</p>
                                         <ul className="text-sm text-muted-foreground space-y-1">
+
                                             {role.benefits.map((benefit, index) => (
                                                 <li key={index} className="flex items-center gap-2">
                                                     <div className="w-1 h-1 bg-current rounded-full" />
