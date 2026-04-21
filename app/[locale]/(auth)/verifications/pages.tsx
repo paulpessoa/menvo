@@ -18,18 +18,19 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar, User, CheckCircle, XCircle, Eye } from "lucide-react"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/lib/auth"
 import { VerificationService } from "@/services/verifications"
+import { Verification } from "@/types/verifications"
 
 export default function VerificationsPage() {
   const { user } = useAuth()
-  const [verifications, setVerifications] = useState([])
+  const [verifications, setVerifications] = useState<Verification[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedVerification, setSelectedVerification] = useState(null)
+  const [selectedVerification, setSelectedVerification] = useState<Verification | null>(null)
 
   useEffect(() => {
     loadVerifications()
-  }, [])
+  }, [user?.id])
 
   const loadVerifications = async () => {
     try {
@@ -104,7 +105,7 @@ export default function VerificationsPage() {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {verifications.map((verification) => (
-                  <Card key={verification.verification_id}>
+                  <Card key={verification.id}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
@@ -113,7 +114,7 @@ export default function VerificationsPage() {
                             <AvatarFallback>
                               {verification.mentor_name
                                 .split(" ")
-                                .map((n) => n[0])
+                                .map((n: string) => n[0])
                                 .join("")}
                             </AvatarFallback>
                           </Avatar>
@@ -155,7 +156,7 @@ export default function VerificationsPage() {
                           </DialogContent>
                         </Dialog>
 
-                        <Button size="sm" onClick={() => handleApprove(verification.verification_id)}>
+                        <Button size="sm" onClick={() => handleApprove(verification.id)}>
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Approve
                         </Button>
@@ -172,7 +173,7 @@ export default function VerificationsPage() {
                               <DialogTitle>Reject Verification</DialogTitle>
                               <DialogDescription>Please provide a reason for rejection</DialogDescription>
                             </DialogHeader>
-                            <RejectForm onReject={(reason) => handleReject(verification.verification_id, reason)} />
+                            <RejectForm onReject={(reason: string) => handleReject(verification.id, reason)} />
                           </DialogContent>
                         </Dialog>
                       </div>

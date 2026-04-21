@@ -233,7 +233,7 @@ export default function SetPasswordPage() {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    {tCommon("saving" ? "..." : "")}
+                                    {tCommon("saving")}
                                 </>
                             ) : (
                                 t("button")
@@ -246,11 +246,11 @@ export default function SetPasswordPage() {
                         <p className="text-xs text-muted-foreground">
                             {t("agreement")}{" "}
                             <Link href="/terms" className="text-blue-600 hover:underline">
-                                {tCommon("terms" ? tCommon("terms") : "Terms")}
+                                {tCommon("terms")}
                             </Link>{" "}
-                            {tCommon("and" ? tCommon("and") : "and")}{" "}
+                            {tCommon("and")}{" "}
                             <Link href="/privacy" className="text-blue-600 hover:underline">
-                                {tCommon("privacy" ? tCommon("privacy") : "Privacy")}
+                                {tCommon("privacy")}
                             </Link>
                         </p>
                     </div>
