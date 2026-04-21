@@ -34,7 +34,7 @@ export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>
     const client = getSupabaseClient()
     return (client as any)[prop]
   }
-})
+}) as ReturnType<typeof createClient<Database>>
 
 export const auth = {
   signUp: async (email: string, password: string, metadata?: any) => {

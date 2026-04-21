@@ -452,6 +452,67 @@ export interface Database {
           updated_at?: string
         }
       }
+      newsletter_subscriptions: {
+        Row: {
+          id: string
+          email: string
+          name: string | null
+          whatsapp: string | null
+          status: string
+          marketing_consent: boolean
+          subscribed_at: string
+          unsubscribed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          name?: string | null
+          whatsapp?: string | null
+          status?: string
+          marketing_consent: boolean
+          subscribed_at?: string
+          unsubscribed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          status?: string
+          marketing_consent?: boolean
+          unsubscribed_at?: string | null
+        }
+      }
+      mentor_availability: {
+        Row: {
+          id: string
+          mentor_id: string
+          day_of_week: number
+          start_time: string
+          end_time: string
+          timezone: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          mentor_id: string
+          day_of_week: number
+          start_time: string
+          end_time: string
+          timezone: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          day_of_week?: number
+          start_time?: string
+          end_time?: string
+          timezone?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+      }
     }
     Enums: {
       user_role: "pending" | "mentee" | "mentor" | "admin"
