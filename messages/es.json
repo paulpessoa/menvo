@@ -31,6 +31,9 @@
         "saving": "Guardando...",
         "close": "Cerrar",
         "submitting": "Enviando...",
+        "addressPlaceholder": "Calle, número, barrio",
+        "cvErrorSize": "El archivo debe tener un máximo de 5MB",
+        "selectPDF": "Seleccionar PDF",
         "languageSelector": {
             "title": "Elige tu idioma",
             "description": "Selecciona tu idioma para continuar",

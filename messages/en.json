@@ -31,6 +31,9 @@
         "saving": "Saving...",
         "close": "Close",
         "submitting": "Submitting...",
+        "addressPlaceholder": "Street, number, neighborhood",
+        "cvErrorSize": "The file must be at most 5MB",
+        "selectPDF": "Select PDF",
         "languageSelector": {
             "title": "Select your language",
             "description": "Choose your language to continue",
