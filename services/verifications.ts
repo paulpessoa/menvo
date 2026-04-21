@@ -15,20 +15,20 @@ export class VerificationServiceClass {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
-    const { error } = await supabase.rpc("request_mentor_verification", {
+    const { error } = await (supabase.rpc("request_mentor_verification" as any, {
       mentor_user_id: user.id,
-    })
+    }) as any)
 
     if (error) throw error
   }
 
   // Agendar verificação (admin)
   async scheduleVerification(verificationId: string, scheduledAt: string, adminId: string): Promise<void> {
-    const { error } = await supabase.rpc("schedule_mentor_verification", {
-      verification_id: verificationId,
+    const { error } = await (supabase.rpc("schedule_mentor_verification" as any, {
+      verification_id: parseInt(verificationId),
       scheduled_datetime: scheduledAt,
       admin_id: adminId,
-    })
+    }) as any)
 
     if (error) throw error
   }
@@ -36,9 +36,9 @@ export class VerificationServiceClass {
   async getPendingVerifications(adminId: string): Promise<Verification[]> {
     // Tenta primeiro via RPC
     try {
-      const { data, error } = await supabase.rpc("get_pending_verifications", {
+      const { data, error } = await (supabase.rpc("get_pending_verifications" as any, {
         admin_id: adminId,
-      })
+      }) as any)
       if (!error && data) return data as any as Verification[]
     } catch (e) {
       console.warn("RPC get_pending_verifications failed, falling back to manual fetch")
@@ -104,18 +104,19 @@ export class VerificationServiceClass {
   async completeVerification(params: CompleteVerificationParams): Promise<void> {
     // Tenta via RPC primeiro
     try {
-      const { error } = await supabase.rpc("complete_mentor_verification", {
-        verification_id: params.verificationId,
+      const { error } = await (supabase.rpc("complete_mentor_verification" as any, {
+        verification_id: parseInt(params.verificationId),
         admin_id: params.adminId,
         verification_passed: params.passed,
         verification_notes: params.notes || null,
-      })
+      }) as any)
       if (!error) return
     } catch (e) {
         console.warn("RPC complete_mentor_verification failed, falling back to manual update")
     }
 
     const { verificationId, adminId, passed, notes } = params
+    const numericId = parseInt(verificationId)
 
     const updates = {
       status: passed ? 'completed' : 'rejected',
@@ -125,20 +126,20 @@ export class VerificationServiceClass {
       updated_at: new Date().toISOString()
     }
 
-    const { data: verification, error } = await supabase
+    const { data: verification, error } = await (supabase
       .from('mentor_verification')
       .select('mentor_id')
-      .eq('id', verificationId)
-      .single()
+      .eq('id', numericId)
+      .single() as any)
 
     if (error || !verification) {
       throw new Error(`Verification not found: ${error?.message || 'No data'}`)
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase
       .from('mentor_verification')
       .update(updates as any)
-      .eq('id', verificationId)
+      .eq('id', numericId) as any)
 
     if (updateError) {
       throw new Error(`Error updating verification: ${updateError.message}`)

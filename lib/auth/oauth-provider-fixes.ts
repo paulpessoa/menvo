@@ -129,7 +129,7 @@ export async function signInWithOAuthProvider(
       console.error(`❌ OAuth error for ${provider}:`, error)
       
       // Enhanced error messages
-      let enhancedError = error
+      let enhancedError: any = error
       if (error.message?.includes('Invalid login credentials')) {
         enhancedError = {
           ...error,

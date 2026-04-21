@@ -63,13 +63,13 @@ export interface SessionResponse {
 export const mentorAvailabilityService = {
   // Obter disponibilidade de um mentor
   getMentorAvailability: async (mentorId: string) => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('mentor_availability')
       .select('*')
       .eq('mentor_id', mentorId)
       .eq('is_active', true)
       .order('day_of_week', { ascending: true })
-      .order('start_time', { ascending: true })
+      .order('start_time', { ascending: true }) as any)
 
     if (error) throw error
     return data as MentorAvailability[]
@@ -77,11 +77,11 @@ export const mentorAvailabilityService = {
 
   // Adicionar horário de disponibilidade
   addAvailability: async (availability: Omit<MentorAvailability, 'id' | 'created_at' | 'updated_at'>) => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('mentor_availability')
       .insert([availability])
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
     return data as MentorAvailability
@@ -89,12 +89,14 @@ export const mentorAvailabilityService = {
 
   // Atualizar disponibilidade
   updateAvailability: async (id: string, updates: Partial<MentorAvailability>) => {
-    const { data, error } = await supabase
+    // Convert string ID to number if necessary for the database
+    const numericId = parseInt(id)
+    const { data, error } = await (supabase
       .from('mentor_availability')
-      .update(updates)
-      .eq('id', id)
+      .update(updates as any)
+      .eq('id', isNaN(numericId) ? id : numericId)
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
     return data as MentorAvailability
@@ -102,10 +104,11 @@ export const mentorAvailabilityService = {
 
   // Remover disponibilidade (soft delete)
   removeAvailability: async (id: string) => {
-    const { error } = await supabase
+    const numericId = parseInt(id)
+    const { error } = await (supabase
       .from('mentor_availability')
-      .update({ is_active: false })
-      .eq('id', id)
+      .update({ is_active: false } as any)
+      .eq('id', isNaN(numericId) ? id : numericId) as any)
 
     if (error) throw error
   },
@@ -113,10 +116,10 @@ export const mentorAvailabilityService = {
   // Definir disponibilidade completa do mentor (substitui todas)
   setMentorAvailability: async (mentorId: string, availabilities: Omit<MentorAvailability, 'id' | 'mentor_id' | 'created_at' | 'updated_at'>[]) => {
     // Primeiro, desativar todas as disponibilidades existentes
-    await supabase
+    await (supabase
       .from('mentor_availability')
-      .update({ is_active: false })
-      .eq('mentor_id', mentorId)
+      .update({ is_active: false } as any)
+      .eq('mentor_id', mentorId) as any)
 
     // Depois, inserir as novas disponibilidades
     const newAvailabilities = availabilities.map(av => ({
@@ -124,10 +127,10 @@ export const mentorAvailabilityService = {
       mentor_id: mentorId
     }))
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('mentor_availability')
-      .insert(newAvailabilities)
-      .select()
+      .insert(newAvailabilities as any)
+      .select() as any)
 
     if (error) throw error
     return data as MentorAvailability[]

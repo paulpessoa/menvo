@@ -14,12 +14,12 @@ async function getMentorData(slug: string) {
     const supabase = await createClient()
 
     // Buscar mentor
-    const { data: mentor, error } = await supabase
+    const { data: mentor, error } = await (supabase
         .from('mentors_view')
         .select('*')
         .eq('slug', slug)
         .eq('verified', true)
-        .single()
+        .single() as any)
 
     if (error || !mentor) {
         return null
@@ -113,7 +113,7 @@ export default async function MentorProfilePage({ params }: PageProps) {
         average_rating: mentor.rating,
         total_reviews: mentor.reviews,
         total_sessions: mentor.sessions,
-    }
+    } as any
 
     return (
         <MentorProfileClient

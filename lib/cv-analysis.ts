@@ -335,7 +335,7 @@ export interface CVAnalysisResult {
     analysisResult?: CVAnalysisResult
   ) {
     const { supabase } = await import('@/lib/supabase');
-    
+
     const metadata = {
       user_id: userId,
       file_path: filePath,
@@ -351,37 +351,37 @@ export interface CVAnalysisResult {
       extraction_confidence: analysisResult?.fieldConfidence || null,
       raw_analysis_result: analysisResult?.rawData || null,
     };
-  
-    const { data, error } = await supabase
-      .from('cv_metadata')
-      .upsert(metadata, { onConflict: 'user_id' })
+
+    const { data, error } = await (supabase
+      .from('cv_metadata' as any)
+      .upsert(metadata as any, { onConflict: 'user_id' })
       .select()
-      .single();
-  
+      .single() as any);
+
     if (error) {
       console.error('Error storing CV metadata:', error);
       throw error;
     }
-  
+
     return data;
   }
-  
+
   /**
    * Gets CV metadata for a user
    */
   export async function getCVMetadata(userId: string) {
     const { supabase } = await import('@/lib/supabase');
-    
-    const { data, error } = await supabase
-      .from('cv_metadata')
+
+    const { data, error } = await (supabase
+      .from('cv_metadata' as any)
       .select('*')
       .eq('user_id', userId)
-      .single();
-  
+      .single() as any);
+
     if (error && error.code !== 'PGRST116') {
       console.error('Error fetching CV metadata:', error);
       throw error;
     }
-  
+
     return data;
   }

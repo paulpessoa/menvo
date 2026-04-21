@@ -99,10 +99,10 @@ export function checkOAuthProviderAvailability(provider: string): {
     
     return { available: true }
     
-  } catch (error) {
+  } catch (error: any) {
     return {
       available: false,
-      error: `Failed to check OAuth provider availability: ${error.message}`
+      error: `Failed to check OAuth provider availability: ${error?.message || 'Unknown error'}`
     }
   }
 }
@@ -163,12 +163,12 @@ export function handleOAuthHealthCheck(): NextResponse {
     
     return NextResponse.json(response, { status: statusCode })
     
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       status: 'error',
       error: 'Failed to check OAuth health',
-      details: error.message,
+      details: error?.message || 'Unknown error',
       timestamp: new Date().toISOString()
     }, { status: 500 })
   }
-}
+  }

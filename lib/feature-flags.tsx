@@ -38,7 +38,17 @@ interface FeatureFlagsProviderProps {
 }
 
 export function FeatureFlagsProvider({ children, initialFlags }: FeatureFlagsProviderProps) {
-    const [flags, setFlags] = useState<FeatureFlags>({ ...DEFAULT_FLAGS, ...initialFlags })
+    const [flags, setFlags] = useState<FeatureFlags>(() => {
+        const merged: any = { ...DEFAULT_FLAGS }
+        if (initialFlags) {
+            Object.keys(initialFlags).forEach(key => {
+                if (initialFlags[key as keyof FeatureFlags] !== undefined) {
+                    merged[key] = initialFlags[key as keyof FeatureFlags]
+                }
+            })
+        }
+        return merged as FeatureFlags
+    })
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 

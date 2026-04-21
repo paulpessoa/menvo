@@ -61,14 +61,14 @@ class HubService {
      * Sugere um novo recurso (Comunidade)
      */
     async suggestResource(resource: Omit<HubResource, 'id' | 'status' | 'created_at' | 'is_affiliate'>) {
-        const { data, error } = await this.supabase
+        const { data, error } = await (this.supabase
             .from('hub_resources')
             .insert({
                 ...resource,
                 status: 'pending'
-            })
+            } as any)
             .select()
-            .single()
+            .single() as any)
 
         if (error) throw error
         return data as HubResource

@@ -17,15 +17,15 @@ class AdminService {
      * Atualiza dados de qualquer perfil (apenas admins via RLS)
      */
     async updateUserProfile(userId: string, updates: AdminUserUpdate) {
-        const { data, error } = await this.supabase
+        const { data, error } = await (this.supabase
             .from('profiles')
             .update({
                 ...updates,
                 updated_at: new Date().toISOString()
-            })
+            } as any)
             .eq('id', userId)
             .select()
-            .single()
+            .single() as any)
 
         if (error) throw error
         return data
@@ -36,18 +36,19 @@ class AdminService {
      */
     async setUserRoles(userId: string, roleNames: string[]) {
         // 1. Buscar os IDs das roles solicitadas
-        const { data: roles, error: rolesError } = await this.supabase
+        const { data: rolesRaw, error: rolesError } = await (this.supabase
             .from('roles')
             .select('id, name')
-            .in('name', roleNames)
+            .in('name', roleNames) as any)
 
         if (rolesError) throw rolesError
+        const roles = (rolesRaw as any[]) || []
 
         // 2. Remover roles atuais
-        const { error: deleteError } = await this.supabase
+        const { error: deleteError } = await (this.supabase
             .from('user_roles')
             .delete()
-            .eq('user_id', userId)
+            .eq('user_id', userId) as any)
 
         if (deleteError) throw deleteError
 
@@ -57,9 +58,9 @@ class AdminService {
             role_id: role.id
         }))
 
-        const { error: insertError } = await this.supabase
+        const { error: insertError } = await (this.supabase
             .from('user_roles')
-            .insert(inserts)
+            .insert(inserts as any) as any)
 
         if (insertError) throw insertError
         return true

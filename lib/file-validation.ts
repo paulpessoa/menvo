@@ -5,8 +5,8 @@
 export interface FileValidationOptions {
   maxSize?: number;
   minSize?: number;
-  allowedTypes?: string[];
-  allowedExtensions?: string[];
+  allowedTypes?: readonly string[] | string[];
+  allowedExtensions?: readonly string[] | string[];
   requireExtension?: boolean;
 }
 

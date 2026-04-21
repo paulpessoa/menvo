@@ -22,7 +22,7 @@ export async function saveGoogleCalendarTokens(
   }
 ) {
   
-  const { error } = await (supabase.rpc('save_google_calendar_tokens', {
+  const { error } = await (supabase.rpc('save_google_calendar_tokens' as any, {
     p_user_id: userId,
     p_access_token: tokens.access_token,
     p_refresh_token: tokens.refresh_token,
@@ -41,7 +41,7 @@ export async function saveGoogleCalendarTokens(
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
   
-  const { data, error } = await (supabase.rpc('get_google_calendar_tokens', {
+  const { data, error } = await (supabase.rpc('get_google_calendar_tokens' as any, {
     p_user_id: userId
   }) as any);
 
@@ -54,7 +54,7 @@ export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCal
     return null;
   }
 
-  return data[0];
+  return (data as any)[0];
 }
 
 /**
@@ -105,7 +105,7 @@ export async function createUserGoogleCalendarClient(userId: string) {
 
   return {
     oauth2Client,
-    calendar: google.calendar({ version: 'v3', auth: oauth2Client })
+    calendar: google.calendar({ version: 'v3', auth: oauth2Client as any })
   };
 }
 

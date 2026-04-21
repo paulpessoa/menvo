@@ -154,7 +154,7 @@ class MentorService {
     // Ordenação
     query = query.order('first_name', { ascending: true })
 
-    const { data, error, count } = await query
+    const { data, error, count } = await (query as any)
 
     if (error) {
       throw new Error(`Erro ao buscar mentores: ${error.message}`)
@@ -164,7 +164,7 @@ class MentorService {
     const totalPages = Math.ceil(totalCount / limit)
 
     return {
-      mentors: data || [],
+      mentors: (data as any) || [],
       totalCount,
       currentPage: page,
       totalPages,
@@ -175,71 +175,73 @@ class MentorService {
 
   async getFilterOptions(): Promise<FilterOptions> {
     // Buscar todas as skills únicas dos mentores
-    const { data: skillsData, error: skillsError } = await supabase
+    const { data: skillsData, error: skillsError } = await (supabase
       .from('mentors_view')
       .select('mentor_skills')
-      .contains('active_roles', ['mentor'])
+      .contains('active_roles', ['mentor']) as any)
 
     if (skillsError) {
       throw new Error(`Erro ao buscar skills: ${skillsError.message}`)
     }
 
     // Buscar todos os idiomas únicos
-    const { data: languagesData, error: languagesError } = await supabase
+    const { data: languagesData, error: languagesError } = await (supabase
       .from('mentors_view')
       .select('languages')
-      .contains('active_roles', ['mentor'])
+      .contains('active_roles', ['mentor']) as any)
 
     if (languagesError) {
       throw new Error(`Erro ao buscar idiomas: ${languagesError.message}`)
     }
 
     // Buscar todos as Tags Inclusivas
-    const { data: inclusionTagsData, error: inclusionTagsError } = await supabase
+    const { data: inclusionTagsData, error: inclusionTagsError } = await (supabase
       .from('mentors_view')
       .select('inclusion_tags')
-      .contains('active_roles', ['mentor'])
+      .contains('active_roles', ['mentor']) as any)
 
     if (inclusionTagsError) {
       throw new Error(`Erro ao buscar Tags Inclusivas: ${inclusionTagsError.message}`)
     }
 
     // Buscar localizações únicas
-    const { data: locationsData, error: locationsError } = await supabase
+    const { data: locationsData, error: locationsError } = await (supabase
       .from('mentors_view')
       .select('location')
       .contains('active_roles', ['mentor'])
-      .not('location', 'is', null)
+      .not('location', 'is', null) as any)
 
     if (locationsError) {
       throw new Error(`Erro ao buscar localizações: ${locationsError.message}`)
     }
 
     // Processar dados
-    const allSkills = skillsData?.flatMap(item => item.mentor_skills || []) || []
+    const allSkills = (skillsData as any[])?.flatMap(item => item.mentor_skills || []) || []
     const uniqueTopics = Array.from(new Set(allSkills))
       .filter(Boolean)
-      .sort()
+      .sort() as string[]
 
-    const allLanguages = languagesData?.flatMap(item => item.languages || []) || []
+    const allLanguages = (languagesData as any[])?.flatMap(item => item.languages || []) || []
     const uniqueLanguages = Array.from(new Set(allLanguages))
       .filter(Boolean)
-      .sort()
+      .sort() as string[]
    
-    const allinclusionTags = inclusionTagsData?.flatMap(item => item.inclusion_tags || []) || []
+    const allinclusionTags = (inclusionTagsData as any[])?.flatMap(item => item.inclusion_tags || []) || []
     const uniqueInclusionTags = Array.from(new Set(allinclusionTags))
       .filter(Boolean)
-      .sort()
+      .sort() as string[]
 
-    const allLocations = locationsData?.map(item => item.location).filter(Boolean) || []
+    const allLocations = (locationsData as any[])?.map(item => item.location).filter(Boolean) || []
     const cities: string[] = []
     const countries: string[] = []
     
     allLocations.forEach(location => {
-      const parts = location.split(',').map((part: string) => part.trim())
-      if (parts.length >= 2) {
-        cities.push(parts[0])
-        countries.push(parts[parts.length - 1])
+      if (location) {
+        const parts = location.split(',').map((part: string) => part.trim())
+        if (parts.length >= 2) {
+          cities.push(parts[0])
+          countries.push(parts[parts.length - 1])
+        }
       }
     })
 
@@ -274,7 +276,7 @@ class MentorService {
   }
 
   async getMentorById(id: string): Promise<MentorProfile | null> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('mentors_view')
       .select(`
         id,
@@ -294,7 +296,7 @@ class MentorService {
       `)
       .eq('id', id)
       .contains('active_roles', ['mentor'])
-      .single()
+      .single() as any)
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -303,7 +305,7 @@ class MentorService {
       throw new Error(`Erro ao buscar mentor: ${error.message}`)
     }
 
-    return data
+    return data as MentorProfile
   }
 }
 
