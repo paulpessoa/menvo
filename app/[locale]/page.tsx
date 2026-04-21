@@ -2,31 +2,16 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
+
 import { Badge } from "@/components/ui/badge"
-import {
-  Calendar,
-  Clock,
-  Globe,
-  Lightbulb,
-  MessageSquare,
-  Search,
-  Users
-} from "lucide-react"
+import { Calendar, MessageSquare, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel"
 
 export default function Home() {
-  const t = useTranslations('home')
-  const tCommon = useTranslations('common')
+  const t = useTranslations("home")
+  const tCommon = useTranslations("common")
   const images = [
     "/images/e.jpg",
     "/images/d.jpg",
@@ -108,8 +93,9 @@ export default function Home() {
                   width={550}
                   height={550}
                   alt={t("hero.title")}
-                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
-                    }`}
+                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${
+                    index === currentIndex ? "opacity-100" : "opacity-0"
+                  }`}
                 />
               ))}
             </div>
@@ -198,9 +184,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 {t("cta.title")}
               </h2>
-              <p className="max-w-[700px] md:text-xl">
-                {t("cta.description")}
-              </p>
+              <p className="max-w-[700px] md:text-xl">{t("cta.description")}</p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
               <Button size="lg" variant="secondary" asChild>
