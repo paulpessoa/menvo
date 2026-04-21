@@ -23,4 +23,4 @@ export {
 export { getUserFromRequest } from './server-utils'
 
 // TypeScript Type Definitions
-export type { AuthContextType, Profile, UserRoleType, Permission } from './auth-context'
+export type { AuthContextType } from './auth-context'

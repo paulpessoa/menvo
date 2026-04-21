@@ -39,7 +39,7 @@ export function AuthGuard({
 
     // Redirect to role selection if role is required but not set
     if (requireRole && auth.needsRoleSelection()) {
-        router.push('/auth/select-role')
+        router.push('/select-role')
         return null
     }
 
@@ -70,7 +70,7 @@ export function AuthGuard({
     }
 
     // Check if mentor verification is required (simplified for MVP)
-    if (requireVerified && auth.isMentor() && !auth.isVerified) {
+    if (requireVerified && auth.isMentor && !auth.isVerified) {
         if (fallback) {
             return <>{fallback}</>
         }

@@ -17,7 +17,7 @@ interface UserProfile {
     is_public: boolean
 }
 
-interface AuthContextType {
+export interface AuthContextType {
     user: User | null
     session: Session | null
     profile: UserProfile | null
@@ -29,6 +29,13 @@ interface AuthContextType {
     isAdmin: boolean
     isMentor: boolean
     isMentee: boolean
+    isVolunteer: boolean
+    isModerator: boolean
+    isPending: boolean
+    claims: any
+    hasRole: (role: string) => boolean
+    hasPermission: (permission: string) => boolean
+    hasAnyPermission: (permissions: string[]) => boolean
     hasAnyRole: (roles: string[]) => boolean
     needsRoleSelection: () => boolean
     signIn: (email: string, password: string) => Promise<void>
@@ -51,6 +58,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isInitializing, setIsInitializing] = useState(true)
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
+
+    const claims = useMemo(() => {
+        if (!session?.user) return null
+        // Supabase stores custom claims in app_metadata
+        return {
+            role: session.user.app_metadata?.role || null,
+            permissions: session.user.app_metadata?.permissions || [],
+            status: session.user.app_metadata?.status || null
+        }
+    }, [session])
 
     const handleAuthError = useCallback((error: any): string => {
         if (!error) return ""
@@ -269,6 +286,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (isAdmin) return false
         return profile?.roles?.includes('mentee') ?? false
     }, [profile, isAdmin])
+    const isVolunteer = useMemo(() => profile?.roles?.includes('volunteer') ?? false, [profile])
+    const isModerator = useMemo(() => profile?.roles?.includes('moderator') ?? false, [profile])
+    const isPending = useMemo(() => (profile?.roles?.length ?? 0) === 0, [profile])
+
+    const hasRole = useCallback((role: string) => {
+        return profile?.roles?.includes(role) ?? false
+    }, [profile])
+
+    const hasPermission = useCallback((permission: string) => {
+        return (claims?.permissions as string[])?.includes(permission) ?? false
+    }, [claims])
+
+    const hasAnyPermission = useCallback((permissions: string[]) => {
+        return permissions.some(p => hasPermission(p))
+    }, [hasPermission])
 
     const effectiveRole = useMemo((): 'admin' | 'mentor' | 'mentee' | null => {
         if (!profile?.roles) return null
@@ -321,6 +353,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin,
         isMentor,
         isMentee,
+        isVolunteer,
+        isModerator,
+        isPending,
+        claims,
+        hasRole,
+        hasPermission,
+        hasAnyPermission,
         hasAnyRole,
         needsRoleSelection,
         signIn,
@@ -332,7 +371,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signOut,
         getDefaultRedirectPath,
         handleAuthError
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, selectRole, getRoleDashboardPath, refreshProfile, getDefaultRedirectPath, handleAuthError])
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, isVolunteer, isModerator, isPending, claims, hasRole, hasPermission, hasAnyPermission, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, selectRole, getRoleDashboardPath, refreshProfile, getDefaultRedirectPath, handleAuthError])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
