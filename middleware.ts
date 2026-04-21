@@ -17,8 +17,10 @@ export async function middleware(request: NextRequest) {
 
   // --- FIX 20-04-26 PRIORITÁRIO ---
   // Se for callback de autenticação, NUNCA redirecione ou mude o caminho.
-  // Isso blinda o processo contra erros 404 e perda de PKCE verifier.
-  if (pathname === '/auth/callback' || pathname.startsWith('/auth/callback')) {
+  // Permitimos tanto /auth/callback quanto /api/auth/callback
+  if (pathname === '/auth/callback' || pathname.startsWith('/auth/callback') || 
+      pathname === '/api/auth/callback' || pathname.startsWith('/api/auth/callback')) {
+    console.log(`[MIDDLEWARE] Auth callback detected: ${pathname}. Allowing through.`)
     return NextResponse.next()
   }
 
