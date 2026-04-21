@@ -128,9 +128,9 @@ export async function PUT(request: NextRequest) {
     const allowedFields = [
       'first_name',
       'last_name', 
+      'full_name',
       'bio',
       'avatar_url',
-      'age',
       'city',
       'state',
       'country',
@@ -152,10 +152,10 @@ export async function PUT(request: NextRequest) {
     ]
 
     // Filtrar apenas campos permitidos
-    const updateData: any = {}
+    const updateData: Database['public']['Tables']['profiles']['Update'] = {}
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field]
+        (updateData as any)[field] = body[field]
       }
     }
 
