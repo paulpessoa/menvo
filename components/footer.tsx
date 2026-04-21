@@ -129,14 +129,6 @@ export default function Footer() {
                     {t("footer.howItWorks")}
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/store"
-                    className="text-muted-foreground hover:text-foreground pointer-events-none opacity-50 cursor-not-allowed"
-                  >
-                    {t("footer.store")}
-                  </Link>
-                </li>
               </ul>
             </div>
             <div className="space-y-4">

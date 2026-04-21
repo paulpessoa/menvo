@@ -148,7 +148,16 @@ export async function PUT(request: NextRequest) {
       'twitter_url',
       'website_url',
       'phone',
-      'expertise_areas'
+      'expertise_areas',
+      'institution',
+      'course',
+      'academic_level',
+      'expected_graduation',
+      'mentee_status',
+      'show_in_community',
+      'origin_platform',
+      'external_id',
+      'original_data'
     ]
 
     // Filtrar apenas campos permitidos

@@ -130,6 +130,10 @@ export default function ProfilePage() {
     bio: "",
     job_title: "",
     company: "",
+    institution: "",
+    course: "",
+    academic_level: "",
+    expected_graduation: "",
     linkedin_url: "",
     portfolio_url: "",
     website_url: "",
@@ -188,6 +192,10 @@ export default function ProfilePage() {
         city: profile.city || "",
         state: profile.state || "",
         country: profile.country || "",
+        institution: (profile as any).institution || "",
+        course: (profile as any).course || "",
+        academic_level: (profile as any).academic_level || "",
+        expected_graduation: (profile as any).expected_graduation || "",
         expertise_areas: profile.expertise_areas || [],
         mentorship_topics: profile.mentorship_topics || [],
         free_topics: profile.free_topics || [],
@@ -198,6 +206,7 @@ export default function ProfilePage() {
         ideal_mentee: profile.ideal_mentee || "",
         cv_url: profile.cv_url || "",
         is_public: profile.is_public || false,
+        show_in_community: (profile as any).show_in_community || false,
       })
     }
   }, [user, profile, authLoading, router])
@@ -461,7 +470,7 @@ export default function ProfilePage() {
             <TabsContent value="professional" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>{t("tabs.professional")}</CardTitle>
+                  <CardTitle>Experiência Profissional</CardTitle>
                   <CardDescription>{t("form.professionalDescription")}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -500,30 +509,88 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="portfolio_url">{t("form.portfolio")}</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="portfolio_url">{t("form.portfolio")}</Label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="portfolio_url"
+                          value={formData.portfolio_url}
+                          onChange={(e) => setFormData(prev => ({ ...prev, portfolio_url: e.target.value }))}
+                          placeholder="https://seu-portfolio.com"
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="website_url">{t("form.website")}</Label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="website_url"
+                          value={formData.website_url}
+                          onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
+                          placeholder="https://seu-site.com"
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Formação Acadêmica</CardTitle>
+                  <CardDescription>Sua jornada de estudos e grau de formação.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="institution">Instituição de Ensino</Label>
                       <Input
-                        id="portfolio_url"
-                        value={formData.portfolio_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, portfolio_url: e.target.value }))}
-                        placeholder="https://seu-portfolio.com"
-                        className="pl-10"
+                        id="institution"
+                        value={formData.institution}
+                        onChange={(e) => setFormData(prev => ({ ...prev, institution: e.target.value }))}
+                        placeholder="Ex: UFPE, Unicap, IFPE..."
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="course">Curso / Área de Estudo</Label>
+                      <Input
+                        id="course"
+                        value={formData.course}
+                        onChange={(e) => setFormData(prev => ({ ...prev, course: e.target.value }))}
+                        placeholder="Ex: Engenharia de Software, Design..."
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="website_url">{t("form.website")}</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="academic_level">Nível Acadêmico</Label>
+                      <select
+                        id="academic_level"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={formData.academic_level}
+                        onChange={(e) => setFormData(prev => ({ ...prev, academic_level: e.target.value }))}
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="Ensino Médio">Ensino Médio</option>
+                        <option value="Ensino Técnico">Ensino Técnico</option>
+                        <option value="Graduação">Graduação</option>
+                        <option value="Pós-Graduação">Pós-Graduação</option>
+                        <option value="Mestrado / Doutorado">Mestrado / Doutorado</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="expected_graduation">Previsão de Conclusão</Label>
                       <Input
-                        id="website_url"
-                        value={formData.website_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-                        placeholder="https://seu-site.com"
-                        className="pl-10"
+                        id="expected_graduation"
+                        value={formData.expected_graduation}
+                        onChange={(e) => setFormData(prev => ({ ...prev, expected_graduation: e.target.value }))}
+                        placeholder="Ex: 2025.2 ou Dezembro/2026"
                       />
                     </div>
                   </div>
