@@ -3,9 +3,9 @@ import { createClient } from '@/utils/supabase/server';
 import { deleteCalendarEvent } from '@/lib/services/google-calendar.service';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -25,17 +25,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Await params (Next.js 15 requirement)
     const { id } = await params;
     const appointmentId = id;
+    const numericId = parseInt(appointmentId);
 
     // Get appointment with profiles
-    const { data: appointment, error: appointmentError } = await supabase
+    const { data: appointment, error: appointmentError } = await (supabase
       .from('appointments')
       .select(`
         *,
-        mentor:mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-        mentee:mentee_id(id, email, first_name, last_name, full_name, avatar_url)
+        mentor:profiles!mentor_id(id, email, first_name, last_name, full_name, avatar_url),
+        mentee:profiles!mentee_id(id, email, first_name, last_name, full_name, avatar_url)
       `)
-      .eq('id', appointmentId)
-      .single();
+      .eq('id', isNaN(numericId) ? appointmentId : numericId)
+      .single() as any);
 
     if (appointmentError || !appointment) {
       return NextResponse.json(

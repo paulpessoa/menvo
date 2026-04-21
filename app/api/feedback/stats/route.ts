@@ -22,13 +22,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Get feedback by type
-    const { data: feedbackByType, error: typeError } = await supabase
+    const { data: feedbackByType, error: typeError } = await (supabase
       .from("feedback")
       .select("type")
       .then(({ data, error }) => {
         if (error) return { data: null, error }
 
-        const counts = data?.reduce((acc: any, item) => {
+        const counts = (data as any[])?.reduce((acc: any, item) => {
           acc[item.type] = (acc[item.type] || 0) + 1
           return acc
         }, {})
@@ -37,16 +37,16 @@ export async function GET(request: NextRequest) {
           data: Object.entries(counts || {}).map(([type, count]) => ({ type, count })),
           error: null,
         }
-      })
+      }) as any)
 
     // Get feedback by status
-    const { data: feedbackByStatus, error: statusError } = await supabase
+    const { data: feedbackByStatus, error: statusError } = await (supabase
       .from("feedback")
       .select("status")
       .then(({ data, error }) => {
         if (error) return { data: null, error }
 
-        const counts = data?.reduce((acc: any, item) => {
+        const counts = (data as any[])?.reduce((acc: any, item) => {
           acc[item.status] = (acc[item.status] || 0) + 1
           return acc
         }, {})
@@ -55,17 +55,17 @@ export async function GET(request: NextRequest) {
           data: Object.entries(counts || {}).map(([status, count]) => ({ status, count })),
           error: null,
         }
-      })
+      }) as any)
 
     // Get average rating by type
-    const { data: ratingsByType, error: ratingError } = await supabase
+    const { data: ratingsByType, error: ratingError } = await (supabase
       .from("feedback")
       .select("type, rating")
       .not("rating", "is", null)
       .then(({ data, error }) => {
         if (error) return { data: null, error }
 
-        const grouped = data?.reduce((acc: any, item) => {
+        const grouped = (data as any[])?.reduce((acc: any, item) => {
           if (!acc[item.type]) {
             acc[item.type] = { ratings: [], count: 0 }
           }
@@ -81,17 +81,17 @@ export async function GET(request: NextRequest) {
         }))
 
         return { data: averages, error: null }
-      })
+      }) as any)
 
     // Get monthly feedback trends
-    const { data: monthlyTrends, error: trendsError } = await supabase
+    const { data: monthlyTrends, error: trendsError } = await (supabase
       .from("feedback")
       .select("created_at, rating")
       .gte("created_at", new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString())
       .then(({ data, error }) => {
         if (error) return { data: null, error }
 
-        const monthly = data?.reduce((acc: any, item) => {
+        const monthly = (data as any[])?.reduce((acc: any, item) => {
           const month = new Date(item.created_at).toISOString().slice(0, 7) // YYYY-MM
           if (!acc[month]) {
             acc[month] = { count: 0, ratings: [] }
@@ -115,17 +115,17 @@ export async function GET(request: NextRequest) {
           .sort((a, b) => a.month.localeCompare(b.month))
 
         return { data: trends, error: null }
-      })
+      }) as any)
 
     // Calculate NPS (Net Promoter Score) - assuming rating 1-10 scale
-    const { data: npsData, error: npsError } = await supabase
+    const { data: npsData, error: npsError } = await (supabase
       .from("feedback")
       .select("rating")
       .not("rating", "is", null)
       .then(({ data, error }) => {
         if (error) return { data: null, error }
 
-        const ratings = data?.map((item) => item.rating) || []
+        const ratings = (data as any[])?.map((item) => item.rating) || []
         const promoters = ratings.filter((r) => r >= 9).length
         const detractors = ratings.filter((r) => r <= 6).length
         const total = ratings.length
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
           },
           error: null,
         }
-      })
+      }) as any)
 
     // Get recent feedback
     const { data: recentFeedback, error: recentError } = await supabase

@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
     let googleMeetLink: string | undefined
 
     // Create appointment in database
-    const { data: appointment, error: appointmentError } = await supabase
+    const { data: appointment, error: appointmentError } = await (supabase
       .from("appointments")
       .insert({
         mentor_id,
@@ -204,15 +204,15 @@ export async function POST(request: NextRequest) {
         status: "pending",
         notes_mentee: message, // Comentários/notas do mentee
         organization_id: organizationId
-      })
+      } as any)
       .select(
         `
         *,
-        mentor:mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-        mentee:mentee_id(id, email, first_name, last_name, full_name, avatar_url)
+        mentor:profiles!mentor_id(id, email, first_name, last_name, full_name, avatar_url),
+        mentee:profiles!mentee_id(id, email, first_name, last_name, full_name, avatar_url)
       `
       )
-      .single()
+      .single() as any)
 
     if (appointmentError) {
       console.error("Error creating appointment:", appointmentError)

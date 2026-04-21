@@ -5,11 +5,11 @@ import { errorResponse, handleApiError } from "@/lib/api/error-handler"
 // GET /api/organizations/[orgId]/reports/export - CSV export
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { orgId } = params
+    const { orgId } = await params
     const searchParams = request.nextUrl.searchParams
 
     // Authenticate user
@@ -42,16 +42,16 @@ export async function GET(
     const endDate = searchParams.get("end_date")
 
     // Build query
-    let query = supabase
+    let query = (supabase
       .from("appointments")
       .select(
         `
         *,
-        mentor:mentor_id(full_name, email),
-        mentee:mentee_id(full_name, email)
+        mentor:profiles!mentor_id(full_name, email),
+        mentee:profiles!mentee_id(full_name, email)
       `
       )
-      .eq("organization_id", orgId)
+      .eq("organization_id", orgId) as any)
 
     if (startDate) {
       query = query.gte("scheduled_at", startDate)
@@ -79,7 +79,7 @@ export async function GET(
       "Tópicos"
     ]
 
-    const csvRows = appointments?.map((appointment) => {
+    const csvRows = (appointments as any[])?.map((appointment) => {
       const date = new Date(appointment.scheduled_at).toLocaleString("pt-BR")
       const mentorName = appointment.mentor?.full_name || "N/A"
       const mentorEmail = appointment.mentor?.email || "N/A"
@@ -87,9 +87,7 @@ export async function GET(
       const menteeEmail = appointment.mentee?.email || "N/A"
       const duration = appointment.duration_minutes || "N/A"
       const status = appointment.status || "N/A"
-      const topics = Array.isArray(appointment.topics)
-        ? appointment.topics.join("; ")
-        : "N/A"
+      const topics = appointment.topic || "N/A"
 
       return [
         date,

@@ -152,10 +152,10 @@ export async function PUT(request: NextRequest) {
     ]
 
     // Filtrar apenas campos permitidos
-    const updateData: Database['public']['Tables']['profiles']['Update'] = {}
+    const updateData: any = {}
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        (updateData as any)[field] = body[field]
+        updateData[field] = body[field]
       }
     }
 
@@ -183,12 +183,12 @@ export async function PUT(request: NextRequest) {
     })
 
     // Atualizar perfil
-    const { data: updatedProfile, error: updateError } = await supabaseAdmin
+    const { data: updatedProfile, error: updateError } = await (supabaseAdmin
       .from("profiles")
       .update(updateData)
       .eq("id", user.id)
       .select()
-      .single()
+      .single() as any)
 
     if (updateError) {
       logger.error("Database update failed", { 

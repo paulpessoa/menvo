@@ -9,11 +9,11 @@ import {
 // GET /api/organizations/[orgId]/dashboard/activity - Activity feed
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { orgId } = params
+    const { orgId } = await params
     const searchParams = request.nextUrl.searchParams
 
     // Authenticate user
@@ -54,25 +54,25 @@ export async function GET(
       data: activities,
       error,
       count
-    } = await supabase
+    } = await (supabase
       .from("organization_activity_log")
       .select(
         `
         *,
-        actor:actor_id(id, full_name, email, avatar_url),
-        target:target_id(id, full_name, email, avatar_url)
+        actor:profiles!actor_id(id, full_name, email, avatar_url),
+        target:profiles!target_id(id, full_name, email, avatar_url)
       `,
         { count: "exact" }
       )
       .eq("organization_id", orgId)
       .gte("created_at", thirtyDaysAgo.toISOString())
       .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limit - 1) as any)
 
     if (error) throw error
 
     // Format activities with human-readable messages
-    const formattedActivities = activities?.map((activity) => {
+    const formattedActivities = (activities as any[])?.map((activity) => {
       let message = ""
       const actorName = activity.actor?.full_name || "Usuário"
       const targetName = activity.target?.full_name || "Usuário"

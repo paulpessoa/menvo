@@ -13,11 +13,11 @@ let statsCache: Map<string, { data: any; timestamp: number }> = new Map()
 // GET /api/organizations/[orgId]/dashboard/stats - Organization metrics
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { orgId } = params
+    const { orgId } = await params
 
     // Authenticate user
     const {
@@ -90,19 +90,18 @@ export async function GET(
         : 0
 
     // 4. Top topics
-    const topicsData = await supabase
+    const topicsData = await (supabase
       .from("appointments")
-      .select("topics")
+      .select("topic")
       .eq("organization_id", orgId)
-      .not("topics", "is", null)
-      .gte("scheduled_at", thirtyDaysAgo.toISOString())
+      .not("topic", "is", null)
+      .gte("scheduled_at", thirtyDaysAgo.toISOString()) as any)
 
     const topicCounts: Record<string, number> = {}
-    topicsData.data?.forEach((appointment) => {
-      if (appointment.topics && Array.isArray(appointment.topics)) {
-        appointment.topics.forEach((topic: string) => {
-          topicCounts[topic] = (topicCounts[topic] || 0) + 1
-        })
+    (topicsData.data as any[])?.forEach((appointment) => {
+      const topic = appointment.topic
+      if (topic) {
+        topicCounts[topic] = (topicCounts[topic] || 0) + 1
       }
     })
 
