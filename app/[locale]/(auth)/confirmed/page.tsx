@@ -40,9 +40,9 @@ export default function EmailConfirmedPage() {
   const handleRedirect = () => {
     if (!profile) return
 
-    if (!profile.role || profile.role === "pending") {
+    if (!profile.roles || profile.roles.length === 0) {
       router.push("/select-role")
-    } else if (profile.status === "pending") {
+    } else if (profile.verification_status === "pending") {
       router.push("/profile?complete=true")
     } else {
       router.push("/dashboard")
@@ -52,9 +52,9 @@ export default function EmailConfirmedPage() {
   const getRedirectMessage = () => {
     if (!profile) return tCommon("loading")
 
-    if (!profile.role || profile.role === "pending") {
+    if (!profile.roles || profile.roles.length === 0) {
       return t("messages.role")
-    } else if (profile.status === "pending") {
+    } else if (profile.verification_status === "pending") {
       return t("messages.profile")
     } else {
       return t("messages.dashboard")
@@ -96,7 +96,7 @@ export default function EmailConfirmedPage() {
         <CardContent className="space-y-4">
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-2">
-              {tCommon("welcome")}, <strong>{profile?.first_name || user.email}</strong>!
+              {tCommon("welcome")}, <strong>{profile?.full_name || user.email}</strong>!
             </p>
             <p className="text-sm text-gray-500">
               {getRedirectMessage()}
@@ -124,7 +124,7 @@ export default function EmailConfirmedPage() {
               onClick={() => router.push("/")}
               className="w-full"
             >
-              {tCommon("goToHome" ? tCommon("home") : "Home")}
+              {tCommon("home")}
             </Button>
           </div>
 

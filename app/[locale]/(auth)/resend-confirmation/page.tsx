@@ -15,7 +15,7 @@ export default function ResendConfirmationPage() {
   const t = useTranslations("auth.resend")
   const tCommon = useTranslations("common")
   const tLogin = useTranslations("login")
-  const { profile, isAuthenticated, loading: authLoading } = useAuth()
+  const { profile, isAuthenticated, loading: authLoading, handleAuthError } = useAuth()
   const router = useRouter()
   
   const [email, setEmail] = useState("")
@@ -34,7 +34,7 @@ export default function ResendConfirmationPage() {
     try {
       const supabase = createClient()
       
-      const { error } = await supabase.auth.resend({
+      const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
         email: email.toLowerCase().trim(),
         options: {
@@ -42,15 +42,15 @@ export default function ResendConfirmationPage() {
         }
       })
 
-      if (error) {
-        console.error("Error resending confirmation:", error)
-        setError(t("error"))
+      if (resendError) {
+        console.error("Error resending confirmation:", resendError)
+        setError(handleAuthError(resendError))
       } else {
         setSent(true)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Unexpected error:", error)
-      setError(t("error"))
+      setError(handleAuthError(error))
     } finally {
       setLoading(false)
     }
@@ -192,7 +192,7 @@ export default function ResendConfirmationPage() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {tLogin("loggingIn" ? "..." : "")}
+                  {tLogin("loggingIn")}
                 </>
               ) : (
                 t("button")

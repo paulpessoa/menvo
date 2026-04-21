@@ -3,17 +3,23 @@
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card"
 import { Globe, CheckCircle2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 const languages = [
   { code: "pt-BR", name: "Português", flag: "🇧🇷" },
   { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
-  { code: "da", name: "Dansk", flag: "🇩🇰" },
-  { code: "sv", name: "Svenska", flag: "🇸🇪" },
+  { code: "es", name: "Español", flag: "🇪🇸" }
+  // { code: "fr", name: "Français", flag: "🇫🇷" },
+  // { code: "da", name: "Dansk", flag: "🇩🇰" },
+  // { code: "sv", name: "Svenska", flag: "🇸🇪" },
 ]
 
 export function LanguageSelectorOverlay() {
@@ -61,7 +67,9 @@ export function LanguageSelectorOverlay() {
               <div className="mx-auto bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
                 <Globe className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle className="text-2xl md:text-3xl">{t("title")}</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl">
+                {t("title")}
+              </CardTitle>
               <CardDescription className="text-lg">
                 {t("description")}
               </CardDescription>
@@ -99,7 +107,12 @@ export function LanguageSelectorOverlay() {
                 <Button onClick={handleFinish} size="lg" className="w-full">
                   {t("button")}
                 </Button>
-                <Button onClick={handleBack} variant="ghost" size="sm" className="w-full">
+                <Button
+                  onClick={handleBack}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full"
+                >
                   {commonT("back")}
                 </Button>
               </div>

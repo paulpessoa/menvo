@@ -8,13 +8,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Lock, CheckCircle2 } from "lucide-react"
+import { Loader2, Lock, CheckCircle2, AlertCircle } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
+import { useAuth } from "@/lib/auth"
 
 function UpdatePasswordForm() {
-  const t = useTranslations("login") // Reutilizando traduções de login
+  const t = useTranslations("login")
+  const { user, loading: authLoading } = useAuth()
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +24,38 @@ function UpdatePasswordForm() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  if (authLoading) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="flex flex-col items-center justify-center p-12 space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-muted-foreground animate-pulse text-lg">Validando sua sessão segura...</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!user) {
+    return (
+      <Card className="w-full max-w-md border-amber-100 bg-amber-50/30">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+            <AlertCircle className="h-6 w-6 text-amber-600" />
+          </div>
+          <CardTitle className="text-amber-800">Sessão Expirada ou Inválida</CardTitle>
+          <CardDescription>
+            Para sua segurança, o link de recuperação de senha só é válido por um curto período e para um único uso.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Button onClick={() => router.push("/forgot-password")} className="w-full" variant="outline">
+                Solicitar novo link de recuperação
+            </Button>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

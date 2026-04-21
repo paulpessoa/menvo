@@ -1,7 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -31,7 +37,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialogTrigger
 } from "@/components/ui/alert-dialog"
 
 export default function SettingsPage() {
@@ -51,7 +57,7 @@ export default function SettingsPage() {
       toast({
         title: commonT("error"),
         description: t("security.mismatch"),
-        variant: "destructive",
+        variant: "destructive"
       })
       return
     }
@@ -60,7 +66,7 @@ export default function SettingsPage() {
       toast({
         title: commonT("error"),
         description: t("security.minLength"),
-        variant: "destructive",
+        variant: "destructive"
       })
       return
     }
@@ -68,15 +74,21 @@ export default function SettingsPage() {
     setIsChangingPassword(true)
     try {
       const supabase = createClient()
-      
+
       // 1. Re-autenticar o usuário com a senha atual para validar a troca (Padrão de Segurança)
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: user?.email || "",
-        password: currentPassword,
+        password: currentPassword
       })
 
       if (signInError) {
-        throw new Error(t("security.invalidCurrentPassword" ? t("security.invalidCurrentPassword") : "Senha atual incorreta"))
+        throw new Error(
+          t(
+            "security.invalidCurrentPassword"
+              ? t("security.invalidCurrentPassword")
+              : "Senha atual incorreta"
+          )
+        )
       }
 
       // 2. Atualizar para a nova senha
@@ -88,7 +100,7 @@ export default function SettingsPage() {
 
       toast({
         title: commonT("success"),
-        description: t("security.success"),
+        description: t("security.success")
       })
       setCurrentPassword("")
       setNewPassword("")
@@ -97,7 +109,7 @@ export default function SettingsPage() {
       toast({
         title: commonT("error"),
         description: error.message || t("security.error"),
-        variant: "destructive",
+        variant: "destructive"
       })
     } finally {
       setIsChangingPassword(false)
@@ -109,14 +121,14 @@ export default function SettingsPage() {
       // Implementar lógica de deletar conta
       toast({
         title: t("dangerZone.deleteButton"),
-        description: t("dangerZone.confirmDesc"),
+        description: t("dangerZone.confirmDesc")
       })
       await signOut()
     } catch (error) {
       toast({
         title: commonT("error"),
         description: commonT("error"),
-        variant: "destructive",
+        variant: "destructive"
       })
     }
   }
@@ -152,9 +164,7 @@ export default function SettingsPage() {
                 <Globe className="h-5 w-5" />
                 {t("language.title")}
               </CardTitle>
-              <CardDescription>
-                {t("language.description")}
-              </CardDescription>
+              <CardDescription>{t("language.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -179,7 +189,7 @@ export default function SettingsPage() {
                 >
                   🇪🇸 {commonT("spanish")}
                 </Button>
-                <Button
+                {/* <Button
                   variant={currentLanguage === "fr" ? "default" : "outline"}
                   onClick={() => changeLanguage("fr")}
                   className="w-full justify-start md:justify-center"
@@ -199,7 +209,7 @@ export default function SettingsPage() {
                   className="w-full justify-start md:justify-center"
                 >
                   🇸🇪 {commonT("swedish", { defaultValue: "Svenska" })}
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>
@@ -207,16 +217,16 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>{t("account.title")}</CardTitle>
-              <CardDescription>
-                {t("account.description")}
-              </CardDescription>
+              <CardDescription>{t("account.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <p className="font-medium">{t("account.email")}</p>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user?.email}
+                    </p>
                   </div>
                   <Badge variant="default">{t("account.verified")}</Badge>
                 </div>
@@ -233,13 +243,13 @@ export default function SettingsPage() {
                 <Lock className="h-5 w-5" />
                 {t("security.title")}
               </CardTitle>
-              <CardDescription>
-                {t("security.description")}
-              </CardDescription>
+              <CardDescription>{t("security.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="current-password">{t("security.currentPassword")}</Label>
+                <Label htmlFor="current-password">
+                  {t("security.currentPassword")}
+                </Label>
                 <Input
                   id="current-password"
                   type="password"
@@ -249,7 +259,9 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">{t("security.newPassword")}</Label>
+                <Label htmlFor="new-password">
+                  {t("security.newPassword")}
+                </Label>
                 <Input
                   id="new-password"
                   type="password"
@@ -259,7 +271,9 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">{t("security.confirmPassword")}</Label>
+                <Label htmlFor="confirm-password">
+                  {t("security.confirmPassword")}
+                </Label>
                 <Input
                   id="confirm-password"
                   type="password"
@@ -270,10 +284,17 @@ export default function SettingsPage() {
               </div>
               <Button
                 onClick={handleChangePassword}
-                disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                disabled={
+                  isChangingPassword ||
+                  !currentPassword ||
+                  !newPassword ||
+                  !confirmPassword
+                }
                 className="w-full"
               >
-                {isChangingPassword ? t("security.changing") : t("security.title")}
+                {isChangingPassword
+                  ? t("security.changing")
+                  : t("security.title")}
               </Button>
             </CardContent>
           </Card>
@@ -284,9 +305,7 @@ export default function SettingsPage() {
                 <AlertTriangle className="h-5 w-5" />
                 {t("dangerZone.title")}
               </CardTitle>
-              <CardDescription>
-                {t("dangerZone.description")}
-              </CardDescription>
+              <CardDescription>{t("dangerZone.description")}</CardDescription>
             </CardHeader>
             <CardContent>
               <AlertDialog>
@@ -298,14 +317,21 @@ export default function SettingsPage() {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>{t("dangerZone.confirmTitle")}</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      {t("dangerZone.confirmTitle")}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
                       {t("dangerZone.confirmDesc")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>{t("dangerZone.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogCancel>
+                      {t("dangerZone.cancel")}
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
                       {t("dangerZone.confirmAction")}
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -323,9 +349,7 @@ export default function SettingsPage() {
                 <Sun className="h-5 w-5" />
                 {t("appearance.title")}
               </CardTitle>
-              <CardDescription>
-                {t("appearance.description")}
-              </CardDescription>
+              <CardDescription>{t("appearance.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

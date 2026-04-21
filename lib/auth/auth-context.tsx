@@ -39,6 +39,7 @@ interface AuthContextType {
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
     getDefaultRedirectPath: () => string
+    handleAuthError: (error: any) => string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -50,6 +51,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isInitializing, setIsInitializing] = useState(true)
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
+
+    const handleAuthError = useCallback((error: any): string => {
+        if (!error) return ""
+        
+        const message = error.message || error.error_description || error.toString()
+        
+        // Mapeamento de erros comuns do Supabase Auth para mensagens amigáveis
+        if (message.includes("Invalid login credentials")) {
+            return "Email ou senha incorretos."
+        }
+        if (message.includes("User not found")) {
+            return "Usuário não encontrado."
+        }
+        if (message.includes("Email not confirmed")) {
+            return "Por favor, confirme seu email antes de fazer login."
+        }
+        if (message.includes("Password is too short")) {
+            return "A senha deve ter pelo menos 6 caracteres."
+        }
+        if (message.includes("User already registered")) {
+            return "Este email já está cadastrado."
+        }
+        if (message.includes("Rate limit exceeded")) {
+            return "Muitas tentativas. Tente novamente mais tarde."
+        }
+        
+        return message
+    }, [])
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
@@ -300,8 +329,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         getRoleDashboardPath,
         refreshProfile,
         signOut,
-        getDefaultRedirectPath
-    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, selectRole, getRoleDashboardPath, refreshProfile, getDefaultRedirectPath])
+        getDefaultRedirectPath,
+        handleAuthError
+    }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, selectRole, getRoleDashboardPath, refreshProfile, getDefaultRedirectPath, handleAuthError])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
