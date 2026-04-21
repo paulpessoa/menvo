@@ -10,15 +10,21 @@ interface LoginRequiredModalProps {
   onClose: () => void
   title?: string
   description?: string
+  mentorName?: string
 }
 
 export function LoginRequiredModal({
   isOpen,
   onClose,
   title = "Login Necessário",
-  description = "Você precisa estar logado para acessar esta funcionalidade.",
+  description,
+  mentorName,
 }: LoginRequiredModalProps) {
   const router = useRouter()
+  
+  const finalDescription = description || (mentorName 
+    ? `Você precisa estar logado para ver o perfil de ${mentorName} e agendar sessões.`
+    : "Você precisa estar logado para acessar esta funcionalidade.")
 
   const handleLogin = () => {
     onClose()
@@ -38,7 +44,7 @@ export function LoginRequiredModal({
             <LogIn className="h-6 w-6 text-blue-600" />
           </div>
           <DialogTitle className="text-center">{title}</DialogTitle>
-          <DialogDescription className="text-center">{description}</DialogDescription>
+          <DialogDescription className="text-center">{finalDescription}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

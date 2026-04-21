@@ -45,70 +45,56 @@ export class VerificationServiceClass {
     }
 
     // Fallback: Fetch pending verifications manualmente
-    const { data: verifications, error } = await supabase
+    const { data: verificationsRaw, error } = await (supabase
       .from('mentor_verification')
       .select('*')
       .eq('status', 'pending')
-      .order('created_at', { ascending: true })
-      .limit(50)
+      .order('submitted_at', { ascending: true })
+      .limit(50) as any)
 
     if (error) {
       throw new Error(`Error fetching pending verifications: ${error.message}`)
     }
 
-    if (!verifications || verifications.length === 0) {
+    const verifications = (verificationsRaw as any[]) || []
+
+    if (verifications.length === 0) {
       return []
     }
 
-    // Fetch mentor info for each verification
+    // Fetch mentor info (from profiles) for each verification
     const mentorIds = verifications.map((v: any) => v.mentor_id)
-    const { data: mentors, error: mentorsError } = await supabase
-      .from('mentors')
-      .select(`
-        id,
-        user_id,
-        title,
-        company
-      `)
-      .in('id', mentorIds)
-
-    if (mentorsError) {
-      throw new Error(`Error fetching mentors: ${mentorsError.message}`)
-    }
-
-    // Fetch profiles for mentors
-    const userIds = mentors?.map((m: any) => m.user_id) || []
-    const { data: profiles, error: profilesError } = await supabase
+    const { data: profilesRaw, error: profilesError } = await (supabase
       .from('profiles')
       .select(`
         id,
         first_name,
         last_name,
-        email
+        email,
+        job_title,
+        company
       `)
-      .in('id', userIds)
+      .in('id', mentorIds) as any)
 
     if (profilesError) {
       throw new Error(`Error fetching profiles: ${profilesError.message}`)
     }
 
-    // Map mentor and profile info to verifications
-    const mentorMap = new Map(mentors?.map((m: any) => [m.id, m]))
-    const profileMap = new Map(profiles?.map((p: any) => [p.id, p]))
+    const profiles = (profilesRaw as any[]) || []
+    const profileMap = new Map(profiles.map((p: any) => [p.id, p]))
 
     const result: Verification[] = verifications.map((v: any) => {
-      const mentor = mentorMap.get(v.mentor_id) as any
-      const profile = mentor ? profileMap.get(mentor.user_id) as any : null
+      const profile = profileMap.get(v.mentor_id) as any
       return {
-        id: v.id,
+        id: v.id.toString(),
         mentor_id: v.mentor_id,
-        verification_type: v.verification_type,
+        verification_type: 'manual', // Default for this simplified schema
         status: v.status,
-        created_at: v.created_at,
+        created_at: v.submitted_at || v.created_at,
         mentor_name: profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown',
         mentor_email: profile ? profile.email : 'Unknown',
-        mentor_title: mentor?.title || '',
-        mentor_company: mentor?.company || ''
+        mentor_title: profile?.job_title || '',
+        mentor_company: profile?.company || ''
       }
     })
 
@@ -159,36 +145,32 @@ export class VerificationServiceClass {
     }
 
     if (passed) {
-      // Update mentor status to 'verified' and set verified_by and verified_at
-      const { error: mentorError } = await supabase
-        .from('mentors')
+      // Update mentor status to 'verified' in profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
         .update({
-          status: 'verified',
-          verified_at: new Date().toISOString(),
-          verified_by: adminId,
+          verified: true,
+          verification_status: 'approved',
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', (verification as any).mentor_id)
 
-      if (mentorError) {
-        throw new Error(`Error updating mentor status: ${mentorError.message}` || 'Unknown error')
+      if (profileError) {
+        throw new Error(`Error updating profile status: ${profileError.message}`)
       }
     }
   }
 
   // Obter detalhes da verificação
   async getVerificationDetails(verificationId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from("mentor_verification")
       .select(`
         *,
-        mentors (
-          *,
-          profiles (*)
-        )
+        mentor:profiles!mentor_id(*)
       `)
-      .eq("id", verificationId)
-      .single()
+      .eq("id", parseInt(verificationId))
+      .single() as any)
 
     if (error) throw error
     return data

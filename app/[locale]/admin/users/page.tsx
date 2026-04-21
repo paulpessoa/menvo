@@ -52,6 +52,7 @@ interface User {
   bio: string | null
   created_at: string
   roles: string[]
+  slug: string | null
 }
 
 interface UserStats {
@@ -91,7 +92,7 @@ export default function AdminUsersPage() {
     if (!supabase) return
     setLoading(true)
     try {
-      const { data: userDataRaw, error: userError } = await supabase
+      const { data: userDataRaw, error: userError } = await (supabase
         .from('profiles')
         .select(`
           id,
@@ -104,17 +105,18 @@ export default function AdminUsersPage() {
           verification_notes,
           bio,
           created_at,
+          slug,
           user_roles (
             roles (
               name
             )
           )
         `)
-        .order('created_at', { ascending: false })
+        .order('created_at', { ascending: false }) as any)
 
       if (userError) throw userError
 
-      const userData = (userDataRaw || []).map(user => ({
+      const userData = ((userDataRaw as any[]) || []).map(user => ({
         ...user,
         roles: (user.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
       }))

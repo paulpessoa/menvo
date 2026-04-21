@@ -43,14 +43,16 @@ export default function AdminSuggestionsPage() {
     }
   }
 
-  const handleUpdateStatus = async (id: string, status: any) => {
+  const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await mentorSuggestionService.updateSuggestionStatus(id, status)
-      const statusText = {
+      
+      const statusMapping: Record<string, string> = {
         reviewing: "em análise",
         approved: "resolvida",
         rejected: "rejeitada"
-      }[status as keyof typeof statusText] || status
+      }
+      const statusText = statusMapping[status] || status
       
       toast.success(`Sugestão marcada como ${statusText}`)
       fetchSuggestions()

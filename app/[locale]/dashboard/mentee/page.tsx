@@ -97,34 +97,36 @@ export default function MenteeDashboard() {
 
   const fetchMenteeStats = async () => {
     try {
-      const { data: appointments, error: appointmentsError } = await supabase
+      const { data: appointmentsRaw, error: appointmentsError } = await (supabase
         .from("appointments")
         .select("id, status, scheduled_at, duration_minutes, mentor_id")
-        .eq("mentee_id", user?.id)
+        .eq("mentee_id", user?.id || "") as any)
 
       if (appointmentsError) throw appointmentsError
+      
+      const appointments = (appointmentsRaw as any[]) || []
 
       const now = new Date()
       const upcoming =
-        appointments?.filter(
-          (apt) =>
+        appointments.filter(
+          (apt: any) =>
             new Date(apt.scheduled_at) > now && apt.status !== "cancelled"
         ).length || 0
 
       const completed =
-        appointments?.filter((apt) => apt.status === "completed").length || 0
+        appointments.filter((apt: any) => apt.status === "completed").length || 0
 
       const totalMinutes =
         appointments
-          ?.filter((apt) => apt.status === "completed")
-          .reduce((sum, apt) => sum + apt.duration_minutes, 0) || 0
+          .filter((apt: any) => apt.status === "completed")
+          .reduce((sum: number, apt: any) => sum + (apt.duration_minutes || 0), 0) || 0
       const totalHours = Math.round((totalMinutes / 60) * 10) / 10
 
-      const uniqueMentors = new Set(appointments?.map((apt) => apt.mentor_id))
+      const uniqueMentors = new Set(appointments.map((apt: any) => apt.mentor_id))
         .size
 
       setStats({
-        totalAppointments: appointments?.length || 0,
+        totalAppointments: appointments.length || 0,
         upcomingAppointments: upcoming,
         completedSessions: completed,
         totalMentors: uniqueMentors,
@@ -163,17 +165,20 @@ export default function MenteeDashboard() {
       if (error) throw error
 
       const formattedAppointments =
-        data?.map((apt) => ({
-          id: apt.id,
-          scheduled_at: apt.scheduled_at,
-          duration_minutes: apt.duration_minutes,
-          status: apt.status,
-          mentor: {
-            full_name: apt.profiles?.full_name || "Mentor",
-            avatar_url: apt.profiles?.avatar_url,
-            job_title: apt.profiles?.job_title
+        data?.map((apt) => {
+          const mentorProfile = Array.isArray(apt.profiles) ? apt.profiles[0] : apt.profiles;
+          return {
+            id: apt.id,
+            scheduled_at: apt.scheduled_at,
+            duration_minutes: apt.duration_minutes,
+            status: apt.status,
+            mentor: {
+              full_name: mentorProfile?.full_name || "Mentor",
+              avatar_url: mentorProfile?.avatar_url,
+              job_title: mentorProfile?.job_title
+            }
           }
-        })) || []
+        }) || []
 
       setUpcomingAppointments(formattedAppointments)
     } catch (error) {

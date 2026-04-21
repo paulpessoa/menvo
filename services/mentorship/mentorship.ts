@@ -145,19 +145,24 @@ export const mentorshipSessionsService = {
     if (!user) throw new Error('Usuário não autenticado')
 
     const sessionData = {
-      ...request,
+      mentor_id: request.mentor_id,
       mentee_id: user.id,
+      requested_date: request.requested_date,
+      requested_start_time: request.requested_start_time,
+      requested_end_time: request.requested_end_time,
+      topic: request.topic,
+      notes: request.mentee_notes, // Mapeado para 'notes' no simplificado
       timezone: request.timezone || 'America/Sao_Paulo',
-      status: 'pending' as const
+      status: 'pending'
     }
 
     const { data, error } = await supabase
-      .from('mentorship_sessions')
-      .insert([sessionData])
+      .from('appointments')
+      .insert([sessionData as any])
       .select(`
         *,
-        mentor:users!mentor_id(first_name, last_name, email),
-        mentee:users!mentee_id(first_name, last_name, email)
+        mentor:profiles!mentor_id(first_name, last_name, email),
+        mentee:profiles!mentee_id(first_name, last_name, email)
       `)
       .single()
 
@@ -178,14 +183,14 @@ export const mentorshipSessionsService = {
     }
 
     const { data, error } = await supabase
-      .from('mentorship_sessions')
-      .update(updates)
-      .eq('id', response.session_id)
-      .eq('mentor_id', user.id) // Garantir que só o mentor pode responder
+      .from('appointments')
+      .update(updates as any)
+      .eq('id', parseInt(response.session_id))
+      .eq('mentor_id', user.id)
       .select(`
         *,
-        mentor:users!mentor_id(first_name, last_name, email),
-        mentee:users!mentee_id(first_name, last_name, email)
+        mentor:profiles!mentor_id(first_name, last_name, email),
+        mentee:profiles!mentee_id(first_name, last_name, email)
       `)
       .single()
 
@@ -199,18 +204,18 @@ export const mentorshipSessionsService = {
     if (!user) throw new Error('Usuário não autenticado')
 
     let query = supabase
-      .from('mentorship_sessions')
+      .from('appointments')
       .select(`
         *,
-        mentor:users!mentor_id(first_name, last_name, email, avatar_url),
-        mentee:users!mentee_id(first_name, last_name, email, avatar_url)
+        mentor:profiles!mentor_id(first_name, last_name, email, avatar_url),
+        mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `)
       .eq('mentor_id', mentorId || user.id)
       .order('requested_date', { ascending: false })
       .order('requested_start_time', { ascending: false })
 
     if (status) {
-      query = query.eq('status', status)
+      query = (query as any).eq('status', status)
     }
 
     const { data, error } = await query
@@ -224,18 +229,18 @@ export const mentorshipSessionsService = {
     if (!user) throw new Error('Usuário não autenticado')
 
     let query = supabase
-      .from('mentorship_sessions')
+      .from('appointments')
       .select(`
         *,
-        mentor:users!mentor_id(first_name, last_name, email, avatar_url),
-        mentee:users!mentee_id(first_name, last_name, email, avatar_url)
+        mentor:profiles!mentor_id(first_name, last_name, email, avatar_url),
+        mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `)
       .eq('mentee_id', menteeId || user.id)
       .order('requested_date', { ascending: false })
       .order('requested_start_time', { ascending: false })
 
     if (status) {
-      query = query.eq('status', status)
+      query = (query as any).eq('status', status)
     }
 
     const { data, error } = await query
@@ -249,13 +254,13 @@ export const mentorshipSessionsService = {
     if (!user) throw new Error('Usuário não autenticado')
 
     const { data, error } = await supabase
-      .from('mentorship_sessions')
+      .from('appointments')
       .update({
         status: 'completed',
-        mentor_notes: mentorNotes,
+        notes_mentor: mentorNotes,
         completed_at: new Date().toISOString()
-      })
-      .eq('id', sessionId)
+      } as any)
+      .eq('id', parseInt(sessionId))
       .eq('mentor_id', user.id) // Só o mentor pode marcar como completa
       .select()
       .single()
@@ -270,12 +275,12 @@ export const mentorshipSessionsService = {
     if (!user) throw new Error('Usuário não autenticado')
 
     const { data, error } = await supabase
-      .from('mentorship_sessions')
+      .from('appointments')
       .update({
         status: 'cancelled',
         mentor_response: reason
-      })
-      .eq('id', sessionId)
+      } as any)
+      .eq('id', parseInt(sessionId))
       .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`) // Mentor ou mentee podem cancelar
       .select()
       .single()
@@ -287,13 +292,13 @@ export const mentorshipSessionsService = {
   // Obter sessão específica
   getSession: async (sessionId: string) => {
     const { data, error } = await supabase
-      .from('mentorship_sessions')
+      .from('appointments')
       .select(`
         *,
-        mentor:users!mentor_id(first_name, last_name, email, avatar_url),
-        mentee:users!mentee_id(first_name, last_name, email, avatar_url)
+        mentor:profiles!mentor_id(first_name, last_name, email, avatar_url),
+        mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `)
-      .eq('id', sessionId)
+      .eq('id', parseInt(sessionId))
       .single()
 
     if (error) throw error
@@ -303,7 +308,7 @@ export const mentorshipSessionsService = {
   // Obter estatísticas do mentor
   getMentorStats: async (mentorId: string) => {
     const { data: sessions, error } = await supabase
-      .from('mentorship_sessions')
+      .from('appointments')
       .select('status')
       .eq('mentor_id', mentorId)
 

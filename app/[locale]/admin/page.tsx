@@ -85,7 +85,10 @@ export default function AdminDashboard() {
 
       const totalMentors = mentorRoles?.length || 0
       const verifiedMentors =
-        mentorRoles?.filter((role) => role.profiles?.verified).length || 0
+        mentorRoles?.filter((role) => {
+          const profile = Array.isArray(role.profiles) ? role.profiles[0] : role.profiles
+          return profile?.verified
+        }).length || 0
       const pendingMentorsCount = totalMentors - verifiedMentors
 
       const { count: totalMentees } = await supabase

@@ -22,13 +22,13 @@ export async function saveGoogleCalendarTokens(
   }
 ) {
   
-  const { error } = await supabase.rpc('save_google_calendar_tokens', {
+  const { error } = await (supabase.rpc('save_google_calendar_tokens', {
     p_user_id: userId,
     p_access_token: tokens.access_token,
     p_refresh_token: tokens.refresh_token,
     p_expires_in: tokens.expires_in,
     p_scope: tokens.scope || 'https://www.googleapis.com/auth/calendar'
-  });
+  }) as any);
 
   if (error) {
     console.error('Error saving Google Calendar tokens:', error);
@@ -41,9 +41,9 @@ export async function saveGoogleCalendarTokens(
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
   
-  const { data, error } = await supabase.rpc('get_google_calendar_tokens', {
+  const { data, error } = await (supabase.rpc('get_google_calendar_tokens', {
     p_user_id: userId
-  });
+  }) as any);
 
   if (error) {
     console.error('Error getting Google Calendar tokens:', error);
@@ -121,11 +121,11 @@ export async function hasGoogleCalendarConnected(userId: string): Promise<boolea
  * Desconectar Google Calendar do usuário
  */
 export async function disconnectGoogleCalendar(userId: string) {
-  
-  const { error } = await supabase
+
+  const { error } = await (supabase
     .from('google_calendar_tokens')
     .delete()
-    .eq('user_id', userId);
+    .eq('user_id', userId) as any);
 
   if (error) {
     console.error('Error disconnecting Google Calendar:', error);

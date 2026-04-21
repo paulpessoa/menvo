@@ -133,7 +133,7 @@ export default function MentorAvailabilityPage() {
 
             // Check if start time is before end time
             if (slot.start_time >= slot.end_time) {
-                const dayLabel = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label
+                const dayLabel = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label || ""
                 return t("invalidTime", { day: dayLabel })
             }
 
@@ -147,7 +147,7 @@ export default function MentorAvailabilityPage() {
                     const otherEnd = new Date(`2000-01-01T${otherSlot.end_time}`)
 
                     if ((slotStart < otherEnd && slotEnd > otherStart)) {
-                        const dayLabel = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label
+                        const dayLabel = DAYS_OF_WEEK.find(d => d.value === slot.day_of_week)?.label || ""
                         return t("overlappingTime", { day: dayLabel })
                     }
                 }

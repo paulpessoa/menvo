@@ -186,7 +186,7 @@ export default function AboutPage() {
               <Button variant="outline" asChild>
                 <Link href="/maps">
                   <Map className="mr-2 h-4 w-4" />
-                  {t("about.ourTeam.viewMap", "Onde estamos?")}
+                  {t("about.ourTeam.viewMap")}
                 </Link>
               </Button>
             </div>
