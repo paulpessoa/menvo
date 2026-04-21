@@ -67,8 +67,11 @@ export function AppointmentCard({
     const [hasUserEvaluated, setHasUserEvaluated] = useState(false)
     const [loading, setLoading] = useState(true)
 
-    const isMentor = appointment.mentor.id === currentUserId
-    const otherPerson = isMentor ? appointment.mentee : appointment.mentor
+    const mentor = Array.isArray(appointment.mentor) ? appointment.mentor[0] : appointment.mentor
+    const mentee = Array.isArray(appointment.mentee) ? appointment.mentee[0] : appointment.mentee
+
+    const isMentor = mentor?.id === currentUserId
+    const otherPerson = isMentor ? mentee : mentor
     const userRole = isMentor ? 'mentor' : 'mentee'
 
     useEffect(() => {

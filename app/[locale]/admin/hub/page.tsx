@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { CheckCircle, XCircle, ExternalLink, Link as LinkIcon, Save, Trash2, Loader2, MapPin, Calendar, Clock, Camera, Upload, Archive, RefreshCw } from "lucide-react"
+import { CheckCircle, XCircle, ExternalLink, Link as LinkIcon, Save, Trash2, Loader2, MapPin, Calendar, Clock, Camera, Archive, RefreshCw } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
@@ -42,14 +42,15 @@ export default function AdminHub() {
     const handleAction = async (id: string, status: HubResourceStatus, updatedData?: Partial<HubResource>) => {
         setProcessingId(id)
         try {
-            const { error } = await supabase
+            const { error } = await (supabase
                 .from('hub_resources')
                 .update({ 
                     ...updatedData,
                     status,
                     updated_at: new Date().toISOString()
-                })
-                .eq('id', id)
+                } as any)
+                .eq('id', id) as any)
+
 
             if (error) throw error
 

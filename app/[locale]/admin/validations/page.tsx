@@ -53,14 +53,14 @@ export default function ValidationsPage() {
 
   const loadValidations = async () => {
     try {
-      const { data, error } = await supabase
-        .from("user_validations")
+      const { data, error } = await (supabase
+        .from("mentor_verification")
         .select(`
           *,
-          user_profile:profiles(*)
+          user_profile:profiles!mentor_id(*)
         `)
         .eq("status", "pending")
-        .order("submitted_at", { ascending: true })
+        .order("submitted_at", { ascending: true }) as any)
 
       if (error) throw error
       setValidations(data || [])
@@ -73,27 +73,27 @@ export default function ValidationsPage() {
 
   const handleApprove = async (validationId: string, notes = "") => {
     try {
-      const { error } = await supabase
-        .from("user_validations")
+      const { error } = await (supabase
+        .from("mentor_verification")
         .update({
           status: "approved",
           reviewed_at: new Date().toISOString(),
           reviewed_by: user?.id,
           reviewer_notes: notes,
-        })
-        .eq("id", validationId)
+        } as any)
+        .eq("id", parseInt(validationId)) as any)
 
       if (error) throw error
 
       // Log admin action
-      await supabase.from("admin_actions").insert({
+      await (supabase.from("admin_actions").insert({
         admin_id: user?.id,
         action_type: "validation_approved",
         target_type: "validation",
         target_id: validationId,
         details: { notes },
         reason: "Validation approved by admin",
-      })
+      } as any) as any)
 
       loadValidations()
     } catch (error) {
@@ -103,27 +103,27 @@ export default function ValidationsPage() {
 
   const handleReject = async (validationId: string, reason: string) => {
     try {
-      const { error } = await supabase
-        .from("user_validations")
+      const { error } = await (supabase
+        .from("mentor_verification")
         .update({
           status: "rejected",
           reviewed_at: new Date().toISOString(),
           reviewed_by: user?.id,
           rejection_reason: reason,
-        })
-        .eq("id", validationId)
+        } as any)
+        .eq("id", parseInt(validationId)) as any)
 
       if (error) throw error
 
       // Log admin action
-      await supabase.from("admin_actions").insert({
+      await (supabase.from("admin_actions").insert({
         admin_id: user?.id,
         action_type: "validation_rejected",
         target_type: "validation",
         target_id: validationId,
         details: { reason },
         reason: "Validation rejected by admin",
-      })
+      } as any) as any)
 
       loadValidations()
     } catch (error) {

@@ -141,7 +141,7 @@ export default function MenteeDashboard() {
 
   const fetchUpcomingAppointments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("appointments")
         .select(
           `
@@ -156,11 +156,11 @@ export default function MenteeDashboard() {
                     )
                 `
         )
-        .eq("mentee_id", user?.id)
+        .eq("mentee_id", user?.id || "")
         .gte("scheduled_at", new Date().toISOString())
         .neq("status", "cancelled")
         .order("scheduled_at", { ascending: true })
-        .limit(3)
+        .limit(3) as any)
 
       if (error) throw error
 

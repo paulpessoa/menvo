@@ -151,7 +151,7 @@ export default function MentorDashboard() {
 
   const fetchUpcomingAppointments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("appointments")
         .select(
           `
@@ -165,13 +165,14 @@ export default function MentorDashboard() {
                     )
                 `
         )
-        .eq("mentor_id", user?.id)
+        .eq("mentor_id", user?.id || "")
         .gte("scheduled_at", new Date().toISOString())
         .neq("status", "cancelled")
         .order("scheduled_at", { ascending: true })
-        .limit(5)
+        .limit(3) as any)
 
       if (error) throw error
+
 
       const formattedAppointments =
         data?.map((apt) => {

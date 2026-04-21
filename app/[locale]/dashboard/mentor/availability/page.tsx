@@ -168,26 +168,27 @@ export default function MentorAvailabilityPage() {
 
         try {
             // Delete existing availability
-            const { error: deleteError } = await supabase
+            const { error: deleteError } = await (supabase
                 .from('mentor_availability')
                 .delete()
-                .eq('mentor_id', user?.id)
+                .eq('mentor_id', user?.id || "") as any)
 
             if (deleteError) throw deleteError
 
             // Insert new availability
             if (availability.length > 0) {
                 const slotsToInsert = availability.map(slot => ({
-                    mentor_id: user?.id,
+                    mentor_id: user?.id || "",
                     day_of_week: slot.day_of_week,
                     start_time: slot.start_time,
                     end_time: slot.end_time,
-                    timezone: slot.timezone
+                    timezone: slot.timezone,
+                    is_active: true
                 }))
 
-                const { error: insertError } = await supabase
+                const { error: insertError } = await (supabase
                     .from('mentor_availability')
-                    .insert(slotsToInsert)
+                    .insert(slotsToInsert as any) as any)
 
                 if (insertError) throw insertError
             }

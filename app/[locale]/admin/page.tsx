@@ -14,7 +14,6 @@ import {
   UserCheck,
   Clock,
   Shield,
-  TrendingUp,
   AlertCircle,
   CheckCircle,
   MessageSquare,
@@ -71,7 +70,7 @@ export default function AdminDashboard() {
         .from("profiles")
         .select("*", { count: "exact", head: true })
 
-      const { data: mentorRoles, error: mentorError } = await supabase
+      const { data: mentorRoles, error: mentorError } = await (supabase
         .from("user_roles")
         .select(
           `
@@ -79,7 +78,7 @@ export default function AdminDashboard() {
           roles!inner(name)
         `
         )
-        .eq("roles.name", "mentor")
+        .eq("roles.name", "mentor") as any)
 
       if (mentorError) throw mentorError
 
