@@ -1,7 +1,6 @@
-import { type NextRequest, NextResponse } from \"next/server\"
-import { cookies } from \"next/headers\"
-import { createServerClient } from \"@supabase/ssr\"
-
+import { type NextRequest, NextResponse } from "next/server"
+import { cookies } from "next/headers"
+import { createServerClient } from "@supabase/ssr"
 
 /**
  * Root callback route to handle redirects from Supabase that don't have a locale.
@@ -12,7 +11,6 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const type = searchParams.get("type")
   const next = searchParams.get("next") || "/dashboard"
-  const tokenHash = searchParams.get("token_hash")
   
   // Obter locale do cookie ou default
   const locale = request.cookies.get('NEXT_LOCALE')?.value || 'pt-BR'
@@ -28,8 +26,7 @@ export async function GET(request: NextRequest) {
         cookies: {
           getAll() { return request.cookies.getAll() },
           setAll(cookiesToSet) {
-            // No Edge Runtime (Middleware/Route Handlers), setAll precisa ser tratado
-            // mas o Supabase SSR gerencia isso bem nos cookies do request/response
+            // Handled automatically by Supabase SSR in request/response
           },
         },
       }
