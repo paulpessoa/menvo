@@ -15,13 +15,18 @@ const handleI18nRouting = createMiddleware(routing)
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // --- FIX 20-04-26 PRIORITÁRIO ---
+  // Se for callback de autenticação, NUNCA redirecione ou mude o caminho.
+  // Isso blinda o processo contra erros 404 e perda de PKCE verifier.
+  if (pathname === '/auth/callback' || pathname.startsWith('/auth/callback')) {
+    return NextResponse.next()
+  }
+
   // 1. Detect and redirect legacy /auth/* paths to clean paths
-  // This handles URLs like /pt-BR/auth/login -> /pt-BR/login
   const locales = routing.locales
   for (const locale of locales) {
     if (pathname.startsWith(`/${locale}/auth/`)) {
       const subPath = pathname.replace(`/${locale}/auth/`, "")
-      // Don't redirect the callback, which is internal to Supabase
       if (subPath !== "callback") {
         const cleanPath = `/${locale}/${subPath}`
         return NextResponse.redirect(new URL(cleanPath, request.url))
@@ -29,15 +34,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Handle case without locale prefix: /auth/login -> /login (next-intl will add locale later)
   if (pathname.startsWith("/auth/") && !pathname.startsWith("/auth/callback")) {
     const cleanPath = pathname.replace("/auth/", "/")
     return NextResponse.redirect(new URL(cleanPath, request.url))
-  }
-
-  // FIX 20-04-26: Antes de qualquer coisa — deixar o callback do Supabase passar sem i18n
-  if (pathname === '/auth/callback' || pathname.startsWith('/auth/callback')) {
-    return NextResponse.next()
   }
 
   // 2. Handle i18n routing
@@ -68,7 +67,7 @@ export async function middleware(request: NextRequest) {
     if (!error) user = data.user
   } catch (error) {}
 
-  // Strip locale prefix for route matching if present
+  // Strip locale prefix for route matching
   const pathnameWithoutLocale = locales.reduce(
     (acc, locale) => acc.replace(new RegExp(`^/${locale}`), ""),
     pathname
@@ -78,10 +77,6 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathnameWithoutLocale.startsWith(route))
   
   if (isProtectedRoute && !user) {
-    const redirectUrl = new URL("/login", request.url)
-    redirectUrl.searchParams.set("redirect", pathnameWithoutLocale)
-    // The response from next-intl already has the correct locale if needed
-    // or we redirect to /login and let next-intl handle it
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
