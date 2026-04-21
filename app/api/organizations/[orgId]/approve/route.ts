@@ -1,12 +1,12 @@
-import { createClient } from "@/utils/supabase/server"
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { NextRequest } from "next/server"
 import {
   errorResponse,
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
-import type { Organization } from "@/types/organizations"
+import type { Organization } from "@/lib/types/organizations"
 
 // POST /api/organizations/[orgId]/approve - Approve organization
 export async function POST(

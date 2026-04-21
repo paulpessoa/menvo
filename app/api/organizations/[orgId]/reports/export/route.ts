@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { errorResponse, handleApiError } from "@/lib/api/error-handler"
 

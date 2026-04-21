@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Upload, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 
 interface OrganizationFormData {

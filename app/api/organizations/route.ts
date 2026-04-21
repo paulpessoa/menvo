@@ -1,5 +1,5 @@
-import { createClient } from "@/utils/supabase/server"
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
@@ -10,7 +10,7 @@ import {
 import type {
   Organization,
   CreateOrganizationRequest
-} from "@/types/organizations"
+} from "@/lib/types/organizations"
 
 // GET /api/organizations - List organizations
 export async function GET(request: NextRequest) {

@@ -1,9 +1,9 @@
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@/lib/utils/supabase/client'
 import type {
   MentorSuggestionInsert,
   MentorSuggestionUpdate,
   MentorSuggestionRow
-} from '@/types/supabase-mentor-suggestions'
+} from '@/lib/types/supabase-mentor-suggestions'
 
 export interface MentorSuggestion {
   id?: string

@@ -24,7 +24,7 @@ import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { useEffect, useState } from "react"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
 interface AdminStats {

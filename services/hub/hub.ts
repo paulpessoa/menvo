@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@/lib/utils/supabase/client'
 
 export type HubResourceType = 'event' | 'course' | 'tool' | 'discount' | 'job'
 export type HubResourceStatus = 'pending' | 'published' | 'rejected' | 'archived'

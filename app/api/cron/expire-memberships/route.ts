@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { NextRequest, NextResponse } from "next/server"
 import { sendMembershipExpiredEmail } from "@/lib/email/brevo"
 

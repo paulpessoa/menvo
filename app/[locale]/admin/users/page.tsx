@@ -37,7 +37,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
 import { UserMetrics } from "@/components/admin/UserMetrics"
 import { EditUserModal } from "@/components/admin/EditUserModal"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 
 interface User {

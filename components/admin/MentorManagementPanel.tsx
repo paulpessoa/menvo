@@ -16,7 +16,7 @@ import {
     RefreshCw,
     AlertTriangle
 } from "lucide-react"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { MentorCard } from "./MentorCard"
 import { toast } from "sonner"
 

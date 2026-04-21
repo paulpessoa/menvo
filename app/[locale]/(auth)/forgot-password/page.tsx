@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Mail, Loader2, AlertTriangle, CheckCircle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 

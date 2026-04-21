@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/utils/supabase/server"
 
 /**
  * Check if a user is a volunteer based on their role or a specific volunteer flag

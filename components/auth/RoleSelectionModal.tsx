@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, GraduationCap, Heart, CheckCircle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 
 interface RoleSelectionModalProps {

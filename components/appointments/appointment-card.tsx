@@ -21,7 +21,7 @@ import { CancelAppointmentButton } from './cancel-appointment-button'
 import { ChatButton } from './chat-button'
 import { CompleteAppointmentModal } from './complete-appointment-modal'
 import { useState, useEffect } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@/lib/utils/supabase/client'
 import { useTranslations, useFormatter } from 'next-intl'
 
 interface Appointment {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
 export function ResendForm({ initialEmail = "" }: { initialEmail?: string }) {

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, Loader2, CheckCircle, AlertTriangle, Shield } from "lucide-react"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 
 export default function ConfirmEmailPage() {
     const router = useRouter()

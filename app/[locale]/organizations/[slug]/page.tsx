@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { Building2, Globe, Mail, Phone, Users, GraduationCap, Loader2, ExternalLink } from "lucide-react"
 import Link from "next/link"
-import { Organization } from "@/types/organizations"
+import { Organization } from "@/lib/types/organizations"
 
 export default function OrganizationProfilePage() {
     const params = useParams()

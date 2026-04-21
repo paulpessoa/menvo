@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, X } from "lucide-react"
 import { format } from "date-fns"
-import type { EventFilters as EventFiltersType, EventType, EventFormat, EventSource } from "@/types/events"
+import type { EventFilters as EventFiltersType, EventType, EventFormat, EventSource } from "@/lib/types/events"
 
 interface EventFiltersProps {
   filters: EventFiltersType

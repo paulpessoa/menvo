@@ -1,11 +1,11 @@
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
-import type { Organization } from "@/types/organizations"
+import type { Organization } from "@/lib/types/organizations"
 
 // GET /api/admin/organizations - List all organizations (admin only)
 export async function GET(request: NextRequest) {

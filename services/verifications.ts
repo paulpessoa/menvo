@@ -1,6 +1,6 @@
 import { supabase } from '@/services/auth/supabase'
-import { Verification } from '@/types/verifications'
-import { Database } from '@/types/database'
+import { Verification } from '@/lib/types/verifications'
+import { Database } from '@/lib/types/database'
 
 interface CompleteVerificationParams {
   verificationId: string

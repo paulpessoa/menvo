@@ -22,7 +22,7 @@ import {
 import { Star, Search, Loader2, RefreshCw } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import { RequireRole } from "@/lib/auth/auth-guard"
 

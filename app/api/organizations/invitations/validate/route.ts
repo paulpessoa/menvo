@@ -1,4 +1,4 @@
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { NextRequest } from "next/server"
 import {
   errorResponse,

@@ -1,5 +1,5 @@
-import { createClient } from "@/utils/supabase/server"
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { NextRequest } from "next/server"
 import {
   errorResponse,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/api/error-handler"
 import { validateQuota } from "@/lib/organizations/quota-checker"
 import { checkRateLimit, RATE_LIMITS, formatResetTime } from "@/lib/rate-limit"
-import type { InvitationRequest } from "@/types/organizations"
+import type { InvitationRequest } from "@/lib/types/organizations"
 import { randomUUID } from "crypto"
 
 // GET /api/organizations/[orgId]/members - List members

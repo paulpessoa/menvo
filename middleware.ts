@@ -3,11 +3,8 @@ import { createServerClient } from "@supabase/ssr"
 import createMiddleware from "next-intl/middleware"
 import { routing } from "./i18n/routing"
 import {
-  protectedRoutes,
-  adminRoutes,
-  onboardingRequiredRoutes,
-  authRoutes
-} from "@/config/routes"
+  protectedRoutes
+} from "@/lib/config/routes"
 
 // Initialize next-intl middleware
 const handleI18nRouting = createMiddleware(routing)
@@ -65,7 +62,7 @@ export async function middleware(request: NextRequest) {
   try {
     const { data, error } = await supabase.auth.getUser()
     if (!error) user = data.user
-  } catch (error) {}
+  } catch (error) { }
 
   // Strip locale prefix for route matching
   const pathnameWithoutLocale = locales.reduce(
@@ -75,7 +72,7 @@ export async function middleware(request: NextRequest) {
 
   // Auth Protection Logic
   const isProtectedRoute = protectedRoutes.some(route => pathnameWithoutLocale.startsWith(route))
-  
+
   if (isProtectedRoute && !user) {
     return NextResponse.redirect(new URL("/login", request.url))
   }

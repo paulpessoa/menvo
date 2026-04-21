@@ -1,5 +1,5 @@
-import { createClient } from "@/utils/supabase/server"
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { NextRequest } from "next/server"
 import {
   errorResponse,
@@ -12,7 +12,7 @@ import { checkRateLimit, RATE_LIMITS, formatResetTime } from "@/lib/rate-limit"
 import type {
   BulkInvitationRequest,
   BulkInvitationResult
-} from "@/types/organizations"
+} from "@/lib/types/organizations"
 import { randomUUID } from "crypto"
 
 // POST /api/organizations/[orgId]/members/bulk-invite - Bulk invite members

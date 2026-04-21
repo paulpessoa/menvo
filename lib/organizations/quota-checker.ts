@@ -3,8 +3,8 @@
 // Utility for checking organization quotas
 // =================================================================
 
-import { createServiceRoleClient } from "@/utils/supabase/service-role"
-import type { QuotaUsage } from "@/types/organizations"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import type { QuotaUsage } from "@/lib/types/organizations"
 
 export type QuotaType = "mentors" | "mentees" | "monthly_appointments"
 

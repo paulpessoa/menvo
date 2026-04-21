@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/chat/ChatInterface"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
 interface Conversation {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/utils/supabase/server'
 import { sendVerificationNotification } from '@/lib/email/brevo'
 
 export async function POST(request: NextRequest) {

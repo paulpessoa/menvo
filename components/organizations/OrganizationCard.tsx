@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Building2, Users, GraduationCap, Briefcase, Heart, Users2, Zap, Globe } from "lucide-react"
-import { Organization, OrganizationType } from "@/types/organizations"
+import { Organization, OrganizationType } from "@/lib/types/organizations"
 
 interface OrganizationCardProps {
     organization: Organization & {

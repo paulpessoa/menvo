@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Calendar, Clock, User, MessageSquare } from 'lucide-react';
-import { AvailableTimeSlot } from '@/types/appointments';
+import { AvailableTimeSlot } from '@/lib/types/appointments';
 import { toast } from 'sonner';
 
 interface BookingFormProps {

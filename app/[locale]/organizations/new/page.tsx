@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { OrganizationForm } from "@/components/organizations/OrganizationForm"
 import { ArrowLeft, CheckCircle } from "lucide-react"
 import Link from "next/link"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 
 export default function NewOrganizationPage() {
     const router = useRouter()

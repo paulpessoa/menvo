@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Calendar, User, CheckCircle, XCircle, Eye, ExternalLink, Play } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import {
   Dialog,
   DialogContent,

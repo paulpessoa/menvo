@@ -27,7 +27,7 @@ import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
 import { useTheme } from "next-themes"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import {
   AlertDialog,
   AlertDialogAction,

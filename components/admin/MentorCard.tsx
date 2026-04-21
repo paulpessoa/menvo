@@ -19,7 +19,7 @@ import {
   FileText,
   ExternalLink
 } from "lucide-react"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import { Link } from "@/i18n/routing"
 import {

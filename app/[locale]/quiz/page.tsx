@@ -24,7 +24,7 @@ export default function QuizPage() {
 
   const handleQuizSubmit = async (data: QuizFormData) => {
     try {
-      const { createClient } = await import("@/utils/supabase/client")
+      const { createClient } = await import("@/lib/utils/supabase/client")
       const supabase = createClient()
 
       // Save quiz response to database

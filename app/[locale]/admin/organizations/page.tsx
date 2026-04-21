@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Building2, Search, CheckCircle, XCircle, Clock, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { Organization } from "@/types/organizations"
+import { Organization } from "@/lib/types/organizations"
 
 export default function AdminOrganizationsPage() {
     const [organizations, setOrganizations] = useState<Organization[]>([])

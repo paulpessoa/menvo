@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient as createServerClient } from "@/utils/supabase/server"
+import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { createClient } from "@supabase/supabase-js"
 import { sendAppointmentConfirmation } from "@/lib/email/brevo"
 import {

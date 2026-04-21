@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/utils/supabase/server"
-import { CreateAppointmentRequest } from "@/types/appointments"
+import { createClient } from "@/lib/utils/supabase/server"
+import { CreateAppointmentRequest } from "@/lib/types/appointments"
 
 export async function POST(request: NextRequest) {
   try {

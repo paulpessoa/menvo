@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import MentorProfileClient from './MentorProfileClient'
 

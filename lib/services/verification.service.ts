@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/utils/supabase/server'
 import { getOrCreateConversation, sendMessage } from '@/lib/chat/chat-service'
 
 export type VerificationStatus = 'approved' | 'rejected' | 'pending'

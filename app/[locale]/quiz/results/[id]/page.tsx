@@ -79,7 +79,7 @@ export default function QuizResultsPage() {
 
         setSendingEmail(true)
         try {
-            const { createClient } = await import("@/utils/supabase/client")
+            const { createClient } = await import("@/lib/utils/supabase/client")
             const supabase = createClient()
 
             const { error } = await supabase.functions.invoke("send-quiz-email", {
@@ -128,7 +128,7 @@ export default function QuizResultsPage() {
 
     const loadResults = async () => {
         try {
-            const { createClient } = await import("@/utils/supabase/client")
+            const { createClient } = await import("@/lib/utils/supabase/client")
             const supabase = createClient()
 
             const { data, error } = await supabase

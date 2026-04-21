@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Building2, Search, Loader2, Plus } from "lucide-react"
 import { OrganizationCard } from "@/components/organizations/OrganizationCard"
-import { Organization } from "@/types/organizations"
+import { Organization } from "@/lib/types/organizations"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 

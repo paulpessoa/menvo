@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, CheckCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { Organization } from "@/types/organizations"
+import { Organization } from "@/lib/types/organizations"
 
 export default function AdminOrganizationApprovePage() {
     const params = useParams()

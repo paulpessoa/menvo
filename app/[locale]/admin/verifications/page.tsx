@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select"
 import { CheckCircle, XCircle, ExternalLink, Play, MessageSquare, AlertCircle } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
-import { createClient } from "@/utils/supabase/client"
+import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"

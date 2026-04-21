@@ -1,5 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr"
-import type { Database } from "@/types/database"
+import type { Database } from "@/lib/types/database"
 
 let _client: ReturnType<typeof createBrowserClient<Database>> | null = null
 

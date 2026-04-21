@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Star, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@/lib/utils/supabase/client'
 
 interface CompleteAppointmentModalProps {
     open: boolean
