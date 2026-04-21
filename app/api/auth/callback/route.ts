@@ -44,9 +44,14 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      // Se o tipo for RECOVERY ou se viermos de um fluxo de recovery detectado pela sessão
-      if (type === 'recovery') {
-        console.log(`[AUTH CALLBACK] Recovery flow detected. Redirecting to update-password.`)
+      // REDE DE SEGURANÇA: Às vezes o 'type' se perde no redirecionamento.
+      // Verificamos se o fluxo originou de um recovery através da sessão.
+      const isRecoveryFlow = type === 'recovery' || 
+                             data.session?.user?.app_metadata?.recovery === true ||
+                             request.url.includes('type=recovery')
+
+      if (isRecoveryFlow) {
+        console.log(`[AUTH CALLBACK] Recovery flow detected (type=${type}). Redirecting to update-password.`)
         return NextResponse.redirect(new URL(`/${locale}/update-password`, request.url))
       }
 
