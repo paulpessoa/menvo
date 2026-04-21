@@ -1,20 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Mail, ArrowLeft, CheckCircle, Loader2 } from "lucide-react"
+import { Mail, ArrowLeft, CheckCircle, Loader2, PartyPopper } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
+import { useAuth } from "@/lib/auth"
 
 export default function ResendConfirmationPage() {
   const t = useTranslations("auth.resend")
   const tCommon = useTranslations("common")
   const tLogin = useTranslations("login")
+  const { profile, isAuthenticated, loading: authLoading } = useAuth()
   const router = useRouter()
+  
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -23,10 +26,7 @@ export default function ResendConfirmationPage() {
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!email) {
-      setError(tCommon("email" ? "error" : "")) // Fallback
-      return
-    }
+    if (!email) return
 
     setLoading(true)
     setError("")
@@ -56,10 +56,55 @@ export default function ResendConfirmationPage() {
     }
   }
 
+  // ESTADO 1: Carregando Auth
+  if (authLoading) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    )
+  }
+
+  // ESTADO 2: Usuário já está confirmado (UX Proativa)
+  if (isAuthenticated && profile?.verified) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-4">
+          <Card className="w-full max-w-md border-2 shadow-2xl overflow-hidden">
+            <div className="h-2 bg-primary" />
+            <CardHeader className="text-center pb-2">
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <PartyPopper className="h-10 w-10" />
+              </div>
+              <CardTitle className="text-3xl font-bold">Você já está confirmado!</CardTitle>
+              <CardDescription className="text-base pt-2">
+                Sua conta já foi verificada com sucesso. Você não precisa reenviar o e-mail de confirmação.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              <Button 
+                onClick={() => router.push("/dashboard")}
+                className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20"
+              >
+                Ir para o meu Dashboard
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => router.push("/")}
+                className="w-full mt-4"
+              >
+                Voltar ao Início
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )
+  }
+
+  // ESTADO 3: E-mail Enviado com Sucesso
   if (sent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md shadow-xl border-2 border-green-100">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -73,16 +118,17 @@ export default function ResendConfirmationPage() {
           </CardHeader>
           
           <CardContent className="space-y-4">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">
-                {t("sentTo")} <strong>{email}</strong>
+            <div className="text-center p-4 bg-white/50 rounded-xl border border-green-200">
+              <p className="text-sm text-gray-600">
+                {t("sentTo")} <br/>
+                <strong className="text-base text-gray-900">{email}</strong>
               </p>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 pt-4">
               <Button 
                 onClick={() => router.push("/login")}
-                className="w-full"
+                className="w-full h-12 font-bold"
               >
                 {tLogin("loginButton")}
               </Button>
@@ -90,7 +136,7 @@ export default function ResendConfirmationPage() {
               <Button 
                 variant="outline" 
                 onClick={() => setSent(false)}
-                className="w-full"
+                className="w-full h-12 bg-transparent"
               >
                 {t("otherEmail")}
               </Button>
@@ -101,9 +147,10 @@ export default function ResendConfirmationPage() {
     )
   }
 
+  // ESTADO 4: Formulário de Reenvio (Padrão)
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md text-foreground">
+      <Card className="w-full max-w-md text-foreground border-2 shadow-xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
             <Mail className="h-8 w-8 text-blue-600" />
@@ -127,18 +174,19 @@ export default function ResendConfirmationPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="h-12"
               />
             </div>
 
             {error && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+              <div className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-200 animate-in fade-in slide-in-from-top-2">
                 {error}
               </div>
             )}
 
             <Button 
               type="submit" 
-              className="w-full"
+              className="w-full h-12 font-bold"
               disabled={loading}
             >
               {loading ? (
@@ -155,7 +203,7 @@ export default function ResendConfirmationPage() {
               type="button"
               variant="ghost" 
               onClick={() => router.back()}
-              className="w-full"
+              className="w-full h-12"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {tCommon("back")}

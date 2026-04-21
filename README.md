@@ -61,6 +61,8 @@ Through video calls, we connect experienced professionals to young people seekin
 
 ### Structure
 
+- [View Complete Routes Map (2026)](docs/ROUTES_MAP.md)
+
 #### Pages:
 
 - [x] Home
