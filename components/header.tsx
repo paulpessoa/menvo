@@ -88,6 +88,19 @@ export default function Header() {
     setIsOpen(false)
   }
 
+  // Helper para obter o nome de exibição mais amigável
+  const displayName = profile?.full_name || 
+                      user?.user_metadata?.full_name || 
+                      user?.user_metadata?.first_name || 
+                      user?.email?.split('@')[0] || 
+                      "Usuário"
+
+  const displayInitial = (profile?.full_name?.[0] || 
+                         user?.user_metadata?.full_name?.[0] || 
+                         user?.user_metadata?.first_name?.[0] || 
+                         user?.email?.[0] || 
+                         "U").toUpperCase()
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
@@ -150,7 +163,7 @@ export default function Header() {
                         alt={profile?.full_name || "User"}
                         />
                         <AvatarFallback className="bg-primary/5 text-primary font-bold">
-                        {profile?.full_name?.[0]?.toUpperCase() || "U"}
+                        {displayInitial}
                         </AvatarFallback>
                     </Avatar>
                     </Button>
@@ -158,7 +171,7 @@ export default function Header() {
                 <DropdownMenuContent className="w-64 p-2" align="end">
                     <DropdownMenuLabel className="font-normal px-2 py-3">
                         <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-bold leading-none">{profile?.full_name || t("header.userMenu.user")}</p>
+                            <p className="text-sm font-bold leading-none">{displayName}</p>
                             <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                             <Badge variant="secondary" className="w-fit mt-2 text-[10px] uppercase tracking-wider">
                                 {isAdmin ? 'Administrador' : role === 'mentor' ? 'Mentor' : 'Mentorado'}
@@ -207,11 +220,11 @@ export default function Header() {
                             <Avatar className="h-12 w-12 border-2 border-primary/20">
                                 <AvatarImage src={profile?.avatar_url || ""} />
                                 <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                                    {profile?.full_name?.[0] || "U"}
+                                    {displayInitial}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex flex-col">
-                                <span className="font-bold text-lg leading-tight truncate max-w-[180px]">{profile?.full_name || "Membro"}</span>
+                                <span className="font-bold text-lg leading-tight truncate max-w-[180px]">{displayName}</span>
                                 <span className="text-xs text-muted-foreground truncate max-w-[180px]">{user?.email}</span>
                             </div>
                         </div>

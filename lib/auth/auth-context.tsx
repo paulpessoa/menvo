@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
+import { debugLog } from '@/lib/debug-logger'
 
 export interface UserProfile {
     id: string
@@ -155,12 +156,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (error) {
                 console.error(`[AUTH] Erro ao buscar perfil:`, error.message)
+                debugLog(`Error fetching profile for ${userId}`, { error: error.message }, 'error')
                 return null
             }
 
-            const rawRoles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
+            debugLog(`Raw profile data for ${userId}`, { 
+                hasData: !!data,
+                user_roles: data?.user_roles 
+            }, 'debug')
+
+            // Robust role extraction
+            let rawRoles: string[] = []
+            if (data?.user_roles) {
+                const userRolesData = Array.isArray(data.user_roles) ? data.user_roles : [data.user_roles]
+                rawRoles = userRolesData
+                    .map((ur: any) => ur.roles?.name)
+                    .filter(Boolean)
+            }
+            
             console.log(`[AUTH] Perfil carregado com sucesso. Roles detectadas:`, rawRoles)
             
+            debugLog(`Detected roles for ${userId}`, { rawRoles }, 'info')
+
             return {
                 ...data,
                 roles: rawRoles

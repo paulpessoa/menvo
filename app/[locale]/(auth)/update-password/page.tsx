@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, Suspense } from "react"
+import { useState, Suspense, useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,7 @@ import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { useAuth } from "@/lib/auth"
+import { debugLog } from "@/lib/debug-logger"
 
 function UpdatePasswordForm() {
   const t = useTranslations("login")
@@ -24,6 +25,14 @@ function UpdatePasswordForm() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    debugLog("UpdatePassword landed", { 
+        hasUser: !!user, 
+        userEmail: user?.email,
+        authLoading 
+    })
+  }, [user, authLoading])
 
   if (authLoading) {
     return (

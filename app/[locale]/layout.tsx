@@ -14,6 +14,8 @@ import { getMessages, getTranslations } from "next-intl/server"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { ConsoleEasterEgg } from "@/components/ConsoleEasterEgg"
+import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -103,6 +105,9 @@ export default async function RootLayout({
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <Suspense fallback={null}>
+          <DebugUrlCapturer />
+        </Suspense>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <div className="flex min-h-screen flex-col">

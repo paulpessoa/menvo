@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
 
       if (isRecoveryFlow) {
         console.log(`[AUTH CALLBACK] Recovery flow detected (type=${type}). Redirecting to update-password.`)
-        return NextResponse.redirect(new URL(`/${locale}/update-password`, request.url))
+        // Adicionamos debug_type para o cliente poder logar com certeza que veio daqui
+        return NextResponse.redirect(new URL(`/${locale}/update-password?type=recovery&source=callback`, request.url))
       }
 
       // Se for confirmação de cadastro
