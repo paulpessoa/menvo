@@ -382,8 +382,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const needsRoleSelection = useCallback(() => {
         if (isInitializing || !user) return false
+        // Se já detectamos que é admin via claims ou profile, não precisa selecionar role
         if (isAdmin) return false
-        return (profile?.roles?.length ?? 0) === 0
+        
+        // Se o perfil carregou e não tem roles, precisa selecionar
+        if (profile && (profile.roles?.length ?? 0) === 0) return true
+        
+        return false
     }, [profile, isInitializing, user, isAdmin])
 
     const getDefaultRedirectPath = useCallback(() => {

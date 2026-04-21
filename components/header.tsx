@@ -159,8 +159,8 @@ export default function Header() {
                     <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 border shadow-sm">
                     <Avatar className="h-full w-full">
                         <AvatarImage
-                        src={user?.user_metadata?.avatar_url || profile?.avatar_url}
-                        alt={profile?.full_name || "User"}
+                        src={profile?.avatar_url || user?.user_metadata?.avatar_url}
+                        alt={displayName}
                         />
                         <AvatarFallback className="bg-primary/5 text-primary font-bold">
                         {displayInitial}
