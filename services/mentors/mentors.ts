@@ -1,48 +1,9 @@
 import { supabase } from '@/services/auth/supabase'
-
-export interface MentorFilters {
-  search?: string
-  topics?: string[]
-  languages?: string[]
-  inclusionTags?: string[]
-  experienceYears?: number[]
-  educationLevels?: string[]
-  rating?: number
-  city?: string
-  country?: string
-  availability?: string
-  page?: number
-  limit?: number
-  sortBy?: string
-}
-
-export interface MentorProfile {
-  id: string
-  first_name: string
-  last_name: string
-  avatar_url?: string
-  bio?: string
-  current_position?: string
-  current_company?: string
-  location?: string
-  availability: 'available' | 'busy'
-  years_experience?: number
-  rating?: number
-  total_sessions?: number
-  mentor_skills: string[]
-  languages: string[]
-  education_level?: string
-  verified_at?: string
-}
-
-export interface PaginatedMentors {
-  mentors: MentorProfile[]
-  totalCount: number
-  currentPage: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPreviousPage: boolean
-}
+import type { 
+  MentorProfile, 
+  MentorFilters, 
+  PaginatedMentors 
+} from '@/lib/types/models/mentor'
 
 export interface FilterOptions {
   topics: string[]
@@ -164,7 +125,7 @@ class MentorService {
     const totalPages = Math.ceil(totalCount / limit)
 
     return {
-      mentors: (data as any) || [],
+      mentors: (data as any as MentorProfile[]) || [],
       totalCount,
       currentPage: page,
       totalPages,
@@ -292,7 +253,11 @@ class MentorService {
         mentor_skills,
         languages,
         education_level,
-        active_roles
+        active_roles,
+        inclusion_tags,
+        rating,
+        sessions,
+        reviews
       `)
       .eq('id', id)
       .contains('active_roles', ['mentor'])

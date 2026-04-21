@@ -1,25 +1,5 @@
 import { createClient } from '@/lib/utils/supabase/client'
-
-export type HubResourceType = 'event' | 'course' | 'tool' | 'discount' | 'job'
-export type HubResourceStatus = 'pending' | 'published' | 'rejected' | 'archived'
-
-export interface HubResource {
-    id: string
-    title: string
-    description: string | null
-    type: HubResourceType
-    url: string
-    image_url: string | null
-    badge_text: string | null
-    is_affiliate: boolean
-    status: HubResourceStatus
-    user_id: string | null
-    address?: string | null
-    location_url?: string | null
-    event_date?: string | null
-    event_time?: string | null
-    created_at: string
-}
+import type { HubResource, HubResourceType, HubResourceStatus } from '@/lib/types/models/hub'
 
 class HubService {
     private supabase = createClient()
@@ -27,7 +7,7 @@ class HubService {
     /**
      * Busca todos os recursos publicados no Hub (Público)
      */
-    async getPublishedResources(type?: HubResourceType) {
+    async getPublishedResources(type?: HubResourceType): Promise<HubResource[]> {
         let query = this.supabase
             .from('hub_resources')
             .select('*')
@@ -40,27 +20,27 @@ class HubService {
 
         const { data, error } = await query
         if (error) throw error
-        return data as HubResource[]
+        return data as any as HubResource[]
     }
 
     /**
      * Busca recursos por status (Apenas Admin)
      */
-    async getAdminResources(status: HubResourceStatus) {
-        const { data, error } = await this.supabase
+    async getAdminResources(status: HubResourceStatus): Promise<HubResource[]> {
+        const { data, error } = await (this.supabase
             .from('hub_resources')
             .select('*')
             .eq('status', status)
-            .order('created_at', { ascending: status === 'pending' }) // Pendentes mostram os mais antigos primeiro
+            .order('created_at', { ascending: status === 'pending' }) as any)
 
         if (error) throw error
-        return data as HubResource[]
+        return (data as any[]) || []
     }
 
     /**
      * Sugere um novo recurso (Comunidade)
      */
-    async suggestResource(resource: Omit<HubResource, 'id' | 'status' | 'created_at' | 'is_affiliate'>) {
+    async suggestResource(resource: Omit<HubResource, 'id' | 'status' | 'created_at' | 'updated_at' | 'is_affiliate'>): Promise<HubResource> {
         const { data, error } = await (this.supabase
             .from('hub_resources')
             .insert({
