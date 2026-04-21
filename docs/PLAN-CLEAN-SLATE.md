@@ -13,7 +13,7 @@ Este documento detalha o plano para limpar o débito técnico e redefinir os pad
 
 ## 2. Testes e Qualidade
 ### Ações:
-- [ ] **Limpeza**: Deletar a pasta `__tests__` e arquivos `jest.config.js` / `jest.setup.js`.
+- [x] **Limpeza**: Deletar a pasta `__tests__` e arquivos `jest.config.js` / `jest.setup.js`.
 - [ ] **Nova Stack Proposta**:
     - **Jest + RTL**: Para lógica de componentes e hooks (Unitários).
     - **Playwright**: Para fluxos críticos (Login, Agendamento, Cadastro). *Preferido sobre Cypress pela performance e execução em paralelo nativa.*
