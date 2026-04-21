@@ -99,7 +99,7 @@ export function usePermissions(): UsePermissionsReturn {
     if (loading) return false
 
     // Check both JWT claims and profile
-    return claims?.role === role || profile?.role === role || hasRole(role)
+    return claims?.role === role || profile?.roles?.includes(role) || hasRole(role)
   }
 
   const hasAllPermissions = (permissions: Permission[]): boolean => {
@@ -116,14 +116,13 @@ export function usePermissions(): UsePermissionsReturn {
   }
 
   // Status checkers
-  const isActive = profile?.status === "active"
-  const isPendingStatus = profile?.status === "pending"
-  const isSuspended = profile?.status === "suspended"
+  const isActive = profile?.verification_status === "verified"
+  const isPendingStatus = profile?.verification_status === "pending"
+  const isSuspended = profile?.verification_status === "rejected"
 
   // Verification checkers
-  const isVerified = profile?.verification_status === "active"
-  const needsVerification =
-    profile?.verification_status === "pending_validation"
+  const isVerified = profile?.verified ?? false
+  const needsVerification = profile?.verification_status === "pending"
   const isRejected = profile?.verification_status === "rejected"
 
   // Specific permission checkers (commonly used)
@@ -138,8 +137,8 @@ export function usePermissions(): UsePermissionsReturn {
 
   return {
     // Current user state
-    role: claims?.role || profile?.role || null,
-    status: claims?.status || profile?.status || null,
+    role: claims?.role || (profile?.roles?.[0] ?? null),
+    status: claims?.status || (profile?.verification_status ?? null),
     permissions: claims?.permissions || [],
     loading,
 

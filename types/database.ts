@@ -44,7 +44,25 @@ export interface Database {
           avatar_url: string | null
           bio: string | null
           location: string | null
-          user_role: Database["public"]["Enums"]["user_role"]
+          city: string | null
+          state: string | null
+          country: string | null
+          timezone: string | null
+          job_title: string | null
+          company: string | null
+          experience_years: number | null
+          session_price_usd: number | null
+          phone: string | null
+          linkedin_url: string | null
+          github_url: string | null
+          twitter_url: string | null
+          website_url: string | null
+          languages: string[] | null
+          mentorship_topics: string[] | null
+          inclusive_tags: string[] | null
+          expertise_areas: string[] | null
+          availability_status: Database["public"]["Enums"]["availability_status"] | null
+          verified: boolean
           verification_status: Database["public"]["Enums"]["verification_status"]
           created_at: string
           updated_at: string
@@ -58,7 +76,25 @@ export interface Database {
           avatar_url?: string | null
           bio?: string | null
           location?: string | null
-          user_role?: Database["public"]["Enums"]["user_role"]
+          city?: string | null
+          state?: string | null
+          country?: string | null
+          timezone?: string | null
+          job_title?: string | null
+          company?: string | null
+          experience_years?: number | null
+          session_price_usd?: number | null
+          phone?: string | null
+          linkedin_url?: string | null
+          github_url?: string | null
+          twitter_url?: string | null
+          website_url?: string | null
+          languages?: string[] | null
+          mentorship_topics?: string[] | null
+          inclusive_tags?: string[] | null
+          expertise_areas?: string[] | null
+          availability_status?: Database["public"]["Enums"]["availability_status"] | null
+          verified?: boolean
           verification_status?: Database["public"]["Enums"]["verification_status"]
           created_at?: string
           updated_at?: string
@@ -72,10 +108,62 @@ export interface Database {
           avatar_url?: string | null
           bio?: string | null
           location?: string | null
-          user_role?: Database["public"]["Enums"]["user_role"]
+          city?: string | null
+          state?: string | null
+          country?: string | null
+          timezone?: string | null
+          job_title?: string | null
+          company?: string | null
+          experience_years?: number | null
+          session_price_usd?: number | null
+          phone?: string | null
+          linkedin_url?: string | null
+          github_url?: string | null
+          twitter_url?: string | null
+          website_url?: string | null
+          languages?: string[] | null
+          mentorship_topics?: string[] | null
+          inclusive_tags?: string[] | null
+          expertise_areas?: string[] | null
+          availability_status?: Database["public"]["Enums"]["availability_status"] | null
+          verified?: boolean
           verification_status?: Database["public"]["Enums"]["verification_status"]
           created_at?: string
           updated_at?: string
+        }
+      }
+      roles: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          created_at?: string
+        }
+        Update: {
+          name?: string
+          description?: string | null
+        }
+      }
+      user_roles: {
+        Row: {
+          user_id: string
+          role_id: string
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          role_id: string
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          role_id?: string
         }
       }
       role_permissions: {
@@ -245,6 +333,72 @@ export interface Database {
         }
         Update: {
           read_at?: string | null
+        }
+      }
+      mentor_verification: {
+        Row: {
+          id: string
+          mentor_id: string
+          verification_type: string
+          status: string
+          verified_by: string | null
+          verification_notes: string | null
+          completed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          mentor_id: string
+          verification_type: string
+          status?: string
+          verified_by?: string | null
+          verification_notes?: string | null
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          status?: string
+          verified_by?: string | null
+          verification_notes?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+      }
+      mentors: {
+        Row: {
+          id: string
+          user_id: string
+          title: string | null
+          company: string | null
+          bio: string | null
+          status: string
+          verified_at: string | null
+          verified_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title?: string | null
+          company?: string | null
+          bio?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          title?: string | null
+          company?: string | null
+          bio?: string | null
+          status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          updated_at?: string
         }
       }
       mentor_profiles: {
