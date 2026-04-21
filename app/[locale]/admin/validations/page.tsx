@@ -22,6 +22,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import type { UserProfile } from "@/lib/types/models/user"
+
 interface Validation {
   id: string
   user_id: string
@@ -29,15 +31,7 @@ interface Validation {
   youtube_video_url: string
   status: string
   submitted_at: string
-  user_profile: {
-    first_name: string
-    last_name: string
-    email: string
-    bio: string
-    location: string
-    linkedin_url: string
-    avatar_url: string
-  }
+  user_profile: Partial<UserProfile>
 }
 
 export default function ValidationsPage() {
