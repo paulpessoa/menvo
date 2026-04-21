@@ -55,6 +55,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL(`/${locale}/update-password`, request.url))
       }
 
+      // Se for confirmação de cadastro
+      if (type === 'signup' || type === 'invite') {
+        console.log(`[AUTH CALLBACK] Signup/Invite confirmation detected. Redirecting to confirmed page.`)
+        return NextResponse.redirect(new URL(`/${locale}/confirmed`, request.url))
+      }
+
       // Fluxo normal (Login/Signup)
       let roleName = null
       let attempts = 0

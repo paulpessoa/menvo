@@ -16,11 +16,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // --- FIX 20-04-26 PRIORITÁRIO ---
-  // Se for callback de autenticação, NUNCA redirecione ou mude o caminho.
-  // Permitimos tanto /auth/callback quanto /api/auth/callback
-  if (pathname === '/auth/callback' || pathname.startsWith('/auth/callback') || 
-      pathname === '/api/auth/callback' || pathname.startsWith('/api/auth/callback')) {
-    console.log(`[MIDDLEWARE] Auth callback detected: ${pathname}. Allowing through.`)
+  // Permitimos que os callbacks passem sem interferência do i18n ou redirecionamentos de rota.
+  // app/auth/callback/route.ts e app/api/auth/callback/route.ts cuidam do resto.
+  if (pathname.startsWith('/auth/callback') || pathname.startsWith('/api/auth/callback')) {
     return NextResponse.next()
   }
 
