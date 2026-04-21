@@ -205,7 +205,7 @@ export default function VerificationsPage() {
   )
 }
 
-function VerificationDetails({ verification }) {
+function VerificationDetails({ verification }: { verification: Verification }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
@@ -254,10 +254,10 @@ function VerificationDetails({ verification }) {
   )
 }
 
-function RejectForm({ onReject }) {
+function RejectForm({ onReject }: { onReject: (reason: string) => void }) {
   const [reason, setReason] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (reason.trim()) {
       onReject(reason)

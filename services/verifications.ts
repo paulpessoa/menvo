@@ -1,5 +1,10 @@
 import { supabase } from '@/services/auth/supabase'
 import { Verification } from '@/types/verifications'
+import { Database } from '@/types/database'
+
+const typedSupabase = supabase as any as { 
+  from: <T extends keyof Database['public']['Tables']>(table: T) => any 
+}
 
 interface CompleteVerificationParams {
   verificationId: string
@@ -11,7 +16,7 @@ interface CompleteVerificationParams {
 class VerificationServiceClass {
   async getPendingVerifications(adminId: string): Promise<Verification[]> {
     // Fetch pending verifications
-    const { data: verifications, error } = await supabase
+    const { data: verifications, error } = await typedSupabase
       .from('mentor_verification')
       .select('*')
       .eq('status', 'pending')
@@ -27,8 +32,8 @@ class VerificationServiceClass {
     }
 
     // Fetch mentor info for each verification
-    const mentorIds = verifications.map(v => v.mentor_id)
-    const { data: mentors, error: mentorsError } = await supabase
+    const mentorIds = verifications.map((v: any) => v.mentor_id)
+    const { data: mentors, error: mentorsError } = await typedSupabase
       .from('mentors')
       .select(`
         id,
@@ -43,8 +48,8 @@ class VerificationServiceClass {
     }
 
     // Fetch profiles for mentors
-    const userIds = mentors?.map(m => m.user_id) || []
-    const { data: profiles, error: profilesError } = await supabase
+    const userIds = mentors?.map((m: any) => m.user_id) || []
+    const { data: profiles, error: profilesError } = await typedSupabase
       .from('profiles')
       .select(`
         id,
@@ -59,12 +64,12 @@ class VerificationServiceClass {
     }
 
     // Map mentor and profile info to verifications
-    const mentorMap = new Map(mentors?.map(m => [m.id, m]))
-    const profileMap = new Map(profiles?.map(p => [p.id, p]))
+    const mentorMap = new Map(mentors?.map((m: any) => [m.id, m]))
+    const profileMap = new Map(profiles?.map((p: any) => [p.id, p]))
 
-    const result: Verification[] = verifications.map(v => {
-      const mentor = mentorMap.get(v.mentor_id)
-      const profile = mentor ? profileMap.get(mentor.user_id) : null
+    const result: Verification[] = verifications.map((v: any) => {
+      const mentor = mentorMap.get(v.mentor_id) as any
+      const profile = mentor ? profileMap.get(mentor.user_id) as any : null
       return {
         id: v.id,
         mentor_id: v.mentor_id,
@@ -92,7 +97,7 @@ class VerificationServiceClass {
       updated_at: new Date().toISOString()
     }
 
-    const { data: verification, error } = await supabase
+    const { data: verification, error } = await typedSupabase
       .from('mentor_verification')
       .select('mentor_id')
       .eq('id', verificationId)
@@ -102,7 +107,7 @@ class VerificationServiceClass {
       throw new Error(`Verification not found: ${error?.message || 'No data'}`)
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await typedSupabase
       .from('mentor_verification')
       .update(updates)
       .eq('id', verificationId)
@@ -113,7 +118,7 @@ class VerificationServiceClass {
 
     if (passed) {
       // Update mentor status to 'verified' and set verified_by and verified_at
-      const { error: mentorError } = await supabase
+      const { error: mentorError } = await typedSupabase
         .from('mentors')
         .update({
           status: 'verified',
@@ -121,7 +126,7 @@ class VerificationServiceClass {
           verified_by: adminId,
           updated_at: new Date().toISOString()
         })
-        .eq('id', verification.mentor_id)
+        .eq('id', (verification as any).mentor_id)
 
       if (mentorError) {
         throw new Error(`Error updating mentor status: ${mentorError.message}`)
