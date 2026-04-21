@@ -15,7 +15,7 @@ export default function ResendConfirmationPage() {
   const t = useTranslations("auth.resend")
   const tCommon = useTranslations("common")
   const tLogin = useTranslations("login")
-  const { profile, isAuthenticated, loading: authLoading, handleAuthError } = useAuth()
+  const { user, profile, isAuthenticated, loading: authLoading, handleAuthError } = useAuth()
   const router = useRouter()
   
   const [email, setEmail] = useState("")
@@ -67,6 +67,7 @@ export default function ResendConfirmationPage() {
 
   // ESTADO 2: Usuário já está confirmado (UX Proativa)
   if (isAuthenticated && profile?.verified) {
+    console.log(`[RESEND-CONFIRMATION] Acesso bloqueado: O usuário ${user?.email} já possui e-mail verificado. Exibindo UI de sucesso proativo.`)
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-4">
           <Card className="w-full max-w-md border-2 shadow-2xl overflow-hidden">

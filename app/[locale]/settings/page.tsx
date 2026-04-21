@@ -189,27 +189,6 @@ export default function SettingsPage() {
                 >
                   🇪🇸 {commonT("spanish")}
                 </Button>
-                {/* <Button
-                  variant={currentLanguage === "fr" ? "default" : "outline"}
-                  onClick={() => changeLanguage("fr")}
-                  className="w-full justify-start md:justify-center"
-                >
-                  🇫🇷 {commonT("french", { defaultValue: "Français" })}
-                </Button>
-                <Button
-                  variant={currentLanguage === "da" ? "default" : "outline"}
-                  onClick={() => changeLanguage("da")}
-                  className="w-full justify-start md:justify-center"
-                >
-                  🇩🇰 {commonT("danish", { defaultValue: "Dansk" })}
-                </Button>
-                <Button
-                  variant={currentLanguage === "sv" ? "default" : "outline"}
-                  onClick={() => changeLanguage("sv")}
-                  className="w-full justify-start md:justify-center"
-                >
-                  🇸🇪 {commonT("swedish", { defaultValue: "Svenska" })}
-                </Button> */}
               </div>
             </CardContent>
           </Card>

@@ -43,9 +43,6 @@
     "confirmTitle": "Você tem certeza?",
     "confirmDesc": "Esta ação não pode ser desfeita.",
     "confirmAction": "Sim, confirmar",
-    "french": "Francês",
-    "danish": "Dinamarquês",
-    "swedish": "Sueco",
     "organizations": "Organizações"
   },
   "header": {

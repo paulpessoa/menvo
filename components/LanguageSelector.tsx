@@ -7,7 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { useLocale, useTranslations } from "next-intl"
@@ -21,10 +21,7 @@ export function LanguageSelector() {
   const languages = [
     { code: "pt-BR", label: t("portuguese") },
     { code: "en", label: t("english") },
-    { code: "es", label: t("spanish") },
-    { code: "da", label: t("danish") },
-    { code: "fr", label: t("french") },
-    { code: "sv", label: t("swedish") },
+    { code: "es", label: t("spanish") }
   ]
 
   const handleLanguageChange = (newLocale: string) => {

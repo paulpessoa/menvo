@@ -142,6 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setUser(currentSession?.user ?? null)
 
                 if (currentSession?.user) {
+                    console.log(`[AUTH] Usuário logado detectado: ${currentSession.user.email} (ID: ${currentSession.user.id})`)
                     const userProfile = await fetchProfile(currentSession.user.id)
                     if (mounted) setProfile(userProfile)
                 }
