@@ -1084,8 +1084,12 @@
             "sentTo": "Hemos enviado un nuevo correo de confirmación a",
             "otherEmail": "Enviar a Otro Correo",
             "button": "Reenviar Correo",
-            "error": "Error al reenviar el correo. Verifica que el correo sea correcto."
+            "error": "Error al reenviar el correo. Verifica que el correo sea correcto.",
+            "alreadyVerifiedTitle": "Correo electrónico ya verificado",
+            "alreadyVerifiedMessage": "Su cuenta ya está activa y puede acceder a todas las funciones.",
+            "alreadyVerifiedDetail": "Su correo electrónico {email} ya está activo y listo para usar."
         },
+
         "setPassword": {
             "title": "Establece tu contraseña",
             "description": "Has sido invitado a la plataforma. Establece tu contraseña para continuar.",

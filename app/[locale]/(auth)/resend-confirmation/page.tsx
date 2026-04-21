@@ -35,7 +35,7 @@ export default async function ResendConfirmationPage({ params }: { params: { loc
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-600 text-center">
-               Seu e-mail <strong>{user.email}</strong> já está ativo e pronto para uso.
+               {t("alreadyVerifiedDetail", { email: user.email })}
             </div>
             <Link href={`/${locale}/dashboard`} className="block w-full">
               <Button className="w-full h-12 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]">

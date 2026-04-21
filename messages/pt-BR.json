@@ -1193,7 +1193,10 @@
       "sentTo": "Enviamos um novo email de confirmação para",
       "otherEmail": "Enviar para Outro Email",
       "button": "Reenviar Email",
-      "error": "Erro ao reenviar email. Verifique se o email está correto."
+      "error": "Erro ao reenviar email. Verifique se o email está correto.",
+      "alreadyVerifiedTitle": "Email já Verificado",
+      "alreadyVerifiedMessage": "Sua conta já está ativa e você pode acessar todas as funcionalidades.",
+      "alreadyVerifiedDetail": "Seu e-mail {email} já está ativo e pronto para uso."
     },
     "setPassword": {
       "title": "Defina sua senha",

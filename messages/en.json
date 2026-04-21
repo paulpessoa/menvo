@@ -1208,15 +1208,19 @@
             "success": "Link sent! Check your email."
         },
         "resend": {
-            "title": "Resend Confirmation",
-            "description": "Enter your email to receive a new confirmation link",
-            "successTitle": "Email Resent!",
-            "successDescription": "Check your inbox and spam folder.",
-            "sentTo": "We\u0027ve sent a new confirmation email to",
-            "otherEmail": "Send to Another Email",
-            "button": "Resend Email",
-            "error": "Error resending email. Please check if the email is correct."
+          "title": "Resend Confirmation",
+          "description": "Enter your email to receive a new confirmation link",
+          "successTitle": "Email Resent!",
+          "successDescription": "Please check your inbox and spam folder.",
+          "sentTo": "We sent a new confirmation email to",
+          "otherEmail": "Send to Another Email",
+          "button": "Resend Email",
+          "error": "Error resending email. Please check if the email is correct.",
+          "alreadyVerifiedTitle": "Email Already Verified",
+          "alreadyVerifiedMessage": "Your account is already active and you can access all features.",
+          "alreadyVerifiedDetail": "Your email {email} is already active and ready to use."
         },
+
         "setPassword": {
             "title": "Set your password",
             "description": "You have been invited to the platform. Set your password to continue.",
