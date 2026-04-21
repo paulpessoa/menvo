@@ -1,5 +1,4 @@
 import { createClient } from "@/utils/supabase/server"
-import { redirect } from "next/navigation"
 import { getTranslations } from "next-intl/server"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2, LayoutDashboard } from "lucide-react"
@@ -11,13 +10,12 @@ export default async function ResendConfirmationPage({ params }: { params: { loc
   const { locale } = await params
   const supabase = await createClient()
   const t = await getTranslations("auth.resend")
-  const tCommon = await getTranslations("common")
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // LÓGICA DE SERVIDOR: Se o usuário já estiver logado e com e-mail confirmado, redireciona ou mostra UI de sucesso.
+  // LÓGICA DE SERVIDOR: Se o usuário já estiver logado e com e-mail confirmado
   if (user && user.email_confirmed_at) {
-    console.log(`[RESEND-CONFIRMATION-SSR] Usuário ${user.email} já está verificado. Redirecionando proativamente.`)
+    console.log(`[RESEND-CONFIRMATION-SSR] Usuário ${user.email} já está verificado. Exibindo sucesso proativo.`)
     
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-4">
@@ -49,14 +47,6 @@ export default async function ResendConfirmationPage({ params }: { params: { loc
     )
   }
 
-  // Função simples para passar ao form client-side (mapeamento básico)
-  const handleAuthError = (error: any): string => {
-    if (!error) return ""
-    const message = error.message || ""
-    if (message.includes("Rate limit")) return "Muitas tentativas. Tente novamente mais tarde."
-    return message || "Ocorreu um erro ao reenviar o e-mail."
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4">
       <Card className="w-full max-w-md shadow-lg border-gray-200">
@@ -71,7 +61,6 @@ export default async function ResendConfirmationPage({ params }: { params: { loc
         <CardContent>
           <ResendForm 
             initialEmail={user?.email || ""} 
-            handleAuthError={handleAuthError} 
           />
         </CardContent>
       </Card>

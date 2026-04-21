@@ -9,7 +9,7 @@ import { Loader2, Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-reac
 import { createClient } from "@/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
-export function ResendForm({ initialEmail = "", handleAuthError }: { initialEmail?: string, handleAuthError: (err: any) => string }) {
+export function ResendForm({ initialEmail = "" }: { initialEmail?: string }) {
   const t = useTranslations("auth.resend")
   const tCommon = useTranslations("common")
   const tLogin = useTranslations("login")
@@ -19,6 +19,14 @@ export function ResendForm({ initialEmail = "", handleAuthError }: { initialEmai
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState("")
+
+  // Função interna para tratar erros (não pode vir do servidor via props)
+  const handleAuthError = (error: any): string => {
+    if (!error) return ""
+    const message = error.message || ""
+    if (message.includes("Rate limit")) return "Muitas tentativas. Tente novamente mais tarde."
+    return message || "Ocorreu um erro ao reenviar o e-mail."
+  }
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,9 +53,9 @@ export function ResendForm({ initialEmail = "", handleAuthError }: { initialEmai
       } else {
         setSent(true)
       }
-    } catch (error: any) {
-      console.error("Unexpected error:", error)
-      setError(handleAuthError(error))
+    } catch (err: any) {
+      console.error("Unexpected error:", err)
+      setError(handleAuthError(err))
     } finally {
       setLoading(false)
     }
@@ -62,7 +70,10 @@ export function ResendForm({ initialEmail = "", handleAuthError }: { initialEmai
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-gray-900">{t("successTitle")}</h3>
           <p className="text-sm text-gray-500">
-            {t("successMessage", { email })}
+            {t("successDescription")}
+          </p>
+          <p className="text-xs text-muted-foreground font-mono bg-gray-50 p-2 rounded">
+            {email}
           </p>
         </div>
         <Button 
@@ -70,7 +81,7 @@ export function ResendForm({ initialEmail = "", handleAuthError }: { initialEmai
           className="w-full h-12"
           onClick={() => router.push("/login")}
         >
-          {tCommon("backToLogin")}
+          {tCommon("login")}
         </Button>
       </div>
     )
@@ -80,7 +91,7 @@ export function ResendForm({ initialEmail = "", handleAuthError }: { initialEmai
     <form onSubmit={handleResend} className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
-          {t("emailLabel")}
+          {tCommon("email")}
         </Label>
         <div className="relative group">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
