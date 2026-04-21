@@ -4,9 +4,11 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { createClient } from '@/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
 
-interface UserProfile {
+export interface UserProfile {
     id: string
     full_name: string | null
+    first_name?: string | null
+    last_name?: string | null
     avatar_url: string | null
     verified: boolean
     roles: string[]
@@ -15,6 +17,20 @@ interface UserProfile {
     verification_status: string
     verification_notes: string | null
     is_public: boolean
+    slug?: string | null
+    job_title?: string | null
+    company?: string | null
+    location?: string | null
+    city?: string | null
+    state?: string | null
+    country?: string | null
+    timezone?: string | null
+    bio?: string | null
+    languages?: string[] | null
+    mentorship_topics?: string[] | null
+    inclusive_tags?: string[] | null
+    expertise_areas?: string[] | null
+    experience_years?: number | null
 }
 
 export interface AuthContextType {
@@ -104,6 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .select(`
                     id,
                     full_name,
+                    first_name,
+                    last_name,
                     avatar_url,
                     verified,
                     verification_status,
@@ -111,6 +129,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     average_rating,
                     total_reviews,
                     is_public,
+                    slug,
+                    job_title,
+                    company,
+                    location,
+                    city,
+                    state,
+                    country,
+                    timezone,
+                    bio,
+                    languages,
+                    mentorship_topics,
+                    inclusive_tags,
+                    expertise_areas,
+                    experience_years,
                     user_roles (
                         roles (
                             name
