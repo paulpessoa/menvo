@@ -4,35 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { createClient } from '@/lib/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
 import { debugLog } from '@/lib/debug-logger'
-
-export interface UserProfile {
-    id: string
-    full_name: string | null
-    first_name?: string | null
-    last_name?: string | null
-    avatar_url: string | null
-    verified: boolean
-    roles: string[]
-    average_rating: number
-    total_reviews: number
-    verification_status: string
-    verification_notes: string | null
-    is_public: boolean
-    slug?: string | null
-    job_title?: string | null
-    company?: string | null
-    location?: string | null
-    city?: string | null
-    state?: string | null
-    country?: string | null
-    timezone?: string | null
-    bio?: string | null
-    languages?: string[] | null
-    mentorship_topics?: string[] | null
-    inclusive_tags?: string[] | null
-    expertise_areas?: string[] | null
-    experience_years?: number | null
-}
+import type { UserProfile, UserRole } from '@/lib/types/models/user'
 
 export interface AuthContextType {
     user: User | null
@@ -150,11 +122,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }, 'debug')
 
             // Robust role extraction
-            let rawRoles: string[] = []
+            let rawRoles: UserRole[] = []
             if (data?.user_roles) {
                 const userRolesData = Array.isArray(data.user_roles) ? data.user_roles : [data.user_roles]
                 rawRoles = userRolesData
-                    .map((ur: any) => ur.roles?.name)
+                    .map((ur: any) => ur.roles?.name as UserRole)
                     .filter(Boolean)
             }
             
@@ -162,10 +134,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
             debugLog(`Detected roles for ${userId}`, { rawRoles }, 'info')
 
-            return {
-                ...data,
+            const profileData: UserProfile = {
+                ...(data as any),
                 roles: rawRoles
-            } as UserProfile
+            }
+
+            return profileData
         } catch (error) {
             console.error(`[AUTH] Erro inesperado no fetchProfile:`, error)
             return null

@@ -1,42 +1,14 @@
 import { supabase } from '@/services/auth/supabase'
+import type { 
+  Appointment, 
+  AppointmentWithProfiles, 
+  MentorAvailability,
+  AppointmentStatus
+} from '@/lib/types/models/mentorship'
 
 // =============================================
 // INTERFACES E TIPOS
 // =============================================
-
-export interface MentorAvailability {
-  id?: string
-  mentor_id: string
-  day_of_week: number // 0=Domingo, 6=Sábado
-  start_time: string // HH:MM format
-  end_time: string // HH:MM format
-  timezone: string
-  is_active: boolean
-  created_at?: string
-  updated_at?: string
-}
-
-export interface MentorshipSession {
-  id?: string
-  mentor_id: string
-  mentee_id: string
-  requested_date: string // YYYY-MM-DD
-  requested_start_time: string // HH:MM
-  requested_end_time: string // HH:MM
-  timezone: string
-  status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'cancelled'
-  mentor_response?: string
-  meeting_link?: string
-  topic: string
-  description?: string
-  mentee_notes?: string
-  mentor_notes?: string
-  requested_at?: string
-  responded_at?: string
-  completed_at?: string
-  created_at?: string
-  updated_at?: string
-}
 
 export interface SessionRequest {
   mentor_id: string
@@ -62,7 +34,7 @@ export interface SessionResponse {
 
 export const mentorAvailabilityService = {
   // Obter disponibilidade de um mentor
-  getMentorAvailability: async (mentorId: string) => {
+  getMentorAvailability: async (mentorId: string): Promise<MentorAvailability[]> => {
     const { data, error } = await (supabase
       .from('mentor_availability')
       .select('*')
@@ -76,7 +48,7 @@ export const mentorAvailabilityService = {
   },
 
   // Adicionar horário de disponibilidade
-  addAvailability: async (availability: Omit<MentorAvailability, 'id' | 'created_at' | 'updated_at'>) => {
+  addAvailability: async (availability: Omit<MentorAvailability, 'id' | 'created_at' | 'updated_at'>): Promise<MentorAvailability> => {
     const { data, error } = await (supabase
       .from('mentor_availability')
       .insert([availability])
@@ -88,8 +60,7 @@ export const mentorAvailabilityService = {
   },
 
   // Atualizar disponibilidade
-  updateAvailability: async (id: string, updates: Partial<MentorAvailability>) => {
-    // Convert string ID to number if necessary for the database
+  updateAvailability: async (id: string, updates: Partial<MentorAvailability>): Promise<MentorAvailability> => {
     const numericId = parseInt(id)
     const { data, error } = await (supabase
       .from('mentor_availability')
@@ -103,7 +74,7 @@ export const mentorAvailabilityService = {
   },
 
   // Remover disponibilidade (soft delete)
-  removeAvailability: async (id: string) => {
+  removeAvailability: async (id: string): Promise<void> => {
     const numericId = parseInt(id)
     const { error } = await (supabase
       .from('mentor_availability')
@@ -114,7 +85,7 @@ export const mentorAvailabilityService = {
   },
 
   // Definir disponibilidade completa do mentor (substitui todas)
-  setMentorAvailability: async (mentorId: string, availabilities: Omit<MentorAvailability, 'id' | 'mentor_id' | 'created_at' | 'updated_at'>[]) => {
+  setMentorAvailability: async (mentorId: string, availabilities: Omit<MentorAvailability, 'id' | 'mentor_id' | 'created_at' | 'updated_at'>[]): Promise<MentorAvailability[]> => {
     // Primeiro, desativar todas as disponibilidades existentes
     await (supabase
       .from('mentor_availability')
@@ -143,7 +114,7 @@ export const mentorAvailabilityService = {
 
 export const mentorshipSessionsService = {
   // Solicitar sessão de mentoria
-  requestSession: async (request: SessionRequest) => {
+  requestSession: async (request: SessionRequest): Promise<AppointmentWithProfiles> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Usuário não autenticado')
 
@@ -154,12 +125,12 @@ export const mentorshipSessionsService = {
       requested_start_time: request.requested_start_time,
       requested_end_time: request.requested_end_time,
       topic: request.topic,
-      notes: request.mentee_notes, // Mapeado para 'notes' no simplificado
+      notes_mentee: request.mentee_notes,
       timezone: request.timezone || 'America/Sao_Paulo',
       status: 'pending'
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('appointments')
       .insert([sessionData as any])
       .select(`
@@ -167,14 +138,14 @@ export const mentorshipSessionsService = {
         mentor:profiles!mentor_id(first_name, last_name, email),
         mentee:profiles!mentee_id(first_name, last_name, email)
       `)
-      .single()
+      .single() as any)
 
     if (error) throw error
-    return data
+    return data as AppointmentWithProfiles
   },
 
   // Responder a uma solicitação (mentor)
-  respondToSession: async (response: SessionResponse) => {
+  respondToSession: async (response: SessionResponse): Promise<AppointmentWithProfiles> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Usuário não autenticado')
 
@@ -185,7 +156,7 @@ export const mentorshipSessionsService = {
       responded_at: new Date().toISOString()
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('appointments')
       .update(updates as any)
       .eq('id', parseInt(response.session_id))
@@ -195,14 +166,14 @@ export const mentorshipSessionsService = {
         mentor:profiles!mentor_id(first_name, last_name, email),
         mentee:profiles!mentee_id(first_name, last_name, email)
       `)
-      .single()
+      .single() as any)
 
     if (error) throw error
-    return data
+    return data as AppointmentWithProfiles
   },
 
   // Obter sessões do mentor
-  getMentorSessions: async (mentorId?: string, status?: string) => {
+  getMentorSessions: async (mentorId?: string, status?: AppointmentStatus): Promise<AppointmentWithProfiles[]> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Usuário não autenticado')
 
@@ -223,11 +194,11 @@ export const mentorshipSessionsService = {
 
     const { data, error } = await query
     if (error) throw error
-    return data
+    return data as any as AppointmentWithProfiles[]
   },
 
   // Obter sessões do mentorado
-  getMenteeSessions: async (menteeId?: string, status?: string) => {
+  getMenteeSessions: async (menteeId?: string, status?: AppointmentStatus): Promise<AppointmentWithProfiles[]> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Usuário não autenticado')
 
@@ -248,15 +219,15 @@ export const mentorshipSessionsService = {
 
     const { data, error } = await query
     if (error) throw error
-    return data
+    return data as any as AppointmentWithProfiles[]
   },
 
   // Marcar sessão como completa
-  completeSession: async (sessionId: string, mentorNotes?: string) => {
+  completeSession: async (sessionId: string, mentorNotes?: string): Promise<Appointment> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Usuário não autenticado')
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('appointments')
       .update({
         status: 'completed',
@@ -264,37 +235,37 @@ export const mentorshipSessionsService = {
         completed_at: new Date().toISOString()
       } as any)
       .eq('id', parseInt(sessionId))
-      .eq('mentor_id', user.id) // Só o mentor pode marcar como completa
+      .eq('mentor_id', user.id)
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
-    return data
+    return data as Appointment
   },
 
   // Cancelar sessão
-  cancelSession: async (sessionId: string, reason?: string) => {
+  cancelSession: async (sessionId: string, reason?: string): Promise<Appointment> => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Usuário não autenticado')
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('appointments')
       .update({
         status: 'cancelled',
         mentor_response: reason
       } as any)
       .eq('id', parseInt(sessionId))
-      .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`) // Mentor ou mentee podem cancelar
+      .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`)
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
-    return data
+    return data as Appointment
   },
 
   // Obter sessão específica
-  getSession: async (sessionId: string) => {
-    const { data, error } = await supabase
+  getSession: async (sessionId: string): Promise<AppointmentWithProfiles> => {
+    const { data, error } = await (supabase
       .from('appointments')
       .select(`
         *,
@@ -302,31 +273,31 @@ export const mentorshipSessionsService = {
         mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `)
       .eq('id', parseInt(sessionId))
-      .single()
+      .single() as any)
 
     if (error) throw error
-    return data
+    return data as AppointmentWithProfiles
   },
 
   // Obter estatísticas do mentor
   getMentorStats: async (mentorId: string) => {
-    const { data: sessions, error } = await supabase
+    const { data: sessions, error } = await (supabase
       .from('appointments')
       .select('status')
-      .eq('mentor_id', mentorId)
+      .eq('mentor_id', mentorId) as any)
 
     if (error) throw error
 
-    const stats = {
-      total: sessions.length,
-      pending: sessions.filter(s => s.status === 'pending').length,
-      confirmed: sessions.filter(s => s.status === 'confirmed').length,
-      completed: sessions.filter(s => s.status === 'completed').length,
-      rejected: sessions.filter(s => s.status === 'rejected').length,
-      cancelled: sessions.filter(s => s.status === 'cancelled').length
-    }
+    const s = (sessions as any[]) || []
 
-    return stats
+    return {
+      total: s.length,
+      pending: s.filter(i => i.status === 'pending').length,
+      confirmed: s.filter(i => i.status === 'confirmed').length,
+      completed: s.filter(i => i.status === 'completed').length,
+      rejected: s.filter(i => i.status === 'rejected').length,
+      cancelled: s.filter(i => i.status === 'cancelled').length
+    }
   }
 }
 
