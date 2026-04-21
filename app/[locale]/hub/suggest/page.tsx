@@ -19,7 +19,8 @@ import { ArrowLeft, CheckCircle2, Loader2, Link as LinkIcon, Send, MapPin, Calen
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-import { hubService, type HubResourceType } from "@/services/hub/hub"
+import { hubService } from "@/services/hub/hub"
+import type { HubResourceType } from "@/lib/types/models/hub"
 import { toast } from "sonner"
 
 export default function HubSuggestPage() {

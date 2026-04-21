@@ -17,7 +17,8 @@ import {
   AlertCircle,
   CheckCircle,
   MessageSquare,
-  Link as LinkIcon
+  Link as LinkIcon,
+  TrendingUp
 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -85,7 +86,9 @@ export default function AdminDashboard() {
       const totalMentors = mentorRoles?.length || 0
       const verifiedMentors =
         mentorRoles?.filter((role) => {
-          const profile = Array.isArray(role.profiles) ? role.profiles[0] : role.profiles
+          const profile = Array.isArray(role.profiles)
+            ? role.profiles[0]
+            : role.profiles
           return profile?.verified
         }).length || 0
       const pendingMentorsCount = totalMentors - verifiedMentors

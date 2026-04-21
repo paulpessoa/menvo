@@ -12,7 +12,8 @@ import { CheckCircle, XCircle, ExternalLink, Link as LinkIcon, Save, Trash2, Loa
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
-import { hubService, type HubResource, type HubResourceStatus } from "@/services/hub/hub"
+import { hubService } from "@/services/hub/hub"
+import type { HubResource, HubResourceStatus } from "@/lib/types/models/hub"
 import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 
 export default function AdminHub() {
