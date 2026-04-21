@@ -39,21 +39,7 @@ import { UserMetrics } from "@/components/admin/UserMetrics"
 import { EditUserModal } from "@/components/admin/EditUserModal"
 import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
-
-interface User {
-  id: string
-  email: string
-  first_name: string | null
-  last_name: string | null
-  full_name: string | null
-  avatar_url: string | null
-  verified: boolean
-  verification_notes: string | null
-  bio: string | null
-  created_at: string
-  roles: string[]
-  slug: string | null
-}
+import type { UserProfile } from "@/lib/types/models/user"
 
 interface UserStats {
   total: number
@@ -68,8 +54,8 @@ export default function AdminUsersPage() {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab') || 'all'
   
-  const [users, setUsers] = useState<User[]>([])
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<UserProfile[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([])
   const [stats, setStats] = useState<UserStats>({
     total: 0,
     mentors: 0,
@@ -83,7 +69,7 @@ export default function AdminUsersPage() {
   const [activeTab, setActiveTab] = useState(initialTab)
   
   // Edit State
-  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [editingUser, setEditingUser] = useState<UserProfile | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const supabase = createClient()
@@ -176,7 +162,7 @@ export default function AdminUsersPage() {
     setFilteredUsers(filtered)
   }
 
-  const handleEdit = (user: User) => {
+  const handleEdit = (user: UserProfile) => {
     setEditingUser(user)
     setIsEditModalOpen(true)
   }
