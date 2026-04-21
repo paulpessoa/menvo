@@ -6,8 +6,7 @@ import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
 import { GraduationCap, Users } from "lucide-react"
 import { Dispatch, SetStateAction } from "react"
-
-type UserType = "mentor" | "mentee"
+import { UserType } from "@/hooks/useSignupForm"
 
 interface UserTypeSelectorProps {
   userType: UserType
@@ -36,9 +35,7 @@ export function UserTypeSelector({ userType, setUserType }: UserTypeSelectorProp
 
   const handleTypeChange = (value: string) => {
     console.log("Valor selecionado:", value)
-    if (value === "mentor" || value === "mentee") {
-      setUserType(value)
-    }
+    setUserType(value as UserType)
   }
 
   return (

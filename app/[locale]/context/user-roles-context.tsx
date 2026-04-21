@@ -1,19 +1,23 @@
-import React, { createContext, useContext } from 'react'
-import { useUserProfile } from '@/hooks/useUserProfile'
-import { UserRoleType } from '@/lib/auth/auth-context'
+import React, { createContext, useContext, useMemo } from 'react'
+import { useAuth } from '@/lib/auth'
 
 type UserRolesContextType = {
-  roles: UserRoleType[]
+  roles: string[]
   isLoading: boolean
 }
 
 const UserRolesContext = createContext<UserRolesContextType>({ roles: [], isLoading: true })
 
 export function UserRolesProvider({ children }: { children: React.ReactNode }) {
-  const { data: profile, isLoading } = useUserProfile()
-  const roles = profile?.roles || []
+  const { profile, loading } = useAuth()
+  
+  const value = useMemo(() => ({
+    roles: profile?.roles || [],
+    isLoading: loading
+  }), [profile, loading])
+
   return (
-    <UserRolesContext.Provider value={{ roles, isLoading }}>
+    <UserRolesContext.Provider value={value}>
       {children}
     </UserRolesContext.Provider>
   )
