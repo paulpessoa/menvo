@@ -2,10 +2,6 @@ import { supabase } from '@/services/auth/supabase'
 import { Verification } from '@/types/verifications'
 import { Database } from '@/types/database'
 
-const typedSupabase = supabase as any as { 
-  from: <T extends keyof Database['public']['Tables']>(table: T) => any 
-}
-
 interface CompleteVerificationParams {
   verificationId: string
   adminId: string
@@ -13,10 +9,43 @@ interface CompleteVerificationParams {
   notes?: string
 }
 
-class VerificationServiceClass {
+export class VerificationServiceClass {
+  // Solicitar verificação (mentor)
+  async requestVerification(): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase.rpc("request_mentor_verification", {
+      mentor_user_id: user.id,
+    })
+
+    if (error) throw error
+  }
+
+  // Agendar verificação (admin)
+  async scheduleVerification(verificationId: string, scheduledAt: string, adminId: string): Promise<void> {
+    const { error } = await supabase.rpc("schedule_mentor_verification", {
+      verification_id: verificationId,
+      scheduled_datetime: scheduledAt,
+      admin_id: adminId,
+    })
+
+    if (error) throw error
+  }
+
   async getPendingVerifications(adminId: string): Promise<Verification[]> {
-    // Fetch pending verifications
-    const { data: verifications, error } = await typedSupabase
+    // Tenta primeiro via RPC
+    try {
+      const { data, error } = await supabase.rpc("get_pending_verifications", {
+        admin_id: adminId,
+      })
+      if (!error && data) return data as any as Verification[]
+    } catch (e) {
+      console.warn("RPC get_pending_verifications failed, falling back to manual fetch")
+    }
+
+    // Fallback: Fetch pending verifications manualmente
+    const { data: verifications, error } = await supabase
       .from('mentor_verification')
       .select('*')
       .eq('status', 'pending')
@@ -33,7 +62,7 @@ class VerificationServiceClass {
 
     // Fetch mentor info for each verification
     const mentorIds = verifications.map((v: any) => v.mentor_id)
-    const { data: mentors, error: mentorsError } = await typedSupabase
+    const { data: mentors, error: mentorsError } = await supabase
       .from('mentors')
       .select(`
         id,
@@ -49,7 +78,7 @@ class VerificationServiceClass {
 
     // Fetch profiles for mentors
     const userIds = mentors?.map((m: any) => m.user_id) || []
-    const { data: profiles, error: profilesError } = await typedSupabase
+    const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
       .select(`
         id,
@@ -87,6 +116,19 @@ class VerificationServiceClass {
   }
 
   async completeVerification(params: CompleteVerificationParams): Promise<void> {
+    // Tenta via RPC primeiro
+    try {
+      const { error } = await supabase.rpc("complete_mentor_verification", {
+        verification_id: params.verificationId,
+        admin_id: params.adminId,
+        verification_passed: params.passed,
+        verification_notes: params.notes || null,
+      })
+      if (!error) return
+    } catch (e) {
+        console.warn("RPC complete_mentor_verification failed, falling back to manual update")
+    }
+
     const { verificationId, adminId, passed, notes } = params
 
     const updates = {
@@ -97,7 +139,7 @@ class VerificationServiceClass {
       updated_at: new Date().toISOString()
     }
 
-    const { data: verification, error } = await typedSupabase
+    const { data: verification, error } = await supabase
       .from('mentor_verification')
       .select('mentor_id')
       .eq('id', verificationId)
@@ -107,9 +149,9 @@ class VerificationServiceClass {
       throw new Error(`Verification not found: ${error?.message || 'No data'}`)
     }
 
-    const { error: updateError } = await typedSupabase
+    const { error: updateError } = await supabase
       .from('mentor_verification')
-      .update(updates)
+      .update(updates as any)
       .eq('id', verificationId)
 
     if (updateError) {
@@ -118,7 +160,7 @@ class VerificationServiceClass {
 
     if (passed) {
       // Update mentor status to 'verified' and set verified_by and verified_at
-      const { error: mentorError } = await typedSupabase
+      const { error: mentorError } = await supabase
         .from('mentors')
         .update({
           status: 'verified',
@@ -129,9 +171,39 @@ class VerificationServiceClass {
         .eq('id', (verification as any).mentor_id)
 
       if (mentorError) {
-        throw new Error(`Error updating mentor status: ${mentorError.message}`)
+        throw new Error(`Error updating mentor status: ${mentorError.message}` || 'Unknown error')
       }
     }
+  }
+
+  // Obter detalhes da verificação
+  async getVerificationDetails(verificationId: string) {
+    const { data, error } = await supabase
+      .from("mentor_verification")
+      .select(`
+        *,
+        mentors (
+          *,
+          profiles (*)
+        )
+      `)
+      .eq("id", verificationId)
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  // Obter histórico de verificações de um mentor
+  async getMentorVerificationHistory(mentorId: string) {
+    const { data, error } = await supabase
+      .from("mentor_verification")
+      .select("*")
+      .eq("mentor_id", mentorId)
+      .order("created_at", { ascending: false })
+
+    if (error) throw error
+    return data || []
   }
 }
 

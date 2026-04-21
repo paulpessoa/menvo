@@ -43,6 +43,7 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           bio: string | null
+          age: number | null
           location: string | null
           city: string | null
           state: string | null
@@ -460,6 +461,54 @@ export interface Database {
       validation_status: ValidationStatus
       notification_type: NotificationType
       app_permission: AppPermission
-    }
-  }
+      }
+      Functions: {
+      request_mentor_verification: {
+        Args: {
+          mentor_user_id: string
+        }
+        Returns: string
+      }
+      schedule_mentor_verification: {
+        Args: {
+          verification_id: string
+          scheduled_datetime: string
+          admin_id: string
+        }
+        Returns: boolean
+      }
+      get_pending_verifications: {
+        Args: {
+          admin_id: string
+        }
+        Returns: Json[]
+      }
+      complete_mentor_verification: {
+        Args: {
+          verification_id: string
+          admin_id: string
+          verification_passed: boolean
+          verification_notes: string | null
+        }
+        Returns: boolean
+      }
+      save_google_calendar_tokens: {
+          Args: {
+              p_user_id: string
+              p_access_token: string
+              p_refresh_token: string
+              p_expires_in: number
+              p_scope: string
+          }
+          Returns: void
+      }
+      get_google_calendar_tokens: {
+          Args: {
+              p_user_id: string
+          }
+          Returns: Json[]
+      }
+      }
+      }
+
 }
