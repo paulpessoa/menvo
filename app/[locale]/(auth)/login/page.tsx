@@ -45,7 +45,12 @@ export default function LoginPage() {
     try {
       await signIn(email, password)
     } catch (err: any) {
-      setError(err.message || t("error.unexpected"))
+      console.error("Login error:", err)
+      if (err.message?.includes("Email not confirmed")) {
+        setError("email_not_confirmed")
+      } else {
+        setError(err.message || t("error.unexpected"))
+      }
     } finally {
       setIsLoading(false)
     }
@@ -184,7 +189,21 @@ export default function LoginPage() {
 
             {error && (
               <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="flex flex-col gap-2">
+                  {error === "email_not_confirmed" ? (
+                    <>
+                      <span>{t("error.emailNotConfirmed")}</span>
+                      <Link 
+                        href="/resend-confirmation" 
+                        className="text-xs font-bold underline hover:opacity-80"
+                      >
+                        {t("error.resendConfirmation")}
+                      </Link>
+                    </>
+                  ) : (
+                    error
+                  )}
+                </AlertDescription>
               </Alert>
             )}
           </form>

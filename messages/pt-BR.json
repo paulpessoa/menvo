@@ -425,7 +425,8 @@
       "tooManyAttempts": "Muitas tentativas de login. Aguarde alguns minutos antes de tentar novamente.",
       "networkError": "Erro de conexão. Verifique sua internet e tente novamente.",
       "unexpected": "Erro inesperado. Tente novamente.",
-      "loginFailed": "Erro ao fazer login. Tente novamente."
+      "loginFailed": "Erro ao fazer login. Tente novamente.",
+      "resendConfirmation": "Reenviar e-mail de confirmação"
     }
   },
   "register": {
