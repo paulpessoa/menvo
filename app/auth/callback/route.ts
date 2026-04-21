@@ -11,11 +11,16 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const type = searchParams.get("type")
   const next = searchParams.get("next") || "/dashboard"
-  
-  // Obter locale do cookie ou default
-  const locale = request.cookies.get('NEXT_LOCALE')?.value || 'pt-BR'
 
-  console.log(`[ROOT CALLBACK] Flow: type=${type}, locale=${locale}, code=${!!code}`)
+  const locale = request.cookies.get("NEXT_LOCALE")?.value || "pt-BR"
+
+  const targetPath =
+    type === "recovery"
+      ? `/${locale}/update-password`
+      : `/${locale}${next.startsWith("/") ? next : "/" + next}`
+
+  // Cria a response ANTES para poder setar cookies nela
+  const redirectResponse = NextResponse.redirect(new URL(targetPath, origin))
 
   // Se houver código PKCE, precisamos trocar por sessão
   if (code) {
@@ -24,28 +29,26 @@ export async function GET(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() { return request.cookies.getAll() },
-          setAll(cookiesToSet) {
-            // Handled automatically by Supabase SSR in request/response
+          getAll() {
+            return request.cookies.getAll()
           },
-        },
+          setAll(cookiesToSet) {
+            // Agora grava os cookies na response de verdade
+            cookiesToSet.forEach(({ name, value, options }) =>
+              redirectResponse.cookies.set(name, value, options)
+            )
+          }
+        }
       }
     )
-    
+
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (error) {
-      console.error("[ROOT CALLBACK] Exchange error:", error.message)
-      return NextResponse.redirect(new URL(`/${locale}/login?error=auth_failed`, request.url))
+      return NextResponse.redirect(
+        new URL(`/${locale}/login?error=auth_failed`, origin)
+      )
     }
   }
 
-  // Redirecionamento Prioritário: RECOVERY
-  if (type === 'recovery' || request.url.includes('type=recovery')) {
-    console.log(`[ROOT CALLBACK] Redirecting to localized update-password`)
-    return NextResponse.redirect(new URL(`/${locale}/update-password`, origin))
-  }
-
-  // Redirecionamento Normal
-  const targetPath = next.startsWith('/') ? next : `/${next}`
-  return NextResponse.redirect(new URL(`/${locale}${targetPath}`, origin))
+  return redirectResponse
 }
