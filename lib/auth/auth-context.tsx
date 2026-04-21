@@ -115,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
+            console.log(`[AUTH] Buscando perfil para o usuário: ${userId}...`)
             const { data, error } = await supabase
                 .from('profiles')
                 .select(`
@@ -152,15 +153,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', userId)
                 .single()
 
-            if (error) return null
+            if (error) {
+                console.error(`[AUTH] Erro ao buscar perfil:`, error.message)
+                return null
+            }
 
             const rawRoles = (data.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
+            console.log(`[AUTH] Perfil carregado com sucesso. Roles detectadas:`, rawRoles)
             
             return {
                 ...data,
                 roles: rawRoles
             } as UserProfile
         } catch (error) {
+            console.error(`[AUTH] Erro inesperado no fetchProfile:`, error)
             return null
         }
     }, [supabase])
@@ -309,17 +315,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return '/dashboard'
     }, [profile])
 
-    const isAdmin = useMemo(() => profile?.roles?.includes('admin') ?? false, [profile])
+    const isAdmin = useMemo(() => {
+        return (claims?.role === 'admin') || (profile?.roles?.includes('admin') ?? false)
+    }, [claims, profile])
+
     const isMentor = useMemo(() => {
         if (isAdmin) return false
-        return profile?.roles?.includes('mentor') ?? false
-    }, [profile, isAdmin])
+        return (claims?.role === 'mentor') || (profile?.roles?.includes('mentor') ?? false)
+    }, [claims, profile, isAdmin])
+
     const isMentee = useMemo(() => {
         if (isAdmin) return false
-        return profile?.roles?.includes('mentee') ?? false
-    }, [profile, isAdmin])
-    const isVolunteer = useMemo(() => profile?.roles?.includes('volunteer') ?? false, [profile])
-    const isModerator = useMemo(() => profile?.roles?.includes('moderator') ?? false, [profile])
+        return (claims?.role === 'mentee') || (profile?.roles?.includes('mentee') ?? false)
+    }, [claims, profile, isAdmin])
+
+    const isVolunteer = useMemo(() => {
+        return (claims?.role === 'volunteer') || (profile?.roles?.includes('volunteer') ?? false)
+    }, [claims, profile])
+
+    const isModerator = useMemo(() => {
+        return (claims?.role === 'moderator') || (profile?.roles?.includes('moderator') ?? false)
+    }, [claims, profile])
     const isPending = useMemo(() => (profile?.roles?.length ?? 0) === 0, [profile])
 
     const hasRole = useCallback((role: string) => {

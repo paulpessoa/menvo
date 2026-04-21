@@ -66,10 +66,12 @@ export default function Header() {
   // Montagem LINEAR e SEGURA do menu para evitar erros de iterabilidade
   const userNavigation: any[] = []
   
-  if (isAuthenticated && profile) {
+  if (isAuthenticated) {
+    // Caso o profile ainda não tenha carregado, mostramos itens básicos que não dependem de roles
     if (isAdmin) {
         userNavigation.push({ name: t("header.userMenu.adminPanel"), href: "/admin", icon: Shield, color: "text-red-600" })
     }
+    
     userNavigation.push({ name: t("header.userMenu.dashboard"), href: "/dashboard", icon: LayoutDashboard, color: "text-primary" })
     userNavigation.push({ name: t("header.userMenu.profile"), href: "/profile", icon: User, color: "text-gray-700" })
     
