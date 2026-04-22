@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
       ? `🎉 Parabéns! Seu perfil de mentor foi aprovado. Agora você já pode configurar sua agenda e aparecer no diretório.`
       : `⚠️ Olá! Seu perfil de mentor precisa de alguns ajustes: ${notes || 'Veja os detalhes no seu perfil.'}`
 
-    const conversationId = await getOrCreateConversation(supabase as any, userId, adminId)
-    await sendMessage(supabase as any, conversationId, adminId, messageContent)
+    const conversationId = await getOrCreateConversation(supabase, userId, adminId)
+    await sendMessage(supabase, conversationId, adminId, messageContent)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

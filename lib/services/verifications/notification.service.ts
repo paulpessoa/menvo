@@ -30,14 +30,14 @@ export async function processVerification({
       verified_at: status === 'approved' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
       verified: status === 'approved'
-    } as any)
+    })
     .eq('id', userId)
 
   if (updateError) throw new Error(`Erro ao atualizar perfil: ${updateError.message}`)
 
   // 2. Send Chat Notification
   try {
-    const conversationId = await getOrCreateConversation(supabase as any, userId, adminId)
+    const conversationId = await getOrCreateConversation(supabase, userId, adminId)
     
     let messageContent = ''
     if (status === 'approved') {
@@ -50,9 +50,9 @@ export async function processVerification({
       messageContent += `\n\nNotas do administrador:\n${notes}`
     }
 
-    await sendMessage(supabase as any, conversationId, adminId, messageContent)
+    await sendMessage(supabase, conversationId, adminId, messageContent)
   } catch (chatError) {
-    // Silently log in server only
+    // Silently log in server only if necessary
   }
 
   return { success: true }
