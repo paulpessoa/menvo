@@ -19,7 +19,7 @@ export async function PATCH(
     const { status } = await request.json()
 
     if (!status) {
-      return errorResponse("Status is required", "BAD_REQUEST", 400)
+      return errorResponse("Status is required", "INVALID_INPUT", 400)
     }
 
     // Authenticate user
@@ -36,6 +36,7 @@ export async function PATCH(
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
+      .returns<any>()
       .single()
 
     const userRole = (roleData?.roles as any)?.name

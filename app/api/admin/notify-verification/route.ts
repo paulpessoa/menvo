@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
       .from('user_roles')
       .select('roles(name)')
       .eq('user_id', user.id)
+      .returns<any>()
       .single()
 
     if ((roleData?.roles as any)?.name !== 'admin') {

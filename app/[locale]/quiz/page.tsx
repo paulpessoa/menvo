@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -41,14 +41,15 @@ export default function QuizPage() {
           future_vision: data.futureVision,
           share_knowledge: data.shareKnowledge,
           personal_life_help: data.personalLifeHelp
-        })
+        } as any)
         .select()
-        .returns<any>()
         .single()
 
       if (error) {
         throw error
       }
+
+      const res = response as any;
 
       toast({
         title: t('quiz_form.submit_success_title'),
@@ -56,18 +57,18 @@ export default function QuizPage() {
       })
 
       // Call Edge Function to process with AI
-      const { error: analysisError } =
+      try {
         await supabase.functions.invoke("analyze-quiz", {
-          body: { responseId: response.id }
+          body: { responseId: res.id }
         })
-
-      if (analysisError) {
-        // Silently handle
+      } catch (analysisError) {
+          // ignore
       }
 
       // Redirect to results page with response ID
-      router.push(`/quiz/results/${response.id}`)
+      router.push(`/quiz/results/${res.id}`)
     } catch (error) {
+      console.error("Error submitting quiz:", error)
       toast({
         title: t('quiz_form.submit_error_title'),
         description: t('quiz_form.submit_error_description'),

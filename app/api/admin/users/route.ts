@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
+      .returns<any>()
       .single()
 
     const userRole = (roleData?.roles as any)?.name

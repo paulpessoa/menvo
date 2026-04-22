@@ -30,6 +30,7 @@ export async function GET(
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
+      .returns<any>()
       .single()
 
     const userRole = (roleData?.roles as any)?.name
@@ -111,6 +112,7 @@ export async function PATCH(
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
+      .returns<any>()
       .single()
 
     const userRole = (roleData?.roles as any)?.name

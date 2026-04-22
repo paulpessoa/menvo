@@ -71,7 +71,9 @@ export default function QuizResultsPage() {
     const [sendingEmail, setSendingEmail] = useState(false)
 
     useEffect(() => {
-        loadResults()
+        if (params.id) {
+            loadResults()
+        }
     }, [params.id])
 
     const handleSendEmail = async () => {
@@ -127,6 +129,7 @@ export default function QuizResultsPage() {
     }
 
     const loadResults = async () => {
+        if (!params.id) return
         try {
             const { createClient } = await import("@/lib/utils/supabase/client")
             const supabase = createClient()
@@ -134,20 +137,22 @@ export default function QuizResultsPage() {
             const { data, error } = await supabase
                 .from("quiz_responses")
                 .select("*")
-                .eq("id", params.id)
-                .returns<any>()
+                .eq("id", params.id as string)
                 .single()
 
             if (error) throw error
 
+            const res = data as any;
+
             // Wait for processing if not done yet
-            if (!data.processed_at) {
+            if (!res.processed_at) {
                 setTimeout(loadResults, 2000) // Retry after 2 seconds
                 return
             }
 
-            setResponse(data)
+            setResponse(res as QuizResponse)
         } catch (error) {
+            console.error("Error loading results:", error)
             toast({
                 title: t('quiz_results.error_loading_results_toast_title'),
                 description: t('quiz_results.error_loading_results_toast_description'),
