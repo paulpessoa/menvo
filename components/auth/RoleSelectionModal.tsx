@@ -4,14 +4,15 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, GraduationCap, Heart, CheckCircle } from "lucide-react"
-import { useAuth } from "@/lib/auth"
+import { Users, GraduationCap, CheckCircle } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 
 interface RoleSelectionModalProps {
   open: boolean
   onClose: () => void
+  userId: string
+  onSuccess?: () => void
 }
 
 const roles = [
@@ -21,12 +22,6 @@ const roles = [
     description: "Busco orientação e acompanhamento para crescer profissionalmente",
     icon: Users,
     color: "bg-blue-100 text-blue-800",
-    benefits: [
-      "Acesso a mentores experientes",
-      "Sessões de mentoria personalizadas",
-      "Networking profissional",
-      "Desenvolvimento de carreira",
-    ],
   },
   {
     id: "mentor",
@@ -34,52 +29,20 @@ const roles = [
     description: "Quero compartilhar conhecimento e ajudar outros profissionais",
     icon: GraduationCap,
     color: "bg-green-100 text-green-800",
-    benefits: [
-      "Compartilhar experiência",
-      "Impactar carreiras",
-      "Expandir rede de contatos",
-      "Desenvolver habilidades de liderança",
-    ],
   },
-  // {
-  //   id: "volunteer",
-  //   name: "Voluntário",
-  //   description: "Desejo contribuir com atividades voluntárias e causas sociais",
-  //   icon: Heart,
-  //   color: "bg-purple-100 text-purple-800",
-  //   benefits: [
-  //     "Participar de projetos sociais",
-  //     "Registrar horas de voluntariado",
-  //     "Conectar com ONGs",
-  //     "Fazer a diferença na comunidade",
-  //   ],
-  // },
 ]
 
-export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
+export function RoleSelectionModal({ open, onClose, userId, onSuccess }: RoleSelectionModalProps) {
   const [selectedRole, setSelectedRole] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
-  const { user, refreshProfile } = useAuth()
   const supabase = createClient()
 
   const handleRoleSelection = async () => {
-    if (!selectedRole || !user) return
+    if (!selectedRole || !userId) return
 
     setIsLoading(true)
     try {
-      // Update user profile with selected role
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          role: selectedRole,
-          status: selectedRole === "mentor" ? "pending" : "active",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id)
-
-      if (profileError) throw profileError
-
-      // Assign role in user_roles table
+      // 1. Buscar ID da role
       const { data: roleData, error: roleQueryError } = await supabase
         .from("roles")
         .select("id")
@@ -88,34 +51,22 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
 
       if (roleQueryError) throw roleQueryError
 
-      // Remove existing primary roles
-      await supabase.from("user_roles").update({ is_primary: false }).eq("user_id", user.id)
-
-      // Check if role already exists
-      const { data: existingRole } = await supabase
+      // 2. Criar atribuição de role
+      const { error: insertError } = await supabase
         .from("user_roles")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("role_id", roleData.id)
-        .single()
+        .insert({
+          user_id: userId,
+          role_id: roleData.id
+        } as any)
 
-      if (existingRole) {
-        // Update existing role to primary
-        await supabase.from("user_roles").update({ is_primary: true }).eq("id", existingRole.id)
-      } else {
-        // Create new role assignment
-        await supabase.from("user_roles").insert({
-          user_id: user.id,
-          role_id: roleData.id,
-          is_primary: true,
-        })
-      }
+      if (insertError) throw insertError
 
-      toast.success("Perfil atualizado com sucesso!")
+      toast.success("Perfil configurado com sucesso!")
+      if (onSuccess) onSuccess()
       onClose()
     } catch (error) {
       console.error("Erro ao selecionar role:", error)
-      toast.error("Erro ao atualizar perfil. Tente novamente.")
+      toast.error("Erro ao atualizar perfil.")
     } finally {
       setIsLoading(false)
     }
@@ -125,9 +76,9 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Escolha seu perfil</DialogTitle>
+          <DialogTitle>Como você deseja usar a Menvo?</DialogTitle>
           <DialogDescription>
-            Selecione como você gostaria de participar da nossa plataforma. Você poderá alterar isso depois.
+            Escolha o perfil que melhor descreve seu objetivo atual.
           </DialogDescription>
         </DialogHeader>
 
@@ -135,7 +86,7 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
           {roles.map((role) => (
             <Card
               key={role.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${selectedRole === role.id ? "ring-2 ring-primary" : ""
+              className={`cursor-pointer transition-all hover:shadow-md ${selectedRole === role.id ? "ring-2 ring-primary border-primary" : ""
                 }`}
               onClick={() => setSelectedRole(role.id)}
             >
@@ -149,19 +100,6 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
                 <CardTitle className="text-lg">{role.name}</CardTitle>
                 <CardDescription>{role.description}</CardDescription>
               </CardHeader>
-              {/* <CardContent>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Benefícios:</p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    {role.benefits.map((benefit, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <div className="w-1 h-1 bg-current rounded-full" />
-                        {benefit}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent> */}
             </Card>
           ))}
         </div>
@@ -171,7 +109,7 @@ export function RoleSelectionModal({ open, onClose }: RoleSelectionModalProps) {
             Cancelar
           </Button>
           <Button onClick={handleRoleSelection} disabled={!selectedRole || isLoading}>
-            {isLoading ? "Salvando..." : "Confirmar Seleção"}
+            {isLoading ? "Salvando..." : "Confirmar e Começar"}
           </Button>
         </div>
       </DialogContent>

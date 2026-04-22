@@ -1,137 +1,101 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/utils/supabase/server';
-import { sendAppointmentRequest } from '@/lib/email/brevo';
-import crypto from 'crypto';
+import { createClient } from "@/lib/utils/supabase/server"
+import { NextRequest, NextResponse } from "next/server"
+import {
+  errorResponse,
+  handleApiError,
+  successResponse
+} from "@/lib/api/error-handler"
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = await createClient()
 
-    // Verificar autenticação
+    // 1. Verificar autenticação
     const {
       data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+      error: authError
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+      return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
-    // Parse do body
-    const body = await request.json();
-    const { mentorId, scheduledAt, duration, message } = body;
+    const body = await request.json()
+    const { mentor_id, scheduled_at, duration_minutes, mentorship_topics, notes_mentee } = body
 
-    // Validação básica
-    if (!mentorId || !scheduledAt || !duration || !message) {
-      return NextResponse.json(
-        { error: 'Campos obrigatórios faltando' },
-        { status: 400 }
-      );
+    if (!mentor_id || !scheduled_at) {
+      return errorResponse("Missing required fields", "INVALID_INPUT", 400)
     }
 
-    // Validar duração (apenas 45 minutos)
-    if (duration !== 45) {
-      return NextResponse.json(
-        { error: 'Duração deve ser até 60 minutos' },
-        { status: 400 }
-      );
+    // 2. Verificar se o mentor existe e está verificado
+    const { data: mentor, error: mentorError } = await supabase
+      .from("profiles")
+      .select("id, verified")
+      .eq("id", mentor_id)
+      .single()
+
+    if (mentorError || !mentor) {
+      return errorResponse("Mentor not found", "NOT_FOUND", 404)
     }
 
-    // Impedir que mentor agende consigo mesmo
-    if (mentorId === user.id) {
-      return NextResponse.json(
-        { error: 'Você não pode agendar uma mentoria consigo mesmo' },
-        { status: 400 }
-      );
+    if (!mentor.verified) {
+      return errorResponse("Mentor is not verified", "FORBIDDEN", 403)
     }
 
-    // Buscar informações do mentor
-    const { data: mentorProfile, error: mentorError } = await supabase
-      .from('profiles')
-      .select('first_name, last_name, email')
-      .eq('id', mentorId)
-      .single();
-
-    if (mentorError || !mentorProfile) {
-      console.error('[APPOINTMENT] Erro ao buscar mentor:', mentorError);
-      return NextResponse.json(
-        { error: 'Mentor não encontrado' },
-        { status: 404 }
-      );
-    }
-
-    // Buscar informações do mentee (usuário atual)
-    const { data: menteeProfile, error: menteeError } = await supabase
-      .from('profiles')
-      .select('first_name, last_name, email')
-      .eq('id', user.id)
-      .single();
-
-    if (menteeError || !menteeProfile) {
-      console.error('[APPOINTMENT] Erro ao buscar mentee:', menteeError);
-      return NextResponse.json(
-        { error: 'Perfil do usuário não encontrado' },
-        { status: 404 }
-      );
-    }
-
-    const mentorFullName = `${mentorProfile.first_name} ${mentorProfile.last_name}`.trim();
-    const menteeFullName = `${menteeProfile.first_name} ${menteeProfile.last_name}`.trim();
-
-    // Gerar token de ação seguro
-    const actionToken = crypto.randomBytes(32).toString('hex');
-
-    // Criar appointment no banco
+    // 3. Criar agendamento
     const { data: appointment, error: insertError } = await supabase
-      .from('appointments')
+      .from("appointments")
       .insert({
-        mentor_id: mentorId,
+        mentor_id,
         mentee_id: user.id,
-        scheduled_at: scheduledAt,
-        duration_minutes: duration,
-        status: 'pending',
-        notes_mentee: message, // Comentários/notas do mentee
-        action_token: actionToken,
+        scheduled_at,
+        duration_minutes: duration_minutes || 60,
+        mentorship_topics: mentorship_topics || [],
+        notes_mentee: notes_mentee || "",
+        status: "pending"
       })
-      .select()
-      .single();
+      .select(`
+        *,
+        mentor:profiles!mentor_id(full_name, avatar_url),
+        mentee:profiles!mentee_id(full_name, avatar_url)
+      `)
+      .returns<any[]>()
+      .single()
 
-    if (insertError) {
-      console.error('[APPOINTMENT] Erro ao criar agendamento:', insertError);
-      return NextResponse.json(
-        { 
-          error: 'Erro ao criar agendamento',
-          details: insertError.message,
-          code: insertError.code 
-        },
-        { status: 500 }
-      );
-    }
+    if (insertError) throw insertError
 
-    // Enviar email ao mentor
-    try {
-      await sendAppointmentRequest({
-        mentorEmail: mentorProfile.email,
-        mentorName: mentorFullName,
-        menteeName: menteeFullName,
-        scheduledAt,
-        message,
-        token: actionToken,
-      });
-    } catch (emailError) {
-      console.error('[APPOINTMENT] ⚠️ Erro ao enviar email, mas agendamento foi criado:', emailError);
-      // Não falhar a requisição se o email falhar
-    }
-
-    return NextResponse.json({
-      success: true,
-      appointmentId: appointment.id,
-    });
+    return successResponse(appointment, "Mentorship scheduled successfully", 201)
   } catch (error) {
-    console.error('[APPOINTMENT] Erro inesperado:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    return handleApiError(error)
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    const { searchParams } = new URL(request.url)
+    const mentorId = searchParams.get("mentorId")
+    const menteeId = searchParams.get("menteeId")
+
+    let query = supabase
+      .from("appointments")
+      .select(`
+        *,
+        mentor:profiles!mentor_id(full_name, avatar_url),
+        mentee:profiles!mentee_id(full_name, avatar_url)
+      `)
+
+    if (mentorId) query = query.eq("mentor_id", mentorId)
+    if (menteeId) query = query.eq("mentee_id", menteeId)
+
+    const { data, error } = await query
+      .order("scheduled_at", { ascending: false })
+      .returns<any[]>()
+
+    if (error) throw error
+
+    return successResponse(data)
+  } catch (error) {
+    return handleApiError(error)
   }
 }
