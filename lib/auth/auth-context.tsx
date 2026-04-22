@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     last_name: lastName,
                     full_name: `${firstName} ${lastName}`
                 },
-                emailRedirectTo: `${window.location.origin}/api/auth/callback`
+                emailRedirectTo: `${window.location.origin}/auth/callback`
             }
         })
         if (error) throw error

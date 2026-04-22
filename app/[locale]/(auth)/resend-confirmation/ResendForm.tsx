@@ -43,7 +43,7 @@ export function ResendForm({ initialEmail = "" }: { initialEmail?: string }) {
         type: 'signup',
         email: email.toLowerCase().trim(),
         options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?type=signup`
+          emailRedirectTo: `${window.location.origin}/auth/callback?type=signup`
         }
       })
 

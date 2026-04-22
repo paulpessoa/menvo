@@ -3,8 +3,8 @@ import { cookies } from "next/headers"
 import { createServerClient } from "@supabase/ssr"
 
 /**
- * Root callback route to handle redirects from Supabase that don't have a locale.
- * Redirects to the central API callback.
+ * Single Source of Truth for Auth Callbacks.
+ * Handles PKCE code exchange, role-based redirection, and locale preservation.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -12,17 +12,21 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type")
   const next = searchParams.get("next") || "/dashboard"
 
-  const locale = request.cookies.get("NEXT_LOCALE")?.value || "pt-BR"
+  // 1. Detect Locale (Priority: Cookie -> Default)
+  const cookieStore = await cookies()
+  const locale = cookieStore.get("NEXT_LOCALE")?.value || "pt-BR"
 
-  const targetPath =
-    type === "recovery"
-      ? `/${locale}/update-password`
-      : `/${locale}${next.startsWith("/") ? next : "/" + next}`
+  // 2. Prepare Base Redirect URL
+  const getTargetUrl = (path: string) => {
+    const cleanPath = path.startsWith("/") ? path : `/${path}`
+    return new URL(`/${locale}${cleanPath}`, origin)
+  }
 
-  // Cria a response ANTES para poder setar cookies nela
-  const redirectResponse = NextResponse.redirect(new URL(targetPath, origin))
+  // Handle password recovery flow
+  if (type === "recovery") {
+    return NextResponse.redirect(getTargetUrl("/update-password"))
+  }
 
-  // Se houver código PKCE, precisamos trocar por sessão
   if (code) {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,22 +37,50 @@ export async function GET(request: NextRequest) {
             return request.cookies.getAll()
           },
           setAll(cookiesToSet) {
-            // Agora grava os cookies na response de verdade
             cookiesToSet.forEach(({ name, value, options }) =>
-              redirectResponse.cookies.set(name, value, options)
+              cookieStore.set(name, value, options)
             )
           }
         }
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (error) {
-      return NextResponse.redirect(
-        new URL(`/${locale}/login?error=auth_failed`, origin)
-      )
+    // 3. Exchange code for session
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (exchangeError) {
+      console.error("Auth exchange error:", exchangeError)
+      return NextResponse.redirect(getTargetUrl(`/login?error=auth_failed`))
+    }
+
+    // 4. Fetch Profile & Roles for smart redirection
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*, user_roles!inner(roles(name))")
+        .eq("id", user.id)
+        .maybeSingle()
+
+      // Redirect based on roles
+      if (profile) {
+        const roles = (profile.user_roles as any[])?.map((ur: any) => ur.roles?.name) || []
+        
+        if (roles.includes("admin")) {
+          return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/admin" : next))
+        }
+        
+        if (roles.includes("mentor")) {
+          return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentor" : next))
+        }
+      } else {
+        // First time login or profile not setup
+        return NextResponse.redirect(getTargetUrl(`/auth/role-selection?next=${next}`))
+      }
     }
   }
 
-  return redirectResponse
+  // Final fallback
+  return NextResponse.redirect(getTargetUrl(next))
 }
