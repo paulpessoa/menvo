@@ -2,7 +2,7 @@
  * Community Event Types
  */
 
-export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'hackathon' | 'other';
+export type EventType = 'workshop' | 'webinar' | 'meetup' | 'conference' | 'hackathon' | 'course' | 'lecture' | 'seminar' | 'networking' | 'other';
 export type EventFormat = 'in-person' | 'virtual' | 'hybrid';
 export type EventSource = 'internal' | 'external';
 
@@ -37,9 +37,13 @@ export interface EventFilters {
   types: EventType[];
   formats: EventFormat[];
   sources: EventSource[];
+  isFree?: boolean;
+  priceRange: [number, number];
   dateRange: {
     from: Date | undefined;
     to: Date | undefined;
+    start?: string;
+    end?: string;
   };
   tags: string[];
 }
