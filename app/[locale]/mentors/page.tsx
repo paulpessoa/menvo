@@ -28,15 +28,12 @@ import {
   Briefcase,
   Heart,
   Loader2,
-  Building2,
-  Plus
+  Building2
 } from "lucide-react"
 
 import { useAuth } from "@/hooks/useAuth"
-import { SuggestionModal } from "@/components/mentors/SuggestionModal"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
-import { useMentorSuggestion } from "@/hooks/useMentorSuggestion"
 import { useFavorites } from "@/hooks/useFavorites"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
@@ -118,8 +115,6 @@ export default function MentorsPage() {
 
   const supabase = createClient()
   const { user } = useAuth()
-  const { isModalOpen, openModal, closeModal, handleSubmit } =
-    useMentorSuggestion()
   const { favorites, toggleFavorite } = useFavorites(user?.id)
 
   const fetchMentors = async (isInitial = false) => {
@@ -314,14 +309,6 @@ export default function MentorsPage() {
   const handleLoadMore = () => {
     setPage((prev) => prev + 1)
     fetchMentors(false)
-  }
-
-  const handleSuggestClick = () => {
-    if (!user) {
-      toast.info("Você precisa estar logado para sugerir temas")
-      return
-    }
-    openModal()
   }
 
   return (
@@ -592,10 +579,6 @@ export default function MentorsPage() {
             >
               {t("clearFilters")}
             </Button>
-            <Button onClick={handleSuggestClick} className="gap-2">
-              <Plus className="w-4 h-4" />
-              {t("suggestTopic")}
-            </Button>
           </div>
         </div>
       ) : (
@@ -633,15 +616,6 @@ export default function MentorsPage() {
           )}
         </>
       )}
-
-      {/* Suggestion Modal Triggered by Hook */}
-      <SuggestionModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSubmit={(suggestion) => handleSubmit(user?.id || "", suggestion)}
-        userId={user?.id || null}
-        availableInclusionTags={availableFilters.inclusiveTags}
-      />
     </div>
   )
 }
