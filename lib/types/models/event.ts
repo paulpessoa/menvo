@@ -12,7 +12,9 @@ export interface Event {
   description: string | null;
   date: string;
   start_date: string;
+  end_date?: string; // Adicionado para multi-day
   start_time: string | null;
+  end_time?: string | null; // Adicionado
   time: string | null;
   location: string | null;
   format: EventFormat;
@@ -22,6 +24,8 @@ export interface Event {
   image_url: string | null;
   url: string | null;
   organizer_id: string | null;
+  organizer?: string; // Adicionado para compatibilidade UI
+  organizer_avatar?: string; // Adicionado para compatibilidade UI
   is_verified: boolean;
   is_free: boolean;
   price?: number | null;

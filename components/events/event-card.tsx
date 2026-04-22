@@ -12,7 +12,7 @@ interface EventCardProps {
   event: Event
 }
 
-const eventTypeColors = {
+const eventTypeColors: Record<string, string> = {
   course: "bg-blue-100 text-blue-800",
   workshop: "bg-green-100 text-green-800",
   hackathon: "bg-purple-100 text-purple-800",
@@ -21,6 +21,7 @@ const eventTypeColors = {
   webinar: "bg-cyan-100 text-cyan-800",
   conference: "bg-indigo-100 text-indigo-800",
   networking: "bg-pink-100 text-pink-800",
+  meetup: "bg-teal-100 text-teal-800",
 }
 
 const formatTypeColors = {
@@ -31,7 +32,7 @@ const formatTypeColors = {
 
 export default function EventCard({ event }: EventCardProps) {
   const eventDate = new Date(event.start_date)
-  const isMultiDay = event.start_date !== event.end_date
+  const isMultiDay = event.end_date && event.start_date !== event.end_date
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200">
@@ -44,7 +45,7 @@ export default function EventCard({ event }: EventCardProps) {
             className="object-cover"
           />
           <div className="absolute top-3 left-3 flex gap-2">
-            <Badge className={eventTypeColors[event.type]}>
+            <Badge className={eventTypeColors[event.type] || "bg-gray-100"}>
               {event.type.charAt(0).toUpperCase() + event.type.slice(1)}
             </Badge>
             {event.source === "external" && (
@@ -77,14 +78,14 @@ export default function EventCard({ event }: EventCardProps) {
               <Calendar className="h-4 w-4" />
               <span>
                 {format(eventDate, "MMM dd, yyyy")}
-                {isMultiDay && ` - ${format(new Date(event.end_date), "MMM dd, yyyy")}`}
+                {isMultiDay && event.end_date && ` - ${format(new Date(event.end_date), "MMM dd, yyyy")}`}
               </span>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
               <span>
-                {event.start_time} - {event.end_time}
+                {event.start_time} {event.end_time ? `- ${event.end_time}` : ""}
               </span>
             </div>
 
@@ -107,18 +108,18 @@ export default function EventCard({ event }: EventCardProps) {
           <div className="flex items-center gap-2">
             <Avatar className="h-6 w-6">
               <AvatarImage src={event.organizer_avatar || "/placeholder.svg"} />
-              <AvatarFallback className="text-xs">{event.organizer.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-xs">{(event.organizer || "U").charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className="text-sm text-muted-foreground">by {event.organizer}</span>
+            <span className="text-sm text-muted-foreground">by {event.organizer || "Menvo"}</span>
           </div>
 
           <div className="flex flex-wrap gap-1">
-            {event.tags.slice(0, 3).map((tag) => (
+            {event.tags && event.tags.slice(0, 3).map((tag) => (
               <Badge key={tag} variant="secondary" className="text-xs">
                 {tag}
               </Badge>
             ))}
-            {event.tags.length > 3 && (
+            {event.tags && event.tags.length > 3 && (
               <Badge variant="secondary" className="text-xs">
                 +{event.tags.length - 3}
               </Badge>

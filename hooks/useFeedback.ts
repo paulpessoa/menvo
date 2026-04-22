@@ -8,79 +8,52 @@ export function useFeedback() {
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
-  const submitFeedback = async (feedback: {
+  const submitFeedback = async (data: {
     type: string;
     message: string;
     rating?: number;
+    user_id?: string | null;
     page_url?: string;
   }) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('feedback')
         .insert({
-          ...feedback,
-          user_id: user?.id || null,
+          user_id: data.user_id || null,
+          type: data.type,
+          message: data.message,
+          rating: data.rating || 0,
+          page_url: data.page_url || window.location.pathname,
           created_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+        } as any);
 
-      if (error) {
-        console.error('Erro ao enviar feedback:', error);
-        toast.error('Erro ao enviar feedback');
-        return { feedback: null, error };
-      }
+      if (error) throw error;
 
-      toast.success('Feedback enviado com sucesso');
-      return { feedback: data, error: null };
-    } catch (error) {
-      console.error('Erro inesperado ao enviar feedback:', error);
-      toast.error('Erro inesperado ao enviar feedback');
-      return { feedback: null, error };
+      toast.success('Feedback enviado com sucesso!');
+      return { success: true };
+    } catch (error: any) {
+      console.error('Erro ao enviar feedback:', error);
+      toast.error('Erro ao enviar feedback. Tente novamente.');
+      return { success: false, error };
     } finally {
       setLoading(false);
     }
   };
 
-  const getFeedback = async (filters: {
-    type?: string;
-    limit?: number;
-    offset?: number;
-  } = {}) => {
+  const getFeedback = async (filters?: any) => {
+    setLoading(true);
     try {
-      setLoading(true);
+      let query = supabase.from('feedback').select('*').order('created_at', { ascending: false });
       
-      let query = supabase
-        .from('feedback')
-        .select('*', { count: 'exact' });
+      if (filters?.type) query = query.eq('type', filters.type);
+      if (filters?.rating) query = query.eq('rating', filters.rating);
 
-      if (filters.type) {
-        query = query.eq('type', filters.type);
-      }
-
-      if (filters.limit) {
-        const from = filters.offset || 0;
-        const to = from + filters.limit - 1;
-        query = query.range(from, to);
-      }
-
-      query = query.order('created_at', { ascending: false });
-
-      const { data, error, count } = await query;
-
-      if (error) {
-        console.error('Erro ao buscar feedback:', error);
-        return { feedback: [], count: 0, error };
-      }
-
-      return { feedback: data || [], count: count || 0, error: null };
-    } catch (error) {
-      console.error('Erro inesperado ao buscar feedback:', error);
-      return { feedback: [], count: 0, error };
+      const { data, error } = await query;
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error: any) {
+      return { data: null, error };
     } finally {
       setLoading(false);
     }
@@ -88,28 +61,22 @@ export function useFeedback() {
 
   const getFeedbackStats = async () => {
     try {
-      const { data, error } = await supabase
-        .from('feedback')
-        .select('type, rating');
-
-      if (error) {
-        console.error('Erro ao buscar estatísticas de feedback:', error);
-        return { stats: null, error };
-      }
+      const { data, error } = await supabase.from('feedback').select('type, rating');
+      if (error) throw error;
 
       const stats = {
         total: data?.length || 0,
-        byType: data?.reduce((acc, item) => {
+        byType: (data || []).reduce((acc: any, item: any) => {
           acc[item.type] = (acc[item.type] || 0) + 1;
           return acc;
-        }, {} as Record<string, number>) || {},
-        averageRating: data?.filter(item => item.rating)
-          .reduce((sum, item, _, arr) => sum + item.rating / arr.length, 0) || 0,
+        }, {}),
+        averageRating: (data || []).filter((item: any) => item.rating).length > 0
+          ? (data || []).reduce((sum: number, item: any) => sum + (item.rating || 0), 0) / (data || []).length
+          : 0,
       };
 
       return { stats, error: null };
     } catch (error) {
-      console.error('Erro inesperado ao buscar estatísticas:', error);
       return { stats: null, error };
     }
   };
