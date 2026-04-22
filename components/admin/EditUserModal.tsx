@@ -87,11 +87,20 @@ export function EditUserModal({
     if (!user) return
     setLoading(true)
     try {
-      // 1. Atualizar Perfil
-      await adminService.updateUserProfile(user.id, formData)
+      // Usar a nova API de Admin que tem Service Role
+      const response = await fetch(`/api/admin/users/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          updates: formData,
+          roles: selectedRoles
+        })
+      })
 
-      // 2. Atualizar Roles
-      await adminService.setUserRoles(user.id, selectedRoles)
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao salvar")
+      }
 
       // 3. Notificar por E-mail se solicitado
       if (
@@ -116,6 +125,36 @@ export function EditUserModal({
     } catch (error: any) {
       console.error("Error updating user:", error)
       toast.error("Erro ao atualizar: " + error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!user) return
+    
+    const confirmName = prompt(`Para deletar PERMANENTEMENTE o usuário ${user.email}, digite "DELETAR" abaixo:`)
+    if (confirmName !== "DELETAR") {
+      if (confirmName !== null) toast.error("Exclusão cancelada. Você não digitou a palavra de confirmação.")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}`, {
+        method: "DELETE"
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Erro ao deletar")
+      }
+
+      toast.success("Usuário removido permanentemente!")
+      onSuccess()
+      onClose()
+    } catch (error: any) {
+      toast.error("Erro ao deletar: " + error.message)
     } finally {
       setLoading(false)
     }
@@ -437,30 +476,41 @@ export function EditUserModal({
           </div>
         </div>
 
-        <DialogFooter className="border-t pt-6 gap-3">
+        <DialogFooter className="border-t pt-6 flex flex-col sm:flex-row justify-between gap-3">
           <Button
-            variant="outline"
-            onClick={onClose}
+            variant="destructive"
+            onClick={handleDelete}
             disabled={loading}
-            className="px-8"
+            className="px-6 gap-2"
           >
-            Cancelar
+            <Trash2 className="h-4 w-4" /> Deletar Usuário
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={loading}
-            className="px-8 bg-primary hover:bg-primary/90"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" /> Salvar e Aplicar Alterações
-              </>
-            )}
-          </Button>
+          
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+              className="px-8"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={loading}
+              className="px-8 bg-primary hover:bg-primary/90"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" /> Salvar Alterações
+                </>
+              )}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

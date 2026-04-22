@@ -96,6 +96,7 @@ export default function AdminUsersPage() {
           bio,
           created_at,
           slug,
+          cv_url,
           invite_sent_at,
           institution,
           course,
