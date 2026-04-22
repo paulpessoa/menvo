@@ -34,32 +34,39 @@ export async function POST(request: NextRequest) {
     if (!mentors || mentors.length === 0) {
       return NextResponse.json({ 
         no_match: true, 
-        justification: "Ainda não temos mentores disponíveis na plataforma." 
-      })
-    }
+        const supabase = await createClient()
+        const { query, debug } = await request.json()
 
-    // 3. Chamar o Groq para fazer o match
-    const matchResult = await groqService.findOptimalMentors(query, mentors)
+        if (!query || query.length < 5) {
+        ...
+        // 3. Chamar o Groq para fazer o match
+        const matchResult = await groqService.findOptimalMentors(query, mentors)
 
-    // 4. Se não houve match ou se queremos trackear a demanda, salvamos no banco
-    if (matchResult.no_match) {
-      await supabase.from('ai_missing_demands').insert({
-        user_id: user?.id || null,
-        query_text: query,
-        suggested_topics: matchResult.suggested_topics,
-        matched_count: 0
-      })
-    } else {
-       // Log da demanda mesmo com sucesso para saber o que as pessoas buscam
-       await supabase.from('ai_missing_demands').insert({
-        user_id: user?.id || null,
-        query_text: query,
-        suggested_topics: matchResult.suggested_topics,
-        matched_count: matchResult.mentor_ids.length
-      })
-    }
+        // 4. Retornar dados (com debug se solicitado)
+        const finalResponse = {
+            ...matchResult,
+            ...(debug ? { debug_context: mentors } : {})
+        }
 
-    return NextResponse.json(matchResult)
+        // 5. Se não houve match ou se queremos trackear a demanda, salvamos no banco
+        if (matchResult.no_match) {
+          await supabase.from('ai_missing_demands').insert({
+            user_id: user?.id || null,
+            query_text: query,
+            suggested_topics: matchResult.suggested_topics,
+            matched_count: 0
+          })
+        } else {
+           // Log da demanda mesmo com sucesso para saber o que as pessoas buscam
+           await supabase.from('ai_missing_demands').insert({
+            user_id: user?.id || null,
+            query_text: query,
+            suggested_topics: matchResult.suggested_topics,
+            matched_count: matchResult.mentor_ids.length
+          })
+        }
+
+        return NextResponse.json(finalResponse)
 
   } catch (error: any) {
     console.error("💥 Erro na API de AI Match:", error)
