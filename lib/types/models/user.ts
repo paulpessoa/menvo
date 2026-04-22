@@ -46,6 +46,7 @@ export interface UserProfile {
   updated_at: string;
   roles: UserRole[];
   is_public: boolean;
+  timezone?: string | null;
 }
 
 /**

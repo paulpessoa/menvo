@@ -135,6 +135,7 @@ export default function QuizResultsPage() {
                 .from("quiz_responses")
                 .select("*")
                 .eq("id", params.id)
+                .returns<any>()
                 .single()
 
             if (error) throw error
@@ -147,7 +148,6 @@ export default function QuizResultsPage() {
 
             setResponse(data)
         } catch (error) {
-            console.error("Error loading results:", error)
             toast({
                 title: t('quiz_results.error_loading_results_toast_title'),
                 description: t('quiz_results.error_loading_results_toast_description'),

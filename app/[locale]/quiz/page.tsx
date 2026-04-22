@@ -43,6 +43,7 @@ export default function QuizPage() {
           personal_life_help: data.personalLifeHelp
         })
         .select()
+        .returns<any>()
         .single()
 
       if (error) {
@@ -55,20 +56,18 @@ export default function QuizPage() {
       })
 
       // Call Edge Function to process with AI
-      const { data: analysisData, error: analysisError } =
+      const { error: analysisError } =
         await supabase.functions.invoke("analyze-quiz", {
           body: { responseId: response.id }
         })
 
       if (analysisError) {
-        console.error("Error analyzing quiz:", analysisError)
-        // Still redirect even if analysis fails - it can be retried
+        // Silently handle
       }
 
       // Redirect to results page with response ID
       router.push(`/quiz/results/${response.id}`)
     } catch (error) {
-      console.error("Error submitting quiz:", error)
       toast({
         title: t('quiz_form.submit_error_title'),
         description: t('quiz_form.submit_error_description'),

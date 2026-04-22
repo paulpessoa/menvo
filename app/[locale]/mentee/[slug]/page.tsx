@@ -27,7 +27,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
         .from('profiles')
         .select('*')
         .eq('slug', slug)
-        .returns<MenteeProfile>()
+        .returns<any>()
         .single()
 
     if (error || !mentee) {
