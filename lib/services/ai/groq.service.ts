@@ -45,9 +45,10 @@ export const groqService = {
 
       REGRAS DE OURO:
       1. NÃO seja literal. Se o usuário quer "ajuda com código", pense em mentores de "Software", "Engenharia" ou "Desenvolvimento".
-      2. Se o usuário parece perdido, sugira mentores de "Carreira" ou "Soft Skills".
-      3. Retorne no máximo 3 mentores.
-      4. A JUSTIFICATIVA deve ser humana: "Sugiro o Mentor X porque ele tem experiência em Y, que é exatamente o que você precisa para resolver Z".
+      2. IMPORTANTE: O nome do mentor (field 'name') muitas vezes contém a sua profissão ou especialidade (ex: "Fulano Chaveiro"). Use isso para o match!
+      3. Se o usuário quer estudar "Jornalismo", e você vir alguém de "Comunicação Social", isso é um match perfeito!
+      4. Retorne no máximo 3 mentores.
+      5. A JUSTIFICATIVA deve ser humana: "Sugiro o Mentor X porque ele tem experiência em Y, que é exatamente o que você precisa para resolver Z".
       5. Se houver QUALQUER mentor minimamente relacionado, defina no_match como false.
 
       FORMATO OBRIGATÓRIO DE RESPOSTA (JSON):

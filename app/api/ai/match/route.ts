@@ -16,12 +16,20 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     // 2. Buscar contexto dos mentores (Apenas os públicos e verificados)
+    // Primeiro, buscamos mentores que batem com as palavras-chave da dúvida para garantir que estejam no contexto
+    const keywords = query.split(' ').filter((w: string) => w.length > 3)
+    let keywordFilter = ''
+    if (keywords.length > 0) {
+      keywordFilter = keywords.map((k: string) => `full_name.ilike.%${k}%,job_title.ilike.%${k}%,bio.ilike.%${k}%`).join(',')
+    }
+
     const { data: mentors } = await supabase
       .from('mentors_view')
       .select('id, full_name, job_title, mentor_skills, bio')
       .eq('is_public', true)
       .eq('verified', true)
-      .limit(50) // Pegamos os top 50 para não estourar contexto
+      .order('created_at', { ascending: false })
+      .limit(100) // Aumentamos para 100 para dar mais chances
 
     if (!mentors || mentors.length === 0) {
       return NextResponse.json({ 
