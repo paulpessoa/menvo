@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { MessageCircle, Linkedin, Github, AlertCircle, X } from "lucide-react"
+import { MessageCircle, Linkedin, Github, AlertCircle, X, Eye } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog"
-import Link from "next/link"
+import { Link, useRouter } from "@/i18n/routing"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useAuth } from "@/lib/auth"
 
@@ -35,6 +35,7 @@ interface UserProfile {
   linkedin_url: string | null
   github_url: string | null
   expertise_areas: string[] | null
+  slug: string | null
   role: string
 }
 
@@ -47,6 +48,7 @@ interface MenteeCardProps {
 export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
   const tCommunity = useTranslations("community")
   const { isAuthenticated } = useAuth()
+  const router = useRouter()
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
 
@@ -57,6 +59,16 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
       return
     }
     callback()
+  }
+
+  const handleViewProfile = () => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true)
+      return
+    }
+    if (profile.slug) {
+      router.push(`/mentee/${profile.slug}`)
+    }
   }
 
   const handleHelpClick = () => {
@@ -74,24 +86,26 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
 
   return (
     <>
-      <Card className="hover:shadow-md transition-all flex flex-col h-full border-2 hover:border-primary/20 bg-white">
+      <Card className="hover:shadow-md transition-all flex flex-col h-full border-2 hover:border-primary/20 bg-white group">
         <CardHeader className="pb-3 px-6 pt-6">
           <div className="flex items-center space-x-4">
-            <Avatar className="h-14 w-14 border-2 border-muted shadow-sm">
-              <AvatarImage
-                src={profile.avatar_url || ""}
-                alt={profile.full_name || "Membro"}
-              />
-              <AvatarFallback className="bg-primary/5 text-primary font-bold">
-                {profile.full_name?.[0]?.toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="h-14 w-14 border-2 border-muted shadow-sm">
+                <AvatarImage
+                  src={profile.avatar_url || ""}
+                  alt={profile.full_name || "Membro"}
+                />
+                <AvatarFallback className="bg-primary/5 text-primary font-bold">
+                  {profile.full_name?.[0]?.toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+            </div>
             <div className="flex-1 min-w-0">
               <CardTitle className="text-lg truncate font-bold text-gray-900">
                 {profile.full_name || "Membro Menvo"}
               </CardTitle>
               <CardDescription className="text-sm truncate text-gray-500 font-medium">
-                {profile.job_title}
+                {profile.job_title || "Mentorado"}
                 {profile.company ? ` @ ${profile.company}` : ""}
               </CardDescription>
             </div>
@@ -119,43 +133,48 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                   {area}
                 </Badge>
               ))}
-              {profile.expertise_areas.length > 4 && (
-                <Badge
-                  variant="outline"
-                  className="text-[10px] border-none text-gray-400"
-                >
-                  +{profile.expertise_areas.length - 4}
-                </Badge>
-              )}
             </div>
           )}
 
-          <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
-            {profile.linkedin_url && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-blue-600 hover:bg-blue-50"
-                onClick={(e) => handleProtectedAction(e, () => window.open(profile.linkedin_url!, '_blank'))}
-              >
-                <Linkedin className="h-5 w-5" />
-              </Button>
-            )}
-            {profile.github_url && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 text-gray-900 hover:bg-gray-100"
-                onClick={(e) => handleProtectedAction(e, () => window.open(profile.github_url!, '_blank'))}
-              >
-                <Github className="h-5 w-5" />
-              </Button>
-            )}
-            <div className="flex-1" />
+          <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-between gap-2">
+               <div className="flex gap-1">
+                {profile.linkedin_url && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                    onClick={(e) => handleProtectedAction(e, () => window.open(profile.linkedin_url!, '_blank'))}
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </Button>
+                )}
+                {profile.github_url && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-900 hover:bg-gray-100"
+                    onClick={(e) => handleProtectedAction(e, () => window.open(profile.github_url!, '_blank'))}
+                  >
+                    <Github className="h-4 w-4" />
+                  </Button>
+                )}
+               </div>
+               
+               <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleViewProfile}
+                  className="text-xs font-semibold text-muted-foreground hover:text-primary gap-1"
+               >
+                 <Eye className="h-3 w-3" /> Ver Perfil
+               </Button>
+            </div>
+
             <Button
               size="sm"
               onClick={handleHelpClick}
-              className="gap-2 font-bold shadow-sm"
+              className="w-full gap-2 font-bold shadow-sm"
             >
               <MessageCircle className="h-4 w-4" /> {tCommunity("offerHelp")}
             </Button>

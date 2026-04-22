@@ -21,6 +21,7 @@ interface UserProfile {
     linkedin_url: string | null
     github_url: string | null
     expertise_areas: string[] | null
+    slug: string | null
     role: string
 }
 
@@ -56,7 +57,7 @@ export default function CommunityPage() {
             const from = currentPage * ITEMS_PER_PAGE
             const to = from + ITEMS_PER_PAGE - 1
 
-            // Buscamos perfis que marcaram is_public = true
+            // Buscamos perfis de MENTEES que marcaram is_public = true
             let query = supabase
                 .from('profiles')
                 .select(`
@@ -69,9 +70,11 @@ export default function CommunityPage() {
                     linkedin_url,
                     github_url,
                     expertise_areas,
+                    slug,
                     user_roles!inner(roles!inner(name))
                 `, { count: 'exact' })
                 .eq('is_public', true)
+                .eq('user_roles.roles.name', 'mentee')
                 .not('bio', 'is', null)
             
             if (searchTerm) {
@@ -126,15 +129,15 @@ export default function CommunityPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight mb-2">{tCommunity("title")}</h1>
+                    <h1 className="text-4xl font-bold tracking-tight mb-2">Mural de Mentorados</h1>
                     <p className="text-xl text-muted-foreground max-w-2xl">
-                        {tCommunity("subtitle")}
+                        Conheça pessoas que buscam aprender e ofereça sua mentoria de forma proativa.
                     </p>
                 </div>
                 <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
                     <Info className="h-5 w-5 text-primary shrink-0" />
                     <p className="text-xs text-primary/80 leading-snug">
-                        {tCommunity("mentorTip")}
+                        Dica: Mentores proativos que ajudam quem busca conhecimento ganham 3x mais visibilidade.
                     </p>
                 </div>
             </div>
@@ -143,7 +146,7 @@ export default function CommunityPage() {
             <div className="relative max-w-md mb-12">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                    placeholder={tCommunity("searchPlaceholder")}
+                    placeholder="Buscar por nome, objetivo ou interesse..."
                     className="pl-10 h-11"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}

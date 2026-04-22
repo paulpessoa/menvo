@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { 
   ArrowLeft, 
@@ -18,7 +18,8 @@ import {
   AlertTriangle,
   Clock,
   ExternalLink,
-  Trash2
+  Trash2,
+  Camera
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { Organization, OrganizationStatus, OrganizationType } from "@/lib/types/organizations"
@@ -29,11 +30,13 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
+import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 
 export default function AdminOrganizationDetailsPage() {
     const params = useParams()
     const router = useRouter()
     const id = params.id as string
+    const fileInputRef = useRef<HTMLInputElement>(null)
     
     const [organization, setOrganization] = useState<Organization | null>(null)
     const [stats, setStats] = useState<any>(null)
@@ -41,6 +44,9 @@ export default function AdminOrganizationDetailsPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [actionLoading, setActionLoading] = useState(false)
+
+    // Hook de upload especializado para organizações
+    const logoUpload = useSimpleImageUpload(`/api/upload/organization-logo?orgId=${id}`)
 
     // Form state
     const [formData, setFormData] = useState<Partial<Organization>>({})
@@ -78,6 +84,41 @@ export default function AdminOrganizationDetailsPage() {
             toast.error("Erro de conexão ao carregar dados")
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        const result = await logoUpload.upload(file)
+
+        if (result.success) {
+            const newLogoUrl = result.data.url + '?t=' + Date.now()
+            setFormData(prev => ({ ...prev, logo_url: newLogoUrl }))
+            
+            // Se não estiver em modo edição, salvar logo imediatamente
+            if (!isEditing) {
+                await updateOrganizationField({ logo_url: newLogoUrl })
+            }
+            
+            toast.success("Logo atualizada com sucesso")
+            fetchOrganization()
+        } else {
+            toast.error(result.error || "Erro ao fazer upload da logo")
+        }
+    }
+
+    const updateOrganizationField = async (fields: Partial<Organization>) => {
+        try {
+            const response = await fetch(`/api/admin/organizations/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(fields)
+            })
+            return response.ok
+        } catch (err) {
+            return false
         }
     }
 
@@ -276,7 +317,7 @@ export default function AdminOrganizationDetailsPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">URL do Logo</label>
+                                    <label className="text-sm font-medium">Logo URL (ou upload ao lado)</label>
                                     <Input 
                                         value={formData.logo_url || ""} 
                                         onChange={(e) => setFormData({...formData, logo_url: e.target.value})}
@@ -369,23 +410,46 @@ export default function AdminOrganizationDetailsPage() {
                 <div className="space-y-8">
                     <Card className="bg-primary/5 border-primary/20">
                         <CardHeader>
-                            <CardTitle className="text-lg">Visualização</CardTitle>
+                            <CardTitle className="text-lg text-center">Identidade Visual</CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col items-center py-6">
-                            {organization.logo_url ? (
-                                <img 
-                                    src={organization.logo_url} 
-                                    alt={organization.name} 
-                                    className="w-32 h-32 rounded-xl object-contain bg-white p-2 shadow-sm border mb-4" 
+                            <div className="relative group">
+                                {formData.logo_url ? (
+                                    <img 
+                                        src={formData.logo_url} 
+                                        alt={organization.name} 
+                                        className="w-32 h-32 rounded-xl object-contain bg-white p-2 shadow-sm border mb-4" 
+                                    />
+                                ) : (
+                                    <div className="w-32 h-32 rounded-xl bg-primary/10 flex items-center justify-center mb-4 border-2 border-dashed border-primary/20">
+                                        <Building2 className="w-16 h-16 text-primary/40" />
+                                    </div>
+                                )}
+                                
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform disabled:opacity-50"
+                                    disabled={logoUpload.isUploading}
+                                    title="Mudar logo"
+                                >
+                                    {logoUpload.isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                                </button>
+                                <input 
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleLogoUpload}
+                                    accept="image/*"
+                                    className="hidden"
                                 />
-                            ) : (
-                                <div className="w-32 h-32 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                    <Users className="w-16 h-16 text-primary" />
-                                </div>
-                            )}
-                            <h3 className="font-bold text-xl text-center">{organization.name}</h3>
+                            </div>
+
+                            <h3 className="font-bold text-xl text-center mt-2">{organization.name}</h3>
                             <p className="text-sm text-muted-foreground mb-4 capitalize">{organization.type}</p>
                             <Badge variant="outline" className="font-mono text-[10px]">{organization.slug}</Badge>
+                            
+                            {logoUpload.isUploading && (
+                                <p className="text-[10px] text-primary animate-pulse mt-2">Fazendo upload...</p>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -435,4 +499,31 @@ export default function AdminOrganizationDetailsPage() {
             </div>
         </div>
     )
+}
+
+function Building2(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+      <path d="M9 22v-4h6v4" />
+      <path d="M8 6h.01" />
+      <path d="M16 6h.01" />
+      <path d="M8 10h.01" />
+      <path d="M16 10h.01" />
+      <path d="M8 14h.01" />
+      <path d="M16 14h.01" />
+      <path d="M15 2H9" />
+    </svg>
+  )
 }

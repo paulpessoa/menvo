@@ -106,7 +106,9 @@ export default async function MenteeProfilePage({ params }: PageProps) {
     // Permitir se:
     // 1. É mentor (pode ver qualquer mentee)
     // 2. É o próprio perfil
-    const canView = isMentor || user.id === mentee.id;
+    // 3. O perfil é público
+    const isOwner = user.id === mentee.id;
+    const canView = isMentor || isOwner || mentee.is_public;
 
     if (!canView) {
         redirect('/unauthorized')

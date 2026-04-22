@@ -3,7 +3,7 @@
     "welcome": "Bem-vindo",
     "home": "Início",
     "findMentors": "Encontrar Mentores",
-    "community": "Comunidade",
+    "community": "Mentorados",
     "events": "Eventos",
     "howItWorks": "Como Funciona",
     "aboutUs": "Sobre Nós",
@@ -45,7 +45,19 @@
     "confirmTitle": "Você tem certeza?",
     "confirmDesc": "Esta ação não pode ser desfeita.",
     "confirmAction": "Sim, confirmar",
-    "organizations": "Organizações"
+    "organizations": "Organizações",
+    "notFound": {
+      "title": "Opa! Página não encontrada",
+      "description": "Parece que o caminho que você seguiu não existe mais ou foi movido. Não se preocupe, vamos te levar de volta para casa.",
+      "backToHome": "Página Inicial",
+      "goBack": "Voltar"
+    },
+    "errorPage": {
+      "title": "Algo deu errado!",
+      "description": "Desculpe pelo transtorno. Um erro inesperado ocorreu em nossos servidores.",
+      "tryAgain": "Tentar novamente",
+      "backToHome": "Página Inicial"
+    }
   },
   "header": {
     "title": "MENVO - Mentores Voluntários",

@@ -3,7 +3,7 @@
         "welcome": "Welcome",
         "home": "Home",
         "findMentors": "Find Mentors",
-        "community": "Community",
+        "community": "Mentees",
         "events": "Events",
         "howItWorks": "How It Works",
         "aboutUs": "About Us",
@@ -45,7 +45,19 @@
         "confirmTitle": "Are you sure?",
         "confirmDesc": "This action cannot be undone.",
         "confirmAction": "Yes, confirm",
-        "organizations": "Organizations"
+        "organizations": "Organizations",
+        "notFound": {
+            "title": "Oops! Page not found",
+            "description": "It seems the path you followed no longer exists or has been moved. Don\u0027t worry, we\u0027ll take you back home.",
+            "backToHome": "Back to Home",
+            "goBack": "Go Back"
+        },
+        "errorPage": {
+            "title": "Something went wrong!",
+            "description": "Sorry for the inconvenience. An unexpected error occurred on our servers.",
+            "tryAgain": "Try Again",
+            "backToHome": "Back to Home"
+        }
     },
     "header": {
         "title": "MENVO - Volunteer Mentors",
