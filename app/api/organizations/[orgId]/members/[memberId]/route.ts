@@ -18,7 +18,7 @@ export async function GET(
       .from("profiles")
       .select(`
         *,
-        user_roles(roles(name))
+        user_roles!inner(roles(name))
       `)
       .eq("id", memberId)
       .eq("organization_id", orgId)

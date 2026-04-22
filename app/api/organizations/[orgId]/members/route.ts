@@ -18,7 +18,7 @@ export async function GET(
       .from("profiles")
       .select(`
         *,
-        user_roles(roles(name))
+        user_roles!inner(roles(name))
       `)
       .eq("organization_id", orgId)
       .returns<any[]>()
@@ -50,7 +50,6 @@ export async function POST(
       .update({ organization_id: orgId } as any)
       .eq("id", user_id)
       .select()
-      .returns<any>()
       .single()
 
     if (error) throw error
