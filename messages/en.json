@@ -4,7 +4,6 @@
         "home": "Home",
         "findMentors": "Find Mentors",
         "community": "Community",
-        "hub": "Hub",
         "events": "Events",
         "howItWorks": "How It Works",
         "aboutUs": "About Us",
@@ -538,31 +537,6 @@
             "whyDescription": "As a verified mentor, you gain access to scheduling tools, synced calendar, and official reviews.",
             "chatAnyway": "Just Chat",
             "becomeMentor": "Become a Mentor"
-        }
-    },
-    "hub": {
-        "subtitle": "Discover curated events, courses, tools, and discounts to accelerate your journey.",
-        "suggestBtn": "Suggest Resource",
-        "searchPlaceholder": "Search the hub...",
-        "viewMore": "Access",
-        "tabs": {
-            "all": "All",
-            "events": "Events",
-            "courses": "Courses",
-            "tools": "Tools",
-            "discounts": "Discounts"
-        },
-        "types": {
-            "event": "Event",
-            "course": "Course",
-            "tool": "Tool",
-            "discount": "Discount",
-            "job": "Job"
-        },
-        "noResults": {
-            "title": "No resources found",
-            "description": "Try adjusting your filters or searching for other terms.",
-            "clear": "Clear filters"
         }
     },
     "mentors": {
@@ -1211,19 +1185,18 @@
             "success": "Link sent! Check your email."
         },
         "resend": {
-          "title": "Resend Confirmation",
-          "description": "Enter your email to receive a new confirmation link",
-          "successTitle": "Email Resent!",
-          "successDescription": "Please check your inbox and spam folder.",
-          "sentTo": "We sent a new confirmation email to",
-          "otherEmail": "Send to Another Email",
-          "button": "Resend Email",
-          "error": "Error resending email. Please check if the email is correct.",
-          "alreadyVerifiedTitle": "Email Already Verified",
-          "alreadyVerifiedMessage": "Your account is already active and you can access all features.",
-          "alreadyVerifiedDetail": "Your email {email} is already active and ready to use."
+            "title": "Resend Confirmation",
+            "description": "Enter your email to receive a new confirmation link",
+            "successTitle": "Email Resent!",
+            "successDescription": "Please check your inbox and spam folder.",
+            "sentTo": "We sent a new confirmation email to",
+            "otherEmail": "Send to Another Email",
+            "button": "Resend Email",
+            "error": "Error resending email. Please check if the email is correct.",
+            "alreadyVerifiedTitle": "Email Already Verified",
+            "alreadyVerifiedMessage": "Your account is already active and you can access all features.",
+            "alreadyVerifiedDetail": "Your email {email} is already active and ready to use."
         },
-
         "setPassword": {
             "title": "Set your password",
             "description": "You have been invited to the platform. Set your password to continue.",

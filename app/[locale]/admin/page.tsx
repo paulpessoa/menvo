@@ -11,13 +11,11 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   Users,
-  UserCheck,
   Clock,
   Shield,
   AlertCircle,
   CheckCircle,
   MessageSquare,
-  Link as LinkIcon,
   TrendingUp
 } from "lucide-react"
 import Link from "next/link"
@@ -139,15 +137,6 @@ export default function AdminDashboard() {
   }
 
   const quickActions = [
-    {
-      title: "Hub",
-      description: "Moderar sugestões de recursos e afiliados",
-      href: "/admin/hub",
-      icon: LinkIcon,
-      color: "bg-orange-500",
-      badge:
-        stats.pendingHubResources > 0 ? stats.pendingHubResources : undefined
-    },
     {
       title: t("actions.suggestions"),
       description: t("actions.suggestionsDesc"),

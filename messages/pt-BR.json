@@ -4,7 +4,6 @@
     "home": "Início",
     "findMentors": "Encontrar Mentores",
     "community": "Comunidade",
-    "hub": "Hub",
     "events": "Eventos",
     "howItWorks": "Como Funciona",
     "aboutUs": "Sobre Nós",
@@ -540,31 +539,6 @@
       "whyDescription": "Como mentor verificado, você ganha acesso a ferramentas de agendamento, calendário sincronizado e avaliações oficiais.",
       "chatAnyway": "Apenas Conversar",
       "becomeMentor": "Tornar-se Mentor"
-    }
-  },
-  "hub": {
-    "subtitle": "Descubra eventos, cursos, ferramentas e descontos curados para acelerar sua jornada.",
-    "suggestBtn": "Sugerir Recurso",
-    "searchPlaceholder": "Buscar no hub...",
-    "viewMore": "Acessar",
-    "tabs": {
-      "all": "Tudo",
-      "events": "Eventos",
-      "courses": "Cursos",
-      "tools": "Ferramentas",
-      "discounts": "Descontos"
-    },
-    "types": {
-      "event": "Evento",
-      "course": "Curso",
-      "tool": "Ferramenta",
-      "discount": "Desconto",
-      "job": "Vaga"
-    },
-    "noResults": {
-      "title": "Nenhum recurso encontrado",
-      "description": "Tente ajustar seus filtros ou buscar por outros termos.",
-      "clear": "Limpar filtros"
     }
   },
   "mentors": {

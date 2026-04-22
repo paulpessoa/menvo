@@ -4,7 +4,6 @@
         "home": "Inicio",
         "findMentors": "Encontrar Mentores",
         "community": "Comunidad",
-        "hub": "Hub",
         "events": "Eventos",
         "howItWorks": "Cómo Funciona",
         "aboutUs": "Sobre Nosotros",
@@ -513,31 +512,6 @@
                 "title": "Reclutador",
                 "description": "Busco profesionales calificados para oportunidades"
             }
-        }
-    },
-    "hub": {
-        "subtitle": "Descubre eventos, cursos, herramientas y descuentos curados para acelerar tu jornada.",
-        "suggestBtn": "Sugerir Recurso",
-        "searchPlaceholder": "Buscar en el hub...",
-        "viewMore": "Acceder",
-        "tabs": {
-            "all": "Todo",
-            "events": "Eventos",
-            "courses": "Cursos",
-            "tools": "Herramientas",
-            "discounts": "Descuentos"
-        },
-        "types": {
-            "event": "Evento",
-            "course": "Curso",
-            "tool": "Herramienta",
-            "discount": "Descuento",
-            "job": "Empleo"
-        },
-        "noResults": {
-            "title": "No se encontraron recursos",
-            "description": "Intenta ajustar tus filtros o buscar por otros términos.",
-            "clear": "Limpiar filtros"
         }
     },
     "mentors": {
@@ -1092,7 +1066,6 @@
             "alreadyVerifiedMessage": "Su cuenta ya está activa y puede acceder a todas las funciones.",
             "alreadyVerifiedDetail": "Su correo electrónico {email} ya está activo y listo para usar."
         },
-
         "setPassword": {
             "title": "Establece tu contraseña",
             "description": "Has sido invitado a la plataforma. Establece tu contraseña para continuar.",

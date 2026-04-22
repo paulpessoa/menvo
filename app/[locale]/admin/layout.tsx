@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, Link, usePathname } from "@/i18n/routing"
+import { Link, usePathname } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -13,7 +13,6 @@ import {
   Home,
   Building2,
   MessageSquare,
-  Link as LinkIcon,
   Star
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -41,12 +40,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       href: "/admin/organizations",
       icon: Building2,
       description: t("nav.organizationsDesc")
-    },
-    {
-      title: "Hub",
-      href: "/admin/hub",
-      icon: LinkIcon,
-      description: "Moderar sugestões e afiliados"
     },
     {
       title: t("nav.users"),
