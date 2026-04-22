@@ -15,7 +15,7 @@ import {
   Shield,
   AlertCircle,
   CheckCircle,
-  MessageSquare,
+  Building2,
   TrendingUp
 } from "lucide-react"
 import Link from "next/link"
@@ -69,19 +69,17 @@ export default function AdminDashboard() {
 
       const { data: mentorRoles, error: mentorError } = await (supabase
         .from("user_roles")
-        .select(
-          `
+        .select(`
           profiles!inner(id, verified),
           roles!inner(name)
-        `
-        )
+        `)
         .eq("roles.name", "mentor") as any)
 
       if (mentorError) throw mentorError
 
       const totalMentors = mentorRoles?.length || 0
       const verifiedMentors =
-        mentorRoles?.filter((role) => {
+        mentorRoles?.filter((role: any) => {
           const profile = Array.isArray(role.profiles)
             ? role.profiles[0]
             : role.profiles
@@ -106,11 +104,6 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .gte("created_at", sevenDaysAgo.toISOString())
 
-      const { count: pendingSuggestions } = await supabase
-        .from("mentor_suggestions")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending")
-
       setStats({
         totalUsers: totalUsers || 0,
         totalMentors,
@@ -119,7 +112,7 @@ export default function AdminDashboard() {
         totalMentees: totalMentees || 0,
         totalSessions: totalSessions || 0,
         recentSignups: recentSignups || 0,
-        pendingSuggestions: pendingSuggestions || 0
+        pendingSuggestions: 0
       })
     } catch (error) {
       console.error("Error fetching admin stats:", error)
@@ -130,27 +123,26 @@ export default function AdminDashboard() {
 
   const quickActions = [
     {
-      title: t("actions.suggestions"),
-      description: t("actions.suggestionsDesc"),
-      href: "/admin/suggestions",
-      icon: MessageSquare,
-      color: "bg-blue-600",
-      badge: stats.pendingSuggestions > 0 ? stats.pendingSuggestions : undefined
-    },
-    {
-      title: "Gestão Global",
-      description: "Gerenciar todos os usuários e permissões",
+      title: "Gestão de Usuários",
+      description: "Gerenciar todos os usuários, permissões e aprovar mentores",
       href: "/admin/users",
       icon: Users,
-      color: "bg-primary"
+      color: "bg-primary",
+      badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
     },
     {
-      title: t("actions.verifyMentors"),
-      description: t("actions.verifyMentorsDesc"),
-      href: "/admin/users?tab=pending",
-      icon: Clock,
-      color: "bg-yellow-500",
-      badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
+      title: "Organizações",
+      description: "Gerenciar parceiros e organizações do ecossistema",
+      href: "/admin/organizations",
+      icon: Building2,
+      color: "bg-blue-600"
+    },
+    {
+      title: "Relatórios & IA",
+      description: "Ver métricas de crescimento e buscas da IA",
+      href: "/admin/reports",
+      icon: TrendingUp,
+      color: "bg-green-600"
     },
     {
       title: t("actions.settings"),
@@ -250,7 +242,7 @@ export default function AdminDashboard() {
             <h2 className="text-2xl font-semibold mb-6">
               {t("actions.title")}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {quickActions.map((action, index) => (
                 <Card key={index} className="hover:shadow-md transition-shadow">
                   <CardHeader>
@@ -259,10 +251,10 @@ export default function AdminDashboard() {
                         <action.icon className="h-6 w-6 text-white" />
                       </div>
                       {action.badge && (
-                        <Badge variant="destructive">{action.badge}</Badge>
+                        <Badge variant="destructive" className="animate-pulse">{action.badge}</Badge>
                       )}
                     </div>
-                    <CardTitle className="text-lg">{action.title}</CardTitle>
+                    <CardTitle className="text-lg mt-4">{action.title}</CardTitle>
                     <CardDescription>{action.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -276,27 +268,24 @@ export default function AdminDashboard() {
           </div>
 
           {stats.pendingMentors > 0 && (
-            <Card className="border-yellow-200 bg-yellow-50">
-              <CardHeader>
+            <Card className="border-yellow-200 bg-yellow-50/50">
+              <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-5 w-5 text-yellow-600" />
-                  <CardTitle className="text-yellow-800">
-                    Pendências de Verificação
+                  <CardTitle className="text-yellow-800 text-lg">
+                    Aprovação de Mentores
                   </CardTitle>
                 </div>
                 <CardDescription className="text-yellow-700">
-                  Existem {stats.pendingMentors} mentores aguardando sua
-                  revisão.
+                  Existem {stats.pendingMentors} perfis aguardando sua validação para aparecerem na busca.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex gap-4">
-                {stats.pendingMentors > 0 && (
-                  <Button asChild variant="outline">
-                    <Link href="/admin/users?tab=pending">
-                      Verificar Mentores
-                    </Link>
-                  </Button>
-                )}
+              <CardContent>
+                <Button asChild variant="outline" className="bg-white border-yellow-300 text-yellow-800 hover:bg-yellow-100">
+                  <Link href="/admin/users?tab=pending">
+                    Revisar Pendências
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           )}
