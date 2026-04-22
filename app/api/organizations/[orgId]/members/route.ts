@@ -45,12 +45,13 @@ export async function POST(
         return errorResponse("User ID is required", "INVALID_INPUT", 400)
     }
 
-    const { data: member, error } = await supabase
-      .from("profiles")
+    const { data: member, error: updateError } = await (supabase
+      .from("profiles" as any)
+      // @ts-ignore
       .update({ organization_id: orgId } as any)
-      .eq("id", user_id)
+      .eq("id", userId)
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
 

@@ -33,30 +33,34 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('mentors' as any)
-      .insert([{
-        user_id,
-        title,
-        company,
-        experience_years,
-        expertise_areas,
-        topics,
-        inclusion_tags,
+      .from('profiles')
+      .update({
+        current_position: title,
+        current_company: company,
+        mentorship_topics: topics,
+        expertise_areas: expertise_areas,
         linkedin_url,
-        portfolio_url,
-        academic_background,
-        current_work,
-        areas_of_interest,
-        session_duration,
         timezone,
-        status
-      }])
+        verification_status: status === 'pending_verification' ? 'pending' : 'approved',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', user_id)
+      .select()
+      .single()
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true, mentor: data?.[0] })
+    // 2. Garantir que o usuário tenha a role de mentor
+    const { error: roleError } = await supabase
+      .from('user_roles')
+      .upsert({ 
+        user_id: user_id as string, 
+        role_id: 2
+      })
+
+    return NextResponse.json({ success: true, mentor: data })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
