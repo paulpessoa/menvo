@@ -19,7 +19,7 @@ export async function PATCH(
     const { status } = await request.json()
 
     if (!status) {
-      return errorResponse("Status is required", "INVALID_INPUT", 400)
+      return errorResponse("Status is required", "VALIDATION_ERROR", 400)
     }
 
     // Authenticate user
@@ -32,14 +32,13 @@ export async function PATCH(
     }
 
     // Check if user is admin
-    const { data: roleData } = await supabase
-      .from("user_roles")
+    const { data: roleData } = await (supabase
+      .from("user_roles" as any)
       .select("roles(name)")
       .eq("user_id", user.id)
-      .returns<any>()
-      .single()
+      .single() as any)
 
-    const userRole = (roleData?.roles as any)?.name
+    const userRole = roleData?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
       return errorResponse(
         "Forbidden - Admin access required",

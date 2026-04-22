@@ -9,11 +9,13 @@ export async function isUserVolunteer(userId: string): Promise<boolean> {
     const supabase = await createClient()
 
     // First check if user has a volunteer flag in their profile
-    const { data: profile, error: profileError } = await supabase
+    const { data: profileData, error: profileError } = await supabase
       .from("profiles")
       .select("is_volunteer, user_role")
       .eq("id", userId)
       .single()
+
+    const profile = profileData as any;
 
     if (profileError) {
       console.error("Error checking profile:", profileError)

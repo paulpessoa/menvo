@@ -85,11 +85,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
-    if (currentAppointment.mentor_id !== user.id && currentAppointment.mentee_id !== user.id) {
+    const appointment = currentAppointment as any;
+
+    if (appointment.mentor_id !== user.id && appointment.mentee_id !== user.id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
-    if (status === 'confirmed' && currentAppointment.status === 'pending') {
+    if (status === 'confirmed' && appointment.status === 'pending') {
       try {
         const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments/confirm`;
         const confirmResponse = await fetch(confirmUrl, {

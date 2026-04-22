@@ -337,6 +337,32 @@ export const mentorshipUtils = {
     )
   },
 
+  getNextOccurrence: (dayOfWeek: number, startTime: string): Date => {
+    const now = new Date();
+    const result = new Date();
+    
+    // Parse start time (HH:mm)
+    const [hours, minutes] = startTime.split(':').map(Number);
+    
+    // Calculate days until next occurrence
+    let daysUntil = (dayOfWeek - now.getDay() + 7) % 7;
+    
+    // If today is the day, check if time has passed
+    if (daysUntil === 0) {
+      const scheduledTime = new Date();
+      scheduledTime.setHours(hours, minutes, 0, 0);
+      if (now > scheduledTime) {
+        daysUntil = 7;
+      }
+    }
+    
+    result.setDate(now.getDate() + daysUntil);
+    result.setHours(hours, minutes, 0, 0);
+    result.setSeconds(0, 0);
+    
+    return result;
+  },
+
   // Gerar slots de horário disponíveis
   generateTimeSlots: (availability: MentorAvailability[], duration: number = 60) => {
     const slots: { day: number, time: string, endTime: string }[] = []

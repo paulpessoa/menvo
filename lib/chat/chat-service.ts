@@ -28,7 +28,7 @@ export interface Conversation {
  * Busca ou cria uma conversa entre mentor e mentee
  */
 export async function getOrCreateConversation(
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient<Database, any, any>,
   mentorId: string,
   menteeId: string
 ): Promise<string> {
@@ -67,7 +67,7 @@ export async function getOrCreateConversation(
  * Envia uma mensagem em uma conversa
  */
 export async function sendMessage(
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient<Database, any, any>,
   conversationId: string,
   senderId: string,
   content: string
@@ -94,7 +94,7 @@ export async function sendMessage(
  * Busca mensagens de uma conversa
  */
 export async function getMessages(
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient<Database, any, any>,
   conversationId: string,
   limit: number = 50
 ): Promise<Message[]> {
@@ -139,7 +139,7 @@ export async function markMessagesAsRead(
  * Conta mensagens não lidas em uma conversa
  */
 export async function getUnreadCount(
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient<Database, any, any>,
   conversationId: string,
   userId: string
 ): Promise<number> {
@@ -162,7 +162,7 @@ export async function getUnreadCount(
  * Busca conversas do usuário
  */
 export async function getUserConversations(
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient<Database, any, any>,
   userId: string
 ): Promise<Conversation[]> {
 

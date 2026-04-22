@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -14,17 +14,17 @@ import type {
 // GET /api/organizations/[orgId] - Get organization details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { orgId } = params
+    const { orgId } = await params
 
-    const { data: organization, error } = await supabase
-      .from("organizations")
+    const { data: organization, error } = await (supabase
+      .from("organizations" as any)
       .select("*")
       .eq("id", orgId)
-      .single()
+      .single() as any)
 
     if (error) throw error
     if (!organization) {
@@ -32,16 +32,16 @@ export async function GET(
     }
 
     // Get member count
-    const { count: memberCount } = await supabase
-      .from("organization_members")
+    const { count: memberCount } = await (supabase
+      .from("organization_members" as any)
       .select("*", { count: "exact", head: true })
       .eq("organization_id", orgId)
-      .eq("status", "active")
+      .eq("status", "active") as any)
 
     return successResponse({
-      ...organization,
+      ...(organization as any),
       member_count: memberCount || 0
-    } as Organization & { member_count: number })
+    } as any)
   } catch (error) {
     return handleApiError(error)
   }
@@ -50,12 +50,12 @@ export async function GET(
 // PATCH /api/organizations/[orgId] - Update organization
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { orgId: string } }
+  { params }: { params: Promise<{ orgId: string }> }
 ) {
   try {
     const supabase = await createClient()
     const serviceSupabase = createServiceRoleClient()
-    const { orgId } = params
+    const { orgId } = await params
 
     // Authenticate user
     const {
@@ -67,12 +67,14 @@ export async function PATCH(
     }
 
     // Check if user is org admin
-    const { data: membership } = await supabase
-      .from("organization_members")
+    const { data: membershipData } = await (supabase
+      .from("organization_members" as any)
       .select("role, status")
       .eq("organization_id", orgId)
       .eq("user_id", user.id)
-      .single()
+      .single() as any)
+
+    const membership = membershipData as any
 
     if (
       !membership ||
@@ -85,8 +87,8 @@ export async function PATCH(
     const body: UpdateOrganizationRequest = await request.json()
 
     // Update organization
-    const { data: organization, error: updateError } = await serviceSupabase
-      .from("organizations")
+    const { data: organization, error: updateError } = await (serviceSupabase
+      .from("organizations" as any)
       .update({
         name: body.name,
         description: body.description,
@@ -98,19 +100,19 @@ export async function PATCH(
       })
       .eq("id", orgId)
       .select()
-      .single()
+      .single() as any)
 
     if (updateError) throw updateError
 
     // Log activity
-    await serviceSupabase.from("organization_activity_log").insert({
+    await serviceSupabase.from("organization_activity_log" as any).insert({
       organization_id: orgId,
       activity_type: "settings_updated",
       actor_id: user.id
     })
 
     return successResponse(
-      organization as Organization,
+      organization as any,
       "Organization updated successfully"
     )
   } catch (error) {

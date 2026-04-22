@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('mentors')
+      .from('mentors' as any)
       .insert([{
         user_id,
         title,

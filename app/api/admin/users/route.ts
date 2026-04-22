@@ -19,14 +19,13 @@ export async function GET(request: NextRequest) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
-    const { data: roleData } = await supabase
-      .from("user_roles")
+    const { data: roleData } = await (supabase
+      .from("user_roles" as any)
       .select("roles(name)")
       .eq("user_id", user.id)
-      .returns<any>()
-      .single()
+      .single() as any)
 
-    const userRole = (roleData?.roles as any)?.name
+    const userRole = roleData?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
       return errorResponse("Forbidden", "FORBIDDEN", 403)
     }
@@ -43,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // 3. Query base
     let query = supabase
-      .from("profiles")
+      .from("profiles" as any)
       .select(`
         *,
         user_roles!inner (
@@ -51,7 +50,7 @@ export async function GET(request: NextRequest) {
             name
           )
         )
-      `, { count: "exact" })
+      `, { count: "exact" }) as any
 
     // Filtros por aba
     if (tab === "pending") {
@@ -74,25 +73,25 @@ export async function GET(request: NextRequest) {
     if (profilesError) throw profilesError
 
     // 4. Buscar contagens para as abas
-    const { count: totalCount } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
+    const { count: totalCount } = await (supabase
+      .from("profiles" as any)
+      .select("*", { count: "exact", head: true }) as any)
 
-    const { count: pendingCount } = await supabase
-      .from("profiles")
+    const { count: pendingCount } = await (supabase
+      .from("profiles" as any)
       .select("*, user_roles!inner(roles!inner(name))", { count: "exact", head: true })
       .eq("verified", false)
-      .eq("user_roles.roles.name", "mentor")
+      .eq("user_roles.roles.name", "mentor") as any)
 
-    const { count: mentorsCount } = await supabase
-      .from("profiles")
+    const { count: mentorsCount } = await (supabase
+      .from("profiles" as any)
       .select("*, user_roles!inner(roles!inner(name))", { count: "exact", head: true })
-      .eq("user_roles.roles.name", "mentor")
+      .eq("user_roles.roles.name", "mentor") as any)
 
-    const { count: menteesCount } = await supabase
-      .from("profiles")
+    const { count: menteesCount } = await (supabase
+      .from("profiles" as any)
       .select("*, user_roles!inner(roles!inner(name))", { count: "exact", head: true })
-      .eq("user_roles.roles.name", "mentee")
+      .eq("user_roles.roles.name", "mentee") as any)
 
     return successResponse({
       users: profiles,

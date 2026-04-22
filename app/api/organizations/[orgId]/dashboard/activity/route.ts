@@ -26,12 +26,14 @@ export async function GET(
     }
 
     // Check if user is org admin
-    const { data: membership } = await supabase
-      .from("organization_members")
+    const { data: membershipData } = await (supabase
+      .from("organization_members" as any)
       .select("role, status")
       .eq("organization_id", orgId)
       .eq("user_id", user.id)
-      .single()
+      .single() as any)
+
+    const membership = membershipData as any
 
     if (
       !membership ||

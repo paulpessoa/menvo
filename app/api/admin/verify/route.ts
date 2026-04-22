@@ -12,13 +12,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
     }
 
-    const { data: roleData } = await supabase
-      .from('user_roles')
+    const { data: roleData } = await (supabase
+      .from('user_roles' as any)
       .select('roles(name)')
       .eq('user_id', user.id)
-      .single()
+      .single() as any)
 
-    const isAdmin = (roleData?.roles as any)?.name === 'admin'
+    const isAdmin = roleData?.roles?.name === 'admin'
     if (!isAdmin) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
