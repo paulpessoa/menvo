@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/services/auth/supabase'
+import { supabase } from '@/lib/services/auth/auth.service'
 import { useUser } from './useUser'
 
 export function useFullUserProfile() {

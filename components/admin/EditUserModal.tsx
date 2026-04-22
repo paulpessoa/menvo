@@ -30,7 +30,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-import { adminService, type AdminUserUpdate } from "@/services/admin/admin"
+import { adminService, type AdminUserUpdate } from "@/lib/services/admin/admin.service"
 import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 import { toast } from "sonner"
 

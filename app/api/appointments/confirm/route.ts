@@ -5,7 +5,7 @@ import { sendAppointmentConfirmation } from "@/lib/email/brevo"
 import {
   createCalendarEvent,
   isGoogleCalendarConfigured
-} from "@/lib/services/google-calendar.service"
+} from "@/lib/services/mentorship/google-calendar.service"
 
 export async function POST(request: NextRequest) {
   try {

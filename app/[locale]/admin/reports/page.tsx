@@ -23,7 +23,7 @@ import {
   adminReportsService,
   type TimeSeriesData,
   type AdminStats
-} from "@/lib/services/admin-reports.service"
+} from "@/lib/services/admin/reports.service"
 import {
   Users,
   TrendingUp,

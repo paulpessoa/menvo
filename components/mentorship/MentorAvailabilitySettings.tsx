@@ -16,8 +16,8 @@ import {
   useUpdateAvailability, 
   useRemoveAvailability 
 } from "@/hooks/useMentorship"
-import { type MentorAvailability } from "@/services/mentorship/mentorship"
-import { mentorshipUtils } from "@/services/mentorship/mentorship"
+import { type MentorAvailability } from "@/lib/services/mentorship/mentorship.service"
+import { mentorshipUtils } from "@/lib/services/mentorship/mentorship.service"
 
 interface MentorAvailabilitySettingsProps {
   isOpen: boolean

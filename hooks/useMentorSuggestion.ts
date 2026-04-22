@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { mentorSuggestionService } from "@/services/mentors/suggestions"
+import { mentorSuggestionService } from "@/lib/services/mentors/suggestions.service"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
 

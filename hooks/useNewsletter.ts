@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { newsletterService, NewsletterSubscription } from '@/services/newsletter/newsletter'
+import { newsletterService, NewsletterSubscription } from '@/lib/services/newsletter/newsletter.service'
 import { toast } from 'sonner'
 
 // Hook para inscrever na newsletter

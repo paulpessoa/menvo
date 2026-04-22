@@ -1,4 +1,4 @@
-import { supabase } from '@/services/auth/supabase'
+import { supabase } from '@/lib/services/auth/auth.service'
 
 export interface NewsletterSubscription {
   id?: string

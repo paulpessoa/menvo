@@ -5,7 +5,7 @@ import {
   type MentorAvailability,
   type SessionRequest,
   type SessionResponse
-} from '@/services/mentorship/mentorship'
+} from '@/lib/services/mentorship/mentorship.service'
 import { toast } from 'sonner'
 
 // =============================================

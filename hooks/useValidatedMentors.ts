@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/services/auth/supabase'
+import { supabase } from '@/lib/services/auth/auth.service'
 
 export function useValidatedMentors() {
   return useQuery({

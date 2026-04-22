@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { auth } from '@/services/auth/supabase'
+import { auth } from '@/lib/services/auth/auth.service'
 
 interface ResendConfirmationEmailProps {
   email: string

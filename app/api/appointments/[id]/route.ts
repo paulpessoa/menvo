@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
-import { deleteCalendarEvent } from '@/lib/services/google-calendar.service';
+import { deleteCalendarEvent } from '@/lib/services/mentorship/google-calendar.service';
 
 interface RouteParams {
   params: Promise<{

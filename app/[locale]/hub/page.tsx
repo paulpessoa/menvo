@@ -10,7 +10,7 @@ import { Search, Plus, ExternalLink, Calendar, BookOpen, Wrench, Tag, Briefcase,
 import Image from "next/image"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { hubService } from "@/services/hub/hub"
+import { hubService } from "@/lib/services/hub/hub.service"
 import type { HubResource, HubResourceType } from "@/lib/types/models/hub"
 
 export default function HubPage() {

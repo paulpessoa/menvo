@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { mentorService, type MentorFilters, type MentorProfile, type PaginatedMentors, type FilterOptions } from '@/services/mentors/mentors'
+import { mentorService, type MentorFilters, type MentorProfile, type PaginatedMentors, type FilterOptions } from '@/lib/services/mentors/mentors.service'
 
 // Hook para buscar mentores com filtros e paginação
 export const useMentors = (filters: MentorFilters = {}) => {

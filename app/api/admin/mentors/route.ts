@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/services/auth/supabase'
+import { supabase } from '@/lib/services/auth/auth.service'
 import { getUserFromRequest } from '@/lib/auth/server-utils'
 
 export async function POST(request: NextRequest) {

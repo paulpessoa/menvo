@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { VerificationService } from '@/services/verifications'
+import { VerificationService } from '@/lib/services/verifications/verifications.service'
 import { getUserFromRequest } from '@/lib/auth/server-utils'
 
 export async function POST(request: NextRequest) {

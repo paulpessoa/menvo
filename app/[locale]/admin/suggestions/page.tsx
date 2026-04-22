@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
-import { mentorSuggestionService } from "@/services/mentors/suggestions"
+import { mentorSuggestionService } from "@/lib/services/mentors/suggestions.service"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
