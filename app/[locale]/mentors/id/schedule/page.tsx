@@ -36,7 +36,7 @@ import { useAuth } from "@/lib/auth"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { format, addDays, isSameDay, isBefore, isAfter } from "date-fns"
+import { format, addDays, isBefore, isAfter } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
 interface SchedulePageProps {
@@ -47,16 +47,6 @@ interface TimeSlot {
   time: string
   available: boolean
   reason?: string
-}
-
-interface SessionRequest {
-  mentorId: string
-  date: Date
-  startTime: string
-  endTime: string
-  topic: string
-  description: string
-  menteeNotes?: string
 }
 
 export default function SchedulePage({ params }: SchedulePageProps) {
@@ -71,31 +61,19 @@ export default function SchedulePage({ params }: SchedulePageProps) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Form fields
   const [topic, setTopic] = useState("")
   const [description, setDescription] = useState("")
   const [menteeNotes, setMenteeNotes] = useState("")
 
-  // Mock availability data - in real app, this would come from API
   const getAvailableTimeSlots = (date: Date): TimeSlot[] => {
     const dayOfWeek = date.getDay()
-    const baseSlots = [
-      "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"
-    ]
-
-    // Mock different availability based on day of week
-    const availability = {
-      1: ["09:00", "10:00", "11:00", "14:00"], // Monday
-      2: ["14:00", "15:00", "16:00", "17:00"], // Tuesday
-      3: ["09:00", "10:00", "14:00", "15:00"], // Wednesday
-      4: ["16:00", "17:00", "18:00", "19:00"], // Thursday
-      5: ["09:00", "10:00", "11:00", "14:00"], // Friday
-      6: ["09:00", "10:00"], // Saturday
-      0: [] // Sunday - not available
+    const baseSlots = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
+    const availability: Record<number, string[]> = {
+      1: ["09:00", "10:00", "11:00", "14:00"], 2: ["14:00", "15:00", "16:00", "17:00"],
+      3: ["09:00", "10:00", "14:00", "15:00"], 4: ["16:00", "17:00", "18:00", "19:00"],
+      5: ["09:00", "10:00", "11:00", "14:00"], 6: ["09:00", "10:00"], 0: []
     }
-
-    const availableTimes = availability[dayOfWeek as keyof typeof availability] || []
-
+    const availableTimes = availability[dayOfWeek] || []
     return baseSlots.map(time => ({
       time,
       available: availableTimes.includes(time),
@@ -103,522 +81,77 @@ export default function SchedulePage({ params }: SchedulePageProps) {
     }))
   }
 
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date)
-    setSelectedTimeSlot(null)
-  }
-
   const handleTimeSlotSelect = (time: string) => {
-    if (!user) {
-      setShowLoginModal(true)
-      return
-    }
+    if (!user) { setShowLoginModal(true); return }
     setSelectedTimeSlot(time)
   }
 
   const handleSubmitRequest = async () => {
     if (!selectedDate || !selectedTimeSlot || !user) return
-
     setIsSubmitting(true)
-
     try {
-      const endTime = `${parseInt(selectedTimeSlot.split(':')[0]) + 1}:${selectedTimeSlot.split(':')[1]}`
-
-      const sessionRequest: SessionRequest = {
-        mentorId: params.id,
-        date: selectedDate,
-        startTime: selectedTimeSlot,
-        endTime,
-        topic: topic.trim(),
-        description: description.trim(),
-        menteeNotes: menteeNotes.trim() || undefined
-      }
-
-      // TODO: Replace with actual API call
-      console.log('Session request:', sessionRequest)
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-
-      toast.success("Solicitação enviada com sucesso!", {
-        description: "O mentor receberá sua solicitação e responderá em breve."
-      })
-
-      // Redirect to sessions page or profile
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      toast.success("Solicitação enviada com sucesso!")
       router.push(`/mentors/${params.id}`)
-
-    } catch (error) {
-      toast.error("Erro ao enviar solicitação", {
-        description: "Tente novamente mais tarde."
-      })
-    } finally {
-      setIsSubmitting(false)
-      setShowConfirmDialog(false)
-    }
+    } catch (e) { toast.error("Erro ao enviar solicitação") }
+    finally { setIsSubmitting(false); setShowConfirmDialog(false) }
   }
 
-  const canSchedule = () => {
-    return user && selectedDate && selectedTimeSlot && topic.trim().length > 0
-  }
+  useEffect(() => { if (!user) setShowLoginModal(true) }, [user])
 
-  // Check if user is authenticated
-  useEffect(() => {
-    if (!user) {
-      setShowLoginModal(true)
-    }
-  }, [user])
-
-  if (isLoading) {
-    return <ScheduleSkeleton />
-  }
-
-  if (error || !mentor) {
-    notFound()
-  }
-
+  if (isLoading) return <ScheduleSkeleton />
+  if (error || !mentor) notFound()
   if (mentor.availability !== 'available') {
-    return (
-      <div className="container py-8 md:py-12">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
-          <div className="flex items-center gap-2 text-yellow-600">
-            <AlertCircle className="h-8 w-8" />
-            <h1 className="text-2xl font-bold">Mentor Indisponível</h1>
-          </div>
-          <p className="text-muted-foreground">
-            {mentor.first_name} {mentor.last_name} está temporariamente indisponível para agendamentos.
-          </p>
-          <Button onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Perfil
-          </Button>
-        </div>
-      </div>
-    )
+    return <div className="container py-12 text-center"><AlertCircle className="h-8 w-8 mx-auto text-yellow-600 mb-4" /><h1 className="text-2xl font-bold">Mentor Indisponível</h1><Button onClick={() => router.back()} className="mt-4">Voltar</Button></div>
   }
 
   return (
-    <>
-      <div className="container py-8 md:py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
-            <Button variant="ghost" size="sm" onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold">Agendar Sessão de Mentoria</h1>
-              <p className="text-muted-foreground">
-                Agende uma sessão com {mentor.first_name} {mentor.last_name}
-              </p>
-            </div>
-          </div>
+    <div className="container py-8 md:py-12 max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-8">
+        <Button variant="ghost" size="sm" onClick={() => router.back()}><ArrowLeft className="h-4 w-4 mr-2" /> Voltar</Button>
+        <h1 className="text-2xl font-bold">Agendar com {mentor.first_name}</h1>
+      </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-            {/* Main Content */}
-            <div className="space-y-6">
-              {/* Mentor Info */}
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="relative h-16 w-16 rounded-full overflow-hidden bg-muted">
-                      {mentor.avatar_url ? (
-                        <Image
-                          src={mentor.avatar_url}
-                          alt={`${mentor.first_name} ${mentor.last_name}`}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                          <User className="h-8 w-8 text-primary/40" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-lg font-semibold">
-                        {mentor.first_name} {mentor.last_name}
-                      </h2>
-                      {mentor.current_position && (
-                        <p className="text-muted-foreground">{mentor.current_position}</p>
-                      )}
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {mentor.mentor_skills.slice(0, 3).map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
+        <div className="space-y-6">
+            <Card><CardHeader><CardTitle>Data e Horário</CardTitle></CardHeader>
+            <CardContent>
+                <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} locale={ptBR} disabled={(d) => isBefore(d, new Date()) || isAfter(d, addDays(new Date(), 30))} />
+                {selectedDate && (
+                    <div className="grid grid-cols-3 gap-2 mt-6">
+                        {getAvailableTimeSlots(selectedDate).map((s) => (
+                            <Button key={s.time} variant={selectedTimeSlot === s.time ? "default" : "outline"} disabled={!s.available} onClick={() => handleTimeSlotSelect(s.time)}>{s.time}</Button>
                         ))}
-                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                )}
+            </CardContent></Card>
 
-              {/* Date Selection */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CalendarIcon className="h-5 w-5" />
-                    Selecione uma Data
-                  </CardTitle>
-                  <CardDescription>
-                    Escolha um dia disponível para sua sessão de mentoria
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={handleDateSelect}
-                    disabled={(date) =>
-                      isBefore(date, new Date()) ||
-                      isAfter(date, addDays(new Date(), 30)) ||
-                      date.getDay() === 0 // Disable Sundays
-                    }
-                    locale={ptBR}
-                    className="rounded-md border"
-                  />
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <Info className="h-4 w-4 text-blue-600 mt-0.5" />
-                      <div className="text-sm text-blue-800">
-                        <p className="font-medium">Informações importantes:</p>
-                        <ul className="mt-1 space-y-1 text-xs">
-                          <li>• Você pode agendar com até 30 dias de antecedência</li>
-                          <li>• Domingos não estão disponíveis</li>
-                          <li>• A disponibilidade varia por dia da semana</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Time Selection */}
-              {selectedDate && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Horários Disponíveis
-                    </CardTitle>
-                    <CardDescription>
-                      {format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {getAvailableTimeSlots(selectedDate).map(({ time, available, reason }) => (
-                        <Button
-                          key={time}
-                          variant={selectedTimeSlot === time ? "default" : available ? "outline" : "ghost"}
-                          disabled={!available}
-                          onClick={() => available && handleTimeSlotSelect(time)}
-                          className={`h-12 ${!available ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={reason}
-                        >
-                          {time}
-                        </Button>
-                      ))}
-                    </div>
-                    {getAvailableTimeSlots(selectedDate).every(slot => !slot.available) && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        <p>Nenhum horário disponível nesta data</p>
-                        <p className="text-sm">Tente selecionar outra data</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Session Details Form */}
-              {selectedTimeSlot && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="h-5 w-5" />
-                      Detalhes da Sessão
-                    </CardTitle>
-                    <CardDescription>
-                      Conte ao mentor sobre o que você gostaria de discutir
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="topic">Tópico Principal *</Label>
-                      <Input
-                        id="topic"
-                        placeholder="Ex: Transição de carreira, Preparação para entrevistas..."
-                        value={topic}
-                        onChange={(e) => setTopic(e.target.value)}
-                        maxLength={100}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {topic.length}/100 caracteres
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Descrição *</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Descreva mais detalhadamente o que você gostaria de discutir na sessão..."
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={4}
-                        maxLength={500}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {description.length}/500 caracteres
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="notes">Informações Adicionais</Label>
-                      <Textarea
-                        id="notes"
-                        placeholder="Alguma informação adicional que o mentor deveria saber? (opcional)"
-                        value={menteeNotes}
-                        onChange={(e) => setMenteeNotes(e.target.value)}
-                        rows={3}
-                        maxLength={300}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {menteeNotes.length}/300 caracteres
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Resumo do Agendamento</CardTitle>
-                </CardHeader>
+            {selectedTimeSlot && (
+                <Card><CardHeader><CardTitle>Detalhes</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Mentor:</span>
-                      <span className="font-medium">
-                        {mentor.first_name} {mentor.last_name}
-                      </span>
-                    </div>
+                    <div className="space-y-2"><Label>Tópico</Label><Input value={topic} onChange={(e) => setTopic(e.target.value)} /></div>
+                    <div className="space-y-2"><Label>Descrição</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} /></div>
+                </CardContent></Card>
+            )}
+        </div>
 
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Data:</span>
-                      <span className="font-medium">
-                        {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "-"}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Horário:</span>
-                      <span className="font-medium">
-                        {selectedTimeSlot ? `${selectedTimeSlot} - ${parseInt(selectedTimeSlot.split(':')[0]) + 1}:${selectedTimeSlot.split(':')[1]}` : "-"}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Duração:</span>
-                      <span className="font-medium">45 minutos</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Preço:</span>
-                      <span className="font-medium text-green-600">Gratuito</span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <Button
-                    onClick={() => setShowConfirmDialog(true)}
-                    disabled={!canSchedule()}
-                    className="w-full"
-                  >
-                    Solicitar Agendamento
-                  </Button>
-
-                  {!user && (
-                    <p className="text-xs text-muted-foreground text-center">
-                      Faça login para agendar
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Como Funciona</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-medium text-blue-600">
-                      1
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Envie sua solicitação</p>
-                      <p className="text-xs text-muted-foreground">
-                        Sua solicitação será enviada ao mentor
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-medium text-blue-600">
-                      2
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Aguarde confirmação</p>
-                      <p className="text-xs text-muted-foreground">
-                        O mentor responderá em até 24 horas
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-medium text-blue-600">
-                      3
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Receba o link</p>
-                      <p className="text-xs text-muted-foreground">
-                        Link da videochamada será enviado por email
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+        <div className="space-y-6">
+            <Card><CardHeader><CardTitle>Resumo</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                <Button onClick={() => setShowConfirmDialog(true)} disabled={!selectedDate || !selectedTimeSlot || !topic} className="w-full">Confirmar Agendamento</Button>
+            </CardContent></Card>
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Agendamento</DialogTitle>
-            <DialogDescription>
-              Revise os detalhes da sua sessão antes de enviar a solicitação
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="bg-muted p-4 rounded-lg space-y-2">
-              <p><strong>Mentor:</strong> {mentor.first_name} {mentor.last_name}</p>
-              <p><strong>Data:</strong> {selectedDate && format(selectedDate, "EEEE, d 'de' MMMM", { locale: ptBR })}</p>
-              <p><strong>Horário:</strong> {selectedTimeSlot} - {selectedTimeSlot && `${parseInt(selectedTimeSlot.split(':')[0]) + 1}:${selectedTimeSlot.split(':')[1]}`}</p>
-              <p><strong>Tópico:</strong> {topic}</p>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              <p>
-                <CheckCircle className="h-4 w-4 inline mr-2 text-green-600" />
-                Sua solicitação será enviada ao mentor
-              </p>
-              <p>
-                <CheckCircle className="h-4 w-4 inline mr-2 text-green-600" />
-                Você receberá uma confirmação por email
-              </p>
-              <p>
-                <CheckCircle className="h-4 w-4 inline mr-2 text-green-600" />
-                O mentor tem até 24h para responder
-              </p>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowConfirmDialog(false)}
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleSubmitRequest}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Enviando..." : "Confirmar Agendamento"}
-            </Button>
-          </DialogFooter>
+            <DialogHeader><DialogTitle>Tudo certo?</DialogTitle></DialogHeader>
+            <DialogFooter><Button onClick={handleSubmitRequest} disabled={isSubmitting}>{isSubmitting ? "Enviando..." : "Sim, solicitar"}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Login Required Modal */}
-      <LoginRequiredModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        mentorName={`${mentor.first_name} ${mentor.last_name}`}
-      />
-    </>
-  )
-}
-
-function ScheduleSkeleton() {
-  return (
-    <div className="container py-8 md:py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Skeleton className="h-9 w-16" />
-          <div className="flex-1">
-            <Skeleton className="h-8 w-64 mb-2" />
-            <Skeleton className="h-4 w-96" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-16 w-16 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-32" />
-                    <Skeleton className="h-4 w-48" />
-                    <div className="flex gap-2">
-                      <Skeleton className="h-5 w-16" />
-                      <Skeleton className="h-5 w-20" />
-                      <Skeleton className="h-5 w-14" />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-40" />
-                <Skeleton className="h-4 w-64" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-64 w-full" />
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-48" />
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-10 w-full" />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+      <LoginRequiredModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} mentorName={`${mentor.first_name} ${mentor.last_name}`} />
     </div>
   )
 }
+
+function ScheduleSkeleton() { return <div className="container py-12"><Skeleton className="h-12 w-64 mb-8" /><Skeleton className="h-64 w-full" /></div> }
