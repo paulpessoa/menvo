@@ -23,7 +23,12 @@ import {
     ShieldCheck, 
     UserPlus,
     UserMinus,
-    AlertCircle
+    AlertCircle,
+    MapPin,
+    GraduationCap,
+    Target,
+    BookOpen,
+    Sparkles
 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useProfile } from "@/hooks/useProfile"
@@ -44,9 +49,39 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Switch } from "@/components/ui/switch"
 
-const expertiseAreasSuggestions = ["Design", "Frontend", "Backend", "Product Management", "Marketing", "Sales", "Data Science", "UX Research"]
-const topicsSuggestions = ["Carreira", "Tecnologia", "Liderança", "Empreendedorismo", "Design Thinking", "React", "Node.js", "Python"]
-const inclusionTagsSuggestions = ["Mulheres na Tecnologia", "LGBTQIA+", "Pessoas Pretas", "PCD", "Primeiro Emprego"]
+interface ChipInputProps {
+  value: string[]
+  onChange: (value: string[]) => void
+  placeholder: string
+}
+
+function ChipInput({ value, onChange, placeholder }: ChipInputProps) {
+  const [inputValue, setInputValue] = useState("")
+  const addChip = (chip: string) => {
+    if (chip.trim() && !value.includes(chip.trim())) {
+      onChange([...value, chip.trim()])
+      setInputValue("")
+    }
+  }
+  const removeChip = (index: number) => onChange(value.filter((_, i) => i !== index))
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 mb-2">
+        {value.map((chip, index) => (
+          <Badge key={index} variant="secondary" className="flex items-center gap-1">
+            {chip} <X className="h-3 w-3 cursor-pointer" onClick={() => removeChip(index)} />
+          </Badge>
+        ))}
+      </div>
+      <Input
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addChip(inputValue) } }}
+        placeholder={placeholder}
+      />
+    </div>
+  )
+}
 
 export default function ProfilePage() {
   const t = useTranslations("profile")
@@ -91,6 +126,7 @@ export default function ProfilePage() {
     ideal_mentee: "",
     cv_url: "",
     is_public: false,
+    learning_goals: "",
   })
 
   useEffect(() => {
@@ -128,6 +164,7 @@ export default function ProfilePage() {
         ideal_mentee: profile.ideal_mentee || "",
         cv_url: profile.cv_url || "",
         is_public: profile.is_public || false,
+        learning_goals: (profile as any).learning_goals || "",
       })
     }
   }, [user, profile, authLoading, router])
@@ -135,17 +172,22 @@ export default function ProfilePage() {
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
-
     const result = await imageUpload.upload(file)
-
     if (result.success) {
       const avatarUrl = result.data.url + '?t=' + Date.now()
-      await updateProfile({ ...formData, avatar_url: avatarUrl })
       setFormData(prev => ({ ...prev, avatar_url: avatarUrl }))
       await refreshProfile()
       toast.success("Foto atualizada!")
-    } else {
-      toast.error("Erro ao subir foto")
+    }
+  }
+
+  const handleCVUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const result = await cvUpload.upload(file)
+    if (result.success) {
+      setFormData(prev => ({ ...prev, cv_url: result.data.url }))
+      toast.success("Currículo atualizado!")
     }
   }
 
@@ -153,199 +195,219 @@ export default function ProfilePage() {
     try {
         const response = await fetch('/api/profile/request-mentor', { method: 'POST' })
         if (response.ok) {
-            toast.success("Solicitação enviada com sucesso! Aguarde a moderação.")
+            toast.success("Solicitação enviada!")
             refreshProfile()
-        } else {
-            toast.error("Falha ao enviar solicitação")
         }
-    } catch (err) {
-        toast.error("Erro de conexão")
-    }
+    } catch (err) { toast.error("Erro ao solicitar") }
   }
 
   const handleStopMentor = async () => {
     try {
         const response = await fetch('/api/profile/stop-mentor', { method: 'POST' })
         if (response.ok) {
-            toast.success("Você não é mais um mentor. Seu perfil agora é apenas de mentee.")
+            toast.success("Você agora é apenas Mentee.")
             refreshProfile()
-        } else {
-            toast.error("Falha ao processar alteração")
         }
-    } catch (err) {
-        toast.error("Erro de conexão")
-    }
+    } catch (err) { toast.error("Erro ao processar") }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
     const result = await updateProfile(formData)
-    if (result.success) {
-      toast.success("Perfil atualizado!")
-    } else {
-      toast.error("Erro ao atualizar")
-    }
+    if (result.success) toast.success("Perfil salvo com sucesso!")
+    else toast.error("Erro ao salvar perfil")
   }
 
   if (authLoading || profileLoading || !profile) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
+    return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
   }
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <div>
             <h1 className="text-3xl font-bold">Meu Perfil</h1>
-            <p className="text-muted-foreground">Gerencie suas informações e visibilidade</p>
+            <p className="text-muted-foreground">Complete seu perfil para ser encontrado e ajudar/receber ajuda.</p>
           </div>
-          <div className="flex items-center gap-2">
-            {formData.slug && (
-              <Button variant="outline" asChild size="sm">
-                <Link href={isMentor ? `/mentors/${formData.slug}` : `/mentee/${formData.slug}`}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Ver Perfil Público
-                </Link>
-              </Button>
-            )}
-          </div>
+          {formData.slug && (
+            <Button variant="outline" asChild size="sm">
+              <Link href={isMentor ? `/mentors/${formData.slug}` : `/mentee/${formData.slug}`}>
+                <Eye className="h-4 w-4 mr-2" /> Ver Perfil Público
+              </Link>
+            </Button>
+          )}
         </div>
 
         <form onSubmit={handleSubmit}>
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-muted/50 p-1">
-              <TabsTrigger value="basic">Pessoal</TabsTrigger>
-              <TabsTrigger value="professional">Carreira</TabsTrigger>
-              <TabsTrigger value="mentorship">{isMentor ? "Mentoria" : "Interesses"}</TabsTrigger>
-              <TabsTrigger value="settings">Conta</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto">
+              <TabsTrigger value="basic" className="py-2">Pessoal</TabsTrigger>
+              <TabsTrigger value="career" className="py-2">Carreira</TabsTrigger>
+              <TabsTrigger value="address" className="py-2">Endereço</TabsTrigger>
+              <TabsTrigger value="interests" className="py-2">Interesses</TabsTrigger>
+              <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Dados Pessoais</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Informações Básicas</CardTitle></CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Visibilidade */}
                   <div className="flex items-center justify-between p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
                     <div className="space-y-1 pr-4">
-                      <Label className="text-base font-bold">
-                        {isMentor ? "Publicar Perfil de Mentor" : "Perfil Público na Comunidade"}
-                      </Label>
+                      <Label className="text-base font-bold">Visibilidade Pública</Label>
                       <p className="text-xs text-muted-foreground">
-                        {isMentor 
-                          ? "Permite que mentees te encontrem no diretório." 
-                          : "Permite que mentores te encontrem no Mural de Mentorados."}
+                        {isMentor ? "Ative para aparecer no diretório de Mentores." : "Ative para aparecer no Mural de Mentorados."}
                       </p>
                     </div>
-                    <Switch 
-                      checked={formData.is_public}
-                      onCheckedChange={(val) => setFormData(prev => ({ ...prev, is_public: val }))}
-                    />
+                    <Switch checked={formData.is_public} onCheckedChange={(v) => setFormData({...formData, is_public: v})} />
                   </div>
 
                   <div className="flex items-center gap-6">
                     <div className="relative">
-                      <Avatar className="h-20 w-24 border">
+                      <Avatar className="h-24 w-24 border-2">
                         <AvatarImage src={formData.avatar_url} />
                         <AvatarFallback>{formData.first_name?.[0]}</AvatarFallback>
                       </Avatar>
-                      <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute -bottom-1 -right-1 bg-primary text-white p-1.5 rounded-full shadow-lg">
-                        <Camera className="h-3 w-3" />
-                      </button>
+                      <button type="button" onClick={() => fileInputRef.current?.click()} className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg"><Camera className="h-4 w-4" /></button>
                       <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4 flex-1">
-                      <div className="space-y-1">
-                        <Label>Nome</Label>
-                        <Input value={formData.first_name} onChange={(e) => setFormData({...formData, first_name: e.target.value})} />
-                      </div>
-                      <div className="space-y-1">
-                        <Label>Sobrenome</Label>
-                        <Input value={formData.last_name} onChange={(e) => setFormData({...formData, last_name: e.target.value})} />
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                      <div className="space-y-1"><Label>Nome</Label><Input value={formData.first_name} onChange={(e) => setFormData({...formData, first_name: e.target.value})} /></div>
+                      <div className="space-y-1"><Label>Sobrenome</Label><Input value={formData.last_name} onChange={(e) => setFormData({...formData, last_name: e.target.value})} /></div>
+                      <div className="space-y-1 sm:col-span-2"><Label>Slug do Perfil</Label><Input value={formData.slug} onChange={(e) => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})} /></div>
                     </div>
                   </div>
+                  <div className="space-y-1"><Label>Bio / Mini-currículo</Label><Textarea value={formData.bio} onChange={(e) => setFormData({...formData, bio: e.target.value})} rows={4} placeholder="Conte sua história e o que te motiva..." /></div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                  <div className="space-y-1">
-                    <Label>Bio / Sobre você</Label>
-                    <Textarea 
-                        value={formData.bio} 
-                        onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                        placeholder="Conte sua história..."
-                    />
+            <TabsContent value="career" className="space-y-6">
+              <Card>
+                <CardHeader><CardTitle>Experiência e Formação</CardTitle></CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1"><Label>Cargo Atual</Label><Input value={formData.job_title} onChange={(e) => setFormData({...formData, job_title: e.target.value})} /></div>
+                    <div className="space-y-1"><Label>Empresa</Label><Input value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} /></div>
+                    <div className="space-y-1"><Label>Linkedin</Label><Input value={formData.linkedin_url} onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})} /></div>
+                    <div className="space-y-1"><Label>Portfolio / GitHub</Label><Input value={formData.portfolio_url} onChange={(e) => setFormData({...formData, portfolio_url: e.target.value})} /></div>
+                  </div>
+                  <div className="pt-4 border-t space-y-4">
+                    <h3 className="font-bold flex items-center gap-2"><GraduationCap className="h-4 w-4" /> Educação</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1"><Label>Instituição</Label><Input value={formData.institution} onChange={(e) => setFormData({...formData, institution: e.target.value})} /></div>
+                        <div className="space-y-1"><Label>Curso</Label><Input value={formData.course} onChange={(e) => setFormData({...formData, course: e.target.value})} /></div>
+                        <div className="space-y-1"><Label>Nível</Label><Input value={formData.academic_level} onChange={(e) => setFormData({...formData, academic_level: e.target.value})} /></div>
+                        <div className="space-y-1"><Label>Previsão de Conclusão</Label><Input value={formData.expected_graduation} onChange={(e) => setFormData({...formData, expected_graduation: e.target.value})} /></div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="settings" className="space-y-6">
-               <Card className="border-amber-100 bg-amber-50/20">
-                 <CardHeader>
-                   <CardTitle className="text-amber-800 flex items-center gap-2">
-                     <ShieldCheck className="h-5 w-5" />
-                     Status de Mentor
-                   </CardTitle>
-                   <CardDescription>Gerencie seu papel como mentor na plataforma</CardDescription>
+            <TabsContent value="address" className="space-y-6">
+              <Card>
+                <CardHeader><CardTitle>Localização</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-1"><Label>Endereço</Label><Input value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} /></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-1"><Label>Cidade</Label><Input value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} /></div>
+                        <div className="space-y-1"><Label>Estado</Label><Input value={formData.state} onChange={(e) => setFormData({...formData, state: e.target.value})} /></div>
+                        <div className="space-y-1"><Label>País</Label><Input value={formData.country} onChange={(e) => setFormData({...formData, country: e.target.value})} /></div>
+                    </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="interests" className="space-y-6">
+               <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Target className="h-5 w-5 text-primary" /> Interesses e Habilidades</CardTitle>
+                  <CardDescription>O que você já sabe e o que busca aprender (útil para todos os usuários)</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-3">
+                        <Label>Minhas Especialidades (O que eu já domino)</Label>
+                        <ChipInput value={formData.expertise_areas} onChange={(v) => setFormData({...formData, expertise_areas: v})} placeholder="Ex: UX Design, React, Vendas..." />
+                    </div>
+                    <div className="space-y-3">
+                        <Label>O que desejo aprender (Tópicos de interesse)</Label>
+                        <ChipInput value={formData.mentorship_topics} onChange={(v) => setFormData({...formData, mentorship_topics: v})} placeholder="Ex: Gestão de Projetos, Node.js..." />
+                    </div>
+                    <div className="space-y-1">
+                        <Label>Objetivos de Aprendizado</Label>
+                        <Textarea value={formData.learning_goals} onChange={(e) => setFormData({...formData, learning_goals: e.target.value})} placeholder="Descreva brevemente o que você busca alcançar com a mentoria..." />
+                    </div>
+                    <div className="pt-4 border-t">
+                        <Label>Currículo / Apresentação (PDF)</Label>
+                        <div className="mt-2 flex items-center gap-4">
+                            {formData.cv_url && (
+                                <div className="flex items-center gap-2 p-2 border rounded bg-green-50">
+                                    <FileText className="h-4 w-4 text-green-600" />
+                                    <span className="text-xs font-medium">PDF Carregado</span>
+                                    <Button variant="ghost" size="sm" onClick={() => window.open(formData.cv_url, '_blank')}><Eye className="h-3 w-3" /></Button>
+                                </div>
+                            )}
+                            <Button type="button" variant="outline" size="sm" onClick={() => cvInputRef.current?.click()} disabled={cvUpload.isUploading}>
+                                {cvUpload.isUploading ? "Subindo..." : "Upload de CV"}
+                            </Button>
+                            <input ref={cvInputRef} type="file" accept=".pdf" onChange={handleCVUpload} className="hidden" />
+                        </div>
+                    </div>
+                </CardContent>
+               </Card>
+            </TabsContent>
+
+            <TabsContent value="mentorship" className="space-y-6">
+               <Card className="border-amber-100 bg-amber-50/30">
+                 <CardHeader className="pb-3">
+                   <CardTitle className="text-amber-800 flex items-center gap-2 text-lg"><ShieldCheck className="h-5 w-5" /> Status de Mentor</CardTitle>
                  </CardHeader>
-                 <CardContent className="space-y-4">
+                 <CardContent>
                     {isMentor ? (
-                        <div className="space-y-4">
-                            <div className="p-3 bg-green-100 text-green-800 rounded-lg flex items-center gap-2 text-sm font-medium">
-                                <Check className="h-4 w-4" /> Você é um mentor verificado.
-                            </div>
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-green-700 flex items-center gap-2"><Check className="h-4 w-4" /> Você é um mentor ativo.</p>
                             <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 gap-2">
-                                        <UserMinus className="h-4 w-4" /> Deixar de ser Mentor
-                                    </Button>
-                                </AlertDialogTrigger>
+                                <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 gap-2"><UserMinus className="h-4 w-4" /> Deixar de ser Mentor</Button></AlertDialogTrigger>
                                 <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Seu perfil não aparecerá mais no diretório de mentores e você não receberá novos agendamentos. Você poderá solicitar novamente no futuro.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleStopMentor} className="bg-red-600">Confirmar</AlertDialogAction>
-                                    </AlertDialogFooter>
+                                    <AlertDialogHeader><AlertDialogTitle>Sair da Mentoria?</AlertDialogTitle><AlertDialogDescription>Seu perfil não aparecerá mais no diretório de mentores.</AlertDialogDescription></AlertDialogHeader>
+                                    <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={handleStopMentor} className="bg-red-600">Confirmar</AlertDialogAction></AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
                         </div>
                     ) : isPendingMentor ? (
-                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-3">
-                            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                            <div>
-                                <p className="font-bold text-blue-900">Solicitação em Análise</p>
-                                <p className="text-sm text-blue-700">Seu pedido para se tornar mentor está sendo revisado pelo nosso time. Você receberá um e-mail em breve.</p>
-                            </div>
-                        </div>
+                        <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3"><AlertCircle className="h-4 w-4 text-blue-600" /><p className="text-sm text-blue-700 font-medium">Solicitação em análise pela equipe Menvo.</p></div>
                     ) : (
-                        <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                Quer compartilhar seu conhecimento? Ao se tornar um mentor, você ganha acesso à agenda, chat proativo e avaliações.
-                            </p>
-                            <Button onClick={handleRequestMentor} className="gap-2 bg-primary">
-                                <UserPlus className="h-4 w-4" /> Solicitar ser Mentor
-                            </Button>
+                        <div className="flex items-center justify-between gap-4">
+                            <p className="text-sm text-muted-foreground flex-1">Gostaria de doar seu tempo para ajudar outros profissionais?</p>
+                            <Button onClick={handleRequestMentor} size="sm" className="gap-2 shrink-0"><UserPlus className="h-4 w-4" /> Tornar-se Mentor</Button>
                         </div>
                     )}
                  </CardContent>
                </Card>
+
+               {isMentor && (
+                 <Card>
+                    <CardHeader><CardTitle>Abordagem de Mentoria</CardTitle></CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                            <Label>Como você costuma mentorar?</Label>
+                            <Textarea value={formData.mentorship_approach} onChange={(e) => setFormData({...formData, mentorship_approach: e.target.value})} placeholder="Fale sobre seu estilo de mentoria..." />
+                        </div>
+                        <div className="space-y-1">
+                            <Label>O que o aluno deve trazer para a sessão?</Label>
+                            <Textarea value={formData.what_to_expect} onChange={(e) => setFormData({...formData, what_to_expect: e.target.value})} />
+                        </div>
+                    </CardContent>
+                 </Card>
+               )}
             </TabsContent>
 
-            {/* Outras abas mantidas como antes mas com UI limpa */}
-            <div className="flex justify-end gap-4 pt-6">
-                <Button type="submit" disabled={isUpdating} className="min-w-[150px]">
-                    {isUpdating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Salvar Alterações
+            <div className="flex justify-end gap-4 pt-6 border-t">
+                <Button type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
+                    {isUpdating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                    Salvar Perfil
                 </Button>
             </div>
           </Tabs>
