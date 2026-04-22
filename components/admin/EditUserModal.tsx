@@ -15,7 +15,19 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Save, Shield, User, Star, Camera, Upload, GraduationCap, ExternalLink, MailCheck } from "lucide-react"
+import {
+  Loader2,
+  Save,
+  Shield,
+  User,
+  Star,
+  Camera,
+  Upload,
+  GraduationCap,
+  ExternalLink,
+  MailCheck,
+  Trash2
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 import { adminService, type AdminUserUpdate } from "@/services/admin/admin"
@@ -132,10 +144,15 @@ export function EditUserModal({
 
   const handleDelete = async () => {
     if (!user) return
-    
-    const confirmName = prompt(`Para deletar PERMANENTEMENTE o usuário ${user.email}, digite "DELETAR" abaixo:`)
+
+    const confirmName = prompt(
+      `Para deletar PERMANENTEMENTE o usuário ${user.email}, digite "DELETAR" abaixo:`
+    )
     if (confirmName !== "DELETAR") {
-      if (confirmName !== null) toast.error("Exclusão cancelada. Você não digitou a palavra de confirmação.")
+      if (confirmName !== null)
+        toast.error(
+          "Exclusão cancelada. Você não digitou a palavra de confirmação."
+        )
       return
     }
 
@@ -296,7 +313,12 @@ export function EditUserModal({
                 <Input
                   id="institution"
                   value={(formData as any).institution}
-                  onChange={(e) => setFormData({ ...formData, institution: e.target.value } as any)}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      institution: e.target.value
+                    } as any)
+                  }
                   className="bg-white"
                 />
               </div>
@@ -305,7 +327,9 @@ export function EditUserModal({
                 <Input
                   id="course"
                   value={(formData as any).course}
-                  onChange={(e) => setFormData({ ...formData, course: e.target.value } as any)}
+                  onChange={(e) =>
+                    setFormData({ ...formData, course: e.target.value } as any)
+                  }
                   className="bg-white"
                 />
               </div>
@@ -322,7 +346,8 @@ export function EditUserModal({
               {user.cv_url ? (
                 <div className="flex flex-col gap-2">
                   <p className="text-xs text-green-600 font-medium flex items-center gap-1">
-                    <MailCheck className="h-3 w-3" /> Currículo disponível no sistema
+                    <MailCheck className="h-3 w-3" /> Currículo disponível no
+                    sistema
                   </p>
                   <Button
                     variant="outline"
@@ -330,32 +355,46 @@ export function EditUserModal({
                     className="w-full gap-2 bg-white"
                     asChild
                   >
-                    <a href={user.cv_url} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" /> Abrir Currículo no Browser
+                    <a
+                      href={user.cv_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" /> Abrir Currículo no
+                      Browser
                     </a>
                   </Button>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground italic">Nenhum currículo enviado.</p>
+                <p className="text-xs text-muted-foreground italic">
+                  Nenhum currículo enviado.
+                </p>
               )}
             </div>
 
             {/* Status de Convite */}
             <div className="space-y-2 p-4 border rounded-xl bg-blue-50/20">
               <Label className="font-bold flex items-center gap-2">
-                <MailCheck className="h-4 w-4 text-blue-600" /> Status do Convite
+                <MailCheck className="h-4 w-4 text-blue-600" /> Status do
+                Convite
               </Label>
               {user.invite_sent_at ? (
                 <div className="space-y-1">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200"
+                  >
                     Convite Enviado
                   </Badge>
                   <p className="text-[10px] text-muted-foreground">
-                    Enviado em: {new Date(user.invite_sent_at).toLocaleString('pt-BR')}
+                    Enviado em:{" "}
+                    {new Date(user.invite_sent_at).toLocaleString("pt-BR")}
                   </p>
                 </div>
               ) : (
-                <p className="text-xs text-orange-600 font-medium">Ainda não recebeu convite de acesso.</p>
+                <p className="text-xs text-orange-600 font-medium">
+                  Ainda não recebeu convite de acesso.
+                </p>
               )}
             </div>
           </div>
@@ -485,7 +524,7 @@ export function EditUserModal({
           >
             <Trash2 className="h-4 w-4" /> Deletar Usuário
           </Button>
-          
+
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -502,7 +541,8 @@ export function EditUserModal({
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                  Processando...
                 </>
               ) : (
                 <>
