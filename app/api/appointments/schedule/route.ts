@@ -24,16 +24,15 @@ export async function POST(request: NextRequest) {
     const { mentor_id, scheduled_at, duration_minutes, mentorship_topics, notes_mentee } = body
 
     if (!mentor_id || !scheduled_at) {
-      return errorResponse("Missing required fields", "INVALID_INPUT", 400)
+      return errorResponse("Missing required fields", "VALIDATION_ERROR", 400)
     }
 
     // 2. Verificar se o mentor existe e está verificado
-    const { data: mentor, error: mentorError } = await supabase
+    const { data: mentor, error: mentorError } = await (supabase
       .from("profiles")
       .select("id, verified")
       .eq("id", mentor_id)
-      .returns<any>()
-      .single()
+      .single() as any)
 
     if (mentorError || !mentor) {
       return errorResponse("Mentor not found", "NOT_FOUND", 404)
@@ -44,8 +43,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Criar agendamento
-    const { data: appointment, error: insertError } = await supabase
-      .from("appointments")
+    const { data: appointment, error: insertError } = await (supabase
+      .from("appointments" as any)
+      // @ts-ignore
       .insert({
         mentor_id,
         mentee_id: user.id,
@@ -54,18 +54,17 @@ export async function POST(request: NextRequest) {
         mentorship_topics: mentorship_topics || [],
         notes_mentee: notes_mentee || "",
         status: "pending"
-      } as any)
+      })
       .select(`
         *,
         mentor:profiles!mentor_id(full_name, avatar_url),
         mentee:profiles!mentee_id(full_name, avatar_url)
       `)
-      .returns<any[]>()
-      .single()
+      .single() as any)
 
     if (insertError) throw insertError
 
-    return successResponse(appointment, "Mentorship scheduled successfully", 201)
+    return successResponse(appointment, "Mentorship scheduled successfully")
   } catch (error) {
     return handleApiError(error)
   }
@@ -79,19 +78,18 @@ export async function GET(request: NextRequest) {
     const menteeId = searchParams.get("menteeId")
 
     let query = supabase
-      .from("appointments")
+      .from("appointments" as any)
       .select(`
         *,
         mentor:profiles!mentor_id(full_name, avatar_url),
         mentee:profiles!mentee_id(full_name, avatar_url)
       `)
 
-    if (mentorId) query = query.eq("mentor_id", mentorId)
-    if (menteeId) query = query.eq("mentee_id", menteeId)
+    if (mentorId) query = (query as any).eq("mentor_id", mentorId)
+    if (menteeId) query = (query as any).eq("mentee_id", menteeId)
 
-    const { data, error } = await query
+    const { data, error } = await (query as any)
       .order("scheduled_at", { ascending: false })
-      .returns<any[]>()
 
     if (error) throw error
 

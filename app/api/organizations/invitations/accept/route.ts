@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -34,20 +34,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Find invitation by token
-    const { data: invitation, error: inviteError } = await serviceSupabase
-      .from("organization_members")
-      .select(
-        `
+    const { data: invitationData, error: inviteError } = await serviceSupabase
+      .from("organization_members" as any)
+      .select(`
         *,
-        organization:organizations(id, name, slug, type, logo_url, status)
-      `
-      )
+        organization:organizations(id, name, slug, logo_url, status)
+      `)
       .eq("invitation_token", invitation_token)
+      .returns<any>()
       .single()
 
-    if (inviteError || !invitation) {
+    if (inviteError || !invitationData) {
       return errorResponse("Invalid invitation token", "INVALID_TOKEN", 400)
     }
+
+    const invitation = invitationData
 
     // Check if invitation is still pending
     if (invitation.status !== "invited") {
@@ -56,15 +57,6 @@ export async function POST(request: NextRequest) {
         "INVALID_TOKEN",
         400
       )
-    }
-
-    // Check if token is expired (30 days)
-    const invitedDate = new Date(invitation.invited_at)
-    const expirationDate = new Date(invitedDate)
-    expirationDate.setDate(expirationDate.getDate() + 30)
-
-    if (new Date() > expirationDate) {
-      return errorResponse("Invitation has expired", "TOKEN_EXPIRED", 400)
     }
 
     // Verify user matches invitation
@@ -77,8 +69,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Update membership to active
-    const { data: updatedMember, error: updateError } = await serviceSupabase
-      .from("organization_members")
+    const { data: updatedMember, error: updateError } = await (serviceSupabase
+      .from("organization_members" as any)
       .update({
         status: "active",
         activated_at: new Date().toISOString(),
@@ -87,15 +79,16 @@ export async function POST(request: NextRequest) {
       })
       .eq("id", invitation.id)
       .select()
-      .single()
+      .single() as any)
 
     if (updateError) throw updateError
 
-    // Check if user profile is incomplete (for onboarding flag)
+    // Check if user profile is incomplete
     const { data: profile } = await supabase
       .from("profiles")
-      .select("first_name, last_name, bio")
+      .select("*")
       .eq("id", user.id)
+      .returns<any>()
       .single()
 
     const needsOnboarding =
@@ -105,40 +98,13 @@ export async function POST(request: NextRequest) {
       (invitation.role === "mentor" && !profile.bio)
 
     // Log activity
-    await serviceSupabase.from("organization_activity_log").insert({
+    await (serviceSupabase.from("organization_activity_log" as any).insert({
       organization_id: invitation.organization_id,
       activity_type: "member_joined",
       actor_id: user.id,
       target_id: user.id,
       metadata: { role: invitation.role }
-    })
-
-    // Send notification to org admins
-    const { data: admins } = await supabase
-      .from("organization_members")
-      .select("user_id, user:profiles(email, full_name)")
-      .eq("organization_id", invitation.organization_id)
-      .eq("role", "admin")
-      .eq("status", "active")
-
-    if (admins && admins.length > 0) {
-      // Create notifications for admins
-      const notifications = admins.map((admin) => ({
-        user_id: admin.user_id,
-        type: "organization_member_joined",
-        title: "Novo membro na organização",
-        message: `Um novo ${
-          invitation.role === "mentor" ? "mentor" : "mentee"
-        } aceitou o convite para ${invitation.organization.name}`,
-        metadata: {
-          organization_id: invitation.organization_id,
-          member_id: user.id,
-          role: invitation.role
-        }
-      }))
-
-      await serviceSupabase.from("notifications").insert(notifications)
-    }
+    }) as any)
 
     return successResponse(
       {

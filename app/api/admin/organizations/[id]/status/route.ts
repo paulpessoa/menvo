@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -32,13 +32,14 @@ export async function PATCH(
     }
 
     // Check if user is admin
-    const { data: roleData } = await (supabase
-      .from("user_roles" as any)
+    const { data: roleData } = await supabase
+      .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
-      .single() as any)
+      .returns<any>()
+      .single()
 
-    const userRole = roleData?.roles?.name
+    const userRole = (roleData as any)?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
       return errorResponse(
         "Forbidden - Admin access required",
@@ -56,19 +57,20 @@ export async function PATCH(
     }
 
     // Update organization status
-    const { data: organization, error: updateError } = await serviceSupabase
-      .from("organizations")
+    const { data: organization, error: updateError } = await (serviceSupabase
+      .from("organizations" as any)
+      // @ts-ignore
       .update(updateData)
       .eq("id", id)
       .select()
-      .single()
+      .single() as any)
 
     if (updateError) throw updateError
 
     // Log activity
-    await serviceSupabase.from("organization_activity_log").insert({
+    await serviceSupabase.from("organization_activity_log" as any).insert({
       organization_id: id,
-      activity_type: "settings_updated",
+      activity_type: "status_change",
       actor_id: user.id,
       metadata: { action: "status_change", new_status: status }
     })

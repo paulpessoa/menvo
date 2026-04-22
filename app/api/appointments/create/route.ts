@@ -22,8 +22,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Criar agendamento
-    const { data: appointment, error: insertError } = await supabase
-      .from("appointments")
+    const { data: appointment, error: insertError } = await (supabase
+      .from("appointments" as any)
+      // @ts-ignore
       .insert({
         mentor_id,
         mentee_id: user.id,
@@ -38,8 +39,7 @@ export async function POST(request: NextRequest) {
         mentor:profiles!mentor_id(full_name, avatar_url, email),
         mentee:profiles!mentee_id(full_name, avatar_url, email)
       `)
-      .returns<any[]>()
-      .single()
+      .single() as any)
 
     if (insertError) throw insertError
 

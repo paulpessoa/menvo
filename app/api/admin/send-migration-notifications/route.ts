@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
     const result = await sendBatchMigrationNotifications()
 
     return NextResponse.json({
-      success: true,
       ...result
     })
 

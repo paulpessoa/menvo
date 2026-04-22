@@ -160,6 +160,58 @@ export function isGoogleCalendarConfigured(): boolean {
   return getMissingEnvVars().length === 0;
 }
 
-// Manter outras funções vazias para não quebrar imports
-export async function updateCalendarEvent() {}
-export async function deleteCalendarEvent() {}
+/**
+ * Atualizar evento no Google Calendar
+ */
+export async function updateCalendarEvent(
+  userId: string,
+  eventId: string,
+  eventData: Partial<CalendarEventData>
+) {
+  try {
+    const oauth2Client = await createAuthenticatedClient();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    const updateBody: any = {};
+    if (eventData.summary) updateBody.summary = eventData.summary;
+    if (eventData.description) updateBody.description = eventData.description;
+    if (eventData.startTime) updateBody.start = { dateTime: eventData.startTime.toISOString() };
+    if (eventData.endTime) updateBody.end = { dateTime: eventData.endTime.toISOString() };
+
+    const response = await calendar.events.patch({
+      calendarId: getCalendarId(),
+      eventId: eventId,
+      requestBody: updateBody,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('[CALENDAR] Erro ao atualizar evento:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Excluir evento no Google Calendar
+ */
+export async function deleteCalendarEvent(
+  userId: string,
+  eventId: string
+) {
+  try {
+    const oauth2Client = await createAuthenticatedClient();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    await calendar.events.delete({
+      calendarId: getCalendarId(),
+      eventId: eventId,
+    });
+
+    return true;
+  } catch (error: any) {
+    // Silently ignore 404
+    if (error.code === 404) return true;
+    console.error('[CALENDAR] Erro ao deletar evento:', error.message);
+    throw error;
+  }
+}

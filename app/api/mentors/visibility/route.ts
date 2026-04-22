@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
       .from("user_roles")
       .select("role:roles(name)")
       .eq("user_id", user.id)
+      .returns<any[]>()
 
     const isMentor = roles?.some((r: any) => r.role?.name === "mentor")
 
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     // Query mentor_visibility_settings
     const { data: settings, error } = await supabase
-      .from("mentor_visibility_settings")
+      .from("mentor_visibility_settings" as any)
       .select(
         `
         *,
@@ -46,10 +47,10 @@ export async function GET(request: NextRequest) {
       `
       )
       .eq("mentor_id", user.id)
-      .single()
+      .returns<any>()
+      .maybeSingle()
 
     if (error && error.code !== "PGRST116") {
-      // PGRST116 is "not found" error
       throw error
     }
 
@@ -88,6 +89,7 @@ export async function PATCH(request: NextRequest) {
       .from("user_roles")
       .select("role:roles(name)")
       .eq("user_id", user.id)
+      .returns<any[]>()
 
     const isMentor = roles?.some((r: any) => r.role?.name === "mentor")
 
@@ -121,13 +123,14 @@ export async function PATCH(request: NextRequest) {
       visible_to_organizations.length > 0
     ) {
       const { data: memberships } = await supabase
-        .from("organization_members")
+        .from("organization_members" as any)
         .select("organization_id")
         .eq("user_id", user.id)
         .eq("status", "active")
         .in("organization_id", visible_to_organizations)
+        .returns<any[]>()
 
-      const memberOrgIds = memberships?.map((m) => m.organization_id) || []
+      const memberOrgIds = memberships?.map((m: any) => m.organization_id) || []
 
       // Check if all requested organizations are valid
       const invalidOrgs = visible_to_organizations.filter(
@@ -145,35 +148,33 @@ export async function PATCH(request: NextRequest) {
 
     // Update or create settings
     const { data: existing } = await supabase
-      .from("mentor_visibility_settings")
+      .from("mentor_visibility_settings" as any)
       .select("*")
       .eq("mentor_id", user.id)
-      .single()
+      .maybeSingle()
 
     let result
 
     if (existing) {
-      // Update existing settings
-      const { data, error } = await supabase
-        .from("mentor_visibility_settings")
+      const { data, error } = await (supabase
+        .from("mentor_visibility_settings" as any)
         .update({
-          visibility_scope: visibility_scope || existing.visibility_scope,
+          visibility_scope: visibility_scope || (existing as any).visibility_scope,
           visible_to_organizations:
             visible_to_organizations !== undefined
               ? visible_to_organizations
-              : existing.visible_to_organizations,
+              : (existing as any).visible_to_organizations,
           updated_at: new Date().toISOString()
         })
         .eq("mentor_id", user.id)
         .select()
-        .single()
+        .single() as any)
 
       if (error) throw error
       result = data
     } else {
-      // Create new settings
-      const { data, error } = await supabase
-        .from("mentor_visibility_settings")
+      const { data, error } = await (supabase
+        .from("mentor_visibility_settings" as any)
         .insert({
           mentor_id: user.id,
           visibility_scope: visibility_scope || "public",
@@ -182,7 +183,7 @@ export async function PATCH(request: NextRequest) {
           updated_at: new Date().toISOString()
         })
         .select()
-        .single()
+        .single() as any)
 
       if (error) throw error
       result = data

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -25,7 +24,7 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
     presentation_video_url: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const { user, profile, refreshProfile } = useAuth()
+  const { user, profile, isMentor, refreshProfile } = useAuth()
   const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +39,11 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
         updated_at: new Date().toISOString(),
       }
 
-      const { error } = await supabase.from("profiles").update(updateData).eq("id", user.id)
+      // Cast here is necessary for build time discovery
+      const { error } = await supabase
+        .from("profiles" as any)
+        .update(updateData)
+        .eq("id", user.id)
 
       if (error) throw error
 
@@ -52,8 +55,6 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
       setIsSubmitting(false)
     }
   }
-
-  const isMentor = profile?.role === "mentor"
 
   if (!isOpen) return null
 

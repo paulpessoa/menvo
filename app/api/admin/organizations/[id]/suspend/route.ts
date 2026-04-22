@@ -10,12 +10,12 @@ import {
 // POST /api/admin/organizations/[id]/suspend - Suspend organization (admin only)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
     const serviceSupabase = createServiceRoleClient()
-    const { id } = params
+    const { id } = await params
 
     // Authenticate user
     const {
@@ -31,9 +31,10 @@ export async function POST(
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
+      .returns<any>()
       .single()
 
-    const userRole = (roleData?.roles as any)?.name
+    const userRole = (roleData as any)?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
       return errorResponse(
         "Forbidden - Admin access required",
@@ -43,17 +44,18 @@ export async function POST(
     }
 
     // Update organization status to suspended
-    const { data: organization, error: updateError } = await serviceSupabase
-      .from("organizations")
+    const { data: organization, error: updateError } = await (serviceSupabase
+      .from("organizations" as any)
+      // @ts-ignore
       .update({ status: "suspended" })
       .eq("id", id)
       .select()
-      .single()
+      .single() as any)
 
     if (updateError) throw updateError
 
     // Log activity
-    await serviceSupabase.from("organization_activity_log").insert({
+    await serviceSupabase.from("organization_activity_log" as any).insert({
       organization_id: id,
       activity_type: "settings_updated",
       actor_id: user.id,

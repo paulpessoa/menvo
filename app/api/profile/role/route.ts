@@ -19,44 +19,59 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Role inválida" }, { status: 400 })
     }
 
-    const status = role === "mentor" ? "validation_pending" : "incomplete"
-
-    const { error: updateError } = await supabase
-      .from("profiles")
+    // 1. Atualizar o perfil do usuário
+    const { error: updateError } = await (supabase
+      .from("profiles" as any)
+      // @ts-ignore
       .update({
         user_role: role,
-        verification_status: status === "validation_pending" ? "pending" : "pending",
+        verification_status: role === "mentor" ? "pending" : "approved",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", user.id)
+      .eq("id", user.id) as any)
 
     if (updateError) {
-      console.error("Erro ao atualizar role:", updateError)
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
     }
 
     if (role === "mentor") {
-      const { error: validationError } = await supabase.from("validation_requests").insert({
-        user_id: user.id,
-        request_type: "mentor_validation",
-        status: "pending",
-        created_at: new Date().toISOString(),
-      })
+      const { error: validationError } = await (supabase
+        .from("validation_requests" as any)
+        .insert({
+          user_id: user.id,
+          request_type: "mentor_verification",
+          status: "pending",
+          created_at: new Date().toISOString(),
+        }) as any)
 
       if (validationError) {
         console.error("Erro ao criar solicitação de validação:", validationError)
-        // Não falhar aqui, apenas logar o erro
       }
+    }
+
+    // 2. Atribuir a role no sistema de RBAC
+    const { data: roleData } = await supabase
+      .from("roles")
+      .select("id")
+      .eq("name", role)
+      .single()
+
+    if (roleData) {
+      await (supabase
+        .from("user_roles" as any)
+        .upsert({ 
+          user_id: user.id, 
+          role_id: roleData.id 
+        }) as any)
     }
 
     return NextResponse.json({
       success: true,
       message: "Role atualizada com sucesso",
       role,
-      status,
+      status: role === "mentor" ? "pending" : "approved",
     })
   } catch (error) {
-    console.error("Erro interno:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

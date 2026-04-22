@@ -1,9 +1,8 @@
 import { createClient } from '@/lib/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { 
-  updateGoogleCalendarEvent, 
-  deleteGoogleCalendarEvent, 
-  hasGoogleCalendarConnected 
+  updateCalendarEvent, 
+  deleteCalendarEvent
 } from '@/lib/services/mentorship/google-calendar.service';
 import { 
   errorResponse, 
@@ -72,7 +71,7 @@ export async function PATCH(
     // 4. Handle Google Calendar Sync if needed
     if (status === 'cancelled' && appointment.google_event_id) {
         try {
-            await deleteGoogleCalendarEvent(user.id, appointment.google_event_id);
+            await deleteCalendarEvent(user.id, appointment.google_event_id);
         } catch (calError) {
             console.error('Failed to delete calendar event:', calError);
         }
@@ -116,7 +115,7 @@ export async function DELETE(
     // Delete calendar event
     if (appointment.google_event_id) {
         try {
-            await deleteGoogleCalendarEvent(user.id, appointment.google_event_id);
+            await deleteCalendarEvent(user.id, appointment.google_event_id);
         } catch (calError) {}
     }
 

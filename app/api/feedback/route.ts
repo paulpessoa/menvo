@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
+import { handleApiError, errorResponse, successResponse } from "@/lib/api/error-handler"
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,20 +12,20 @@ export async function GET(request: NextRequest) {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
-    if (authError) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    
+    if (authError || !user) {
+      return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
     // Check if user is admin
-    const { data: userRoles } = await supabase
+    const { data: roleData } = await supabase
       .from("user_roles")
-      .select(`
-        role_id,
-        roles!inner(name)
-      `)
-      .eq("user_id", user?.id)
+      .select("roles(name)")
+      .eq("user_id", user.id)
+      .returns<any>()
+      .single()
 
-    const isAdmin = userRoles?.some((ur: any) => ur.roles?.name === "admin")
+    const isAdmin = roleData?.roles?.name === "admin"
 
     // Parse query parameters
     const page = Number.parseInt(searchParams.get("page") || "1")
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     let query = supabase
-      .from("feedback")
+      .from("feedback" as any)
       .select(`
         *,
         user:profiles(full_name, avatar_url)
@@ -41,30 +42,16 @@ export async function GET(request: NextRequest) {
 
     // Apply filters based on user role
     if (!isAdmin) {
-      // Regular users can only see their own feedback
-      query = query.eq("user_id", user?.id)
+      query = (query as any).eq("user_id", user.id)
     }
 
     // Apply pagination
-    query = query.range(offset, offset + limit - 1)
+    const { data: feedback, error, count } = await (query as any)
+      .range(offset, offset + limit - 1)
 
-    const { data: feedback, error } = await query
+    if (error) throw error
 
-    if (error) {
-      console.error("Error fetching feedback:", error)
-      return NextResponse.json({ error: "Failed to fetch feedback" }, { status: 500 })
-    }
-
-    // Get total count for pagination
-    let countQuery = supabase.from("feedback").select("*", { count: "exact", head: true })
-
-    if (!isAdmin) {
-      countQuery = countQuery.eq("user_id", user?.id)
-    }
-
-    const { count } = await countQuery
-
-    return NextResponse.json({
+    return successResponse({
       feedback,
       pagination: {
         page,
@@ -74,8 +61,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("Error in feedback API:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return handleApiError(error)
   }
 }
 
@@ -91,56 +77,30 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { rating, comment, email } = body
 
-    // Validate required fields
     if (!rating) {
-      return NextResponse.json(
-        {
-          error: "Rating is required",
-        },
-        { status: 400 },
-      )
+      return errorResponse("Rating is required", "VALIDATION_ERROR", 400)
     }
 
-    // Validate rating
-    if (rating < 1 || rating > 5) {
-      return NextResponse.json(
-        {
-          error: "Rating must be between 1 and 5",
-        },
-        { status: 400 },
-      )
-    }
-
-    // For non-authenticated users, email is required
     if (!user && !email) {
-      return NextResponse.json(
-        {
-          error: "Email is required for anonymous feedback",
-        },
-        { status: 400 },
-      )
+      return errorResponse("Email is required for anonymous feedback", "VALIDATION_ERROR", 400)
     }
 
     // Create feedback
-    const { data: feedback, error } = await supabase
-      .from("feedback")
+    const { data: feedback, error } = await (supabase
+      .from("feedback" as any)
       .insert({
         user_id: user?.id || null,
-        rating: typeof rating === 'string' ? Number.parseInt(rating) : rating,
+        rating: Number(rating),
         comment: comment || null,
-        email: user ? null : email, // Only store email for non-authenticated users
+        email: user ? null : email,
       })
       .select()
-      .single()
+      .single() as any)
 
-    if (error) {
-      console.error("Error creating feedback:", error)
-      return NextResponse.json({ error: error.message || "Failed to create feedback" }, { status: 500 })
-    }
+    if (error) throw error
 
-    return NextResponse.json({ feedback }, { status: 201 })
+    return successResponse(feedback, "Feedback submitted successfully")
   } catch (error) {
-    console.error("Error in feedback POST:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return handleApiError(error)
   }
 }

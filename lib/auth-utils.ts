@@ -27,7 +27,7 @@ export async function getValidAuthToken(): Promise<AuthResult> {
     });
     
     // If we have a valid session, return it
-    if (session?.access_token) {
+    if (session?.access_token && session.expires_at) {
       // Check if token is not expired (with 5 minute buffer)
       const expiresAt = session.expires_at * 1000;
       const now = Date.now();

@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
         )
       `)
       .eq('user_id', user.id)
+      .returns<any[]>()
 
     if (roleError || !userRoles?.some((ur: any) => ur.roles?.name === 'admin')) {
       return NextResponse.json({ error: 'Acesso negado - apenas admins' }, { status: 403 })
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Construir query base
     let query = supabase
-      .from('profiles')
+      .from('profiles' as any)
       .select(`
         id,
         email,
@@ -60,16 +61,16 @@ export async function GET(request: NextRequest) {
 
     // Aplicar filtros
     if (search) {
-      query = query.or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%,full_name.ilike.%${search}%`)
+      query = (query as any).or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%,full_name.ilike.%${search}%`)
     }
 
     if (statusFilter) {
       const verified = statusFilter === 'verified'
-      query = query.eq('verified', verified)
+      query = (query as any).eq('verified', verified)
     }
 
     // Executar query principal
-    const { data: profiles, error: profilesError, count } = await query
+    const { data: profiles, error: profilesError, count } = await (query as any)
       .range(offset, offset + limit - 1)
       .order('created_at', { ascending: false })
 
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Processar dados dos usuários
-    const users = profiles?.map(profile => {
+    const users = (profiles as any[])?.map(profile => {
       const userRole = profile.user_roles?.[0]?.roles?.name || 'mentee'
       
       return {
@@ -110,7 +111,6 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -140,6 +140,7 @@ export async function POST(request: NextRequest) {
         )
       `)
       .eq('user_id', user.id)
+      .returns<any[]>()
 
     if (roleError || !userRoles?.some((ur: any) => ur.roles?.name === 'admin')) {
       return NextResponse.json({ error: 'Acesso negado - apenas admins' }, { status: 403 })
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest) {
 
     // Criar perfil
     const { error: profileError } = await supabase
-      .from('profiles')
+      .from('profiles' as any)
       .insert({
         id: authUser.user.id,
         email,
@@ -193,7 +194,7 @@ export async function POST(request: NextRequest) {
 
       if (roleData) {
         await supabase
-          .from('user_roles')
+          .from('user_roles' as any)
           .insert({
             user_id: authUser.user.id,
             role_id: roleData.id
@@ -226,7 +227,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao criar usuário:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -256,6 +256,7 @@ export async function PUT(request: NextRequest) {
         )
       `)
       .eq('user_id', user.id)
+      .returns<any[]>()
 
     if (roleError || !userRoles?.some((ur: any) => ur.roles?.name === 'admin')) {
       return NextResponse.json({ error: 'Acesso negado - apenas admins' }, { status: 403 })
@@ -274,7 +275,7 @@ export async function PUT(request: NextRequest) {
 
     if (Object.keys(profileUpdates).length > 0) {
       const { error: profileError } = await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .update(profileUpdates)
         .eq('id', userId)
 
@@ -298,7 +299,7 @@ export async function PUT(request: NextRequest) {
     if (updates.user_role) {
       // Remover roles existentes
       await supabase
-        .from('user_roles')
+        .from('user_roles' as any)
         .delete()
         .eq('user_id', userId)
 
@@ -312,7 +313,7 @@ export async function PUT(request: NextRequest) {
 
         if (roleData) {
           await supabase
-            .from('user_roles')
+            .from('user_roles' as any)
             .insert({
               user_id: userId,
               role_id: roleData.id
@@ -337,7 +338,6 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao atualizar usuário:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -368,6 +368,7 @@ export async function DELETE(request: NextRequest) {
         )
       `)
       .eq('user_id', user.id)
+      .returns<any[]>()
 
     if (roleError || !userRoles?.some((ur: any) => ur.roles?.name === 'admin')) {
       return NextResponse.json({ error: 'Acesso negado - apenas admins' }, { status: 403 })
@@ -401,11 +402,11 @@ export async function DELETE(request: NextRequest) {
       user.id,
       'user_deleted',
       {
-        deleted_user_email: userToDelete?.email,
-        deleted_user_name: userToDelete?.full_name
+        deleted_user_email: (userToDelete as any)?.email,
+        deleted_user_name: (userToDelete as any)?.full_name
       },
       userId,
-      userToDelete?.email,
+      (userToDelete as any)?.email,
       request
     )
 
@@ -415,7 +416,6 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro ao deletar usuário:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

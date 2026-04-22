@@ -13,11 +13,11 @@ export async function POST(request: NextRequest) {
     const { name, email, role, interests, linkedin_url } = body
 
     if (!email) {
-      return errorResponse("Email is required", "INVALID_INPUT", 400)
+      return errorResponse("Email is required", "VALIDATION_ERROR", 400)
     }
 
-    const { data, error } = await supabase
-      .from("waiting_list")
+    const { data, error } = await (supabase
+      .from("waiting_list" as any)
       .insert({
         name: name || null,
         email,
@@ -25,18 +25,18 @@ export async function POST(request: NextRequest) {
         interests: interests || [],
         linkedin_url: linkedin_url || null,
         status: 'pending'
-      } as any)
+      })
       .select()
-      .single()
+      .single() as any)
 
     if (error) {
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
         return errorResponse("Email already registered", "CONFLICT", 409)
       }
       throw error
     }
 
-    return successResponse(data, "Joined waiting list successfully", 201)
+    return successResponse(data, "Joined waiting list successfully")
   } catch (error) {
     return handleApiError(error)
   }
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       .returns<any>()
       .maybeSingle()
 
-    if ((roleData?.roles as any)?.name !== 'admin') {
+    if (roleData?.roles?.name !== 'admin') {
       return errorResponse("Forbidden", "FORBIDDEN", 403)
     }
 
@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
       .from("waiting_list")
       .select("*")
       .order("created_at", { ascending: false })
+      .returns<any[]>()
 
     if (error) throw error
 

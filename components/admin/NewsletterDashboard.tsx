@@ -203,7 +203,7 @@ export function NewsletterDashboard() {
                         <Calendar className="h-3 w-3 text-muted-foreground" />
                         <span className="text-sm">
                           {format(
-                            new Date(subscription.subscribed_at || ''), 
+                            new Date((subscription as any).subscribed_at || subscription.created_at), 
                             'dd/MM/yyyy HH:mm',
                             { locale: ptBR }
                           )}
@@ -226,9 +226,9 @@ export function NewsletterDashboard() {
                     </TableCell>
                     <TableCell>
                       <Badge 
-                        variant={subscription.status === 'active' ? 'default' : 'secondary'}
+                        variant={(subscription as any).status === 'active' ? 'default' : 'secondary'}
                       >
-                        {subscription.status === 'active' ? 'Ativo' : 'Cancelado'}
+                        {(subscription as any).status === 'active' ? 'Ativo' : 'Cancelado'}
                       </Badge>
                     </TableCell>
                   </TableRow>

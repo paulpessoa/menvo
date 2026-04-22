@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       .returns<any>()
       .single()
 
-    const userRole = (roleData?.roles as any)?.name
+    const userRole = roleData?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
       return errorResponse(
         "Forbidden - Admin access required",

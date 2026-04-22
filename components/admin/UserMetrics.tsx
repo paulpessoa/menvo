@@ -180,7 +180,7 @@ export function UserMetrics({ data = [], appointments = [] }: UserMetricsProps) 
                   cx="50%"
                   cy="50%"
                   labelLine={true}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }: any) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                   outerRadius={80}
                   innerRadius={60}
                   paddingAngle={5}
