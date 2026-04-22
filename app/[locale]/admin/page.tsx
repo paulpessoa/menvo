@@ -34,7 +34,6 @@ interface AdminStats {
   totalSessions: number
   recentSignups: number
   pendingSuggestions: number
-  pendingHubResources: number
 }
 
 export default function AdminDashboard() {
@@ -48,8 +47,7 @@ export default function AdminDashboard() {
     totalMentees: 0,
     totalSessions: 0,
     recentSignups: 0,
-    pendingSuggestions: 0,
-    pendingHubResources: 0
+    pendingSuggestions: 0
   })
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
@@ -293,8 +291,7 @@ export default function AdminDashboard() {
                   </CardTitle>
                 </div>
                 <CardDescription className="text-yellow-700">
-                  Existem {stats.pendingMentors} mentores e{" "}
-                  {stats.pendingHubResources} recursos do Hub aguardando sua
+                  Existem {stats.pendingMentors} mentores aguardando sua
                   revisão.
                 </CardDescription>
               </CardHeader>
@@ -304,11 +301,6 @@ export default function AdminDashboard() {
                     <Link href="/admin/users?tab=pending">
                       Verificar Mentores
                     </Link>
-                  </Button>
-                )}
-                {stats.pendingHubResources > 0 && (
-                  <Button asChild variant="outline">
-                    <Link href="/admin/hub">Moderar Hub</Link>
                   </Button>
                 )}
               </CardContent>

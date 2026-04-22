@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
-import { Heart, MapPin, MessageCircle, Star } from "lucide-react"
+import { Heart, MapPin, MessageCircle, Star, Sparkles } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -35,12 +35,16 @@ interface MentorCardProps {
   mentor: MentorProfile
   isFavorite: boolean
   onToggleFavorite: () => void
+  isAIHighlighted?: boolean
+  aiReason?: string | null
 }
 
 export function MentorCard({ 
   mentor, 
   isFavorite, 
-  onToggleFavorite 
+  onToggleFavorite,
+  isAIHighlighted,
+  aiReason
 }: MentorCardProps) {
   const t = useTranslations("mentorsPage")
   const router = useRouter()
@@ -69,7 +73,15 @@ export function MentorCard({
   }
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full relative group">
+    <Card className={`hover:shadow-lg transition-all duration-300 flex flex-col h-full relative group ${
+      isAIHighlighted ? 'ring-2 ring-primary border-primary/20 shadow-primary/10 shadow-xl scale-[1.02]' : ''
+    }`}>
+      {isAIHighlighted && (
+        <div className="absolute -top-3 -right-3 z-20 bg-primary text-white p-2 rounded-full shadow-lg animate-bounce">
+          <Sparkles className="h-5 w-5" />
+        </div>
+      )}
+      
       <button 
         onClick={(e) => {
           e.preventDefault();
@@ -93,7 +105,12 @@ export function MentorCard({
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg line-clamp-1 pr-8">{mentor.full_name}</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-lg line-clamp-1 pr-8">{mentor.full_name}</CardTitle>
+                {isAIHighlighted && (
+                  <Badge className="bg-primary hover:bg-primary text-[10px] py-0 h-4">Sugestão IA</Badge>
+                )}
+              </div>
               <CardDescription className="text-sm line-clamp-1">
                 {mentor.job_title}
                 {mentor.company && ` @ ${mentor.company}`}
@@ -104,6 +121,12 @@ export function MentorCard({
       </CardHeader>
 
       <CardContent className="space-y-4 flex-1 flex flex-col">
+        {isAIHighlighted && aiReason && (
+          <div className="p-3 bg-primary/5 rounded-lg border border-primary/10 text-xs text-primary font-medium italic">
+            "{aiReason}"
+          </div>
+        )}
+
         <div className="flex justify-between items-center">
             <Badge variant="secondary" className={`${getAvailabilityColor(mentor.availability_status)} border-none whitespace-nowrap`}>
                 {getAvailabilityText(mentor.availability_status)}

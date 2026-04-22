@@ -115,14 +115,6 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/hub"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    {t("footer.events")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     href="/how-it-works"
                     className="text-muted-foreground hover:text-foreground"
                   >

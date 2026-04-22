@@ -34,6 +34,7 @@ import {
 import { useAuth } from "@/hooks/useAuth"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
+import { MagicSearchBar } from "@/components/mentors/MagicSearchBar"
 import { useFavorites } from "@/hooks/useFavorites"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
@@ -101,6 +102,9 @@ export default function MentorsPage() {
   const [page, setPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
+
+  const [suggestedMentorIds, setSuggestedMentorIds] = useState<string[]>([])
+  const [aiJustification, setAiJustification] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [availableFilters, setAvailableFilters] = useState({
@@ -311,13 +315,34 @@ export default function MentorsPage() {
     fetchMentors(false)
   }
 
+  const handleAIMatch = (mentorIds: string[], justification: string) => {
+    setSuggestedMentorIds(mentorIds)
+    setAiJustification(justification)
+    // Rola para os resultados com um pequeno delay
+    setTimeout(() => {
+        window.scrollTo({ top: 400, behavior: 'smooth' })
+    }, 100)
+  }
+
+  const handleClearAI = () => {
+    setSuggestedMentorIds([])
+    setAiJustification(null)
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("title")}</h1>
-        <p className="text-gray-600">{t("subtitle")}</p>
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          {t("title")}
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          {t("subtitle")}
+        </p>
       </div>
+
+      {/* Magic AI Search Bar */}
+      <MagicSearchBar onMatch={handleAIMatch} onClear={handleClearAI} />
 
       {/* Search and Filter Bar */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4">
@@ -584,14 +609,31 @@ export default function MentorsPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mentors.map((mentor) => (
-              <MentorCard
-                key={mentor.id}
-                mentor={mentor}
-                isFavorite={favorites.includes(mentor.id)}
-                onToggleFavorite={() => toggleFavorite(mentor.id)}
-              />
-            ))}
+            {/* Primeiro os sugeridos pela IA */}
+            {mentors
+              .filter(m => suggestedMentorIds.includes(m.id))
+              .map((mentor) => (
+                <MentorCard
+                  key={`ai-${mentor.id}`}
+                  mentor={mentor}
+                  isFavorite={favorites.includes(mentor.id)}
+                  onToggleFavorite={() => toggleFavorite(mentor.id)}
+                  isAIHighlighted={true}
+                  aiReason={aiJustification}
+                />
+              ))}
+            
+            {/* Depois os demais */}
+            {mentors
+              .filter(m => !suggestedMentorIds.includes(m.id))
+              .map((mentor) => (
+                <MentorCard
+                  key={mentor.id}
+                  mentor={mentor}
+                  isFavorite={favorites.includes(mentor.id)}
+                  onToggleFavorite={() => toggleFavorite(mentor.id)}
+                />
+              ))}
           </div>
 
           {/* Load More */}
