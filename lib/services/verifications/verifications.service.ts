@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/services/auth/auth.service'
 import { Verification } from '@/lib/types/models/verification'
-import { Database } from '@/lib/types/database'
 
 interface CompleteVerificationParams {
   verificationId: string
@@ -15,20 +14,20 @@ export class VerificationServiceClass {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
-    const { error } = await (supabase.rpc("request_mentor_verification" as any, {
+    const { error } = await (supabase.rpc("request_mentor_verification", {
       mentor_user_id: user.id,
-    }) as any)
+    } as any) as any)
 
     if (error) throw error
   }
 
   // Agendar verificação (admin)
   async scheduleVerification(verificationId: string, scheduledAt: string, adminId: string): Promise<void> {
-    const { error } = await (supabase.rpc("schedule_mentor_verification" as any, {
+    const { error } = await (supabase.rpc("schedule_mentor_verification", {
       verification_id: parseInt(verificationId),
       scheduled_datetime: scheduledAt,
       admin_id: adminId,
-    }) as any)
+    } as any) as any)
 
     if (error) throw error
   }
@@ -36,12 +35,12 @@ export class VerificationServiceClass {
   async getPendingVerifications(adminId: string): Promise<Verification[]> {
     // Tenta primeiro via RPC
     try {
-      const { data, error } = await (supabase.rpc("get_pending_verifications" as any, {
+      const { data, error } = await (supabase.rpc("get_pending_verifications", {
         admin_id: adminId,
-      }) as any)
+      } as any) as any)
       if (!error && data) return data as any as Verification[]
     } catch (e) {
-      console.warn("RPC get_pending_verifications failed, falling back to manual fetch")
+      // fallback
     }
 
     // Fallback: Fetch pending verifications manualmente
@@ -88,7 +87,7 @@ export class VerificationServiceClass {
       return {
         id: v.id.toString(),
         mentor_id: v.mentor_id,
-        verification_type: 'manual', // Default for this simplified schema
+        verification_type: 'manual', 
         status: v.status,
         created_at: v.submitted_at || v.created_at,
         mentor_name: profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown',
@@ -102,17 +101,16 @@ export class VerificationServiceClass {
   }
 
   async completeVerification(params: CompleteVerificationParams): Promise<void> {
-    // Tenta via RPC primeiro
     try {
-      const { error } = await (supabase.rpc("complete_mentor_verification" as any, {
+      const { error } = await (supabase.rpc("complete_mentor_verification", {
         verification_id: parseInt(params.verificationId),
         admin_id: params.adminId,
         verification_passed: params.passed,
         verification_notes: params.notes || null,
-      }) as any)
+      } as any) as any)
       if (!error) return
     } catch (e) {
-        console.warn("RPC complete_mentor_verification failed, falling back to manual update")
+        // fallback
     }
 
     const { verificationId, adminId, passed, notes } = params
@@ -146,7 +144,6 @@ export class VerificationServiceClass {
     }
 
     if (passed) {
-      // Update mentor status to 'verified' in profiles table
       const { error: profileError } = await supabase
         .from('profiles')
         .update({

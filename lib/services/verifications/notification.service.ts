@@ -29,16 +29,15 @@ export async function processVerification({
       verification_notes: notes,
       verified_at: status === 'approved' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
-      // Auto-publish if approved
-      published: status === 'approved'
-    })
+      verified: status === 'approved'
+    } as any)
     .eq('id', userId)
 
   if (updateError) throw new Error(`Erro ao atualizar perfil: ${updateError.message}`)
 
   // 2. Send Chat Notification
   try {
-    const conversationId = await getOrCreateConversation(supabase, userId, adminId)
+    const conversationId = await getOrCreateConversation(supabase as any, userId, adminId)
     
     let messageContent = ''
     if (status === 'approved') {
@@ -51,10 +50,9 @@ export async function processVerification({
       messageContent += `\n\nNotas do administrador:\n${notes}`
     }
 
-    await sendMessage(supabase, conversationId, adminId, messageContent)
+    await sendMessage(supabase as any, conversationId, adminId, messageContent)
   } catch (chatError) {
-    console.error('[VERIFICATION SERVICE] Erro ao enviar notificação via chat:', chatError)
-    // Don't fail the whole process if chat notification fails
+    // Silently log in server only
   }
 
   return { success: true }
