@@ -125,7 +125,7 @@ export default function AdminDashboard() {
     {
       title: "Gestão de Usuários",
       description: "Gerenciar todos os usuários, permissões e aprovar mentores",
-      href: "/admin/users",
+      href: "/dashboard/admin/users",
       icon: Users,
       color: "bg-primary",
       badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
@@ -133,21 +133,21 @@ export default function AdminDashboard() {
     {
       title: "Organizações",
       description: "Gerenciar parceiros e organizações do ecossistema",
-      href: "/admin/organizations",
+      href: "/dashboard/admin/organizations",
       icon: Building2,
       color: "bg-blue-600"
     },
     {
       title: "Relatórios & IA",
       description: "Ver métricas de crescimento e buscas da IA",
-      href: "/admin/reports",
+      href: "/dashboard/admin/reports",
       icon: TrendingUp,
       color: "bg-green-600"
     },
     {
       title: t("actions.settings"),
       description: t("actions.settingsDesc"),
-      href: "/admin/settings",
+      href: "/dashboard/admin/settings",
       icon: Shield,
       color: "bg-purple-500"
     }
@@ -282,7 +282,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="outline" className="bg-white border-yellow-300 text-yellow-800 hover:bg-yellow-100">
-                  <Link href="/admin/users?tab=pending">
+                  <Link href="/dashboard/admin/users?tab=pending">
                     Revisar Pendências
                   </Link>
                 </Button>

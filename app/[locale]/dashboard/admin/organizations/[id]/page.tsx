@@ -86,7 +86,7 @@ export default function AdminOrganizationDetailsPage() {
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <p className="text-gray-600 mb-4">Organização não encontrada</p>
-                    <Link href="/admin/organizations" className="text-indigo-600 hover:text-indigo-700">
+                    <Link href="/dashboard/admin/organizations" className="text-indigo-600 hover:text-indigo-700">
                         Voltar para lista
                     </Link>
                 </div>
@@ -99,7 +99,7 @@ export default function AdminOrganizationDetailsPage() {
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <Link
-                        href="/admin/organizations"
+                        href="/dashboard/admin/organizations"
                         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />

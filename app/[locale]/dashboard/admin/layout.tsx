@@ -31,39 +31,39 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const adminNavItems = [
     {
       title: t("nav.dashboard"),
-      href: "/admin",
+      href: "/dashboard/admin",
       icon: Home,
       description: t("nav.dashboardDesc")
     },
     {
       title: t("nav.organizations"),
-      href: "/admin/organizations",
+      href: "/dashboard/admin/organizations",
       icon: Building2,
       description: t("nav.organizationsDesc")
     },
     {
       title: t("nav.users"),
-      href: "/admin/users",
+      href: "/dashboard/admin/users",
       icon: Users,
       description: t("nav.usersDesc")
     },
     {
       title: "Feedbacks",
-      href: "/admin/feedbacks",
+      href: "/dashboard/admin/feedbacks",
       icon: Star,
       description: "Voz da comunidade"
     },
     {
       title: t("nav.reports"),
-      href: "/admin/reports",
+      href: "/dashboard/admin/reports",
       icon: BarChart3,
       description: t("nav.reportsDesc")
     }
   ]
 
   const isActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin"
+    if (href === "/dashboard/admin") {
+      return pathname === "/dashboard/admin"
     }
     return pathname.startsWith(href)
   }

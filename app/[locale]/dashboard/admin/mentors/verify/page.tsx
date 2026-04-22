@@ -143,7 +143,7 @@ export default function VerifyMentorsPage() {
                 {/* Header */}
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm" asChild>
-                        <Link href="/admin/mentors">
+                        <Link href="/dashboard/admin/mentors">
                             <ArrowLeft className="h-4 w-4 mr-2" />
                             Voltar
                         </Link>
@@ -259,7 +259,7 @@ export default function VerifyMentorsPage() {
                                 Não há mentores aguardando verificação no momento.
                             </p>
                             <Button asChild>
-                                <Link href="/admin/mentors">
+                                <Link href="/dashboard/admin/mentors">
                                     Ver Todos os Mentores
                                 </Link>
                             </Button>

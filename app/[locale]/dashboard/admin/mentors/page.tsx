@@ -9,7 +9,7 @@ export default function AdminMentorsRedirect() {
 
     useEffect(() => {
         // Redireciona para a central unificada com o filtro de mentores ativo
-        router.replace("/admin/users?tab=mentors")
+        router.replace("/dashboard/admin/users?tab=mentors")
     }, [router])
 
     return (

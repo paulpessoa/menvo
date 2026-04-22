@@ -50,6 +50,15 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
 
+  const handleProtectedAction = (e: React.MouseEvent, callback: () => void) => {
+    e.preventDefault()
+    if (!isAuthenticated) {
+      setShowLoginModal(true)
+      return
+    }
+    callback()
+  }
+
   const handleHelpClick = () => {
     if (!isAuthenticated) {
       setShowLoginModal(true)
@@ -127,15 +136,9 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 text-blue-600 hover:bg-blue-50"
-                asChild
+                onClick={(e) => handleProtectedAction(e, () => window.open(profile.linkedin_url!, '_blank'))}
               >
-                <a
-                  href={profile.linkedin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
+                <Linkedin className="h-5 w-5" />
               </Button>
             )}
             {profile.github_url && (
@@ -143,15 +146,9 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 text-gray-900 hover:bg-gray-100"
-                asChild
+                onClick={(e) => handleProtectedAction(e, () => window.open(profile.github_url!, '_blank'))}
               >
-                <a
-                  href={profile.github_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Github className="h-5 w-5" />
-                </a>
+                <Github className="h-5 w-5" />
               </Button>
             )}
             <div className="flex-1" />

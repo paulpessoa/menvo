@@ -63,7 +63,7 @@ export default function Header() {
     if (isAdmin) {
       userNavigation.push({
         name: t("header.userMenu.adminPanel"),
-        href: "/admin",
+        href: "/dashboard/admin",
         icon: Shield,
         color: "text-red-600"
       })

@@ -70,7 +70,7 @@ export default function AdminOrganizationApprovePage() {
                     <p className="text-gray-600 mb-4">
                         {!organization ? "Organização não encontrada" : "Esta organização não está pendente de aprovação"}
                     </p>
-                    <Link href="/admin/organizations" className="text-indigo-600 hover:text-indigo-700">
+                    <Link href="/dashboard/admin/organizations" className="text-indigo-600 hover:text-indigo-700">
                         Voltar para lista
                     </Link>
                 </div>
