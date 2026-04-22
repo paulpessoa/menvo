@@ -48,12 +48,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       description: t("nav.usersDesc")
     },
     {
-      title: t("nav.suggestions"),
-      href: "/admin/suggestions",
-      icon: MessageSquare,
-      description: t("nav.suggestionsDesc")
-    },
-    {
       title: "Feedbacks",
       href: "/admin/feedbacks",
       icon: Star,
@@ -88,7 +82,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Sidebar */}
         <div
           className={cn(
-            "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out lg:translate-x-0",
+            "fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:top-16 lg:h-[calc(100vh-4rem)]",
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >

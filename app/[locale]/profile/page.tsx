@@ -354,9 +354,9 @@ export default function ProfilePage() {
               <TabsTrigger value="basic">{t("tabs.personal")}</TabsTrigger>
               <TabsTrigger value="professional">{t("tabs.professional")}</TabsTrigger>
               <TabsTrigger value="location">{t("form.address")}</TabsTrigger>
-              {isMentor && (
-                <TabsTrigger value="mentorship">{t("tabs.mentorship")}</TabsTrigger>
-              )}
+              <TabsTrigger value="mentorship" className={!isMentor ? "opacity-50" : ""}>
+                {t("tabs.mentorship")} {!isMentor && " (Mentor)"}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">

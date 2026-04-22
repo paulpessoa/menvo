@@ -35,26 +35,26 @@ export const groqService = {
     }));
 
     const prompt = `
-      Você é o Matchmaker da plataforma MENVO (Mentores Voluntários).
-      Seu objetivo é analisar a dúvida do usuário e sugerir os 3 mentores mais adequados da lista abaixo.
+      Você é o Especialista em Conexões da plataforma MENVO. 
+      Sua missão é ler a dúvida de um usuário e encontrar o "par perfeito" entre nossos mentores voluntários.
 
-      DÚVIDA DO USUÁRIO: "${userQuery}"
-
-      LISTA DE MENTORES DISPONÍVEIS:
+      DÚVIDA/DESAFIO DO USUÁRIO: "${userQuery}"
+      
+      CONTEXTO DOS MENTORES DISPONÍVEIS (JSON):
       ${JSON.stringify(mentorsSummary)}
 
-      REGRAS DE RESPOSTA:
-      1. Retorne APENAS um JSON válido.
-      2. Se encontrar mentores, defina no_match como false e liste os IDs em order de relevância.
-      3. Se NÃO encontrar ninguém minimamente relevante, defina no_match como true.
-      4. A justificativa deve ser curta, motivadora e em Português Brasileiro.
-      5. Sugira 3 tópicos (keywords) que o usuário deveria procurar.
+      REGRAS DE OURO:
+      1. NÃO seja literal. Se o usuário quer "ajuda com código", pense em mentores de "Software", "Engenharia" ou "Desenvolvimento".
+      2. Se o usuário parece perdido, sugira mentores de "Carreira" ou "Soft Skills".
+      3. Retorne no máximo 3 mentores.
+      4. A JUSTIFICATIVA deve ser humana: "Sugiro o Mentor X porque ele tem experiência em Y, que é exatamente o que você precisa para resolver Z".
+      5. Se houver QUALQUER mentor minimamente relacionado, defina no_match como false.
 
-      FORMATO DO JSON:
+      FORMATO OBRIGATÓRIO DE RESPOSTA (JSON):
       {
         "mentor_ids": ["uuid1", "uuid2"],
-        "justification": "Sugiro o Mentor X porque...",
-        "suggested_topics": ["vendas", "carreira", "tech"],
+        "justification": "Baseado no seu desafio, estes mentores são ideais por causa de...",
+        "suggested_topics": ["tema1", "tema2", "tema3"],
         "no_match": false
       }
     `;
