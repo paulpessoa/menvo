@@ -981,7 +981,9 @@
             "noMatch": "We didn't find an exact match, but we recorded your interest to look for new mentors!",
             "success": "We found the best mentors for you!",
             "minChars": "Please describe your challenge with a bit more detail.",
-            "disclaimer": "Our AI analyzes bios and skills of all mentors for you."
+            "disclaimer": "Our AI analyzes bios and skills of all mentors for you.",
+            "loginRequired": "AI Magic Search is exclusive to logged-in users.",
+            "loginLink": "Login or sign up to use it"
         }
     },
     "profile": {

@@ -958,7 +958,9 @@
       "noMatch": "Não encontramos um match exato, mas registramos seu interesse para buscar novos mentores!",
       "success": "Encontramos os melhores mentores para você!",
       "minChars": "Por favor, descreva seu desafio com um pouco mais de detalhes.",
-      "disclaimer": "Nossa IA analisa as bios e habilidades de todos os mentores para você."
+      "disclaimer": "Nossa IA analisa as bios e habilidades de todos os mentores para você.",
+      "loginRequired": "A busca mágica com IA é exclusiva para usuários logados.",
+      "loginLink": "Entre ou cadastre-se para usar"
     }
   },
   "profile": {
