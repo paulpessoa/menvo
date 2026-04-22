@@ -11,18 +11,11 @@ import type { Organization } from "@/lib/types/organizations"
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const searchParams = request.nextUrl.searchParams
 
-    // Authenticate user
-    const {
-      data: { user },
-      error: authError
-    } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
-    }
+    // 1. Check Auth & Admin
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
 
-    // Check if user is admin
     const { data: roleData } = await supabase
       .from("user_roles")
       .select("roles(name)")
@@ -32,52 +25,41 @@ export async function GET(request: NextRequest) {
 
     const userRole = roleData?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
-      return errorResponse(
-        "Forbidden - Admin access required",
-        "FORBIDDEN",
-        403
-      )
+      return errorResponse("Forbidden - Admin only", "FORBIDDEN", 403)
     }
 
-    // Get query parameters
-    const status = searchParams.get("status")
+    // 2. Fetch Organizations
+    const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "50")
-    const offset = (page - 1) * limit
+    const limit = parseInt(searchParams.get("limit") || "10")
+    const search = searchParams.get("search") || ""
+    const from = (page - 1) * limit
+    const to = from + limit - 1
 
-    // Build query
     let query = supabase
       .from("organizations")
       .select("*", { count: "exact" })
-      .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1)
 
-    if (status) {
-      query = query.eq("status", status)
+    if (search) {
+      query = (query as any).or(`name.ilike.%${search}%,slug.ilike.%${search}%`)
     }
 
-    const { data, error, count } = await query
+    const { data: orgs, error: orgsError, count } = await (query as any)
+      .order("created_at", { ascending: false })
+      .range(from, to)
 
-    if (error) throw error
+    if (orgsError) throw orgsError
 
-    // Fetch counts for each organization
-    const orgsWithStats = await Promise.all((data as Organization[]).map(async (org) => {
-      // Direct links (new structure)
-      const { count: profileCount } = await supabase
-        .from("profiles")
-        .select("*", { count: 'exact', head: true })
-        .eq("organization_id", org.id)
-
-      // Legacy links
-      const { count: legacyCount } = await supabase
+    // 3. Get extra stats for each org
+    const orgsWithStats = await Promise.all((orgs || []).map(async (org: any) => {
+      const { count: memberCount } = await (supabase
         .from("organization_members")
         .select("*", { count: 'exact', head: true })
-        .eq("organization_id", org.id)
-        .eq("status", "active")
+        .eq("organization_id", org.id) as any)
 
       return {
         ...org,
-        memberCount: (profileCount || 0) + (legacyCount || 0)
+        member_count: memberCount || 0
       }
     }))
 

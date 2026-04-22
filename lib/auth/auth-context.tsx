@@ -29,7 +29,7 @@ export interface AuthContextType {
     signIn: (email: string, password: string) => Promise<void>
     signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>
     signInWithProvider: (provider: 'google' | 'linkedin') => Promise<void>
-    selectRole: (role: 'mentor' | 'mentee') => Promise<void>
+    selectRole: (roleName: 'mentor' | 'mentee') => Promise<void>
     getRoleDashboardPath: (roleName?: string) => string
     refreshProfile: () => Promise<void>
     signOut: () => Promise<void>
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!session?.user) return null
         return {
             role: session.user.app_metadata?.role || null,
-            permissions: session.user.app_metadata?.permissions || [],
+            permissions: (session.user.app_metadata?.permissions as string[]) || [],
             status: session.user.app_metadata?.status || null
         }
     }, [session])
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return message
     }, [])
 
-    const fetchProfile = useCallback(async (userId: string) => {
+    const fetchProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -81,18 +81,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     )
                 `)
                 .eq('id', userId)
+                .returns<any>()
                 .single()
 
-            if (error) return null
+            if (error || !data) return null
 
-            const rawRoles = (data?.user_roles as any[])?.map((ur: any) => ur.roles?.name as UserRole).filter(Boolean) || []
+            const rawRoles = (data.user_roles as any[])?.map((ur: any) => ur.roles?.name as UserRole).filter(Boolean) || []
             
-            const profileData: UserProfile = {
-                ...(data as any),
+            return {
+                ...data,
                 roles: rawRoles
-            }
-
-            return profileData
+            } as UserProfile
         } catch (error) {
             return null
         }
@@ -122,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     if (mounted) setProfile(userProfile)
                 }
             } catch (err) {
-                // Silently handle error to keep console clean
+                // Ignore initialization errors
             } finally {
                 if (mounted) setIsInitializing(false)
             }
@@ -198,50 +197,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const selectRole = useCallback(async (roleName: 'mentor' | 'mentee') => {
         if (!user) throw new Error('User not authenticated')
+        
         const { data: roleData, error: roleError } = await supabase
             .from('roles')
             .select('id')
             .eq('name', roleName)
             .single()
-        if (roleError) throw roleError
-        const { error: insertError } = await supabase
-            .from('user_roles')
-            .insert({ user_id: user.id, role_id: roleData.id })
+            
+        if (roleError || !roleData) throw roleError || new Error('Role not found')
+        
+        const { error: insertError } = await (supabase
+            .from('user_roles' as any)
+            .insert({ user_id: user.id, role_id: roleData.id }) as any)
+            
         if (insertError) throw insertError
         await refreshProfile()
     }, [user, supabase, refreshProfile])
 
     const getRoleDashboardPath = useCallback((roleName?: string) => {
-        const r = roleName || profile?.roles?.[0]
+        const r = roleName || (profile?.roles?.[0] as string)
         if (r === 'admin') return '/dashboard/admin'
         if (r === 'mentor') return '/dashboard/mentor'
         if (r === 'mentee') return '/dashboard/mentee'
         return '/dashboard'
     }, [profile])
 
-    const isAdmin = useMemo(() => (claims?.role === 'admin') || (profile?.roles?.includes('admin') ?? false), [claims, profile])
-    const isMentor = useMemo(() => !isAdmin && ((claims?.role === 'mentor') || (profile?.roles?.includes('mentor') ?? false)), [claims, profile, isAdmin])
-    const isMentee = useMemo(() => !isAdmin && ((claims?.role === 'mentee') || (profile?.roles?.includes('mentee') ?? false)), [claims, profile, isAdmin])
-    const isVolunteer = useMemo(() => (claims?.role === 'volunteer') || (profile?.roles?.includes('volunteer') ?? false), [claims, profile])
-    const isModerator = useMemo(() => (claims?.role === 'moderator') || (profile?.roles?.includes('moderator') ?? false), [claims, profile])
+    const isAdmin = useMemo(() => (claims?.role === 'admin') || (profile?.roles?.includes('admin' as UserRole) ?? false), [claims, profile])
+    const isMentor = useMemo(() => !isAdmin && ((claims?.role === 'mentor') || (profile?.roles?.includes('mentor' as UserRole) ?? false)), [claims, profile, isAdmin])
+    const isMentee = useMemo(() => !isAdmin && ((claims?.role === 'mentee') || (profile?.roles?.includes('mentee' as UserRole) ?? false)), [claims, profile, isAdmin])
+    const isVolunteer = useMemo(() => (claims?.role === 'volunteer') || (profile?.roles?.includes('volunteer' as UserRole) ?? false), [claims, profile])
+    const isModerator = useMemo(() => (claims?.role === 'moderator') || (profile?.roles?.includes('moderator' as UserRole) ?? false), [claims, profile])
     const isPending = useMemo(() => (profile?.roles?.length ?? 0) === 0, [profile])
 
-    const hasRole = useCallback((role: string) => profile?.roles?.includes(role) ?? false, [profile])
+    const hasRole = useCallback((r: string) => profile?.roles?.includes(r as UserRole) ?? false, [profile])
     const hasPermission = useCallback((p: string) => (claims?.permissions as string[])?.includes(p) ?? false, [claims])
     const hasAnyPermission = useCallback((ps: string[]) => ps.some(p => hasPermission(p)), [hasPermission])
-    const hasAnyRole = useCallback((rs: string[]) => profile?.roles?.some(r => rs.includes(r)) ?? false, [profile])
+    const hasAnyRole = useCallback((rs: string[]) => profile?.roles?.some(r => rs.includes(r as UserRole)) ?? false, [profile])
 
     const effectiveRole = useMemo((): 'admin' | 'mentor' | 'mentee' | null => {
         if (!profile?.roles) return null
-        if (profile.roles.includes('admin')) return 'admin'
-        if (profile.roles.includes('mentor')) return 'mentor'
-        if (profile.roles.includes('mentee')) return 'mentee'
+        if (profile.roles.includes('admin' as UserRole)) return 'admin'
+        if (profile.roles.includes('mentor' as UserRole)) return 'mentor'
+        if (profile.roles.includes('mentee' as UserRole)) return 'mentee'
         return null
     }, [profile])
 
     const needsRoleSelection = useCallback(() => {
         if (isInitializing || !user || isAdmin) return false
-        return profile && (profile.roles?.length ?? 0) === 0
+        return !!(profile && (profile.roles?.length ?? 0) === 0)
     }, [profile, isInitializing, user, isAdmin])
 
     const getDefaultRedirectPath = useCallback(() => {

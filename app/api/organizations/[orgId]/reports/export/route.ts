@@ -27,6 +27,7 @@ export async function GET(
       .select("role, status")
       .eq("organization_id", orgId)
       .eq("user_id", user.id)
+      .returns<any>()
       .single()
 
     if (
@@ -42,8 +43,8 @@ export async function GET(
     const endDate = searchParams.get("end_date")
 
     // Build query
-    let query = (supabase
-      .from("appointments")
+    let query = supabase
+      .from("appointments" as any)
       .select(
         `
         *,
@@ -51,17 +52,17 @@ export async function GET(
         mentee:profiles!mentee_id(full_name, email)
       `
       )
-      .eq("organization_id", orgId) as any)
+      .eq("organization_id", orgId)
 
     if (startDate) {
-      query = query.gte("scheduled_at", startDate)
+      query = (query as any).gte("scheduled_at", startDate)
     }
 
     if (endDate) {
-      query = query.lte("scheduled_at", endDate)
+      query = (query as any).lte("scheduled_at", endDate)
     }
 
-    const { data: appointments, error } = await query.order("scheduled_at", {
+    const { data: appointments, error } = await (query as any).order("scheduled_at", {
       ascending: false
     })
 

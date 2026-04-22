@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -20,12 +20,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Marcar perfil como solicitante de mentor
-    const { data, error } = await supabase
-      .from("profiles")
+    const { data, error } = await (supabase
+      .from("profiles" as any)
+      // @ts-ignore
       .update({ is_pending_mentor: true })
       .eq("id", user.id)
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
 
