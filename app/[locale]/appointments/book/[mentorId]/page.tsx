@@ -37,19 +37,20 @@ export default function BookAppointmentPage() {
                     .from('profiles')
                     .select('id, email, first_name, last_name, full_name, avatar_url, verified')
                     .eq('id', mentorId)
-                    .returns<MentorProfile>()
                     .single();
 
                 if (error) {
                     throw error;
                 }
 
-                if (!data?.verified) {
+                const mentorData = data as unknown as MentorProfile;
+
+                if (!mentorData?.verified) {
                     setError('Este mentor ainda não foi verificado');
                     return;
                 }
 
-                setMentor(data);
+                setMentor(mentorData);
             } catch (error) {
                 console.error('Error fetching mentor:', error);
                 setError('Mentor não encontrado');
