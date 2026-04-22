@@ -17,7 +17,7 @@ export function getSimpleRedirect(role: SimpleUserRole): string {
   // Role-based dashboard redirect
   switch (role) {
     case "admin":
-      return "/admin"
+      return "/dashboard/admin"
     case "mentor":
       return "/dashboard/mentor"
     case "mentee":
@@ -64,7 +64,7 @@ export function isAuthorizedForPath(
   }
 
   // Admin paths
-  if (path.startsWith("/admin")) {
+  if (path.startsWith("/dashboard/admin")) {
     return role === "admin"
   }
 

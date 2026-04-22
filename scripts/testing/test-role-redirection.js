@@ -12,7 +12,7 @@ console.log("=====================================")
 function getRoleDashboardPath(userRole) {
   switch (userRole) {
     case "admin":
-      return "/admin"
+      return "/dashboard/admin"
     case "mentor":
       return "/dashboard/mentor"
     case "mentee":
@@ -24,7 +24,7 @@ function getRoleDashboardPath(userRole) {
 
 // Test cases
 const testCases = [
-  { role: "admin", expected: "/admin" },
+  { role: "admin", expected: "/dashboard/admin" },
   { role: "mentor", expected: "/dashboard/mentor" },
   { role: "mentee", expected: "/dashboard/mentee" },
   { role: null, expected: "/dashboard" },

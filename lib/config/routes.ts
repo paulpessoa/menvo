@@ -23,7 +23,7 @@ export const protectedRoutes = [
   "/mentors/[id]/schedule",
   "/messages",
   "/calendar",
-  "/admin",
+  "/dashboard/admin",
   "/mentorship",
   "/volunteer-activities",
   "/onboarding",
@@ -31,7 +31,7 @@ export const protectedRoutes = [
   "/settings"
 ]
 
-export const adminRoutes = ["/admin"]
+export const adminRoutes = ["/dashboard/admin"]
 
 export const onboardingRequiredRoutes = [
   "/dashboard",

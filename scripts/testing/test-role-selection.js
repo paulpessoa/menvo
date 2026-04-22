@@ -122,7 +122,7 @@ function testRoleSelectionLogic() {
   const roleTests = [
     { role: "mentor", expected: "/dashboard/mentor" },
     { role: "mentee", expected: "/dashboard/mentee" },
-    { role: "admin", expected: "/admin" },
+    { role: "admin", expected: "/dashboard/admin" },
     { role: null, expected: "/dashboard" },
     { role: undefined, expected: "/dashboard" }
   ]

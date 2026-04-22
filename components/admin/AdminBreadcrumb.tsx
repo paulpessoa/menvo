@@ -11,28 +11,28 @@ interface BreadcrumbItem {
 }
 
 const routeMap: Record<string, BreadcrumbItem[]> = {
-    "/admin": [
+    "/dashboard/admin": [
         { label: "Dashboard" }
     ],
-    "/admin/mentors": [
-        { label: "Dashboard", href: "/admin" },
+    "/dashboard/admin/mentors": [
+        { label: "Dashboard", href: "/dashboard/admin" },
         { label: "Mentores" }
     ],
-    "/admin/mentors/verify": [
-        { label: "Dashboard", href: "/admin" },
-        { label: "Mentores", href: "/admin/mentors" },
+    "/dashboard/admin/mentors/verify": [
+        { label: "Dashboard", href: "/dashboard/admin" },
+        { label: "Mentores", href: "/dashboard/admin/mentors" },
         { label: "Verificar" }
     ],
-    "/admin/users": [
-        { label: "Dashboard", href: "/admin" },
+    "/dashboard/admin/users": [
+        { label: "Dashboard", href: "/dashboard/admin" },
         { label: "Usuários" }
     ],
-    "/admin/settings": [
-        { label: "Dashboard", href: "/admin" },
+    "/dashboard/admin/settings": [
+        { label: "Dashboard", href: "/dashboard/admin" },
         { label: "Configurações" }
     ],
-    "/admin/reports": [
-        { label: "Dashboard", href: "/admin" },
+    "/dashboard/admin/reports": [
+        { label: "Dashboard", href: "/dashboard/admin" },
         { label: "Relatórios" }
     ]
 }
@@ -51,7 +51,7 @@ export function AdminBreadcrumb() {
     return (
         <nav className="flex items-center space-x-1 text-sm text-muted-foreground mb-6">
             <Link
-                href="/admin"
+                href="/dashboard/admin"
                 className="flex items-center hover:text-foreground transition-colors"
             >
                 <Home className="h-4 w-4" />
