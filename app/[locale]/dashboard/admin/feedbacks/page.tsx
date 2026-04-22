@@ -60,33 +60,34 @@ export default function AdminFeedbacks() {
         .order("created_at", { ascending: false })
 
       if (feedbackError) throw feedbackError
+if (feedbackData && feedbackData.length > 0) {
+  // Buscar perfis separadamente para os feedbacks que possuem user_id
+  const validFeedbacks = feedbackData as Feedback[]
+  const userIds = validFeedbacks.map(f => f.user_id).filter(Boolean) as string[]
 
-      if (feedbackData && feedbackData.length > 0) {
-        const userIds = feedbackData.map(f => f.user_id).filter(Boolean) as string[]
-        
-        if (userIds.length > 0) {
-            const { data: profileData } = await supabase
-                .from("profiles")
-                .select("id, first_name, last_name, email, avatar_url")
-                .in("id", userIds)
+  if (userIds.length > 0) {
+      const { data: profileData } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, email, avatar_url")
+          .in("id", userIds)
 
-            const profilesMap = (profileData || []).reduce((acc: any, curr: any) => {
-                acc[curr.id] = curr
-                return acc
-            }, {})
+      const profilesMap = (profileData || []).reduce((acc: any, curr: any) => {
+          acc[curr.id] = curr
+          return acc
+      }, {})
 
-            const mergedData = feedbackData.map(f => ({
-                ...f,
-                profiles: f.user_id ? profilesMap[f.user_id] : null
-            }))
+      const mergedData = validFeedbacks.map(f => ({
+          ...f,
+          profiles: f.user_id ? profilesMap[f.user_id] : null
+      }))
 
-            setFeedbacks(mergedData)
-        } else {
-            setFeedbacks(feedbackData as Feedback[])
-        }
-      } else {
-        setFeedbacks([])
-      }
+      setFeedbacks(mergedData)
+  } else {
+      setFeedbacks(validFeedbacks)
+  }
+} else {
+  setFeedbacks([])
+}
     } catch (error) {
       console.error("Error fetching feedbacks:", error)
       toast.error("Erro ao carregar feedbacks")

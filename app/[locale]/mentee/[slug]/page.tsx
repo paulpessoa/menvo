@@ -17,6 +17,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
         .from('profiles')
         .select('*')
         .eq('slug', slug)
+        .returns<any>()
         .single()
 
     if (error || !mentee) {
@@ -24,32 +25,25 @@ async function getMenteeData(slug: string, currentUserId: string) {
     }
 
     // Verificar se o usuário atual é mentor
-    // Primeiro tentar na tabela mentors
     let isMentor = false
 
-    const { data: mentorData, error: mentorError } = await supabase
+    const { data: mentorData } = await supabase
         .from('mentors')
         .select('id')
         .eq('id', currentUserId)
         .maybeSingle()
 
-    console.log('[MENTEE PROFILE] Checking mentors table:', { mentorData, mentorError })
-
     if (mentorData) {
         isMentor = true
     } else {
-        // Se não encontrou, tentar na view mentors_view
         const { data: mentorView } = await supabase
             .from('mentors_view')
             .select('id')
             .eq('id', currentUserId)
             .maybeSingle()
 
-        console.log('[MENTEE PROFILE] Checking mentors_view:', { mentorView })
         isMentor = !!mentorView
     }
-
-    console.log('[MENTEE PROFILE] Final result - User:', currentUserId, 'Mentee slug:', slug, 'Is Mentor:', isMentor)
 
     return {
         mentee,

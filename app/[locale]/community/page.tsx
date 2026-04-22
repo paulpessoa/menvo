@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, Users, Loader2, Info } from "lucide-react"
+import { Search, Users, Loader2, Info, MessageCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { MenteeCard } from "@/components/community/MenteeCard"
@@ -10,6 +10,13 @@ import { useAuth } from "@/lib/auth"
 import { useRouter } from "@/i18n/routing"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import { ChatInterface } from "@/components/chat/ChatInterface"
 
 interface UserProfile {
     id: string
@@ -36,7 +43,10 @@ export default function CommunityPage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [page, setPage] = useState(0)
     const [hasMore, setHasMore] = useState(false)
-    const [totalCount, setTotalCount] = useState(0)
+    
+    // Chat Sidebar State
+    const [isChatOpen, setIsChatOpen] = useState(false)
+    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
 
     const { user, profile: currentUserProfile } = useAuth()
     const router = useRouter()
@@ -57,7 +67,6 @@ export default function CommunityPage() {
             const from = currentPage * ITEMS_PER_PAGE
             const to = from + ITEMS_PER_PAGE - 1
 
-            // Buscamos perfis de MENTEES que marcaram is_public = true
             let query = supabase
                 .from('profiles')
                 .select(`
@@ -86,21 +95,13 @@ export default function CommunityPage() {
                 .range(from, to)
 
             const { data, error, count } = await query
-
             if (error) throw error
 
-            const formattedData = (data || []).map((p: any) => ({
-                ...p,
-                role: 'mentee'
-            }))
+            const formattedData = (data || []).map((p: any) => ({ ...p, role: 'mentee' }))
 
-            if (isInitial) {
-                setProfiles(formattedData)
-            } else {
-                setProfiles(prev => [...prev, ...formattedData])
-            }
+            if (isInitial) setProfiles(formattedData)
+            else setProfiles(prev => [...prev, ...formattedData])
 
-            setTotalCount(count || 0)
             setHasMore((count || 0) > (from + formattedData.length))
         } catch (error) {
             console.error('Error fetching community profiles:', error)
@@ -121,7 +122,12 @@ export default function CommunityPage() {
             router.push("/login")
             return
         }
-        router.push(`/messages?userId=${targetUserId}`)
+        
+        const targetProfile = profiles.find(p => p.id === targetUserId)
+        if (targetProfile) {
+            setSelectedUser(targetProfile)
+            setIsChatOpen(true)
+        }
     }
 
     return (
@@ -197,6 +203,29 @@ export default function CommunityPage() {
                     )}
                 </>
             )}
+
+            {/* Inline Chat Drawer */}
+            <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
+                <SheetContent className="sm:max-w-md p-0 flex flex-col h-full border-l shadow-2xl">
+                    <SheetHeader className="p-4 border-b bg-white">
+                        <SheetTitle className="flex items-center gap-2">
+                           <MessageCircle className="h-5 w-5 text-primary" />
+                           Chat com {selectedUser?.full_name}
+                        </SheetTitle>
+                    </SheetHeader>
+                    
+                    {selectedUser && user && (
+                        <div className="flex-1 overflow-hidden">
+                            <ChatInterface 
+                                mentorId={selectedUser.id}
+                                currentUserId={user.id}
+                                mentorName={selectedUser.full_name || "Membro"}
+                                mentorAvatar={selectedUser.avatar_url || undefined}
+                            />
+                        </div>
+                    )}
+                </SheetContent>
+            </Sheet>
         </div>
     )
 }

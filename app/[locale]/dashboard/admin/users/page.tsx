@@ -231,7 +231,9 @@ export default function AdminUsersPage() {
                               {user.full_name || 'Sem Nome'}
                             </span>
                             {user.cv_url && (
-                              <FileText className="h-3.5 w-3.5 text-blue-500" title="Possui currículo" />
+                              <div title="Possui currículo">
+                                <FileText className="h-3.5 w-3.5 text-blue-500" />
+                              </div>
                             )}
                             {user.roles.includes('mentor') && (
                                 <Badge variant={user.verified ? "default" : "secondary"} className={user.verified ? "bg-green-600" : "bg-yellow-100 text-yellow-800 border-none"}>

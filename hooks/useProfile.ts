@@ -46,6 +46,9 @@ interface Profile {
   what_to_expect: string | null // needs migration
   ideal_mentee: string | null // needs migration
   cv_url: string | null
+  is_public: boolean
+  is_pending_mentor?: boolean
+  learning_goals?: string | null
   
   // System fields
   verified: boolean

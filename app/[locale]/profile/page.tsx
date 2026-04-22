@@ -290,7 +290,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1"><Label>Cargo Atual</Label><Input value={formData.job_title} onChange={(e) => setFormData({...formData, job_title: e.target.value})} /></div>
                     <div className="space-y-1"><Label>Empresa</Label><Input value={formData.company} onChange={(e) => setFormData({...formData, company: e.target.value})} /></div>
-                    <div className="space-y-1"><Label>Linkedin</Label><Input value={formData.linkedin_url} onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})} /></div>
+                    <div className="space-y-1"><Label>Linkedin</Label><Input value={formData.linkedin_url} onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})} placeholder="https://..." /></div>
                     <div className="space-y-1"><Label>Portfolio / GitHub</Label><Input value={formData.portfolio_url} onChange={(e) => setFormData({...formData, portfolio_url: e.target.value})} /></div>
                   </div>
                   <div className="pt-4 border-t space-y-4">
@@ -298,7 +298,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1"><Label>Instituição</Label><Input value={formData.institution} onChange={(e) => setFormData({...formData, institution: e.target.value})} /></div>
                         <div className="space-y-1"><Label>Curso</Label><Input value={formData.course} onChange={(e) => setFormData({...formData, course: e.target.value})} /></div>
-                        <div className="space-y-1"><Label>Nível</Label><Input value={formData.academic_level} onChange={(e) => setFormData({...formData, academic_level: e.target.value})} /></div>
+                        <div className="space-y-1"><Label>Nível</Label><Input value={formData.academic_level} onChange={(e) => setFormData({...formData, academic_level: e.target.value})} placeholder="Ex: Graduação, Técnico..." /></div>
                         <div className="space-y-1"><Label>Previsão de Conclusão</Label><Input value={formData.expected_graduation} onChange={(e) => setFormData({...formData, expected_graduation: e.target.value})} /></div>
                     </div>
                   </div>

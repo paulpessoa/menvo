@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/utils/supabase/client'
 import { User, Session } from '@supabase/supabase-js'
-import { debugLog } from '@/lib/debug-logger'
 import type { UserProfile, UserRole } from '@/lib/types/models/user'
 
 export interface AuthContextType {
@@ -50,7 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const claims = useMemo(() => {
         if (!session?.user) return null
-        // Supabase stores custom claims in app_metadata
         return {
             role: session.user.app_metadata?.role || null,
             permissions: session.user.app_metadata?.permissions || [],
@@ -60,35 +58,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const handleAuthError = useCallback((error: any): string => {
         if (!error) return ""
-        
         const message = error.message || error.error_description || error.toString()
-        
-        // Mapeamento de erros comuns do Supabase Auth para mensagens amigáveis
-        if (message.includes("Invalid login credentials")) {
-            return "Email ou senha incorretos."
-        }
-        if (message.includes("User not found")) {
-            return "Usuário não encontrado."
-        }
-        if (message.includes("Email not confirmed")) {
-            return "Por favor, confirme seu email antes de fazer login."
-        }
-        if (message.includes("Password is too short")) {
-            return "A senha deve ter pelo menos 6 caracteres."
-        }
-        if (message.includes("User already registered")) {
-            return "Este email já está cadastrado."
-        }
-        if (message.includes("Rate limit exceeded")) {
-            return "Muitas tentativas. Tente novamente mais tarde."
-        }
-        
+        if (message.includes("Invalid login credentials")) return "Email ou senha incorretos."
+        if (message.includes("User not found")) return "Usuário não encontrado."
+        if (message.includes("Email not confirmed")) return "Confirme seu email antes de fazer login."
+        if (message.includes("Password is too short")) return "A senha deve ter pelo menos 6 caracteres."
+        if (message.includes("User already registered")) return "Este email já está cadastrado."
+        if (message.includes("Rate limit exceeded")) return "Muitas tentativas. Tente novamente mais tarde."
         return message
     }, [])
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
-            console.log(`[AUTH] Buscando perfil para o usuário: ${userId}...`)
             const { data, error } = await supabase
                 .from('profiles')
                 .select(`
@@ -102,12 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .eq('id', userId)
                 .single()
 
-            if (error) {
-                console.error(`[AUTH] Erro ao buscar perfil:`, error.message)
-                return null
-            }
+            if (error) return null
 
-            // Mapeamento seguro das roles
             const rawRoles = (data?.user_roles as any[])?.map((ur: any) => ur.roles?.name as UserRole).filter(Boolean) || []
             
             const profileData: UserProfile = {
@@ -117,7 +94,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             return profileData
         } catch (error) {
-            console.error(`[AUTH] Erro inesperado no fetchProfile:`, error)
             return null
         }
     }, [supabase])
@@ -133,12 +109,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         let mounted = true
         
-        const timeout = setTimeout(() => {
-            if (mounted && isInitializing) {
-                setIsInitializing(false)
-            }
-        }, 5000)
-
         const initAuth = async () => {
             try {
                 const { data: { session: currentSession } } = await supabase.auth.getSession()
@@ -148,17 +118,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setUser(currentSession?.user ?? null)
 
                 if (currentSession?.user) {
-                    console.log(`[AUTH] Usuário logado detectado: ${currentSession.user.email} (ID: ${currentSession.user.id})`)
                     const userProfile = await fetchProfile(currentSession.user.id)
                     if (mounted) setProfile(userProfile)
                 }
             } catch (err) {
-                console.error('Auth initialization error:', err)
+                // Silently handle error to keep console clean
             } finally {
-                if (mounted) {
-                    setIsInitializing(false)
-                    clearTimeout(timeout)
-                }
+                if (mounted) setIsInitializing(false)
             }
         }
 
@@ -178,13 +144,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (newSession) {
                 setSession(newSession)
                 setUser(newSession.user)
-                
-                fetchProfile(newSession.user.id).then(userProfile => {
-                    if (mounted) {
-                        setProfile(userProfile)
-                        setIsInitializing(false)
-                    }
-                })
+                const userProfile = await fetchProfile(newSession.user.id)
+                if (mounted) {
+                    setProfile(userProfile)
+                    setIsInitializing(false)
+                }
             } else {
                 setIsInitializing(false)
             }
@@ -192,7 +156,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         return () => {
             mounted = false
-            clearTimeout(timeout)
             subscription.unsubscribe()
         }
     }, [supabase, fetchProfile])
@@ -235,26 +198,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const selectRole = useCallback(async (roleName: 'mentor' | 'mentee') => {
         if (!user) throw new Error('User not authenticated')
-        
-        // 1. Buscar o ID da role
         const { data: roleData, error: roleError } = await supabase
             .from('roles')
             .select('id')
             .eq('name', roleName)
             .single()
-        
         if (roleError) throw roleError
-
-        // 2. Inserir na user_roles
         const { error: insertError } = await supabase
             .from('user_roles')
-            .insert({
-                user_id: user.id,
-                role_id: roleData.id
-            })
-        
+            .insert({ user_id: user.id, role_id: roleData.id })
         if (insertError) throw insertError
-
         await refreshProfile()
     }, [user, supabase, refreshProfile])
 
@@ -266,40 +219,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return '/dashboard'
     }, [profile])
 
-    const isAdmin = useMemo(() => {
-        return (claims?.role === 'admin') || (profile?.roles?.includes('admin') ?? false)
-    }, [claims, profile])
-
-    const isMentor = useMemo(() => {
-        if (isAdmin) return false
-        return (claims?.role === 'mentor') || (profile?.roles?.includes('mentor') ?? false)
-    }, [claims, profile, isAdmin])
-
-    const isMentee = useMemo(() => {
-        if (isAdmin) return false
-        return (claims?.role === 'mentee') || (profile?.roles?.includes('mentee') ?? false)
-    }, [claims, profile, isAdmin])
-
-    const isVolunteer = useMemo(() => {
-        return (claims?.role === 'volunteer') || (profile?.roles?.includes('volunteer') ?? false)
-    }, [claims, profile])
-
-    const isModerator = useMemo(() => {
-        return (claims?.role === 'moderator') || (profile?.roles?.includes('moderator') ?? false)
-    }, [claims, profile])
+    const isAdmin = useMemo(() => (claims?.role === 'admin') || (profile?.roles?.includes('admin') ?? false), [claims, profile])
+    const isMentor = useMemo(() => !isAdmin && ((claims?.role === 'mentor') || (profile?.roles?.includes('mentor') ?? false)), [claims, profile, isAdmin])
+    const isMentee = useMemo(() => !isAdmin && ((claims?.role === 'mentee') || (profile?.roles?.includes('mentee') ?? false)), [claims, profile, isAdmin])
+    const isVolunteer = useMemo(() => (claims?.role === 'volunteer') || (profile?.roles?.includes('volunteer') ?? false), [claims, profile])
+    const isModerator = useMemo(() => (claims?.role === 'moderator') || (profile?.roles?.includes('moderator') ?? false), [claims, profile])
     const isPending = useMemo(() => (profile?.roles?.length ?? 0) === 0, [profile])
 
-    const hasRole = useCallback((role: string) => {
-        return profile?.roles?.includes(role) ?? false
-    }, [profile])
-
-    const hasPermission = useCallback((permission: string) => {
-        return (claims?.permissions as string[])?.includes(permission) ?? false
-    }, [claims])
-
-    const hasAnyPermission = useCallback((permissions: string[]) => {
-        return permissions.some(p => hasPermission(p))
-    }, [hasPermission])
+    const hasRole = useCallback((role: string) => profile?.roles?.includes(role) ?? false, [profile])
+    const hasPermission = useCallback((p: string) => (claims?.permissions as string[])?.includes(p) ?? false, [claims])
+    const hasAnyPermission = useCallback((ps: string[]) => ps.some(p => hasPermission(p)), [hasPermission])
+    const hasAnyRole = useCallback((rs: string[]) => profile?.roles?.some(r => rs.includes(r)) ?? false, [profile])
 
     const effectiveRole = useMemo((): 'admin' | 'mentor' | 'mentee' | null => {
         if (!profile?.roles) return null
@@ -309,20 +239,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return null
     }, [profile])
 
-    const hasAnyRole = useCallback((roles: string[]) => {
-        if (!profile?.roles) return false
-        return profile.roles.some(r => roles.includes(r))
-    }, [profile])
-
     const needsRoleSelection = useCallback(() => {
-        if (isInitializing || !user) return false
-        // Se já detectamos que é admin via claims ou profile, não precisa selecionar role
-        if (isAdmin) return false
-        
-        // Se o perfil carregou e não tem roles, precisa selecionar
-        if (profile && (profile.roles?.length ?? 0) === 0) return true
-        
-        return false
+        if (isInitializing || !user || isAdmin) return false
+        return profile && (profile.roles?.length ?? 0) === 0
     }, [profile, isInitializing, user, isAdmin])
 
     const getDefaultRedirectPath = useCallback(() => {
@@ -339,42 +258,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await supabase.auth.signOut()
             window.location.href = '/'
         } catch (err) {
-            console.error('Sign out error:', err)
+            // Error handling
         } finally {
             setLoading(false)
         }
     }
 
     const value = useMemo(() => ({
-        user,
-        session,
-        profile,
-        role: effectiveRole,
-        isAuthenticated: !!user,
-        isInitializing,
-        loading: loading || isInitializing,
-        isVerified: profile?.verified ?? false,
-        isAdmin,
-        isMentor,
-        isMentee,
-        isVolunteer,
-        isModerator,
-        isPending,
-        claims,
-        hasRole,
-        hasPermission,
-        hasAnyPermission,
-        hasAnyRole,
-        needsRoleSelection,
-        signIn,
-        signUp,
-        signInWithProvider,
-        selectRole,
-        getRoleDashboardPath,
-        refreshProfile,
-        signOut,
-        getDefaultRedirectPath,
-        handleAuthError
+        user, session, profile, role: effectiveRole, isAuthenticated: !!user, isInitializing, loading: loading || isInitializing,
+        isVerified: profile?.verified ?? false, isAdmin, isMentor, isMentee, isVolunteer, isModerator, isPending,
+        claims, hasRole, hasPermission, hasAnyPermission, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider,
+        selectRole, getRoleDashboardPath, refreshProfile, signOut, getDefaultRedirectPath, handleAuthError
     }), [user, session, profile, isInitializing, loading, effectiveRole, isAdmin, isMentor, isMentee, isVolunteer, isModerator, isPending, claims, hasRole, hasPermission, hasAnyPermission, hasAnyRole, needsRoleSelection, signIn, signUp, signInWithProvider, selectRole, getRoleDashboardPath, refreshProfile, getDefaultRedirectPath, handleAuthError])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
@@ -382,8 +276,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
     const context = useContext(AuthContext)
-    if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider')
-    }
+    if (context === undefined) throw new Error('useAuth must be used within an AuthProvider')
     return context
 }
