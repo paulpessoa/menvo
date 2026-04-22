@@ -145,13 +145,6 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/reports",
       icon: TrendingUp,
       color: "bg-green-600"
-    },
-    {
-      title: t("actions.settings"),
-      description: t("actions.settingsDesc"),
-      href: "/settings",
-      icon: Shield,
-      color: "bg-purple-500"
     }
   ]
 

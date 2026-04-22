@@ -157,8 +157,6 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        <UserMetrics data={users} />
-
         <div className="space-y-6">
           <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">

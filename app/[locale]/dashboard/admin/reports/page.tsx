@@ -136,6 +136,7 @@ export default function AdminReportsPage() {
             </div>
           </div>
 
+          {/* KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="border-l-4 border-l-blue-600">
               <CardHeader className="pb-2">
