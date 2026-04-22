@@ -34,6 +34,13 @@ export interface MentorAvailability {
   updated_at: string;
 }
 
+export interface AvailableTimeSlot {
+  time: string;
+  available: boolean;
+  date?: string;
+  datetime?: string;
+}
+
 /**
  * Joined type for UI display
  */

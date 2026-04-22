@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { AvailableTimeSlot } from "@/lib/types/appointments"
+import { AvailableTimeSlot } from "@/lib/types/models/mentorship"
 import { createClient } from "@supabase/supabase-js"
 
 export async function GET(request: NextRequest) {
