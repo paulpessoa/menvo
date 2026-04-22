@@ -72,7 +72,6 @@ This document lists all available pages, categorized by access level and operati
 | `/how-it-works`  | Step-by-step guide for mentors/mentees.        | ✅ Fully Functional |
 | `/mentors`       | Public feed of available mentors.              | ✅ Fully Functional |
 | `/community`     | Public board of members offering/seeking help. | ✅ Fully Functional |
-| `/hub`           | Resources, affiliate links, and materials.     | ✅ Fully Functional |
 | `/organizations` | List of partner organizations/NGOs.            | ✅ Fully Functional |
 | `/faq`           | Frequently Asked Questions.                    | ✅ Fully Functional |
 | `/privacy`       | Privacy Policy and GDPR compliance.            | ✅ Operational      |
@@ -105,13 +104,12 @@ This document lists all available pages, categorized by access level and operati
 
 ## 👑 Admin Pages (Staff members only)
 
-| Page Path               | Purpose                                      | Status               |
-| :---------------------- | :------------------------------------------- | :------------------- |
-| `/admin`                | Main administrative overview.                | ✅ Fully Functional  |
-| `/admin/users`          | User management and growth metrics.          | ✅ Highly Functional |
-| `/admin/hub`            | Moderation of resources and affiliate links. | ✅ Fully Functional  |
-| `/admin/feedbacks`      | Voice of the community (Feedback review).    | ✅ Fully Functional  |
-| `/admin/mentors/verify` | Verification of new mentor applications.     | ✅ Operational       |
+| Page Path               | Purpose                                   | Status               |
+| :---------------------- | :---------------------------------------- | :------------------- |
+| `/admin`                | Main administrative overview.             | ✅ Fully Functional  |
+| `/admin/users`          | User management and growth metrics.       | ✅ Highly Functional |
+| `/admin/feedbacks`      | Voice of the community (Feedback review). | ✅ Fully Functional  |
+| `/admin/mentors/verify` | Verification of new mentor applications.  | ✅ Operational       |
 
 ## Installation
 

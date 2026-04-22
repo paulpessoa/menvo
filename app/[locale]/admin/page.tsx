@@ -111,11 +111,6 @@ export default function AdminDashboard() {
         .select("*", { count: "exact", head: true })
         .eq("status", "pending")
 
-      const { count: pendingHub } = await supabase
-        .from("hub_resources")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending")
-
       setStats({
         totalUsers: totalUsers || 0,
         totalMentors,
@@ -124,8 +119,7 @@ export default function AdminDashboard() {
         totalMentees: totalMentees || 0,
         totalSessions: totalSessions || 0,
         recentSignups: recentSignups || 0,
-        pendingSuggestions: pendingSuggestions || 0,
-        pendingHubResources: pendingHub || 0
+        pendingSuggestions: pendingSuggestions || 0
       })
     } catch (error) {
       console.error("Error fetching admin stats:", error)
@@ -281,7 +275,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {(stats.pendingMentors > 0 || stats.pendingHubResources > 0) && (
+          {stats.pendingMentors > 0 && (
             <Card className="border-yellow-200 bg-yellow-50">
               <CardHeader>
                 <div className="flex items-center gap-2">

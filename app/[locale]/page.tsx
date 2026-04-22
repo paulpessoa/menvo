@@ -190,14 +190,6 @@ export default function Home() {
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/signup">{t("cta.signup")}</Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-transparent"
-                asChild
-              >
-                <Link href="/hub">{t("cta.learnMore")}</Link>
-              </Button>
             </div>
           </div>
         </div>

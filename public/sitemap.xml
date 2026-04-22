@@ -31,12 +31,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://menvo.com.br/hub</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://menvo.com.br/doar</loc>
     <lastmod>2025-10-12</lastmod>
     <changefreq>monthly</changefreq>
