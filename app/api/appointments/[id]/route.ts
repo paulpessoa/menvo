@@ -8,6 +8,16 @@ interface RouteParams {
   }>;
 }
 
+interface AppointmentDetails {
+    id: string;
+    mentor_id: string;
+    mentee_id: string;
+    status: string;
+    scheduled_at: string;
+    google_event_id: string | null;
+    duration_minutes: number;
+}
+
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const supabase = await createClient();
@@ -34,7 +44,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
     }
 
-    if (appointment.mentor_id !== user.id && appointment.mentee_id !== user.id) {
+    const appt = appointment as AppointmentDetails;
+
+    if (appt.mentor_id !== user.id && appt.mentee_id !== user.id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
@@ -66,7 +78,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .from('appointments')
       .select('*')
       .eq('id', appointmentId)
-      .returns<any>()
+      .returns<AppointmentDetails>()
       .single();
 
     if (fetchError || !currentAppointment) {
@@ -156,7 +168,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       .from('appointments')
       .select('*')
       .eq('id', appointmentId)
-      .returns<any>()
+      .returns<AppointmentDetails>()
       .single();
 
     if (fetchError || !appointment) {

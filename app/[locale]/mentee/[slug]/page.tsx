@@ -9,12 +9,31 @@ interface PageProps {
     }>
 }
 
+// Interface idêntica à esperada pelo MenteeProfileClient
 interface MenteeProfile {
     id: string
     first_name: string
     last_name: string
     email: string
     avatar_url?: string
+    city?: string
+    state?: string
+    country?: string
+    bio?: string
+    job_title?: string
+    company?: string
+    institution?: string
+    course?: string
+    academic_level?: string
+    expected_graduation?: string
+    career_goals?: string
+    expertise_areas?: string[]
+    mentorship_topics?: string[]
+    linkedin_url?: string
+    github_url?: string
+    portfolio_url?: string
+    cv_url?: string
+    languages?: string[]
     is_public: boolean
     created_at: string
 }
@@ -27,7 +46,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
         .from('profiles')
         .select('*')
         .eq('slug', slug)
-        .returns<any>()
+        .returns<MenteeProfile>()
         .single()
 
     if (error || !mentee) {

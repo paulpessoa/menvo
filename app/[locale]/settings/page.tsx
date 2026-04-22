@@ -82,13 +82,7 @@ export default function SettingsPage() {
       })
 
       if (signInError) {
-        throw new Error(
-          t(
-            "security.invalidCurrentPassword"
-              ? t("security.invalidCurrentPassword")
-              : "Senha atual incorreta"
-          )
-        )
+        throw new Error(t("security.invalidCurrentPassword") || "Senha atual incorreta")
       }
 
       // 2. Atualizar para a nova senha
