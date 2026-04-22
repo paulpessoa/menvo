@@ -1,94 +1,51 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
-  const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get("code")
-  const type = requestUrl.searchParams.get("type")
-  const tokenHash = requestUrl.searchParams.get("token_hash")
-  const next = requestUrl.searchParams.get("next") || "/dashboard"
-  
-  const cookieStore = await cookies()
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR'
+export async function GET(request: Request) {
+  try {
+    const { searchParams, origin } = new URL(request.url)
+    const code = searchParams.get("code")
+    const next = searchParams.get("next") || "/dashboard"
 
-  console.log(`[AUTH CALLBACK] Processing: code=${!!code}, tokenHash=${!!tokenHash}, type=${type}, locale=${locale}`)
+    if (code) {
+      const supabase = await createClient()
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-  const supabase = await createClient()
-
-  // 1. Lógica para OTP/Token Hash (Verificação de Email via link direto)
-  if (tokenHash && type) {
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: type as any,
-    })
-    
-    if (error) {
-      console.error("[AUTH CALLBACK] OTP Verification Error:", error.message)
-      return NextResponse.redirect(new URL(`/${locale}/login?error=verification_failed`, request.url))
-    }
-
-    // Se verificou email de cadastro, manda para o confirmed
-    if (type === 'signup' || type === 'invite') {
-        return NextResponse.redirect(new URL(`/${locale}/confirmed`, request.url))
-    }
-    
-    // Se for recovery via OTP hash
-    if (type === 'recovery') {
-        return NextResponse.redirect(new URL(`/${locale}/update-password`, request.url))
-    }
-  }
-
-  // 2. Lógica para Code Exchange (PKCE)
-  if (code) {
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
-    if (!error && data.user) {
-      // REDE DE SEGURANÇA: Às vezes o 'type' se perde no redirecionamento.
-      // Verificamos se o fluxo originou de um recovery através da sessão.
-      const isRecoveryFlow = type === 'recovery' || 
-                             data.session?.user?.app_metadata?.recovery === true ||
-                             request.url.includes('type=recovery')
-
-      if (isRecoveryFlow) {
-        console.log(`[AUTH CALLBACK] Recovery flow detected (type=${type}). Redirecting to update-password.`)
-        // Adicionamos debug_type para o cliente poder logar com certeza que veio daqui
-        return NextResponse.redirect(new URL(`/${locale}/update-password?type=recovery&source=callback`, request.url))
-      }
-
-      // Se for confirmação de cadastro
-      if (type === 'signup' || type === 'invite') {
-        console.log(`[AUTH CALLBACK] Signup/Invite confirmation detected. Redirecting to confirmed page.`)
-        return NextResponse.redirect(new URL(`/${locale}/confirmed`, request.url))
-      }
-
-      // Fluxo normal (Login/Signup)
-      let roleName = null
-      let attempts = 0
-      
-      while (!roleName && attempts < 2) {
-        const { data: roleData } = await supabase
-          .from("user_roles")
-          .select(`roles (name)`)
-          .eq("user_id", data.user.id)
-          .single()
+      if (!error) {
+        // 1. Obter o usuário
+        const { data: { user } } = await supabase.auth.getUser()
         
-        roleName = (roleData?.roles as any)?.name
-        if (!roleName) {
-            await new Promise(resolve => setTimeout(resolve, 500))
-            attempts++
+        if (!user) {
+          return NextResponse.redirect(`${origin}/login?error=user_not_found`)
         }
+
+        // 2. Buscar o perfil e a role do usuário
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*, user_roles!inner(roles(name))")
+          .eq("id", user.id)
+          .returns<any>()
+          .maybeSingle()
+
+        if (!profile) {
+          return NextResponse.redirect(`${origin}/setup-profile?next=${next}`)
+        }
+
+        const roles = profile.user_roles?.map((ur: any) => ur.roles?.name) || []
+        
+        if (roles.includes("admin")) {
+            const adminNext = next === '/dashboard' ? '/dashboard/admin' : next
+            return NextResponse.redirect(`${origin}${adminNext.startsWith('/') ? '' : '/'}${adminNext}`)
+        }
+        
+        return NextResponse.redirect(`${origin}${next.startsWith('/') ? '' : '/'}${next}`)
       }
-
-      let targetPath = `/${locale}/dashboard`
-      if (!roleName) targetPath = `/${locale}/select-role`
-      else if (roleName === 'admin') targetPath = `/${locale}/admin`
-      else if (roleName === 'mentor') targetPath = `/${locale}/dashboard/mentor`
-      else if (roleName === 'mentee') targetPath = `/${locale}/dashboard/mentee`
-
-      return NextResponse.redirect(new URL(targetPath, request.url))
     }
-  }
 
-  return NextResponse.redirect(new URL(`/${locale}/login?error=auth_failed`, request.url))
+    // Retorno em caso de erro no código ou na troca
+    return NextResponse.redirect(`${origin}/auth/auth-error`)
+  } catch (error) {
+    console.error("Auth callback error:", error)
+    return NextResponse.redirect(`${new URL(request.url).origin}/auth/auth-error`)
+  }
 }

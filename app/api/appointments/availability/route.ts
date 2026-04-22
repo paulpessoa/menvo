@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { AvailableTimeSlot } from "@/lib/types/models/mentorship"
 import { createClient } from "@supabase/supabase-js"
 
 export async function GET(request: NextRequest) {
   try {
     // Usar Service Role para permitir leitura pública da disponibilidade
-    // A disponibilidade dos mentores deve ser visível para todos
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -43,10 +41,6 @@ export async function GET(request: NextRequest) {
       .order("day_of_week", { ascending: true })
 
     if (availabilityError) {
-      console.error(
-        "[AVAILABILITY] Error fetching availability:",
-        availabilityError
-      )
       return NextResponse.json(
         { error: "Failed to fetch availability" },
         { status: 500 }
@@ -62,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get existing appointments in the date range
-    const { data: appointments, error: appointmentsError } = await supabase
+    const { data: appointments } = await supabase
       .from("appointments")
       .select("scheduled_at, duration_minutes")
       .eq("mentor_id", mentorId)
@@ -70,16 +64,8 @@ export async function GET(request: NextRequest) {
       .gte("scheduled_at", start.toISOString())
       .lte("scheduled_at", end.toISOString())
 
-    if (appointmentsError) {
-      console.error("[AVAILABILITY] Error fetching appointments:", appointmentsError)
-      return NextResponse.json(
-        { error: "Failed to fetch appointments" },
-        { status: 500 }
-      )
-    }
-
     // Generate available time slots
-    const availableSlots: AvailableTimeSlot[] = []
+    const availableSlots: any[] = []
 
     const isSlotBooked = (
       slotStart: Date,
@@ -95,19 +81,14 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Loop de geração de slots à prova de fusos
-    // Começamos do 'start' e vamos até 'end'
     let current = new Date(start.getTime());
-    // Normalizar current para o início do dia local para o loop ser consistente
     current.setHours(0, 0, 0, 0);
 
     const safeEnd = new Date(end.getTime());
     safeEnd.setHours(23, 59, 59, 999);
 
     while (current <= safeEnd) {
-      // Pegar o dia da semana (0-6)
       const dayOfWeek = current.getDay();
-      
       const dayAvailability = availability.filter(
         (avail) => Number(avail.day_of_week) === dayOfWeek
       );
@@ -120,16 +101,11 @@ export async function GET(request: NextRequest) {
           const [endHour, endMinute] = avail.end_time.split(":").map(Number);
 
           for (let hour = startHour; hour < endHour; hour++) {
-            // Ignorar se for o último slot e passar do minuto final
-            if (hour === endHour - 1 && startMinute > endMinute) continue;
-
-            // Criar data do slot no fuso de Brasília (-03:00)
             const h = hour.toString().padStart(2, '0');
             const m = startMinute.toString().padStart(2, '0');
             const slotIso = `${dateStr}T${h}:${m}:00-03:00`;
             const slotDate = new Date(slotIso);
 
-            // Só adicionar se for no futuro
             if (slotDate > new Date()) {
               if (!isSlotBooked(slotDate, 45)) {
                 availableSlots.push({
@@ -142,14 +118,11 @@ export async function GET(request: NextRequest) {
           }
         }
       }
-      
-      // Incrementar 1 dia
       current.setDate(current.getDate() + 1);
     }
 
-    // Sort slots by datetime
     availableSlots.sort(
-      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+      (a: any, b: any) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
     )
 
     return NextResponse.json({
@@ -157,10 +130,9 @@ export async function GET(request: NextRequest) {
       availableSlots,
       totalSlots: availableSlots.length
     })
-  } catch (error) {
-    console.error("[AVAILABILITY] Fatal error:", error)
+  } catch (error: any) {
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error.message },
       { status: 500 }
     )
   }
