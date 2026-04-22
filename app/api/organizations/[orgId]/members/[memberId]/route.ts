@@ -46,7 +46,7 @@ export async function PATCH(
 
     const { data: member, error } = await supabase
       .from("profiles")
-      .update(body)
+      .update(body as any)
       .eq("id", memberId)
       .eq("organization_id", orgId)
       .select()
@@ -71,7 +71,7 @@ export async function DELETE(
 
     const { error } = await supabase
       .from("profiles")
-      .update({ organization_id: null })
+      .update({ organization_id: null } as any)
       .eq("id", memberId)
       .eq("organization_id", orgId)
 

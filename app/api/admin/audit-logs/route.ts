@@ -6,21 +6,6 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 
-interface AuditLog {
-    id: number
-    action_type: string
-    details: any
-    created_at: string
-    admin: {
-        email: string
-        full_name: string
-    } | null
-    target: {
-        full_name: string
-    } | null
-    target_user_email: string | null
-}
-
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -52,7 +37,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || ""
     const searchLower = search.toLowerCase()
 
-    const filteredLogs = logs.filter((log: any) => {
+    const filteredLogs = (logs || []).filter((log: any) => {
         if (!search) return true
         return (
             log.action_type?.toLowerCase().includes(searchLower) ||

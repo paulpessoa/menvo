@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       .from("profiles")
       .select("id, verified")
       .eq("id", mentor_id)
+      .returns<any>()
       .single()
 
     if (mentorError || !mentor) {
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
         mentorship_topics: mentorship_topics || [],
         notes_mentee: notes_mentee || "",
         status: "pending"
-      })
+      } as any)
       .select(`
         *,
         mentor:profiles!mentor_id(full_name, avatar_url),
