@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Building2, Search, CheckCircle, XCircle, Clock, Loader2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Organization } from "@/lib/types/organizations"
 
@@ -112,6 +113,9 @@ export default function AdminOrganizationsPage() {
                                         Organização
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Membros
+                                    </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Tipo
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -126,7 +130,7 @@ export default function AdminOrganizationsPage() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredOrgs.map((org) => (
+                                {filteredOrgs.map((org: any) => (
                                     <tr key={org.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
@@ -142,6 +146,11 @@ export default function AdminOrganizationsPage() {
                                                     <div className="text-sm text-gray-500">{org.slug}</div>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                                                {org.memberCount || 0} usuários
+                                            </Badge>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <span className="text-sm text-gray-900">{org.type}</span>

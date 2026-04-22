@@ -52,12 +52,31 @@ export async function POST(request: NextRequest) {
     console.log("📁 Processing form data...");
     const formData = await request.formData()
     const file = formData.get("file") as File
+    const targetUserId = formData.get("targetUserId") as string | null
 
     if (!file) {
       console.error("❌ No file provided")
       return NextResponse.json({ 
         error: "Nenhum arquivo fornecido" 
       }, { status: 400 })
+    }
+
+    // Determine target user ID
+    let finalUserId = user.id
+    if (targetUserId && targetUserId !== user.id) {
+      const { data: roleData } = await supabaseAdmin
+        .from('user_roles')
+        .select('roles(name)')
+        .eq('user_id', user.id)
+        .single()
+      
+      const isAdmin = (roleData?.roles as any)?.map?.((r: any) => r.roles?.name).includes('admin') || 
+                      (roleData?.roles as any)?.name === 'admin'
+      
+      if (!isAdmin) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+      }
+      finalUserId = targetUserId
     }
 
     console.log("📄 File received:", { 
@@ -92,7 +111,7 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const fileExtension = file.name.split(".").pop()
     const timestamp = Date.now();
-    const fileName = `${user.id}/${timestamp}.${fileExtension}`
+    const fileName = `${finalUserId}/${timestamp}.${fileExtension}`
 
     console.log("📤 Uploading to storage:", fileName)
 
@@ -141,14 +160,14 @@ export async function POST(request: NextRequest) {
     console.log("✅ Public URL generated:", publicUrl)
 
     // Update user profile with new photo
-    console.log("💾 Updating profile with new avatar URL...");
+    console.log(`💾 Updating profile ${finalUserId} with new avatar URL...`);
     const { data: profileData, error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
         avatar_url: publicUrl,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", user.id)
+      .eq("id", finalUserId)
       .select()
 
     if (updateError) {

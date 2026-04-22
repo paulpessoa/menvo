@@ -59,8 +59,29 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
+    // Fetch counts for each organization
+    const orgsWithStats = await Promise.all((data as Organization[]).map(async (org) => {
+      // Direct links (new structure)
+      const { count: profileCount } = await supabase
+        .from("profiles")
+        .select("*", { count: 'exact', head: true })
+        .eq("organization_id", org.id)
+
+      // Legacy links
+      const { count: legacyCount } = await supabase
+        .from("organization_members")
+        .select("*", { count: 'exact', head: true })
+        .eq("organization_id", org.id)
+        .eq("status", "active")
+
+      return {
+        ...org,
+        memberCount: (profileCount || 0) + (legacyCount || 0)
+      }
+    }))
+
     return successResponse({
-      organizations: data as Organization[],
+      organizations: orgsWithStats,
       pagination: {
         page,
         limit,

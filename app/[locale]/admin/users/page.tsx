@@ -25,7 +25,8 @@ import {
   AlertTriangle,
   Edit,
   ExternalLink,
-  SquareCheck
+  SquareCheck,
+  FileText
 } from "lucide-react"
 import {
   DropdownMenu,
@@ -71,6 +72,9 @@ export default function AdminUsersPage() {
   const [activeTab, setActiveTab] = useState(initialTab)
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const [inviting, setInviting] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const ITEMS_PER_PAGE = 30
   
   // Edit State
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null)
@@ -78,11 +82,19 @@ export default function AdminUsersPage() {
 
   const supabase = createClient()
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isLoadMore = false) => {
     if (!supabase) return
-    setLoading(true)
+    
+    if (!isLoadMore) {
+        setLoading(true)
+        setPage(1)
+    }
+
     try {
-      const { data: userDataRaw, error: userError } = await (supabase
+      const from = isLoadMore ? page * ITEMS_PER_PAGE : 0
+      const to = from + ITEMS_PER_PAGE - 1
+
+      const { data: userDataRaw, error: userError, count } = await (supabase
         .from('profiles')
         .select(`
           id,
@@ -105,37 +117,41 @@ export default function AdminUsersPage() {
               name
             )
           )
-        `)
-        .order('created_at', { ascending: false }) as any)
+        `, { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to) as any)
 
       if (userError) throw userError
 
-      const userData = ((userDataRaw as any[]) || []).map(user => ({
+      const newUserData = ((userDataRaw as any[]) || []).map(user => ({
         ...user,
         roles: (user.user_roles as any)?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
       }))
 
-      setUsers(userData)
+      if (isLoadMore) {
+        setUsers(prev => [...prev, ...newUserData])
+        setPage(prev => prev + 1)
+      } else {
+        setUsers(newUserData)
+      }
 
-      const total = userData.length
-      const mentors = userData.filter(u => u.roles.includes('mentor')).length
-      const mentees = userData.filter(u => u.roles.includes('mentee')).length
-      const admins = userData.filter(u => u.roles.includes('admin')).length
-      const verified = userData.filter(u => u.verified).length
-      const pending = userData.filter(u => u.roles.includes('mentor') && !u.verified).length
+      setHasMore(newUserData.length === ITEMS_PER_PAGE)
 
-      setStats({ total, mentors, mentees, admins, verified, pending })
+      if (!isLoadMore) {
+        const total = count || 0
+        setStats(prev => ({ ...prev, total }))
+      }
     } catch (error) {
       console.error('Error fetching admin users:', error)
       toast.error('Erro ao carregar dados')
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }, [supabase, page])
 
   useEffect(() => {
     fetchData()
-  }, [fetchData])
+  }, [])
 
   useEffect(() => {
     filterUsers()
@@ -313,6 +329,9 @@ export default function AdminUsersPage() {
                             <span className="font-semibold text-sm truncate">
                               {user.full_name || 'Sem Nome'}
                             </span>
+                            {user.cv_url && (
+                              <FileText className="h-3.5 w-3.5 text-blue-500" title="Possui currículo" />
+                            )}
                             {user.roles.includes('mentor') && (
                                 <Badge variant={user.verified ? "default" : "secondary"} className={user.verified ? "bg-green-600" : "bg-yellow-100 text-yellow-800"}>
                                     {user.verified ? "VERIFICADO" : "PENDENTE"}
@@ -364,6 +383,14 @@ export default function AdminUsersPage() {
                     ))
                   )}
                 </div>
+
+                {hasMore && !loading && (
+                    <div className="p-4 border-t flex justify-center bg-gray-50/50">
+                        <Button variant="outline" onClick={() => fetchData(true)} className="gap-2">
+                            <RefreshCw className="h-4 w-4" /> Carregar Mais Usuários
+                        </Button>
+                    </div>
+                )}
               </Tabs>
             </CardContent>
           </Card>
