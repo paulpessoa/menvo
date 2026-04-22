@@ -50,6 +50,7 @@ export async function POST(
       .update({ organization_id: orgId } as any)
       .eq("id", user_id)
       .select()
+      .returns<any>()
       .single()
 
     if (error) throw error
