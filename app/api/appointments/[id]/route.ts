@@ -78,7 +78,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .from('appointments')
       .select('*')
       .eq('id', appointmentId)
-      .returns<AppointmentDetails>()
+      .returns<any>()
       .single();
 
     if (fetchError || !currentAppointment) {
@@ -168,7 +168,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       .from('appointments')
       .select('*')
       .eq('id', appointmentId)
-      .returns<AppointmentDetails>()
+      .returns<any>()
       .single();
 
     if (fetchError || !appointment) {

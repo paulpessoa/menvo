@@ -9,7 +9,6 @@ interface PageProps {
     }>
 }
 
-// Interface idêntica à esperada pelo MenteeProfileClient
 interface MenteeProfile {
     id: string
     first_name: string
@@ -85,18 +84,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        return {
-            title: 'Perfil do Mentee | Menvo',
-        }
-    }
-
-    const data = await getMenteeData(slug, user.id)
+    const data = user ? await getMenteeData(slug, user.id) : null
 
     if (!data) {
-        return {
-            title: 'Mentee não encontrado | Menvo',
-        }
+        return { title: 'Perfil do Mentee | Menvo' }
     }
 
     const { mentee } = data
