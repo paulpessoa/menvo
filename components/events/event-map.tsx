@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Monitor, Calendar, Users } from "lucide-react"
 import { format } from "date-fns"
-import type { Event } from "@/lib/types/events"
+import type { Event } from "@/lib/types/models/event"
 
 interface EventMapProps {
   events: Event[]

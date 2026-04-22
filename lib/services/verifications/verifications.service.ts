@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/services/auth/auth.service'
-import { Verification } from '@/lib/types/verifications'
+import { Verification } from '@/lib/types/models/verification'
 import { Database } from '@/lib/types/database'
 
 interface CompleteVerificationParams {

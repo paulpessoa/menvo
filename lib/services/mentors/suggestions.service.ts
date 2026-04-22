@@ -3,7 +3,7 @@ import type {
   MentorSuggestionInsert,
   MentorSuggestionUpdate,
   MentorSuggestionRow
-} from '@/lib/types/supabase-mentor-suggestions'
+} from '@/lib/types/models/suggestion'
 
 export interface MentorSuggestion {
   id?: string

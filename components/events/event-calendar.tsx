@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday } from "date-fns"
-import type { Event } from "@/lib/types/events"
+import type { Event } from "@/lib/types/models/event"
 
 interface EventCalendarProps {
   eventsByDate: Record<string, Event[]>

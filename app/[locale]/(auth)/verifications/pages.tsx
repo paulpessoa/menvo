@@ -19,8 +19,8 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar, User, CheckCircle, XCircle, Eye } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { VerificationService } from "@/services/verifications"
-import { Verification } from "@/lib/types/verifications"
+import { VerificationService } from "@/lib/services/verifications/verifications.service"
+import { Verification } from "@/lib/types/models/verification"
 
 export default function VerificationsPage() {
   const { user } = useAuth()

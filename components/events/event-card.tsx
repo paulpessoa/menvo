@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Calendar, Clock, MapPin, Monitor, Users, ExternalLink, Star, DollarSign } from "lucide-react"
 import { format } from "date-fns"
-import type { Event } from "@/lib/types/events"
+import type { Event } from "@/lib/types/models/event"
 
 interface EventCardProps {
   event: Event
