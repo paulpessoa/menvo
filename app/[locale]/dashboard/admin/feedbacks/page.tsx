@@ -26,8 +26,22 @@ import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import { RequireRole } from "@/lib/auth/auth-guard"
 
+interface Feedback {
+  id: string
+  user_id: string | null
+  rating: number
+  comment: string | null
+  created_at: string
+  profiles?: {
+    first_name: string | null
+    last_name: string | null
+    email: string | null
+    avatar_url: string | null
+  } | null
+}
+
 export default function AdminFeedbacks() {
-  const [feedbacks, setFeedbacks] = useState<any[]>([])
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [ratingFilter, setRatingFilter] = useState<string>("all")
@@ -40,7 +54,6 @@ export default function AdminFeedbacks() {
   const fetchFeedbacks = async () => {
     setLoading(true)
     try {
-      // Tentativa de busca com join manual para evitar erro de cache do schema
       const { data: feedbackData, error: feedbackError } = await supabase
         .from("feedback")
         .select("*")
@@ -49,8 +62,7 @@ export default function AdminFeedbacks() {
       if (feedbackError) throw feedbackError
 
       if (feedbackData && feedbackData.length > 0) {
-        // Buscar perfis separadamente para os feedbacks que possuem user_id
-        const userIds = feedbackData.map(f => f.user_id).filter(Boolean)
+        const userIds = feedbackData.map(f => f.user_id).filter(Boolean) as string[]
         
         if (userIds.length > 0) {
             const { data: profileData } = await supabase
@@ -70,7 +82,7 @@ export default function AdminFeedbacks() {
 
             setFeedbacks(mergedData)
         } else {
-            setFeedbacks(feedbackData)
+            setFeedbacks(feedbackData as Feedback[])
         }
       } else {
         setFeedbacks([])

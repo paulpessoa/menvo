@@ -9,10 +9,8 @@ import {
   BarChart3,
   Shield,
   Menu,
-  X,
   Home,
   Building2,
-  MessageSquare,
   Star
 } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -87,22 +85,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           )}
         >
           <div className="flex flex-col h-full">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-2">
-                <Shield className="h-6 w-6 text-red-600" />
-                <span className="font-semibold text-lg">{t("title")}</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-2">
               {adminNavItems.map((item) => (
@@ -154,9 +136,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <Menu className="h-4 w-4" />
             </Button>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-red-600" />
-              <span className="font-semibold">{t("title")}</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Shield className="h-4 w-4 text-red-600" />
+              <span className="text-xs font-medium uppercase tracking-wider">Staff</span>
             </div>
             <div /> {/* Spacer */}
           </div>

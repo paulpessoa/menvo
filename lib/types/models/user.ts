@@ -23,6 +23,7 @@ export interface UserProfile {
   experience_years: number | null;
   expertise_areas: string[] | null;
   languages: string[] | null;
+  cv_url?: string | null;
   
   // Mentorship specifics
   mentorship_topics: string[] | null;
@@ -31,16 +32,20 @@ export interface UserProfile {
   average_rating: number | null;
   total_reviews: number | null;
   total_sessions: number | null;
+  is_pending_mentor?: boolean;
+  learning_goals?: string | null;
   
   // Social/Links
   linkedin_url: string | null;
   github_url: string | null;
   website_url: string | null;
+  portfolio_url?: string | null;
   
   // System
   created_at: string;
   updated_at: string;
   roles: UserRole[];
+  is_public: boolean;
 }
 
 /**

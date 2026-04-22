@@ -92,15 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const { data, error } = await supabase
                 .from('profiles')
                 .select(`
-                    id,
-                    full_name,
-                    first_name,
-                    last_name,
-                    avatar_url,
-                    verified,
-                    slug,
-                    bio,
-                    expertise_areas,
+                    *,
                     user_roles (
                         roles (
                             name
@@ -112,28 +104,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (error) {
                 console.error(`[AUTH] Erro ao buscar perfil:`, error.message)
-                debugLog(`Error fetching profile for ${userId}`, { error: error.message }, 'error')
                 return null
             }
 
-            debugLog(`Raw profile data for ${userId}`, { 
-                hasData: !!data,
-                user_roles: data?.user_roles 
-            }, 'debug')
-
-            // Robust role extraction
-            let rawRoles: UserRole[] = []
-            if (data?.user_roles) {
-                const userRolesData = Array.isArray(data.user_roles) ? data.user_roles : [data.user_roles]
-                rawRoles = userRolesData
-                    .map((ur: any) => ur.roles?.name as UserRole)
-                    .filter(Boolean)
-            }
+            // Mapeamento seguro das roles
+            const rawRoles = (data?.user_roles as any[])?.map((ur: any) => ur.roles?.name as UserRole).filter(Boolean) || []
             
-            console.log(`[AUTH] Perfil carregado com sucesso. Roles detectadas:`, rawRoles)
-            
-            debugLog(`Detected roles for ${userId}`, { rawRoles }, 'info')
-
             const profileData: UserProfile = {
                 ...(data as any),
                 roles: rawRoles

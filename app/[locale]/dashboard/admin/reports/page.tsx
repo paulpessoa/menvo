@@ -28,8 +28,6 @@ import {
   TrendingUp,
   Download,
   Calendar,
-  Star,
-  Activity,
   Loader2,
   RefreshCw,
   PieChart as PieIcon
