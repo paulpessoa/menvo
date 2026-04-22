@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import {
@@ -33,12 +32,33 @@ import {
   Activity,
   Loader2,
   RefreshCw,
-  Box
+  PieChart as PieIcon
 } from "lucide-react"
 import { toast } from "sonner"
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from "recharts"
+
+const COLORS = ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"]
 
 export default function AdminReportsPage() {
-  const [timeRange, setTimeRange] = useState("2020-01-01")
+  // Default para últimos 30 dias
+  const [timeRange, setTimeRange] = useState(() => {
+    const d = new Date()
+    d.setDate(d.getDate() - 30)
+    return d.toISOString().split("T")[0]
+  })
+  
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<AdminStats["overview"] | null>(null)
   const [growthData, setGrowthData] = useState<TimeSeriesData[]>([])
@@ -65,13 +85,18 @@ export default function AdminReportsPage() {
     fetchData()
   }, [fetchData])
 
+  const pieData = [
+    { name: "Mentores", value: stats?.totalMentors || 0 },
+    { name: "Mentees", value: stats?.totalMentees || 0 },
+  ]
+
   const exportReport = () => {
     if (!stats) return
     const csvContent = `Data,Contagem\n${growthData.map((d) => `${d.date},${d.count}`).join("\n")}`
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     link.href = URL.createObjectURL(blob)
-    link.download = `crescimento-menvo-${new Date().toISOString().split("T")[0]}.csv`
+    link.download = `relatorio-menvo-${new Date().toISOString().split("T")[0]}.csv`
     link.click()
   }
 
@@ -82,9 +107,9 @@ export default function AdminReportsPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Métricas da Plataforma</h1>
+              <h1 className="text-3xl font-bold">Relatórios e Métricas</h1>
               <p className="text-muted-foreground">
-                Dados reais sincronizados com o banco de dados
+                Análise detalhada de crescimento e distribuição da base
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -94,12 +119,10 @@ export default function AdminReportsPage() {
                   <SelectValue placeholder="Período" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2020-01-01">
-                    Desde 2020 (Início)
-                  </SelectItem>
-                  <SelectItem value="2023-01-01">Desde 2023</SelectItem>
-                  <SelectItem value="2024-01-01">Desde 2024</SelectItem>
-                  <SelectItem value="2025-01-01">Último Ano (2025)</SelectItem>
+                  <SelectItem value={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}>Últimos 7 dias</SelectItem>
+                  <SelectItem value={new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}>Últimos 30 dias</SelectItem>
+                  <SelectItem value={new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}>Últimos 90 dias</SelectItem>
+                  <SelectItem value="2020-01-01">Desde o início</SelectItem>
                 </SelectContent>
               </Select>
               <Button onClick={fetchData} variant="outline" size="icon">
@@ -108,130 +131,107 @@ export default function AdminReportsPage() {
                 />
               </Button>
               <Button onClick={exportReport} variant="secondary">
-                <Download className="h-4 w-4 mr-2" /> Exportar CSV
+                <Download className="h-4 w-4 mr-2" /> Exportar
               </Button>
             </div>
           </div>
 
-          {loading && !stats ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="text-muted-foreground font-medium">
-                Buscando histórico desde 2020...
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {/* KPIs */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="border-l-4 border-l-blue-600">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total de Usuários
-                    </CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {stats?.totalUsers.toLocaleString()}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-green-600">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Mentores
-                    </CardTitle>
-                    <Star className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {stats?.totalMentors}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-purple-600">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Mentees
-                    </CardTitle>
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {stats?.totalMentees}
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="border-l-4 border-l-orange-600">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Recursos no Hub
-                    </CardTitle>
-                    <Box className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {stats?.totalHubResources}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="border-l-4 border-l-blue-600">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Total de Usuários</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats?.totalUsers.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-green-600">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Mentores</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats?.totalMentors}</div>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-purple-600">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Mentees</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats?.totalMentees}</div>
+              </CardContent>
+            </Card>
+          </div>
 
-              {/* Growth Chart */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-xl flex items-center gap-2">
-                        <TrendingUp className="text-primary h-5 w-5" />{" "}
-                        Crescimento de Novos Usuários
-                      </CardTitle>
-                      <CardDescription>
-                        Novos cadastros mensais agrupados por data de criação
-                      </CardDescription>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Growth Chart */}
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-primary" />
+                    Fluxo de Novos Usuários
+                </CardTitle>
+                <CardDescription>Novos cadastros no período selecionado</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px] pt-4">
+                {loading ? (
+                    <div className="h-full flex items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
-                    <Badge
-                      variant="outline"
-                      className="text-primary border-primary"
-                    >
-                      DADOS REAIS
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    {growthData.length === 0 ? (
-                      <p className="text-center py-10 text-muted-foreground italic">
-                        Nenhum dado encontrado para este período.
-                      </p>
-                    ) : (
-                      [...growthData].reverse().map((month) => (
-                        <div key={month.date} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="font-semibold text-gray-700">
-                              {month.date}
-                            </span>
-                            <Badge variant="secondary" className="font-bold">
-                              +{month.count}
-                            </Badge>
-                          </div>
-                          <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden border">
-                            <div
-                              className="bg-primary h-full rounded-full transition-all duration-1000 shadow-sm"
-                              style={{
-                                width: `${Math.min((month.count / (stats?.totalUsers || 100)) * 500, 100)}%`
-                              }}
+                ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={growthData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                            <XAxis dataKey="date" fontSize={10} tickMargin={10} />
+                            <YAxis fontSize={10} />
+                            <Tooltip 
+                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                             />
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+                            <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Novos Usuários" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Distribution Chart */}
+            <Card className="shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                    <PieIcon className="h-5 w-5 text-primary" />
+                    Distribuição de Perfis
+                </CardTitle>
+                <CardDescription>Base total de usuários por papel</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px] pt-4">
+                {loading ? (
+                    <div className="h-full flex items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={pieData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={60}
+                                outerRadius={80}
+                                paddingAngle={5}
+                                dataKey="value"
+                            >
+                                {pieData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend verticalAlign="bottom" height={36}/>
+                        </PieChart>
+                    </ResponsiveContainer>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </RequireRole>

@@ -10,7 +10,6 @@ export interface AdminStats {
     totalUsers: number
     totalMentors: number
     totalMentees: number
-    totalHubResources: number
   }
   growth: {
     users: TimeSeriesData[]
@@ -19,7 +18,7 @@ export interface AdminStats {
 
 export const adminReportsService = {
   /**
-   * Busca dados históricos de novos usuários desde Janeiro de 2020
+   * Busca dados históricos de novos usuários
    */
   async getUserGrowth(startDate: string = "2020-01-01"): Promise<TimeSeriesData[]> {
     const supabase = createClient()
@@ -32,20 +31,19 @@ export const adminReportsService = {
 
     if (error) throw error
 
-    // Agrupar por Mês/Ano para o gráfico
+    // Agrupar por Dia para períodos curtos, ou Mês para períodos longos
     const counts: Record<string, number> = {}
     
     data.forEach(profile => {
         const date = new Date(profile.created_at)
-        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        counts[monthYear] = (counts[monthYear] || 0) + 1
+        const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD
+        counts[dateKey] = (counts[dateKey] || 0) + 1
     })
 
-    // Converter para array e preencher meses vazios se necessário
     return Object.entries(counts).map(([date, count]) => ({
         date,
         count
-    }))
+    })).sort((a, b) => a.date.localeCompare(b.date))
   },
 
   async getDashboardStats(): Promise<AdminStats['overview']> {
@@ -54,20 +52,17 @@ export const adminReportsService = {
     const [
       { count: totalUsers },
       { count: totalMentors },
-      { count: totalMentees },
-      { count: totalHub }
+      { count: totalMentees }
     ] = await Promise.all([
       supabase.from('profiles').select('*', { count: 'exact', head: true }),
       supabase.from('user_roles').select('*, roles!inner(*)', { count: 'exact', head: true }).eq('roles.name', 'mentor'),
-      supabase.from('user_roles').select('*, roles!inner(*)', { count: 'exact', head: true }).eq('roles.name', 'mentee'),
-      supabase.from('hub_resources').select('*', { count: 'exact', head: true })
+      supabase.from('user_roles').select('*, roles!inner(*)', { count: 'exact', head: true }).eq('roles.name', 'mentee')
     ])
 
     return {
       totalUsers: totalUsers || 0,
       totalMentors: totalMentors || 0,
-      totalMentees: totalMentees || 0,
-      totalHubResources: totalHub || 0
+      totalMentees: totalMentees || 0
     }
   }
 }

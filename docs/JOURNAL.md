@@ -1,5 +1,15 @@
 # 📓 JOURNAL - Registro de Decisões e Marcos
 
+## 2026-04-22: Estabilização de Roteamento e Expansão de Perfis
+- **Decisão:** Unificação do acesso ao dashboard via rota polimórfica `/dashboard`.
+- **Racional:** Reduzir a confusão de navegação do usuário final e centralizar o redirecionamento baseado em roles (Admin, Mentor, Mentee) via servidor.
+- **Marcos Técnicos:**
+    - Correção do `router` para usar a instância localizada do `next-intl` (evitando quebras de rota em `/admin`).
+    - Implementação de transição de estado de Mentor no Perfil (Solicitar/Sair).
+    - Mural de Mentorados (Ex-Comunidade) agora filtra por `is_public` e tipo `mentee`.
+    - Gestão de Organizações agora suporta upload de logo via Supabase Storage.
+    - Criação do documento `ARCHITECTURE_EVOLUTION.md` prevendo migração para Monorepo.
+
 ## 2026-03-30: Inicialização e Otimização de Agente
 - **Decisão:** Atualização do modelo base no `.geminirc` de `1.5-pro` para `2.0-flash`.
 - **Racional:** Melhorar a latência de resposta e a eficiência em tarefas de "Vibe Coding" e pequenas correções iterativas, mantendo a inteligência necessária para o contexto do projeto.
