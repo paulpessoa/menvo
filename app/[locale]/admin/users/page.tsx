@@ -69,6 +69,8 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState(initialTab)
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
+  const [inviting, setInviting] = useState(false)
   
   // Edit State
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null)
@@ -94,6 +96,9 @@ export default function AdminUsersPage() {
           bio,
           created_at,
           slug,
+          invite_sent_at,
+          institution,
+          course,
           user_roles (
             roles (
               name
@@ -169,6 +174,47 @@ export default function AdminUsersPage() {
     setIsEditModalOpen(true)
   }
 
+  const handleBatchInvite = async () => {
+    if (selectedUserIds.length === 0) return
+    if (!confirm(`Deseja enviar convites de acesso para os ${selectedUserIds.length} usuários selecionados?`)) return
+    
+    setInviting(true)
+    try {
+      const response = await fetch('/api/admin/users/invite-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: selectedUserIds })
+      })
+      
+      const result = await response.json()
+      if (response.ok) {
+        toast.success(result.message)
+        setSelectedUserIds([])
+        fetchData()
+      } else {
+        throw new Error(result.error)
+      }
+    } catch (error: any) {
+      toast.error('Erro no envio em massa: ' + error.message)
+    } finally {
+      setInviting(false)
+    }
+  }
+
+  const toggleSelectUser = (id: string) => {
+    setSelectedUserIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedUserIds.length === filteredUsers.length && filteredUsers.length > 0) {
+      setSelectedUserIds([])
+    } else {
+      setSelectedUserIds(filteredUsers.map(u => u.id))
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <AdminBreadcrumb />
@@ -178,9 +224,17 @@ export default function AdminUsersPage() {
             <h1 className="text-3xl font-bold">Gestão Global</h1>
             <p className="text-muted-foreground">Controle central de usuários, mentores e permissões</p>
           </div>
-          <Button onClick={fetchData} variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" /> Sincronizar
-          </Button>
+          <div className="flex gap-2">
+            {selectedUserIds.length > 0 && (
+              <Button onClick={handleBatchInvite} disabled={inviting} className="bg-blue-600 hover:bg-blue-700">
+                {inviting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Mail className="h-4 w-4 mr-2" />}
+                Convidar ({selectedUserIds.length})
+              </Button>
+            )}
+            <Button onClick={fetchData} variant="outline" size="sm">
+              <RefreshCw className="h-4 w-4 mr-2" /> Sincronizar
+            </Button>
+          </div>
         </div>
 
         <UserMetrics data={users} />
@@ -218,6 +272,16 @@ export default function AdminUsersPage() {
                   </TabsList>
                 </div>
 
+                <div className="px-4 py-2 bg-muted/30 border-b flex items-center gap-4">
+                    <input 
+                      type="checkbox" 
+                      className="h-4 w-4 rounded border-gray-300 cursor-pointer"
+                      checked={selectedUserIds.length > 0 && selectedUserIds.length === filteredUsers.length}
+                      onChange={toggleSelectAll}
+                    />
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Selecionar Todos ({filteredUsers.length})</span>
+                </div>
+
                 <div className="divide-y">
                   {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -231,7 +295,13 @@ export default function AdminUsersPage() {
                     </div>
                   ) : (
                     filteredUsers.map((user) => (
-                      <div key={user.id} className="p-4 hover:bg-gray-50/50 transition-colors flex items-center gap-4">
+                      <div key={user.id} className={`p-4 hover:bg-gray-50/50 transition-colors flex items-center gap-4 ${selectedUserIds.includes(user.id) ? 'bg-blue-50/50' : ''}`}>
+                        <input 
+                          type="checkbox" 
+                          className="h-4 w-4 rounded border-gray-300 cursor-pointer"
+                          checked={selectedUserIds.includes(user.id)}
+                          onChange={() => toggleSelectUser(user.id)}
+                        />
                         <Avatar className="h-12 w-12 border shadow-sm">
                           <AvatarImage src={user.avatar_url || undefined} />
                           <AvatarFallback className="bg-primary/5 text-primary">{user.full_name?.[0] || 'U'}</AvatarFallback>
@@ -247,8 +317,18 @@ export default function AdminUsersPage() {
                                     {user.verified ? "VERIFICADO" : "PENDENTE"}
                                 </Badge>
                             )}
+                            {(user as any).invite_sent_at && (
+                              <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">
+                                <MailCheck className="h-3 w-3 mr-1" /> CONVIDADO
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">{user.email}</div>
+                          {(user as any).institution && (
+                            <div className="text-[10px] text-muted-foreground mt-1 italic">
+                              {(user as any).course} @ {(user as any).institution}
+                            </div>
+                          )}
                         </div>
 
                         <div className="hidden md:flex gap-1">
