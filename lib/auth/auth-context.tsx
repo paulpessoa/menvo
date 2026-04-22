@@ -284,7 +284,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const getRoleDashboardPath = useCallback((roleName?: string) => {
         const r = roleName || profile?.roles?.[0]
-        if (r === 'admin') return '/admin'
+        if (r === 'admin') return '/dashboard/admin'
         if (r === 'mentor') return '/dashboard/mentor'
         if (r === 'mentee') return '/dashboard/mentee'
         return '/dashboard'
@@ -351,7 +351,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const getDefaultRedirectPath = useCallback(() => {
         if (!profile) return '/dashboard'
-        if (isAdmin) return '/admin'
+        if (isAdmin) return '/dashboard/admin'
         if (isMentor) return '/dashboard/mentor'
         if (isMentee) return '/dashboard/mentee'
         return '/dashboard'
