@@ -58,8 +58,7 @@
             "adminPanel": "Dashboard",
             "logout": "Logout",
             "administration": "Administration",
-            "user": "User",
-            "createOrganization": "Create Organization"
+            "user": "User"
         }
     },
     "home": {

@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import {
   errorResponse,
   handleApiError,

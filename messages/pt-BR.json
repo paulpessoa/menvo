@@ -58,8 +58,7 @@
       "adminPanel": "Dashboard",
       "logout": "Sair",
       "administration": "Administração",
-      "user": "Usuário",
-      "createOrganization": "Criar Organização"
+      "user": "Usuário"
     }
   },
   "home": {
@@ -1451,7 +1450,7 @@
       "feedbacksDesc": "Voz da comunidade",
       "reports": "Relatórios",
       "reportsDesc": "Estatísticas e métricas"
-      },
+    },
     "alerts": {
       "pendingMentors": "Atenção: Mentores Pendentes",
       "pendingMentorsDesc": "Existem {count} mentores aguardando verificação. Revise e aprove os perfis.",

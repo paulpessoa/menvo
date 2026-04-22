@@ -58,8 +58,7 @@
             "adminPanel": "Panel Administrativo",
             "logout": "Cerrar sesión",
             "administration": "Administration",
-            "user": "Usuario",
-            "createOrganization": "Crear Organización"
+            "user": "Usuario"
         }
     },
     "home": {

@@ -74,13 +74,6 @@ export default function Header() {
     })
 
     userNavigation.push({
-      name: t("header.userMenu.createOrganization"),
-      href: "/organizations/new",
-      icon: Building2,
-      color: "text-gray-700"
-    })
-
-    userNavigation.push({
       name: t("header.userMenu.messages"),
       href: "/messages",
       icon: MessageSquare,

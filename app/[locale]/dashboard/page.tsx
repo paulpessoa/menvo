@@ -20,7 +20,7 @@ export default function Dashboard() {
           router.push('/dashboard/mentee')
           break
         case 'admin':
-          router.push('/admin')
+          router.push('/dashboard/admin')
           break
         default:
           // If no role, AuthGuard will handle redirect to role selection
