@@ -15,7 +15,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Save, Shield, User, Star, Camera, Upload } from "lucide-react"
+import { Loader2, Save, Shield, User, Star, Camera, Upload, GraduationCap, ExternalLink, MailCheck } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 import { adminService, type AdminUserUpdate } from "@/services/admin/admin"
 import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
@@ -52,8 +53,12 @@ export function EditUserModal({
         avatar_url: user.avatar_url || "",
         verified: user.verified || false,
         verification_notes: user.verification_notes || "",
-        is_public: user.is_public || false
-      })
+        is_public: user.is_public || false,
+        institution: user.institution || "",
+        course: user.course || "",
+        academic_level: user.academic_level || "",
+        expected_graduation: user.expected_graduation || ""
+      } as any)
       setSelectedRoles(user.roles || [])
     }
   }, [user])
@@ -239,6 +244,81 @@ export function EditUserModal({
               rows={4}
               className="bg-white"
             />
+          </div>
+
+          {/* Dados Acadêmicos / Formação */}
+          <div className="space-y-4 p-5 border-2 rounded-xl bg-green-50/30 border-green-100">
+            <Label className="text-base font-bold flex items-center gap-2 text-green-900">
+              <GraduationCap className="h-5 w-5" /> Formação Acadêmica
+            </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="institution">Instituição</Label>
+                <Input
+                  id="institution"
+                  value={(formData as any).institution}
+                  onChange={(e) => setFormData({ ...formData, institution: e.target.value } as any)}
+                  className="bg-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="course">Curso</Label>
+                <Input
+                  id="course"
+                  value={(formData as any).course}
+                  onChange={(e) => setFormData({ ...formData, course: e.target.value } as any)}
+                  className="bg-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Currículo e Convite */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Currículo */}
+            <div className="space-y-2 p-4 border rounded-xl bg-gray-50/50">
+              <Label className="font-bold flex items-center gap-2">
+                <Upload className="h-4 w-4" /> Currículo (CV)
+              </Label>
+              {user.cv_url ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs text-green-600 font-medium flex items-center gap-1">
+                    <MailCheck className="h-3 w-3" /> Currículo disponível no sistema
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2 bg-white"
+                    asChild
+                  >
+                    <a href={user.cv_url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" /> Abrir Currículo no Browser
+                    </a>
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground italic">Nenhum currículo enviado.</p>
+              )}
+            </div>
+
+            {/* Status de Convite */}
+            <div className="space-y-2 p-4 border rounded-xl bg-blue-50/20">
+              <Label className="font-bold flex items-center gap-2">
+                <MailCheck className="h-4 w-4 text-blue-600" /> Status do Convite
+              </Label>
+              {user.invite_sent_at ? (
+                <div className="space-y-1">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">
+                    Convite Enviado
+                  </Badge>
+                  <p className="text-[10px] text-muted-foreground">
+                    Enviado em: {new Date(user.invite_sent_at).toLocaleString('pt-BR')}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-orange-600 font-medium">Ainda não recebeu convite de acesso.</p>
+              )}
+            </div>
           </div>
 
           {/* Roles Management */}

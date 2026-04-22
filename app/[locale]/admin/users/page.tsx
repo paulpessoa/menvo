@@ -15,6 +15,7 @@ import {
   Loader2,
   RefreshCw,
   Mail,
+  MailCheck,
   Calendar,
   Shield,
   Eye,
@@ -23,7 +24,8 @@ import {
   X,
   AlertTriangle,
   Edit,
-  ExternalLink
+  ExternalLink,
+  SquareCheck
 } from "lucide-react"
 import {
   DropdownMenu,

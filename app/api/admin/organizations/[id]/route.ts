@@ -10,11 +10,11 @@ import type { Organization } from "@/lib/types/organizations"
 // GET /api/admin/organizations/[id] - Get organization details (admin only)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { id } = params
+    const { id } = await params
 
     // Authenticate user
     const {
@@ -55,18 +55,48 @@ export async function GET(
       throw orgError
     }
 
-    // Get member counts
-    const { data: memberCounts } = await supabase
+    // Get member counts from profiles (direct link used in migration)
+    const { data: profileMembers } = await supabase
+      .from("profiles")
+      .select(`
+        id,
+        user_roles(roles(name))
+      `)
+      .eq("organization_id", id)
+
+    // Get counts from organization_members (legacy link)
+    const { data: legacyMembers } = await supabase
       .from("organization_members")
       .select("role")
       .eq("organization_id", id)
       .eq("status", "active")
 
+    // Get appointments count
+    const { count: sessionCount } = await supabase
+      .from("appointments")
+      .select("*", { count: 'exact', head: true })
+      .eq("organization_id", id)
+
+    const mentors = new Set()
+    const mentees = new Set()
+
+    // Process profiles
+    profileMembers?.forEach(p => {
+      const roles = (p.user_roles as any)?.map((ur: any) => ur.roles?.name) || []
+      if (roles.includes('mentor')) mentors.add(p.id)
+      if (roles.includes('mentee')) mentees.add(p.id)
+    })
+
+    // Process legacy
+    legacyMembers?.forEach(m => {
+      if (m.role === 'mentor') mentors.add(Math.random().toString())
+      if (m.role === 'mentee') mentees.add(Math.random().toString())
+    })
+
     const stats = {
-      mentors: memberCounts?.filter((m) => m.role === "mentor").length || 0,
-      mentees: memberCounts?.filter((m) => m.role === "mentee").length || 0,
-      admins: memberCounts?.filter((m) => m.role === "admin").length || 0,
-      sessions: 0 // TODO: Count appointments
+      mentors: mentors.size,
+      mentees: mentees.size,
+      sessions: sessionCount || 0
     }
 
     return successResponse({
