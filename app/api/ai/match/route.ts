@@ -55,7 +55,7 @@ if (!mentors || mentors.length === 0) {
       query_text: query,
       suggested_topics: matchResult.suggested_topics,
       matched_count: matchResult.suggestions?.length || 0
-    })
+    } as any)
 
 
     return NextResponse.json(finalResponse)

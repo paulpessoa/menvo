@@ -18,7 +18,8 @@ export async function GET(request: NextRequest) {
       .returns<any>()
       .maybeSingle()
 
-    const roles = profile?.user_roles?.map((ur: any) => ur.roles?.name) || []
+    const profileData = profile as any
+    const roles = profileData?.user_roles?.map((ur: any) => ur.roles?.name) || []
     if (!roles.includes("admin")) {
       return NextResponse.json({ error: "Forbidden - Admin only" }, { status: 403 })
     }
