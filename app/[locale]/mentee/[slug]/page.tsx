@@ -9,6 +9,16 @@ interface PageProps {
     }>
 }
 
+interface MenteeProfile {
+    id: string
+    first_name: string
+    last_name: string
+    email: string
+    avatar_url?: string
+    is_public: boolean
+    created_at: string
+}
+
 async function getMenteeData(slug: string, currentUserId: string) {
     const supabase = await createClient()
 
@@ -17,7 +27,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
         .from('profiles')
         .select('*')
         .eq('slug', slug)
-        .returns<any>()
+        .returns<MenteeProfile>()
         .single()
 
     if (error || !mentee) {

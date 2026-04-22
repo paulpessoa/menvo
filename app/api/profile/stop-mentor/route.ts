@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
-    // 1. Remover a role de mentor
+    // 1. Buscar a role de mentor
     const { data: mentorRole } = await supabase
         .from('roles')
         .select('id')
@@ -27,11 +27,12 @@ export async function POST(request: NextRequest) {
         .single()
 
     if (mentorRole) {
+        // Remover a role de mentor do usuário
         await supabase
             .from('user_roles')
             .delete()
             .eq('user_id', user.id)
-            .eq('role_id', mentorRole.id)
+            .eq('role_id', (mentorRole as any).id)
     }
 
     // 2. Garantir que tenha pelo menos a role de mentee
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     if (menteeRole) {
         await supabase
             .from('user_roles')
-            .upsert({ user_id: user.id, role_id: menteeRole.id })
+            .upsert({ user_id: user.id, role_id: (menteeRole as any).id })
     }
 
     // 3. Resetar flags no perfil
@@ -53,8 +54,8 @@ export async function POST(request: NextRequest) {
       .update({ 
           is_pending_mentor: false,
           verified: false,
-          is_public: false // Ocultar por segurança ao mudar de role
-      })
+          is_public: false 
+      } as any)
       .eq("id", user.id)
       .select()
       .single()
