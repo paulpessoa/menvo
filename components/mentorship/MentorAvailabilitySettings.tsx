@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Clock, Plus, Trash2, Settings, Calendar } from "lucide-react"
+import { useAuth } from "@/lib/auth"
 import { 
   useMentorAvailability, 
   useAddAvailability, 
@@ -33,6 +34,9 @@ interface AvailabilitySlot {
 }
 
 export function MentorAvailabilitySettings({ isOpen, onClose }: MentorAvailabilitySettingsProps) {
+  const { profile } = useAuth()
+  const mentorId = profile?.id || ""
+  
   const [slots, setSlots] = useState<AvailabilitySlot[]>([])
   const [newSlot, setNewSlot] = useState<AvailabilitySlot>({
     day_of_week: 1,
@@ -41,7 +45,7 @@ export function MentorAvailabilitySettings({ isOpen, onClose }: MentorAvailabili
     is_active: true
   })
 
-  const { data: availability } = useMentorAvailability()
+  const { data: availability } = useMentorAvailability(mentorId)
   const addAvailabilityMutation = useAddAvailability()
   const updateAvailabilityMutation = useUpdateAvailability()
   const removeAvailabilityMutation = useRemoveAvailability()
@@ -50,7 +54,7 @@ export function MentorAvailabilitySettings({ isOpen, onClose }: MentorAvailabili
   useEffect(() => {
     if (availability) {
       setSlots(availability.map(slot => ({
-        id: slot.id,
+        id: String(slot.id),
         day_of_week: slot.day_of_week,
         start_time: slot.start_time,
         end_time: slot.end_time,
@@ -60,8 +64,11 @@ export function MentorAvailabilitySettings({ isOpen, onClose }: MentorAvailabili
   }, [availability])
 
   const handleAddSlot = async () => {
+    if (!mentorId) return
+
     try {
       await addAvailabilityMutation.mutateAsync({
+        mentor_id: mentorId,
         day_of_week: newSlot.day_of_week,
         start_time: newSlot.start_time,
         end_time: newSlot.end_time,
@@ -84,7 +91,7 @@ export function MentorAvailabilitySettings({ isOpen, onClose }: MentorAvailabili
   const handleUpdateSlot = async (slotId: string, updates: Partial<AvailabilitySlot>) => {
     try {
       await updateAvailabilityMutation.mutateAsync({
-        availabilityId: slotId,
+        id: slotId,
         updates: {
           day_of_week: updates.day_of_week,
           start_time: updates.start_time,

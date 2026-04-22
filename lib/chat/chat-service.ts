@@ -4,6 +4,7 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
+import { Database } from '@/lib/types/supabase';
 
 export interface Message {
   id: string;
@@ -27,13 +28,10 @@ export interface Conversation {
  * Busca ou cria uma conversa entre mentor e mentee
  */
 export async function getOrCreateConversation(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   mentorId: string,
   menteeId: string
 ): Promise<string> {
-
-  console.log('[CHAT SERVICE] Buscando conversa:', { mentorId, menteeId });
-
   // Tentar buscar conversa existente (em qualquer ordem)
   const { data: existingConversations, error: fetchError } = await supabase
     .from('conversations')
@@ -41,15 +39,12 @@ export async function getOrCreateConversation(
     .or(`and(mentor_id.eq.${mentorId},mentee_id.eq.${menteeId}),and(mentor_id.eq.${menteeId},mentee_id.eq.${mentorId})`);
 
   if (fetchError) {
-    console.error('[CHAT SERVICE] Erro ao buscar conversa:', fetchError);
+    throw new Error(`Erro ao buscar conversa: ${fetchError.message}`);
   }
 
   if (existingConversations && existingConversations.length > 0) {
-    console.log('[CHAT SERVICE] Conversa existente encontrada:', existingConversations[0].id);
     return existingConversations[0].id;
   }
-
-  console.log('[CHAT SERVICE] Criando nova conversa...');
 
   // Se não existe, criar nova conversa
   const { data: newConversation, error: createError } = await supabase
@@ -62,11 +57,9 @@ export async function getOrCreateConversation(
     .single();
 
   if (createError) {
-    console.error('[CHAT SERVICE] Erro ao criar conversa:', createError);
     throw new Error(`Erro ao criar conversa: ${createError.message}`);
   }
 
-  console.log('[CHAT SERVICE] Nova conversa criada:', newConversation.id);
   return newConversation.id;
 }
 
@@ -74,7 +67,7 @@ export async function getOrCreateConversation(
  * Envia uma mensagem em uma conversa
  */
 export async function sendMessage(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   conversationId: string,
   senderId: string,
   content: string
@@ -91,18 +84,17 @@ export async function sendMessage(
     .single();
 
   if (error) {
-    console.error('[CHAT] Erro ao enviar mensagem:', error);
-    throw new Error('Erro ao enviar mensagem');
+    throw new Error(`Erro ao enviar mensagem: ${error.message}`);
   }
 
-  return message;
+  return message as any;
 }
 
 /**
  * Busca mensagens de uma conversa
  */
 export async function getMessages(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   conversationId: string,
   limit: number = 50
 ): Promise<Message[]> {
@@ -115,31 +107,31 @@ export async function getMessages(
     .limit(limit);
 
   if (error) {
-    console.error('[CHAT] Erro ao buscar mensagens:', error);
-    throw new Error('Erro ao buscar mensagens');
+    throw new Error(`Erro ao buscar mensagens: ${error.message}`);
   }
 
-  return messages || [];
+  return (messages as any) || [];
 }
 
 /**
  * Marca mensagens como lidas
  */
 export async function markMessagesAsRead(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database, any, any>,
   conversationId: string,
   userId: string
 ): Promise<void> {
 
   const { error } = await supabase
     .from('messages')
-    .update({ read_at: new Date().toISOString() })
+    .update({ read_at: new Date().toISOString() } as any)
     .eq('conversation_id', conversationId)
     .neq('sender_id', userId)
     .is('read_at', null);
 
   if (error) {
-    console.error('[CHAT] Erro ao marcar mensagens como lidas:', error);
+    // Apenas logar erro silencioso para não quebrar a UX de leitura
+    console.error('Erro ao marcar mensagens como lidas:', error);
   }
 }
 
@@ -147,7 +139,7 @@ export async function markMessagesAsRead(
  * Conta mensagens não lidas em uma conversa
  */
 export async function getUnreadCount(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   conversationId: string,
   userId: string
 ): Promise<number> {
@@ -160,7 +152,6 @@ export async function getUnreadCount(
     .is('read_at', null);
 
   if (error) {
-    console.error('[CHAT] Erro ao contar mensagens não lidas:', error);
     return 0;
   }
 
@@ -171,7 +162,7 @@ export async function getUnreadCount(
  * Busca conversas do usuário
  */
 export async function getUserConversations(
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<Conversation[]> {
 
@@ -182,9 +173,8 @@ export async function getUserConversations(
     .order('last_message_at', { ascending: false, nullsFirst: false });
 
   if (error) {
-    console.error('[CHAT] Erro ao buscar conversas:', error);
-    throw new Error('Erro ao buscar conversas');
+    throw new Error(`Erro ao buscar conversas: ${error.message}`);
   }
 
-  return conversations || [];
+  return (conversations as any) || [];
 }

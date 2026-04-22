@@ -107,12 +107,23 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
         <div className="space-y-8">
           <div className="flex flex-col md:flex-row gap-6 items-start">
             <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-background shadow-lg bg-muted flex-shrink-0">
-              {mentor.avatar_url ? <Image src={mentor.avatar_url} alt={mentor.full_name} fill className="object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-primary/10"><User className="h-16 w-16 text-primary/40" /></div>}
+              {mentor.avatar_url ? (
+                <Image 
+                  src={mentor.avatar_url} 
+                  alt={mentor.full_name || `${mentor.first_name} ${mentor.last_name}`} 
+                  fill 
+                  className="object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                  <User className="h-16 w-16 text-primary/40" />
+                </div>
+              )}
             </div>
             <div className="flex-1 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <h1 className="text-3xl font-bold">{mentor.first_name} {mentor.last_name}</h1>
-                {mentor.verified_at && <Badge variant="outline" className="flex items-center gap-1 border-blue-200 text-blue-700"><Shield className="h-3 w-3" /> Verificado</Badge>}
+                {mentor.verified && <Badge variant="outline" className="flex items-center gap-1 border-blue-200 text-blue-700"><Shield className="h-3 w-3" /> Verificado</Badge>}
               </div>
               <div className="flex flex-wrap gap-y-2 gap-x-4 text-muted-foreground text-sm">
                 {mentor.current_position && <div className="flex items-center gap-1"><Briefcase className="h-4 w-4" /> <span>{mentor.current_position} {mentor.current_company && ` na ${mentor.current_company}`}</span></div>}
@@ -121,7 +132,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
                 <Badge variant={availabilityStatus.variant} className={availabilityStatus.color}><availabilityStatus.icon className="h-3 w-3 mr-1" /> {availabilityStatus.text}</Badge>
-                {mentor.mentor_skills.slice(0, 3).map((s: string) => <Badge key={s} variant="secondary">{s}</Badge>)}
+                {(mentor.mentor_skills || []).slice(0, 3).map((s: string) => <Badge key={s} variant="secondary">{s}</Badge>)}
               </div>
             </div>
           </div>
@@ -139,7 +150,7 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
               {mentor.bio && <div><h2 className="text-xl font-semibold mb-3">Sobre</h2><p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{mentor.bio}</p></div>}
             </TabsContent>
             <TabsContent value="expertise" className="pt-4">
-              <div className="flex flex-wrap gap-2">{mentor.mentor_skills.map((s: string) => <Badge key={s} variant="secondary" className="text-sm py-1 px-3">{s}</Badge>)}</div>
+              <div className="flex flex-wrap gap-2">{(mentor.mentor_skills || []).map((s: string) => <Badge key={s} variant="secondary" className="text-sm py-1 px-3">{s}</Badge>)}</div>
             </TabsContent>
           </Tabs>
         </div>

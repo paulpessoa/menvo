@@ -1,6 +1,7 @@
 "use client"
 
 import { useAuth } from "@/lib/auth"
+import type { UserRole, UserProfile } from "@/lib/types/models/user"
 
 // Permission types based on the RBAC system
 export type Permission =
@@ -17,14 +18,6 @@ export type Permission =
   | "validate_activities"
   | "moderate_content"
   | "moderate_verifications"
-
-export type UserRole =
-  | "pending"
-  | "mentee"
-  | "mentor"
-  | "admin"
-  | "volunteer"
-  | "moderator"
 
 export interface UsePermissionsReturn {
   // Current user state
@@ -99,7 +92,7 @@ export function usePermissions(): UsePermissionsReturn {
     if (loading) return false
 
     // Check both JWT claims and profile
-    return claims?.role === role || profile?.roles?.includes(role) || hasRole(role)
+    return claims?.role === role || (profile?.roles as any)?.includes(role) || hasRole(role)
   }
 
   const hasAllPermissions = (permissions: Permission[]): boolean => {
@@ -115,8 +108,8 @@ export function usePermissions(): UsePermissionsReturn {
     )
   }
 
-  // Status checkers
-  const isActive = profile?.verification_status === "verified"
+  // Status checkers - Aligning with 'approved' status from user.ts
+  const isActive = profile?.verification_status === "approved"
   const isPendingStatus = profile?.verification_status === "pending"
   const isSuspended = profile?.verification_status === "rejected"
 

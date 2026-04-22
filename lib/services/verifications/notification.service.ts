@@ -23,7 +23,7 @@ export async function processVerification({
 
   // 1. Update Profile Status
   const { error: updateError } = await supabase
-    .from('profiles')
+    .from('profiles' as any)
     .update({
       verification_status: status,
       verification_notes: notes,

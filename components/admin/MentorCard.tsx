@@ -49,6 +49,7 @@ interface MentorCardProps {
     profile_status?: string
     linkedin_url?: string | null
     cv_url?: string | null
+    slug?: string | null
   }
   onVerificationChange?: (mentorId: string, verified: boolean) => void
   showActions?: boolean
@@ -65,9 +66,9 @@ export function MentorCard({
   // Check if profile is complete
   const isProfileComplete = () => {
     return (
-      mentor.first_name &&
-      mentor.last_name &&
-      mentor.bio &&
+      !!mentor.first_name &&
+      !!mentor.last_name &&
+      !!mentor.bio &&
       mentor.bio.trim().length > 0
     )
   }
@@ -84,21 +85,13 @@ export function MentorCard({
     setIsVerifying(true)
 
     try {
-      const updateData: any = {
-        verified,
-        updated_at: new Date().toISOString()
-      }
-
-      // Add verified_at timestamp when verifying
-      if (verified) {
-        updateData.verified_at = new Date().toISOString()
-      } else {
-        updateData.verified_at = null
-      }
-
       const { error } = await supabase
         .from("profiles")
-        .update(updateData)
+        .update({
+          verified,
+          updated_at: new Date().toISOString(),
+          verified_at: verified ? new Date().toISOString() : null
+        } as any)
         .eq("id", mentor.id)
 
       if (error) throw error

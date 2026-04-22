@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Loader2 } from 'lucide-react';
-import { AppointmentWithProfiles } from '@/lib/types/appointments';
+import { AppointmentWithProfiles } from '@/lib/types/models/mentorship';
 import { toast } from 'sonner';
 import { AppointmentCard } from './appointment-card';
 import { useAuth } from '@/lib/auth';

@@ -6,6 +6,8 @@ import type {
   AppointmentStatus
 } from '@/lib/types/models/mentorship'
 
+export type { Appointment, AppointmentWithProfiles, MentorAvailability, AppointmentStatus }
+
 // =============================================
 // INTERFACES E TIPOS
 // =============================================

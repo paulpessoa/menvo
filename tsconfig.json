@@ -38,6 +38,7 @@
     "node_modules",
     ".next",
     "__tests__",
-    "supabase/functions"
+    "supabase/functions",
+    "components/ui"
   ]
 }

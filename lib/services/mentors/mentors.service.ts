@@ -5,6 +5,8 @@ import type {
   PaginatedMentors 
 } from '@/lib/types/models/mentor'
 
+export type { MentorProfile, MentorFilters, PaginatedMentors }
+
 export interface FilterOptions {
   topics: string[]
   languages: string[]

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Calendar, Clock, User, MessageSquare } from 'lucide-react';
-import { AvailableTimeSlot } from '@/lib/types/appointments';
+import { type MentorAvailability as AvailableTimeSlot, mentorshipUtils } from '@/lib/services/mentorship/mentorship.service';
 import { toast } from 'sonner';
 
 interface BookingFormProps {
@@ -34,12 +34,9 @@ export default function BookingForm({
             try {
                 setFetchingSlots(true);
 
-                // Get next 14 days
-                const startDate = new Date().toISOString().split('T')[0];
-                const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
+                // Get availability from mentor directly
                 const response = await fetch(
-                    `/api/appointments/availability?mentor_id=${mentorId}&start_date=${startDate}&end_date=${endDate}`
+                    `/api/appointments/availability?mentor_id=${mentorId}`
                 );
 
                 if (!response.ok) {
@@ -56,7 +53,9 @@ export default function BookingForm({
             }
         };
 
-        fetchAvailability();
+        if (mentorId) {
+            fetchAvailability();
+        }
     }, [mentorId]);
 
     const handleBooking = async () => {
@@ -68,6 +67,12 @@ export default function BookingForm({
         try {
             setLoading(true);
 
+            // Calculate the next occurrence of the day_of_week
+            const scheduledAt = mentorshipUtils.getNextOccurrence(
+              selectedSlot.day_of_week, 
+              selectedSlot.start_time
+            );
+
             const response = await fetch('/api/appointments/create', {
                 method: 'POST',
                 headers: {
@@ -75,7 +80,7 @@ export default function BookingForm({
                 },
                 body: JSON.stringify({
                     mentor_id: mentorId,
-                    scheduled_at: selectedSlot.datetime,
+                    scheduled_at: scheduledAt.toISOString(),
                     duration_minutes: 60,
                     message: message.trim() || undefined,
                 }),
@@ -100,109 +105,109 @@ export default function BookingForm({
         }
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-    };
-
     const formatTime = (timeString: string) => {
-        return timeString;
+        return timeString.substring(0, 5);
     };
 
-    // Group slots by date
-    const slotsByDate = availableSlots.reduce((acc, slot) => {
-        const date = slot.date;
-        if (!acc[date]) {
-            acc[date] = [];
+    // Group slots by day
+    const slotsByDay = availableSlots.reduce((acc, slot) => {
+        const day = slot.day_of_week;
+        if (!acc[day]) {
+            acc[day] = [];
         }
-        acc[date].push(slot);
+        acc[day].push(slot);
         return acc;
-    }, {} as Record<string, AvailableTimeSlot[]>);
+    }, {} as Record<number, AvailableTimeSlot[]>);
 
     return (
-        <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
+        <Card className="w-full max-w-2xl mx-auto shadow-none border-none">
+            <CardHeader className="px-0">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                    <Calendar className="h-5 w-5 text-primary" />
                     Agendar Mentoria
                 </CardTitle>
                 <CardDescription>
-                    Agende uma sessão de mentoria com {mentorName}
+                    Escolha um dos horários semanais de {mentorName}
                 </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 px-0">
                 {/* Available Slots */}
-                <div>
-                    <Label className="text-base font-medium">Horários Disponíveis</Label>
+                <div className="space-y-3">
+                    <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                        Horários Semanais
+                    </Label>
 
                     {fetchingSlots ? (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <div className="flex items-center justify-center py-12">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
                         </div>
                     ) : availableSlots.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                            <p>Nenhum horário disponível nos próximos 14 dias</p>
-                            <p className="text-sm">Entre em contato diretamente com o mentor</p>
+                        <div className="text-center py-12 border rounded-xl bg-muted/30">
+                            <Clock className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                            <p className="font-medium">Nenhum horário disponível</p>
+                            <p className="text-sm text-muted-foreground">Este mentor ainda não configurou sua agenda.</p>
                         </div>
                     ) : (
-                        <div className="space-y-4 mt-3">
-                            {Object.entries(slotsByDate).map(([date, slots]) => (
-                                <div key={date}>
-                                    <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                                        {formatDate(date)}
-                                    </h4>
-                                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                                        {slots.map((slot) => (
-                                            <Button
-                                                key={slot.datetime}
-                                                variant={selectedSlot?.datetime === slot.datetime ? "default" : "outline"}
-                                                size="sm"
-                                                onClick={() => setSelectedSlot(slot)}
-                                                className="justify-center"
-                                            >
-                                                {formatTime(slot.time)}
-                                            </Button>
-                                        ))}
+                        <div className="space-y-6 mt-4">
+                            {[1, 2, 3, 4, 5, 6, 0].map((dayNum) => {
+                                const daySlots = slotsByDay[dayNum] || [];
+                                if (daySlots.length === 0) return null;
+
+                                return (
+                                    <div key={dayNum} className="space-y-3">
+                                        <h4 className="font-semibold text-sm flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                            {mentorshipUtils.getDayName(dayNum)}
+                                        </h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {daySlots.map((slot) => (
+                                                <Button
+                                                    key={slot.id}
+                                                    variant={selectedSlot?.id === slot.id ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => setSelectedSlot(slot)}
+                                                    className="rounded-full px-4"
+                                                >
+                                                    {formatTime(slot.start_time)}
+                                                </Button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
 
                 {/* Selected Slot Display */}
                 {selectedSlot && (
-                    <div className="p-4 bg-muted rounded-lg">
-                        <div className="flex items-center gap-2 text-sm">
-                            <Calendar className="h-4 w-4" />
-                            <span className="font-medium">Horário selecionado:</span>
-                            <span>
-                                {formatDate(selectedSlot.date)} às {formatTime(selectedSlot.time)}
-                            </span>
+                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                        <div className="flex items-center gap-3 text-sm">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <Calendar className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-primary">Próxima sessão disponível:</p>
+                                <p className="text-muted-foreground">
+                                    {mentorshipUtils.getDayName(selectedSlot.day_of_week)} às {formatTime(selectedSlot.start_time)}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {/* Message */}
-                <div>
-                    <Label htmlFor="message" className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
-                        Mensagem (opcional)
+                <div className="space-y-3">
+                    <Label htmlFor="message" className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                        O que você quer discutir?
                     </Label>
                     <Textarea
                         id="message"
-                        placeholder="Descreva brevemente o que você gostaria de discutir na mentoria..."
+                        placeholder="Ex: Gostaria de dicas para meu primeiro emprego na área..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        className="mt-2"
-                        rows={3}
+                        className="mt-2 min-h-[100px] bg-muted/30 border-none focus-visible:ring-primary"
                     />
                 </div>
 
@@ -210,7 +215,7 @@ export default function BookingForm({
                 <div className="flex gap-3 pt-4">
                     {onCancel && (
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             onClick={onCancel}
                             disabled={loading}
                             className="flex-1"
@@ -221,16 +226,13 @@ export default function BookingForm({
                     <Button
                         onClick={handleBooking}
                         disabled={!selectedSlot || loading}
-                        className="flex-1"
+                        className="flex-1 shadow-lg shadow-primary/20"
                     >
                         {loading ? (
-                            <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                Agendando...
-                            </>
+                            <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <>
-                                <User className="h-4 w-4 mr-2" />
+                                <CheckCircle className="h-4 w-4 mr-2" />
                                 Confirmar Agendamento
                             </>
                         )}
@@ -240,3 +242,27 @@ export default function BookingForm({
         </Card>
     );
 }
+
+const Loader2 = ({ className }: { className?: string }) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="24" 
+        height="24" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className={className}
+    >
+        <path d="M12 2v4" />
+        <path d="M12 18v4" />
+        <path d="M4.93 4.93l2.83 2.83" />
+        <path d="M16.24 16.24l2.83 2.83" />
+        <path d="M2 12h4" />
+        <path d="M18 12h4" />
+        <path d="M4.93 19.07l2.83-2.83" />
+        <path d="M16.24 7.76l2.83-2.83" />
+    </svg>
+);

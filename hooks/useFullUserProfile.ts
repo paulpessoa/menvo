@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/services/auth/auth.service'
-import { useUser } from './useUser'
 
 export function useFullUserProfile() {
   return useQuery({
@@ -34,8 +33,8 @@ export function useSaveFullUserProfile() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: SaveProfileInput) => {
-      const userUpdate: Partial<SaveProfileInput> = {}
-      const profileUpdate: Partial<SaveProfileInput> = {}
+      const userUpdate: Record<string, any> = {}
+      const profileUpdate: Record<string, any> = {}
 
       for (const key of userFields) {
         if (data[key] !== undefined) userUpdate[key] = data[key]
@@ -44,13 +43,15 @@ export function useSaveFullUserProfile() {
         if (data[key] !== undefined) profileUpdate[key] = data[key]
       }
 
-      if (Object.keys(userUpdate).length > 0) {
-        const { error } = await supabase.from('users').update(userUpdate).eq('id', data.id)
-        if (error) throw error
-      }
+      const updates = { ...userUpdate, ...profileUpdate }
 
-      if (Object.keys(profileUpdate).length > 0) {
-        const { error } = await supabase.from('user_profiles').update(profileUpdate).eq('user_id', data.id)
+      if (Object.keys(updates).length > 0) {
+        // Centralizado na tabela profiles conforme padrão do projeto
+        const { error } = await supabase
+          .from('profiles')
+          .update(updates)
+          .eq('id', data.id)
+        
         if (error) throw error
       }
     },

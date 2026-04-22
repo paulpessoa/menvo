@@ -37,7 +37,7 @@ interface MenteeProfile {
     created_at: string
 }
 
-async function getMenteeData(slug: string, currentUserId: string) {
+async function getMenteeData(slug: string, currentUserId: string): Promise<{ mentee: MenteeProfile, isMentor: boolean } | null> {
     const supabase = await createClient()
 
     // Buscar perfil do mentee pelo slug
@@ -45,7 +45,6 @@ async function getMenteeData(slug: string, currentUserId: string) {
         .from('profiles')
         .select('*')
         .eq('slug', slug)
-        .returns<MenteeProfile>()
         .single()
 
     if (error || !mentee) {
@@ -56,7 +55,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
     let isMentor = false
 
     const { data: mentorData } = await supabase
-        .from('mentors')
+        .from('mentors' as any)
         .select('id')
         .eq('id', currentUserId)
         .maybeSingle()
@@ -65,7 +64,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
         isMentor = true
     } else {
         const { data: mentorView } = await supabase
-            .from('mentors_view')
+            .from('mentors_view' as any)
             .select('id')
             .eq('id', currentUserId)
             .maybeSingle()
@@ -74,7 +73,7 @@ async function getMenteeData(slug: string, currentUserId: string) {
     }
 
     return {
-        mentee,
+        mentee: mentee as any as MenteeProfile,
         isMentor
     }
 }

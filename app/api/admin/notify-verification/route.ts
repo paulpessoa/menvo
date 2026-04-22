@@ -17,13 +17,13 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: roleData } = await supabase
-      .from('user_roles')
+      .from('user_roles' as any)
       .select('roles(name)')
       .eq('user_id', user.id)
-      .returns<any>()
       .single()
 
-    if ((roleData?.roles as any)?.name !== 'admin') {
+    const roles = (roleData as any)?.user_roles?.map((ur: any) => ur.roles?.name) || []
+    if (!roles.includes('admin')) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
@@ -31,10 +31,9 @@ export async function POST(request: NextRequest) {
 
     // 2. Buscar dados do usuário alvo
     const { data: targetUser, error: userError } = await supabase
-      .from('profiles')
+      .from('profiles' as any)
       .select('email, full_name')
       .eq('id', userId)
-      .returns<any>()
       .single()
 
     if (userError || !targetUser) {
