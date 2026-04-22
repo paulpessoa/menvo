@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/utils/supabase/server'
-import { sendVerificationNotification } from '@/lib/email/brevo'
+import { sendMessage, getOrCreateConversation } from '@/lib/services/chat/chat.service'
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // 1. Verificar Auth & Admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
+    // 1. Verificar se é admin
+    const {
+      data: { user },
+      error: authError
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
 
     const { data: roleData } = await supabase
       .from('user_roles')
@@ -21,29 +27,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     }
 
-    // 2. Parse Body
-    const { userId, status, notes } = await request.json()
+    const { userId, adminId, status, notes } = await request.json()
 
-    // 3. Buscar dados do usuário alvo
+    // 2. Buscar dados do usuário alvo
     const { data: targetUser, error: userError } = await supabase
       .from('profiles')
       .select('email, full_name')
       .eq('id', userId)
+      .returns<any>()
       .single()
 
-    if (userError || !targetUser) throw new Error('Usuário não encontrado')
+    if (userError || !targetUser) {
+      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+    }
 
-    // 4. Enviar E-mail via Brevo
-    await sendVerificationNotification({
-      userEmail: targetUser.email,
-      userName: targetUser.full_name || 'Usuário Menvo',
-      status,
-      notes
-    })
+    // 3. Preparar mensagem de chat
+    const messageContent = status === 'approved' 
+      ? `🎉 Parabéns! Seu perfil de mentor foi aprovado. Agora você já pode configurar sua agenda e aparecer no diretório.`
+      : `⚠️ Olá! Seu perfil de mentor precisa de alguns ajustes: ${notes || 'Veja os detalhes no seu perfil.'}`
+
+    const conversationId = await getOrCreateConversation(supabase as any, userId, adminId)
+    await sendMessage(supabase as any, conversationId, adminId, messageContent)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('[API NOTIFY] Erro:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

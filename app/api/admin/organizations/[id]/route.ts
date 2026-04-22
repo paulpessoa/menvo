@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -129,7 +129,7 @@ export async function PATCH(
     // Update organization
     const { data: organization, error: updateError } = await supabase
       .from("organizations")
-      .update(body)
+      .update(body as any)
       .eq("id", id)
       .select()
       .single()
