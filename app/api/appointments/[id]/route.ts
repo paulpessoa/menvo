@@ -130,12 +130,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (notes_mentor !== undefined) updateData.notes_mentor = notes_mentor;
 
     if (status === 'cancelled' && currentAppointment.google_event_id) {
-      try { await deleteCalendarEvent(currentAppointment.google_event_id); } catch (e) { /* ignore */ }
+      try { await deleteCalendarEvent(); } catch (e) { /* ignore */ }
     }
 
     const { data: updatedAppointment, error: updateError } = await supabase
       .from('appointments')
-      .update(updateData)
+      .update(updateData as any)
       .eq('id', appointmentId)
       .select(`
         *,
@@ -180,7 +180,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     if (appointment.google_event_id) {
-      try { await deleteCalendarEvent(appointment.google_event_id); } catch (e) { /* ignore */ }
+      try { await deleteCalendarEvent(); } catch (e) { /* ignore */ }
     }
 
     const { error: deleteError } = await supabase.from('appointments').delete().eq('id', appointmentId);

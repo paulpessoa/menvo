@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button"
 import { Clock, CheckCircle, AlertCircle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/routing"
 
 interface ValidationPendingModalProps {
   open: boolean
@@ -12,13 +12,15 @@ interface ValidationPendingModalProps {
 }
 
 export function ValidationPendingModal({ open, onClose }: ValidationPendingModalProps) {
-  const { user, hasRole } = useAuth()
+  const { profile } = useAuth()
   const router = useRouter()
 
   const getStatusInfo = () => {
-    if (!user) return null
+    if (!profile) return null
 
-    switch (user.verification_status) {
+    const status = (profile as any).verification_status || (profile.verified ? 'approved' : 'pending')
+
+    switch (status) {
       case "pending":
         return {
           icon: Clock,
@@ -52,8 +54,9 @@ export function ValidationPendingModal({ open, onClose }: ValidationPendingModal
   }
 
   const statusInfo = getStatusInfo()
-  if (!statusInfo) return null
+  if (!statusInfo || !profile) return null
 
+  const status = (profile as any).verification_status || (profile.verified ? 'approved' : 'pending')
   const Icon = statusInfo.icon
 
   return (
@@ -70,19 +73,19 @@ export function ValidationPendingModal({ open, onClose }: ValidationPendingModal
         </DialogHeader>
 
         <div className="space-y-4">
-          {user.verification_status === "pending" && (
+          {status === "pending" && (
             <div className={`p-4 rounded-lg ${statusInfo.bgColor} ${statusInfo.borderColor} border`}>
               <h4 className="font-semibold mb-2">O que acontece agora?</h4>
               <ul className="text-sm space-y-1 list-disc list-inside">
-                <li>Nossa equipe analisará seu perfil e vídeo</li>
+                <li>Nossa equipe analisará seu perfil</li>
                 <li>O processo pode levar até 3 dias úteis</li>
                 <li>Você receberá um email com o resultado</li>
-                <li>Enquanto isso, você pode usar outras funcionalidades</li>
+                <li>Enquanto isso, você pode navegar pela plataforma</li>
               </ul>
             </div>
           )}
 
-          {user.verification_status === "rejected" && (
+          {status === "rejected" && (
             <div className={`p-4 rounded-lg ${statusInfo.bgColor} ${statusInfo.borderColor} border`}>
               <h4 className="font-semibold mb-2">Próximos passos:</h4>
               <ul className="text-sm space-y-1 list-disc list-inside">
@@ -93,11 +96,11 @@ export function ValidationPendingModal({ open, onClose }: ValidationPendingModal
             </div>
           )}
 
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-2 justify-center pt-4">
             <Button variant="outline" onClick={() => router.push("/profile")}>
               Ver Perfil
             </Button>
-            {user.verification_status === "approved" && (
+            {status === "approved" && (
               <Button onClick={() => router.push("/dashboard")}>Ir para Dashboard</Button>
             )}
             {onClose && (

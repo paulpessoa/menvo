@@ -18,7 +18,7 @@ export async function GET(
       .from("profiles")
       .select(`
         *,
-        user_roles!inner(roles(name))
+        user_roles(roles(name))
       `)
       .eq("organization_id", orgId)
       .returns<any[]>()
@@ -39,7 +39,7 @@ export async function POST(
     const supabase = await createClient()
     const { orgId } = await params
     const body = await request.json()
-    const { user_id, role_id } = body
+    const { user_id } = body
 
     if (!user_id) {
         return errorResponse("User ID is required", "INVALID_INPUT", 400)
@@ -47,7 +47,7 @@ export async function POST(
 
     const { data: member, error } = await supabase
       .from("profiles")
-      .update({ organization_id: orgId })
+      .update({ organization_id: orgId } as any)
       .eq("id", user_id)
       .select()
       .single()
