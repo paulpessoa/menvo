@@ -1,10 +1,18 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Building2, Search, CheckCircle, XCircle, Clock, Loader2 } from "lucide-react"
+import { Building2, Search, CheckCircle, XCircle, Clock, Loader2, Filter, MoreHorizontal } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 import { Organization } from "@/lib/types/organizations"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { 
+    DropdownMenu, 
+    DropdownMenuContent, 
+    DropdownMenuItem, 
+    DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu"
 
 export default function AdminOrganizationsPage() {
     const [organizations, setOrganizations] = useState<Organization[]>([])
@@ -25,13 +33,8 @@ export default function AdminOrganizationsPage() {
             const response = await fetch(`/api/admin/organizations?${params}`)
             if (response.ok) {
                 const result = await response.json()
-                console.log("API Response:", result)
-                // API returns { data: { organizations: [...] } }
                 const data = result.data || result
-                console.log("Organizations:", data.organizations)
                 setOrganizations(data.organizations || [])
-            } else {
-                console.error("API Error:", response.status, await response.text())
             }
         } catch (err) {
             console.error("Error fetching organizations:", err)
@@ -42,132 +45,138 @@ export default function AdminOrganizationsPage() {
 
     const getStatusBadge = (status: string) => {
         const badges = {
-            pending_approval: { icon: Clock, color: "bg-yellow-100 text-yellow-700", label: "Pendente" },
-            active: { icon: CheckCircle, color: "bg-green-100 text-green-700", label: "Ativo" },
-            suspended: { icon: XCircle, color: "bg-red-100 text-red-700", label: "Suspenso" },
-            inactive: { icon: XCircle, color: "bg-gray-100 text-gray-700", label: "Inativo" }
+            pending_approval: { color: "bg-yellow-100 text-yellow-700 border-yellow-200", label: "Pendente" },
+            active: { color: "bg-green-100 text-green-700 border-green-200", label: "Ativo" },
+            suspended: { color: "bg-red-100 text-red-700 border-red-200", label: "Suspenso" },
+            inactive: { color: "bg-gray-100 text-gray-700 border-gray-200", label: "Inativo" }
         }
         const badge = badges[status as keyof typeof badges] || badges.inactive
-        const Icon = badge.icon
         return (
-            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${badge.color}`}>
-                <Icon className="w-3 h-3" />
+            <Badge variant="outline" className={`font-medium ${badge.color}`}>
                 {badge.label}
-            </span>
+            </Badge>
         )
     }
 
     const filteredOrgs = organizations.filter(org =>
-        org.name.toLowerCase().includes(searchQuery.toLowerCase())
+        org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        org.slug.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Gerenciar Organizações</h1>
+        <div className="container mx-auto py-8 space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Gerenciar Organizações</h1>
+                    <p className="text-muted-foreground">Visualize e gerencie todas as instituições parceiras da Menvo.</p>
+                </div>
+                <Button asChild>
+                    <Link href="/organizations/new">Criar Nova Organização</Link>
+                </Button>
+            </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Buscar organizações..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
-                        </div>
+            <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-xl border shadow-sm">
+                <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Buscar por nome ou slug..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
 
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-                        >
-                            <option value="">Todos os status</option>
-                            <option value="pending_approval">Pendente</option>
-                            <option value="active">Ativo</option>
-                            <option value="suspended">Suspenso</option>
-                            <option value="inactive">Inativo</option>
-                        </select>
-                    </div>
+                <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-muted-foreground" />
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="h-10 px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                        <option value="">Todos os status</option>
+                        <option value="pending_approval">Pendentes</option>
+                        <option value="active">Ativas</option>
+                        <option value="suspended">Suspensas</option>
+                        <option value="inactive">Inativas</option>
+                    </select>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
                 {loading ? (
-                    <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
+                        <p className="text-muted-foreground">Carregando organizações...</p>
                     </div>
                 ) : filteredOrgs.length === 0 ? (
-                    <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
-                        <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600">Nenhuma organização encontrada</p>
+                    <div className="py-20 text-center">
+                        <Building2 className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium">Nenhuma organização encontrada</h3>
+                        <p className="text-muted-foreground">Tente ajustar seus filtros ou busca.</p>
                     </div>
                 ) : (
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Organização
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Membros
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tipo
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Criado em
-                                    </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ações
-                                    </th>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-muted/30 border-b">
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Organização</th>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Membros</th>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Tipo</th>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">Data</th>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-right">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredOrgs.map((org: any) => (
-                                    <tr key={org.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center">
+                            <tbody className="divide-y">
+                                {filteredOrgs.map((org) => (
+                                    <tr key={org.id} className="hover:bg-muted/10 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
                                                 {org.logo_url ? (
-                                                    <img src={org.logo_url} alt={org.name} className="w-10 h-10 rounded-lg object-cover" />
+                                                    <img src={org.logo_url} alt={org.name} className="w-10 h-10 rounded-lg object-contain bg-white border p-1" />
                                                 ) : (
-                                                    <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                                                        <Building2 className="w-5 h-5 text-indigo-600" />
+                                                    <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center border border-primary/10">
+                                                        <Building2 className="w-5 h-5 text-primary" />
                                                     </div>
                                                 )}
-                                                <div className="ml-4">
-                                                    <div className="text-sm font-medium text-gray-900">{org.name}</div>
-                                                    <div className="text-sm text-gray-500">{org.slug}</div>
+                                                <div>
+                                                    <div className="font-bold text-sm text-foreground">{org.name}</div>
+                                                    <div className="text-[10px] text-muted-foreground font-mono">{org.slug}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200">
+                                        <td className="px-6 py-4">
+                                            <Badge variant="secondary" className="font-normal">
                                                 {org.memberCount || 0} usuários
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="text-sm text-gray-900">{org.type}</span>
+                                        <td className="px-6 py-4 capitalize text-sm">
+                                            {org.type}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4">
                                             {getStatusBadge(org.status)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-6 py-4 text-sm text-muted-foreground">
                                             {new Date(org.created_at).toLocaleDateString('pt-BR')}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <Link
-                                                href={`/admin/organizations/${org.id}`}
-                                                className="text-indigo-600 hover:text-indigo-900"
-                                            >
-                                                Ver detalhes
-                                            </Link>
+                                        <td className="px-6 py-4 text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/dashboard/admin/organizations/${org.id}`}>
+                                                            Ver detalhes
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-destructive">
+                                                        Suspender
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </td>
                                     </tr>
                                 ))}

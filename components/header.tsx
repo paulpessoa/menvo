@@ -59,16 +59,7 @@ export default function Header() {
   const userNavigation: any[] = []
 
   if (isAuthenticated) {
-    // Caso o profile ainda não tenha carregado, mostramos itens básicos que não dependem de roles
-    if (isAdmin) {
-      userNavigation.push({
-        name: t("header.userMenu.adminPanel"),
-        href: "/dashboard/admin",
-        icon: Shield,
-        color: "text-red-600"
-      })
-    }
-
+    // Todos os usuários autenticados vão para /dashboard, o middleware cuida do resto
     userNavigation.push({
       name: t("header.userMenu.dashboard"),
       href: "/dashboard",
@@ -82,14 +73,12 @@ export default function Header() {
       color: "text-gray-700"
     })
 
-    if (isAdmin || role === "mentor") {
-      userNavigation.push({
-        name: t("header.userMenu.createOrganization"),
-        href: "/organizations/new",
-        icon: Building2,
-        color: "text-gray-700"
-      })
-    }
+    userNavigation.push({
+      name: t("header.userMenu.createOrganization"),
+      href: "/organizations/new",
+      icon: Building2,
+      color: "text-gray-700"
+    })
 
     userNavigation.push({
       name: t("header.userMenu.messages"),

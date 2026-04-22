@@ -10,22 +10,21 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 export interface AIMatchResult {
-  mentor_ids: string[];
-  justification: string;
+  suggestions: Array<{
+    mentor_id: string;
+    reason: string;
+  }>;
+  global_justification: string;
   suggested_topics: string[];
   no_match: boolean;
 }
 
 export const groqService = {
-  /**
-   * Realiza o match entre a dúvida do usuário e a base de mentores
-   */
   async findOptimalMentors(userQuery: string, mentorsContext: any[]): Promise<AIMatchResult> {
     if (!GROQ_API_KEY) {
       throw new Error('GROQ_API_KEY não configurada no ambiente.');
     }
 
-    // Criar um resumo compacto dos mentores para o contexto da IA
     const mentorsSummary = mentorsContext.map(m => ({
       id: m.id,
       name: m.full_name,
@@ -36,26 +35,22 @@ export const groqService = {
 
     const prompt = `
       Você é o Especialista em Conexões da plataforma MENVO. 
-      Sua missão é ler a dúvida de um usuário e encontrar o "par perfeito" entre nossos mentores voluntários.
+      Sua missão é sugerir os 3 mentores mais adequados da lista abaixo para a dúvida: "${userQuery}"
 
-      DÚVIDA/DESAFIO DO USUÁRIO: "${userQuery}"
-      
-      CONTEXTO DOS MENTORES DISPONÍVEIS (JSON):
-      ${JSON.stringify(mentorsSummary)}
+      MENTORES: ${JSON.stringify(mentorsSummary)}
 
-      REGRAS DE OURO:
-      1. NÃO seja literal. Se o usuário quer "ajuda com código", pense em mentores de "Software", "Engenharia" ou "Desenvolvimento".
-      2. IMPORTANTE: O nome do mentor (field 'name') muitas vezes contém a sua profissão ou especialidade (ex: "Fulano Chaveiro"). Use isso para o match!
-      3. Se o usuário quer estudar "Jornalismo", e você vir alguém de "Comunicação Social", isso é um match perfeito!
-      4. Retorne no máximo 3 mentores.
-      5. A JUSTIFICATIVA deve ser humana: "Sugiro o Mentor X porque ele tem experiência em Y, que é exatamente o que você precisa para resolver Z".
-      5. Se houver QUALQUER mentor minimamente relacionado, defina no_match como false.
+      REGRAS:
+      1. Se não houver match direto (ex: o usuário quer algo que ninguém faz), sugira mentores de "RH", "Carreira" ou "Psicologia" como suporte geral.
+      2. Para CADA mentor sugerido, crie uma justificativa CURTA e PERSONALIZADA (reason).
+      3. Se for um caso de fallback (sem match direto), defina no_match como true mas AINDA ASSIM sugira mentores de carreira.
 
-      FORMATO OBRIGATÓRIO DE RESPOSTA (JSON):
+      FORMATO JSON:
       {
-        "mentor_ids": ["uuid1", "uuid2"],
-        "justification": "Baseado no seu desafio, estes mentores são ideais por causa de...",
-        "suggested_topics": ["tema1", "tema2", "tema3"],
+        "suggestions": [
+          { "mentor_id": "uuid", "reason": "Ele é especialista em X..." }
+        ],
+        "global_justification": "Frase curta de efeito sobre a busca.",
+        "suggested_topics": ["tema1", "tema2"],
         "no_match": false
       }
     `;

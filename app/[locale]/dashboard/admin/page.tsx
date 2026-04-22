@@ -69,10 +69,12 @@ export default function AdminDashboard() {
 
       const { data: mentorRoles, error: mentorError } = await (supabase
         .from("user_roles")
-        .select(`
+        .select(
+          `
           profiles!inner(id, verified),
           roles!inner(name)
-        `)
+        `
+        )
         .eq("roles.name", "mentor") as any)
 
       if (mentorError) throw mentorError
@@ -147,7 +149,7 @@ export default function AdminDashboard() {
     {
       title: t("actions.settings"),
       description: t("actions.settingsDesc"),
-      href: "/dashboard/admin/settings",
+      href: "/settings",
       icon: Shield,
       color: "bg-purple-500"
     }
@@ -251,10 +253,14 @@ export default function AdminDashboard() {
                         <action.icon className="h-6 w-6 text-white" />
                       </div>
                       {action.badge && (
-                        <Badge variant="destructive" className="animate-pulse">{action.badge}</Badge>
+                        <Badge variant="destructive" className="animate-pulse">
+                          {action.badge}
+                        </Badge>
                       )}
                     </div>
-                    <CardTitle className="text-lg mt-4">{action.title}</CardTitle>
+                    <CardTitle className="text-lg mt-4">
+                      {action.title}
+                    </CardTitle>
                     <CardDescription>{action.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -277,11 +283,16 @@ export default function AdminDashboard() {
                   </CardTitle>
                 </div>
                 <CardDescription className="text-yellow-700">
-                  Existem {stats.pendingMentors} perfis aguardando sua validação para aparecerem na busca.
+                  Existem {stats.pendingMentors} perfis aguardando sua validação
+                  para aparecerem na busca.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="outline" className="bg-white border-yellow-300 text-yellow-800 hover:bg-yellow-100">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="bg-white border-yellow-300 text-yellow-800 hover:bg-yellow-100"
+                >
                   <Link href="/dashboard/admin/users?tab=pending">
                     Revisar Pendências
                   </Link>

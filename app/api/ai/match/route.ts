@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
-import { groqService } from "@/lib/services/ai/groq.service"
+import { groqService, type AIMatchResult } from "@/lib/services/ai/groq.service"
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +41,7 @@ if (!mentors || mentors.length === 0) {
 
 
     // 3. Chamar o Groq para fazer o match
-    const matchResult = await groqService.findOptimalMentors(query, mentors)
+    const matchResult: AIMatchResult = await groqService.findOptimalMentors(query, mentors)
 
     // 4. Preparar resposta (incluindo debug se solicitado)
     const finalResponse = {
@@ -50,12 +50,13 @@ if (!mentors || mentors.length === 0) {
     }
 
     // 5. Trackear a demanda no banco
-    await supabase.from("ai_missing_demands").insert({
+    await supabase.from('ai_missing_demands').insert({
       user_id: user?.id || null,
       query_text: query,
       suggested_topics: matchResult.suggested_topics,
-      matched_count: matchResult.no_match ? 0 : matchResult.mentor_ids.length
+      matched_count: matchResult.suggestions?.length || 0
     })
+
 
     return NextResponse.json(finalResponse)
   } catch (error: any) {

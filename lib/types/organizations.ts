@@ -51,6 +51,7 @@ export interface Organization {
   max_monthly_appointments?: number
   approved_by?: string
   approved_at?: string
+  memberCount?: number // UI field for counts
   created_at: string
   updated_at: string
 }

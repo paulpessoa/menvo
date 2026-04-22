@@ -103,7 +103,7 @@ export default function MentorsPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
 
-  const [suggestedMentorIds, setSuggestedMentorIds] = useState<string[]>([])
+  const [suggestedMentors, setSuggestedMentors] = useState<Record<string, string>>({})
   const [aiJustification, setAiJustification] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
@@ -315,17 +315,21 @@ export default function MentorsPage() {
     fetchMentors(false)
   }
 
-  const handleAIMatch = (mentorIds: string[], justification: string) => {
-    setSuggestedMentorIds(mentorIds)
+  const handleAIMatch = (suggestions: Array<{mentor_id: string, reason: string}>, justification: string) => {
+    const suggestionsMap: Record<string, string> = {}
+    suggestions.forEach(s => {
+      suggestionsMap[s.mentor_id] = s.reason
+    })
+    setSuggestedMentors(suggestionsMap)
     setAiJustification(justification)
-    // Rola para os resultados com um pequeno delay
+    
     setTimeout(() => {
         window.scrollTo({ top: 400, behavior: 'smooth' })
     }, 100)
   }
 
   const handleClearAI = () => {
-    setSuggestedMentorIds([])
+    setSuggestedMentors({})
     setAiJustification(null)
   }
 
@@ -611,7 +615,7 @@ export default function MentorsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Primeiro os sugeridos pela IA */}
             {mentors
-              .filter(m => suggestedMentorIds.includes(m.id))
+              .filter(m => Object.keys(suggestedMentors).includes(m.id))
               .map((mentor) => (
                 <MentorCard
                   key={`ai-${mentor.id}`}
@@ -619,13 +623,13 @@ export default function MentorsPage() {
                   isFavorite={favorites.includes(mentor.id)}
                   onToggleFavorite={() => toggleFavorite(mentor.id)}
                   isAIHighlighted={true}
-                  aiReason={aiJustification}
+                  aiReason={suggestedMentors[mentor.id]}
                 />
               ))}
             
             {/* Depois os demais */}
             {mentors
-              .filter(m => !suggestedMentorIds.includes(m.id))
+              .filter(m => !Object.keys(suggestedMentors).includes(m.id))
               .map((mentor) => (
                 <MentorCard
                   key={mentor.id}

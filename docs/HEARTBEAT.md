@@ -1,51 +1,22 @@
 # ❤️ HEARTBEAT - Single Source of Truth
 
-## 📅 Última Atualização: 17/04/2026
-**Status Atual:** Mentores Modularizados ✅ / Dashboards i18n ✅ / Admin Premium ✅ / Verificação com Chat ✅
+## 📅 Última Atualização: 22/04/2026
+**Status Atual:** Mentores Modularizados ✅ / Admin Consolidation 🔄 / Gestão de Orgs Premium ✅ / IA Match Fix ✅
 
 ---
 
 ## 📍 Onde Paramos?
-- **Modularização de Mentores:** Extraímos `MentorCard` e `MentorSkeletonCard` para componentes reutilizáveis. A página de listagem agora está limpa e modular.
-- **Internacionalização (i18n):**
-  - Finalizada internacionalização completa do **Login**, **Signup**, **Dashboard Mentee**, **Dashboard Mentor** e **Admin Dashboard**.
-  - Página de **Doação** e **FAQ** 100% bilíngues e com SEO polido.
-  - O componente de **Disponibilidade** e o **Chat** agora falam múltiplos idiomas.
-- **Sistema de Verificação (MVP+):**
-  - Criado `VerificationService` e API `/api/admin/verify`.
-  - Admin agora pode aprovar/rejeitar perfis (Mentores/Organizações) com mensagens pré-definidas.
-  - **Notificação Automática:** O usuário recebe feedback instantâneo via Chat interno sobre o status do seu perfil.
-- **Limpeza de Código:** Removidos componentes obsoletos (`mentor-availability.tsx`, `mentor-filters.tsx`), códigos comentados na Home e logs verbosos de API.
+- **Admin Consolidation:** Simplificação do título "Painel Administrativo" para "Dashboard" e unificação de rotas no menu de avatar para apontar para `/dashboard`.
+- **Gestão de Organizações:** Página de detalhes (`organizations/[id]`) agora permite edição completa de campos, upload de logo, website e gestão de status (Ativa, Pendente, Suspensa).
+- **IA Match:** Recuperação de processo quebrado. Corrigido erro de sintaxe no `groq.service.ts` e tipagem no `MagicSearchBar.tsx`. Retorno agora inclui `suggestions` individuais por mentor.
+- **Limpeza:** Removido diretório redundante `admin/users/manage`.
 
----
+## 🚀 Próximos Passos (P0)
+1. **Auditoria de Eventos:** Auditar a tabela `events` para substituir os mocks da página pública.
+2. **Settings Admin:** Mover configurações globais remanescentes para a rota centralizada `/settings`.
+3. **Limpeza de Legado:** Concluir a deleção de páginas de admin obsoletas (mentors/verify, migrations, etc).
 
-## 🎯 Objetivos de Curto Prazo (P0)
-1. [x] **Fix:** Internacionalizar Auth (Login/Registro) e Dashboards.
-2. [x] **Feat:** Sistema de verificação universal com feedback via Chat.
-3. [ ] **Fix:** Validar RLS de `conversations` (Pendência do Heartbeat anterior - Monitorar se o Admin enviando mensagens via Server resolveu os gargalos).
-4. [ ] **Feat:** Integrar seção de Eventos (hoje mockada) ao banco de dados.
-
----
-
-## 🚧 Status das Funcionalidades
-- **Agendamento MVP:** ✅ Produção
-- **Chat Real-time:** 🟢 Estável (Polido e Internacionalizado)
-- **Verificação Admin:** ✅ Premium (Com Chat e Canned Responses)
-- **Dashboards:** ✅ Mobile-First & Bilíngues
-
----
-
-## 🛠️ Stack & Contexto Técnico
-- **Framework:** Next.js (App Router)
-- **Database:** Supabase (PostgreSQL)
-- **Auth:** Supabase Auth (SSR)
-- **UI:** Tailwind CSS + Radix/Shadcn
-- **Internacionalização:** next-intl (da, en, es, fr, pt-BR, sv)
-- **Comunicação:** Supabase Realtime (Chat) + Server-side Verification
-
----
-
-## 📝 Notas de Engenharia
-- A unificação da lógica de verificação via API Route (`/api/admin/verify`) permite que o Admin atue como facilitador sem precisar de permissões de escrita excessivamente abertas no client-side.
-- O foco em mobile-first nos dashboards melhorou significativamente a usabilidade em dispositivos pequenos.
-- Próximo mergulho: Auditar a tabela `events` para substituir os mocks da página pública.
+## 🛠️ Notas Técnicas
+- **Routing:** Unificação do acesso ao dashboard via `/dashboard` para todas as roles, permitindo que o middleware decida o destino final ou que a página de dashboard seja polimórfica.
+- **API Admin:** Nova rota `/api/admin/organizations/[id]/status` para gerenciar transições de estado de organizações com tracking de quem aprovou.
+- **i18n:** Adicionadas chaves `magicSearch` e `admin.feedbacks` para manter a paridade de tradução.

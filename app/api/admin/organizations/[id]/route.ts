@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import {
   errorResponse,
   handleApiError,
@@ -55,47 +55,27 @@ export async function GET(
       throw orgError
     }
 
-    // Get member counts from profiles (direct link used in migration)
-    const { data: profileMembers } = await supabase
+    // Get counts
+    const { count: mentorCount } = await supabase
       .from("profiles")
-      .select(`
-        id,
-        user_roles(roles(name))
-      `)
+      .select("*", { count: 'exact', head: true })
       .eq("organization_id", id)
+      .eq("user_type", "mentor")
 
-    // Get counts from organization_members (legacy link)
-    const { data: legacyMembers } = await supabase
-      .from("organization_members")
-      .select("role")
+    const { count: menteeCount } = await supabase
+      .from("profiles")
+      .select("*", { count: 'exact', head: true })
       .eq("organization_id", id)
-      .eq("status", "active")
+      .eq("user_type", "mentee")
 
-    // Get appointments count
     const { count: sessionCount } = await supabase
       .from("appointments")
       .select("*", { count: 'exact', head: true })
       .eq("organization_id", id)
 
-    const mentors = new Set()
-    const mentees = new Set()
-
-    // Process profiles
-    profileMembers?.forEach(p => {
-      const roles = (p.user_roles as any)?.map((ur: any) => ur.roles?.name) || []
-      if (roles.includes('mentor')) mentors.add(p.id)
-      if (roles.includes('mentee')) mentees.add(p.id)
-    })
-
-    // Process legacy
-    legacyMembers?.forEach(m => {
-      if (m.role === 'mentor') mentors.add(Math.random().toString())
-      if (m.role === 'mentee') mentees.add(Math.random().toString())
-    })
-
     const stats = {
-      mentors: mentors.size,
-      mentees: mentees.size,
+      mentors: mentorCount || 0,
+      mentees: menteeCount || 0,
       sessions: sessionCount || 0
     }
 
@@ -111,11 +91,11 @@ export async function GET(
 // PATCH /api/admin/organizations/[id] - Update organization (admin only)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const { id } = params
+    const { id } = await params
 
     // Authenticate user
     const {

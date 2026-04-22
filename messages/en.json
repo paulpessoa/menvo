@@ -55,7 +55,7 @@
             "profile": "Profile",
             "messages": "Messages",
             "settings": "Settings",
-            "adminPanel": "Admin Panel",
+            "adminPanel": "Dashboard",
             "logout": "Logout",
             "administration": "Administration",
             "user": "User",
@@ -973,6 +973,16 @@
             "text": "Meet {name}, mentor specialized in {topics}",
             "success": "Shared successfully!",
             "copySuccess": "Link copied to clipboard!"
+        },
+        "magicSearch": {
+            "placeholder": "Describe your challenge (e.g.: 'I want help to get my first Design internship')",
+            "button": "Search with AI",
+            "loading": "Magic in progress...",
+            "error": "The magic failed this time. Try again in a moment.",
+            "noMatch": "We didn't find an exact match, but we recorded your interest to look for new mentors!",
+            "success": "We found the best mentors for you!",
+            "minChars": "Please describe your challenge with a bit more detail.",
+            "disclaimer": "Our AI analyzes bios and skills of all mentors for you."
         }
     },
     "profile": {
@@ -1421,7 +1431,7 @@
         "errorSend": "Error sending message"
     },
     "admin": {
-        "title": "Admin Panel",
+        "title": "Dashboard",
         "welcome": "Welcome, {name}!",
         "description": "Manage mentors, users, and monitor the Menvo platform",
         "stats": {
@@ -1459,6 +1469,8 @@
             "usersDesc": "Manage platform users",
             "suggestions": "Suggestions",
             "suggestionsDesc": "Suggested topics and areas",
+            "feedbacks": "Feedbacks",
+            "feedbacksDesc": "Community voice",
             "reports": "Reports",
             "reportsDesc": "Statistics and metrics"
         },

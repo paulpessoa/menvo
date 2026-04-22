@@ -55,7 +55,7 @@
       "profile": "Perfil",
       "messages": "Mensagens",
       "settings": "Configurações",
-      "adminPanel": "Painel Administrativo",
+      "adminPanel": "Dashboard",
       "logout": "Sair",
       "administration": "Administração",
       "user": "Usuário",
@@ -950,6 +950,16 @@
       "text": "Conheça {name}, mentor especializado em {topics}",
       "success": "Compartilhado com sucesso!",
       "copySuccess": "Link copiado para a área de transferência!"
+    },
+    "magicSearch": {
+      "placeholder": "Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')",
+      "button": "Buscar com IA",
+      "loading": "Mágica em andamento...",
+      "error": "A mágica falhou desta vez. Tente novamente em instantes.",
+      "noMatch": "Não encontramos um match exato, mas registramos seu interesse para buscar novos mentores!",
+      "success": "Encontramos os melhores mentores para você!",
+      "minChars": "Por favor, descreva seu desafio com um pouco mais de detalhes.",
+      "disclaimer": "Nossa IA analisa as bios e habilidades de todos os mentores para você."
     }
   },
   "profile": {
@@ -1399,7 +1409,7 @@
     "errorSend": "Erro ao enviar mensagem"
   },
   "admin": {
-    "title": "Painel Administrativo",
+    "title": "Dashboard",
     "welcome": "Bem-vindo, {name}!",
     "description": "Gerencie mentores, usuários e monitore a plataforma Menvo",
     "stats": {
@@ -1436,10 +1446,12 @@
       "users": "Usuários",
       "usersDesc": "Gerenciar usuários da plataforma",
       "suggestions": "Sugestões",
-      "suggestionsDesc": "Temas e áreas sugeridas",
+      "suggestionsDesc": "Tópicos e áreas sugeridas",
+      "feedbacks": "Feedbacks",
+      "feedbacksDesc": "Voz da comunidade",
       "reports": "Relatórios",
       "reportsDesc": "Estatísticas e métricas"
-    },
+      },
     "alerts": {
       "pendingMentors": "Atenção: Mentores Pendentes",
       "pendingMentorsDesc": "Existem {count} mentores aguardando verificação. Revise e aprove os perfis.",

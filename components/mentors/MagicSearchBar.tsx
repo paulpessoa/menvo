@@ -7,13 +7,15 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
+import { useTranslations } from "next-intl"
 
 interface MagicSearchBarProps {
-  onMatch: (mentorIds: string[], justification: string) => void
+  onMatch: (suggestions: Array<{mentor_id: string, reason: string}>, justification: string) => void
   onClear: () => void
 }
 
 export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
+  const t = useTranslations("mentorsPage.magicSearch")
   const [query, setQuery] = useState("")
   const [loading, setLoading] = useState(false)
   const [hasResult, setHasResult] = useState(false)
@@ -21,7 +23,7 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
   const handleMagicSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim().length < 5) {
-      toast.error("Por favor, descreva seu desafio com um pouco mais de detalhes.")
+      toast.error(t("minChars"))
       return
     }
 
@@ -35,20 +37,20 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
 
       const result = await response.json()
 
-      if (!response.ok) throw new Error(result.error || "Erro na busca mágica")
+      if (!response.ok) throw new Error(result.error || t("error"))
 
       if (result.no_match) {
-        toast.info("Não encontramos um match exato, mas registramos seu interesse para buscar novos mentores!")
+        toast.info(t("noMatch"))
         onClear()
         setHasResult(false)
       } else {
-        onMatch(result.mentor_ids, result.justification)
+        onMatch(result.suggestions, result.global_justification)
         setHasResult(true)
-        toast.success("Encontramos os melhores mentores para você!")
+        toast.success(t("success"))
       }
     } catch (error: any) {
       console.error("Magic Search Error:", error)
-      toast.error("A magia falhou desta vez. Tente novamente em instantes.")
+      toast.error(t("error"))
     } finally {
       setLoading(false)
     }
@@ -72,7 +74,7 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')"
+              placeholder={t("placeholder")}
               className="border-0 focus-visible:ring-0 text-lg py-6 shadow-none flex-1 placeholder:text-muted-foreground/60"
               disabled={loading}
             />
@@ -95,7 +97,10 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                "Buscar com IA"
+                <div className="flex items-center gap-2">
+                  <Search className="h-4 w-4" />
+                  <span>{t("button")}</span>
+                </div>
               )}
             </Button>
           </CardContent>
@@ -110,8 +115,17 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
              className="text-center text-xs text-muted-foreground mt-3 flex items-center justify-center gap-1"
            >
              <Info className="h-3 w-3" /> 
-             Nossa IA analisa as bios e habilidades de todos os mentores para você.
+             {t("disclaimer")}
            </motion.p>
+        )}
+        {loading && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center text-xs text-primary font-medium mt-3 animate-pulse"
+          >
+            {t("loading")}
+          </motion.p>
         )}
       </AnimatePresence>
     </div>
