@@ -13,9 +13,9 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // --- FIX 20-04-26 PRIORITÁRIO ---
-  // Permitimos que os callbacks passem sem interferência do i18n ou redirecionamentos de rota.
-  // app/auth/callback/route.ts e app/api/auth/callback/route.ts cuidam do resto.
-  if (pathname.startsWith('/auth/callback') || pathname.startsWith('/api/auth/callback')) {
+  // Permitimos que o callback passe sem interferência do i18n ou redirecionamentos de rota.
+  // app/auth/callback/route.ts cuida do resto.
+  if (pathname.startsWith('/auth/callback')) {
     return NextResponse.next()
   }
 

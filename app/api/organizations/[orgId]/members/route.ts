@@ -42,20 +42,20 @@ export async function POST(
     const { user_id } = body
 
     if (!user_id) {
-        return errorResponse("User ID is required", "INVALID_INPUT", 400)
+        return errorResponse("User ID is required", "VALIDATION_ERROR", 400)
     }
 
+    // Cast as any here is necessary because of Supabase table discovery issues during build
     const { data: member, error: updateError } = await (supabase
       .from("profiles" as any)
-      // @ts-ignore
-      .update({ organization_id: orgId } as any)
-      .eq("id", userId)
+      .update({ organization_id: orgId })
+      .eq("id", user_id)
       .select()
       .single() as any)
 
-    if (error) throw error
+    if (updateError) throw updateError
 
-    return successResponse(member, "Member added successfully", 201)
+    return successResponse(member, "Member added successfully")
   } catch (error) {
     return handleApiError(error)
   }

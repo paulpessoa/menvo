@@ -1,79 +1,31 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
-import { deleteCalendarEvent } from '@/lib/services/mentorship/google-calendar.service';
+import { NextResponse } from 'next/server';
+import { 
+  updateGoogleCalendarEvent, 
+  deleteGoogleCalendarEvent, 
+  hasGoogleCalendarConnected 
+} from '@/lib/services/mentorship/google-calendar.service';
+import { 
+  errorResponse, 
+  handleApiError, 
+  successResponse 
+} from '@/lib/api/error-handler';
 
-interface RouteParams {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-interface AppointmentDetails {
-    id: string;
-    mentor_id: string;
-    mentee_id: string;
-    status: string;
-    scheduled_at: string;
-    google_event_id: string | null;
-    duration_minutes: number;
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { id } = await params;
-
-    const { data: appointment, error: appointmentError } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        mentor:profiles!mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-        mentee:profiles!mentee_id(id, email, first_name, last_name, full_name, avatar_url)
-      `)
-      .eq('id', id)
-      .returns<any>()
-      .single();
-
-    if (appointmentError || !appointment) {
-      return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
-    }
-
-    const appt = appointment as AppointmentDetails;
-
-    if (appt.mentor_id !== user.id && appt.mentee_id !== user.id) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    }
-
-    return NextResponse.json({ success: true, appointment });
-  } catch (error: any) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
-
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { id: appointmentId } = await params;
-    const body = await request.json();
-    const { status, notes_mentor } = body;
-    
-    const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
-    if (status && !validStatuses.includes(status)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+    const supabase = await createClient();
+    const { status, message } = await request.json();
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 'UNAUTHORIZED', 401);
     }
 
+    // 1. Get current appointment to check permissions
     const { data: currentAppointment, error: fetchError } = await supabase
       .from('appointments')
       .select('*')
@@ -82,114 +34,101 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .single();
 
     if (fetchError || !currentAppointment) {
-      return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
+      return errorResponse('Appointment not found', 'NOT_FOUND', 404);
     }
 
-    const appointment = currentAppointment as any;
+    const appointment = currentAppointment;
 
     if (appointment.mentor_id !== user.id && appointment.mentee_id !== user.id) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      return errorResponse('Access denied', 'FORBIDDEN', 403);
     }
+
+    // 2. Business Logic for status transitions
+    const updateData: any = {
+      status,
+      updated_at: new Date().toISOString()
+    };
 
     if (status === 'confirmed' && appointment.status === 'pending') {
-      try {
-        const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/appointments/confirm`;
-        const confirmResponse = await fetch(confirmUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ appointmentId, mentorNotes: notes_mentor }),
-        });
-
-        if (!confirmResponse.ok) {
-          return NextResponse.json({ error: 'Failed to confirm' }, { status: 500 });
-        }
-        
-        const successData = await confirmResponse.json();
-        const { data: confirmedAppointment } = await supabase
-          .from('appointments')
-          .select(`
-            *,
-            mentor:profiles!mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-            mentee:profiles!mentee_id(id, email, first_name, last_name, full_name, avatar_url)
-          `)
-          .eq('id', appointmentId)
-          .returns<any>()
-          .single();
-
-        return NextResponse.json({
-          success: true,
-          appointment: confirmedAppointment,
-          googleMeetLink: successData.googleMeetLink,
-          message: 'Appointment confirmed successfully',
-        });
-      } catch (confirmError) {
-        return NextResponse.json({ error: 'Failed to trigger confirmation flow' }, { status: 500 });
-      }
+      updateData.confirmed_at = new Date().toISOString();
     }
 
-    const updateData: any = { updated_at: new Date().toISOString() };
-    if (status) updateData.status = status;
-    if (notes_mentor !== undefined) updateData.notes_mentor = notes_mentor;
-
-    if (status === 'cancelled' && currentAppointment.google_event_id) {
-      try { await deleteCalendarEvent(); } catch (e) { /* ignore */ }
+    if (status === 'cancelled') {
+      updateData.cancelled_at = new Date().toISOString();
+      updateData.cancelled_by = user.id;
     }
 
+    // 3. Update in Database
     const { data: updatedAppointment, error: updateError } = await supabase
       .from('appointments')
-      .update(updateData as any)
+      .update(updateData)
       .eq('id', appointmentId)
-      .select(`
-        *,
-        mentor:profiles!mentor_id(id, email, first_name, last_name, full_name, avatar_url),
-        mentee:profiles!mentee_id(id, email, first_name, last_name, full_name, avatar_url)
-      `)
+      .select()
       .returns<any>()
       .single();
 
     if (updateError) throw updateError;
 
-    return NextResponse.json({ success: true, appointment: updatedAppointment });
-  } catch (error: any) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    // 4. Handle Google Calendar Sync if needed
+    if (status === 'cancelled' && appointment.google_event_id) {
+        try {
+            await deleteGoogleCalendarEvent(user.id, appointment.google_event_id);
+        } catch (calError) {
+            console.error('Failed to delete calendar event:', calError);
+        }
+    }
+
+    return successResponse(updatedAppointment, `Appointment ${status} successfully`);
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id: appointmentId } = await params;
     const supabase = await createClient();
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return errorResponse('Unauthorized', 'UNAUTHORIZED', 401);
     }
 
-    const { id: appointmentId } = await params;
-
-    const { data: appointment, error: fetchError } = await supabase
+    // Check permissions
+    const { data: appointment } = await supabase
       .from('appointments')
-      .select('*')
+      .select('mentor_id, mentee_id, google_event_id')
       .eq('id', appointmentId)
       .returns<any>()
       .single();
 
-    if (fetchError || !appointment) {
-      return NextResponse.json({ error: 'Appointment not found' }, { status: 404 });
+    if (!appointment) {
+      return errorResponse('Appointment not found', 'NOT_FOUND', 404);
     }
 
     if (appointment.mentor_id !== user.id && appointment.mentee_id !== user.id) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      return errorResponse('Access denied', 'FORBIDDEN', 403);
     }
 
+    // Delete calendar event
     if (appointment.google_event_id) {
-      try { await deleteCalendarEvent(); } catch (e) { /* ignore */ }
+        try {
+            await deleteGoogleCalendarEvent(user.id, appointment.google_event_id);
+        } catch (calError) {}
     }
 
-    const { error: deleteError } = await supabase.from('appointments').delete().eq('id', appointmentId);
+    const { error: deleteError } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', appointmentId);
+
     if (deleteError) throw deleteError;
 
-    return NextResponse.json({ success: true, message: 'Appointment deleted successfully' });
-  } catch (error: any) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return successResponse(null, 'Appointment deleted successfully');
+  } catch (error) {
+    return handleApiError(error);
   }
 }
