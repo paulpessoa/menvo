@@ -73,7 +73,7 @@ export function AppointmentCard({
     : appointment.mentee
 
   const isMentor = mentor?.id === currentUserId
-  const otherPerson = isMentor ? mentee : mentor
+  const otherPerson = (isMentor ? mentee : mentor) || { id: "", full_name: "Usuário", avatar_url: null }
   const userRole = isMentor ? "mentor" : "mentee"
 
   useEffect(() => {
