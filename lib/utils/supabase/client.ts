@@ -21,7 +21,6 @@ export function createClient() {
 
   // No navegador, usar o singleton global
   if (!window.__supabase_client__) {
-    console.log('🛡️ [Supabase] Inicializando instância única do cliente...');
     window.__supabase_client__ = createBrowserClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

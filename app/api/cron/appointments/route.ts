@@ -9,13 +9,6 @@ const supabase = createClient(
 );
 
 export async function GET(request: Request) {
-    // Verificar token de segurança simples (opcional, mas recomendado para cron)
-    const { searchParams } = new URL(request.url);
-    const cronToken = searchParams.get('token');
-    
-    // Se quiser segurança extra, descomente a linha abaixo e adicione CRON_TOKEN no .env
-    // if (cronToken !== process.env.CRON_TOKEN) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
     try {
         const now = new Date();
         const results = { reminders: 0, feedbacks: 0, errors: [] as string[] };

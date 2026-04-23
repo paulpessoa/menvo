@@ -121,7 +121,7 @@ function MessagesContent() {
         setConversations(conversationsWithDetails.filter(Boolean) as Conversation[])
       }
     } catch (error) {
-      console.error("Error loading conversations:", error)
+      // Error handled silently
     } finally {
       setIsLoading(false)
     }

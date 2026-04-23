@@ -57,8 +57,6 @@ export async function POST(request: NextRequest) {
       notes
     })
 
-    console.log(`✅ [NOTIFY] E-mail enviado para ${profile.email} com status ${status}`)
-
     return NextResponse.json({ success: true, message: "Notificação enviada com sucesso" })
   } catch (error: any) {
     console.error("❌ [NOTIFY] Erro ao notificar usuário:", error)
