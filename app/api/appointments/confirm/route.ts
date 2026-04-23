@@ -158,11 +158,11 @@ export async function POST(request: NextRequest) {
         // Continua mesmo com erro no calendar
       }
     } else {
-      const missing = (global as any).missingGoogleVars || "Desconhecido";
+      const missing = getMissingEnvVars().join(", ") || "Configuração incompleta";
       console.warn(
         "⚠️ [CONFIRM] Google Calendar não configurado no servidor. Faltando:", missing
       )
-      calendarError = "Google Calendar não configurado"
+      calendarError = `Google Calendar não configurado. Faltando: ${missing}`
     }
 
     // Atualizar appointment no banco
