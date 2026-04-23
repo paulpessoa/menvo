@@ -231,3 +231,17 @@ export async function sendOrganizationApprovedEmail(data: any): Promise<void> {
     `;
     await sendEmail(adminEmail, "✅ Organização aprovada!", getEmailLayout("Organização Aprovada", content));
 }
+
+/**
+ * Envia e-mail de aviso de expiração de membership
+ */
+export async function sendMembershipExpiredEmail(data: {
+    userEmail: string; userName: string; organizationName: string;
+}): Promise<void> {
+    const content = `
+        <h2>Membership Expirada ⏰</h2>
+        <p>Olá, ${data.userName}. Sua membership na organização <strong>${data.organizationName}</strong> expirou.</p>
+        <p>Para continuar acessando os benefícios exclusivos desta organização, entre em contato com os administradores ou solicite uma renovação.</p>
+    `;
+    await sendEmail(data.userEmail, "⏰ Sua membership expirou", getEmailLayout("Membership Expirada", content));
+}

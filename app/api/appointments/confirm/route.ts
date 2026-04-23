@@ -4,7 +4,8 @@ import { createClient } from "@supabase/supabase-js"
 import { sendAppointmentConfirmation } from "@/lib/email/brevo"
 import {
   createCalendarEvent,
-  isGoogleCalendarConfigured
+  isGoogleCalendarConfigured,
+  getMissingEnvVars
 } from "@/lib/services/mentorship/google-calendar.service"
 
 export async function POST(request: NextRequest) {
@@ -108,6 +109,7 @@ export async function POST(request: NextRequest) {
     let googleEventId: string | null = null
     let googleMeetLink: string | null = null
     let calendarError: string | null = null
+    let calendarResult: any = null
 
     if (isGoogleCalendarConfigured()) {
       try {
@@ -145,9 +147,9 @@ export async function POST(request: NextRequest) {
           menteeName: appointment.mentee.full_name
         }
 
-        const result = await createCalendarEvent(eventData)
-        googleEventId = result.eventId
-        googleMeetLink = result.meetLink
+        calendarResult = await createCalendarEvent(eventData)
+        googleEventId = calendarResult.eventId
+        googleMeetLink = calendarResult.meetLink
       } catch (error) {
         console.error(
           "❌ [CONFIRM] Erro ao criar evento no Google Calendar:",
@@ -179,8 +181,8 @@ export async function POST(request: NextRequest) {
       updateData.google_meet_link = googleMeetLink
     }
 
-    if ((result as any)?.calendarLink) {
-      updateData.google_calendar_link = (result as any).calendarLink
+    if (calendarResult?.calendarLink) {
+      updateData.google_calendar_link = calendarResult.calendarLink
     }
 
     if (mentorNotes) {
@@ -213,7 +215,7 @@ export async function POST(request: NextRequest) {
         menteeName: appointment.mentee.full_name,
         scheduledAt: appointment.scheduled_at,
         meetLink: googleMeetLink,
-        calendarLink: (result as any)?.calendarLink, // Passar o link do calendário se disponível
+        calendarLink: calendarResult?.calendarLink, // Passar o link do calendário se disponível
         menteeNotes: appointment.notes_mentee,
         mentorNotes: mentorNotes
       })
