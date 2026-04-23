@@ -62,18 +62,20 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Criar agendamento
+    // Colunas reais validadas via: supabase gen types (lib/types/supabase.ts)
+    // A tabela usa 'topic' (string), não 'mentorship_topics' (array inexistente)
     const { data: appointment, error: insertError } = await (supabase
-      .from("appointments" as any)
-      // @ts-ignore
+      .from("appointments")
       .insert({
         mentor_id: resolvedMentorId,
         mentee_id: user.id,
         scheduled_at: resolvedScheduledAt,
         duration_minutes: resolvedDuration,
-        mentorship_topics: resolvedTopics,
+        topic: Array.isArray(resolvedTopics) ? resolvedTopics.join(", ") : "",
         notes_mentee: resolvedNotes,
+        message: resolvedNotes,
         status: "pending"
-      })
+      } as any)
       .select(`
         *,
         mentor:profiles!mentor_id(full_name, avatar_url),
@@ -81,10 +83,14 @@ export async function POST(request: NextRequest) {
       `)
       .single() as any)
 
-    if (insertError) throw insertError
+    if (insertError) {
+      console.error("[schedule] DB insert error:", JSON.stringify(insertError))
+      throw insertError
+    }
 
     return successResponse(appointment, "Mentorship scheduled successfully")
   } catch (error) {
+    console.error("[schedule] Unexpected error:", error)
     return handleApiError(error)
   }
 }
