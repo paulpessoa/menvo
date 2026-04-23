@@ -145,6 +145,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/reports",
       icon: TrendingUp,
       color: "bg-green-600"
+    },
+    {
+      title: "Feature Flags",
+      description: "Ligar/Desligar funcionalidades em tempo real (Governança)",
+      href: "/dashboard/admin/feature-flags",
+      icon: Shield,
+      color: "bg-purple-600"
     }
   ]
 
