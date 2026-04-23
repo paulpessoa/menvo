@@ -179,6 +179,10 @@ export async function POST(request: NextRequest) {
       updateData.google_meet_link = googleMeetLink
     }
 
+    if ((result as any)?.calendarLink) {
+      updateData.google_calendar_link = (result as any).calendarLink
+    }
+
     if (mentorNotes) {
       // Salvar anotações do mentor no campo separado
       updateData.notes_mentor = mentorNotes

@@ -1,7 +1,60 @@
 /**
  * Brevo Email Service
- * Serviço simplificado para envio de emails via Brevo (SMTP)
+ * Serviço para envio de emails via Brevo (SMTP) com visual padronizado MENVO/Supabase
  */
+
+// Cores padrão
+const COLORS = {
+  primary: '#0F7185',
+  secondary: '#4191A2',
+  text: '#333333',
+  muted: '#9A979E',
+  bg: '#f4f4f4',
+  white: '#ffffff',
+  divider: '#C6C2CC'
+};
+
+// Layout Base (CSS e Container)
+const getEmailLayout = (title: string, content: string, footerExtra?: string) => `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: ${COLORS.text}; background-color: ${COLORS.bg}; padding: 20px; }
+        .email-container { max-width: 550px; margin: 0 auto; background-color: ${COLORS.white}; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .header { background: ${COLORS.primary}; color: white; padding: 35px; text-align: center; }
+        .header h1 { font-size: 22px; font-weight: 600; margin: 0; letter-spacing: 0.5px; }
+        .content { padding: 40px 35px; background-color: ${COLORS.white}; }
+        .content h2 { color: ${COLORS.secondary}; font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.3; }
+        .content p { color: ${COLORS.muted}; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
+        .info-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 25px 0; }
+        .info-item { margin-bottom: 10px; font-size: 14px; }
+        .info-item strong { color: ${COLORS.text}; }
+        .button-container { text-align: center; margin: 30px 0; }
+        .button { display: inline-block; background: ${COLORS.primary}; color: white !important; text-decoration: none; padding: 15px 35px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 2px 10px rgba(15, 113, 133, 0.2); }
+        .divider { height: 1px; background-color: ${COLORS.divider}; margin: 30px 0; opacity: 0.5; }
+        .footer { background-color: #F8F9FB; padding: 25px 35px; text-align: center; border-top: 1px solid #e9ecef; }
+        .footer p { color: ${COLORS.muted}; font-size: 12px; margin: 3px 0; }
+        @media only screen and (max-width: 480px) { .email-container { width: 100% !important; } .header { padding: 25px; } .content { padding: 25px; } }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header"><h1>${title}</h1></div>
+        <div class="content">${content}</div>
+        <div class="footer">
+            <p>Este e-mail foi enviado automaticamente. Por favor, não responda.</p>
+            <p>© 2025 MENVO. Todos os direitos reservados.</p>
+            ${footerExtra || ''}
+        </div>
+    </div>
+</body>
+</html>
+`;
 
 interface AppointmentRequestData {
   mentorEmail: string
@@ -20,8 +73,8 @@ interface AppointmentConfirmationData {
   scheduledAt: string
   meetLink: string | null
   calendarLink?: string | null
-  menteeNotes?: string // Comentários do mentee
-  mentorNotes?: string // Anotações do mentor
+  menteeNotes?: string
+  mentorNotes?: string
 }
 
 interface VerificationData {
@@ -34,937 +87,156 @@ interface VerificationData {
 /**
  * Envia notificação de status de verificação de perfil
  */
-export async function sendVerificationNotification(
-  data: VerificationData
-): Promise<void> {
+export async function sendVerificationNotification(data: VerificationData): Promise<void> {
   const { userEmail, userName, status, notes } = data
   const isApproved = status === 'approved'
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: ${isApproved ? '#10B981' : '#F59E0B'}; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid ${isApproved ? '#10B981' : '#F59E0B'}; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>${isApproved ? 'Perfil Verificado!' : 'Ajustes Necessários no Perfil'}</h1>
-        </div>
-        <div class="content">
-          <p>Olá, <strong>${userName}</strong>!</p>
-          
-          <p>A equipe do Menvo analisou seu perfil.</p>
-          
-          <div class="info">
-            <p><strong>Status:</strong> ${isApproved ? 'Aprovado' : 'Aguardando Ajustes'}</p>
-            ${notes ? `<p><strong>Observações do Administrador:</strong></p><p>${notes}</p>` : ''}
-          </div>
-          
-          ${isApproved 
-            ? `<p>Parabéns! Seu perfil já está publicado e visível para a comunidade.</p>`
-            : `<p>Por favor, realize os ajustes solicitados para que possamos validar seu perfil o quanto antes.</p>`
-          }
-          
-          <div style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Acessar meu Dashboard</a>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria Voluntária</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: { name: "Menvo", email: "contato@menvo.com.br" },
-        to: [{ email: userEmail, name: userName }],
-        subject: isApproved ? "🎉 Seu perfil no Menvo foi aprovado!" : "📢 Ajustes necessários no seu perfil Menvo",
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(`Erro API Brevo: ${JSON.stringify(errorData)}`)
+  
+  const content = `
+    <h2>Olá, ${userName}!</h2>
+    <p>A equipe do Menvo analisou o seu perfil de mentor.</p>
+    <div class="info-box" style="border-left: 4px solid ${isApproved ? '#10B981' : '#F59E0B'}">
+        <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado ✅' : 'Ajustes Necessários 📢'}</p>
+        ${notes ? `<p><strong>Observações:</strong> ${notes}</p>` : ''}
+    </div>
+    ${isApproved 
+        ? `<p>Parabéns! Seu perfil já está publicado e visível para a comunidade de mentees.</p>` 
+        : `<p>Por favor, realize os ajustes solicitados no seu dashboard para que possamos validar seu perfil o quanto antes.</p>`
     }
-  } catch (error) {
-    console.error("Erro ao enviar email de verificação:", error)
-  }
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Acessar meu Dashboard</a>
+    </div>
+  `;
+
+  await sendEmail(userEmail, isApproved ? "🎉 Seu perfil no Menvo foi aprovado!" : "📢 Ajustes necessários no seu perfil Menvo", getEmailLayout(isApproved ? "Perfil Verificado" : "Ajustes no Perfil", content));
 }
 
 /**
  * Envia email de solicitação de agendamento ao mentor
  */
-export async function sendAppointmentRequest(
-  data: AppointmentRequestData
-): Promise<void> {
-  const { mentorEmail, mentorName, menteeName, scheduledAt, message, token } =
-    data
-
-  // URL de confirmação
+export async function sendAppointmentRequest(data: AppointmentRequestData): Promise<void> {
+  const { mentorEmail, mentorName, menteeName, scheduledAt, message, token } = data
   const confirmUrl = `${process.env.NEXT_PUBLIC_APP_URL}/appointments/confirm?token=${token}`
 
-  // Template HTML simples
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>Nova Solicitação de Mentoria</h1>
-        </div>
-        <div class="content">
-          <p>Olá, <strong>${mentorName}</strong>!</p>
-          
-          <p><strong>${menteeName}</strong> solicitou uma sessão de mentoria com você.</p>
-          
-          <div class="info">
-            <p><strong>📅 Data e Hora:</strong> ${new Date(
-              scheduledAt
-            ).toLocaleString("pt-BR")}</p>
-            <p><strong>💬 Mensagem:</strong></p>
-            <p>${message}</p>
-          </div>
-          
-          <p>Para confirmar este agendamento, clique no botão abaixo:</p>
-          
-          <div style="text-align: center;">
-            <a href="${confirmUrl}" class="button">Confirmar Agendamento</a>
-          </div>
-          
-          <p style="font-size: 12px; color: #666; margin-top: 20px;">
-            Ou copie e cole este link no seu navegador:<br>
-            ${confirmUrl}
-          </p>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
+  const content = `
+    <h2>Olá, ${mentorName}!</h2>
+    <p>Você recebeu uma nova solicitação de mentoria na plataforma.</p>
+    <div class="info-box">
+        <div class="info-item"><strong>Solicitante:</strong> ${menteeName}</div>
+        <div class="info-item"><strong>Data e Hora:</strong> ${new Date(scheduledAt).toLocaleString("pt-BR")}</div>
+        <div class="info-item"><strong>Mensagem:</strong><br/>${message}</div>
+    </div>
+    <p>Para aceitar e gerar automaticamente o link do Google Meet, clique no botão abaixo:</p>
+    <div class="button-container">
+        <a href="${confirmUrl}" class="button">Confirmar Agendamento</a>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size: 12px;">Se o botão não funcionar, copie e cole este link:<br/>${confirmUrl}</p>
+  `;
 
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: mentorEmail,
-            name: mentorName
-          }
-        ],
-        subject: `Nova solicitação de mentoria de ${menteeName}`,
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar email de agendamento:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log(
-      "[EMAIL] Email de agendamento enviado com sucesso para:",
-      mentorEmail
-    )
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
+  await sendEmail(mentorEmail, `Nova solicitação de mentoria de ${menteeName}`, getEmailLayout("Nova Solicitação", content));
 }
 
 /**
  * Envia email de confirmação de agendamento para mentor e mentee
  */
-export async function sendAppointmentConfirmation(
-  data: AppointmentConfirmationData
-): Promise<void> {
-  const {
-    mentorEmail,
-    menteeEmail,
-    mentorName,
-    menteeName,
-    scheduledAt,
-    meetLink,
-    menteeNotes,
-    mentorNotes
-  } = data
+export async function sendAppointmentConfirmation(data: AppointmentConfirmationData): Promise<void> {
+  const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt, meetLink, calendarLink, menteeNotes, mentorNotes } = data
+  const formattedDate = new Date(scheduledAt).toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short" });
 
-  // Formatar data
-  const formattedDate = new Date(scheduledAt).toLocaleString("pt-BR", {
-    dateStyle: "full",
-    timeStyle: "short"
-  })
-
-  // Template HTML com link do Meet e Calendar
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #10B981; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #e5e7eb; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #10B981; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; font-weight: bold; }
-        .meet-link { background-color: #EEF2FF; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #4F46E5; }
-        .calendar-link { background-color: #F0FDF4; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #10B981; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>✅ Mentoria Confirmada!</h1>
-        </div>
-        <div class="content">
-          <p>Sua sessão de mentoria foi confirmada com sucesso!</p>
-          
-          <div class="info">
-            <p><strong>👤 Mentor:</strong> ${mentorName}</p>
-            <p><strong>👤 Mentee:</strong> ${menteeName}</p>
-            <p><strong>📅 Data e Hora:</strong> ${formattedDate}</p>
-          </div>
-          
-          ${
-            menteeNotes
-              ? `
-          <div class="info">
-            <p><strong>💬 Comentários do Mentee:</strong></p>
-            <p style="white-space: pre-wrap;">${menteeNotes}</p>
-          </div>
-          `
-              : ""
-          }
-          
-          ${
-            mentorNotes
-              ? `
-          <div class="info">
-            <p><strong>📝 Observações do Mentor:</strong></p>
-            <p style="white-space: pre-wrap;">${mentorNotes}</p>
-          </div>
-          `
-              : ""
-          }
-          
-          ${
-            meetLink
-              ? `
-          <div class="meet-link">
-            <p><strong>🎥 Link da Reunião (Google Meet):</strong></p>
-            <p style="margin: 10px 0;">
-              <a href="${meetLink}" class="button">Entrar no Google Meet</a>
-            </p>
-            <p style="font-size: 12px; color: #666; word-break: break-all;">
-              Ou copie e cole este link: ${meetLink}
-            </p>
-          </div>
-          `
-              : ""
-          }
-
-          ${
-            calendarLink
-              ? `
-          <div class="calendar-link">
-            <p><strong>📅 Adicionar ao Calendário:</strong></p>
-            <p>Você pode acessar os detalhes e gerenciar este evento no seu Google Calendar:</p>
-            <p style="margin: 10px 0;">
-              <a href="${calendarLink}" style="color: #10B981; font-weight: bold; text-decoration: underline;">Ver Evento no Google Calendar</a>
-            </p>
-          </div>
-          `
-              : `
-          <div class="meet-link">
-            <p><strong>📧 Convite do Google Calendar:</strong></p>
-            <p>Você também receberá um convite por e-mail do Google Calendar com o link da reunião.</p>
-          </div>
-          `
-          }
-          
-          <p><strong>💡 Dicas para a sessão:</strong></p>
-          <ul>
-            <li>Entre alguns minutos antes do horário agendado</li>
-            <li>Teste seu microfone e câmera</li>
-            <li>Prepare suas dúvidas e objetivos</li>
-            <li>Tenha papel e caneta para anotações</li>
-          </ul>
-          
-          <p>Prepare-se para uma ótima sessão de mentoria! 🚀</p>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria Voluntária</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    // Enviar para ambos (mentor e mentee)
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: mentorEmail,
-            name: mentorName
-          },
-          {
-            email: menteeEmail,
-            name: menteeName
-          }
-        ],
-        subject: "Mentoria confirmada!",
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar email de confirmação:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log("[EMAIL] Email de confirmação enviado com sucesso")
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
-}
-
-interface OrganizationInvitationData {
-  recipientEmail: string
-  recipientName: string
-  organizationName: string
-  organizationLogo?: string
-  inviterName: string
-  role: string
-  invitationToken: string
-}
-
-/**
- * Envia email de convite para organização
- */
-export async function sendOrganizationInvitation(
-  data: OrganizationInvitationData
-): Promise<void> {
-  const {
-    recipientEmail,
-    recipientName,
-    organizationName,
-    organizationLogo,
-    inviterName,
-    role,
-    invitationToken
-  } = data
-
-  // URL de aceitação do convite
-  const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/invitations/accept?token=${invitationToken}`
-
-  // Template HTML with organization branding
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        ${getEmailHeaderWithBranding(
-          "Convite para Organização",
-          organizationName,
-          organizationLogo
-        )}
-        <div class="content">
-          <p>Olá, <strong>${recipientName}</strong>!</p>
-          
-          <p><strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong>.</p>
-          
-          <div class="info">
-            <p><strong>🏢 Organização:</strong> ${organizationName}</p>
-            <p><strong>👤 Função:</strong> ${
-              role === "mentor" ? "Mentor" : "Mentee"
-            }</p>
-            <p><strong>✉️ Convidado por:</strong> ${inviterName}</p>
-          </div>
-          
-          <p>Para aceitar este convite, clique no botão abaixo:</p>
-          
-          <div style="text-align: center;">
-            <a href="${acceptUrl}" class="button">Aceitar Convite</a>
-          </div>
-          
-          <p style="font-size: 12px; color: #666; margin-top: 20px;">
-            Ou copie e cole este link no seu navegador:<br>
-            ${acceptUrl}
-          </p>
-          
-          <p style="font-size: 12px; color: #999; margin-top: 20px;">
-            Este convite expira em 30 dias.
-          </p>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: recipientEmail,
-            name: recipientName
-          }
-        ],
-        subject: getEmailSubject(
-          `Convite para ${organizationName}`,
-          organizationName
-        ),
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar convite de organização:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log(
-      "[EMAIL] Convite de organização enviado com sucesso para:",
-      recipientEmail
-    )
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
-}
-
-interface OrganizationApprovedData {
-  adminEmail: string
-  adminName: string
-  organizationName: string
-  organizationId: string
-  organizationLogo?: string
-}
-
-/**
- * Envia email de aprovação de organização para o admin
- */
-export async function sendOrganizationApprovedEmail(
-  data: OrganizationApprovedData
-): Promise<void> {
-  const {
-    adminEmail,
-    adminName,
-    organizationName,
-    organizationId,
-    organizationLogo
-  } = data
-
-  // URL do dashboard da organização
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/${organizationId}`
-
-  // Template HTML with organization branding
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #10B981; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #10B981; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-        .steps { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .steps li { margin: 10px 0; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        ${
-          organizationLogo
-            ? `<div style="text-align: center; padding: 20px;"><img src="${organizationLogo}" alt="${organizationName}" style="max-width: 150px; max-height: 150px;" /></div>`
-            : ""
-        }
-        <div class="header">
-          <h1>✅ Organização Aprovada!</h1>
-        </div>
-        <div class="content">
-          <p>Olá, <strong>${adminName}</strong>!</p>
-          
-          <p>Temos ótimas notícias! Sua organização <strong>${organizationName}</strong> foi aprovada e está pronta para uso.</p>
-          
-          <div class="info">
-            <p><strong>🎉 Próximos Passos:</strong></p>
-          </div>
-          
-          <div class="steps">
-            <ol>
-              <li><strong>Convide membros:</strong> Adicione mentores e mentees à sua organização</li>
-              <li><strong>Configure preferências:</strong> Ajuste as configurações de visibilidade e permissões</li>
-              <li><strong>Explore o dashboard:</strong> Acompanhe métricas e atividades da organização</li>
-            </ol>
-          </div>
-          
-          <p>Acesse o painel de controle da sua organização:</p>
-          
-          <div style="text-align: center;">
-            <a href="${dashboardUrl}" class="button">Acessar Dashboard</a>
-          </div>
-          
-          <p style="font-size: 12px; color: #666; margin-top: 20px;">
-            Ou copie e cole este link no seu navegador:<br>
-            ${dashboardUrl}
-          </p>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: adminEmail,
-            name: adminName
-          }
-        ],
-        subject: getEmailSubject("Organização aprovada!", organizationName),
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar email de aprovação:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log(
-      "[EMAIL] Email de aprovação enviado com sucesso para:",
-      adminEmail
-    )
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
-}
-
-interface MemberJoinedData {
-  adminEmail: string
-  adminName: string
-  organizationName: string
-  memberName: string
-  memberRole: string
-}
-
-/**
- * Envia email para admins quando um novo membro entra na organização
- */
-export async function sendMemberJoinedEmail(
-  data: MemberJoinedData
-): Promise<void> {
-  const { adminEmail, adminName, organizationName, memberName, memberRole } =
-    data
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>👋 Novo Membro</h1>
-        </div>
-        <div class="content">
-          <p>Olá, <strong>${adminName}</strong>!</p>
-          
-          <p><strong>${memberName}</strong> aceitou o convite e agora faz parte de <strong>${organizationName}</strong>.</p>
-          
-          <div class="info">
-            <p><strong>👤 Membro:</strong> ${memberName}</p>
-            <p><strong>🎯 Função:</strong> ${
-              memberRole === "mentor" ? "Mentor" : "Mentee"
-            }</p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: adminEmail,
-            name: adminName
-          }
-        ],
-        subject: `Novo membro em ${organizationName}`,
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar email de novo membro:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log("[EMAIL] Email de novo membro enviado com sucesso")
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
-}
-
-interface MemberLeftData {
-  adminEmail: string
-  adminName: string
-  organizationName: string
-  memberName: string
-  memberRole: string
-}
-
-/**
- * Envia email para admins quando um membro sai da organização
- */
-export async function sendMemberLeftEmail(data: MemberLeftData): Promise<void> {
-  const { adminEmail, adminName, organizationName, memberName, memberRole } =
-    data
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #EF4444; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>👋 Membro Saiu</h1>
-        </div>
-        <div class="content">
-          <p>Olá, <strong>${adminName}</strong>!</p>
-          
-          <p><strong>${memberName}</strong> saiu de <strong>${organizationName}</strong>.</p>
-          
-          <div class="info">
-            <p><strong>👤 Membro:</strong> ${memberName}</p>
-            <p><strong>🎯 Função:</strong> ${
-              memberRole === "mentor" ? "Mentor" : "Mentee"
-            }</p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: adminEmail,
-            name: adminName
-          }
-        ],
-        subject: `Membro saiu de ${organizationName}`,
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar email de saída de membro:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log("[EMAIL] Email de saída de membro enviado com sucesso")
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
-}
-
-interface MembershipExpiredData {
-  userEmail: string
-  userName: string
-  organizationName: string
-}
-
-/**
- * Envia email para usuário quando sua membership expira
- */
-export async function sendMembershipExpiredEmail(
-  data: MembershipExpiredData
-): Promise<void> {
-  const { userEmail, userName, organizationName } = data
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background-color: #F59E0B; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background-color: #f9fafb; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>⏰ Membership Expirada</h1>
-        </div>
-        <div class="content">
-          <p>Olá, <strong>${userName}</strong>!</p>
-          
-          <p>Sua membership em <strong>${organizationName}</strong> expirou.</p>
-          
-          <div class="info">
-            <p>Se você deseja continuar fazendo parte desta organização, entre em contato com os administradores.</p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>Menvo - Plataforma de Mentoria</p>
-          <p>Este é um email automático, por favor não responda.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `
-
-  try {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
-      body: JSON.stringify({
-        sender: {
-          name: process.env.BREVO_SENDER_NAME || "Menvo",
-          email: process.env.BREVO_SENDER_EMAIL || "noreply@menvo.com.br"
-        },
-        to: [
-          {
-            email: userEmail,
-            name: userName
-          }
-        ],
-        subject: `Sua membership em ${organizationName} expirou`,
-        htmlContent
-      })
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      console.error("[EMAIL] Erro ao enviar email de expiração:", error)
-      throw new Error(`Falha ao enviar email: ${response.status}`)
-    }
-
-    console.log("[EMAIL] Email de expiração enviado com sucesso")
-  } catch (error) {
-    console.error("[EMAIL] Erro ao enviar email:", error)
-    throw error
-  }
-}
-
-/**
- * Helper function to add organization branding to email templates
- */
-function getEmailHeaderWithBranding(
-  title: string,
-  organizationName?: string,
-  organizationLogo?: string
-): string {
-  const backgroundColor = organizationName ? "#4F46E5" : "#4F46E5"
-
-  let logoHtml = ""
-  if (organizationLogo) {
-    logoHtml = `<img src="${organizationLogo}" alt="${organizationName}" style="max-width: 100px; max-height: 100px; margin-bottom: 10px;" />`
-  }
-
-  let orgNameHtml = ""
-  if (organizationName) {
-    orgNameHtml = `<p style="margin: 5px 0; font-size: 14px; opacity: 0.9;">${organizationName}</p>`
-  }
-
-  return `
-    <div class="header" style="background-color: ${backgroundColor}; color: white; padding: 20px; text-align: center;">
-      ${logoHtml}
-      <h1 style="margin: 10px 0;">${title}</h1>
-      ${orgNameHtml}
+  const content = `
+    <h2>Sua mentoria está confirmada! ✅</h2>
+    <p>Tudo certo! A sessão de mentoria foi agendada e os detalhes estão abaixo:</p>
+    <div class="info-box">
+        <div class="info-item"><strong>Mentor:</strong> ${mentorName}</div>
+        <div class="info-item"><strong>Mentee:</strong> ${menteeName}</div>
+        <div class="info-item"><strong>Data:</strong> ${formattedDate}</div>
     </div>
-  `
+    
+    ${meetLink ? `
+    <div class="button-container">
+        <a href="${meetLink}" class="button" style="background: #4F46E5;">Entrar no Google Meet</a>
+    </div>` : ''}
+
+    ${calendarLink ? `
+    <p style="text-align: center;">
+        <a href="${calendarLink}" style="color: ${COLORS.secondary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Ver no Google Calendar</a>
+    </p>` : ''}
+
+    <div class="divider"></div>
+    <p><strong>Dica:</strong> Entre alguns minutos antes e prepare suas dúvidas. Ótima mentoria! 🚀</p>
+  `;
+
+  await sendEmail([mentorEmail, menteeEmail], "Sessão de Mentoria Confirmada! ✅", getEmailLayout("Mentoria Confirmada", content));
 }
 
 /**
- * Get email subject with organization name prefix
+ * Helper para envio via Brevo API
  */
-function getEmailSubject(
-  baseSubject: string,
-  organizationName?: string
-): string {
-  if (organizationName) {
-    return `[${organizationName}] ${baseSubject}`
+async function sendEmail(to: string | string[], subject: string, htmlContent: string) {
+  const recipients = Array.isArray(to) ? to.map(email => ({ email })) : [{ email: to }];
+  
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY || ""
+      },
+      body: JSON.stringify({
+        sender: { 
+          name: process.env.BREVO_SENDER_NAME || "Menvo", 
+          email: process.env.BREVO_SENDER_EMAIL || "contato@menvo.com.br" 
+        },
+        to: recipients,
+        subject,
+        htmlContent
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("[EMAIL] Erro Brevo:", errorData);
+    }
+  } catch (error) {
+    console.error("[EMAIL] Falha crítica:", error);
   }
-  return baseSubject
+}
+
+// Interfaces e funções de Organização (mantendo compatibilidade)
+interface OrganizationInvitationData {
+  recipientEmail: string; recipientName: string; organizationName: string; organizationLogo?: string;
+  inviterName: string; role: string; invitationToken: string;
+}
+
+export async function sendOrganizationInvitation(data: OrganizationInvitationData): Promise<void> {
+  const { recipientEmail, recipientName, organizationName, inviterName, role, invitationToken } = data;
+  const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/invitations/accept?token=${invitationToken}`;
+
+  const content = `
+    <h2>Você foi convidado! 🏢</h2>
+    <p>Olá, ${recipientName}! <strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong>.</p>
+    <div class="info-box">
+        <div class="info-item"><strong>Organização:</strong> ${organizationName}</div>
+        <div class="info-item"><strong>Função:</strong> ${role === "mentor" ? "Mentor" : "Mentee"}</div>
+    </div>
+    <div class="button-container">
+        <a href="${acceptUrl}" class="button">Aceitar Convite</a>
+    </div>
+  `;
+  await sendEmail(recipientEmail, `Convite para ${organizationName}`, getEmailLayout("Convite Organização", content));
+}
+
+interface OrganizationApprovedData { adminEmail: string; adminName: string; organizationName: string; organizationId: string; }
+export async function sendOrganizationApprovedEmail(data: OrganizationApprovedData): Promise<void> {
+    const { adminEmail, adminName, organizationName, organizationId } = data;
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/${organizationId}`;
+    const content = `
+        <h2>Sua organização foi aprovada! 🎉</h2>
+        <p>Olá, ${adminName}. Temos ótimas notícias! <strong>${organizationName}</strong> foi aprovada e está pronta.</p>
+        <div class="button-container">
+            <a href="${dashboardUrl}" class="button">Acessar Painel</a>
+        </div>
+    `;
+    await sendEmail(adminEmail, "✅ Organização aprovada!", getEmailLayout("Organização Aprovada", content));
 }
