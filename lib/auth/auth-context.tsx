@@ -257,12 +257,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signOut = async () => {
         setLoading(true)
         try {
-            await supabase.auth.signOut()
-            window.location.href = '/'
+            await supabase.auth.signOut({ scope: 'local' })
         } catch (err) {
-            // Error handling
+            // Ignora erro de signOut — o cookie já foi invalidado client-side
+            console.warn('[Auth] signOut error (non-critical):', err)
         } finally {
             setLoading(false)
+            // Usa replace() para não deixar a página autenticada no histórico,
+            // evitando o loop loading ← back ← middleware ← redirect
+            window.location.replace('/')
         }
     }
 

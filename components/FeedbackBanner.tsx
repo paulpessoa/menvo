@@ -89,9 +89,10 @@ export function FeedbackBanner() {
   }
 
   // Não renderizar até estar montado no cliente para evitar hydration mismatch
-  if (!mounted) {
-    return null
-  }
+  if (!mounted) return null
+
+  // 🚧 Feature flag: escondido até estar pronto para produção
+  if (!process.env.NEXT_PUBLIC_FEEDBACK_ENABLED) return null
 
   return (
     <>

@@ -7,32 +7,18 @@ import { toast } from "sonner"
 
 export function useLogout() {
   const { signOut } = useAuth()
-  const router = useRouter()
 
   const logout = useCallback(async (redirectTo: string = "/") => {
     try {
+      // signOut em auth-context.tsx já faz window.location.replace('/')
+      // Aqui apenas chamamos e deixamos o contexto redirecionar.
       await signOut()
-      
-      // Show success message
-      toast.success("Logout realizado com sucesso!")
-      
-      // Redirect after a short delay to allow toast to show
-      setTimeout(() => {
-        router.push(redirectTo)
-        router.refresh()
-      }, 1000)
-      
     } catch (error) {
       console.error("Erro ao fazer logout:", error)
-      toast.error("Erro ao fazer logout. Redirecionando...")
-      
-      // Still redirect even if logout failed
-      setTimeout(() => {
-        router.push("/login?error=logout-failed")
-        router.refresh()
-      }, 1500)
+      // Fallback: força redirect mesmo se signOut lançar
+      window.location.replace(redirectTo)
     }
-  }, [signOut, router])
+  }, [signOut])
 
   const logoutAndRedirect = useCallback((redirectTo: string = "/") => {
     logout(redirectTo)
@@ -42,4 +28,4 @@ export function useLogout() {
     logout,
     logoutAndRedirect
   }
-}
+}
