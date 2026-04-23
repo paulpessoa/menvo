@@ -1244,7 +1244,8 @@
         "selectConversation": "Select a conversation",
         "selectConversationDesc": "Choose a conversation in the sidebar to start messaging",
         "roleMentor": "Mentor",
-        "roleMentee": "Mentee"
+        "roleMentee": "Mentee",
+        "roleAdmin": "Administrator"
     },
     "settings": {
         "title": "Settings",

@@ -67,10 +67,12 @@ function MessagesContent() {
       if (convs) {
         const rawConvs = convs as RawConversation[]
         const conversationsWithDetails = await Promise.all(rawConvs.map(async (conv) => {
-          const otherUserId = conv.mentor_id === user.id 
-            ? (conv.mentee_id === user.id ? conv.mentor_id : conv.mentee_id)
-            : conv.mentor_id
+          // Identificar o outro usuário de forma robusta
+          const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
           
+          // Se o chat for com o próprio usuário (ex: notas), ignoramos na listagem principal
+          if (otherUserId === user.id) return null
+
           const { data: otherUser } = await supabase
             .from('profiles')
             .select(`
@@ -99,13 +101,6 @@ function MessagesContent() {
           if (roleNames.includes('admin')) primaryRole = 'admin'
           else if (roleNames.includes('mentor')) primaryRole = 'mentor'
 
-          const mappedOtherUser = {
-            id: otherUserId,
-            full_name: (otherUser as any)?.full_name || (otherUserId === user.id ? 'Você (Notas)' : 'Usuário'),
-            avatar_url: (otherUser as any)?.avatar_url || null,
-            role_name: primaryRole
-          }
-
           return {
             id: conv.id,
             mentor_id: conv.mentor_id,
@@ -113,14 +108,20 @@ function MessagesContent() {
             last_message_at: conv.last_message_at,
             created_at: conv.created_at,
             unread_count: unreadCount || 0,
-            other_user: mappedOtherUser
+            other_user: {
+              id: otherUserId,
+              full_name: (otherUser as any)?.full_name || 'Usuário',
+              avatar_url: (otherUser as any)?.avatar_url || null,
+              role_name: primaryRole
+            }
           }
         }))
 
-        setConversations(conversationsWithDetails as Conversation[])
+        // Filtrar nulos (casos de chat com si mesmo)
+        setConversations(conversationsWithDetails.filter(Boolean) as Conversation[])
       }
     } catch (error) {
-      // Silently handle
+      console.error("Error loading conversations:", error)
     } finally {
       setIsLoading(false)
     }

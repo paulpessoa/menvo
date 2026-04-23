@@ -1222,7 +1222,8 @@
     "selectConversation": "Selecione uma conversa",
     "selectConversationDesc": "Escolha uma conversa na sidebar para começar a trocar mensagens",
     "roleMentor": "Mentor",
-    "roleMentee": "Mentorado"
+    "roleMentee": "Mentorado",
+    "roleAdmin": "Administrador"
   },
   "settings": {
     "title": "Configurações",
