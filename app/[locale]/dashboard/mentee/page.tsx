@@ -118,7 +118,7 @@ export default function MenteeDashboard() {
             scheduled_at,
             duration_minutes,
             status,
-            profiles!appointments_mentor_id_fkey (
+            mentor:profiles!mentor_id (
                 full_name,
                 avatar_url,
                 job_title
@@ -133,16 +133,15 @@ export default function MenteeDashboard() {
       if (error) throw error
 
       const formatted = (data as any[])?.map((apt: any) => {
-          const m = Array.isArray(apt.profiles) ? apt.profiles[0] : apt.profiles;
           return {
             id: apt.id,
             scheduled_at: apt.scheduled_at,
             duration_minutes: apt.duration_minutes,
             status: apt.status,
             mentor: {
-              full_name: m?.full_name || "Mentor",
-              avatar_url: m?.avatar_url || null,
-              job_title: m?.job_title || null
+              full_name: apt.mentor?.full_name || "Mentor",
+              avatar_url: apt.mentor?.avatar_url || null,
+              job_title: apt.mentor?.job_title || null
             }
           }
       }) || []

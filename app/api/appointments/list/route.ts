@@ -25,13 +25,13 @@ export async function GET(request: NextRequest) {
             .from('appointments')
             .select(`
                 *,
-                mentor:profiles!appointments_mentor_id_fkey(
+                mentor:profiles!mentor_id(
                     id,
                     full_name,
                     email,
                     avatar_url
                 ),
-                mentee:profiles!appointments_mentee_id_fkey(
+                mentee:profiles!mentee_id(
                     id,
                     full_name,
                     email,
