@@ -56,6 +56,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       href: "/dashboard/admin/reports",
       icon: BarChart3,
       description: t("nav.reportsDesc")
+    },
+    {
+      title: "Feature Flags",
+      href: "/dashboard/admin/feature-flags",
+      icon: Shield,
+      description: "Governança em tempo real"
     }
   ]
 
