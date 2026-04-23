@@ -11,7 +11,7 @@ import { MenteeMentorshipNewUX } from "@/components/mentorship/MenteeMentorshipN
 import { useFeatureFlag } from "@/lib/feature-flags"
 
 export default function MenteeMentorshipPage() {
-    const isNewUXEnabled = useFeatureFlag('NEW_MENTORSHIP_UX')
+    const isNewUXEnabled = useFeatureFlag('newMentorshipUx')
 
     return (
         <RequireRole roles={['mentee']}>

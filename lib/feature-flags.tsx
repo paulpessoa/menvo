@@ -2,7 +2,34 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react"
-import { DEFAULT_FLAGS, type FeatureFlags } from "@/lib/constants/feature-flags"
+import type { Database } from "@/lib/types/supabase"
+
+/**
+ * Interface única para Feature Flags da plataforma.
+ * Nomes padronizados em camelCase conforme as diretrizes de design.
+ */
+export interface FeatureFlags {
+    waitingListEnabled: boolean
+    feedbackEnabled: boolean
+    maintenanceMode: boolean
+    newUserRegistration: boolean
+    mentorVerification: boolean
+    newMentorshipUx: boolean
+    [key: string]: boolean | undefined
+}
+
+/**
+ * Fallbacks seguros (Hardcoded e Env Vars).
+ * Esta é a base que garante que o app não quebre se a API falhar.
+ */
+export const DEFAULT_FLAGS: FeatureFlags = {
+    waitingListEnabled: process.env.NEXT_PUBLIC_FEATURE_WAITING_LIST === "true",
+    feedbackEnabled: process.env.NEXT_PUBLIC_FEATURE_FEEDBACK !== "false",
+    maintenanceMode: process.env.NEXT_PUBLIC_FEATURE_MAINTENANCE_MODE === "true",
+    newUserRegistration: process.env.NEXT_PUBLIC_FEATURE_NEW_USER_REGISTRATION !== "false",
+    mentorVerification: process.env.NEXT_PUBLIC_FEATURE_MENTOR_VERIFICATION !== "false",
+    newMentorshipUx: process.env.NEXT_PUBLIC_FEATURE_NEW_UX === "true"
+}
 
 interface FeatureFlagsContextType {
     flags: FeatureFlags
@@ -13,6 +40,12 @@ interface FeatureFlagsContextType {
 
 const FeatureFlagsContext = createContext<FeatureFlagsContextType | undefined>(undefined)
 
+/**
+ * FeatureFlagsProvider
+ * Provedor de estado global para flags. Centraliza a busca na nossa API.
+ * Estrutura preparada para integração com LaunchDarkly ou similares:
+ * Basta trocar a lógica de fetch para consumir o SDK do provedor externo.
+ */
 export function FeatureFlagsProvider({ children, initialFlags }: { children: React.ReactNode, initialFlags?: Partial<FeatureFlags> }) {
     const [flags, setFlags] = useState<FeatureFlags>(() => ({ ...DEFAULT_FLAGS, ...initialFlags }))
     const [isLoading, setIsLoading] = useState(true)
@@ -50,13 +83,18 @@ export function useFeatureFlags() {
     return context
 }
 
+/**
+ * useFeatureFlag (Hook Principal)
+ * Use este hook em qualquer componente para ler uma flag.
+ */
 export function useFeatureFlag(flagName: keyof FeatureFlags): boolean {
     const { flags } = useFeatureFlags()
     return flags[flagName] ?? DEFAULT_FLAGS[flagName] ?? false
 }
 
 /**
- * Helper para verificar flags no servidor (RSC)
+ * getFeatureFlags (Servidor)
+ * Helper para verificar flags no servidor (Server Components).
  */
 export async function getFeatureFlags(): Promise<FeatureFlags> {
     return DEFAULT_FLAGS;

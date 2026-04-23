@@ -2,7 +2,10 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import type { Database, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
-import { FEATURE_FLAGS_TABLE, FEATURE_FLAGS_AUDIT_LOGS_TABLE } from "@/lib/constants/feature-flags"
+
+// Constantes de tabela movidas para cá ou lidas do schema
+const FEATURE_FLAGS_TABLE = 'feature_flags'
+const FEATURE_FLAGS_AUDIT_LOGS_TABLE = 'feature_flag_audit_logs'
 
 // Usar Service Role para bypass RLS nas ações administrativas
 const supabase = createClient<Database>(

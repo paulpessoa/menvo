@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { DEFAULT_FLAGS } from "@/lib/constants/feature-flags"
+import { DEFAULT_FLAGS } from "@/lib/feature-flags"
 import type { Database } from "@/lib/types/supabase"
 
 // Usar chaves de ambiente para o cliente Supabase interno
@@ -30,7 +30,7 @@ export async function GET() {
       console.warn("⚠️ [Flags] Erro ao buscar do banco, usando fallback:", error.message)
     }
 
-    // 2. Mesclar: Banco de Dados > Variáveis de Ambiente (via DEFAULT_FLAGS)
+    // 2. Mesclar: Banco de Dados > Defaults (Variáveis de Ambiente)
     const mergedFlags = { ...DEFAULT_FLAGS, ...flagsFromDB }
 
     return NextResponse.json({

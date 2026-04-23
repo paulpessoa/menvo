@@ -35,8 +35,8 @@ export async function saveGoogleCalendarTokens(
     updated_at: new Date().toISOString()
   };
 
-  const { error } = await supabase
-    .from('google_calendar_tokens')
+  const { error } = await (supabase
+    .from('google_calendar_tokens') as any)
     .upsert(upsertData);
 
   if (error) {
@@ -50,11 +50,11 @@ export async function saveGoogleCalendarTokens(
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
   const supabase = createClient();
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from('google_calendar_tokens')
     .select('*')
     .eq('user_id', userId)
-    .maybeSingle();
+    .maybeSingle() as any);
 
   if (error) {
     console.error('Error getting Google Calendar tokens:', error);
