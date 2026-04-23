@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
         .select(
           `
           *,
-          mentor:mentor_id(id, full_name, email),
-          mentee:mentee_id(id, full_name, email)
+          mentor:profiles!mentor_id(id, full_name, email),
+          mentee:profiles!mentee_id(id, full_name, email)
         `
         )
         .eq("action_token", token)
@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
         .select(
           `
           *,
-          mentor:mentor_id(id, full_name, email),
-          mentee:mentee_id(id, full_name, email)
+          mentor:profiles!mentor_id(id, full_name, email),
+          mentee:profiles!mentee_id(id, full_name, email)
         `
         )
         .eq("id", appointmentId)

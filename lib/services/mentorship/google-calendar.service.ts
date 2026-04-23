@@ -1,9 +1,4 @@
-/**
- * Google Calendar Service - Versão Unificada
- * Usa tokens globais de uma conta única para criar eventos
- */
-
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
 /**
  * ID da agenda do Google Calendar
@@ -31,9 +26,12 @@ async function createAuthenticatedClient() {
 
   const missing = getMissingEnvVars();
   if (missing.length > 0) {
-      throw new Error(`Configuração do Google Calendar incompleta. Faltando: ${missing.join(', ')}`);
+      const errorMsg = `Configuração do Google Calendar incompleta. Faltando: ${missing.join(', ')}`;
+      console.error(`❌ [CALENDAR] ${errorMsg}`);
+      throw new Error(errorMsg);
   }
 
+  // Usando a forma recomendada para inicializar o cliente
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CALENDAR_CLIENT_ID,
     process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
@@ -44,18 +42,23 @@ async function createAuthenticatedClient() {
     refresh_token: process.env.GOOGLE_CALENDAR_REFRESH_TOKEN,
   });
 
-  // Fazer refresh do token
   try {
     console.log('🔄 [CALENDAR] Fazendo refresh do access token...');
+    // refreshAccessToken é a forma padrão
     const { credentials } = await oauth2Client.refreshAccessToken();
     oauth2Client.setCredentials(credentials);
     console.log('✅ [CALENDAR] Access token obtido com sucesso!');
+    return oauth2Client;
   } catch (error: any) {
-    console.error('❌ [CALENDAR] Erro ao fazer refresh:', error.message || error);
-    throw new Error(`Falha ao renovar access token: ${error.message || 'Erro desconhecido'}`);
+    const detail = error.response?.data?.error_description || error.message || error;
+    console.error('❌ [CALENDAR] Erro ao fazer refresh:', detail);
+    
+    if (detail === 'invalid_client') {
+        throw new Error('Erro do Google: CLIENT_ID ou CLIENT_SECRET inválidos. Verifique na Vercel.');
+    }
+    
+    throw new Error(`Falha ao renovar access token: ${detail}`);
   }
-
-  return oauth2Client;
 }
 
 /**
