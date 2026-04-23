@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { 
   Loader2, RefreshCw, Save, Plus, Trash2, History, Tag, 
-  AlertTriangle, CheckCircle2, XCircle, Info
+  AlertTriangle, CheckCircle2, XCircle, Info, Shield
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -66,7 +66,7 @@ export default function AdminFeatureFlagsPage() {
   const [newFlag, setNewFlag] = useState({ name: '', description: '', tags: '' });
   const [isCreating, setIsCreateing] = useState(false);
 
-  const supabase = createClient();
+  const supabase = createClient() as any;
 
   const fetchData = async () => {
     setLoading(true);
@@ -104,23 +104,25 @@ export default function AdminFeatureFlagsPage() {
       const newStatus = !currentStatus;
       
       // 1. Atualizar flag
-      const { error: updateError } = await (supabase
-        .from('feature_flags' as any)
+      // @ts-ignore
+      const { error: updateError } = await supabase
+        .from('feature_flags')
         .update({ 
           enabled: newStatus, 
           updated_at: new Date().toISOString() 
-        } as any)
-        .eq('id', id) as any);
+        })
+        .eq('id', id);
 
       if (updateError) throw updateError;
       
       // 2. Gravar Log
       const { data: { user } } = await supabase.auth.getUser();
-      await (supabase.from('feature_flag_audit_logs' as any).insert({
+      // @ts-ignore
+      await supabase.from('feature_flag_audit_logs').insert({
         flag_name: name,
         action: newStatus ? 'Ativada' : 'Desativada',
         performed_by: user?.email || 'Sistema'
-      }) as any);
+      });
 
       setFlags(flags.map(f => f.id === id ? { ...f, enabled: newStatus } : f));
       toast.success(`Flag ${name} ${newStatus ? 'ativada' : 'desativada'}!`);
