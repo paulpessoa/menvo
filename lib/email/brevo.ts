@@ -37,6 +37,8 @@ const getEmailLayout = (title: string, content: string, footerExtra?: string) =>
         .button-container { text-align: center; margin: 30px 0; }
         .button { display: inline-block; background: ${COLORS.primary}; color: white !important; text-decoration: none; padding: 15px 35px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 2px 10px rgba(15, 113, 133, 0.2); }
         .divider { height: 1px; background-color: ${COLORS.divider}; margin: 30px 0; opacity: 0.5; }
+        .signature { margin-top: 30px; border-top: 1px solid ${COLORS.bg}; padding-top: 20px; }
+        .signature p { margin: 2px 0; font-size: 13px; }
         .footer { background-color: #F8F9FB; padding: 25px 35px; text-align: center; border-top: 1px solid #e9ecef; }
         .footer p { color: ${COLORS.muted}; font-size: 12px; margin: 3px 0; }
         @media only screen and (max-width: 480px) { .email-container { width: 100% !important; } .header { padding: 25px; } .content { padding: 25px; } }
@@ -45,7 +47,13 @@ const getEmailLayout = (title: string, content: string, footerExtra?: string) =>
 <body>
     <div class="email-container">
         <div class="header"><h1>${title}</h1></div>
-        <div class="content">${content}</div>
+        <div class="content">
+            ${content}
+            <div class="signature">
+                <p><strong>Paul Pessoa</strong></p>
+                <p>Equipe MENVO - Mentoria Voluntária</p>
+            </div>
+        </div>
         <div class="footer">
             <p>Este e-mail foi enviado automaticamente. Por favor, não responda.</p>
             <p>© 2025 MENVO. Todos os direitos reservados.</p>
@@ -56,32 +64,60 @@ const getEmailLayout = (title: string, content: string, footerExtra?: string) =>
 </html>
 `;
 
+// Interfaces e Tipos
 interface AppointmentRequestData {
-  mentorEmail: string
-  mentorName: string
-  menteeName: string
-  scheduledAt: string
-  message: string
-  token: string
+  mentorEmail: string; mentorName: string; menteeName: string; scheduledAt: string; message: string; token: string;
 }
 
 interface AppointmentConfirmationData {
-  mentorEmail: string
-  menteeEmail: string
-  mentorName: string
-  menteeName: string
-  scheduledAt: string
-  meetLink: string | null
-  calendarLink?: string | null
-  menteeNotes?: string
-  mentorNotes?: string
+  mentorEmail: string; menteeEmail: string; mentorName: string; menteeName: string; scheduledAt: string; 
+  meetLink: string | null; calendarLink?: string | null; menteeNotes?: string; mentorNotes?: string;
 }
 
 interface VerificationData {
-  userEmail: string
-  userName: string
-  status: 'approved' | 'rejected'
-  notes?: string
+  userEmail: string; userName: string; status: 'approved' | 'rejected'; notes?: string;
+}
+
+/**
+ * Envia lembrete de mentoria no dia da sessão
+ */
+export async function sendAppointmentReminder(data: {
+    userEmail: string; userName: string; otherPersonName: string; scheduledAt: string; meetLink: string | null;
+}): Promise<void> {
+    const formattedTime = new Date(data.scheduledAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+    const content = `
+        <h2>Lembrete: Sua mentoria é hoje! 📅</h2>
+        <p>Olá, ${data.userName}. Passando para lembrar que sua sessão de mentoria com <strong>${data.otherPersonName}</strong> está agendada para hoje às <strong>${formattedTime}</strong>.</p>
+        <div class="info-box">
+            <p><strong>Evento:</strong> Mentoria MENVO</p>
+            <p><strong>Horário:</strong> ${formattedTime} (Horário de Brasília)</p>
+        </div>
+        ${data.meetLink ? `
+        <div class="button-container">
+            <a href="${data.meetLink}" class="button">Entrar no Google Meet</a>
+        </div>` : ''}
+        <p>Prepare suas perguntas e aproveite a sessão! 🚀</p>
+    `;
+    await sendEmail(data.userEmail, "🔔 Lembrete: Sua mentoria é hoje!", getEmailLayout("Lembrete de Mentoria", content));
+}
+
+/**
+ * Envia solicitação de feedback após a mentoria
+ */
+export async function sendFeedbackRequest(data: {
+    userEmail: string; userName: string; mentorName: string; appointmentId: string | number;
+}): Promise<void> {
+    const feedbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/mentee?feedback=${data.appointmentId}`;
+    const content = `
+        <h2>Como foi sua mentoria? ⭐</h2>
+        <p>Olá, ${data.userName}! Notamos que sua sessão com <strong>${data.mentorName}</strong> terminou há pouco tempo.</p>
+        <p>Sua avaliação é fundamental para ajudarmos o mentor a evoluir e para darmos credibilidade ao trabalho voluntário dele na plataforma.</p>
+        <div class="button-container">
+            <a href="${feedbackUrl}" class="button">Avaliar Mentoria Agora</a>
+        </div>
+        <p>Leva menos de 1 minuto e faz toda a diferença para a nossa comunidade!</p>
+    `;
+    await sendEmail(data.userEmail, "⭐ Como foi sua mentoria? Deixe sua avaliação!", getEmailLayout("Avaliação de Mentoria", content));
 }
 
 /**
@@ -98,15 +134,10 @@ export async function sendVerificationNotification(data: VerificationData): Prom
         <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado ✅' : 'Ajustes Necessários 📢'}</p>
         ${notes ? `<p><strong>Observações:</strong> ${notes}</p>` : ''}
     </div>
-    ${isApproved 
-        ? `<p>Parabéns! Seu perfil já está publicado e visível para a comunidade de mentees.</p>` 
-        : `<p>Por favor, realize os ajustes solicitados no seu dashboard para que possamos validar seu perfil o quanto antes.</p>`
-    }
     <div class="button-container">
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Acessar meu Dashboard</a>
     </div>
   `;
-
   await sendEmail(userEmail, isApproved ? "🎉 Seu perfil no Menvo foi aprovado!" : "📢 Ajustes necessários no seu perfil Menvo", getEmailLayout(isApproved ? "Perfil Verificado" : "Ajustes no Perfil", content));
 }
 
@@ -125,14 +156,10 @@ export async function sendAppointmentRequest(data: AppointmentRequestData): Prom
         <div class="info-item"><strong>Data e Hora:</strong> ${new Date(scheduledAt).toLocaleString("pt-BR")}</div>
         <div class="info-item"><strong>Mensagem:</strong><br/>${message}</div>
     </div>
-    <p>Para aceitar e gerar automaticamente o link do Google Meet, clique no botão abaixo:</p>
     <div class="button-container">
         <a href="${confirmUrl}" class="button">Confirmar Agendamento</a>
     </div>
-    <div class="divider"></div>
-    <p style="font-size: 12px;">Se o botão não funcionar, copie e cole este link:<br/>${confirmUrl}</p>
   `;
-
   await sendEmail(mentorEmail, `Nova solicitação de mentoria de ${menteeName}`, getEmailLayout("Nova Solicitação", content));
 }
 
@@ -140,7 +167,7 @@ export async function sendAppointmentRequest(data: AppointmentRequestData): Prom
  * Envia email de confirmação de agendamento para mentor e mentee
  */
 export async function sendAppointmentConfirmation(data: AppointmentConfirmationData): Promise<void> {
-  const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt, meetLink, calendarLink, menteeNotes, mentorNotes } = data
+  const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt, meetLink, calendarLink } = data
   const formattedDate = new Date(scheduledAt).toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short" });
 
   const content = `
@@ -151,21 +178,11 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
         <div class="info-item"><strong>Mentee:</strong> ${menteeName}</div>
         <div class="info-item"><strong>Data:</strong> ${formattedDate}</div>
     </div>
-    
-    ${meetLink ? `
-    <div class="button-container">
-        <a href="${meetLink}" class="button" style="background: #4F46E5;">Entrar no Google Meet</a>
-    </div>` : ''}
-
-    ${calendarLink ? `
-    <p style="text-align: center;">
-        <a href="${calendarLink}" style="color: ${COLORS.secondary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Ver no Google Calendar</a>
-    </p>` : ''}
-
+    ${meetLink ? `<div class="button-container"><a href="${meetLink}" class="button" style="background: #4F46E5;">Entrar no Google Meet</a></div>` : ''}
+    ${calendarLink ? `<p style="text-align: center;"><a href="${calendarLink}" style="color: ${COLORS.secondary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Ver no Google Calendar</a></p>` : ''}
     <div class="divider"></div>
     <p><strong>Dica:</strong> Entre alguns minutos antes e prepare suas dúvidas. Ótima mentoria! 🚀</p>
   `;
-
   await sendEmail([mentorEmail, menteeEmail], "Sessão de Mentoria Confirmada! ✅", getEmailLayout("Mentoria Confirmada", content));
 }
 
@@ -174,26 +191,15 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
  */
 async function sendEmail(to: string | string[], subject: string, htmlContent: string) {
   const recipients = Array.isArray(to) ? to.map(email => ({ email })) : [{ email: to }];
-  
   try {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
-      },
+      headers: { Accept: "application/json", "Content-Type": "application/json", "api-key": process.env.BREVO_API_KEY || "" },
       body: JSON.stringify({
-        sender: { 
-          name: process.env.BREVO_SENDER_NAME || "Menvo", 
-          email: process.env.BREVO_SENDER_EMAIL || "contato@menvo.com.br" 
-        },
-        to: recipients,
-        subject,
-        htmlContent
+        sender: { name: process.env.BREVO_SENDER_NAME || "Menvo", email: process.env.BREVO_SENDER_EMAIL || "contato@menvo.com.br" },
+        to: recipients, subject, htmlContent
       })
     });
-
     if (!response.ok) {
       const errorData = await response.json();
       console.error("[EMAIL] Erro Brevo:", errorData);
@@ -203,40 +209,25 @@ async function sendEmail(to: string | string[], subject: string, htmlContent: st
   }
 }
 
-// Interfaces e funções de Organização (mantendo compatibilidade)
-interface OrganizationInvitationData {
-  recipientEmail: string; recipientName: string; organizationName: string; organizationLogo?: string;
-  inviterName: string; role: string; invitationToken: string;
-}
-
-export async function sendOrganizationInvitation(data: OrganizationInvitationData): Promise<void> {
+// Interfaces e funções de Organização
+export async function sendOrganizationInvitation(data: any): Promise<void> {
   const { recipientEmail, recipientName, organizationName, inviterName, role, invitationToken } = data;
   const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/invitations/accept?token=${invitationToken}`;
-
   const content = `
     <h2>Você foi convidado! 🏢</h2>
     <p>Olá, ${recipientName}! <strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong>.</p>
-    <div class="info-box">
-        <div class="info-item"><strong>Organização:</strong> ${organizationName}</div>
-        <div class="info-item"><strong>Função:</strong> ${role === "mentor" ? "Mentor" : "Mentee"}</div>
-    </div>
-    <div class="button-container">
-        <a href="${acceptUrl}" class="button">Aceitar Convite</a>
-    </div>
+    <div class="button-container"><a href="${acceptUrl}" class="button">Aceitar Convite</a></div>
   `;
   await sendEmail(recipientEmail, `Convite para ${organizationName}`, getEmailLayout("Convite Organização", content));
 }
 
-interface OrganizationApprovedData { adminEmail: string; adminName: string; organizationName: string; organizationId: string; }
-export async function sendOrganizationApprovedEmail(data: OrganizationApprovedData): Promise<void> {
+export async function sendOrganizationApprovedEmail(data: any): Promise<void> {
     const { adminEmail, adminName, organizationName, organizationId } = data;
     const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/${organizationId}`;
     const content = `
         <h2>Sua organização foi aprovada! 🎉</h2>
         <p>Olá, ${adminName}. Temos ótimas notícias! <strong>${organizationName}</strong> foi aprovada e está pronta.</p>
-        <div class="button-container">
-            <a href="${dashboardUrl}" class="button">Acessar Painel</a>
-        </div>
+        <div class="button-container"><a href="${dashboardUrl}" class="button">Acessar Painel</a></div>
     `;
     await sendEmail(adminEmail, "✅ Organização aprovada!", getEmailLayout("Organização Aprovada", content));
 }
