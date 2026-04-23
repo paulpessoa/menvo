@@ -142,10 +142,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (newSession) {
                 setSession(newSession)
                 setUser(newSession.user)
-                const userProfile = await fetchProfile(newSession.user.id)
-                if (mounted) {
-                    setProfile(userProfile)
-                    setIsInitializing(false)
+                try {
+                    const userProfile = await fetchProfile(newSession.user.id)
+                    if (mounted) setProfile(userProfile)
+                } catch (err) {
+                    console.error('[Auth] Error fetching profile during state change:', err)
+                } finally {
+                    if (mounted) setIsInitializing(false)
                 }
             } else {
                 setIsInitializing(false)

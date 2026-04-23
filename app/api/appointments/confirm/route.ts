@@ -209,6 +209,7 @@ export async function POST(request: NextRequest) {
         menteeName: appointment.mentee.full_name,
         scheduledAt: appointment.scheduled_at,
         meetLink: googleMeetLink,
+        calendarLink: (result as any)?.calendarLink, // Passar o link do calendário se disponível
         menteeNotes: appointment.notes_mentee,
         mentorNotes: mentorNotes
       })

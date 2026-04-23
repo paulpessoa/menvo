@@ -19,6 +19,7 @@ interface AppointmentConfirmationData {
   menteeName: string
   scheduledAt: string
   meetLink: string | null
+  calendarLink?: string | null
   menteeNotes?: string // Comentários do mentee
   mentorNotes?: string // Anotações do mentor
 }
@@ -240,7 +241,7 @@ export async function sendAppointmentConfirmation(
     timeStyle: "short"
   })
 
-  // Template HTML com link do Meet
+  // Template HTML com link do Meet e Calendar
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -251,9 +252,10 @@ export async function sendAppointmentConfirmation(
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background-color: #10B981; color: white; padding: 20px; text-align: center; }
         .content { padding: 20px; background-color: #f9fafb; }
-        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .info { background-color: white; padding: 15px; border-radius: 6px; margin: 15px 0; border: 1px solid #e5e7eb; }
         .button { display: inline-block; padding: 12px 24px; background-color: #10B981; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0; font-weight: bold; }
         .meet-link { background-color: #EEF2FF; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #4F46E5; }
+        .calendar-link { background-color: #F0FDF4; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #10B981; }
         .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
       </style>
     </head>
@@ -297,7 +299,7 @@ export async function sendAppointmentConfirmation(
             meetLink
               ? `
           <div class="meet-link">
-            <p><strong>🎥 Link da Reunião:</strong></p>
+            <p><strong>🎥 Link da Reunião (Google Meet):</strong></p>
             <p style="margin: 10px 0;">
               <a href="${meetLink}" class="button">Entrar no Google Meet</a>
             </p>
@@ -306,10 +308,24 @@ export async function sendAppointmentConfirmation(
             </p>
           </div>
           `
+              : ""
+          }
+
+          ${
+            calendarLink
+              ? `
+          <div class="calendar-link">
+            <p><strong>📅 Adicionar ao Calendário:</strong></p>
+            <p>Você pode acessar os detalhes e gerenciar este evento no seu Google Calendar:</p>
+            <p style="margin: 10px 0;">
+              <a href="${calendarLink}" style="color: #10B981; font-weight: bold; text-decoration: underline;">Ver Evento no Google Calendar</a>
+            </p>
+          </div>
+          `
               : `
           <div class="meet-link">
             <p><strong>📧 Convite do Google Calendar:</strong></p>
-            <p>Você também receberá um convite do Google Calendar com o link da reunião.</p>
+            <p>Você também receberá um convite por e-mail do Google Calendar com o link da reunião.</p>
           </div>
           `
           }
