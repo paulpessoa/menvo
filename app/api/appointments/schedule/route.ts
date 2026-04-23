@@ -21,9 +21,28 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { mentor_id, scheduled_at, duration_minutes, mentorship_topics, notes_mentee } = body
+    const {
+      // snake_case (API-direct callers)
+      mentor_id,
+      scheduled_at,
+      duration_minutes,
+      mentorship_topics,
+      notes_mentee,
+      // camelCase (frontend BookMentorshipModal)
+      mentorId,
+      scheduledAt,
+      duration,
+      message,
+    } = body
 
-    if (!mentor_id || !scheduled_at) {
+    // Normalize: prefer snake_case if present, fall back to camelCase
+    const resolvedMentorId = mentor_id ?? mentorId
+    const resolvedScheduledAt = scheduled_at ?? scheduledAt
+    const resolvedDuration = duration_minutes ?? duration ?? 45
+    const resolvedNotes = notes_mentee ?? message ?? ""
+    const resolvedTopics = mentorship_topics ?? []
+
+    if (!resolvedMentorId || !resolvedScheduledAt) {
       return errorResponse("Missing required fields", "VALIDATION_ERROR", 400)
     }
 
@@ -31,7 +50,7 @@ export async function POST(request: NextRequest) {
     const { data: mentor, error: mentorError } = await (supabase
       .from("profiles")
       .select("id, verified")
-      .eq("id", mentor_id)
+      .eq("id", resolvedMentorId)
       .single() as any)
 
     if (mentorError || !mentor) {
@@ -47,12 +66,12 @@ export async function POST(request: NextRequest) {
       .from("appointments" as any)
       // @ts-ignore
       .insert({
-        mentor_id,
+        mentor_id: resolvedMentorId,
         mentee_id: user.id,
-        scheduled_at,
-        duration_minutes: duration_minutes || 60,
-        mentorship_topics: mentorship_topics || [],
-        notes_mentee: notes_mentee || "",
+        scheduled_at: resolvedScheduledAt,
+        duration_minutes: resolvedDuration,
+        mentorship_topics: resolvedTopics,
+        notes_mentee: resolvedNotes,
         status: "pending"
       })
       .select(`
