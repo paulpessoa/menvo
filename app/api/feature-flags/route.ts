@@ -30,7 +30,7 @@ export async function GET() {
       console.warn("⚠️ [Flags] Erro ao buscar do banco, usando fallback:", error.message)
     }
 
-    // 2. Mesclar: Banco de Dados > Defaults (Variáveis de Ambiente)
+    // 2. Mesclar: Banco de Dados > Defaults Fixos
     const mergedFlags = { ...DEFAULT_FLAGS, ...flagsFromDB }
 
     return NextResponse.json({

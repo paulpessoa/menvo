@@ -20,11 +20,11 @@ USING (
 
 -- Inserir flags padronizadas (camelCase)
 INSERT INTO public.feature_flags (name, enabled, description) VALUES 
-('waitingListEnabled', false, 'Habilita a lista de espera para novos usuários'),
+('waitingListEnabled', true, 'Habilita a lista de espera para novos usuários'),
 ('feedbackEnabled', true, 'Habilita o sistema de avaliações de mentorias'),
-('maintenanceMode', false, 'Ativa o modo de manutenção global'),
+('maintenanceMode', true, 'Ativa o modo de manutenção global'),
 ('newUserRegistration', true, 'Permite o cadastro de novos usuários'),
 ('mentorVerification', true, 'Exige aprovação manual para novos mentores'),
-('newMentorshipUx', false, 'Ativa a nova interface fluida estilo ADPList')
+('newMentorshipUx', true, 'Ativa a nova interface fluida estilo ADPList')
 ON CONFLICT (name) DO UPDATE SET 
   description = EXCLUDED.description;
