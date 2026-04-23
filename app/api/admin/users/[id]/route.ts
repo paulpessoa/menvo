@@ -42,17 +42,35 @@ export async function PATCH(
 
     if (profileError) throw profileError
 
-    // 3. Atualizar Roles se fornecidas
+    // 3. Atualizar Roles se fornecidas (Otimizado para evitar webhooks desnecessários)
     if (roles && Array.isArray(roles)) {
-      // Remover roles atuais
-      await supabaseAdmin.from('user_roles').delete().eq('user_id', id)
+      // Buscar roles atuais do usuário
+      const { data: currentRolesData } = await supabaseAdmin
+        .from('user_roles')
+        .select('roles(name)')
+        .eq('user_id', id)
       
-      // Buscar IDs das novas roles
-      const { data: roleObjects } = await supabaseAdmin.from('roles').select('id, name').in('name', roles)
+      const currentRoleNames = (currentRolesData as any[])?.map(r => r.roles?.name) || []
       
-      if (roleObjects && roleObjects.length > 0) {
-        const roleInserts = roleObjects.map(r => ({ user_id: id, role_id: r.id }))
-        await supabaseAdmin.from('user_roles').insert(roleInserts)
+      // Verificar se as roles mudaram
+      const sortedCurrent = [...currentRoleNames].sort().join(',')
+      const sortedNew = [...roles].sort().join(',')
+
+      if (sortedCurrent !== sortedNew) {
+        console.log(`🔄 [ROLES] Mudança detectada (${sortedCurrent} -> ${sortedNew}). Atualizando...`)
+        
+        // Remover roles atuais
+        await supabaseAdmin.from('user_roles').delete().eq('user_id', id)
+        
+        // Buscar IDs das novas roles
+        const { data: roleObjects } = await supabaseAdmin.from('roles').select('id, name').in('name', roles)
+        
+        if (roleObjects && roleObjects.length > 0) {
+          const roleInserts = roleObjects.map(r => ({ user_id: id, role_id: r.id }))
+          await supabaseAdmin.from('user_roles').insert(roleInserts)
+        }
+      } else {
+        console.log(`ℹ️ [ROLES] Nenhuma mudança de papéis para o usuário ${id}.`)
       }
     }
 
