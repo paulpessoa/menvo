@@ -1,10 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
+import type { Database } from '@/lib/types/supabase'
 
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies()
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
      process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
@@ -39,7 +40,7 @@ export function getAuthToken(request: NextRequest): string | null {
 
 // Helper para criar cliente Supabase com token customizado
 export function createSupabaseWithToken(token: string) {
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

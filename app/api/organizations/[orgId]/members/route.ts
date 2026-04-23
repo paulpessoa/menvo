@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import type { Database } from "@/lib/types/supabase"
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 import {
   errorResponse,
   handleApiError,
@@ -46,12 +49,17 @@ export async function POST(
     }
 
     // Cast as any here is necessary because of Supabase table discovery issues during build
+    const insertData: any = { 
+      organization_id: orgId, 
+      user_id: user_id,
+      role: 'member',
+      status: 'active'
+    };
     const { data: member, error: updateError } = await (supabase
-      .from("profiles" as any)
-      .update({ organization_id: orgId })
-      .eq("id", user_id)
+      .from("organization_members") as any)
+      .insert(insertData)
       .select()
-      .single() as any)
+      .single();
 
     if (updateError) throw updateError
 

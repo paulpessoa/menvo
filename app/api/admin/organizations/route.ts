@@ -5,7 +5,10 @@ import {
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
-import type { Organization } from "@/lib/types/organizations"
+
+import type { Database } from "@/lib/types/supabase"
+
+type OrganizationRow = Database["public"]["Tables"]["organizations"]["Row"]
 
 // GET /api/admin/organizations - List all organizations (admin only)
 export async function GET(request: NextRequest) {
@@ -16,12 +19,13 @@ export async function GET(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
 
-    const { data: roleData } = await supabase
+    const { data: roleDataResult } = await supabase
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
-      .returns<any>()
       .single()
+
+    const roleData = roleDataResult as any;
 
     const userRole = roleData?.roles?.name
     if (userRole !== "admin" && userRole !== "moderator") {
@@ -41,21 +45,23 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact" })
 
     if (search) {
-      query = (query as any).or(`name.ilike.%${search}%,slug.ilike.%${search}%`)
+      query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%`)
     }
 
-    const { data: orgs, error: orgsError, count } = await (query as any)
+    const { data: orgsData, error: orgsError, count } = await query
       .order("created_at", { ascending: false })
       .range(from, to)
+      
+    const orgs = orgsData as OrganizationRow[] | null;
 
     if (orgsError) throw orgsError
 
     // 3. Get extra stats for each org
-    const orgsWithStats = await Promise.all((orgs || []).map(async (org: any) => {
-      const { count: memberCount } = await (supabase
+    const orgsWithStats = await Promise.all((orgs || []).map(async (org) => {
+      const { count: memberCount } = await supabase
         .from("organization_members")
         .select("*", { count: 'exact', head: true })
-        .eq("organization_id", org.id) as any)
+        .eq("organization_id", org.id)
 
       return {
         ...org,

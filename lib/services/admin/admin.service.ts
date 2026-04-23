@@ -18,14 +18,14 @@ class AdminService {
      */
     async updateUserProfile(userId: string, updates: AdminUserUpdate) {
         const { data, error } = await (this.supabase
-            .from('profiles')
+            .from('profiles') as any)
             .update({
                 ...updates,
                 updated_at: new Date().toISOString()
-            } as any)
+            })
             .eq('id', userId)
             .select()
-            .single() as any)
+            .single()
 
         if (error) throw error
         return data
@@ -59,8 +59,8 @@ class AdminService {
         }))
 
         const { error: insertError } = await (this.supabase
-            .from('user_roles')
-            .insert(inserts as any) as any)
+            .from('user_roles') as any)
+            .insert(inserts)
 
         if (insertError) throw insertError
         return true

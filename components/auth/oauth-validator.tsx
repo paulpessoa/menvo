@@ -57,7 +57,7 @@ export function OAuthValidator() {
                 setValidation({
                     status: 'error',
                     message: 'Failed to validate OAuth configuration',
-                    details: { error: error.message }
+                    details: { error: (error instanceof Error) ? error.message : String(error) }
                 })
             }
         }

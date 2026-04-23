@@ -22,8 +22,8 @@ export async function processVerification({
   const supabase = await createClient()
 
   // 1. Update Profile Status
-  const { error: updateError } = await supabase
-    .from('profiles' as any)
+  const { error: updateError } = await (supabase
+    .from('profiles') as any)
     .update({
       verification_status: status,
       verification_notes: notes,

@@ -70,8 +70,8 @@ export function MentorManagementPanel() {
 
         try {
             // Use mentors_admin_view to get all mentors (verified and unverified)
-            const { data, error } = await supabase
-                .from('mentors_admin_view')
+            const { data, error } = await (supabase
+                .from('mentors_admin_view') as any)
                 .select('*')
                 .order('created_at', { ascending: false })
 
@@ -82,7 +82,7 @@ export function MentorManagementPanel() {
 
             // Calculate stats
             const total = mentorData.length
-            const verified = mentorData.filter(m => m.verified).length
+            const verified = mentorData.filter((m: any) => m.verified).length
             const pending = total - verified
 
             setStats({ total, verified, pending })

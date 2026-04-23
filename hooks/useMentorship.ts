@@ -128,7 +128,7 @@ export const useRespondToSession = () => {
 export const useMentorSessions = (mentorId?: string, status?: string) => {
   return useQuery({
     queryKey: ['mentorship-sessions', 'mentor', mentorId, status],
-    queryFn: () => mentorshipSessionsService.getMentorSessions(mentorId, status),
+    queryFn: () => mentorshipSessionsService.getMentorSessions(mentorId, status as any),
     staleTime: 1000 * 60 * 2, // 2 minutos
   })
 }
@@ -136,7 +136,7 @@ export const useMentorSessions = (mentorId?: string, status?: string) => {
 export const useMenteeSessions = (menteeId?: string, status?: string) => {
   return useQuery({
     queryKey: ['mentorship-sessions', 'mentee', menteeId, status],
-    queryFn: () => mentorshipSessionsService.getMenteeSessions(menteeId, status),
+    queryFn: () => mentorshipSessionsService.getMenteeSessions(menteeId, status as any),
     staleTime: 1000 * 60 * 2, // 2 minutos
   })
 }

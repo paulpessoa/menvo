@@ -49,9 +49,9 @@ export function NewsletterDashboard() {
         sub.email,
         sub.name || '',
         sub.whatsapp || '',
-        format(new Date(sub.subscribed_at || ''), 'dd/MM/yyyy HH:mm'),
+        format(new Date((sub as any).subscribed_at || sub.created_at || ''), 'dd/MM/yyyy HH:mm'),
         sub.marketing_consent ? 'Sim' : 'Não',
-        sub.status
+        (sub as any).status || ''
       ].join(','))
     ].join('\n')
 

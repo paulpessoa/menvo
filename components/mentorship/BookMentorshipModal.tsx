@@ -72,13 +72,13 @@ export function BookMentorshipModal({
                     .eq('status', 'completed');
                 
                 if (completed && completed.length > 0) {
-                    const { data: feedbacks } = await supabase
-                        .from('appointment_feedbacks')
+                    const { data: feedbacks } = await (supabase
+                        .from('appointment_feedbacks') as any)
                         .select('appointment_id')
                         .eq('reviewer_id', user.id);
                     
-                    const feedbackIds = new Set(feedbacks?.map(f => f.appointment_id));
-                    const pending = completed.some(c => !feedbackIds.has(c.id));
+                    const feedbackIds = new Set((feedbacks as any[])?.map((f: any) => f.appointment_id));
+                    const pending = completed.some((c: any) => !feedbackIds.has(c.id));
                     
                     if (pending) {
                         setPendingEvaluation(true);

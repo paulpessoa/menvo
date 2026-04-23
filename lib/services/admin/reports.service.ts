@@ -23,18 +23,18 @@ export const adminReportsService = {
   async getUserGrowth(startDate: string = "2020-01-01"): Promise<TimeSeriesData[]> {
     const supabase = createClient()
     
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('profiles')
       .select('created_at')
       .gte('created_at', startDate)
-      .order('created_at', { ascending: true })
+      .order('created_at', { ascending: true }) as any)
 
     if (error) throw error
 
     // Agrupar por Dia para períodos curtos, ou Mês para períodos longos
     const counts: Record<string, number> = {}
     
-    data.forEach(profile => {
+    data.forEach((profile: any) => {
         const date = new Date(profile.created_at)
         const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD
         counts[dateKey] = (counts[dateKey] || 0) + 1

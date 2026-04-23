@@ -38,15 +38,15 @@ class VerificationServiceClass {
     passed: boolean
     notes: string
   }) {
-    const { error } = await this.supabase
-      .from('profiles')
+    const { error } = await (this.supabase
+      .from('profiles') as any)
       .update({
         verification_status: passed ? 'approved' : 'rejected',
         verification_notes: notes,
         verified: passed,
         verified_at: passed ? new Date().toISOString() : null,
         updated_at: new Date().toISOString()
-      } as any)
+      })
       .eq('id', verificationId)
 
     if (error) throw error

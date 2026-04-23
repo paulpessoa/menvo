@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
     if (mentorRole) {
         // Remover a role de mentor do usuário
-        await supabase
-            .from('user_roles')
+        await (supabase
+            .from('user_roles') as any)
             .delete()
             .eq('user_id', user.id)
             .eq('role_id', (mentorRole as any).id)
@@ -43,19 +43,19 @@ export async function POST(request: NextRequest) {
         .single()
 
     if (menteeRole) {
-        await supabase
-            .from('user_roles')
+        await (supabase
+            .from('user_roles') as any)
             .upsert({ user_id: user.id, role_id: (menteeRole as any).id })
     }
 
     // 3. Resetar flags no perfil
-    const { data, error } = await supabase
-      .from("profiles")
+    const { data, error } = await (supabase
+      .from("profiles") as any)
       .update({ 
           is_pending_mentor: false,
           verified: false,
           is_public: false 
-      } as any)
+      })
       .eq("id", user.id)
       .select()
       .single()

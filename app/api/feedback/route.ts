@@ -22,10 +22,9 @@ export async function GET(request: NextRequest) {
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
-      .returns<any>()
       .single()
 
-    const isAdmin = roleData?.roles?.name === "admin"
+    const isAdmin = (roleData as any)?.roles?.name === "admin"
 
     // Parse query parameters
     const page = Number.parseInt(searchParams.get("page") || "1")
@@ -86,16 +85,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Create feedback
-    const { data: feedback, error } = await (supabase
-      .from("feedback" as any)
-      .insert({
-        user_id: user?.id || null,
-        rating: Number(rating),
-        comment: comment || null,
-        email: user ? null : email,
-      })
+    const insertData: any = {
+      user_id: user?.id || null,
+      rating: Number(rating),
+      comment: comment || null,
+      email: user ? null : email,
+    };
+
+    const { data: feedback, error } = await supabase
+      .from("feedback")
+      .insert(insertData)
       .select()
-      .single() as any)
+      .single();
 
     if (error) throw error
 

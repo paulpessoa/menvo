@@ -21,14 +21,13 @@ export async function POST(request: NextRequest) {
 
     // 1. Atualizar o perfil do usuário
     const { error: updateError } = await (supabase
-      .from("profiles" as any)
-      // @ts-ignore
+      .from("profiles") as any)
       .update({
         user_role: role,
         verification_status: role === "mentor" ? "pending" : "approved",
         updated_at: new Date().toISOString(),
       })
-      .eq("id", user.id) as any)
+      .eq("id", user.id);
 
     if (updateError) {
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
@@ -36,13 +35,13 @@ export async function POST(request: NextRequest) {
 
     if (role === "mentor") {
       const { error: validationError } = await (supabase
-        .from("validation_requests" as any)
+        .from("validation_requests") as any)
         .insert({
           user_id: user.id,
           request_type: "mentor_verification",
           status: "pending",
           created_at: new Date().toISOString(),
-        }) as any)
+        });
 
       if (validationError) {
         console.error("Erro ao criar solicitação de validação:", validationError)
@@ -58,11 +57,11 @@ export async function POST(request: NextRequest) {
 
     if (roleData) {
       await (supabase
-        .from("user_roles" as any)
+        .from("user_roles") as any)
         .upsert({ 
           user_id: user.id, 
-          role_id: roleData.id 
-        }) as any)
+          role_id: (roleData as any).id 
+        });
     }
 
     return NextResponse.json({

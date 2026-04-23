@@ -65,11 +65,11 @@ export const mentorAvailabilityService = {
   updateAvailability: async (id: string, updates: Partial<MentorAvailability>): Promise<MentorAvailability> => {
     const numericId = parseInt(id)
     const { data, error } = await (supabase
-      .from('mentor_availability')
-      .update(updates as any)
+      .from('mentor_availability') as any)
+      .update(updates)
       .eq('id', isNaN(numericId) ? id : numericId)
       .select()
-      .single() as any)
+      .single()
 
     if (error) throw error
     return data as MentorAvailability
@@ -79,9 +79,9 @@ export const mentorAvailabilityService = {
   removeAvailability: async (id: string): Promise<void> => {
     const numericId = parseInt(id)
     const { error } = await (supabase
-      .from('mentor_availability')
-      .update({ is_active: false } as any)
-      .eq('id', isNaN(numericId) ? id : numericId) as any)
+      .from('mentor_availability') as any)
+      .update({ is_active: false })
+      .eq('id', isNaN(numericId) ? id : numericId)
 
     if (error) throw error
   },

@@ -73,8 +73,8 @@ export function validateFile(file: File, options: FileValidationOptions = {}): F
   }
 
   // Check MIME type
-  if (allowedTypes.length > 0 && !allowedTypes.includes(file.type)) {
-    const typeNames = getFileTypeNames(allowedTypes);
+  if (allowedTypes.length > 0 && !(allowedTypes as string[]).includes(file.type)) {
+    const typeNames = getFileTypeNames(allowedTypes as string[]);
     errors.push(`Tipo de arquivo não suportado. Tipos aceitos: ${typeNames}`);
   }
 

@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await (supabase
                 .from('profiles')
                 .select(`
                     *,
@@ -81,8 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     )
                 `)
                 .eq('id', userId)
-                .returns<any>()
-                .single()
+                .single() as any)
 
             if (error || !data) return null
 
@@ -207,8 +206,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (roleError || !roleData) throw roleError || new Error('Role not found')
         
         const { error: insertError } = await (supabase
-            .from('user_roles' as any)
-            .insert({ user_id: user.id, role_id: roleData.id }) as any)
+            .from('user_roles') as any)
+            .insert({ user_id: user.id, role_id: (roleData as any).id })
             
         if (insertError) throw insertError
         await refreshProfile()

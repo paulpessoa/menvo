@@ -85,13 +85,13 @@ export function MentorCard({
     setIsVerifying(true)
 
     try {
-      const { error } = await supabase
-        .from("profiles")
+      const { error } = await (supabase
+        .from("profiles") as any)
         .update({
           verified,
           updated_at: new Date().toISOString(),
           verified_at: verified ? new Date().toISOString() : null
-        } as any)
+        })
         .eq("id", mentor.id)
 
       if (error) throw error

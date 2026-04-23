@@ -64,8 +64,8 @@ export const newsletterService = {
 
   // Cancelar inscrição
   unsubscribe: async (email: string) => {
-    const { error } = await supabase
-      .from('newsletter_subscriptions')
+    const { error } = await (supabase
+      .from('newsletter_subscriptions') as any)
       .update({
         status: 'unsubscribed',
         unsubscribed_at: new Date().toISOString()

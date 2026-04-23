@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
+import type { Database } from '@/lib/types/supabase';
+
+type AppointmentRow = Database['public']['Tables']['appointments']['Row'];
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,21 +19,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar appointment pelo token
-    const { data: appointmentData, error: fetchError } = await supabase
+    const { data: appointmentDataResult, error: fetchError } = await supabase
       .from('appointments')
       .select('*')
       .eq('action_token', token)
-      .returns<any>()
       .single();
 
-    if (fetchError || !appointmentData) {
+    if (fetchError || !appointmentDataResult) {
       return NextResponse.json(
         { error: 'Agendamento não encontrado ou token inválido' },
         { status: 404 }
       );
     }
 
-    const appointment = appointmentData;
+    const appointment = appointmentDataResult as AppointmentRow;
 
     // Verificar se já foi processado
     if (appointment.status !== 'pending') {
@@ -42,17 +44,16 @@ export async function POST(request: NextRequest) {
 
     // Atualizar status
     const newStatus = action === 'confirm' ? 'confirmed' : 'cancelled';
-    const updateData: any = { 
+    const updateData: Partial<AppointmentRow> = { 
       status: newStatus,
       cancellation_reason: action === 'cancel' ? reason : null,
       cancelled_at: action === 'cancel' ? new Date().toISOString() : null,
     };
 
     const { error: updateError } = await (supabase
-      .from('appointments' as any)
-      // @ts-ignore
+      .from('appointments') as any)
       .update(updateData)
-      .eq('id', appointment.id) as any);
+      .eq('id', appointment.id);
 
     if (updateError) {
       return NextResponse.json(

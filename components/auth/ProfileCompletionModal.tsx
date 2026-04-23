@@ -40,8 +40,8 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
       }
 
       // Cast here is necessary for build time discovery
-      const { error } = await supabase
-        .from("profiles" as any)
+      const { error } = await (supabase
+        .from("profiles") as any)
         .update(updateData)
         .eq("id", user.id)
 

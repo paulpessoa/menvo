@@ -57,8 +57,8 @@ export async function logAdminAction(
       user_agent: userAgent
     }
 
-    const { error } = await supabase
-      .from("admin_audit_logs")
+    const { error } = await (supabase
+      .from("admin_audit_logs") as any)
       .insert(logEntry)
 
     if (error) {

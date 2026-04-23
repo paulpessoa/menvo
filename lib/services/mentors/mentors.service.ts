@@ -26,7 +26,6 @@ class MentorService {
       inclusionTags = [],
       experienceYears = [],
       educationLevels = [],
-      rating = 3,
       city,
       country,
       availability,

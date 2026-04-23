@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import type { Database } from '@/lib/types/supabase';
+
+type AppointmentRow = Database['public']['Tables']['appointments']['Row'];
 import { 
   updateCalendarEvent, 
   deleteCalendarEvent
@@ -10,6 +13,7 @@ import {
   successResponse 
 } from '@/lib/api/error-handler';
 
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -17,7 +21,7 @@ export async function PATCH(
   try {
     const { id: appointmentId } = await params;
     const supabase = await createClient();
-    const { status, message } = await request.json();
+    const { status } = await request.json();
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -25,18 +29,17 @@ export async function PATCH(
     }
 
     // 1. Get current appointment to check permissions
-    const { data: currentAppointment, error: fetchError } = await supabase
+    const { data: appointmentData, error: fetchError } = await supabase
       .from('appointments')
-      .select('*')
+      .select('id, mentor_id, mentee_id, status, google_event_id')
       .eq('id', appointmentId)
-      .returns<any>()
       .single();
 
-    if (fetchError || !currentAppointment) {
+    const appointment = appointmentData as AppointmentRow | null;
+
+    if (fetchError || !appointment) {
       return errorResponse('Appointment not found', 'NOT_FOUND', 404);
     }
-
-    const appointment = currentAppointment;
 
     if (appointment.mentor_id !== user.id && appointment.mentee_id !== user.id) {
       return errorResponse('Access denied', 'FORBIDDEN', 403);
@@ -48,9 +51,10 @@ export async function PATCH(
       updated_at: new Date().toISOString()
     };
 
-    if (status === 'confirmed' && appointment.status === 'pending') {
+    // removed confirmed_at logic entirely, not in DB
+    /* if (status === 'confirmed' && appointment.status === 'pending') {
       updateData.confirmed_at = new Date().toISOString();
-    }
+    } */
 
     if (status === 'cancelled') {
       updateData.cancelled_at = new Date().toISOString();
@@ -58,13 +62,14 @@ export async function PATCH(
     }
 
     // 3. Update in Database
-    const { data: updatedAppointment, error: updateError } = await supabase
-      .from('appointments')
+    const { data: updateDataResult, error: updateError } = await (supabase
+      .from('appointments') as any)
       .update(updateData)
       .eq('id', appointmentId)
       .select()
-      .returns<any>()
       .single();
+
+    const updatedAppointment = updateDataResult as AppointmentRow | null;
 
     if (updateError) throw updateError;
 
@@ -97,12 +102,13 @@ export async function DELETE(
     }
 
     // Check permissions
-    const { data: appointment } = await supabase
+    const { data: appointmentData } = await supabase
       .from('appointments')
       .select('mentor_id, mentee_id, google_event_id')
       .eq('id', appointmentId)
-      .returns<any>()
       .single();
+
+    const appointment = appointmentData as AppointmentRow | null;
 
     if (!appointment) {
       return errorResponse('Appointment not found', 'NOT_FOUND', 404);

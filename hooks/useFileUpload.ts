@@ -74,7 +74,6 @@ export function useFileUpload(options: FileUploadOptions): UseFileUploadReturn {
     const validation = validateFile(file, {
       maxSize,
       allowedTypes,
-      fileType,
     });
 
     if (!validation.valid) {

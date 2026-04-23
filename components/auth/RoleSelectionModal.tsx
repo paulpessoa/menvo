@@ -52,12 +52,12 @@ export function RoleSelectionModal({ open, onClose, userId, onSuccess }: RoleSel
       if (roleQueryError) throw roleQueryError
 
       // 2. Criar atribuição de role
-      const { error: insertError } = await supabase
-        .from("user_roles")
+      const { error: insertError } = await (supabase
+        .from("user_roles") as any)
         .insert({
           user_id: userId,
-          role_id: roleData.id
-        } as any)
+          role_id: (roleData as any).id
+        })
 
       if (insertError) throw insertError
 

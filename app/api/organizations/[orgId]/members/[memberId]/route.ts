@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
+import type { Database } from "@/lib/types/supabase"
+
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"]
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 import {
   errorResponse,
   handleApiError,
@@ -16,14 +20,14 @@ export async function PATCH(
     const body = await request.json()
 
     // Update member (actually updates the profile)
-    // Cast as any is needed for table discovery during build
+    const updateData = body as ProfileUpdate;
     const { data: member, error: updateError } = await (supabase
-      .from("profiles" as any)
-      .update(body)
+      .from("profiles") as any)
+      .update(updateData)
       .eq("id", memberId)
       .eq("organization_id", orgId)
       .select()
-      .single() as any)
+      .single();
 
     if (updateError) throw updateError
 
@@ -41,12 +45,12 @@ export async function DELETE(
     const supabase = await createClient()
     const { orgId, memberId } = await params
 
-    // Remove organization_id from profile
+    // Remove from organization_members
     const { error: updateError } = await (supabase
-      .from("profiles" as any)
-      .update({ organization_id: null })
-      .eq("id", memberId)
-      .eq("organization_id", orgId) as any)
+      .from("organization_members") as any)
+      .delete()
+      .eq("user_id", memberId)
+      .eq("organization_id", orgId);
 
     if (updateError) throw updateError
 

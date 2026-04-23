@@ -36,8 +36,8 @@ export function useProfiles() {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase
+        .from('profiles') as any)
         .update({
           ...updates,
           updated_at: new Date().toISOString(),

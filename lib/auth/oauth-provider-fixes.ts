@@ -5,7 +5,8 @@
  * to resolve authentication issues with Google and LinkedIn.
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/types/supabase'
 
 export interface OAuthProviderConfig {
   provider: 'google' | 'linkedin' | 'github'
@@ -85,7 +86,7 @@ export function getRedirectUri(customRedirectTo?: string): string {
  * Enhanced OAuth sign-in with proper error handling
  */
 export async function signInWithOAuthProvider(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, 'public', any>,
   provider: 'google' | 'linkedin' | 'github',
   options: OAuthOptions = {}
 ): Promise<{ data: any; error: any }> {
@@ -228,7 +229,7 @@ export function validateOAuthProvider(provider: 'google' | 'linkedin' | 'github'
  * Test OAuth provider availability
  */
 export async function testOAuthProvider(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, 'public', any>,
   provider: 'google' | 'linkedin' | 'github'
 ): Promise<{
   available: boolean
@@ -274,7 +275,7 @@ export async function testOAuthProvider(
  * Get OAuth provider status for all providers
  */
 export async function getOAuthProvidersStatus(
-  supabase: ReturnType<typeof createClient>
+  supabase: SupabaseClient<any, 'public', any>
 ): Promise<Record<string, {
   configured: boolean
   available: boolean

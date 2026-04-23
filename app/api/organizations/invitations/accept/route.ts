@@ -34,15 +34,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Find invitation by token
-    const { data: invitationData, error: inviteError } = await serviceSupabase
+    const { data: inviteResult, error: inviteError } = await serviceSupabase
       .from("organization_members" as any)
       .select(`
         *,
         organization:organizations(id, name, slug, logo_url, status)
       `)
       .eq("invitation_token", invitation_token)
-      .returns<any>()
       .single()
+      
+    const invitationData = inviteResult as any;
 
     if (inviteError || !invitationData) {
       return errorResponse("Invalid invitation token", "INVALID_TOKEN", 400)
@@ -84,12 +85,13 @@ export async function POST(request: NextRequest) {
     if (updateError) throw updateError
 
     // Check if user profile is incomplete
-    const { data: profile } = await supabase
+    const { data: profileResult } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .returns<any>()
       .single()
+      
+    const profile = profileResult as any;
 
     const needsOnboarding =
       !profile ||

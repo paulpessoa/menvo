@@ -22,13 +22,14 @@ export async function GET(
     }
 
     // Check if user is org admin
-    const { data: membership } = await supabase
+    const { data: membershipData } = await supabase
       .from("organization_members")
       .select("role, status")
       .eq("organization_id", orgId)
       .eq("user_id", user.id)
-      .returns<any>()
       .single()
+      
+    const membership = membershipData as any;
 
     if (
       !membership ||

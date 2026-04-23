@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
+import type { Database } from '@/lib/types/supabase';
+
+type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -27,9 +30,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Atualizar configuração
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ chat_enabled: chatEnabled })
+    const updateData: ProfileUpdate = { chat_enabled: chatEnabled };
+    const { error: updateError } = await (supabase
+      .from('profiles') as any)
+      .update(updateData)
       .eq('id', user.id);
 
     if (updateError) {

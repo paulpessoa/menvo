@@ -27,7 +27,7 @@ afterAll(() => {
 describe('OAuth Configuration Validator', () => {
   describe('getOAuthEnvironment', () => {
     it('should detect development environment', () => {
-      process.env.NODE_ENV = 'development'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', configurable: true, writable: true })
       process.env.NEXT_PUBLIC_SITE_URL = 'http://localhost:3000'
       process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 
@@ -40,7 +40,7 @@ describe('OAuth Configuration Validator', () => {
     })
 
     it('should detect production environment', () => {
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true, writable: true })
       process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com'
       process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 
@@ -230,7 +230,7 @@ describe('OAuth Configuration Validator', () => {
 
   describe('isOAuthReadyForProduction', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', configurable: true, writable: true })
       process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com'
       process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
     })

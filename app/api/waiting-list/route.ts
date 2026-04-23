@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data, error } = await (supabase
-      .from("waiting_list" as any)
+      .from("waiting_list") as any)
       .insert({
         name: name || null,
         email,
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         status: 'pending'
       })
       .select()
-      .single() as any)
+      .single();
 
     if (error) {
       if (error.code === '23505') {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       .returns<any>()
       .maybeSingle()
 
-    if (roleData?.roles?.name !== 'admin') {
+    if ((roleData as any)?.roles?.name !== 'admin') {
       return errorResponse("Forbidden", "FORBIDDEN", 403)
     }
 

@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest } from "next/server"
+import type { Database } from "@/lib/types/supabase"
+
+type VisUpdate = Database['public']['Tables']['mentor_visibility_settings']['Update'];
+type VisInsert = Database['public']['Tables']['mentor_visibility_settings']['Insert'];
 import {
   errorResponse,
   handleApiError,
@@ -156,34 +160,36 @@ export async function PATCH(request: NextRequest) {
     let result
 
     if (existing) {
+      const updateData: VisUpdate = {
+        visibility_scope: visibility_scope || (existing as any).visibility_scope,
+        visible_to_organizations:
+          visible_to_organizations !== undefined
+            ? visible_to_organizations
+            : (existing as any).visible_to_organizations,
+        updated_at: new Date().toISOString()
+      };
       const { data, error } = await (supabase
-        .from("mentor_visibility_settings" as any)
-        .update({
-          visibility_scope: visibility_scope || (existing as any).visibility_scope,
-          visible_to_organizations:
-            visible_to_organizations !== undefined
-              ? visible_to_organizations
-              : (existing as any).visible_to_organizations,
-          updated_at: new Date().toISOString()
-        })
+        .from("mentor_visibility_settings") as any)
+        .update(updateData)
         .eq("mentor_id", user.id)
         .select()
-        .single() as any)
+        .single();
 
       if (error) throw error
       result = data
     } else {
+      const insertData: VisInsert = {
+        mentor_id: user.id,
+        visibility_scope: visibility_scope || "public",
+        visible_to_organizations: visible_to_organizations || [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
       const { data, error } = await (supabase
-        .from("mentor_visibility_settings" as any)
-        .insert({
-          mentor_id: user.id,
-          visibility_scope: visibility_scope || "public",
-          visible_to_organizations: visible_to_organizations || [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+        .from("mentor_visibility_settings") as any)
+        .insert(insertData)
         .select()
-        .single() as any)
+        .single();
 
       if (error) throw error
       result = data

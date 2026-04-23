@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/utils/supabase/client';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -21,14 +21,14 @@ export async function saveGoogleCalendarTokens(
     scope?: string;
   }
 ) {
-  
+  const supabase = createClient();
   const { error } = await (supabase.rpc('save_google_calendar_tokens' as any, {
     p_user_id: userId,
     p_access_token: tokens.access_token,
     p_refresh_token: tokens.refresh_token,
     p_expires_in: tokens.expires_in,
     p_scope: tokens.scope || 'https://www.googleapis.com/auth/calendar'
-  }) as any);
+  } as any) as any);
 
   if (error) {
     console.error('Error saving Google Calendar tokens:', error);
@@ -40,10 +40,10 @@ export async function saveGoogleCalendarTokens(
  * Obter tokens do Google Calendar do Supabase
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
-  
+  const supabase = createClient();
   const { data, error } = await (supabase.rpc('get_google_calendar_tokens' as any, {
     p_user_id: userId
-  }) as any);
+  } as any) as any);
 
   if (error) {
     console.error('Error getting Google Calendar tokens:', error);
@@ -121,11 +121,11 @@ export async function hasGoogleCalendarConnected(userId: string): Promise<boolea
  * Desconectar Google Calendar do usuário
  */
 export async function disconnectGoogleCalendar(userId: string) {
-
+  const supabase = createClient();
   const { error } = await (supabase
-    .from('google_calendar_tokens')
+    .from('google_calendar_tokens') as any)
     .delete()
-    .eq('user_id', userId) as any);
+    .eq('user_id', userId);
 
   if (error) {
     console.error('Error disconnecting Google Calendar:', error);
