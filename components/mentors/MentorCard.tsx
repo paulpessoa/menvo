@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 interface MentorProfile {
-  id: string
-  full_name: string
+  id: string | null
+  full_name: string | null
   avatar_url: string | null
   bio: string | null
   job_title: string | null
@@ -23,10 +23,10 @@ interface MentorProfile {
   inclusive_tags: string[] | null
   expertise_areas: string[] | null
   session_price_usd: number | null
-  availability_status: string
-  average_rating: number
-  total_reviews: number
-  total_sessions: number
+  availability_status: string | null
+  average_rating: number | null
+  total_reviews: number | null
+  total_sessions: number | null
   experience_years: number | null
   slug: string | null
 }
@@ -49,7 +49,7 @@ export function MentorCard({
   const t = useTranslations("mentorsPage")
   const router = useRouter()
 
-  const getAvailabilityColor = (status: string) => {
+  const getAvailabilityColor = (status: string | null) => {
     switch (status) {
       case 'available': return 'bg-green-100 text-green-800'
       case 'busy': return 'bg-yellow-100 text-yellow-800'
@@ -58,7 +58,7 @@ export function MentorCard({
     }
   }
 
-  const getAvailabilityText = (status: string) => {
+  const getAvailabilityText = (status: string | null) => {
     switch (status) {
       case 'available': return t("status.available")
       case 'busy': return t("status.busy")
@@ -69,7 +69,7 @@ export function MentorCard({
 
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    router.push(`/mentors/${mentor.slug || mentor.id}`)
+    router.push(`/mentors/${mentor.slug || mentor.id || ''}`)
   }
 
   return (
@@ -99,7 +99,7 @@ export function MentorCard({
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
             <Avatar className="h-12 w-12 border">
-              <AvatarImage src={mentor.avatar_url || undefined} alt={mentor.full_name} />
+              <AvatarImage src={mentor.avatar_url || undefined} alt={mentor.full_name || undefined} />
               <AvatarFallback>
                 {mentor.full_name?.split(' ').map(n => n[0]).join('') || 'M'}
               </AvatarFallback>
@@ -133,7 +133,7 @@ export function MentorCard({
             </Badge>
             <div className="flex items-center text-xs text-muted-foreground">
                 <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
-                {mentor.average_rating.toFixed(1)} ({mentor.total_reviews})
+                {(mentor.average_rating || 0).toFixed(1)} ({mentor.total_reviews || 0})
             </div>
         </div>
 

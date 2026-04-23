@@ -28,13 +28,14 @@ import {
 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
+import type { TablesInsert } from "@/lib/types/supabase"
 
 interface AvailabilitySlot {
-    id?: string
+    id?: number | string
     day_of_week: number
     start_time: string
     end_time: string
-    timezone: string
+    timezone: string | null
 }
 
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
@@ -167,28 +168,29 @@ export default function MentorAvailabilityPage() {
         setMessage(null)
 
         try {
+            if (!user?.id) throw new Error("User not found");
+
             // Delete existing availability
             const { error: deleteError } = await (supabase
-                .from('mentor_availability')
+                .from('mentor_availability') as any)
                 .delete()
-                .eq('mentor_id', user?.id || "") as any)
+                .eq('mentor_id', user.id)
 
             if (deleteError) throw deleteError
 
             // Insert new availability
             if (availability.length > 0) {
-                const slotsToInsert = availability.map(slot => ({
-                    mentor_id: user?.id || "",
+                const slotsToInsert: TablesInsert<'mentor_availability'>[] = availability.map(slot => ({
+                    mentor_id: user.id,
                     day_of_week: slot.day_of_week,
                     start_time: slot.start_time,
                     end_time: slot.end_time,
                     timezone: slot.timezone,
-                    is_active: true
                 }))
 
                 const { error: insertError } = await (supabase
-                    .from('mentor_availability')
-                    .insert(slotsToInsert as any) as any)
+                    .from('mentor_availability') as any)
+                    .insert(slotsToInsert)
 
                 if (insertError) throw insertError
             }

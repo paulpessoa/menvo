@@ -41,8 +41,8 @@ import { useTranslations } from "next-intl"
 import { createClient } from "@/lib/utils/supabase/client"
 
 interface MentorProfile {
-  id: string
-  full_name: string
+  id: string | null
+  full_name: string | null
   avatar_url: string | null
   bio: string | null
   job_title: string | null
@@ -55,10 +55,10 @@ interface MentorProfile {
   inclusive_tags: string[] | null
   expertise_areas: string[] | null
   session_price_usd: number | null
-  availability_status: string
-  average_rating: number
-  total_reviews: number
-  total_sessions: number
+  availability_status: string | null
+  average_rating: number | null
+  total_reviews: number | null
+  total_sessions: number | null
   experience_years: number | null
   slug: string | null
   organization_ids: string[] | null
@@ -145,6 +145,7 @@ export default function MentorsPage() {
           languages,
           mentorship_topics,
           inclusion_tags,
+          inclusive_tags,
           expertise_areas,
           session_price_usd,
           availability_status,
@@ -615,27 +616,27 @@ export default function MentorsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Primeiro os sugeridos pela IA */}
             {mentors
-              .filter(m => Object.keys(suggestedMentors).includes(m.id))
+              .filter(m => m.id && Object.keys(suggestedMentors).includes(m.id))
               .map((mentor) => (
                 <MentorCard
                   key={`ai-${mentor.id}`}
                   mentor={mentor}
-                  isFavorite={favorites.includes(mentor.id)}
-                  onToggleFavorite={() => toggleFavorite(mentor.id)}
+                  isFavorite={!!(mentor.id && favorites.includes(mentor.id))}
+                  onToggleFavorite={() => mentor.id && toggleFavorite(mentor.id)}
                   isAIHighlighted={true}
-                  aiReason={suggestedMentors[mentor.id]}
+                  aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
                 />
               ))}
             
             {/* Depois os demais */}
             {mentors
-              .filter(m => !Object.keys(suggestedMentors).includes(m.id))
+              .filter(m => !m.id || !Object.keys(suggestedMentors).includes(m.id))
               .map((mentor) => (
                 <MentorCard
-                  key={mentor.id}
+                  key={mentor.id || 'unknown'}
                   mentor={mentor}
-                  isFavorite={favorites.includes(mentor.id)}
-                  onToggleFavorite={() => toggleFavorite(mentor.id)}
+                  isFavorite={!!(mentor.id && favorites.includes(mentor.id))}
+                  onToggleFavorite={() => mentor.id && toggleFavorite(mentor.id)}
                 />
               ))}
           </div>

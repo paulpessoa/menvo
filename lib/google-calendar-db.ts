@@ -1,11 +1,12 @@
+
 import { createClient } from '@/lib/utils/supabase/client';
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
+import type { Database, TablesInsert } from '@/lib/types/supabase';
 
 export interface GoogleCalendarTokens {
   access_token: string;
   refresh_token: string;
-  expires_at: string;
+  expiry_date: number;
   is_expired: boolean;
 }
 
@@ -22,13 +23,21 @@ export async function saveGoogleCalendarTokens(
   }
 ) {
   const supabase = createClient();
-  const { error } = await (supabase.rpc('save_google_calendar_tokens' as any, {
-    p_user_id: userId,
-    p_access_token: tokens.access_token,
-    p_refresh_token: tokens.refresh_token,
-    p_expires_in: tokens.expires_in,
-    p_scope: tokens.scope || 'https://www.googleapis.com/auth/calendar'
-  } as any) as any);
+  
+  // Calcular expiry_date como timestamp em milissegundos
+  const expiryDate = Date.now() + (tokens.expires_in * 1000);
+
+  const upsertData: TablesInsert<'google_calendar_tokens'> = {
+    user_id: userId,
+    access_token: tokens.access_token,
+    refresh_token: tokens.refresh_token,
+    expiry_date: expiryDate,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase
+    .from('google_calendar_tokens')
+    .upsert(upsertData);
 
   if (error) {
     console.error('Error saving Google Calendar tokens:', error);
@@ -41,20 +50,30 @@ export async function saveGoogleCalendarTokens(
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
   const supabase = createClient();
-  const { data, error } = await (supabase.rpc('get_google_calendar_tokens' as any, {
-    p_user_id: userId
-  } as any) as any);
+  const { data, error } = await supabase
+    .from('google_calendar_tokens')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
 
   if (error) {
     console.error('Error getting Google Calendar tokens:', error);
     return null;
   }
 
-  if (!data || data.length === 0) {
+  if (!data) {
     return null;
   }
 
-  return (data as any)[0];
+  const now = Date.now();
+  const expiryDate = Number(data.expiry_date);
+
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expiry_date: expiryDate,
+    is_expired: expiryDate <= now
+  };
 }
 
 /**
@@ -67,7 +86,7 @@ export async function createUserGoogleCalendarClient(userId: string) {
     throw new Error('User has not connected Google Calendar');
   }
 
-  const oauth2Client = new OAuth2Client(
+  const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CALENDAR_CLIENT_ID,
     process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
     process.env.GOOGLE_CALENDAR_REDIRECT_URI
@@ -105,7 +124,7 @@ export async function createUserGoogleCalendarClient(userId: string) {
 
   return {
     oauth2Client,
-    calendar: google.calendar({ version: 'v3', auth: oauth2Client as any })
+    calendar: google.calendar({ version: 'v3', auth: oauth2Client })
   };
 }
 
@@ -122,8 +141,8 @@ export async function hasGoogleCalendarConnected(userId: string): Promise<boolea
  */
 export async function disconnectGoogleCalendar(userId: string) {
   const supabase = createClient();
-  const { error } = await (supabase
-    .from('google_calendar_tokens') as any)
+  const { error } = await supabase
+    .from('google_calendar_tokens')
     .delete()
     .eq('user_id', userId);
 
