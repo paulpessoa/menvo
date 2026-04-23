@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       admin_actions: {
@@ -470,63 +445,6 @@ export type Database = {
           id?: string
           rating?: number
           updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      hub_resources: {
-        Row: {
-          address: string | null
-          badge_text: string | null
-          created_at: string | null
-          description: string | null
-          event_date: string | null
-          event_time: string | null
-          id: string
-          image_url: string | null
-          is_affiliate: boolean | null
-          location_url: string | null
-          status: Database["public"]["Enums"]["hub_resource_status"] | null
-          title: string
-          type: Database["public"]["Enums"]["hub_resource_type"]
-          updated_at: string | null
-          url: string
-          user_id: string | null
-        }
-        Insert: {
-          address?: string | null
-          badge_text?: string | null
-          created_at?: string | null
-          description?: string | null
-          event_date?: string | null
-          event_time?: string | null
-          id?: string
-          image_url?: string | null
-          is_affiliate?: boolean | null
-          location_url?: string | null
-          status?: Database["public"]["Enums"]["hub_resource_status"] | null
-          title: string
-          type?: Database["public"]["Enums"]["hub_resource_type"]
-          updated_at?: string | null
-          url: string
-          user_id?: string | null
-        }
-        Update: {
-          address?: string | null
-          badge_text?: string | null
-          created_at?: string | null
-          description?: string | null
-          event_date?: string | null
-          event_time?: string | null
-          id?: string
-          image_url?: string | null
-          is_affiliate?: boolean | null
-          location_url?: string | null
-          status?: Database["public"]["Enums"]["hub_resource_status"] | null
-          title?: string
-          type?: Database["public"]["Enums"]["hub_resource_type"]
-          updated_at?: string | null
-          url?: string
           user_id?: string | null
         }
         Relationships: []
@@ -1113,6 +1031,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          academic_level: string | null
           address: string | null
           age: number | null
           availability_status: string | null
@@ -1123,11 +1042,14 @@ export type Database = {
           city: string | null
           company: string | null
           country: string | null
+          course: string | null
           created_at: string
           cv_url: string | null
           email: string
+          expected_graduation: string | null
           experience_years: number | null
           expertise_areas: string[] | null
+          external_id: string | null
           first_name: string | null
           free_topics: string[] | null
           full_name: string | null
@@ -1135,6 +1057,8 @@ export type Database = {
           id: string
           ideal_mentee: string | null
           inclusive_tags: string[] | null
+          institution: string | null
+          invite_sent_at: string | null
           is_public: boolean | null
           is_volunteer: boolean | null
           job_title: string | null
@@ -1142,14 +1066,19 @@ export type Database = {
           last_name: string | null
           linkedin_url: string | null
           location: string | null
+          mentee_status: string | null
           mentorship_approach: string | null
           mentorship_guidelines: string | null
           mentorship_topics: string[] | null
+          organization_id: string | null
+          origin_platform: string | null
+          original_data: Json | null
           phone: string | null
           portfolio_url: string | null
           profile_visibility: string | null
           search_vector: unknown
           session_price_usd: number | null
+          show_in_community: boolean | null
           slug: string | null
           state: string | null
           timezone: string | null
@@ -1165,6 +1094,7 @@ export type Database = {
           what_to_expect: string | null
         }
         Insert: {
+          academic_level?: string | null
           address?: string | null
           age?: number | null
           availability_status?: string | null
@@ -1175,11 +1105,14 @@ export type Database = {
           city?: string | null
           company?: string | null
           country?: string | null
+          course?: string | null
           created_at?: string
           cv_url?: string | null
           email: string
+          expected_graduation?: string | null
           experience_years?: number | null
           expertise_areas?: string[] | null
+          external_id?: string | null
           first_name?: string | null
           free_topics?: string[] | null
           full_name?: string | null
@@ -1187,6 +1120,8 @@ export type Database = {
           id: string
           ideal_mentee?: string | null
           inclusive_tags?: string[] | null
+          institution?: string | null
+          invite_sent_at?: string | null
           is_public?: boolean | null
           is_volunteer?: boolean | null
           job_title?: string | null
@@ -1194,14 +1129,19 @@ export type Database = {
           last_name?: string | null
           linkedin_url?: string | null
           location?: string | null
+          mentee_status?: string | null
           mentorship_approach?: string | null
           mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
+          organization_id?: string | null
+          origin_platform?: string | null
+          original_data?: Json | null
           phone?: string | null
           portfolio_url?: string | null
           profile_visibility?: string | null
           search_vector?: unknown
           session_price_usd?: number | null
+          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
@@ -1217,6 +1157,7 @@ export type Database = {
           what_to_expect?: string | null
         }
         Update: {
+          academic_level?: string | null
           address?: string | null
           age?: number | null
           availability_status?: string | null
@@ -1227,11 +1168,14 @@ export type Database = {
           city?: string | null
           company?: string | null
           country?: string | null
+          course?: string | null
           created_at?: string
           cv_url?: string | null
           email?: string
+          expected_graduation?: string | null
           experience_years?: number | null
           expertise_areas?: string[] | null
+          external_id?: string | null
           first_name?: string | null
           free_topics?: string[] | null
           full_name?: string | null
@@ -1239,6 +1183,8 @@ export type Database = {
           id?: string
           ideal_mentee?: string | null
           inclusive_tags?: string[] | null
+          institution?: string | null
+          invite_sent_at?: string | null
           is_public?: boolean | null
           is_volunteer?: boolean | null
           job_title?: string | null
@@ -1246,14 +1192,19 @@ export type Database = {
           last_name?: string | null
           linkedin_url?: string | null
           location?: string | null
+          mentee_status?: string | null
           mentorship_approach?: string | null
           mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
+          organization_id?: string | null
+          origin_platform?: string | null
+          original_data?: Json | null
           phone?: string | null
           portfolio_url?: string | null
           profile_visibility?: string | null
           search_vector?: unknown
           session_price_usd?: number | null
+          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
@@ -1268,7 +1219,15 @@ export type Database = {
           website_url?: string | null
           what_to_expect?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quiz_mentors: {
         Row: {
@@ -2005,9 +1964,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       hub_resource_status: ["pending", "published", "rejected", "archived"],
