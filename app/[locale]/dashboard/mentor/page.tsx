@@ -29,6 +29,7 @@ import { useAuth } from "@/lib/auth"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations, useLocale } from "next-intl"
 import { useFavorites } from "@/hooks/useFavorites"
+import { UserOrganizationsList } from "@/components/organizations/UserOrganizationsList"
 
 interface MentorStats {
   totalAppointments: number
@@ -267,6 +268,7 @@ export default function MentorDashboard() {
             </div>
 
             <div className="space-y-6">
+              <UserOrganizationsList />
               <h2 className="text-2xl font-semibold">{t("mentor.sections.upcoming")}</h2>
               {upcomingAppointments.length === 0 ? <Card><CardContent className="py-8 text-center"><Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" /><p className="text-sm text-muted-foreground">{t("mentor.sections.noSessions")}</p></CardContent></Card> : (
                 <div className="space-y-4">

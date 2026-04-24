@@ -80,6 +80,12 @@ export default function Header() {
       color: "text-gray-700"
     })
     userNavigation.push({
+      name: t("header.userMenu.organizations"),
+      href: "/settings/organizations",
+      icon: Building2,
+      color: "text-gray-700"
+    })
+    userNavigation.push({
       name: t("header.userMenu.settings"),
       href: "/settings",
       icon: Settings,

@@ -26,6 +26,7 @@ import { useAuth } from "@/lib/auth"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useLocale, useTranslations } from "next-intl"
 import { useFavorites } from "@/hooks/useFavorites"
+import { UserOrganizationsList } from "@/components/organizations/UserOrganizationsList"
 
 interface MenteeStats {
   totalAppointments: number
