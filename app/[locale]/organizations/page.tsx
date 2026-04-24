@@ -53,7 +53,7 @@ export default function OrganizationsPage() {
             } else {
                 setOrganizations((prev) => [...prev, ...orgsList])
             }
-            setHasMore(data.pagination?.page < data.pagination?.totalPages)
+            setHasMore(result.pagination?.page < result.pagination?.totalPages)
         } catch (err) {
             console.error("Error fetching organizations:", err)
         } finally {
