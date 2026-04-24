@@ -45,13 +45,18 @@ export default function OrganizationMembersPage() {
   const [loadingMore, setLoadingMore] = useState(false)
 
   const fetchMembers = useCallback(async (organizationId: string, pageNum = 1) => {
+    const limit = 50
+    const url = `/api/organizations/${organizationId}/members?page=${pageNum}&limit=${limit}`
+    console.log(`🌐 [API Request] Fetching members from: ${url}`)
+
     try {
       if (pageNum === 1) setLoading(true)
       else setLoadingMore(true)
 
-      const limit = 20
-      const res = await fetch(`/api/organizations/${organizationId}/members?page=${pageNum}&limit=${limit}`)
+      const res = await fetch(url)
       const result = await res.json()
+      
+      console.log("📥 [API Response] Raw result:", result)
       
       if (result.success) {
         const membersList = result.data?.members || []
@@ -64,11 +69,16 @@ export default function OrganizationMembersPage() {
         }
 
         setHasMore(pagination?.page < pagination?.totalPages)
+        console.log(`✅ [Debug] Loaded ${membersList.length} members. HasMore: ${pagination?.page < pagination?.totalPages}`)
       } else {
-        toast.error("Erro ao carregar lista de membros")
+        const errorMsg = result.error || result.message || "Erro desconhecido na API"
+        const errorCode = result.code || "NO_CODE"
+        console.error(`❌ [API Error] Code: ${errorCode} | Message: ${errorMsg}`)
+        toast.error(`Falha na API (${errorCode}): ${errorMsg}`)
       }
-    } catch (err) {
-      toast.error("Erro de conexão ao buscar membros")
+    } catch (err: any) {
+      console.error("💥 [Fetch Exception] Critical failure:", err)
+      toast.error(`Erro crítico de conexão: ${err.message}`)
     } finally {
       setLoading(false)
       setLoadingMore(false)
