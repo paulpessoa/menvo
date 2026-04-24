@@ -11,20 +11,19 @@ export async function GET(request: NextRequest) {
     expirationDate.setDate(expirationDate.getDate() - 30)
 
     // Query invitations that are expired
-    const { data: expiredInvitations, error: queryError } =
-      await serviceSupabase
-        .from("organization_members")
+    const { data: expiredInvitations, error: queryError } = await (serviceSupabase
+        .from("organization_invitations") as any)
         .select(
           `
         id,
         organization_id,
-        user_id,
+        email,
         invited_at,
         organization:organization_id(id, name)
       `
         )
-        .eq("status", "invited")
-        .lt("invited_at", expirationDate.toISOString())
+        .eq("status", "pending")
+        .lt("expires_at", new Date().toISOString())
 
     if (queryError) {
       console.error("Error querying expired invitations:", queryError)
@@ -35,14 +34,12 @@ export async function GET(request: NextRequest) {
 
     if (expiredCount > 0) {
       // Update status to expired
-      const invitationIds = expiredInvitations.map((inv) => inv.id)
+      const invitationIds = expiredInvitations.map((inv: any) => inv.id)
 
-      const { error: updateError } = await serviceSupabase
-        .from("organization_members")
+      const { error: updateError } = await (serviceSupabase
+        .from("organization_invitations") as any)
         .update({
-          status: "expired",
-          invitation_token: null,
-          updated_at: new Date().toISOString()
+          status: "expired"
         })
         .in("id", invitationIds)
 
@@ -53,7 +50,7 @@ export async function GET(request: NextRequest) {
 
       // Group by organization to notify admins
       const orgInvitationCounts: Record<string, number> = {}
-      expiredInvitations.forEach((inv) => {
+      expiredInvitations.forEach((inv: any) => {
         const orgId = inv.organization_id
         orgInvitationCounts[orgId] = (orgInvitationCounts[orgId] || 0) + 1
       })
@@ -105,7 +102,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
       expiredCount,
       organizationsAffected: Object.keys(
-        expiredInvitations?.reduce((acc, inv) => {
+        expiredInvitations?.reduce((acc: any, inv: any) => {
           acc[inv.organization_id] = true
           return acc
         }, {} as Record<string, boolean>) || {}

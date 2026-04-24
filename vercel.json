@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/appointments",
-      "schedule": "0 * * * *"
+      "schedule": "0 4 * * *"
     },
     {
       "path": "/api/cron/expire-invitations",

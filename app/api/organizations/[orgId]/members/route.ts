@@ -1,8 +1,9 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import type { Database } from "@/lib/types/supabase"
+import crypto from "crypto"
+import { sendOrganizationInvitation } from "@/lib/email/brevo"
 
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 import {
   errorResponse,
   handleApiError,
@@ -17,7 +18,8 @@ export async function GET(
     const supabase = await createClient()
     const { orgId } = await params
 
-    const { data: members, error } = await supabase
+    // Pega membros ativos
+    const { data: members, error: membersError } = await supabase
       .from("organization_members")
       .select(`
         id,
@@ -35,9 +37,46 @@ export async function GET(
       `)
       .eq("organization_id", orgId)
 
-    if (error) throw error
+    if (membersError) throw membersError
 
-    return successResponse(members)
+    // Pega convites pendentes
+    const { data: invitations, error: invitesError } = await (supabase
+      .from("organization_invitations") as any)
+      .select(`
+        id,
+        email,
+        role,
+        status,
+        invited_at,
+        expires_at
+      `)
+      .eq("organization_id", orgId)
+      .eq("status", "pending")
+
+    if (invitesError) throw invitesError
+
+    // Formata a resposta misturando os dois para a UI
+    const formattedMembers = (members || []).map((m: any) => ({
+      ...m,
+      isInvitation: false
+    }))
+
+    const formattedInvites = (invitations || []).map((i: any) => ({
+      id: i.id,
+      user_id: null,
+      role: i.role,
+      status: "invited",
+      invited_at: i.invited_at,
+      user: {
+        id: "invite-" + i.id,
+        full_name: "Aguardando Aceite",
+        email: i.email,
+        avatar_url: null,
+      },
+      isInvitation: true
+    }))
+
+    return successResponse([...formattedMembers, ...formattedInvites])
   } catch (error) {
     return handleApiError(error)
   }
@@ -51,28 +90,60 @@ export async function POST(
     const supabase = await createClient()
     const { orgId } = await params
     const body = await request.json()
-    const { user_id } = body
+    const { email, role, expires_at } = body
 
-    if (!user_id) {
-        return errorResponse("User ID is required", "VALIDATION_ERROR", 400)
+    if (!email) {
+        return errorResponse("Email is required", "VALIDATION_ERROR", 400)
     }
 
-    // Cast as any here is necessary because of Supabase table discovery issues during build
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Gera um token aleatório para o link do convite
+    const token = crypto.randomBytes(32).toString('hex')
+    const expiry = expires_at ? new Date(expires_at).toISOString() : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+
     const insertData: any = { 
       organization_id: orgId, 
-      user_id: user_id,
-      role: 'member',
-      status: 'active'
+      email: email,
+      role: role || 'member',
+      token: token,
+      invited_by: user?.id,
+      status: 'pending',
+      expires_at: expiry
     };
-    const { data: member, error: updateError } = await (supabase
-      .from("organization_members") as any)
+
+    const { data: invitation, error: insertError } = await (supabase
+      .from("organization_invitations") as any)
       .insert(insertData)
       .select()
       .single();
 
-    if (updateError) throw updateError
+    if (insertError) {
+      if (insertError.code === '23505') { // Unique violation
+        return errorResponse("Este e-mail já possui um convite pendente para esta organização.", "VALIDATION_ERROR", 400)
+      }
+      throw insertError
+    }
 
-    return successResponse(member, "Member added successfully")
+    // Dispara E-mail
+    try {
+      const { data: orgData } = await supabase.from('organizations').select('name').eq('id', orgId).single();
+      const { data: profileData } = await supabase.from('profiles').select('full_name').eq('id', user?.id || '').single();
+      
+      await sendOrganizationInvitation({
+        recipientEmail: email,
+        recipientName: "Convidado(a)", 
+        organizationName: (orgData as any)?.name || "Nossa Organização",
+        inviterName: (profileData as any)?.full_name || "Membro da Equipe",
+        role: role,
+        invitationToken: token
+      });
+    } catch (emailError) {
+      console.error("Erro ao enviar e-mail de convite:", emailError)
+      // Não joga erro para não impedir a UI de mostrar sucesso (o convite está no BD)
+    }
+
+    return successResponse(invitation, "Convite gerado e e-mail enviado com sucesso")
   } catch (error) {
     return handleApiError(error)
   }

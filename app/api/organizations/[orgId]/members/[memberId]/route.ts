@@ -50,16 +50,27 @@ export async function DELETE(
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error("Unauthorized")
 
-    // Remove from organization_members
-    const { error: deleteError } = await supabase
+    // 1. Tentar deletar de organization_members
+    const { error: deleteMemberError, count: memberCount } = await supabase
       .from("organization_members")
-      .delete()
+      .delete({ count: 'exact' })
       .eq("id", memberId)
       .eq("organization_id", orgId);
 
-    if (deleteError) throw deleteError
+    if (deleteMemberError) throw deleteMemberError
 
-    return successResponse(null, "Membro removido com sucesso")
+    // 2. Se não deletou nada, tenta deletar de organization_invitations
+    if (memberCount === 0) {
+      const { error: deleteInviteError } = await (supabase
+        .from("organization_invitations") as any)
+        .delete()
+        .eq("id", memberId)
+        .eq("organization_id", orgId);
+        
+      if (deleteInviteError) throw deleteInviteError
+    }
+
+    return successResponse(null, "Removido com sucesso")
   } catch (error) {
     return handleApiError(error)
   }

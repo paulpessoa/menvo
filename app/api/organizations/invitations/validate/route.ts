@@ -18,15 +18,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Find invitation by token
-    const { data: invitation, error: inviteError } = await serviceSupabase
-      .from("organization_members")
+    const { data: invitation, error: inviteError } = await (serviceSupabase
+      .from("organization_invitations") as any)
       .select(
         `
         *,
         organization:organizations(id, name, slug, type, description, logo_url, status)
       `
       )
-      .eq("invitation_token", token)
+      .eq("token", token)
       .single()
 
     if (inviteError || !invitation) {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if invitation is still pending
-    if (invitation.status !== "invited") {
+    if (invitation.status !== "pending") {
       return errorResponse(
         "Invitation is no longer valid",
         "INVALID_TOKEN",

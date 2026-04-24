@@ -7,13 +7,12 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 
-// POST /api/organizations/invitations/accept - Accept invitation
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     const serviceSupabase = createServiceRoleClient()
 
-    // Authenticate user
+    // 1. Autenticar usuário
     const {
       data: { user },
       error: authError
@@ -26,65 +25,64 @@ export async function POST(request: NextRequest) {
     const { invitation_token } = body
 
     if (!invitation_token) {
-      return errorResponse(
-        "Invitation token is required",
-        "VALIDATION_ERROR",
-        400
-      )
+      return errorResponse("Invitation token is required", "VALIDATION_ERROR", 400)
     }
 
-    // Find invitation by token
-    const { data: inviteResult, error: inviteError } = await serviceSupabase
-      .from("organization_members" as any)
+    // 2. Buscar convite
+    const { data: invitation, error: inviteError } = await (serviceSupabase
+      .from("organization_invitations") as any)
       .select(`
         *,
         organization:organizations(id, name, slug, logo_url, status)
       `)
-      .eq("invitation_token", invitation_token)
+      .eq("token", invitation_token)
       .single()
-      
-    const invitationData = inviteResult as any;
 
-    if (inviteError || !invitationData) {
+    if (inviteError || !invitation) {
       return errorResponse("Invalid invitation token", "INVALID_TOKEN", 400)
     }
 
-    const invitation = invitationData
-
-    // Check if invitation is still pending
-    if (invitation.status !== "invited") {
-      return errorResponse(
-        "Invitation is no longer valid",
-        "INVALID_TOKEN",
-        400
-      )
+    // 3. Validar status e validade
+    if (invitation.status !== "pending") {
+      return errorResponse("Invitation is no longer valid", "INVALID_TOKEN", 400)
     }
 
-    // Verify user matches invitation
-    if (invitation.user_id !== user.id) {
-      return errorResponse(
-        "Invitation is for a different user",
-        "FORBIDDEN",
-        403
-      )
+    if (new Date() > new Date(invitation.expires_at)) {
+        return errorResponse("Invitation has expired", "TOKEN_EXPIRED", 400)
     }
 
-    // Update membership to active
-    const { data: updatedMember, error: updateError } = await (serviceSupabase
-      .from("organization_members" as any)
-      .update({
-        status: "active",
-        activated_at: new Date().toISOString(),
-        invitation_token: null,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", invitation.id)
+    // 4. Inserir usuário como membro ativo
+    const insertData: any = {
+      organization_id: invitation.organization_id,
+      user_id: user.id,
+      role: invitation.role,
+      status: "active",
+      invited_at: invitation.invited_at,
+      invited_by: invitation.invited_by,
+      activated_at: new Date().toISOString()
+    };
+
+    const { data: newMember, error: insertError } = await (serviceSupabase
+      .from("organization_members") as any)
+      .insert(insertData)
       .select()
-      .single() as any)
+      .single()
 
-    if (updateError) throw updateError
+    if (insertError) {
+       // Check for duplicate key if user is already a member
+       if (insertError.code === '23505') {
+           return errorResponse("Você já é membro desta organização.", "ALREADY_MEMBER", 400)
+       }
+       throw insertError
+    }
 
-    // Check if user profile is incomplete
+    // 5. Atualizar convite para aceito
+    await (serviceSupabase
+      .from("organization_invitations") as any)
+      .update({ status: 'accepted' })
+      .eq('id', invitation.id)
+
+    // 6. Verificar se o perfil está completo para sugerir onboarding
     const { data: profileResult } = await supabase
       .from("profiles")
       .select("*")
@@ -99,18 +97,9 @@ export async function POST(request: NextRequest) {
       !profile.last_name ||
       (invitation.role === "mentor" && !profile.bio)
 
-    // Log activity
-    await (serviceSupabase.from("organization_activity_log" as any).insert({
-      organization_id: invitation.organization_id,
-      activity_type: "member_joined",
-      actor_id: user.id,
-      target_id: user.id,
-      metadata: { role: invitation.role }
-    }) as any)
-
     return successResponse(
       {
-        member: updatedMember,
+        member: newMember,
         organization: invitation.organization,
         needsOnboarding
       },
