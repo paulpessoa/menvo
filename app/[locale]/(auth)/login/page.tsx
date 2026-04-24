@@ -29,13 +29,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (needsRoleSelection()) {
-        router.push("/auth/select-role")
-      } else {
-        router.push(getDefaultRedirectPath())
-      }
+      router.push(getDefaultRedirectPath())
     }
-  }, [isAuthenticated, needsRoleSelection, router, getDefaultRedirectPath])
+  }, [isAuthenticated, router, getDefaultRedirectPath])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

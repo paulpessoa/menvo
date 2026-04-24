@@ -26,10 +26,9 @@ import { WaitingList } from "@/components/WaitingList"
 function SignupForm() {
   const t = useTranslations("register")
   const tl = useTranslations("login")
-  const { user, role, loading, signUp, signInWithProvider } = useAuth()
+  const { user, role, loading, signUp, signInWithProvider, getDefaultRedirectPath } = useAuth()
 
   const isAuthenticated = !!user && !loading
-  const needsRoleSelection = () => user && !role
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -44,13 +43,9 @@ function SignupForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (needsRoleSelection()) {
-        router.push("/auth/select-role")
-      } else {
-        router.push("/dashboard")
-      }
+      router.push(getDefaultRedirectPath())
     }
-  }, [isAuthenticated, needsRoleSelection, router])
+  }, [isAuthenticated, router, getDefaultRedirectPath])
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()

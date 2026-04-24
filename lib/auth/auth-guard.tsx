@@ -37,12 +37,6 @@ export function AuthGuard({
         return null
     }
 
-    // Redirect to role selection if role is required but not set
-    if (requireRole && auth.needsRoleSelection()) {
-        router.push('/select-role')
-        return null
-    }
-
     // Check if user has required role
     if (allowedRoles.length > 0 && !auth.hasAnyRole(allowedRoles)) {
         if (fallback) {

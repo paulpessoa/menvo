@@ -74,9 +74,12 @@ export async function GET(request: NextRequest) {
         if (roles.includes("mentor")) {
           return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentor" : next))
         }
+        
+        // Default to mentee dashboard
+        return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentee" : next))
       } else {
-        // First time login or profile not setup
-        return NextResponse.redirect(getTargetUrl(`/auth/role-selection?next=${next}`))
+        // First time login or profile not setup - MANDAR PARA PERFIL CONFORME SOLICITADO
+        return NextResponse.redirect(getTargetUrl("/profile"))
       }
     }
   }

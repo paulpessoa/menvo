@@ -91,6 +91,29 @@ export default function Header() {
       icon: Settings,
       color: "text-gray-700"
     })
+
+    // Itens de Administração (Somente para Admins)
+    if (isAdmin) {
+      userNavigation.push({ type: 'separator' })
+      userNavigation.push({
+        name: "Gerenciar Usuários",
+        href: "/dashboard/admin/users",
+        icon: User,
+        color: "text-amber-600"
+      })
+      userNavigation.push({
+        name: "Organizações",
+        href: "/dashboard/admin/organizations",
+        icon: Building2,
+        color: "text-amber-600"
+      })
+      userNavigation.push({
+        name: "Feature Flags",
+        href: "/dashboard/admin/feature-flags",
+        icon: Shield,
+        color: "text-amber-600"
+      })
+    }
   }
 
   const handleSignOut = async () => {

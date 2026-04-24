@@ -11,7 +11,7 @@ export type SimpleUserRole = "mentor" | "mentee" | "admin" | null
 export function getSimpleRedirect(role: SimpleUserRole): string {
   // No role = need to select role
   if (!role) {
-    return "/auth/select-role"
+    return "/profile"
   }
 
   // Role-based dashboard redirect
