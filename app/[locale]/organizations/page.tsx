@@ -36,10 +36,12 @@ export default function OrganizationsPage() {
             if (!response.ok) throw new Error("Erro ao carregar organizações")
 
             const data = await response.json()
+            const orgsList = data.data || data.organizations || []
+            
             if (page === 1) {
-                setOrganizations(data.organizations || [])
+                setOrganizations(orgsList)
             } else {
-                setOrganizations((prev) => [...prev, ...(data.organizations || [])])
+                setOrganizations((prev) => [...prev, ...orgsList])
             }
             setHasMore(data.pagination?.page < data.pagination?.totalPages)
         } catch (err) {
