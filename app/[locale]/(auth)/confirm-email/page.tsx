@@ -140,7 +140,7 @@ export default function ConfirmEmailPage() {
         setMessage("Email confirmado com sucesso!")
 
         setTimeout(() => {
-          router.push("/auth/select-role")
+          router.push("/profile")
         }, 2000)
       }
     } catch (error) {
@@ -300,10 +300,10 @@ export default function ConfirmEmailPage() {
           {status === "success" && (
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-4">
-                Redirecionando para seleção de perfil...
+                Redirecionando para seu perfil...
               </p>
               <Button asChild className="w-full">
-                <Link href="/auth/select-role">Continuar</Link>
+                <Link href="/profile">Continuar</Link>
               </Button>
             </div>
           )}

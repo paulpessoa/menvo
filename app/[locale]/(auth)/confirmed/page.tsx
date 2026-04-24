@@ -40,9 +40,7 @@ export default function EmailConfirmedPage() {
   const handleRedirect = () => {
     if (!profile) return
 
-    if (!profile.roles || profile.roles.length === 0) {
-      router.push("/select-role")
-    } else if (profile.verification_status === "pending") {
+    if (profile.verification_status === "pending") {
       router.push("/profile?complete=true")
     } else {
       router.push("/dashboard")
@@ -52,9 +50,7 @@ export default function EmailConfirmedPage() {
   const getRedirectMessage = () => {
     if (!profile) return tCommon("loading")
 
-    if (!profile.roles || profile.roles.length === 0) {
-      return t("messages.role")
-    } else if (profile.verification_status === "pending") {
+    if (profile.verification_status === "pending") {
       return t("messages.profile")
     } else {
       return t("messages.dashboard")

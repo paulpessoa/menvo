@@ -31,7 +31,7 @@ import {
   Building2
 } from "lucide-react"
 
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from '@/lib/auth'
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
 import { MagicSearchBar } from "@/components/mentors/MagicSearchBar"

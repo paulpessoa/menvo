@@ -34,7 +34,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Tables } from '@/lib/types/supabase';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/lib/auth';
 
 // Tipagem baseada nos tipos do Supabase
 type FeatureFlag = Tables<'feature_flags'>;
