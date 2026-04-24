@@ -43,14 +43,20 @@ export default function OrganizationMembersPage() {
 
   const fetchMembers = useCallback(async (organizationId: string) => {
     try {
-      const res = await fetch(`/api/organizations/${organizationId}/members`)
-      const data = await res.json()
-      if (data.success) {
-        setMembers(data.data)
+      const res = await fetch(`/api/organizations/${organizationId}/members?limit=100`)
+      const result = await res.json()
+      console.log("🔍 [DEBUG] Organization Members Response:", result)
+      
+      if (result.success) {
+        // Suportar tanto o formato antigo (array direto) quanto o novo (objeto com members)
+        const membersList = Array.isArray(result.data) ? result.data : result.data?.members || []
+        setMembers(membersList)
       } else {
+        console.error("❌ [DEBUG] API Error:", result.error)
         toast.error("Erro ao carregar lista de membros")
       }
     } catch (err) {
+      console.error("❌ [DEBUG] Fetch Exception:", err)
       toast.error("Erro de conexão ao buscar membros")
     }
   }, [])

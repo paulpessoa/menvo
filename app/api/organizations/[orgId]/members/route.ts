@@ -17,9 +17,17 @@ export async function GET(
   try {
     const supabase = await createClient()
     const { orgId } = await params
+    
+    // Pegar parâmetros de paginação
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get("page") || "1")
+    const limit = parseInt(searchParams.get("limit") || "50")
+    const from = (page - 1) * limit
+    const to = from + limit - 1
 
-    // Pega membros ativos
-    const { data: members, error: membersError } = await supabase
+    // 1. Pega membros ativos com paginação
+    // Simplificando o join para evitar erros de alias
+    const { data: members, error: membersError, count } = await supabase
       .from("organization_members")
       .select(`
         id,
@@ -27,56 +35,71 @@ export async function GET(
         role,
         status,
         invited_at,
-        user:profiles!user_id(
+        profiles(
           id,
           full_name,
           email,
-          avatar_url,
-          user_roles(roles(name))
+          avatar_url
         )
-      `)
+      `, { count: 'exact' })
       .eq("organization_id", orgId)
+      .range(from, to)
 
-    if (membersError) throw membersError
+    if (membersError) {
+        console.error("[API Members] Error fetching members:", membersError)
+        throw membersError
+    }
 
-    // Pega convites pendentes
-    const { data: invitations, error: invitesError } = await (supabase
-      .from("organization_invitations") as any)
-      .select(`
-        id,
-        email,
-        role,
-        status,
-        invited_at,
-        expires_at
-      `)
-      .eq("organization_id", orgId)
-      .eq("status", "pending")
+    // 2. Pega convites pendentes (apenas na página 1 para simplificar)
+    let formattedInvites: any[] = []
+    if (page === 1) {
+        const { data: invitations, error: invitesError } = await (supabase
+          .from("organization_invitations") as any)
+          .select(`
+            id,
+            email,
+            role,
+            status,
+            invited_at,
+            expires_at
+          `)
+          .eq("organization_id", orgId)
+          .eq("status", "pending")
 
-    if (invitesError) throw invitesError
+        if (!invitesError && invitations) {
+            formattedInvites = invitations.map((i: any) => ({
+              id: i.id,
+              user_id: null,
+              role: i.role,
+              status: "invited",
+              invited_at: i.invited_at,
+              user: {
+                id: "invite-" + i.id,
+                full_name: "Aguardando Aceite",
+                email: i.email,
+                avatar_url: null,
+              },
+              isInvitation: true
+            }))
+        }
+    }
 
     // Formata a resposta misturando os dois para a UI
     const formattedMembers = (members || []).map((m: any) => ({
       ...m,
+      user: m.profiles, // Ajustando o campo do join simplificado
       isInvitation: false
     }))
 
-    const formattedInvites = (invitations || []).map((i: any) => ({
-      id: i.id,
-      user_id: null,
-      role: i.role,
-      status: "invited",
-      invited_at: i.invited_at,
-      user: {
-        id: "invite-" + i.id,
-        full_name: "Aguardando Aceite",
-        email: i.email,
-        avatar_url: null,
-      },
-      isInvitation: true
-    }))
-
-    return successResponse([...formattedMembers, ...formattedInvites])
+    return successResponse({
+        members: [...formattedMembers, ...formattedInvites],
+        pagination: {
+            page,
+            limit,
+            total: count || 0,
+            totalPages: Math.ceil((count || 0) / limit)
+        }
+    })
   } catch (error) {
     return handleApiError(error)
   }
@@ -98,14 +121,13 @@ export async function POST(
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Gera um token aleatório para o link do convite
     const token = crypto.randomBytes(32).toString('hex')
     const expiry = expires_at ? new Date(expires_at).toISOString() : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
     const insertData: any = { 
       organization_id: orgId, 
       email: email,
-      role: role || 'member',
+      role: role || 'mentee',
       token: token,
       invited_by: user?.id,
       status: 'pending',
@@ -119,13 +141,12 @@ export async function POST(
       .single();
 
     if (insertError) {
-      if (insertError.code === '23505') { // Unique violation
+      if (insertError.code === '23505') {
         return errorResponse("Este e-mail já possui um convite pendente para esta organização.", "VALIDATION_ERROR", 400)
       }
       throw insertError
     }
 
-    // Dispara E-mail
     try {
       const { data: orgData } = await supabase.from('organizations').select('name').eq('id', orgId).single();
       const { data: profileData } = await supabase.from('profiles').select('full_name').eq('id', user?.id || '').single();
@@ -140,7 +161,6 @@ export async function POST(
       });
     } catch (emailError) {
       console.error("Erro ao enviar e-mail de convite:", emailError)
-      // Não joga erro para não impedir a UI de mostrar sucesso (o convite está no BD)
     }
 
     return successResponse(invitation, "Convite gerado e e-mail enviado com sucesso")
