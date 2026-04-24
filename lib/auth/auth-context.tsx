@@ -30,7 +30,7 @@ export interface AuthContextType {
     updateProfile: (data: any) => Promise<{ success: boolean, error?: string }>
     handleAuthError: (error: any) => string
     getDefaultRedirectPath: () => string
-    getRoleDashboardPath: (role: string) => string
+    getRoleDashboardPath: (role: string | null) => string
     selectRole: (role: string) => Promise<{ success: boolean, error?: string }>
     hasRole: (role: string | string[]) => boolean
     hasAnyRole: (roles: string[]) => boolean
@@ -162,14 +162,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false
     }, [cachedRoles.admin])
 
-    const getRoleDashboardPath = useCallback((roleName: string) => {
+    const getRoleDashboardPath = useCallback((roleName: string | null) => {
         if (roleName === 'admin') return '/dashboard/admin'
         if (roleName === 'mentor') return '/dashboard/mentor'
         return '/dashboard/mentee'
     }, [])
 
     const getDefaultRedirectPath = useCallback(() => {
-        return getRoleDashboardPath(cachedRoles.role || 'mentee')
+        if (!cachedRoles.role) return '/profile'
+        return getRoleDashboardPath(cachedRoles.role)
     }, [cachedRoles.role, getRoleDashboardPath])
 
     const selectRole = useCallback(async (roleName: string) => {
@@ -260,9 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         hasAnyRole: (roles: string[]) => hasRole(roles),
         hasPermission,
         hasAnyPermission,
-        needsRoleSelection: () => {
-            return !!user && !cachedRoles.role
-        },
+        needsRoleSelection: () => false,
         refreshProfile: async () => {
             if (user) {
                 const newProfile = await fetchProfile(user.id)
