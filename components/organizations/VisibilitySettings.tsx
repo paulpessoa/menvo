@@ -44,7 +44,8 @@ export function VisibilitySettings({ mentorId }: VisibilitySettingsProps) {
             setSettings(visibilityData)
 
             // Fetch user's organizations (only if mentor is member)
-            const orgsResponse = await fetch("/api/user/organizations")
+            const orgsResponse = await fetch("/api/profile/organizations")
+
             if (orgsResponse.ok) {
                 const orgsData = await orgsResponse.json()
                 // Filter only organizations where user is a mentor

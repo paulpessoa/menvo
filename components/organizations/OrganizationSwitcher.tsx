@@ -23,7 +23,7 @@ export function OrganizationSwitcher() {
 
     const fetchOrganizations = async () => {
         try {
-            const response = await fetch("/api/user/organizations")
+            const response = await fetch("/api/profile/organizations")
             if (response.ok) {
                 const data = await response.json()
                 const adminOrgs = data.organizations?.filter(

@@ -28,4 +28,4 @@ export function useLogout() {
     logout,
     logoutAndRedirect
   }
-}
+}

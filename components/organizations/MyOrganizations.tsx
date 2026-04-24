@@ -40,7 +40,7 @@ export function MyOrganizations({ onLeave }: MyOrganizationsProps) {
         setError(null)
 
         try {
-            const response = await fetch("/api/user/organizations")
+            const response = await fetch("/api/profile/organizations")
             if (!response.ok) {
                 throw new Error("Erro ao carregar organizações")
             }

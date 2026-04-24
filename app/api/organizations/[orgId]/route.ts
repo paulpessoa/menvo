@@ -20,11 +20,18 @@ export async function GET(
     const supabase = await createClient()
     const { orgId } = await params
 
-    const { data: organization, error } = await (supabase
-      .from("organizations" as any)
-      .select("*")
-      .eq("id", orgId)
-      .single() as any)
+    // Tentar buscar por ID ou Slug de forma resiliente
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orgId);
+    
+    let query = supabase.from("organizations" as any).select("*");
+    
+    if (isUuid) {
+        query = query.eq("id", orgId);
+    } else {
+        query = query.eq("slug", orgId);
+    }
+
+    const { data: organization, error } = await (query.single() as any)
 
     if (error) throw error
     if (!organization) {

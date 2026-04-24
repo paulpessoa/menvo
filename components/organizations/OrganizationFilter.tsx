@@ -32,7 +32,7 @@ export function OrganizationFilter({
         setLoading(true)
 
         try {
-            const response = await fetch("/api/user/organizations")
+            const response = await fetch("/api/profile/organizations")
             if (response.ok) {
                 const data = await response.json()
                 // Filter only active memberships
