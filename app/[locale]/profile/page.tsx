@@ -241,12 +241,13 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSubmit}>
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-6 bg-muted/50 p-1 h-auto">
               <TabsTrigger value="basic" className="py-2">Pessoal</TabsTrigger>
               <TabsTrigger value="career" className="py-2">Carreira</TabsTrigger>
               <TabsTrigger value="address" className="py-2">Endereço</TabsTrigger>
               <TabsTrigger value="interests" className="py-2">Interesses</TabsTrigger>
               <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
+              <TabsTrigger value="visibility" className="py-2">Privacidade</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">
