@@ -30,9 +30,10 @@ export default function OrganizationProfilePage() {
                 throw new Error("Organização não encontrada")
             }
 
-            const data = await response.json()
+            const result = await response.json()
+            const data = result.data
             setOrganization(data.organization)
-            setStats(data.stats)
+            setStats(data.stats || { mentors: 0, mentees: 0, sessions: 0 })
         } catch (err) {
             setError(err instanceof Error ? err.message : "Erro ao carregar organização")
         } finally {

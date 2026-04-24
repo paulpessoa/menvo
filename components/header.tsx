@@ -81,7 +81,7 @@ export default function Header() {
     })
     userNavigation.push({
       name: t("header.userMenu.organizations"),
-      href: "/organizations?tab=mine",
+      href: "/organizations",
       icon: Building2,
       color: "text-gray-700"
     })
