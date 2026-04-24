@@ -142,12 +142,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (newSession) {
                 setSession(newSession)
                 setUser(newSession.user)
+                
+                // Failsafe: Garantir que o loading termine mesmo que o perfil demore
+                const profileTimeout = setTimeout(() => {
+                    if (mounted) setIsInitializing(false)
+                }, 5000);
+
                 try {
                     const userProfile = await fetchProfile(newSession.user.id)
                     if (mounted) setProfile(userProfile)
                 } catch (err) {
-                    console.error('[Auth] Error fetching profile during state change:', err)
+                    console.error('[Auth] Error fetching profile:', err)
                 } finally {
+                    clearTimeout(profileTimeout)
                     if (mounted) setIsInitializing(false)
                 }
             } else {

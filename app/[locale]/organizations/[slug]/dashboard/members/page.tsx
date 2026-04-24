@@ -64,10 +64,11 @@ export default function OrganizationMembersPage() {
         router.push("/organizations")
         return
       }
-      const data = await response.json()
+      const result = await response.json()
+      const data = result.data
       
       // 'is_admin' agora retorna true para Super Admins ou Admins da Org no backend
-      if (!data.is_admin) {
+      if (!data?.is_admin) {
         toast.error("Acesso negado. Apenas administradores podem gerenciar membros.")
         router.push(`/organizations/${slug}`)
         return

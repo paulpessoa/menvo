@@ -47,7 +47,7 @@ export function MyOrganizations({ onLeave }: MyOrganizationsProps) {
 
             const data = await response.json()
             // Filter only active memberships
-            const active = data.organizations?.filter(
+            const active = (data.data || []).filter(
                 (m: OrganizationMembership) => m.status === "active"
             )
             setMemberships(active || [])
