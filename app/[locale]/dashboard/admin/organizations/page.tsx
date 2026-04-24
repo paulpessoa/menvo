@@ -172,6 +172,11 @@ export default function AdminOrganizationsPage() {
                                                             Ver detalhes
                                                         </Link>
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/organizations/${org.slug}/dashboard/members`}>
+                                                            Gerenciar membros
+                                                        </Link>
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem className="text-destructive">
                                                         Suspender
                                                     </DropdownMenuItem>
