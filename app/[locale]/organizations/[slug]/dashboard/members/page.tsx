@@ -91,8 +91,9 @@ export default function OrganizationMembersPage() {
         return
       }
       
-      setOrgId(data.organization.id)
-      await fetchMembers(data.organization.id, 1)
+      const organizationId = data.organization.id
+      setOrgId(organizationId)
+      await fetchMembers(organizationId, 1)
       
     } catch (err) {
       router.push("/organizations")
