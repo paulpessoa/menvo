@@ -6,6 +6,7 @@ import { OrganizationCard } from "@/components/organizations/OrganizationCard"
 import { MyOrganizations } from "@/components/organizations/MyOrganizations"
 import { Organization } from "@/lib/types/organizations"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 
