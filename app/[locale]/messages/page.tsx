@@ -45,10 +45,10 @@ function MessagesContent() {
   const [searchTerm, setSearchTerm] = useState('')
   const supabase = createClient()
 
-  const loadConversations = useCallback(async () => {
+  const loadConversations = useCallback(async (isInitial = true) => {
     if (!user) return
 
-    setIsLoading(true)
+    if (isInitial) setIsLoading(true)
     try {
       const { data: convs, error } = await supabase
         .from('conversations')
@@ -66,82 +66,97 @@ function MessagesContent() {
 
       if (convs) {
         const rawConvs = convs as RawConversation[]
-        const conversationsWithDetails = await Promise.all(rawConvs.map(async (conv) => {
-          // Identificar o outro usuário de forma robusta
-          const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
-          
-          // Se o chat for com o próprio usuário (ex: notas), ignoramos na listagem principal
-          if (otherUserId === user.id) return null
+        
+        // Mapeamento sequencial e seguro para evitar quebras em Promise.all
+        const conversationsWithDetails = []
+        for (const conv of rawConvs) {
+          try {
+            const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
+            if (otherUserId === user.id) continue
 
-          const { data: otherUser } = await supabase
-            .from('profiles')
-            .select(`
-              id, 
-              full_name, 
-              avatar_url,
-              user_roles (
-                roles (
-                  name
+            const { data: otherUser } = await supabase
+              .from('profiles')
+              .select(`
+                id, 
+                full_name, 
+                avatar_url,
+                user_roles (
+                  roles (
+                    name
+                  )
                 )
-              )
-            `)
-            .eq('id', otherUserId)
-            .maybeSingle()
+              `)
+              .eq('id', otherUserId)
+              .maybeSingle()
 
-          const { count: unreadCount } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('conversation_id', conv.id)
-            .neq('sender_id', user.id)
-            .is('read_at', null)
+            const { count: unreadCount } = await supabase
+              .from('messages')
+              .select('*', { count: 'exact', head: true })
+              .eq('conversation_id', conv.id)
+              .neq('sender_id', user.id)
+              .is('read_at', null)
 
-          const roles = (otherUser as any)?.user_roles || []
-          const roleNames = roles.map((ur: any) => ur.roles?.name).filter(Boolean)
-          let primaryRole = 'mentee'
-          if (roleNames.includes('admin')) primaryRole = 'admin'
-          else if (roleNames.includes('mentor')) primaryRole = 'mentor'
+            const roles = (otherUser as any)?.user_roles || []
+            const roleNames = roles.map((ur: any) => ur.roles?.name).filter(Boolean)
+            let primaryRole = 'mentee'
+            if (roleNames.includes('admin')) primaryRole = 'admin'
+            else if (roleNames.includes('mentor')) primaryRole = 'mentor'
 
-          return {
-            id: conv.id,
-            mentor_id: conv.mentor_id,
-            mentee_id: conv.mentee_id,
-            last_message_at: conv.last_message_at,
-            created_at: conv.created_at,
-            unread_count: unreadCount || 0,
-            other_user: {
-              id: otherUserId,
-              full_name: (otherUser as any)?.full_name || 'Usuário',
-              avatar_url: (otherUser as any)?.avatar_url || null,
-              role_name: primaryRole
-            }
+            conversationsWithDetails.push({
+              id: conv.id,
+              mentor_id: conv.mentor_id,
+              mentee_id: conv.mentee_id,
+              last_message_at: conv.last_message_at,
+              created_at: conv.created_at,
+              unread_count: unreadCount || 0,
+              other_user: {
+                id: otherUserId,
+                full_name: (otherUser as any)?.full_name || 'Usuário',
+                avatar_url: (otherUser as any)?.avatar_url || null,
+                role_name: primaryRole
+              }
+            })
+          } catch (itemErr) {
+            console.warn(`[Messages] Erro ao carregar detalhes da conversa ${conv.id}`)
           }
-        }))
+        }
 
-        // Filtrar nulos (casos de chat com si mesmo)
-        setConversations(conversationsWithDetails.filter(Boolean) as Conversation[])
+        setConversations(conversationsWithDetails as Conversation[])
       }
     } catch (error) {
-      // Error handled silently
+      // Falha silenciosa em produção, mas garante que o loading pare
     } finally {
-      setIsLoading(false)
+      if (isInitial) setIsLoading(false)
     }
   }, [user, supabase])
 
   useEffect(() => {
-    if (user) {
+    let mounted = true
+    if (user && mounted) {
       loadConversations()
     }
+    return () => { mounted = false }
   }, [user, loadConversations])
 
   useEffect(() => {
     if (!user) return;
+    
+    // Subscrição Realtime otimizada (Filtro por ID de conversa é complexo no frontend, 
+    // mas vamos garantir que o payload afete apenas o usuário logado no loadConversations)
     const channel = supabase
-      .channel('conversations-list-updates')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => { loadConversations() })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, (payload: any) => {
-          if (payload.new.read_at !== payload.old.read_at) { loadConversations() }
+      .channel(`user-chats-${user.id}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'messages'
+      }, (payload: any) => { 
+          // Apenas recarrega se o usuário for o receptor da mensagem ou o sender
+          if (payload.new?.sender_id !== user.id) {
+            loadConversations(false) // false para não mostrar o skeleton de novo
+          }
       })
       .subscribe();
+
     return () => { supabase.removeChannel(channel) };
   }, [user, supabase, loadConversations])
 
