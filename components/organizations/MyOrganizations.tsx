@@ -48,13 +48,17 @@ export function MyOrganizations({ onLeave }: MyOrganizationsProps) {
                 throw new Error(result.error || "Erro ao carregar organizações")
             }
 
-            // O retorno pode vir como { success: true, data: [...] }
-            const orgsArray = result.data || result.organizations || []
+            // O retorno pode vir como { data: [...] } ou { data: { organizations: [...] } }
+            let orgsArray = []
+            if (Array.isArray(result.data)) {
+                orgsArray = result.data
+            } else if (result.data?.organizations && Array.isArray(result.data.organizations)) {
+                orgsArray = result.data.organizations
+            } else if (Array.isArray(result.organizations)) {
+                orgsArray = result.organizations
+            }
             
-            const active = Array.isArray(orgsArray) 
-                ? orgsArray.filter((m: OrganizationMembership) => m.status === "active")
-                : []
-            
+            const active = orgsArray.filter((m: OrganizationMembership) => m.status === "active")
             setMemberships(active)
         } catch (err) {
             setError(err instanceof Error ? err.message : "Erro ao carregar dados")

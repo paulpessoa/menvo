@@ -33,12 +33,20 @@ export default function OrganizationsPage() {
             if (searchQuery) params.append("search", searchQuery)
 
             const response = await fetch(`/api/organizations?${params}`)
-            const data = await response.json()
-            console.log("🔍 [DEBUG] Organizations Explore Response:", data)
+            const result = await response.json()
+            console.log("🔍 [DEBUG] Organizations Explore Response:", result)
 
             if (!response.ok) throw new Error("Erro ao carregar organizações")
 
-            const orgsList = data.data || data.organizations || []
+            // Suportar tanto { data: { organizations: [] } } quanto { data: [] }
+            let orgsList = []
+            if (result.data?.organizations && Array.isArray(result.data.organizations)) {
+                orgsList = result.data.organizations
+            } else if (Array.isArray(result.data)) {
+                orgsList = result.data
+            } else if (Array.isArray(result.organizations)) {
+                orgsList = result.organizations
+            }
             
             if (page === 1) {
                 setOrganizations(orgsList)
