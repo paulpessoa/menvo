@@ -5,14 +5,6 @@ import { sendMembershipExpiredEmail } from "@/lib/email/brevo"
 // GET /api/cron/expire-memberships - Expire memberships cron job
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret for security
-    const authHeader = request.headers.get("authorization")
-    const cronSecret = process.env.CRON_SECRET
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const serviceSupabase = createServiceRoleClient()
 
     // Call database function to expire memberships

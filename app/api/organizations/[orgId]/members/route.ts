@@ -18,13 +18,22 @@ export async function GET(
     const { orgId } = await params
 
     const { data: members, error } = await supabase
-      .from("profiles")
+      .from("organization_members")
       .select(`
-        *,
-        user_roles!inner(roles(name))
+        id,
+        user_id,
+        role,
+        status,
+        invited_at,
+        user:profiles!user_id(
+          id,
+          full_name,
+          email,
+          avatar_url,
+          user_roles(roles(name))
+        )
       `)
       .eq("organization_id", orgId)
-      .returns<any[]>()
 
     if (error) throw error
 

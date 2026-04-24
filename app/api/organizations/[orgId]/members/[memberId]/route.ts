@@ -1,9 +1,5 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
-import type { Database } from "@/lib/types/supabase"
-
-type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"]
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 import {
   errorResponse,
   handleApiError,
@@ -19,11 +15,17 @@ export async function PATCH(
     const { orgId, memberId } = await params
     const body = await request.json()
 
-    // Update member (actually updates the profile)
-    const updateData = body as ProfileUpdate;
+    // 1. Validar se quem chama é admin da org (Opcional, mas recomendado para segurança)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("Unauthorized")
+
+    // Atualiza apenas a tabela relacional
+    const { role } = body;
+    if (!role) return errorResponse("Role is required", "VALIDATION_ERROR", 400)
+
     const { data: member, error: updateError } = await (supabase
-      .from("profiles") as any)
-      .update(updateData)
+      .from("organization_members") as any)
+      .update({ role, updated_at: new Date().toISOString() })
       .eq("id", memberId)
       .eq("organization_id", orgId)
       .select()
@@ -31,7 +33,7 @@ export async function PATCH(
 
     if (updateError) throw updateError
 
-    return successResponse(member, "Member updated successfully")
+    return successResponse(member, "Papel atualizado com sucesso")
   } catch (error) {
     return handleApiError(error)
   }
@@ -45,16 +47,19 @@ export async function DELETE(
     const supabase = await createClient()
     const { orgId, memberId } = await params
 
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("Unauthorized")
+
     // Remove from organization_members
-    const { error: updateError } = await (supabase
-      .from("organization_members") as any)
+    const { error: deleteError } = await supabase
+      .from("organization_members")
       .delete()
-      .eq("user_id", memberId)
+      .eq("id", memberId)
       .eq("organization_id", orgId);
 
-    if (updateError) throw updateError
+    if (deleteError) throw deleteError
 
-    return successResponse(null, "Member removed successfully")
+    return successResponse(null, "Membro removido com sucesso")
   } catch (error) {
     return handleApiError(error)
   }
