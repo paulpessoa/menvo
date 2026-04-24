@@ -41,16 +41,21 @@ export function MyOrganizations({ onLeave }: MyOrganizationsProps) {
 
         try {
             const response = await fetch("/api/profile/organizations")
+            const result = await response.json()
+            console.log("🔍 [DEBUG] MyOrganizations API Response:", result)
+            
             if (!response.ok) {
-                throw new Error("Erro ao carregar organizações")
+                throw new Error(result.error || "Erro ao carregar organizações")
             }
 
-            const data = await response.json()
-            // Filter only active memberships
-            const active = (data.data || []).filter(
-                (m: OrganizationMembership) => m.status === "active"
-            )
-            setMemberships(active || [])
+            // O retorno pode vir como { success: true, data: [...] }
+            const orgsArray = result.data || result.organizations || []
+            
+            const active = Array.isArray(orgsArray) 
+                ? orgsArray.filter((m: OrganizationMembership) => m.status === "active")
+                : []
+            
+            setMemberships(active)
         } catch (err) {
             setError(err instanceof Error ? err.message : "Erro ao carregar dados")
         } finally {

@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from("organizations")
-      .select("*", { count: "exact" })
+      .select(`
+        *,
+        member_count:organization_members(count)
+      `, { count: "exact" })
 
     if (search) {
       query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%`)
@@ -52,25 +55,16 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false })
       .range(from, to)
       
-    const orgs = orgsData as OrganizationRow[] | null;
-
     if (orgsError) throw orgsError
 
-    // 3. Get extra stats for each org
-    const orgsWithStats = await Promise.all((orgs || []).map(async (org) => {
-      const { count: memberCount } = await supabase
-        .from("organization_members")
-        .select("*", { count: 'exact', head: true })
-        .eq("organization_id", org.id)
-
-      return {
-        ...org,
-        member_count: memberCount || 0
-      }
+    // Ajustar o formato da contagem retornada pelo Supabase
+    const formattedOrgs = (orgsData as any[])?.map(org => ({
+      ...org,
+      member_count: org.member_count?.[0]?.count || 0
     }))
 
     return successResponse({
-      organizations: orgsWithStats,
+      organizations: formattedOrgs,
       pagination: {
         page,
         limit,

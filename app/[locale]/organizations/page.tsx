@@ -33,9 +33,11 @@ export default function OrganizationsPage() {
             if (searchQuery) params.append("search", searchQuery)
 
             const response = await fetch(`/api/organizations?${params}`)
+            const data = await response.json()
+            console.log("🔍 [DEBUG] Organizations Explore Response:", data)
+
             if (!response.ok) throw new Error("Erro ao carregar organizações")
 
-            const data = await response.json()
             const orgsList = data.data || data.organizations || []
             
             if (page === 1) {

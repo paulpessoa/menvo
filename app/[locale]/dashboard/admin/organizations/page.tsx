@@ -201,7 +201,7 @@ export default function AdminOrganizationsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <Badge variant="secondary" className="font-normal">
-                        {org.memberCount || 0} usuários
+                        {org.member_count || 0} usuários
                       </Badge>
                     </td>
                     <td className="px-6 py-4 capitalize text-sm">{org.type}</td>
