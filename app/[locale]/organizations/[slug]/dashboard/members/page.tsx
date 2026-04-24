@@ -40,31 +40,43 @@ export default function OrganizationMembersPage() {
   const [orgId, setOrgId] = useState<string | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
 
-  const fetchMembers = useCallback(async (organizationId: string) => {
+  const fetchMembers = useCallback(async (organizationId: string, pageNum = 1) => {
     try {
-      const res = await fetch(`/api/organizations/${organizationId}/members?limit=100`)
+      if (pageNum === 1) setLoading(true)
+      else setLoadingMore(true)
+
+      const limit = 20
+      const res = await fetch(`/api/organizations/${organizationId}/members?page=${pageNum}&limit=${limit}`)
       const result = await res.json()
-      console.log("🔍 [DEBUG] Organization Members Response:", result)
       
       if (result.success) {
-        // Suportar tanto o formato antigo (array direto) quanto o novo (objeto com members)
-        const membersList = Array.isArray(result.data) ? result.data : result.data?.members || []
-        setMembers(membersList)
+        const membersList = result.data?.members || []
+        const pagination = result.data?.pagination
+
+        if (pageNum === 1) {
+          setMembers(membersList)
+        } else {
+          setMembers(prev => [...prev, ...membersList])
+        }
+
+        setHasMore(pagination?.page < pagination?.totalPages)
       } else {
-        console.error("❌ [DEBUG] API Error:", result.error)
         toast.error("Erro ao carregar lista de membros")
       }
     } catch (err) {
-      console.error("❌ [DEBUG] Fetch Exception:", err)
       toast.error("Erro de conexão ao buscar membros")
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
     }
   }, [])
 
   const checkAccessAndLoad = useCallback(async () => {
-    setLoading(true)
     try {
-      // 1. Validar acesso e pegar o ID da org
       const response = await fetch(`/api/organizations/${slug}`)
       if (!response.ok) {
         router.push("/organizations")
@@ -73,7 +85,6 @@ export default function OrganizationMembersPage() {
       const result = await response.json()
       const data = result.data
       
-      // 'is_admin' agora retorna true para Super Admins ou Admins da Org no backend
       if (!data?.is_admin) {
         toast.error("Acesso negado. Apenas administradores podem gerenciar membros.")
         router.push(`/organizations/${slug}`)
@@ -81,14 +92,10 @@ export default function OrganizationMembersPage() {
       }
       
       setOrgId(data.organization.id)
-      
-      // 2. Buscar Membros
-      await fetchMembers(data.organization.id)
+      await fetchMembers(data.organization.id, 1)
       
     } catch (err) {
       router.push("/organizations")
-    } finally {
-      setLoading(false)
     }
   }, [slug, router, fetchMembers])
 
@@ -97,6 +104,13 @@ export default function OrganizationMembersPage() {
       checkAccessAndLoad()
     }
   }, [slug, checkAccessAndLoad])
+
+  const handleLoadMore = () => {
+    if (!orgId || loadingMore || !hasMore) return
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchMembers(orgId, nextPage)
+  }
 
   const removeMember = async (memberId: string) => {
     if (!orgId) return
@@ -266,6 +280,26 @@ export default function OrganizationMembersPage() {
             )}
           </CardContent>
         </Card>
+
+        {hasMore && (
+          <div className="mt-8 text-center">
+            <Button 
+              variant="outline" 
+              onClick={handleLoadMore} 
+              disabled={loadingMore}
+              className="min-w-[200px]"
+            >
+              {loadingMore ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Carregando...
+                </>
+              ) : (
+                "Carregar mais membros"
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
