@@ -121,6 +121,14 @@ export default function Footer() {
                     {t("footer.howItWorks")}
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/doar"
+                    className="text-muted-foreground hover:text-foreground font-medium text-primary"
+                  >
+                    {t("footer.donate")}
+                  </Link>
+                </li>
               </ul>
             </div>
             <div className="space-y-4">

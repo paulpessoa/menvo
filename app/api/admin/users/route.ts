@@ -35,13 +35,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "10")
-    const tab = searchParams.get("tab") || "all" // all, pending, mentors, mentees
+    const tab = searchParams.get("tab") || "all" // all, pending, mentors, mentees, undefined
     const search = searchParams.get("search") || ""
 
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    // 3. Query base - Usar joins padrão (LEFT JOIN) em vez de !inner para não excluir usuários sem roles
+    // 3. Query base
     let query = supabase
       .from("profiles")
       .select(`
@@ -53,14 +53,19 @@ export async function GET(request: NextRequest) {
         )
       `, { count: "exact" })
 
-    // Filtros por aba - Aqui sim usamos filtros que podem restringir
+    // Filtros por aba
     if (tab === "pending") {
-      // Para filtros específicos de role, precisamos garantir que a role exista
-      query = query.eq("verified", false).eq("user_roles.roles.name", "mentor")
+      // Aguardando: Mentores pendentes de verificação
+      query = query.filter("user_roles.roles.name", "eq", "mentor").eq("verified", false)
     } else if (tab === "mentors") {
-      query = query.eq("user_roles.roles.name", "mentor")
+      // Mentores: Qualquer um com role mentor
+      query = query.filter("user_roles.roles.name", "eq", "mentor")
     } else if (tab === "mentees") {
-      query = query.eq("user_roles.roles.name", "mentee")
+      // Mentees: Qualquer um com role mentee
+      query = query.filter("user_roles.roles.name", "eq", "mentee")
+    } else if (tab === "undefined") {
+      // Não Definidos: Usuários sem nenhuma role atribuída
+      query = query.is("user_roles", null)
     }
 
     // Filtro de busca
@@ -74,26 +79,31 @@ export async function GET(request: NextRequest) {
 
     if (profilesError) throw profilesError
 
-    // 4. Buscar contagens para as abas
+    // 4. Buscar contagens para as abas de forma eficiente
     const { count: totalCount } = await supabase
       .from("profiles")
       .select("*", { count: "exact", head: true })
 
     const { count: pendingCount } = await supabase
       .from("profiles")
-      .select("*, user_roles!inner(roles!inner(name))", { count: "exact", head: true })
+      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
       .eq("verified", false)
       .eq("user_roles.roles.name", "mentor")
 
     const { count: mentorsCount } = await supabase
       .from("profiles")
-      .select("*, user_roles!inner(roles!inner(name))", { count: "exact", head: true })
+      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
       .eq("user_roles.roles.name", "mentor")
 
     const { count: menteesCount } = await supabase
       .from("profiles")
-      .select("*, user_roles!inner(roles!inner(name))", { count: "exact", head: true })
+      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
       .eq("user_roles.roles.name", "mentee")
+
+    const { count: undefinedCount } = await supabase
+      .from("profiles")
+      .select("user_roles", { count: "exact", head: true })
+      .is("user_roles", null)
 
     return successResponse({
       users: profiles,
@@ -107,7 +117,8 @@ export async function GET(request: NextRequest) {
         all: totalCount || 0,
         pending: pendingCount || 0,
         mentors: mentorsCount || 0,
-        mentees: menteesCount || 0
+        mentees: menteesCount || 0,
+        undefined: undefinedCount || 0
       }
     })
   } catch (error) {

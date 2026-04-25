@@ -49,6 +49,7 @@ interface UserStats {
   pending: number
   mentors: number
   mentees: number
+  undefined: number
 }
 
 export default function AdminUsersPage() {
@@ -60,7 +61,8 @@ export default function AdminUsersPage() {
     all: 0,
     pending: 0,
     mentors: 0,
-    mentees: 0
+    mentees: 0,
+    undefined: 0
   })
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -186,6 +188,9 @@ export default function AdminUsersPage() {
                     </TabsTrigger>
                     <TabsTrigger value="mentees" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
                         Mentees <Badge variant="outline" className="ml-2">{stats.mentees}</Badge>
+                    </TabsTrigger>
+                    <TabsTrigger value="undefined" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
+                        Não Definidos <Badge variant="destructive" className="ml-2">{stats.undefined}</Badge>
                     </TabsTrigger>
                   </TabsList>
                 </div>
