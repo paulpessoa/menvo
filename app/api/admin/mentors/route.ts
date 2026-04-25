@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/services/auth/auth.service'
-import { getUserFromRequest } from '@/lib/auth/server-utils'
+import { NextRequest, NextResponse } from "next/server"
+import { supabase } from "@/lib/services/auth/auth.service"
+import { getUserFromRequest } from "@/lib/auth/server-utils"
+import { UUID } from "crypto"
 
 export async function POST(request: NextRequest) {
   try {
     const user = await getUserFromRequest(request)
-    if (!user || !user.role || !['admin', 'moderator'].includes(user.role)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user || !user.role || !["admin", "moderator"].includes(user.role)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const body = await request.json()
@@ -25,15 +26,24 @@ export async function POST(request: NextRequest) {
       areas_of_interest,
       session_duration,
       timezone,
-      status = 'pending_verification'
+      status = "pending_verification"
     } = body
 
-    if (!user_id || !title || !experience_years || !expertise_areas || !topics) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    if (
+      !user_id ||
+      !title ||
+      !experience_years ||
+      !expertise_areas ||
+      !topics
+    ) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
     }
 
     const { data, error } = await supabase
-      .from('profiles')
+      .from("profiles")
       .update({
         current_position: title,
         current_company: company,
@@ -41,10 +51,11 @@ export async function POST(request: NextRequest) {
         expertise_areas: expertise_areas,
         linkedin_url,
         timezone,
-        verification_status: status === 'pending_verification' ? 'pending' : 'approved',
+        verification_status:
+          status === "pending_verification" ? "pending" : "approved",
         updated_at: new Date().toISOString()
       })
-      .eq('id', user_id)
+      .eq("id", user_id)
       .select()
       .single()
 
@@ -53,12 +64,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Garantir que o usuário tenha a role de mentor
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .upsert({ 
-        user_id: user_id as string, 
-        role_id: 2
-      })
+    const { error: roleError } = await supabase.from("user_roles").upsert({
+      user_id: user_id as string,
+      role_id: 2
+    })
 
     return NextResponse.json({ success: true, mentor: data })
   } catch (error: any) {

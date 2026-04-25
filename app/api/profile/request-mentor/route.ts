@@ -6,6 +6,10 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import { sendAdminNewMentorNotification } from "@/lib/email/brevo"
+import type { Database } from "@/lib/types/supabase"
+import { SupabaseClient } from "@supabase/supabase-js"
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,13 +24,15 @@ export async function POST(request: NextRequest) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
+    const updateData: ProfileUpdate = {
+      is_pending_mentor: true,
+      verification_status: 'pending'
+    }
+
     // Marcar perfil como solicitante de mentor
     const { data, error } = await supabase
-      .from("profiles" as any)
-      .update({ 
-        is_pending_mentor: true,
-        verification_status: 'pending'
-      })
+      .from("profiles")
+      .update(updateData)
       .eq("id", user.id)
       .select()
       .single()
