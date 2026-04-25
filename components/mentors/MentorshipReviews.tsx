@@ -82,7 +82,11 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
                         {review.mentee?.first_name || "Aluno"}
                       </p>
                       <span className="text-[10px] text-gray-400">
-                        {format(new Date(review.created_at), "MMM yyyy", { locale: ptBR })}
+                        {new Date(review.created_at).toLocaleDateString("pt-BR", {
+                          timeZone: "America/Sao_Paulo",
+                          month: "short",
+                          year: "numeric"
+                        })}
                       </span>
                     </div>
                     <div className="flex gap-0.5">

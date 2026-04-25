@@ -79,12 +79,30 @@ interface VerificationData {
 }
 
 /**
+ * Helper para formatar data/hora no fuso de Brasília para os e-mails
+ */
+function formatDateTimeBR(dateStr: string) {
+    return new Date(dateStr).toLocaleString("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+/**
  * Envia lembrete de mentoria no dia da sessão
  */
 export async function sendAppointmentReminder(data: {
     userEmail: string; userName: string; otherPersonName: string; scheduledAt: string; meetLink: string | null;
 }): Promise<void> {
-    const formattedTime = new Date(data.scheduledAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+    const formattedTime = new Date(data.scheduledAt).toLocaleTimeString("pt-BR", { 
+        timeZone: "America/Sao_Paulo",
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
     const content = `
         <h2>Lembrete: Sua mentoria é hoje! 📅</h2>
         <p>Olá, ${data.userName}. Passando para lembrar que sua sessão de mentoria com <strong>${data.otherPersonName}</strong> está agendada para hoje às <strong>${formattedTime}</strong>.</p>
@@ -153,7 +171,7 @@ export async function sendAppointmentRequest(data: AppointmentRequestData): Prom
     <p>Você recebeu uma nova solicitação de mentoria na plataforma.</p>
     <div class="info-box">
         <div class="info-item"><strong>Solicitante:</strong> ${menteeName}</div>
-        <div class="info-item"><strong>Data e Hora:</strong> ${new Date(scheduledAt).toLocaleString("pt-BR")}</div>
+        <div class="info-item"><strong>Data e Hora:</strong> ${formatDateTimeBR(scheduledAt)}</div>
         <div class="info-item"><strong>Mensagem:</strong><br/>${message}</div>
     </div>
     <div class="button-container">
@@ -168,7 +186,11 @@ export async function sendAppointmentRequest(data: AppointmentRequestData): Prom
  */
 export async function sendAppointmentConfirmation(data: AppointmentConfirmationData): Promise<void> {
   const { mentorEmail, menteeEmail, mentorName, menteeName, scheduledAt, meetLink, calendarLink } = data
-  const formattedDate = new Date(scheduledAt).toLocaleString("pt-BR", { dateStyle: "full", timeStyle: "short" });
+  const formattedDate = new Date(scheduledAt).toLocaleString("pt-BR", { 
+    timeZone: "America/Sao_Paulo",
+    dateStyle: "full", 
+    timeStyle: "short" 
+  });
 
   const content = `
     <h2>Sua mentoria está confirmada! ✅</h2>

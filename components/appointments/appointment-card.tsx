@@ -106,14 +106,16 @@ export function AppointmentCard({
   )
   const isPast = endTime < now
 
-  const formattedDate = format.dateTime(dateObj, {
-    weekday: isToday ? undefined : "short",
+  // Formatação explícita com Timezone de Brasília para evitar erro de 3h
+  const formattedDate = dateObj.toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
     day: "numeric",
     month: "short",
-    year: dateObj.getFullYear() !== now.getFullYear() ? "numeric" : undefined
+    weekday: isToday ? undefined : "short"
   })
 
-  const formattedTime = format.dateTime(dateObj, {
+  const formattedTime = dateObj.toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
     hour: "2-digit",
     minute: "2-digit"
   })
@@ -193,19 +195,14 @@ export function AppointmentCard({
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span className={isToday ? "font-medium text-blue-600" : ""}>
+          <span className={isToday ? "font-bold text-blue-600" : ""}>
             {isToday ? t("today") : formattedDate}
           </span>
-          {isToday && (
-            <Badge variant="outline" className="text-xs">
-              {t("today")}
-            </Badge>
-          )}
         </div>
 
         <div className="flex items-center gap-2 text-sm">
           <Clock className="w-4 h-4 text-muted-foreground" />
-          <span>{formattedTime}</span>
+          <span className="font-medium text-gray-900">{formattedTime}</span>
           <span className="text-muted-foreground">
             ({appointment.duration_minutes} {t("minutes")})
           </span>

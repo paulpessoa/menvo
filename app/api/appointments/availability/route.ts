@@ -105,15 +105,18 @@ export async function GET(request: NextRequest) {
           for (let hour = startHour; hour < endHour; hour++) {
             const h = hour.toString().padStart(2, "0")
             const m = startMinute.toString().padStart(2, "0")
+            
+            // Gerar ISO com offset explícito de Brasília (-03:00) para garantir 
+            // que a conversão para UTC (Z) seja sempre correta (+3h)
             const slotIso = `${dateStr}T${h}:${m}:00-03:00`
-            const slotDate = new Date(slotIso)
+            const utcDate = new Date(slotIso)
 
-            if (slotDate > new Date()) {
-              if (!isSlotBooked(slotDate, 45)) {
+            if (utcDate > new Date()) {
+              if (!isSlotBooked(utcDate, 45)) {
                 availableSlots.push({
                   date: dateStr,
                   time: `${h}:${m}`,
-                  datetime: slotDate.toISOString()
+                  datetime: utcDate.toISOString()
                 })
               }
             }
