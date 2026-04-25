@@ -24,7 +24,7 @@ import { useFeatureFlag } from "@/lib/feature-flags"
 export function FeedbackBanner() {
   const t = useTranslations()
   const { isAuthenticated } = useAuth()
-  const feedbackEnabled = useFeatureFlag("feedbackEnabled")
+  const feedbackEnabled = useFeatureFlag("feedback_app_flag")
   const { toast } = useToast()
   
   const [isOpen, setIsOpen] = useState(false)

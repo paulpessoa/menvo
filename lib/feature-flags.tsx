@@ -9,23 +9,23 @@ import React, {
 } from "react"
 
 /**
- * Interface de Feature Flags.
+ * Interface de Feature Flags (Padrão Sincronizado com o Banco).
  */
 export interface FeatureFlags {
-  waitingListEnabled: boolean
-  newMentorshipUx: boolean
-  feedbackEnabled: boolean
-  maintenanceMode: boolean
+  waiting_list_flag: boolean
+  new_mentorship_flag: boolean
+  feedback_app_flag: boolean
+  maintenance_mode_flag: boolean
 }
 
 /**
  * Defaults seguros.
  */
 export const DEFAULT_FLAGS: FeatureFlags = {
-  waitingListEnabled: false,
-  newMentorshipUx: false,
-  feedbackEnabled: false,
-  maintenanceMode: false
+  waiting_list_flag: false,
+  new_mentorship_flag: false,
+  feedback_app_flag: false,
+  maintenance_mode_flag: false
 }
 
 interface FeatureFlagsContextType {

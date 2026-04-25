@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { DEFAULT_FLAGS } from "@/lib/feature-flags"
@@ -19,21 +18,12 @@ export async function GET() {
 
     const flagsFromDB: Record<string, boolean> = {}
     
-    // Mapeamento de snake_case (DB) para camelCase (Frontend)
-    const nameMapping: Record<string, string> = {
-      'waiting_list_enabled': 'waitingListEnabled',
-      'new_mentorship_ux': 'newMentorshipUx',
-      'feedback_enabled': 'feedbackEnabled',
-      'maintenance_mode': 'maintenanceMode'
-    }
-
+    // Mapeamento Direto: O nome no Banco deve ser igual ao nome no Frontend
+    // Padrão solicitado: waiting_list_flag, new_mentorship_flag, feedback_app_flag, maintenance_mode_flag
     if (dbFlags) {
       dbFlags.forEach(f => {
         if (f.name && f.enabled !== null) {
-          const frontendName = nameMapping[f.name]
-          if (frontendName) {
-            flagsFromDB[frontendName] = f.enabled
-          }
+          flagsFromDB[f.name] = f.enabled
         }
       })
     }
@@ -47,7 +37,7 @@ export async function GET() {
 
     return NextResponse.json({
       flags: mergedFlags,
-      source: dbFlags ? "database" : "environment-variables",
+      source: dbFlags ? "database" : "default",
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
@@ -55,7 +45,7 @@ export async function GET() {
     
     return NextResponse.json({
       flags: DEFAULT_FLAGS,
-      source: "default",
+      source: "error",
       error: "Failed to fetch feature flags",
       timestamp: new Date().toISOString(),
     })

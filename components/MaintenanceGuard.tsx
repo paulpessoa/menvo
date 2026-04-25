@@ -10,7 +10,7 @@ import { Hammer } from "lucide-react"
  * Administradores ignoram esta trava para poderem realizar testes e ajustes.
  */
 export function MaintenanceGuard({ children }: { children: React.ReactNode }) {
-  const isMaintenance = useFeatureFlag("maintenanceMode")
+  const isMaintenance = useFeatureFlag("maintenance_mode_flag")
   const { user, cachedRoles } = useAuth()
   
   const isAdmin = cachedRoles?.role === 'admin'
