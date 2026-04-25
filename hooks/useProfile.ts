@@ -1,66 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/lib/utils/supabase/client"
 import { handleAsyncOperation } from "@/lib/error-handler"
 import { logger } from "@/lib/logger"
+import type { Database } from "@/lib/types/supabase"
 
-interface Profile {
-  id: string
-  email: string
-  first_name: string | null
-  last_name: string | null
-  full_name: string | null
-  slug: string | null
-  bio: string | null
-  avatar_url: string | null
-  
-  // Professional fields (mapped from database)
-  job_title: string | null // maps to current_position in form
-  company: string | null // maps to current_company in form
-  linkedin_url: string | null
-  github_url: string | null
-  twitter_url: string | null
-  website_url: string | null // maps to personal_website_url in form
-  phone: string | null
-  
-  // Location fields
-  city: string | null
-  state: string | null
-  country: string | null
-  timezone: string | null
-  age: number | null
-  
-  // Mentorship fields
-  expertise_areas: string[] | null
-  mentorship_topics: string[] | null // maps to topics in form
-  free_topics: string[] | null // custom topics added by mentor
-  inclusive_tags: string[] | null // maps to inclusion_tags in form
-  languages: string[] | null
-  
-  // Additional fields that need to be added to database
-  address: string | null // needs migration
-  portfolio_url: string | null // needs migration  
-  mentorship_approach: string | null // needs migration
-  what_to_expect: string | null // needs migration
-  ideal_mentee: string | null // needs migration
-  cv_url: string | null
-  is_public: boolean | null
-  is_pending_mentor?: boolean
-  learning_goals?: string | null
-  
-  // System fields
-  verified: boolean
-  experience_years: number | null
-  session_price_usd: number | null
-  availability_status: string | null
-  average_rating: number | null
-  total_reviews: number | null
-  total_sessions: number | null
-  created_at: string
-  updated_at: string
-}
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
 
 export interface ProfileUpdateResult {
   success: boolean;
@@ -75,16 +22,7 @@ export function useProfile() {
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile()
-    } else {
-      setProfile(null)
-      setLoading(false)
-    }
-  }, [user])
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return
 
     console.log('🔍 Starting fetchProfile for user:', user.id);
@@ -111,7 +49,7 @@ export function useProfile() {
         }
 
         logger.debug('Profile fetched successfully', 'useProfile', { userId: user.id });
-        return data;
+        return data as Profile;
       },
       'fetchProfile'
     );
@@ -127,7 +65,16 @@ export function useProfile() {
       console.error('❌ Profile fetch failed:', result.error);
       setError(result.error || 'Error fetching profile');
     }
-  }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile()
+    } else {
+      setProfile(null)
+      setLoading(false)
+    }
+  }, [user, fetchProfile])
 
   const createProfile = async (): Promise<Profile> => {
     if (!user) throw new Error('No user found');
@@ -189,7 +136,7 @@ export function useProfile() {
 
     // Optimistic update
     const previousProfile = profile;
-    const optimisticProfile = { ...profile, ...updates };
+    const optimisticProfile = { ...profile, ...updates } as Profile;
     setProfile(optimisticProfile);
 
     const result = await handleAsyncOperation(

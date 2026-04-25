@@ -187,6 +187,30 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
 }
 
 /**
+ * Notifica o administrador sobre uma nova solicitação de mentor
+ */
+export async function sendAdminNewMentorNotification(data: {
+    userName: string;
+    userEmail: string;
+}): Promise<void> {
+    const adminEmail = process.env.ADMIN_EMAIL || "contato@menvo.com.br";
+    const content = `
+        <h2>🎯 Nova Solicitação de Mentor!</h2>
+        <p>Olá, Admin. Um usuário acaba de solicitar a validação de perfil como <strong>Mentor</strong> na plataforma.</p>
+        <div class="info-box">
+            <div class="info-item"><strong>Nome:</strong> ${data.userName}</div>
+            <div class="info-item"><strong>E-mail:</strong> ${data.userEmail}</div>
+            <div class="info-item"><strong>Data:</strong> ${new Date().toLocaleString("pt-BR")}</div>
+        </div>
+        <div class="button-container">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/admin/users" class="button">Verificar no Painel Admin</a>
+        </div>
+        <p>Por favor, revise o perfil e os documentos para aprovação em até 48h.</p>
+    `;
+    await sendEmail(adminEmail, `🎯 Novo Mentor Pendente: ${data.userName}`, getEmailLayout("Nova Solicitação de Mentor", content));
+}
+
+/**
  * Helper para envio via Brevo API
  */
 async function sendEmail(to: string | string[], subject: string, htmlContent: string) {

@@ -69,7 +69,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (error) throw error
 
             const roleNames = (data as any)?.user_roles?.map((ur: any) => ur.roles?.name) || []
-            let primaryRole = roleNames.includes('admin') ? 'admin' : (roleNames.includes('mentor') ? 'mentor' : (roleNames.includes('mentee') ? 'mentee' : null))
+            
+            // Prioridade absoluta: Admin > Mentor > Mentee
+            let primaryRole = 'mentee'
+            if (roleNames.includes('admin')) primaryRole = 'admin'
+            else if (roleNames.includes('mentor')) primaryRole = 'mentor'
+            else if (roleNames.includes('mentee')) primaryRole = 'mentee'
             
             const roles = {
                 admin: roleNames.includes('admin'),

@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import {
   errorResponse,
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
+import { sendAdminNewMentorNotification } from "@/lib/email/brevo"
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,15 +21,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Marcar perfil como solicitante de mentor
-    const { data, error } = await (supabase
+    const { data, error } = await supabase
       .from("profiles" as any)
-      // @ts-ignore
-      .update({ is_pending_mentor: true })
+      .update({ 
+        is_pending_mentor: true,
+        verification_status: 'pending'
+      })
       .eq("id", user.id)
       .select()
-      .single() as any)
+      .single()
 
     if (error) throw error
+
+    // Notificar admin
+    const userName = `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || user.email || 'Usuário'
+    
+    sendAdminNewMentorNotification({
+        userName: userName,
+        userEmail: user.email || ''
+    }).catch(err => console.error('[API] Error sending admin notification:', err))
 
     return successResponse(data, "Solicitação enviada com sucesso")
   } catch (error) {

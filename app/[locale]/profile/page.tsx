@@ -93,7 +93,7 @@ export default function ProfilePage() {
   const cvInputRef = useRef<HTMLInputElement>(null)
 
   const isMentor = role === 'mentor'
-  const isPendingMentor = (profile as any)?.is_pending_mentor
+  const isPendingMentor = profile?.is_pending_mentor
 
   const imageUpload = useSimpleImageUpload('/api/upload/profile-photo')
   const cvUpload = useSimplePDFUpload('/api/upload/cv')
@@ -362,42 +362,83 @@ export default function ProfilePage() {
             <TabsContent value="mentorship" className="space-y-6">
                <Card className="border-amber-100 bg-amber-50/30">
                  <CardHeader className="pb-3">
-                   <CardTitle className="text-amber-800 flex items-center gap-2 text-lg"><ShieldCheck className="h-5 w-5" /> Status de Mentor</CardTitle>
+                   <CardTitle className="text-amber-800 flex items-center gap-2 text-lg"><ShieldCheck className="h-5 w-5" /> {t("form.mentorshipStatus")}</CardTitle>
                  </CardHeader>
                  <CardContent>
                     {isMentor ? (
                         <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-green-700 flex items-center gap-2"><Check className="h-4 w-4" /> Você é um mentor ativo.</p>
+                            <p className="text-sm font-medium text-green-700 flex items-center gap-2"><Check className="h-4 w-4" /> {t("form.activeMentor")}</p>
                             <AlertDialog>
-                                <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 gap-2"><UserMinus className="h-4 w-4" /> Deixar de ser Mentor</Button></AlertDialogTrigger>
+                                <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 gap-2"><UserMinus className="h-4 w-4" /> {t("form.stopMentorButton")}</Button></AlertDialogTrigger>
                                 <AlertDialogContent>
-                                    <AlertDialogHeader><AlertDialogTitle>Sair da Mentoria?</AlertDialogTitle><AlertDialogDescription>Seu perfil não aparecerá mais no diretório de mentores.</AlertDialogDescription></AlertDialogHeader>
-                                    <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={handleStopMentor} className="bg-red-600">Confirmar</AlertDialogAction></AlertDialogFooter>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>{t("form.stopMentorTitle")}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            {t("form.stopMentorDescription")}
+                                            <span className="block mt-2 font-bold text-red-600">{t("form.stopMentorWarning")}</span>
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter><AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel><AlertDialogAction onClick={handleStopMentor} className="bg-red-600">{t("form.stopMentorConfirm")}</AlertDialogAction></AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
                         </div>
                     ) : isPendingMentor ? (
-                        <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3"><AlertCircle className="h-4 w-4 text-blue-600" /><p className="text-sm text-blue-700 font-medium">Solicitação em análise pela equipe Menvo.</p></div>
+                        <div className="space-y-4">
+                            <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
+                                <AlertCircle className="h-4 w-4 text-blue-600" />
+                                <div className="space-y-1">
+                                    <p className="text-sm text-blue-700 font-medium">{t("form.pendingAnalysis")}</p>
+                                    <p className="text-xs text-blue-600">{t("form.pendingAnalysisSubtitle")}</p>
+                                </div>
+                            </div>
+                        </div>
                     ) : (
                         <div className="flex items-center justify-between gap-4">
-                            <p className="text-sm text-muted-foreground flex-1">Gostaria de doar seu tempo para ajudar outros profissionais?</p>
-                            <Button onClick={handleRequestMentor} size="sm" className="gap-2 shrink-0"><UserPlus className="h-4 w-4" /> Tornar-se Mentor</Button>
+                            <p className="text-sm text-muted-foreground flex-1">{t("form.becomeMentorPrompt")}</p>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button size="sm" className="gap-2 shrink-0"><UserPlus className="h-4 w-4" /> {t("form.becomeMentorButton")}</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>{t("form.becomeMentorTitle")}</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            <span className="block mb-2">{t("form.becomeMentorDescription")}</span>
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>{t("form.becomeMentorCancel")}</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleRequestMentor}>{t("form.becomeMentorAction")}</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
                     )}
                  </CardContent>
                </Card>
 
-               {isMentor && (
+               {(isMentor || isPendingMentor) && (
                  <Card>
-                    <CardHeader><CardTitle>Abordagem de Mentoria</CardTitle></CardHeader>
+                    <CardHeader>
+                        <CardTitle>{t("form.mentorshipApproachTitle")}</CardTitle>
+                        <CardDescription>{t("form.mentorshipApproachDescription")}</CardDescription>
+                    </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-1">
-                            <Label>Como você costuma mentorar?</Label>
-                            <Textarea value={formData.mentorship_approach} onChange={(e) => setFormData({...formData, mentorship_approach: e.target.value})} placeholder="Fale sobre seu estilo de mentoria..." />
+                            <Label>{t("form.mentorshipApproachLabel")}</Label>
+                            <Textarea 
+                                value={formData.mentorship_approach} 
+                                onChange={(e) => setFormData({...formData, mentorship_approach: e.target.value})} 
+                                placeholder={t("form.mentorshipApproachPlaceholder")} 
+                            />
                         </div>
                         <div className="space-y-1">
-                            <Label>O que o aluno deve trazer para a sessão?</Label>
-                            <Textarea value={formData.what_to_expect} onChange={(e) => setFormData({...formData, what_to_expect: e.target.value})} />
+                            <Label>{t("form.whatToExpectLabel")}</Label>
+                            <Textarea 
+                                value={formData.what_to_expect} 
+                                onChange={(e) => setFormData({...formData, what_to_expect: e.target.value})} 
+                                placeholder={t("form.whatToExpectPlaceholder")} 
+                            />
                         </div>
                     </CardContent>
                  </Card>
