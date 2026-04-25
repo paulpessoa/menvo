@@ -21,12 +21,15 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { WaitingList } from "@/components/WaitingList"
+import { WaitingListForm } from "@/components/WaitingListForm"
+import { useFeatureFlag } from "@/lib/feature-flags"
 
 function SignupForm() {
   const t = useTranslations("register")
   const tl = useTranslations("login")
-  const { user, role, loading, signUp, signInWithProvider, getDefaultRedirectPath } = useAuth()
+  const { user, loading, signUp, signInWithProvider, getDefaultRedirectPath } =
+    useAuth()
+  const waitingListEnabled = useFeatureFlag("waiting_list_flag")
 
   const isAuthenticated = !!user && !loading
   const [email, setEmail] = useState("")
@@ -84,7 +87,7 @@ function SignupForm() {
     setError("")
     setIsGoogleLoading(true)
     try {
-      await signInWithProvider('google')
+      await signInWithProvider("google")
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
@@ -96,12 +99,21 @@ function SignupForm() {
     setError("")
     setIsLinkedInLoading(true)
     try {
-      await signInWithProvider('linkedin')
+      await signInWithProvider("linkedin")
     } catch (err: any) {
       setError(err.message)
       toast.error(err.message)
       setIsLinkedInLoading(false)
     }
+  }
+
+  // 🚀 Se a fila de espera estiver ativa, renderiza o componente de WaitingListForm
+  if (waitingListEnabled) {
+    return (
+      <div className="container max-w-5xl py-10 md:py-16 flex justify-center">
+        <WaitingListForm />
+      </div>
+    )
   }
 
   if (success) {
@@ -124,8 +136,7 @@ function SignupForm() {
 
             <div className="rounded-lg bg-yellow-50 p-3">
               <p className="text-xs text-yellow-800">
-                <strong>{t("didntReceiveEmail")}</strong>{" "}
-                {t("checkSpam")}
+                <strong>{t("didntReceiveEmail")}</strong> {t("checkSpam")}
               </p>
             </div>
           </CardContent>
@@ -274,9 +285,7 @@ function SignupForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">
-                {t("confirmPassword")}
-              </Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
