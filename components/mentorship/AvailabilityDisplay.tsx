@@ -1,27 +1,27 @@
-'use client';
+"use client"
 
-import { useTranslations } from 'next-intl';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, Calendar } from 'lucide-react';
+import { useTranslations } from "next-intl"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Clock, Calendar } from "lucide-react"
 
 interface AvailabilitySlot {
-  day_of_week: number;
-  start_time: string;
-  end_time: string;
-  timezone?: string | null;
+  day_of_week: number
+  start_time: string
+  end_time: string
+  timezone?: string | null
 }
 
 interface AvailabilityDisplayProps {
-  availability: AvailabilitySlot[] | null;
-  availability_status?: string | null;
+  availability: AvailabilitySlot[] | null
+  availability_status?: string | null
 }
 
-export function AvailabilityDisplay({ 
-  availability, 
-  availability_status 
+export function AvailabilityDisplay({
+  availability,
+  availability_status
 }: AvailabilityDisplayProps) {
-  const t = useTranslations('availability');
+  const t = useTranslations("availability")
 
   if (!availability || availability.length === 0) {
     return (
@@ -29,30 +29,30 @@ export function AvailabilityDisplay({
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock className="h-5 w-5 text-muted-foreground" />
-            {t('noAvailability')}
+            {t("display.noAvailability")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground italic">
-            {t('noAvailabilityDesc')}
+            {t("display.noAvailabilityDesc")}
           </p>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   // Agrupar por dia da semana
   const grouped = availability.reduce(
     (acc: Record<number, AvailabilitySlot[]>, slot: AvailabilitySlot) => {
-      const day = slot.day_of_week;
-      if (!acc[day]) acc[day] = [];
-      acc[day].push(slot);
-      return acc;
+      const day = slot.day_of_week
+      if (!acc[day]) acc[day] = []
+      acc[day].push(slot)
+      return acc
     },
     {}
-  );
+  )
 
-  const daysOrder = [0, 1, 2, 3, 4, 5, 6];
+  const daysOrder = [0, 1, 2, 3, 4, 5, 6]
 
   return (
     <Card>
@@ -60,19 +60,24 @@ export function AvailabilityDisplay({
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            {t('slotsTitle')}
+            {t("slotsTitle")}
           </CardTitle>
           {availability_status && (
-             <Badge variant={availability_status === 'available' ? 'default' : 'secondary'} className="text-[10px] uppercase">
-                {availability_status}
-             </Badge>
+            <Badge
+              variant={
+                availability_status === "available" ? "default" : "secondary"
+              }
+              className="text-[10px] uppercase"
+            >
+              {availability_status}
+            </Badge>
           )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {daysOrder.map((day) => {
-          const slots = grouped[day];
-          if (!slots || slots.length === 0) return null;
+          const slots = grouped[day]
+          if (!slots || slots.length === 0) return null
 
           return (
             <div key={day} className="space-y-2">
@@ -81,17 +86,24 @@ export function AvailabilityDisplay({
               </h4>
               <div className="flex flex-wrap gap-2">
                 {slots
-                  .sort((a: AvailabilitySlot, b: AvailabilitySlot) => a.start_time.localeCompare(b.start_time))
+                  .sort((a: AvailabilitySlot, b: AvailabilitySlot) =>
+                    a.start_time.localeCompare(b.start_time)
+                  )
                   .map((slot, i) => (
-                    <Badge key={i} variant="outline" className="font-medium bg-muted/30">
-                      {slot.start_time.substring(0, 5)} - {slot.end_time.substring(0, 5)}
+                    <Badge
+                      key={i}
+                      variant="outline"
+                      className="font-medium bg-muted/30"
+                    >
+                      {slot.start_time.substring(0, 5)} -{" "}
+                      {slot.end_time.substring(0, 5)}
                     </Badge>
                   ))}
               </div>
             </div>
-          );
+          )
         })}
       </CardContent>
     </Card>
-  );
+  )
 }

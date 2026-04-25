@@ -1344,7 +1344,10 @@
         "startTime": "Start Time",
         "endTime": "End Time",
         "previewTitle": "Availability Preview",
-        "noAvailability": "No slots defined at the moment.",
+        "display": {
+            "noAvailability": "No slots defined at the moment.",
+            "noAvailabilityDesc": "This mentor hasn't configured their schedule yet."
+        },
         "timezoneWarning": "The times below are based on your timezone:",
         "previewDesc": "How your availability will appear to mentees",
         "noSchedule": "No schedule configured",

@@ -1344,7 +1344,10 @@
         "startTime": "Hora de Inicio",
         "endTime": "Hora de Fin",
         "previewTitle": "Vista Previa de Disponibilidad",
-        "noAvailability": "No hay horarios definidos en este momento.",
+        "display": {
+            "noAvailability": "No hay horarios definidos en este momento.",
+            "noAvailabilityDesc": "Este mentor aún no ha configurado sus horarios de atención."
+        },
         "timezoneWarning": "Los horarios a continuación se basan en tu zona horaria:",
         "previewDesc": "Cómo aparecerá tu disponibilidad a los mentees",
         "noSchedule": "Sin horario configurado",

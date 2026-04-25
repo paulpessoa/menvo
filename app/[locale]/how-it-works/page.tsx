@@ -36,173 +36,119 @@ export default function HowItWorksPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="mentees" className="w-full max-w-4xl mx-auto">
-        <div className="flex justify-center mb-8">
-          <TabsList className="grid w-full max-w-4xl grid-cols-2 md:grid-cols-4">
-            <TabsTrigger value="mentees">
+      <Tabs defaultValue="mentees" className="w-full max-w-5xl mx-auto">
+        <div className="flex justify-center mb-12">
+          <TabsList className="grid w-full h-auto p-1 bg-muted/50 rounded-2xl grid-cols-2 md:grid-cols-4 gap-1">
+            <TabsTrigger value="mentees" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               {t("howItWorks.forMentees")}
             </TabsTrigger>
-            <TabsTrigger value="mentors">
+            <TabsTrigger value="mentors" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               {t("howItWorks.forMentors")}
             </TabsTrigger>
-            <TabsTrigger value="ngos">{t("howItWorks.forNGOs")}</TabsTrigger>
-            <TabsTrigger value="companies">
+            <TabsTrigger value="ngos" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
+              {t("howItWorks.forNGOs")}
+            </TabsTrigger>
+            <TabsTrigger value="companies" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               {t("howItWorks.forCompanies")}
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="mentees" className="space-y-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <User className="h-5 w-5" />
+        <TabsContent value="mentees" className="space-y-20 outline-none">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div className="space-y-6">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transform -rotate-3">
+                <User className="h-6 w-6" />
               </div>
-              <h2 className="text-2xl font-bold">
-                {t("howItWorks.mentees.step1.title")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t("howItWorks.mentees.step1.description")}
-              </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step1.feature1")}</span>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-extrabold tracking-tight">
+                    {t("howItWorks.mentees.step1.title")}
+                </h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                    {t("howItWorks.mentees.step1.description")}
+                </p>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-gray-700">{t("howItWorks.mentees.step1.feature1")}</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step1.feature2")}</span>
+                <li className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-gray-700">{t("howItWorks.mentees.step1.feature2")}</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step1.feature3")}</span>
+                <li className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-gray-700">{t("howItWorks.mentees.step1.feature3")}</span>
                 </li>
               </ul>
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center relative">
+              <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
               <Image
                 src="/images/how-it-works/register-mentee.jpg"
-                width={400}
-                height={300}
+                width={450}
+                height={350}
                 alt="Create profile illustration"
-                className="rounded-lg object-cover"
+                className="rounded-2xl object-cover shadow-2xl relative z-10"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:order-last">
-            <div className="flex justify-center md:order-last">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="flex justify-center md:order-last relative">
+              <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
               <Image
                 src="/images/how-it-works/find.jpg"
-                width={400}
-                height={300}
+                width={450}
+                height={350}
                 alt="Find mentors illustration"
-                className="rounded-lg object-cover"
+                className="rounded-2xl object-cover shadow-2xl relative z-10"
               />
             </div>
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Search className="h-5 w-5" />
+            <div className="space-y-6">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transform rotate-3">
+                <Search className="h-6 w-6" />
               </div>
-              <h2 className="text-2xl font-bold">
-                {t("howItWorks.mentees.step2.title")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t("howItWorks.mentees.step2.description")}
-              </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step2.feature1")}</span>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-extrabold tracking-tight">
+                    {t("howItWorks.mentees.step2.title")}
+                </h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                    {t("howItWorks.mentees.step2.description")}
+                </p>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-gray-700">{t("howItWorks.mentees.step2.feature1")}</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step2.feature2")}</span>
+                <li className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-gray-700">{t("howItWorks.mentees.step2.feature2")}</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step2.feature3")}</span>
+                <li className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="font-medium text-gray-700">{t("howItWorks.mentees.step2.feature3")}</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Calendar className="h-5 w-5" />
-              </div>
-              <h2 className="text-2xl font-bold">
-                {t("howItWorks.mentees.step3.title")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t("howItWorks.mentees.step3.description")}
-              </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step3.feature1")}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step3.feature2")}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step3.feature3")}</span>
-                </li>
-              </ul>
-            </div>
-            <div className="flex justify-center">
-              <Image
-                src="/images/how-it-works/schedule.jpg"
-                width={400}
-                height={300}
-                alt="Schedule session illustration"
-                className="rounded-lg object-cover"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center md:order-last">
-            <div className="flex justify-center md:order-last">
-              <Image
-                src="/images/how-it-works/grow-together.jpg"
-                width={400}
-                height={300}
-                alt="Connect and grow illustration"
-                className="rounded-lg object-cover"
-              />
-            </div>
-            <div className="space-y-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Video className="h-5 w-5" />
-              </div>
-              <h2 className="text-2xl font-bold">
-                {t("howItWorks.mentees.step4.title")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t("howItWorks.mentees.step4.description")}
-              </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step4.feature1")}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step4.feature2")}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span>{t("howItWorks.mentees.step4.feature3")}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <Button size="lg" asChild>
+          <div className="flex justify-center pt-8">
+            <Button size="xl" asChild className="px-12 shadow-xl shadow-primary/20">
               <Link href="/signup">{t("howItWorks.mentees.getStarted")}</Link>
             </Button>
           </div>

@@ -1322,7 +1322,10 @@
     "startTime": "Horário de Início",
     "endTime": "Horário de Fim",
     "previewTitle": "Preview da Disponibilidade",
-    "noAvailability": "Nenhum horário definido no momento.",
+    "display": {
+      "noAvailability": "Nenhum horário definido no momento.",
+      "noAvailabilityDesc": "Este mentor ainda não configurou seus horários de atendimento."
+    },
     "timezoneWarning": "Os horários abaixo estão baseados no seu fuso horário:",
     "previewDesc": "Como sua disponibilidade aparecerá para os mentees",
     "noSchedule": "Nenhum horário configurado",

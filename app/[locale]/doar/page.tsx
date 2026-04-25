@@ -32,110 +32,105 @@ export default function DonatePage() {
       </div>
 
       {/* Impact Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>{t("impact.mentees.title")}</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p>{t("impact.mentees.description")}</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-center space-y-4">
+          <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto transform -rotate-6">
+            <Users className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900">{t("impact.mentees.title")}</h3>
+          <p className="text-muted-foreground leading-relaxed">{t("impact.mentees.description")}</p>
+        </div>
 
-        <Card>
-          <CardHeader className="text-center">
-            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>{t("impact.sessions.title")}</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p>{t("impact.sessions.description")}</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-center space-y-4">
+          <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto transform rotate-3">
+            <BookOpen className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900">{t("impact.sessions.title")}</h3>
+          <p className="text-muted-foreground leading-relaxed">{t("impact.sessions.description")}</p>
+        </div>
 
-        <Card>
-          <CardHeader className="text-center">
-            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trophy className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>{t("impact.volunteer.title")}</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p>{t("impact.volunteer.description")}</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-center space-y-4">
+          <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto transform -rotate-3">
+            <Trophy className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900">{t("impact.volunteer.title")}</h3>
+          <p className="text-muted-foreground leading-relaxed">{t("impact.volunteer.description")}</p>
+        </div>
       </div>
 
       {/* Donation Options */}
-      <div className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-8">{t("options.title")}</h2>
+      <div className="mb-24">
+        <h2 className="text-3xl font-extrabold text-center mb-12 tracking-tight text-gray-900">{t("options.title")}</h2>
 
-        <Tabs defaultValue="products" className="max-w-3xl mx-auto">
-          <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="products">{t("options.tabs.products")}</TabsTrigger>
-            <TabsTrigger value="pix">{t("options.tabs.pix")}</TabsTrigger>
-            <TabsTrigger value="vaquinha">{t("options.tabs.crowdfunding")}</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="products" className="max-w-4xl mx-auto">
+          <div className="flex justify-center mb-10">
+            <TabsList className="grid w-full max-w-md h-auto p-1 bg-muted/50 rounded-2xl grid-cols-3 gap-1">
+              <TabsTrigger value="products" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">{t("options.tabs.products")}</TabsTrigger>
+              <TabsTrigger value="pix" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">{t("options.tabs.pix")}</TabsTrigger>
+              <TabsTrigger value="vaquinha" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">{t("options.tabs.crowdfunding")}</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="products" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <Coffee className="h-5 w-5 mr-2" /> {t("products.coffee.title")}
-                  </CardTitle>
+          <TabsContent value="products" className="space-y-4 outline-none">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                <CardHeader className="pb-4">
+                  <div className="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                    <Coffee className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <CardTitle className="text-xl">{t("products.coffee.title")}</CardTitle>
                   <CardDescription>{t("products.coffee.description")}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold mb-2">{t("products.coffee.price")}</div>
+                <CardContent className="flex-1">
+                  <div className="text-4xl font-extrabold text-gray-900 mb-2">{t("products.coffee.price")}</div>
                   <p className="text-sm text-muted-foreground">{t("products.coffee.info")}</p>
                 </CardContent>
-                <CardFooter>
-                  <Button className="w-full">{t("products.coffee.button")}</Button>
+                <CardFooter className="pt-0">
+                  <Button className="w-full rounded-xl h-12 font-bold">{t("products.coffee.button")}</Button>
                 </CardFooter>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <Gift className="h-5 w-5 mr-2" /> {t("products.kit.title")}
-                  </CardTitle>
+              <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                <CardHeader className="pb-4">
+                  <div className="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
+                    <Gift className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-xl">{t("products.kit.title")}</CardTitle>
                   <CardDescription>{t("products.kit.description")}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold mb-2">{t("products.kit.price")}</div>
+                <CardContent className="flex-1">
+                  <div className="text-4xl font-extrabold text-gray-900 mb-2">{t("products.kit.price")}</div>
                   <p className="text-sm text-muted-foreground">{t("products.kit.info")}</p>
                 </CardContent>
-                <CardFooter>
-                  <Button className="w-full">{t("products.kit.button")}</Button>
+                <CardFooter className="pt-0">
+                  <Button className="w-full rounded-xl h-12 font-bold">{t("products.kit.button")}</Button>
                 </CardFooter>
               </Card>
 
-              <Card className="border-primary">
-                <CardHeader>
-                  <Badge className="w-fit mb-2">{t("products.supporter.badge")}</Badge>
-                  <CardTitle className="flex items-center text-lg">
-                    <Heart className="h-5 w-5 mr-2 text-rose-500" /> {t("products.supporter.title")}
-                  </CardTitle>
-                  <CardDescription>{t("products.supporter.description")}</CardDescription>
+              <Card className="rounded-3xl border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/20 overflow-hidden flex flex-col relative scale-105 z-10">
+                <div className="absolute top-0 right-0 p-4">
+                    <Badge className="bg-white/20 text-white border-none backdrop-blur-md">{t("products.supporter.badge")}</Badge>
+                </div>
+                <CardHeader className="pb-4">
+                  <div className="bg-white/10 w-10 h-10 rounded-lg flex items-center justify-center mb-2 backdrop-blur-md">
+                    <Heart className="h-5 w-5 text-white fill-white" />
+                  </div>
+                  <CardTitle className="text-xl text-white">{t("products.supporter.title")}</CardTitle>
+                  <CardDescription className="text-primary-50/80">{t("products.supporter.description")}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold mb-2">{t("products.supporter.price")}</div>
-                  <p className="text-sm text-muted-foreground">{t("products.supporter.info")}</p>
+                <CardContent className="flex-1">
+                  <div className="text-4xl font-extrabold text-white mb-2">{t("products.supporter.price")}</div>
+                  <p className="text-sm text-primary-50/70">{t("products.supporter.info")}</p>
                 </CardContent>
-                <CardFooter>
-                  <Button className="w-full" variant="default">
+                <CardFooter className="pt-0">
+                  <Button className="w-full rounded-xl h-12 font-bold bg-white text-primary hover:bg-white/90 shadow-2xl">
                     {t("products.supporter.button")}
                   </Button>
                 </CardFooter>
               </Card>
             </div>
 
-            <div className="text-center mt-8 text-sm text-muted-foreground">
+            <div className="text-center mt-12 text-sm text-muted-foreground italic">
               <p>{t("products.disclaimer")}</p>
             </div>
           </TabsContent>
