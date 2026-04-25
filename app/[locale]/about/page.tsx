@@ -186,34 +186,6 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <div className="bg-primary text-primary-foreground rounded-[2.5rem] p-10 md:p-20 mb-24 shadow-2xl shadow-primary/20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="max-w-4xl mx-auto text-center space-y-10 relative z-10">
-          <h2 className="text-3xl font-extrabold tracking-tight">{t("about.ourImpact.title")}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
-            <div className="space-y-2">
-              <div className="text-5xl font-black text-white">
-                {t("about.ourImpact.volunteerMentors.count")}
-              </div>
-              <div className="text-sm font-bold uppercase tracking-widest opacity-80">{t("about.ourImpact.volunteerMentors.label")}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-5xl font-black text-white">
-                {t("about.ourImpact.mentorshipSessions.count")}
-              </div>
-              <div className="text-sm font-bold uppercase tracking-widest opacity-80">{t("about.ourImpact.mentorshipSessions.label")}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-5xl font-black text-white">
-                {t("about.ourImpact.countriesReached.count")}
-              </div>
-              <div className="text-sm font-bold uppercase tracking-widest opacity-80">{t("about.ourImpact.countriesReached.label")}</div>
-            </div>
-          </div>
-          <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto italic leading-relaxed">"{t("about.ourImpact.description")}"</p>
-        </div>
-      </div>
-
       <div className="text-center mb-24" id="partners">
         <Partners />
       </div>

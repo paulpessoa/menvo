@@ -86,49 +86,54 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
 
   return (
     <>
-      <Card className="hover:shadow-md transition-all flex flex-col h-full border-2 hover:border-primary/20 bg-white group">
-        <CardHeader className="pb-3 px-6 pt-6">
-          <div className="flex items-center space-x-4">
+      <Card className="hover:shadow-xl transition-all duration-300 flex flex-col h-full border-none shadow-sm bg-white group overflow-hidden rounded-[2rem]">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+        
+        <CardHeader className="pb-3 px-6 pt-8">
+          <div className="flex flex-col items-center text-center space-y-3">
             <div className="relative">
-              <Avatar className="h-14 w-14 border-2 border-muted shadow-sm">
+              <Avatar className="h-20 w-20 border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300">
                 <AvatarImage
                   src={profile.avatar_url || ""}
                   alt={profile.full_name || "Membro"}
                 />
-                <AvatarFallback className="bg-primary/5 text-primary font-bold">
+                <AvatarFallback className="bg-primary/5 text-primary text-xl font-bold">
                   {profile.full_name?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
+              <div className="absolute -bottom-1 -right-1 bg-green-500 h-4 w-4 rounded-full border-2 border-white shadow-sm" title="Disponível para aprender" />
             </div>
-            <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg truncate font-bold text-gray-900">
+            <div className="space-y-1">
+              <CardTitle className="text-xl font-extrabold text-gray-900 group-hover:text-primary transition-colors">
                 {profile.full_name || "Membro Menvo"}
               </CardTitle>
-              <CardDescription className="text-sm truncate text-gray-500 font-medium">
-                {profile.job_title || "Mentorado"}
-                {profile.company ? ` @ ${profile.company}` : ""}
-              </CardDescription>
+              <div className="flex flex-col items-center text-sm font-semibold text-primary/70">
+                <span>{profile.job_title || "Mentorado"}</span>
+                {profile.company && (
+                    <span className="text-xs text-muted-foreground font-medium">@{profile.company}</span>
+                )}
+              </div>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4 flex-1 flex flex-col px-6 pb-6">
-          <div className="space-y-2 flex-1">
-            <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
+        <CardContent className="space-y-5 flex-1 flex flex-col px-8 pb-8">
+          <div className="space-y-3 flex-1 text-center">
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
               {tCommunity("seekingHelpWith")}
             </p>
-            <p className="text-sm text-gray-600 line-clamp-3 italic leading-relaxed">
+            <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed italic">
               "{profile.bio || tCommunity("noBioProvided")}"
             </p>
           </div>
 
           {profile.expertise_areas && profile.expertise_areas.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-2">
-              {profile.expertise_areas.slice(0, 4).map((area, i) => (
+            <div className="flex flex-wrap justify-center gap-1.5 pt-2">
+              {profile.expertise_areas.slice(0, 3).map((area, i) => (
                 <Badge
                   key={i}
                   variant="secondary"
-                  className="text-[10px] font-semibold bg-gray-100 text-gray-700 border-none"
+                  className="text-[9px] font-bold uppercase tracking-wider bg-primary/5 text-primary border-none px-2"
                 >
                   {area}
                 </Badge>
@@ -136,14 +141,14 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
             </div>
           )}
 
-          <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
-            <div className="flex items-center justify-between gap-2">
-               <div className="flex gap-1">
+          <div className="flex flex-col gap-4 pt-6">
+            <div className="flex items-center justify-between gap-4">
+               <div className="flex gap-2">
                 {profile.linkedin_url && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                    className="h-9 w-9 rounded-xl text-blue-600 bg-blue-50/50 hover:bg-blue-100 hover:scale-110 transition-all"
                     onClick={(e) => handleProtectedAction(e, () => window.open(profile.linkedin_url!, '_blank'))}
                   >
                     <Linkedin className="h-4 w-4" />
@@ -153,7 +158,7 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-gray-900 hover:bg-gray-100"
+                    className="h-9 w-9 rounded-xl text-gray-900 bg-gray-100/50 hover:bg-gray-200 hover:scale-110 transition-all"
                     onClick={(e) => handleProtectedAction(e, () => window.open(profile.github_url!, '_blank'))}
                   >
                     <Github className="h-4 w-4" />
@@ -162,21 +167,21 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                </div>
                
                <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={handleViewProfile}
-                  className="text-xs font-semibold text-muted-foreground hover:text-primary gap-1"
+                  className="rounded-xl text-xs font-bold text-muted-foreground hover:text-primary hover:border-primary px-4"
                >
-                 <Eye className="h-3 w-3" /> Ver Perfil
+                 Ver Perfil
                </Button>
             </div>
 
             <Button
-              size="sm"
+              size="lg"
               onClick={handleHelpClick}
-              className="w-full gap-2 font-bold shadow-sm"
+              className="w-full gap-2 font-bold shadow-lg shadow-primary/20 rounded-xl h-12"
             >
-              <MessageCircle className="h-4 w-4" /> {tCommunity("offerHelp")}
+              <MessageCircle className="h-5 w-5" /> {tCommunity("offerHelp")}
             </Button>
           </div>
         </CardContent>
