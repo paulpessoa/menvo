@@ -31,6 +31,7 @@ import { AvailabilityDisplay } from "@/components/mentorship/AvailabilityDisplay
 import { BookMentorshipModal } from "@/components/mentorship/BookMentorshipModal"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useTranslations } from "next-intl"
+import { MentorshipReviews } from "@/components/mentors/MentorshipReviews"
 
 interface MentorProfile {
   id: string
@@ -334,6 +335,8 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
               </CardContent>
             </Card>
           )}
+
+          <MentorshipReviews mentorId={mentor.id} />
         </div>
 
         <div className="space-y-6">

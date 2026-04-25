@@ -7,32 +7,26 @@ import React, {
   useState,
   useCallback
 } from "react"
-import type { Database } from "@/lib/types/supabase"
 
 /**
- * Interface única para Feature Flags da plataforma.
- * Nomes padronizados em camelCase conforme as diretrizes de design.
+ * Interface de Feature Flags.
  */
 export interface FeatureFlags {
   waitingListEnabled: boolean
-  feedbackEnabled: boolean
-  newUserRegistration: boolean
   newMentorshipUx: boolean
-  [key: string]: boolean | undefined
+  feedbackEnabled: boolean
+  maintenanceMode: boolean
 }
 
 /**
- * Fallbacks seguros (Hardcoded).
- * Esta é a base que garante que o app não quebre se a API falhar.
- * O banco de dados é a fonte soberana e sempre sobrescreverá estes valores.
+ * Defaults seguros.
  */
 export const DEFAULT_FLAGS: FeatureFlags = {
   waitingListEnabled: false,
-  feedbackEnabled: false, // Oculto por padrão conforme solicitado
-  newUserRegistration: true,
-  newMentorshipUx: false
+  newMentorshipUx: false,
+  feedbackEnabled: false,
+  maintenanceMode: false
 }
-
 
 interface FeatureFlagsContextType {
   flags: FeatureFlags
@@ -45,34 +39,22 @@ const FeatureFlagsContext = createContext<FeatureFlagsContextType | undefined>(
   undefined
 )
 
-/**
- * FeatureFlagsProvider
- * Provedor de estado global para flags. Centraliza a busca na nossa API.
- * Estrutura preparada para integração com LaunchDarkly ou similares:
- * Basta trocar a lógica de fetch para consumir o SDK do provedor externo.
- */
 export function FeatureFlagsProvider({
-  children,
-  initialFlags
+  children
 }: {
   children: React.ReactNode
-  initialFlags?: Partial<FeatureFlags>
 }) {
-  const [flags, setFlags] = useState<FeatureFlags>(() => ({
-    ...DEFAULT_FLAGS,
-    ...initialFlags
-  }))
+  const [flags, setFlags] = useState<FeatureFlags>(DEFAULT_FLAGS)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchFlags = useCallback(async () => {
     try {
-      setIsLoading(true)
       const response = await fetch("/api/feature-flags")
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       const data = await response.json()
-      setFlags((prev) => ({ ...prev, ...data.flags }))
+      
+      setFlags(data.flags)
     } catch (err) {
       console.error("Error fetching feature flags:", err)
       setError(err instanceof Error ? err.message : "Unknown error")
@@ -97,25 +79,11 @@ export function FeatureFlagsProvider({
 export function useFeatureFlags() {
   const context = useContext(FeatureFlagsContext)
   if (context === undefined)
-    throw new Error(
-      "useFeatureFlags must be used within a FeatureFlagsProvider"
-    )
+    throw new Error("useFeatureFlags must be used within a FeatureFlagsProvider")
   return context
 }
 
-/**
- * useFeatureFlag (Hook Principal)
- * Use este hook em qualquer componente para ler uma flag.
- */
 export function useFeatureFlag(flagName: keyof FeatureFlags): boolean {
   const { flags } = useFeatureFlags()
-  return flags[flagName] ?? DEFAULT_FLAGS[flagName] ?? false
-}
-
-/**
- * getFeatureFlags (Servidor)
- * Helper para verificar flags no servidor (Server Components).
- */
-export async function getFeatureFlags(): Promise<FeatureFlags> {
-  return DEFAULT_FLAGS
+  return flags[flagName] ?? DEFAULT_FLAGS[flagName]
 }

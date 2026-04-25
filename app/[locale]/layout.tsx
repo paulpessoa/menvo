@@ -15,6 +15,7 @@ import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
 import { ConsoleEasterEgg } from "@/components/ConsoleEasterEgg"
 import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
+import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -113,7 +114,11 @@ export default async function RootLayout({
             <div className="flex min-h-screen flex-col">
               <ConsoleEasterEgg />
               <Header />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1">
+                <MaintenanceGuard>
+                  {children}
+                </MaintenanceGuard>
+              </main>
               <Footer />
               <FeedbackBanner />
               <CookieConsentBanner />

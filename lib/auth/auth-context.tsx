@@ -23,6 +23,16 @@ export interface AuthContextType {
     isModerator: boolean
     isVerified: boolean
     isPending: boolean
+    cachedRoles: {
+        admin: boolean
+        mentor: boolean
+        mentee: boolean
+        moderator: boolean
+        role: string | null
+        isVerified: boolean
+        roles: string[]
+        isPending: boolean
+    }
     signIn: (email: string, password: string) => Promise<{ success: boolean, error?: any }>
     signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ success: boolean, error?: any }>
     signInWithProvider: (provider: Provider) => Promise<{ success: boolean, error?: any }>
@@ -257,6 +267,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isModerator: cachedRoles.moderator,
         isVerified: cachedRoles.isVerified,
         isPending: cachedRoles.isPending,
+        cachedRoles,
         signIn,
         signUp,
         signInWithProvider,

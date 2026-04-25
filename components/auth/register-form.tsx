@@ -32,9 +32,8 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
     const { signUp, signInWithProvider } = useAuth()
     const waitingListEnabled = useFeatureFlag("waitingListEnabled")
-    const newUserRegistration = useFeatureFlag("newUserRegistration")
 
-    if (waitingListEnabled && !newUserRegistration) {
+    if (waitingListEnabled) {
         return <WaitingListForm onSuccess={onSuccess} />
     }
 

@@ -22,16 +22,18 @@ export async function GET() {
     // Mapeamento de snake_case (DB) para camelCase (Frontend)
     const nameMapping: Record<string, string> = {
       'waiting_list_enabled': 'waitingListEnabled',
+      'new_mentorship_ux': 'newMentorshipUx',
       'feedback_enabled': 'feedbackEnabled',
-      'new_user_registration': 'newUserRegistration',
-      'new_mentorship_ux': 'newMentorshipUx'
+      'maintenance_mode': 'maintenanceMode'
     }
 
     if (dbFlags) {
       dbFlags.forEach(f => {
         if (f.name && f.enabled !== null) {
-          const frontendName = nameMapping[f.name] || f.name
-          flagsFromDB[frontendName] = f.enabled
+          const frontendName = nameMapping[f.name]
+          if (frontendName) {
+            flagsFromDB[frontendName] = f.enabled
+          }
         }
       })
     }

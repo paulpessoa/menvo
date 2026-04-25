@@ -1,43 +1,39 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Star, MessageSquare } from "lucide-react"
+import { Star, MessageSquare, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { useTranslations } from "next-intl"
-import { useToast } from "@/hooks/useToast"
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogHeader,
+  DialogTitle
 } from "@/components/ui/dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from "@/components/ui/tooltip"
+import { useToast } from "@/hooks/use-toast"
+import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { useFeatureFlag } from "@/lib/feature-flags"
 
+/**
+ * FeedbackBanner
+ * Exibe um balão flutuante para coletar feedback rápido dos usuários.
+ * Controlado pela Feature Flag 'feedbackEnabled'.
+ */
 export function FeedbackBanner() {
   const t = useTranslations()
   const { isAuthenticated } = useAuth()
   const feedbackEnabled = useFeatureFlag("feedbackEnabled")
   const { toast } = useToast()
+  
   const [isOpen, setIsOpen] = useState(false)
   const [rating, setRating] = useState<number | null>(null)
   const [comment, setComment] = useState("")
-  const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showThankYou, setShowThankYou] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // Evitar hydration mismatch
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -45,7 +41,8 @@ export function FeedbackBanner() {
   const handleSubmit = async () => {
     if (!rating) {
       toast({
-        title: t("feedback.ratingRequired"),
+        title: "Avaliação necessária",
+        description: "Por favor, selecione uma nota de 1 a 5.",
         variant: "destructive"
       })
       return
@@ -56,28 +53,19 @@ export function FeedbackBanner() {
     try {
       const response = await fetch("/api/feedback", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          rating,
-          comment,
-          email: isAuthenticated ? undefined : email
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, comment })
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Erro ao enviar feedback")
-      }
+      if (!response.ok) throw new Error("Falha ao enviar")
 
       setShowThankYou(true)
       setRating(null)
       setComment("")
-      setEmail("")
     } catch (error) {
       toast({
-        title: t("feedback.error"),
+        title: "Erro ao enviar",
+        description: "Tente novamente em instantes.",
         variant: "destructive"
       })
     } finally {
@@ -85,112 +73,73 @@ export function FeedbackBanner() {
     }
   }
 
-  const handleClose = () => {
-    setIsOpen(false)
-    setShowThankYou(false)
-  }
-
-  // Não renderizar até estar montado no cliente para evitar hydration mismatch
-  if (!mounted) return null
-
-  // 🚧 Feature flag controlada via Contexto/Banco
-  if (!feedbackEnabled) return null
+  if (!mounted || !feedbackEnabled) return null
 
   return (
     <>
-      {/* Floating Button with Tooltip */}
-      <div className="fixed bottom-6 left-4 z-50">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
-                onClick={() => setIsOpen(true)}
-                aria-label={t("feedback.title")}
-              >
-                <MessageSquare className="h-10 w-10" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent
-              side="left"
-              className="bg-primary text-primary-foreground"
-            >
-              <p>{t("feedback.helpUsImprove")}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+      {/* Botão Flutuante */}
+      <Button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-primary hover:scale-110 transition-transform"
+        size="icon"
+      >
+        <MessageSquare className="h-6 w-6" />
+      </Button>
 
-      {/* Feedback Dialog */}
+      {/* Modal de Feedback */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-[425px]">
           {showThankYou ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-center text-2xl">🎉</DialogTitle>
-                <DialogDescription className="text-center text-lg">
-                  {t("feedback.thankYou")}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button onClick={handleClose} className="w-full">
-                  {t("common.close")}
-                </Button>
-              </DialogFooter>
-            </>
+            <div className="py-10 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <Star className="h-8 w-8 text-green-600 fill-green-600" />
+              </div>
+              <DialogTitle>Obrigado pelo seu feedback!</DialogTitle>
+              <DialogDescription>
+                Sua opinião é fundamental para construirmos uma Menvo melhor.
+              </DialogDescription>
+              <Button onClick={() => setIsOpen(false)} className="w-full">Fechar</Button>
+            </div>
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle>{t("feedback.title")}</DialogTitle>
+                <DialogTitle>O que você está achando da Menvo?</DialogTitle>
                 <DialogDescription>
-                  {t("feedback.description")}
+                  Sua avaliação ajuda a melhorar a experiência de mentoria para todos.
                 </DialogDescription>
               </DialogHeader>
-
-              <div className="space-y-4">
-                <div className="flex justify-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Button
-                      key={star}
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setRating(star)}
-                      className={`h-8 w-8 ${
-                        rating && star <= rating
-                          ? "text-yellow-400"
-                          : "text-gray-300"
+              
+              <div className="py-6 space-y-6">
+                <div className="flex justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setRating(num)}
+                      className={`p-2 rounded-lg transition-all ${
+                        rating === num ? 'bg-primary text-white scale-110' : 'bg-muted hover:bg-muted/80'
                       }`}
-                      aria-label={t("feedback.rateStars", { count: star })}
                     >
-                      <Star className="h-5 w-5" />
-                    </Button>
+                      <Star className={`h-8 w-8 ${rating === num ? 'fill-current' : 'text-muted-foreground'}`} />
+                    </button>
                   ))}
                 </div>
 
-                <Textarea
-                  placeholder={t("feedback.commentPlaceholder")}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="min-h-[100px]"
-                />
-
-                {!isAuthenticated && (
-                  <Input
-                    type="email"
-                    placeholder={t("feedback.emailPlaceholder")}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Conte-nos mais (opcional)</p>
+                  <Textarea
+                    placeholder="Elogios, críticas ou sugestões..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    rows={4}
                   />
-                )}
+                </div>
 
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full"
+                <Button 
+                  onClick={handleSubmit} 
+                  className="w-full" 
+                  disabled={isSubmitting || !rating}
                 >
-                  {isSubmitting ? t("common.submitting") : t("feedback.submit")}
+                  {isSubmitting ? "Enviando..." : "Enviar Feedback"}
                 </Button>
               </div>
             </>
