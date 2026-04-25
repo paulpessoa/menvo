@@ -1322,12 +1322,21 @@
         }
     },
     "availability": {
+        "common": {
+            "back": "Volver"
+        },
         "title": "Configurar Disponibilidad",
-        "description": "Define tus horarios disponibles para mentorías",
+        "subtitle": "Define los días y horarios en los que podrás atender a tus mentorizados.",
         "loading": "Cargando disponibilidad...",
         "saving": "Guardando...",
+        "save": "Guardar Disponibilidad",
         "saveButton": "Guardar Disponibilidad",
+        "addSlot": "Añadir Horario",
         "addTime": "Añadir Horario",
+        "slotsTitle": "Tus Horarios",
+        "slotsSubtitle": "Añade los intervalos de tiempo para cada día de la semana.",
+        "noSlots": "Aún no has configurado ningún horario de disponibilidad.",
+        "addFirstSlot": "Haz clic aquí para añadir tu primer horario",
         "availableHours": "Horarios Disponibles",
         "availableHoursDesc": "Añade los días y horarios en los que estás disponible para mentorías",
         "timeSlot": "Horario {number}",
@@ -1335,6 +1344,8 @@
         "startTime": "Hora de Inicio",
         "endTime": "Hora de Fin",
         "previewTitle": "Vista Previa de Disponibilidad",
+        "noAvailability": "No hay horarios definidos en este momento.",
+        "timezoneWarning": "Los horarios a continuación se basan en tu zona horaria:",
         "previewDesc": "Cómo aparecerá tu disponibilidad a los mentees",
         "noSchedule": "Sin horario configurado",
         "addScheduleToPreview": "Añade horarios para ver la vista previa",

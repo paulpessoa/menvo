@@ -1322,12 +1322,21 @@
         }
     },
     "availability": {
+        "common": {
+            "back": "Back"
+        },
         "title": "Setup Availability",
-        "description": "Define your available hours for mentorship",
+        "subtitle": "Set the days and times when you will be able to assist your mentees.",
         "loading": "Loading availability...",
         "saving": "Saving...",
+        "save": "Save Availability",
         "saveButton": "Save Availability",
+        "addSlot": "Add Time Slot",
         "addTime": "Add Time Slot",
+        "slotsTitle": "Your Schedule",
+        "slotsSubtitle": "Add time intervals for each day of the week.",
+        "noSlots": "You haven't configured any availability slots yet.",
+        "addFirstSlot": "Click here to add your first slot",
         "availableHours": "Available Hours",
         "availableHoursDesc": "Add the days and times when you are available for mentorships",
         "timeSlot": "Slot {number}",
@@ -1335,6 +1344,8 @@
         "startTime": "Start Time",
         "endTime": "End Time",
         "previewTitle": "Availability Preview",
+        "noAvailability": "No slots defined at the moment.",
+        "timezoneWarning": "The times below are based on your timezone:",
         "previewDesc": "How your availability will appear to mentees",
         "noSchedule": "No schedule configured",
         "addScheduleToPreview": "Add time slots to see the preview",

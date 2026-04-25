@@ -41,30 +41,40 @@ export async function GET(request: NextRequest) {
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    // 3. Query base
-    let query = supabase
-      .from("profiles")
-      .select(`
+    // 3. Query base - Definimos o select dependendo da aba para forçar o filtro
+    let selectStr = `
+      *,
+      user_roles (
+        roles (
+          name
+        )
+      )
+    `
+
+    // Se for uma aba de role específica, usamos !inner para filtrar o nível superior (Profiles)
+    if (["pending", "mentors", "mentees"].includes(tab)) {
+      selectStr = `
         *,
-        user_roles (
-          roles (
+        user_roles!inner (
+          roles!inner (
             name
           )
         )
-      `, { count: "exact" })
+      `
+    }
+
+    let query = supabase
+      .from("profiles")
+      .select(selectStr, { count: "exact" })
 
     // Filtros por aba
     if (tab === "pending") {
-      // Aguardando: Mentores pendentes de verificação
-      query = query.filter("user_roles.roles.name", "eq", "mentor").eq("verified", false)
+      query = query.eq("user_roles.roles.name", "mentor").eq("verified", false)
     } else if (tab === "mentors") {
-      // Mentores: Qualquer um com role mentor
-      query = query.filter("user_roles.roles.name", "eq", "mentor")
+      query = query.eq("user_roles.roles.name", "mentor")
     } else if (tab === "mentees") {
-      // Mentees: Qualquer um com role mentee
-      query = query.filter("user_roles.roles.name", "eq", "mentee")
+      query = query.eq("user_roles.roles.name", "mentee")
     } else if (tab === "undefined") {
-      // Não Definidos: Usuários sem nenhuma role atribuída
       query = query.is("user_roles", null)
     }
 
