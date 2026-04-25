@@ -47,11 +47,8 @@ export async function POST(request: NextRequest) {
       appointment = result.data
       fetchError = result.error
     } else if (rawAppointmentId) {
-      // Buscar por ID (fluxo antigo)
-      const appointmentId =
-        typeof rawAppointmentId === "string"
-          ? parseInt(rawAppointmentId, 10)
-          : rawAppointmentId
+      // Buscar por ID (UUID como string)
+      const appointmentId = rawAppointmentId
 
       const result = await supabase
         .from("appointments")

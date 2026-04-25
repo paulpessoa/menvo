@@ -87,7 +87,7 @@ export function AppointmentCard({
       const { data } = await supabase
         .from("appointment_feedbacks")
         .select("id")
-        .eq("appointment_id", Number(appointment.id))
+        .eq("appointment_id", appointment.id)
         .eq("reviewer_id", currentUserId)
         .maybeSingle()
 
