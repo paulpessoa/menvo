@@ -91,7 +91,7 @@ export default function AdminDashboard() {
 
       const { count: totalMentees } = await supabase
         .from("user_roles")
-        .select("*", { count: "exact", head: true })
+        .select("*, roles!inner(name)", { count: "exact", head: true })
         .eq("roles.name", "mentee")
 
       const { count: totalSessions } = await supabase
