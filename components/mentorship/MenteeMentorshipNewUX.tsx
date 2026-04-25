@@ -15,16 +15,16 @@ export function MenteeMentorshipNewUX() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Hero / Próxima Mentoria */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0F7185] to-[#4191A2] p-8 text-white shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-700 p-8 text-white shadow-lg">
                 <div className="relative z-10 space-y-4">
-                    <Badge className="bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md">Próximo Encontro</Badge>
+                    <Badge className="bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-3 py-1">Próximo Encontro</Badge>
                     <h2 className="text-3xl font-bold tracking-tight">Prepare-se para crescer!</h2>
-                    <p className="max-w-md text-white/80">Você tem uma sessão agendada em breve. Revise suas perguntas e aproveite cada minuto.</p>
+                    <p className="max-w-md text-primary-50/90 leading-relaxed">Você tem uma sessão agendada em breve. Revise suas perguntas e aproveite cada minuto.</p>
                     <div className="flex flex-wrap gap-3 pt-2">
-                        <Button className="bg-white text-[#0F7185] hover:bg-white/90 font-bold">
+                        <Button className="bg-white text-primary hover:bg-white/90 font-bold shadow-xl border-none">
                             Ver Detalhes
                         </Button>
-                        <Button variant="outline" className="border-white text-white hover:bg-white/10">
+                        <Button variant="outline" className="border-white/40 text-white hover:bg-white/10 backdrop-blur-sm">
                             Meus Objetivos
                         </Button>
                     </div>

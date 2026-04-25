@@ -201,7 +201,7 @@ export default function QuizResultsPage() {
                                 <Target className="h-4 w-4" />
                                 {t('quiz_results.incomplete_analysis')}
                             </div>
-                            <h1 className="text-4xl md:text-5xl font-bold text-primary-600">
+                            <h1 className="text-4xl md:text-5xl font-bold text-primary">
                                 {analysis.titulo_personalizado}
                             </h1>
                             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -468,7 +468,7 @@ export default function QuizResultsPage() {
                     <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-700">
                         <CardContent className="pt-6">
                             <p
-                                className="text-center text-lg font-medium mb-4 text-primary-600"
+                                className="text-center text-lg font-medium mb-4 text-primary"
                             >
                                 {analysis.mensagem_final}
                             </p>

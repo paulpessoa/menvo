@@ -194,7 +194,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <div className="bg-primary-600 text-primary-foreground rounded-lg p-8 md:p-12 mb-16">
+      <div className="bg-primary text-primary-foreground rounded-lg p-8 md:p-12 mb-16">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-2xl font-bold">{t("about.ourImpact.title")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
