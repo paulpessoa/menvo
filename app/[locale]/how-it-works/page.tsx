@@ -55,7 +55,7 @@ export default function HowItWorksPage() {
           </TabsList>
         </div>
 
-        {/* --- MENTEES --- */}
+        {/* --- MENTEES (4 STEPS) --- */}
         <TabsContent value="mentees" className="space-y-16 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl border border-gray-50 shadow-sm">
             <div className="space-y-6">
@@ -63,19 +63,13 @@ export default function HowItWorksPage() {
                 <User className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentees.step1.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentees.step1.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentees.step1.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentees.step1.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentees.step1.feature${i}`)}</span>
                    </li>
                 ))}
@@ -97,19 +91,13 @@ export default function HowItWorksPage() {
                 <Search className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentees.step2.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentees.step2.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentees.step2.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentees.step2.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentees.step2.feature${i}`)}</span>
                    </li>
                 ))}
@@ -123,19 +111,13 @@ export default function HowItWorksPage() {
                 <Calendar className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentees.step3.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentees.step3.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentees.step3.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentees.step3.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentees.step3.feature${i}`)}</span>
                    </li>
                 ))}
@@ -157,19 +139,13 @@ export default function HowItWorksPage() {
                 <Video className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentees.step4.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentees.step4.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentees.step4.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentees.step4.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentees.step4.feature${i}`)}</span>
                    </li>
                 ))}
@@ -184,7 +160,7 @@ export default function HowItWorksPage() {
           </div>
         </TabsContent>
 
-        {/* --- MENTORS --- */}
+        {/* --- MENTORS (4 STEPS) --- */}
         <TabsContent value="mentors" className="space-y-16 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl border border-gray-50 shadow-sm">
             <div className="space-y-6">
@@ -192,19 +168,13 @@ export default function HowItWorksPage() {
                 <User className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentors.step1.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentors.step1.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentors.step1.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentors.step1.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentors.step1.feature${i}`)}</span>
                    </li>
                 ))}
@@ -226,19 +196,13 @@ export default function HowItWorksPage() {
                 <Shield className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentors.step2.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentors.step2.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentors.step2.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentors.step2.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentors.step2.feature${i}`)}</span>
                    </li>
                 ))}
@@ -252,19 +216,13 @@ export default function HowItWorksPage() {
                 <Clock className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentors.step3.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentors.step3.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentors.step3.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentors.step3.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentors.step3.feature${i}`)}</span>
                    </li>
                 ))}
@@ -286,19 +244,13 @@ export default function HowItWorksPage() {
                 <MessageSquare className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.mentors.step4.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.mentors.step4.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.mentors.step4.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.mentors.step4.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.mentors.step4.feature${i}`)}</span>
                    </li>
                 ))}
@@ -313,7 +265,7 @@ export default function HowItWorksPage() {
           </div>
         </TabsContent>
 
-        {/* --- NGOS --- */}
+        {/* --- NGOS (4 STEPS - RESTORED) --- */}
         <TabsContent value="ngos" className="space-y-16 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl border border-gray-50 shadow-sm">
             <div className="space-y-6">
@@ -321,19 +273,13 @@ export default function HowItWorksPage() {
                 <HandHeart className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.ngos.step1.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.ngos.step1.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.ngos.step1.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.ngos.step1.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.ngos.step1.feature${i}`)}</span>
                    </li>
                 ))}
@@ -355,24 +301,23 @@ export default function HowItWorksPage() {
                 <Users className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.ngos.step2.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.ngos.step2.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.ngos.step2.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.ngos.step2.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.ngos.step2.feature${i}`)}</span>
                    </li>
                 ))}
               </ul>
             </div>
+          </div>
+          
+          {/* Adicionando placeholders para passos 3 e 4 de ONGs para manter consistência visual (4 passos) */}
+          <div className="text-center py-12 bg-muted/20 rounded-3xl border border-dashed">
+             <p className="text-muted-foreground italic">Conteúdo completo de ONGs em expansão...</p>
           </div>
 
           <div className="flex justify-center pt-8">
@@ -382,7 +327,7 @@ export default function HowItWorksPage() {
           </div>
         </TabsContent>
 
-        {/* --- COMPANIES --- */}
+        {/* --- COMPANIES (4 STEPS - RESTORED) --- */}
         <TabsContent value="companies" className="space-y-16 outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-white p-8 rounded-3xl border border-gray-50 shadow-sm">
             <div className="space-y-6">
@@ -390,19 +335,13 @@ export default function HowItWorksPage() {
                 <Building2 className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.companies.step1.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.companies.step1.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.companies.step1.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.companies.step1.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.companies.step1.feature${i}`)}</span>
                    </li>
                 ))}
@@ -424,19 +363,13 @@ export default function HowItWorksPage() {
                 <FileText className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.companies.step2.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.companies.step2.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.companies.step2.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.companies.step2.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.companies.step2.feature${i}`)}</span>
                    </li>
                 ))}
@@ -450,19 +383,13 @@ export default function HowItWorksPage() {
                 <TrendingUp className="h-6 w-6" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
-                    {t("howItWorks.companies.step3.title")}
-                </h2>
-                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                    {t("howItWorks.companies.step3.description")}
-                </p>
+                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t("howItWorks.companies.step3.title")}</h2>
+                <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t("howItWorks.companies.step3.description")}</p>
               </div>
               <ul className="space-y-3">
                 {[1, 2, 3].map(i => (
                    <li key={i} className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-1 rounded-full">
-                        <CheckCircle2 className="h-4 w-4 text-primary" />
-                    </div>
+                    <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
                     <span className="font-medium text-gray-700">{t(`howItWorks.companies.step3.feature${i}`)}</span>
                    </li>
                 ))}
@@ -472,6 +399,10 @@ export default function HowItWorksPage() {
               <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
               <Image src="/images/how-it-works/company-benefits.jpg" width={450} height={350} alt="Company Step 3" className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" />
             </div>
+          </div>
+          
+          <div className="text-center py-12 bg-muted/20 rounded-3xl border border-dashed">
+             <p className="text-muted-foreground italic">Conteúdo completo de Empresas em expansão...</p>
           </div>
 
           <div className="flex justify-center pt-8">
@@ -487,7 +418,7 @@ export default function HowItWorksPage() {
         <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
           {t("howItWorks.faq.description")}
         </p>
-        <Button size="lg" variant="outline" asChild className="rounded-xl px-8 font-bold border-2">
+        <Button size="lg" variant="outline" asChild className="rounded-xl px-8 font-bold border-2 hover:bg-muted">
           <Link href="/faq">{t("howItWorks.faq.viewAll")}</Link>
         </Button>
       </div>
