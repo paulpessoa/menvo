@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 interface Review {
   id: string
   rating: number
-  comment: string | null
+  public_feedback: string | null
   created_at: string
   mentee: {
     first_name: string | null
@@ -33,7 +33,7 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
           .select(`
             id,
             rating,
-            comment,
+            public_feedback,
             created_at,
             mentee:profiles!reviewer_id(first_name, last_name, avatar_url)
           `)
@@ -95,9 +95,9 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
                         />
                       ))}
                     </div>
-                    {review.comment && (
+                    {review.public_feedback && (
                       <p className="text-sm text-gray-600 italic mt-2 leading-relaxed">
-                        "{review.comment}"
+                        "{review.public_feedback}"
                       </p>
                     )}
                   </div>

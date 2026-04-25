@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea"
 interface Feedback {
   id: string
   rating: number
-  comment: string | null
+  public_feedback: string | null
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
   rejection_reason: string | null
@@ -52,7 +52,7 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
 
     try {
       let query = supabase.from("appointment_feedbacks").select(`
-        id, rating, comment, status, created_at, rejection_reason,
+        id, rating, public_feedback, status, created_at, rejection_reason,
         mentee:profiles!reviewer_id(full_name, email),
         mentor:profiles!reviewed_id(full_name)
       `)
@@ -79,7 +79,7 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
 
   const handleEdit = (fb: Feedback) => {
     setEditingFeedback(fb)
-    setNewComment(fb.comment || "")
+    setNewComment(fb.public_feedback || "")
   }
 
   const saveEdit = async () => {
@@ -148,7 +148,7 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
                         ))}
                       </div>
                       <p className="text-sm text-gray-600 leading-relaxed italic">
-                        "{fb.comment || "Sem comentário"}"
+                        "{fb.public_feedback || "Sem comentário"}"
                       </p>
                     </div>
                   </div>

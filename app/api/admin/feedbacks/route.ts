@@ -60,7 +60,7 @@ export async function PATCH(request: NextRequest) {
             mentorName: updatedFeedback.mentor.full_name || 'Mentor',
             menteeName: updatedFeedback.mentee.full_name || 'Um aluno',
             rating: updatedFeedback.rating,
-            comment: updatedFeedback.comment
+            comment: updatedFeedback.public_feedback
         }).catch(err => console.error("[API] Erro ao enviar email para mentor:", err))
     }
 

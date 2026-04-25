@@ -116,7 +116,7 @@ export function BookMentorshipModal({
         .split("T")[0]
 
       const response = await fetch(
-        `/api/appointments/availability_status?mentor_id=${mentorId}&start_date=${startDate}&end_date=${endDate}`
+        `/api/appointments/availability?mentor_id=${mentorId}&start_date=${startDate}&end_date=${endDate}`
       )
 
       if (!response.ok) {

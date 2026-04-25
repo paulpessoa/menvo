@@ -64,7 +64,7 @@ export default function BookAppointmentPage() {
         }
     }, [mentorId]);
 
-    const handleBookingSuccess = (appointmentId: number) => {
+    const handleBookingSuccess = (appointmentId: string) => {
         toast.success('Agendamento criado com sucesso!');
         router.push('/dashboard/mentee');
     };

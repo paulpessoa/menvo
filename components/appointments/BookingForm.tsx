@@ -21,7 +21,7 @@ import { toast } from "sonner"
 interface BookingFormProps {
   mentorId: string
   mentorName: string
-  onSuccess?: (appointmentId: number) => void
+  onSuccess?: (appointmentId: string) => void
   onCancel?: () => void
 }
 
@@ -44,20 +44,16 @@ export default function BookingForm({
     const fetchAvailability = async () => {
       try {
         setFetchingSlots(true)
-
-        // Get availability_status from mentor directly
         const response = await fetch(
-          `/api/appointments/availability_status?mentor_id=${mentorId}`
+          `/api/appointments/availability?mentor_id=${mentorId}`
         )
-
         if (!response.ok) {
-          throw new Error("Failed to fetch availability_status")
+          throw new Error("Failed to fetch availability")
         }
-
         const data = await response.json()
         setAvailableSlots(data.availableSlots || [])
       } catch (error) {
-        console.error("Error fetching availability_status:", error)
+        console.error("Error fetching availability:", error)
         toast.error("Erro ao carregar horários disponíveis")
       } finally {
         setFetchingSlots(false)
