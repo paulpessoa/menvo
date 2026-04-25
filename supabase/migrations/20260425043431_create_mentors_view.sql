@@ -1,4 +1,4 @@
--- Remove a view antiga e cria a nova com TODAS as colunas relevantes de profiles
+-- Remove a view antiga para reconstruir com todas as colunas e aliases de compatibilidade
 DROP VIEW IF EXISTS public.mentors_view;
 
 CREATE OR REPLACE VIEW public.mentors_view WITH (security_invoker = true) AS
@@ -11,26 +11,26 @@ SELECT
     p.slug,
     p.bio,
     p.avatar_url,
-    p.job_title as current_position,
+    p.job_title,
+    p.job_title as current_position, -- Alias para compatibilidade
     p.company as current_company,
     p.linkedin_url,
     p.github_url,
     p.twitter_url,
     p.website_url,
+    p.portfolio_url,
     p.phone,
     p.city,
     p.state,
     p.country,
     p.address,
-    COALESCE(p.city, '') || 
-    CASE WHEN p.city IS NOT NULL AND p.state IS NOT NULL THEN ', ' ELSE '' END || COALESCE(p.state, '') ||
-    CASE WHEN (p.city IS NOT NULL OR p.state IS NOT NULL) AND p.country IS NOT NULL THEN ', ' ELSE '' END || COALESCE(p.country, '') as location,
     p.timezone,
     p.age,
     p.expertise_areas,
     p.mentorship_topics,
     p.free_topics,
     p.inclusive_tags,
+    p.inclusive_tags as inclusion_tags, -- Alias para compatibilidade
     p.languages,
     p.academic_level as education_level,
     p.institution,
@@ -46,6 +46,10 @@ SELECT
     p.verified,
     p.verification_status,
     p.is_pending_mentor,
+    -- Localização formatada como string única
+    COALESCE(p.city, '') || 
+    CASE WHEN p.city IS NOT NULL AND p.state IS NOT NULL THEN ', ' ELSE '' END || COALESCE(p.state, '') ||
+    CASE WHEN (p.city IS NOT NULL OR p.state IS NOT NULL) AND p.country IS NOT NULL THEN ', ' ELSE '' END || COALESCE(p.country, '') as location,
     (
         SELECT array_agg(DISTINCT skill)
         FROM unnest(array_cat(p.expertise_areas, p.mentorship_topics)) as skill

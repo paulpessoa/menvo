@@ -927,9 +927,10 @@
         }
     },
     "mentorsPage": {
-        "title": "Find your Ideal Mentor",
+        "title": "Find Your Ideal Mentor",
         "subtitle": "Connect with verified mentors and accelerate your career",
         "searchPlaceholder": "Search by name, specialty, company...",
+        "errorLoadingMentors": "Error loading mentors. Please try again.",
         "filters": "Filters",
         "sheetTitle": "Advanced Filters",
         "sheetDescription": "Refine your search to find the perfect mentor",

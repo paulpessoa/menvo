@@ -10,6 +10,7 @@ export interface MentorProfile extends Partial<UserProfile> {
   avatar_url: string | null;
   bio: string | null;
   current_position: string | null;
+  job_title: string | null; // Added for compatibility
   current_company: string | null;
   location: string | null;
   availability: 'available' | 'busy';
@@ -18,6 +19,7 @@ export interface MentorProfile extends Partial<UserProfile> {
   languages: string[] | null;
   education_level: string | null;
   inclusion_tags: string[] | null;
+  inclusive_tags: string[] | null; // Added for compatibility
   rating?: number;
   sessions?: number;
   reviews?: number;

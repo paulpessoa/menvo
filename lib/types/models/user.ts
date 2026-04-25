@@ -19,6 +19,7 @@ export interface UserProfile {
   
   // Professional info
   job_title: string | null;
+  current_position?: string | null; // Alias for job_title
   company: string | null;
   experience_years: number | null;
   expertise_areas: string[] | null;
@@ -28,6 +29,7 @@ export interface UserProfile {
   // Mentorship specifics
   mentorship_topics: string[] | null;
   inclusive_tags: string[] | null;
+  inclusion_tags?: string[] | null; // Alias for inclusive_tags
   availability_status: string | null;
   average_rating: number | null;
   total_reviews: number | null;

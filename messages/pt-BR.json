@@ -907,6 +907,7 @@
     "title": "Encontre seu Mentor Ideal",
     "subtitle": "Conecte-se com mentores verificados e acelere sua carreira",
     "searchPlaceholder": "Buscar por nome, especialidade, empresa...",
+    "errorLoadingMentors": "Erro ao carregar mentores. Por favor, tente novamente.",
     "filters": "Filtros",
     "sheetTitle": "Filtros Avançados",
     "sheetDescription": "Refine sua busca para encontrar o mentor perfeito",
