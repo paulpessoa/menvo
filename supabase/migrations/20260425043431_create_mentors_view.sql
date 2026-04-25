@@ -1,4 +1,4 @@
--- Remove a view antiga para reconstruir com todas as colunas e aliases de compatibilidade
+-- Remove a view antiga para reconstruir com todas as colunas e aliases de compatibilidade total
 DROP VIEW IF EXISTS public.mentors_view;
 
 CREATE OR REPLACE VIEW public.mentors_view WITH (security_invoker = true) AS
@@ -11,8 +11,11 @@ SELECT
     p.slug,
     p.bio,
     p.avatar_url,
+    -- Variantes de Cargo/Título
     p.job_title,
-    p.job_title as current_position, -- Alias para compatibilidade
+    p.job_title as current_position,
+    -- Variantes de Empresa
+    p.company,
     p.company as current_company,
     p.linkedin_url,
     p.github_url,
@@ -30,7 +33,7 @@ SELECT
     p.mentorship_topics,
     p.free_topics,
     p.inclusive_tags,
-    p.inclusive_tags as inclusion_tags, -- Alias para compatibilidade
+    p.inclusive_tags as inclusion_tags,
     p.languages,
     p.academic_level as education_level,
     p.institution,

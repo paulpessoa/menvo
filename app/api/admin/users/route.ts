@@ -41,20 +41,21 @@ export async function GET(request: NextRequest) {
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    // 3. Query base
+    // 3. Query base - Usar joins padrão (LEFT JOIN) em vez de !inner para não excluir usuários sem roles
     let query = supabase
       .from("profiles")
       .select(`
         *,
-        user_roles!inner (
-          roles!inner (
+        user_roles (
+          roles (
             name
           )
         )
       `, { count: "exact" })
 
-    // Filtros por aba
+    // Filtros por aba - Aqui sim usamos filtros que podem restringir
     if (tab === "pending") {
+      // Para filtros específicos de role, precisamos garantir que a role exista
       query = query.eq("verified", false).eq("user_roles.roles.name", "mentor")
     } else if (tab === "mentors") {
       query = query.eq("user_roles.roles.name", "mentor")
