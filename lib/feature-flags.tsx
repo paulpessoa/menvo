@@ -50,7 +50,15 @@ export function FeatureFlagsProvider({
 
   const fetchFlags = useCallback(async () => {
     try {
-      const response = await fetch("/api/feature-flags")
+      // 🚀 CACHE BUSTING: Adicionamos um timestamp para garantir que o navegador não cacheie o GET
+      const response = await fetch(`/api/feature-flags?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      })
+      
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       const data = await response.json()
       
@@ -86,4 +94,31 @@ export function useFeatureFlags() {
 export function useFeatureFlag(flagName: keyof FeatureFlags): boolean {
   const { flags } = useFeatureFlags()
   return flags[flagName] ?? DEFAULT_FLAGS[flagName]
+}
+
+/**
+ * getFeatureFlags (Servidor)
+ * Chamada direta ao banco para Server Components, garantindo tempo real.
+ */
+export async function getFeatureFlags(): Promise<FeatureFlags> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    
+    const { data } = await supabase
+      .from('feature_flags')
+      .select('name, enabled')
+
+    const flagsFromDB: any = {}
+    data?.forEach(f => {
+      flagsFromDB[f.name] = f.enabled
+    })
+
+    return { ...DEFAULT_FLAGS, ...flagsFromDB }
+  } catch {
+    return DEFAULT_FLAGS
+  }
 }
