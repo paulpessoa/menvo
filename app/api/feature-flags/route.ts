@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js"
 import { DEFAULT_FLAGS } from "@/lib/feature-flags"
 import type { Database } from "@/lib/types/supabase"
 
+export const dynamic = 'force-dynamic'
+
 // Usar chaves de ambiente para o cliente Supabase interno
 const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
