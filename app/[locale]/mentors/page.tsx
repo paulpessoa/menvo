@@ -27,8 +27,7 @@ import {
   Users,
   Briefcase,
   Heart,
-  Loader2,
-  Building2
+  Loader2
 } from "lucide-react"
 
 import { useAuth } from '@/lib/auth'
@@ -61,7 +60,6 @@ interface MentorProfile {
   total_sessions: number | null
   experience_years: number | null
   slug: string | null
-  organization_ids: string[] | null
 }
 
 interface FilterState {
@@ -75,7 +73,6 @@ interface FilterState {
   priceRange: [number, number]
   availabilityStatus: string
   experienceYears: string
-  organizationId: string
 }
 
 const initialFilters: FilterState = {
@@ -88,8 +85,7 @@ const initialFilters: FilterState = {
   inclusiveTags: [],
   priceRange: [0, 500],
   availabilityStatus: "all",
-  experienceYears: "all",
-  organizationId: "all"
+  experienceYears: "all"
 }
 
 const ITEMS_PER_PAGE = 12
@@ -113,8 +109,7 @@ export default function MentorsPage() {
     cities: [] as string[],
     languages: [] as string[],
     topics: [] as string[],
-    inclusiveTags: [] as string[],
-    organizations: [] as { id: string; name: string }[]
+    inclusiveTags: [] as string[]
   })
 
   const supabase = createClient()
@@ -153,8 +148,7 @@ export default function MentorsPage() {
           total_reviews,
           total_sessions,
           experience_years,
-          slug,
-          organization_ids
+          slug
         `,
         { count: "exact" }
       )
@@ -165,10 +159,6 @@ export default function MentorsPage() {
         query = query.or(
           `full_name.ilike.${searchTerm},job_title.ilike.${searchTerm},company.ilike.${searchTerm},bio.ilike.${searchTerm}`
         )
-      }
-
-      if (filters.organizationId && filters.organizationId !== "all") {
-        query = query.contains("organization_ids", [filters.organizationId])
       }
 
       if (filters.country && filters.country !== "all") {
@@ -267,21 +257,13 @@ export default function MentorsPage() {
         mentor.inclusion_tags?.forEach((t: string) => inclusiveTags.add(t))
       })
 
-      // Fetch active organizations
-      const { data: orgData } = await supabase
-        .from("organizations")
-        .select("id, name")
-        .eq("status", "active")
-        .order("name")
-
       setAvailableFilters({
         countries: Array.from(countries).sort(),
         states: Array.from(states).sort(),
         cities: Array.from(cities).sort(),
         languages: Array.from(languages).sort(),
         topics: Array.from(topics).sort(),
-        inclusiveTags: Array.from(inclusiveTags).sort(),
-        organizations: orgData || []
+        inclusiveTags: Array.from(inclusiveTags).sort()
       })
     } catch (error) {
       console.error("Error fetching filter options:", error)
@@ -307,7 +289,6 @@ export default function MentorsPage() {
     if (filters.inclusiveTags.length > 0) count++
     if (filters.availabilityStatus !== "all") count++
     if (filters.experienceYears !== "all") count++
-    if (filters.organizationId !== "all") count++
     return count
   }, [filters])
 
@@ -382,32 +363,6 @@ export default function MentorsPage() {
             </SheetHeader>
 
             <div className="mt-6 space-y-6 pb-8">
-              {/* Organization Filter */}
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <Building2 className="h-4 w-4 mr-2 text-primary" />
-                  {t("organization")}
-                </h3>
-                <Select
-                  value={filters.organizationId}
-                  onValueChange={(value) =>
-                    setFilters((prev) => ({ ...prev, organizationId: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("organizationPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t("allOrganizations")}</SelectItem>
-                    {availableFilters.organizations?.map((org) => (
-                      <SelectItem key={org.id} value={org.id}>
-                        {org.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
               <div className="space-y-3">
                 <h3 className="font-medium flex items-center">
                   <MapPin className="h-4 w-4 mr-2 text-primary" />
