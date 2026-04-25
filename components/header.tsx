@@ -13,7 +13,8 @@ import {
   LayoutDashboard,
   Building2,
   Loader2,
-  ChevronRight
+  ChevronRight,
+  Heart
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -170,6 +171,21 @@ export default function Header() {
         {/* Direita: Ferramentas */}
         <div className="w-3/4 lg:w-1/4 flex justify-end items-center gap-2">
           <LanguageSelector />
+          
+          {isAuthenticated && role === "mentee" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9 text-muted-foreground hover:text-red-500 transition-colors"
+              asChild
+            >
+              <Link href="/dashboard/mentee">
+                <Heart className="h-5 w-5" />
+                <span className="sr-only">Favoritos</span>
+              </Link>
+            </Button>
+          )}
+
           <MessagesBadge />
 
           {loading ? (

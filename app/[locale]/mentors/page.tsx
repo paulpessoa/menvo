@@ -34,7 +34,6 @@ import { useAuth } from "@/lib/auth"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
 import { MagicSearchBar } from "@/components/mentors/MagicSearchBar"
-import { useFavorites } from "@/hooks/useFavorites"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { createClient } from "@/lib/utils/supabase/client"
@@ -115,7 +114,6 @@ export default function MentorsPage() {
 
   const supabase = createClient()
   const { user } = useAuth()
-  const { favorites, toggleFavorite } = useFavorites(user?.id)
 
   const fetchMentors = async (isInitial = false) => {
     try {
@@ -317,6 +315,8 @@ export default function MentorsPage() {
     setAiJustification(null)
   }
 
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
@@ -326,6 +326,14 @@ export default function MentorsPage() {
         </h1>
         <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
           {t("subtitle")}
+        </p>
+      </div>
+
+      {/* Timezone Info Banner */}
+      <div className="mb-8 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center gap-3 text-blue-800">
+        <Clock className="h-5 w-5 shrink-0" />
+        <p className="text-sm">
+          Todos os horários de mentoria são exibidos automaticamente no seu fuso horário local: <strong>{userTimezone}</strong>.
         </p>
       </div>
 
@@ -580,10 +588,6 @@ export default function MentorsPage() {
                 <MentorCard
                   key={`ai-${mentor.id}`}
                   mentor={mentor}
-                  isFavorite={!!(mentor.id && favorites.includes(mentor.id))}
-                  onToggleFavorite={() =>
-                    mentor.id && toggleFavorite(mentor.id)
-                  }
                   isAIHighlighted={true}
                   aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
                 />
@@ -598,10 +602,6 @@ export default function MentorsPage() {
                 <MentorCard
                   key={mentor.id || "unknown"}
                   mentor={mentor}
-                  isFavorite={!!(mentor.id && favorites.includes(mentor.id))}
-                  onToggleFavorite={() =>
-                    mentor.id && toggleFavorite(mentor.id)
-                  }
                 />
               ))}
           </div>

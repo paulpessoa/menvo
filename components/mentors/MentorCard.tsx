@@ -38,16 +38,12 @@ interface MentorProfile {
 
 interface MentorCardProps {
   mentor: MentorProfile
-  isFavorite: boolean
-  onToggleFavorite: () => void
   isAIHighlighted?: boolean
   aiReason?: string | null
 }
 
 export function MentorCard({
   mentor,
-  isFavorite,
-  onToggleFavorite,
   isAIHighlighted,
   aiReason
 }: MentorCardProps) {
@@ -98,21 +94,6 @@ export function MentorCard({
           <Sparkles className="h-5 w-5" />
         </div>
       )}
-
-      <button
-        onClick={(e) => {
-          e.preventDefault()
-          onToggleFavorite()
-        }}
-        className={`absolute top-4 right-4 p-2 rounded-full shadow-sm transition-all z-10 ${
-          isFavorite
-            ? "bg-red-50 text-red-500"
-            : "bg-white/80 text-gray-400 hover:text-red-400"
-        }`}
-        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-      >
-        <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-      </button>
 
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
