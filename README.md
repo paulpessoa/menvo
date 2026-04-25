@@ -72,7 +72,6 @@ This document lists all available pages, categorized by access level and operati
 | `/how-it-works`  | Step-by-step guide for mentors/mentees.        | ✅ Fully Functional |
 | `/mentors`       | Public feed of available mentors.              | ✅ Fully Functional |
 | `/community`     | Public board of members offering/seeking help. | ✅ Fully Functional |
-| `/organizations` | List of partner organizations/NGOs.            | ✅ Fully Functional |
 | `/faq`           | Frequently Asked Questions.                    | ✅ Fully Functional |
 | `/privacy`       | Privacy Policy and GDPR compliance.            | ✅ Operational      |
 | `/terms`         | Terms of Service and Use.                      | ✅ Operational      |
@@ -100,7 +99,6 @@ This document lists all available pages, categorized by access level and operati
 | `/messages`          | Real-time chat system with mentors.            | ✅ Operational        |
 | `/settings`          | Global account and security configurations.    | ✅ Stable             |
 | `/calendar`          | Integration with Google Calendar.              | 🛠️ Needs Verification |
-| `/organizations/new` | Form to register a new partner organization.   | ✅ Fully Functional   |
 
 ## 👑 Admin Pages (Staff members only)
 

@@ -44,12 +44,7 @@ export async function GET(request: NextRequest) {
     // Query mentor_visibility_settings
     const { data: settings, error } = await supabase
       .from("mentor_visibility_settings" as any)
-      .select(
-        `
-        *,
-        organizations:visible_to_organizations(id, name, slug, logo_url)
-      `
-      )
+      .select("*")
       .eq("mentor_id", user.id)
       .returns<any>()
       .maybeSingle()
@@ -58,13 +53,12 @@ export async function GET(request: NextRequest) {
       throw error
     }
 
-    // If no settings exist, return default
+    // If no settings exist, return default (always public now)
     if (!settings) {
       return successResponse({
         mentor_id: user.id,
         visibility_scope: "public",
-        visible_to_organizations: [],
-        organizations: []
+        visible_to_organizations: []
       })
     }
 
@@ -106,48 +100,15 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { visibility_scope, visible_to_organizations } = body
+    const { visibility_scope } = body
 
-    // Validate visibility_scope
-    if (
-      visibility_scope &&
-      !["public", "exclusive"].includes(visibility_scope)
-    ) {
+    // Validate visibility_scope - only public is allowed now
+    if (visibility_scope && visibility_scope !== "public") {
       return errorResponse(
-        "Invalid visibility_scope. Must be 'public' or 'exclusive'",
+        "Invalid visibility_scope. Only 'public' is supported",
         "VALIDATION_ERROR",
         400
       )
-    }
-
-    // If exclusive, validate user is member of selected organizations
-    if (
-      visibility_scope === "exclusive" &&
-      visible_to_organizations &&
-      visible_to_organizations.length > 0
-    ) {
-      const { data: memberships } = await supabase
-        .from("organization_members" as any)
-        .select("organization_id")
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .in("organization_id", visible_to_organizations)
-        .returns<any[]>()
-
-      const memberOrgIds = memberships?.map((m: any) => m.organization_id) || []
-
-      // Check if all requested organizations are valid
-      const invalidOrgs = visible_to_organizations.filter(
-        (orgId: string) => !memberOrgIds.includes(orgId)
-      )
-
-      if (invalidOrgs.length > 0) {
-        return errorResponse(
-          "You must be an active member of all selected organizations",
-          "VALIDATION_ERROR",
-          400
-        )
-      }
     }
 
     // Update or create settings
@@ -161,11 +122,8 @@ export async function PATCH(request: NextRequest) {
 
     if (existing) {
       const updateData: VisUpdate = {
-        visibility_scope: visibility_scope || (existing as any).visibility_scope,
-        visible_to_organizations:
-          visible_to_organizations !== undefined
-            ? visible_to_organizations
-            : (existing as any).visible_to_organizations,
+        visibility_scope: "public",
+        visible_to_organizations: [],
         updated_at: new Date().toISOString()
       };
       const { data, error } = await (supabase
@@ -180,8 +138,8 @@ export async function PATCH(request: NextRequest) {
     } else {
       const insertData: VisInsert = {
         mentor_id: user.id,
-        visibility_scope: visibility_scope || "public",
-        visible_to_organizations: visible_to_organizations || [],
+        visibility_scope: "public",
+        visible_to_organizations: [],
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

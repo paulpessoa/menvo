@@ -80,12 +80,6 @@ export default function Header() {
       color: "text-gray-700"
     })
     userNavigation.push({
-      name: t("header.userMenu.organizations"),
-      href: "/organizations",
-      icon: Building2,
-      color: "text-gray-700"
-    })
-    userNavigation.push({
       name: t("header.userMenu.settings"),
       href: "/settings",
       icon: Settings,
@@ -99,12 +93,6 @@ export default function Header() {
         name: "Gerenciar Usuários",
         href: "/dashboard/admin/users",
         icon: User,
-        color: "text-amber-600"
-      })
-      userNavigation.push({
-        name: "Organizações",
-        href: "/dashboard/admin/organizations",
-        icon: Building2,
         color: "text-amber-600"
       })
       userNavigation.push({

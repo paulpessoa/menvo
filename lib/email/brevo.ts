@@ -209,39 +209,3 @@ async function sendEmail(to: string | string[], subject: string, htmlContent: st
   }
 }
 
-// Interfaces e funções de Organização
-export async function sendOrganizationInvitation(data: any): Promise<void> {
-  const { recipientEmail, recipientName, organizationName, inviterName, role, invitationToken } = data;
-  const acceptUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/invitations/accept?token=${invitationToken}`;
-  const content = `
-    <h2>Você foi convidado! 🏢</h2>
-    <p>Olá, ${recipientName}! <strong>${inviterName}</strong> convidou você para fazer parte da organização <strong>${organizationName}</strong>.</p>
-    <div class="button-container"><a href="${acceptUrl}" class="button">Aceitar Convite</a></div>
-  `;
-  await sendEmail(recipientEmail, `Convite para ${organizationName}`, getEmailLayout("Convite Organização", content));
-}
-
-export async function sendOrganizationApprovedEmail(data: any): Promise<void> {
-    const { adminEmail, adminName, organizationName, organizationId } = data;
-    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/organizations/${organizationId}`;
-    const content = `
-        <h2>Sua organização foi aprovada! 🎉</h2>
-        <p>Olá, ${adminName}. Temos ótimas notícias! <strong>${organizationName}</strong> foi aprovada e está pronta.</p>
-        <div class="button-container"><a href="${dashboardUrl}" class="button">Acessar Painel</a></div>
-    `;
-    await sendEmail(adminEmail, "✅ Organização aprovada!", getEmailLayout("Organização Aprovada", content));
-}
-
-/**
- * Envia e-mail de aviso de expiração de membership
- */
-export async function sendMembershipExpiredEmail(data: {
-    userEmail: string; userName: string; organizationName: string;
-}): Promise<void> {
-    const content = `
-        <h2>Membership Expirada ⏰</h2>
-        <p>Olá, ${data.userName}. Sua membership na organização <strong>${data.organizationName}</strong> expirou.</p>
-        <p>Para continuar acessando os benefícios exclusivos desta organização, entre em contato com os administradores ou solicite uma renovação.</p>
-    `;
-    await sendEmail(data.userEmail, "⏰ Sua membership expirou", getEmailLayout("Membership Expirada", content));
-}

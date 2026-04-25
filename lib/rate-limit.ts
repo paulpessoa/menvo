@@ -83,21 +83,6 @@ export function checkRateLimit(
  * Rate limit configurations for different endpoints
  */
 export const RATE_LIMITS = {
-  // 10 invitations per minute per organization
-  INVITATION_PER_MINUTE: {
-    maxRequests: 10,
-    windowMs: 60 * 1000 // 1 minute
-  },
-  // 100 invitations per day per organization
-  INVITATION_PER_DAY: {
-    maxRequests: 100,
-    windowMs: 24 * 60 * 60 * 1000 // 24 hours
-  },
-  // 5 bulk invites per hour per organization
-  BULK_INVITATION_PER_HOUR: {
-    maxRequests: 5,
-    windowMs: 60 * 60 * 1000 // 1 hour
-  }
 }
 
 /**

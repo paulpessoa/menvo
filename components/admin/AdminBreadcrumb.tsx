@@ -25,10 +25,6 @@ const routeMap: Record<string, BreadcrumbItem[]> = {
     { label: "Dashboard", href: "/dashboard/admin" },
     { label: "Usuários" }
   ],
-  "/dashboard/admin/organizations": [
-    { label: "Dashboard", href: "/dashboard/admin" },
-    { label: "Organizações" }
-  ],
   "/settings": [
     { label: "Dashboard", href: "/dashboard/admin" },
     { label: "Configurações" }
@@ -51,16 +47,6 @@ export function AdminBreadcrumb() {
   
   let breadcrumbs = routeMap[normalizedPathname] || []
 
-  // Fallback para rotas dinâmicas como /dashboard/admin/organizations/[id]
-  if (breadcrumbs.length === 0) {
-    if (normalizedPathname.startsWith("/dashboard/admin/organizations/")) {
-      breadcrumbs = [
-        { label: "Dashboard", href: "/dashboard/admin" },
-        { label: "Organizações", href: "/dashboard/admin/organizations" },
-        { label: "Detalhes" }
-      ]
-    }
-  }
 
   if (breadcrumbs.length === 0) {
     return null

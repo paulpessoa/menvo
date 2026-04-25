@@ -13,8 +13,7 @@ export const publicRoutes = [
   "/auth/error",
   "/auth/resend-confirmation",
   "/test-callback",
-  "/mentors",
-  "/organizations"
+  "/mentors"
 ]
 
 export const protectedRoutes = [
@@ -27,7 +26,6 @@ export const protectedRoutes = [
   "/mentorship",
   "/volunteer-activities",
   "/onboarding",
-  "/organizations/new",
   "/settings"
 ]
 

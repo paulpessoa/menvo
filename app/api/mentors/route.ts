@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
   const city = searchParams.get("city")
   const country = searchParams.get("country")
   const availability = searchParams.get("availability")
-  const organizationId = searchParams.get("organization_id")
   const page = parseInt(searchParams.get("page") || "1", 10)
   const limit = parseInt(searchParams.get("limit") || "12", 10)
 
@@ -23,10 +22,10 @@ export async function GET(req: NextRequest) {
 
   // Get visible mentor IDs based on visibility settings
   let visibleMentorIds: string[] | null = null
-  if (userId || organizationId) {
+  if (userId) {
     const { data: visibleIds } = await supabase.rpc("get_visible_mentor_ids", {
       p_user_id: userId,
-      p_organization_id: organizationId
+      p_organization_id: null
     })
     visibleMentorIds = visibleIds || []
   }

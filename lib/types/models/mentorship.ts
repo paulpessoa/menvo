@@ -17,7 +17,6 @@ export interface Appointment {
   meeting_link: string | null;
   google_event_id: string | null;
   google_meet_link: string | null;
-  organization_id: string | null;
   created_at: string;
   updated_at: string;
 }

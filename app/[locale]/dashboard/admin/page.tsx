@@ -133,13 +133,6 @@ export default function AdminDashboard() {
       badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
     },
     {
-      title: "Organizações",
-      description: "Gerenciar parceiros e organizações do ecossistema",
-      href: "/dashboard/admin/organizations",
-      icon: Building2,
-      color: "bg-blue-600"
-    },
-    {
       title: "Relatórios & IA",
       description: "Ver métricas de crescimento e buscas da IA",
       href: "/dashboard/admin/reports",
