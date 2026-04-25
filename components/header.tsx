@@ -220,20 +220,24 @@ export default function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {userNavigation.map((item) => (
-                    <DropdownMenuItem
-                      key={item.name}
-                      asChild
-                      className="cursor-pointer rounded-md"
-                    >
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-3 py-2"
+                  {userNavigation.map((item, index) => (
+                    item.type === 'separator' ? (
+                      <DropdownMenuSeparator key={`sep-${index}`} />
+                    ) : (
+                      <DropdownMenuItem
+                        key={item.name}
+                        asChild
+                        className="cursor-pointer rounded-md"
                       >
-                        <item.icon className={`h-4 w-4 ${item.color || ""}`} />
-                        <span className="font-medium">{item.name}</span>
-                      </Link>
-                    </DropdownMenuItem>
+                        <Link
+                          href={item.href}
+                          className="flex items-center gap-3 py-2"
+                        >
+                          <item.icon className={`h-4 w-4 ${item.color || ""}`} />
+                          <span className="font-medium">{item.name}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )
                   ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
