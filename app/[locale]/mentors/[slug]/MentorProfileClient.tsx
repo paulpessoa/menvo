@@ -27,7 +27,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
-import AvailabilityDisplay from "@/components/mentorship/AvailabilityDisplay"
+import { AvailabilityDisplay } from "@/components/mentorship/AvailabilityDisplay"
 import { BookMentorshipModal } from "@/components/mentorship/BookMentorshipModal"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useTranslations } from "next-intl"
@@ -64,7 +64,7 @@ interface MentorAvailability {
   day_of_week: number
   start_time: string
   end_time: string
-  timezone: string
+  timezone: string | null
 }
 
 interface Props {
@@ -378,14 +378,8 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
           </Card>
 
           <AvailabilityDisplay
-            mentorId={mentor.id}
             availability={availability}
-            timezone={mentor.timezone || "America/Sao_Paulo"}
-            showBookingButtons={true}
-            onBookSlot={(slot) => {
-              // Slot booking handled by modal
-            }}
-            compact={true}
+            availability_status={mentor.availability_status}
           />
 
           {(mentor.linkedin_url ||

@@ -19,7 +19,6 @@ export interface UserProfile {
 
   // Professional info
   job_title: string | null
-  job_title?: string | null // Alias for job_title
   company: string | null
   experience_years: number | null
   expertise_areas: string[] | null
@@ -31,6 +30,7 @@ export interface UserProfile {
   inclusive_tags: string[] | null
   inclusion_tags?: string[] | null // Alias for inclusive_tags
   availability_status: string | null
+  availability: any[] | null // Array of slots
   average_rating: number | null
   total_reviews: number | null
   total_sessions: number | null

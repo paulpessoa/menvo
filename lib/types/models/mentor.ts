@@ -10,10 +10,15 @@ export interface MentorProfile extends Partial<UserProfile> {
   avatar_url: string | null
   bio: string | null
   job_title: string | null
-  job_title: string | null // Added for compatibility
   company: string | null
   location: string | null
-  availability_status: "available" | "busy"
+  availability_status: "available" | "busy" | "unavailable" | null
+  availability: Array<{
+    day_of_week: number
+    start_time: string
+    end_time: string
+    timezone: string | null
+  }> | null
   experience_years: number | null
   mentor_skills: string[] | null
   languages: string[] | null

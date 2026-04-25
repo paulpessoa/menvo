@@ -26,15 +26,15 @@ async function getMentorData(slug: string) {
   }
 
   // Buscar disponibilidade configurada via API (usa Service Role, bypass RLS)
-  let availability_status = []
+  let availability = []
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/mentors/${mentor.id}/availability_status?format=config`
+    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/mentors/${mentor.id}/availability?format=config`
     const response = await fetch(apiUrl, { cache: "no-store" })
     if (response.ok) {
       const data = await response.json()
       // Se a API retornar o formato novo, extrair availableSlots
       // Se retornar array direto, usar como está
-      availability_status = Array.isArray(data)
+      availability = Array.isArray(data)
         ? data
         : data.weeklyConfig || data.availableSlots || []
     }
@@ -44,7 +44,7 @@ async function getMentorData(slug: string) {
 
   return {
     mentor,
-    availability_status: availability_status || []
+    availability: availability || []
   }
 }
 
@@ -109,7 +109,7 @@ export default async function MentorProfilePage({ params }: PageProps) {
     notFound()
   }
 
-  const { mentor, availability_status } = data
+  const { mentor, availability } = data
 
   // Mapear campos da view para o formato esperado pelo componente
   const mappedMentor = {
@@ -125,7 +125,7 @@ export default async function MentorProfilePage({ params }: PageProps) {
   return (
     <MentorProfileClient
       mentor={mappedMentor}
-      availability_status={availability_status}
+      availability={availability}
     />
   )
 }

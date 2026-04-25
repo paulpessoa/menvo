@@ -140,7 +140,6 @@ export default function MentorsPage() {
           country,
           languages,
           mentorship_topics,
-          inclusion_tags,
           inclusive_tags,
           expertise_areas,
           availability_status,
@@ -182,7 +181,7 @@ export default function MentorsPage() {
       }
 
       if (filters.inclusiveTags.length > 0) {
-        query = query.contains("inclusion_tags", filters.inclusiveTags)
+        query = query.contains("inclusive_tags", filters.inclusiveTags)
       }
 
       if (filters.availabilityStatus !== "all") {
@@ -236,7 +235,7 @@ export default function MentorsPage() {
       const { data, error } = await supabase
         .from("mentors_view")
         .select(
-          "country, state, city, languages, mentorship_topics, inclusion_tags"
+          "country, state, city, languages, mentorship_topics, inclusive_tags"
         )
 
       if (error) throw error
@@ -254,7 +253,7 @@ export default function MentorsPage() {
         if (mentor.city) cities.add(mentor.city)
         mentor.languages?.forEach((l: string) => languages.add(l))
         mentor.mentorship_topics?.forEach((t: string) => topics.add(t))
-        mentor.inclusion_tags?.forEach((t: string) => inclusiveTags.add(t))
+        mentor.inclusive_tags?.forEach((t: string) => inclusiveTags.add(t))
       })
 
       setAvailableFilters({

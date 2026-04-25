@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       experience_years,
       expertise_areas,
       topics,
-      inclusion_tags,
+      inclusive_tags,
       linkedin_url,
       portfolio_url,
       academic_background,

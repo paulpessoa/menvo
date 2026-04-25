@@ -199,8 +199,8 @@ export default function MentorAvailabilityPage() {
             timezone: slot.timezone || "America/Sao_Paulo"
           }))
 
-        const { error: insertError } = await supabase
-          .from("mentor_availability")
+        const { error: insertError } = await (supabase
+          .from("mentor_availability") as any)
           .insert(slotsToInsert)
 
         if (insertError) throw insertError
