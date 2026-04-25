@@ -482,6 +482,7 @@
         "tryAgain": "Try again",
         "emailConfirmed": "Email Confirmed!",
         "emailConfirmedDescription": "Your email has been confirmed successfully. Now choose how you want to use the platform.",
+        "emailConfirmedNext": "Complete your profile to start using the platform.",
         "selectRoleDescription": "Choose how you want to use the platform:",
         "menteeDescription": "I seek guidance and professional development",
         "mentorDescription": "I want to share knowledge and guide other professionals",

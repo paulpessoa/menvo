@@ -5,24 +5,16 @@ import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, CheckCircle, ArrowRight, AlertTriangle } from "lucide-react"
+import { CheckCircle, ArrowRight, AlertTriangle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
-import { UserType } from "@/hooks/useSignupForm"
-import { useToast } from "@/hooks/useToast"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export default function ConfirmationPage() {
   const t = useTranslations()
-  const { user, loading } = useAuth()
+  const { user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { toast } = useToast()
-  const supabase = createClientComponentClient()
   const [isEmailExpired, setIsEmailExpired] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<UserType>("mentee")
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Detectar se o email expirou baseado nos parâmetros da URL
   useEffect(() => {
@@ -35,53 +27,9 @@ export default function ConfirmationPage() {
     }
   }, [searchParams])
 
-  const handleRoleSelection = async () => {
-    if (!selectedRole || !user) return
-
-    setIsSubmitting(true)
-    try {
-      // Atualizar role no JWT
-      const { error: jwtError } = await supabase.auth.updateUser({
-        data: { role: selectedRole }
-      })
-
-      if (jwtError) {
-        console.error("❌ ConfirmationPage: Erro ao atualizar JWT:", jwtError)
-        toast({
-          title: "Erro",
-          description: "Não foi possível atualizar as permissões. Tente novamente.",
-          variant: "destructive",
-        })
-        return
-      }
-
-      // Refresh da sessão para aplicar mudanças
-      await supabase.auth.refreshSession()
-
-      toast({
-        title: "Sucesso",
-        description: "Tipo de usuário definido com sucesso!",
-      })
-
-      // Redirecionar baseado na role
-      if (selectedRole === 'mentor') {
-        router.push('/profile?role=mentor')
-      } else if (selectedRole === 'mentee') {
-        router.push('/profile?role=mentee')
-      } else {
-        router.push('/dashboard')
-      }
-
-    } catch (error) {
-      console.error("❌ ConfirmationPage: Erro geral:", error)
-      toast({
-        title: "Erro",
-        description: "Ocorreu um erro inesperado. Tente novamente.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  const handleContinue = () => {
+    // Redirecionar para o perfil para completar cadastro
+    router.push('/profile')
   }
 
   return (
@@ -107,21 +55,13 @@ export default function ConfirmationPage() {
         </CardHeader>
         <CardContent className="space-y-4">
 
-          {/* Conteúdo para email confirmado com sucesso - Seleção de Role */}
+          {/* Conteúdo para email confirmado com sucesso */}
           {!isEmailExpired && (
-            <>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {t("register.selectRoleDescription")}
-                </p>
-
-                {/* Seleção de Role */}
-                <UserTypeSelector
-                  userType={selectedRole}
-                  setUserType={setSelectedRole}
-                />
-              </div>
-            </>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {t("register.emailConfirmedNext")}
+              </p>
+            </div>
           )}
 
           {/* Conteúdo para email expirado */}
@@ -159,11 +99,10 @@ export default function ConfirmationPage() {
           ) : (
             <>
               <Button
-                onClick={handleRoleSelection}
-                disabled={!selectedRole || isSubmitting}
+                onClick={handleContinue}
                 className="w-full"
               >
-                {isSubmitting ? t("common.saving") : t("register.continue")}
+                {t("register.continue")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button asChild variant="outline" className="w-full">
