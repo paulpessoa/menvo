@@ -5,10 +5,27 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, Clock, User } from "lucide-react"
 import { format } from "date-fns"
@@ -23,7 +40,7 @@ interface ScheduleSessionModalProps {
   onClose: () => void
   mentorId: string
   mentorName: string
-  availability: MentorAvailability[]
+  availability_status: MentorAvailability[]
 }
 
 export function ScheduleSessionModal({
@@ -31,7 +48,7 @@ export function ScheduleSessionModal({
   onClose,
   mentorId,
   mentorName,
-  availability
+  availability_status
 }: ScheduleSessionModalProps) {
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("")
@@ -44,36 +61,40 @@ export function ScheduleSessionModal({
   // Gerar slots de horário disponíveis para a data selecionada
   const getAvailableTimeSlots = (date: Date) => {
     if (!date) return []
-    
+
     const dayOfWeek = date.getDay()
-    const dayAvailability = availability.filter(slot => slot.day_of_week === dayOfWeek)
-    
+    const dayAvailability = availability_status.filter(
+      (slot) => slot.day_of_week === dayOfWeek
+    )
+
     return mentorshipUtils.generateTimeSlots(dayAvailability, 60) // 60 minutos por sessão
   }
 
-  const availableTimeSlots = selectedDate ? getAvailableTimeSlots(selectedDate) : []
+  const availableTimeSlots = selectedDate
+    ? getAvailableTimeSlots(selectedDate)
+    : []
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!selectedDate || !selectedTimeSlot || !topic.trim()) {
       return
     }
 
-    const [startTime, endTime] = selectedTimeSlot.split(' - ')
-    
+    const [startTime, endTime] = selectedTimeSlot.split(" - ")
+
     try {
       await requestSessionMutation.mutateAsync({
         mentor_id: mentorId,
-        requested_date: format(selectedDate, 'yyyy-MM-dd'),
+        requested_date: format(selectedDate, "yyyy-MM-dd"),
         requested_start_time: startTime,
         requested_end_time: endTime,
         topic: topic.trim(),
         description: description.trim() || undefined,
         mentee_notes: menteeNotes.trim() || undefined,
-        timezone: 'America/Sao_Paulo'
+        timezone: "America/Sao_Paulo"
       })
-      
+
       // Reset form and close modal
       setSelectedDate(undefined)
       setSelectedTimeSlot("")
@@ -82,7 +103,7 @@ export function ScheduleSessionModal({
       setMenteeNotes("")
       onClose()
     } catch (error) {
-      console.error('Erro ao solicitar sessão:', error)
+      console.error("Erro ao solicitar sessão:", error)
     }
   }
 
@@ -98,7 +119,9 @@ export function ScheduleSessionModal({
   // Verificar se uma data tem disponibilidade
   const isDateAvailable = (date: Date) => {
     const dayOfWeek = date.getDay()
-    return availability.some(slot => slot.day_of_week === dayOfWeek && slot.is_active)
+    return availability_status.some(
+      (slot) => slot.day_of_week === dayOfWeek && slot.is_active
+    )
   }
 
   // Desabilitar datas passadas e sem disponibilidade
@@ -170,7 +193,11 @@ export function ScheduleSessionModal({
                       <Button
                         key={index}
                         type="button"
-                        variant={selectedTimeSlot === timeSlotValue ? "default" : "outline"}
+                        variant={
+                          selectedTimeSlot === timeSlotValue
+                            ? "default"
+                            : "outline"
+                        }
                         className="justify-start"
                         onClick={() => setSelectedTimeSlot(timeSlotValue)}
                       >
@@ -216,7 +243,9 @@ export function ScheduleSessionModal({
 
           {/* Mentee Notes */}
           <div className="space-y-2">
-            <Label htmlFor="menteeNotes">Informações Adicionais (Opcional)</Label>
+            <Label htmlFor="menteeNotes">
+              Informações Adicionais (Opcional)
+            </Label>
             <Textarea
               id="menteeNotes"
               placeholder="Compartilhe qualquer contexto adicional que possa ajudar o mentor a se preparar..."
@@ -227,14 +256,15 @@ export function ScheduleSessionModal({
           </div>
 
           {/* Availability Summary */}
-          {availability.length > 0 && (
+          {availability_status.length > 0 && (
             <div className="space-y-2">
               <Label>Disponibilidade Geral do Mentor</Label>
               <div className="flex flex-wrap gap-2">
-                {availability.map((slot) => (
+                {availability_status.map((slot) => (
                   <Badge key={slot.id} variant="secondary" className="text-xs">
-                    {mentorshipUtils.getDayName(slot.day_of_week)}: {' '}
-                    {mentorshipUtils.formatTime(slot.start_time)} - {mentorshipUtils.formatTime(slot.end_time)}
+                    {mentorshipUtils.getDayName(slot.day_of_week)}:{" "}
+                    {mentorshipUtils.formatTime(slot.start_time)} -{" "}
+                    {mentorshipUtils.formatTime(slot.end_time)}
                   </Badge>
                 ))}
               </div>
@@ -245,11 +275,18 @@ export function ScheduleSessionModal({
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button 
-              type="submit" 
-              disabled={!selectedDate || !selectedTimeSlot || !topic.trim() || requestSessionMutation.isPending}
+            <Button
+              type="submit"
+              disabled={
+                !selectedDate ||
+                !selectedTimeSlot ||
+                !topic.trim() ||
+                requestSessionMutation.isPending
+              }
             >
-              {requestSessionMutation.isPending ? 'Enviando...' : 'Solicitar Mentoria'}
+              {requestSessionMutation.isPending
+                ? "Enviando..."
+                : "Solicitar Mentoria"}
             </Button>
           </DialogFooter>
         </form>

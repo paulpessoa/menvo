@@ -46,8 +46,8 @@ export async function GET(req: NextRequest) {
       `first_name.ilike.%${search}%,` +
         `last_name.ilike.%${search}%,` +
         `bio.ilike.%${search}%,` +
-        `current_position.ilike.%${search}%,` +
-        `current_company.ilike.%${search}%,` +
+        `job_title.ilike.%${search}%,` +
+        `company.ilike.%${search}%,` +
         `mentor_skills.cs.{${search}}`
     )
   }

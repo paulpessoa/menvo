@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from("profiles")
       .update({
-        current_position: title,
-        current_company: company,
+        job_title: title,
+        company: company,
         mentorship_topics: topics,
         expertise_areas: expertise_areas,
         linkedin_url,

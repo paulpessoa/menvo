@@ -45,19 +45,19 @@ export default function BookingForm({
       try {
         setFetchingSlots(true)
 
-        // Get availability from mentor directly
+        // Get availability_status from mentor directly
         const response = await fetch(
-          `/api/appointments/availability?mentor_id=${mentorId}`
+          `/api/appointments/availability_status?mentor_id=${mentorId}`
         )
 
         if (!response.ok) {
-          throw new Error("Failed to fetch availability")
+          throw new Error("Failed to fetch availability_status")
         }
 
         const data = await response.json()
         setAvailableSlots(data.availableSlots || [])
       } catch (error) {
-        console.error("Error fetching availability:", error)
+        console.error("Error fetching availability_status:", error)
         toast.error("Erro ao carregar horários disponíveis")
       } finally {
         setFetchingSlots(false)

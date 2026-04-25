@@ -5,6 +5,7 @@ This module provides comprehensive authentication utilities for the Menvo platfo
 ## Overview
 
 The authentication system is built around Supabase Auth and provides:
+
 - React authentication context and hooks
 - Route protection components
 - OAuth provider configuration and validation
@@ -14,15 +15,18 @@ The authentication system is built around Supabase Auth and provides:
 ## Core Components
 
 ### Authentication Context (`auth-context.tsx`)
+
 Provides global authentication state management using React Context.
 
 **Key Features:**
+
 - User session management
 - Profile data loading
 - Authentication state persistence
 - Sign out functionality
 
 **Usage:**
+
 ```typescript
 import { AuthProvider, useAuth } from '@/lib/auth'
 
@@ -36,18 +40,22 @@ const { user, profile, loading, signOut } = useAuth()
 ```
 
 ### Authentication Hook (`use-auth.ts`)
+
 Custom hook that provides access to authentication context.
 
 **Returns:**
+
 - `user`: Current authenticated user
 - `profile`: User profile data
 - `loading`: Authentication loading state
 - `signOut`: Function to sign out user
 
 ### Route Guards (`auth-guard.tsx`)
+
 Components for protecting routes based on authentication and roles.
 
 **Available Guards:**
+
 - `AuthGuard`: Requires authentication
 - `RequireAuth`: Redirects to login if not authenticated
 - `RequireRole`: Requires specific user role
@@ -55,6 +63,7 @@ Components for protecting routes based on authentication and roles.
 - `RequireAdmin`: Requires admin role
 
 **Usage:**
+
 ```typescript
 import { RequireRole, RequireAuth } from '@/lib/auth'
 
@@ -72,9 +81,11 @@ import { RequireRole, RequireAuth } from '@/lib/auth'
 ## OAuth Configuration
 
 ### OAuth Config Validator (`oauth-config-validator.ts`)
+
 Validates OAuth provider configurations and provides detailed error reporting.
 
 **Key Functions:**
+
 - `validateGoogleOAuth()`: Validates Google OAuth setup
 - `validateLinkedInOAuth()`: Validates LinkedIn OAuth setup
 - `validateGitHubOAuth()`: Validates GitHub OAuth setup
@@ -83,61 +94,70 @@ Validates OAuth provider configurations and provides detailed error reporting.
 - `generateOAuthReport()`: Creates detailed configuration report
 
 **Usage:**
+
 ```typescript
-import { validateAllOAuthProviders, generateOAuthReport } from '@/lib/auth'
+import { validateAllOAuthProviders, generateOAuthReport } from "@/lib/auth";
 
 // Validate all providers
-const validations = validateAllOAuthProviders()
+const validations = validateAllOAuthProviders();
 
 // Generate detailed report
-const report = generateOAuthReport()
+const report = generateOAuthReport();
 ```
 
 ### OAuth Middleware (`oauth-middleware.ts`)
+
 Provides middleware functions for OAuth validation in Next.js applications.
 
 **Key Functions:**
+
 - `oauthValidationMiddleware()`: Validates OAuth on auth routes
 - `checkOAuthProviderAvailability()`: Checks if provider is available
 - `createOAuthErrorResponse()`: Creates standardized error responses
 - `handleOAuthHealthCheck()`: Health check endpoint handler
 
 ### OAuth Provider Fixes (`oauth-provider-fixes.ts`)
+
 Enhanced OAuth implementations with proper error handling and provider-specific fixes.
 
 **Key Functions:**
+
 - `signInWithOAuthProvider()`: Enhanced OAuth sign-in with error handling
 - `getOAuthConfig()`: Gets provider-specific configuration
 - `validateOAuthProvider()`: Validates individual provider setup
-- `testOAuthProvider()`: Tests provider availability
+- `testOAuthProvider()`: Tests provider availability_status
 
 **Usage:**
+
 ```typescript
-import { signInWithOAuthProvider } from '@/lib/auth'
+import { signInWithOAuthProvider } from "@/lib/auth";
 
 // Sign in with enhanced error handling
-const result = await signInWithOAuthProvider(supabase, 'google', {
-  redirectTo: '/dashboard'
-})
+const result = await signInWithOAuthProvider(supabase, "google", {
+  redirectTo: "/dashboard",
+});
 ```
 
 ## Server Utilities
 
 ### Server Utils (`server-utils.ts`)
+
 Server-side authentication utilities for API routes and middleware.
 
 **Key Functions:**
+
 - `getUserFromRequest()`: Extracts authenticated user from request
 
 **Usage:**
+
 ```typescript
-import { getUserFromRequest } from '@/lib/auth'
+import { getUserFromRequest } from "@/lib/auth";
 
 // In API route
 export async function GET(request: NextRequest) {
-  const user = await getUserFromRequest(request)
+  const user = await getUserFromRequest(request);
   if (!user) {
-    return new Response('Unauthorized', { status: 401 })
+    return new Response("Unauthorized", { status: 401 });
   }
   // ... handle authenticated request
 }
@@ -146,48 +166,51 @@ export async function GET(request: NextRequest) {
 ## Types
 
 ### Core Types
+
 ```typescript
 interface AuthContextType {
-  user: User | null
-  profile: Profile | null
-  loading: boolean
-  signOut: () => Promise<void>
+  user: User | null;
+  profile: Profile | null;
+  loading: boolean;
+  signOut: () => Promise<void>;
 }
 
 interface Profile {
-  id: string
-  email: string
-  first_name: string | null
-  last_name: string | null
-  full_name: string | null
-  role: string | null
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  full_name: string | null;
+  role: string | null;
   // ... other profile fields
 }
 ```
 
 ### OAuth Types
+
 ```typescript
 interface OAuthConfig {
-  provider: 'google' | 'linkedin' | 'github'
-  clientId: string
-  clientSecret: string
-  redirectUri: string
-  scopes?: string[]
-  enabled: boolean
+  provider: "google" | "linkedin" | "github";
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+  scopes?: string[];
+  enabled: boolean;
 }
 
 interface ConfigValidation {
-  isValid: boolean
-  provider: string
-  errors: string[]
-  warnings: string[]
-  config?: Partial<OAuthConfig>
+  isValid: boolean;
+  provider: string;
+  errors: string[];
+  warnings: string[];
+  config?: Partial<OAuthConfig>;
 }
 ```
 
 ## Environment Variables
 
 ### Required Variables
+
 ```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -211,6 +234,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ## Development
 
 ### Testing OAuth Configuration
+
 Use the validation utilities to check your OAuth setup:
 
 ```bash
@@ -252,6 +276,7 @@ node scripts/test-oauth-fixes.js
 ## Migration Notes
 
 This module was cleaned up to remove unused code:
+
 - Removed `oauth-startup-validator.ts` (functions were exported but never used)
 - Updated exports in `index.ts` to reflect actual usage
 - All existing functionality remains intact

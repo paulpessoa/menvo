@@ -5,19 +5,16 @@
 ### ✅ Pontos Positivos
 
 1. **Separação de Responsabilidades**
-
    - APIs bem definidas e focadas
    - Componentes reutilizáveis
    - Lógica de negócio centralizada
 
 2. **Prevenção de Overbooking**
-
    - Verificação de sobreposição de horários
    - Filtragem de slots ocupados
    - Validação em múltiplas camadas
 
 3. **Sistema de Avaliação Simplificado**
-
    - Apenas mentee avalia (foco claro)
    - Feedback público para reputação
    - Notas privadas para aprendizado
@@ -29,13 +26,11 @@
 ### ⚠️ Pontos de Atenção
 
 1. **Múltiplas APIs para Availability**
-
-   - `/api/appointments/availability` - Slots disponíveis (com filtro)
-   - `/api/mentors/[id]/availability` - Redireciona para a primeira
+   - `/api/appointments/availability_status` - Slots disponíveis (com filtro)
+   - `/api/mentors/[id]/availability_status` - Redireciona para a primeira
    - Pode confundir no futuro
 
 2. **Service Role em Produção**
-
    - Usado para bypass RLS
    - Necessário documentar bem os motivos
    - Considerar políticas RLS mais flexíveis
@@ -53,12 +48,12 @@
 **Solução**:
 
 ```typescript
-// Cache de 30 segundos para availability
+// Cache de 30 segundos para availability_status
 export const revalidate = 30;
 
 // Ou usar React Query
 const { data } = useQuery({
-  queryKey: ["availability", mentorId],
+  queryKey: ["availability_status", mentorId],
   queryFn: () => fetchAvailability(mentorId),
   staleTime: 30000, // 30 segundos
 });
@@ -125,7 +120,7 @@ const channel = supabase
     (payload) => {
       // Atualizar lista de horários disponíveis
       refreshAvailability();
-    }
+    },
   )
   .subscribe();
 ```
@@ -145,15 +140,15 @@ const channel = supabase
 **Solução**:
 
 ```typescript
-// Manter apenas /api/appointments/availability
+// Manter apenas /api/appointments/availability_status
 // Adicionar parâmetro opcional: ?format=slots|config
 
 // Slots disponíveis (padrão)
-GET /api/appointments/availability?mentor_id=xxx
+GET /api/appointments/availability_status?mentor_id=xxx
 → { availableSlots: [...] }
 
 // Configuração semanal
-GET /api/appointments/availability?mentor_id=xxx&format=config
+GET /api/appointments/availability_status?mentor_id=xxx&format=config
 → { weeklyConfig: [...] }
 ```
 

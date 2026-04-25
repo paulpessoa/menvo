@@ -8,7 +8,7 @@ Sem controle adequado, múltiplos mentees poderiam solicitar mentorias no mesmo 
 
 ### 1. API Centralizada de Disponibilidade
 
-**Endpoint**: `/api/appointments/availability`
+**Endpoint**: `/api/appointments/availability_status`
 
 Esta API é a **única fonte de verdade** para horários disponíveis. Ela:
 
@@ -30,7 +30,7 @@ const isSlotBooked = (slotStart: Date, slotDuration: number = 45): boolean => {
   return (appointments || []).some((apt: any) => {
     const aptStart = new Date(apt.scheduled_at);
     const aptEnd = new Date(
-      aptStart.getTime() + apt.duration_minutes * 60 * 1000
+      aptStart.getTime() + apt.duration_minutes * 60 * 1000,
     );
     const slotEnd = new Date(slotStart.getTime() + slotDuration * 60 * 1000);
 
@@ -57,7 +57,7 @@ A API filtra appointments com status:
 ```
 1. Mentee abre modal de agendamento
    ↓
-2. Modal chama /api/appointments/availability
+2. Modal chama /api/appointments/availability_status
    ↓
 3. API verifica appointments existentes
    ↓
@@ -114,7 +114,7 @@ Horários disponíveis:
 
 ### Camada 1: Frontend (BookMentorshipModal)
 
-- Usa API de availability
+- Usa API de availability_status
 - Mostra apenas horários disponíveis
 - Previne seleção de horários ocupados
 
@@ -137,7 +137,7 @@ const { data: conflicts } = await supabase
 if (conflicts && conflicts.length > 0) {
   return NextResponse.json(
     { error: "Time slot is not available" },
-    { status: 409 }
+    { status: 409 },
   );
 }
 ```
@@ -162,7 +162,7 @@ Se dois mentees abrem o modal ao mesmo tempo, ambos veem o mesmo horário dispon
 
 ## 📝 Componentes Atualizados
 
-### ✅ `/api/appointments/availability`
+### ✅ `/api/appointments/availability_status`
 
 - Função `isSlotBooked` para verificar sobreposição
 - Filtra appointments `pending` e `confirmed`
@@ -170,7 +170,7 @@ Se dois mentees abrem o modal ao mesmo tempo, ambos veem o mesmo horário dispon
 
 ### ✅ `BookMentorshipModal.tsx`
 
-- Usa API de availability (não gera slots localmente)
+- Usa API de availability_status (não gera slots localmente)
 - Remove função `generateUpcomingSlots`
 - Confia na API como fonte única de verdade
 

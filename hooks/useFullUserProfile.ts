@@ -1,12 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '@/lib/services/auth/auth.service'
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { supabase } from "@/lib/services/auth/auth.service"
 
 export function useFullUserProfile() {
   return useQuery({
-    queryKey: ['full-user-profile'],
+    queryKey: ["full-user-profile"],
     queryFn: async () => {
-      const res = await fetch('/api/auth/me')
-      if (!res.ok) throw new Error('Erro ao buscar perfil completo')
+      const res = await fetch("/api/auth/me")
+      if (!res.ok) throw new Error("Erro ao buscar perfil completo")
       return res.json()
     }
   })
@@ -22,12 +22,24 @@ interface SaveProfileInput {
   location?: string
   linkedin_url?: string
   github_url?: string
-  current_position?: string
-  current_company?: string
+  job_title?: string
+  company?: string
 }
 
-const userFields: (keyof SaveProfileInput)[] = ['first_name', 'last_name', 'phone', 'avatar_url']
-const profileFields: (keyof SaveProfileInput)[] = ['bio', 'location', 'linkedin_url', 'github_url', 'current_position', 'current_company']
+const userFields: (keyof SaveProfileInput)[] = [
+  "first_name",
+  "last_name",
+  "phone",
+  "avatar_url"
+]
+const profileFields: (keyof SaveProfileInput)[] = [
+  "bio",
+  "location",
+  "linkedin_url",
+  "github_url",
+  "job_title",
+  "company"
+]
 
 export function useSaveFullUserProfile() {
   const queryClient = useQueryClient()
@@ -48,15 +60,15 @@ export function useSaveFullUserProfile() {
       if (Object.keys(updates).length > 0) {
         // Centralizado na tabela profiles conforme padrão do projeto
         const { error } = await supabase
-          .from('profiles')
+          .from("profiles")
           .update(updates)
-          .eq('id', data.id)
-        
+          .eq("id", data.id)
+
         if (error) throw error
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['full-user-profile'] })
+      queryClient.invalidateQueries({ queryKey: ["full-user-profile"] })
     }
   })
 }

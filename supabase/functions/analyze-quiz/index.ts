@@ -1,10 +1,11 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type"
 }
 
 interface QuizResponse {
@@ -24,8 +25,8 @@ interface Mentor {
   id: string
   full_name: string
   bio: string
-  current_position: string
-  current_company: string
+  job_title: string
+  company: string
   expertise_areas: string[]
   mentor_skills: string[]
   mentorship_topics: string[]
@@ -58,49 +59,57 @@ interface AnalysisResult {
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders })
   }
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     )
 
     const { responseId } = await req.json()
 
     if (!responseId) {
       return new Response(
-        JSON.stringify({ error: 'Response ID is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Response ID is required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
       )
     }
 
     // Get quiz response
     const { data: quizResponse, error: responseError } = await supabaseClient
-      .from('quiz_responses')
-      .select('*')
-      .eq('id', responseId)
+      .from("quiz_responses")
+      .select("*")
+      .eq("id", responseId)
       .single()
 
     if (responseError || !quizResponse) {
       return new Response(
-        JSON.stringify({ error: 'Quiz response not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Quiz response not found" }),
+        {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
       )
     }
 
     // Get available mentors from mentors_view
     const { data: mentors, error: mentorsError } = await supabaseClient
-      .from('mentors_view')
-      .select(`
-        id, full_name, bio, current_position, current_company,
+      .from("mentors_view")
+      .select(
+        `
+        id, full_name, bio, job_title, company,
         expertise_areas, mentor_skills, mentorship_topics,
         inclusive_tags, inclusion_tags, availability_status,
         is_available, rating, reviews, sessions
-      `)
-      .eq('is_available', true)
+      `
+      )
+      .eq("is_available", true)
 
     const availableMentors = mentors || []
 
@@ -109,74 +118,80 @@ serve(async (req) => {
     let usedFallback = false
 
     try {
-      const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-      
+      const openaiApiKey = Deno.env.get("OPENAI_API_KEY")
+
       if (!openaiApiKey) {
-        throw new Error('OpenAI API key not configured')
+        throw new Error("OpenAI API key not configured")
       }
 
       const prompt = generateAnalysisPrompt(quizResponse, availableMentors)
 
-      const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'Você é um especialista e consultor pessoal, em desenvolvimento de carreira e mentoria da Startup Menvo. Forneça análises objetivas, motivadoras e construtivas em português brasileiro. Sempre retorne JSON válido.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 2000
-        })
-      })
+      const openaiResponse = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${openaiApiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "Você é um especialista e consultor pessoal, em desenvolvimento de carreira e mentoria da Startup Menvo. Forneça análises objetivas, motivadoras e construtivas em português brasileiro. Sempre retorne JSON válido."
+              },
+              {
+                role: "user",
+                content: prompt
+              }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+          })
+        }
+      )
 
       if (!openaiResponse.ok) {
         const errorData = await openaiResponse.text()
-        console.error('OpenAI API error:', errorData)
-        throw new Error('OpenAI API request failed')
+        console.error("OpenAI API error:", errorData)
+        throw new Error("OpenAI API request failed")
       }
 
       const openaiData = await openaiResponse.json()
       const content = openaiData.choices[0].message.content
-      
+
       // Try to parse JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         analysisResult = JSON.parse(jsonMatch[0])
       } else {
-        throw new Error('Could not extract JSON from OpenAI response')
+        throw new Error("Could not extract JSON from OpenAI response")
       }
-
     } catch (openaiError) {
-      console.error('Error using OpenAI, using fallback:', openaiError)
+      console.error("Error using OpenAI, using fallback:", openaiError)
       usedFallback = true
       analysisResult = generateFallbackAnalysis(quizResponse, availableMentors)
     }
 
     // Update quiz response with analysis
     const { error: updateError } = await supabaseClient
-      .from('quiz_responses')
+      .from("quiz_responses")
       .update({
         ai_analysis: analysisResult,
         processed_at: new Date().toISOString()
       })
-      .eq('id', responseId)
+      .eq("id", responseId)
 
     if (updateError) {
-      console.error('Error updating quiz response:', updateError)
+      console.error("Error updating quiz response:", updateError)
       return new Response(
-        JSON.stringify({ error: 'Failed to save analysis' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Failed to save analysis" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
       )
     }
 
@@ -189,37 +204,49 @@ serve(async (req) => {
         usedFallback,
         responseId
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     )
-
   } catch (error) {
-    console.error('General error:', error)
+    console.error("General error:", error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        error: "Internal server error",
+        details: error.message
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      }
     )
   }
 })
 
-function generateAnalysisPrompt(response: QuizResponse, mentors: Mentor[]): string {
+function generateAnalysisPrompt(
+  response: QuizResponse,
+  mentors: Mentor[]
+): string {
   return `Analise as respostas do questionário abaixo e crie uma análise personalizada, criativa e motivadora.
 
 RESPOSTAS DO PARTICIPANTE:
 - Nome: ${response.name}
 - Momento de carreira: ${response.career_moment}
 - Experiência com mentoria: ${response.mentorship_experience}
-- Áreas de desenvolvimento: ${response.development_areas.join(', ')}
+- Áreas de desenvolvimento: ${response.development_areas.join(", ")}
 - Desafio profissional: ${response.current_challenge}
 - Visão de futuro (2 anos): ${response.future_vision}
 - Interesse em compartilhar conhecimento: ${response.share_knowledge}
 - Desafios na vida pessoal: ${response.personal_life_help}
 
 MENTORES DISPONÍVEIS NA PLATAFORMA:
-${mentors.map(m => `- ${m.full_name} (${m.current_position} na ${m.current_company}): 
-  Expertise: ${m.expertise_areas?.join(', ') || 'N/A'}
-  Tópicos de Mentoria: ${m.mentorship_topics?.join(', ') || 'N/A'}
+${mentors
+  .map(
+    (m) => `- ${m.full_name} (${m.job_title} na ${m.company}): 
+  Expertise: ${m.expertise_areas?.join(", ") || "N/A"}
+  Tópicos de Mentoria: ${m.mentorship_topics?.join(", ") || "N/A"}
   Rating: ${m.rating}/5 (${m.reviews} avaliações, ${m.sessions} sessões)
-  Status: ${m.availability_status}`).join('\n\n')}
+  Status: ${m.availability_status}`
+  )
+  .join("\n\n")}
 
 INSTRUÇÕES:
 1. PRIMEIRO: Avalie a qualidade e coerência das respostas
@@ -273,24 +300,29 @@ Para respostas adequadas:
 }`
 }
 
-function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): AnalysisResult {
+function generateFallbackAnalysis(
+  response: QuizResponse,
+  mentors: Mentor[]
+): AnalysisResult {
   // Check if responses are too vague or incoherent
   const challengeLength = response.current_challenge?.trim().length || 0
   const visionLength = response.future_vision?.trim().length || 0
   const personalHelpLength = response.personal_life_help?.trim().length || 0
-  
-  const hasVagueResponses = challengeLength < 20 || visionLength < 20 || personalHelpLength < 20
-  const hasGenericResponses = 
-    response.current_challenge?.toLowerCase().includes('não sei') ||
-    response.future_vision?.toLowerCase().includes('não sei') ||
-    response.current_challenge?.toLowerCase().includes('nada') ||
-    response.future_vision?.toLowerCase().includes('nada')
-  
+
+  const hasVagueResponses =
+    challengeLength < 20 || visionLength < 20 || personalHelpLength < 20
+  const hasGenericResponses =
+    response.current_challenge?.toLowerCase().includes("não sei") ||
+    response.future_vision?.toLowerCase().includes("não sei") ||
+    response.current_challenge?.toLowerCase().includes("nada") ||
+    response.future_vision?.toLowerCase().includes("nada")
+
   if (hasVagueResponses || hasGenericResponses) {
     return {
       precisa_refazer: true,
       titulo_personalizado: "Que tal tentar novamente?",
-      resumo_motivador: "Notamos que suas respostas foram muito breves ou vagas. Para uma análise mais precisa e útil, recomendamos refazer o questionário com mais detalhes e reflexão sobre seus objetivos profissionais.",
+      resumo_motivador:
+        "Notamos que suas respostas foram muito breves ou vagas. Para uma análise mais precisa e útil, recomendamos refazer o questionário com mais detalhes e reflexão sobre seus objetivos profissionais.",
       mentores_sugeridos: [],
       conselhos_praticos: [
         "Reflita mais profundamente sobre seus desafios atuais",
@@ -302,61 +334,71 @@ function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): An
         "Dedique tempo para pensar sobre seus objetivos de carreira"
       ],
       areas_desenvolvimento: response.development_areas || [],
-      mensagem_final: "Uma boa análise precisa de respostas thoughtful. Tente novamente quando estiver pronto para compartilhar mais sobre seus desafios e objetivos!",
+      mensagem_final:
+        "Uma boa análise precisa de respostas thoughtful. Tente novamente quando estiver pronto para compartilhar mais sobre seus desafios e objetivos!",
       potencial_mentor: false,
       areas_vida_pessoal: []
     }
   }
-  
+
   // Match mentors with development areas using expertise_areas and mentorship_topics
-  const matchedMentors = mentors.filter(mentor => {
-    const mentorAreas = [
-      ...(mentor.expertise_areas || []),
-      ...(mentor.mentorship_topics || []),
-      ...(mentor.mentor_skills || [])
-    ].map(area => area.toLowerCase())
-    
-    return response.development_areas.some(devArea => 
-      mentorAreas.some(mentorArea => 
-        mentorArea.includes(devArea.toLowerCase()) || 
-        devArea.toLowerCase().includes(mentorArea)
+  const matchedMentors = mentors
+    .filter((mentor) => {
+      const mentorAreas = [
+        ...(mentor.expertise_areas || []),
+        ...(mentor.mentorship_topics || []),
+        ...(mentor.mentor_skills || [])
+      ].map((area) => area.toLowerCase())
+
+      return response.development_areas.some((devArea) =>
+        mentorAreas.some(
+          (mentorArea) =>
+            mentorArea.includes(devArea.toLowerCase()) ||
+            devArea.toLowerCase().includes(mentorArea)
+        )
       )
-    )
-  }).slice(0, 3)
+    })
+    .slice(0, 3)
 
   // Use real mentors if available, otherwise show generic unavailable mentors
-  const mentoresSugeridos = matchedMentors.length > 0
-    ? matchedMentors.map(mentor => ({
-        tipo: `${mentor.full_name} - ${mentor.current_position}`,
-        razao: `${mentor.bio?.substring(0, 100)}... | Expertise: ${mentor.expertise_areas?.slice(0, 2).join(', ')} | Rating: ${mentor.rating}/5`,
-        disponivel: mentor.availability_status === 'available',
-        mentor_nome: mentor.full_name
-      }))
-    : [
-        {
-          tipo: "Mentor de Carreira",
-          razao: "Para te ajudar a planejar seus próximos passos profissionais e definir objetivos claros",
-          disponivel: false
-        },
-        {
-          tipo: "Mentor de Desenvolvimento Técnico", 
-          razao: "Para desenvolver suas habilidades técnicas e se manter atualizado no mercado",
-          disponivel: false
-        },
-        {
-          tipo: "Mentor de Liderança",
-          razao: "Para desenvolver suas soft skills e capacidades de liderança",
-          disponivel: false
-        }
-      ]
+  const mentoresSugeridos =
+    matchedMentors.length > 0
+      ? matchedMentors.map((mentor) => ({
+          tipo: `${mentor.full_name} - ${mentor.job_title}`,
+          razao: `${mentor.bio?.substring(0, 100)}... | Expertise: ${mentor.expertise_areas?.slice(0, 2).join(", ")} | Rating: ${mentor.rating}/5`,
+          disponivel: mentor.availability_status === "available",
+          mentor_nome: mentor.full_name
+        }))
+      : [
+          {
+            tipo: "Mentor de Carreira",
+            razao:
+              "Para te ajudar a planejar seus próximos passos profissionais e definir objetivos claros",
+            disponivel: false
+          },
+          {
+            tipo: "Mentor de Desenvolvimento Técnico",
+            razao:
+              "Para desenvolver suas habilidades técnicas e se manter atualizado no mercado",
+            disponivel: false
+          },
+          {
+            tipo: "Mentor de Liderança",
+            razao:
+              "Para desenvolver suas soft skills e capacidades de liderança",
+            disponivel: false
+          }
+        ]
 
-  const potencialMentor = response.share_knowledge.includes('sim') || 
-                          response.share_knowledge.includes('ja-faco')
+  const potencialMentor =
+    response.share_knowledge.includes("sim") ||
+    response.share_knowledge.includes("ja-faco")
 
   return {
     precisa_refazer: false,
     titulo_personalizado: "Seu Perfil de Crescimento Profissional",
-    resumo_motivador: "Você demonstra clareza sobre seus objetivos e está no caminho certo para alcançá-los. Continue investindo em seu desenvolvimento!",
+    resumo_motivador:
+      "Você demonstra clareza sobre seus objetivos e está no caminho certo para alcançá-los. Continue investindo em seu desenvolvimento!",
     mentores_sugeridos: mentoresSugeridos,
     conselhos_praticos: [
       "Defina metas específicas e mensuráveis para os próximos 3 meses",
@@ -369,8 +411,12 @@ function generateFallbackAnalysis(response: QuizResponse, mentors: Mentor[]): An
       "Participe de comunidades e eventos da sua área"
     ],
     areas_desenvolvimento: response.development_areas.slice(0, 3),
-    mensagem_final: "Você tem um grande potencial! Continue buscando crescimento e não hesite em pedir ajuda quando precisar.",
+    mensagem_final:
+      "Você tem um grande potencial! Continue buscando crescimento e não hesite em pedir ajuda quando precisar.",
     potencial_mentor: potencialMentor,
-    areas_vida_pessoal: ["Equilíbrio vida-trabalho", "Desenvolvimento de hobbies"]
+    areas_vida_pessoal: [
+      "Equilíbrio vida-trabalho",
+      "Desenvolvimento de hobbies"
+    ]
   }
 }

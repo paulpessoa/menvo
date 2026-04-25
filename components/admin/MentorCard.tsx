@@ -28,7 +28,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog"
 
 interface MentorCardProps {
@@ -41,8 +41,8 @@ interface MentorCardProps {
     bio: string | null
     avatar_url: string | null
     verified: boolean
-    current_position: string | null
-    current_company: string | null
+    job_title: string | null
+    company: string | null
     expertise_areas: string[] | null
     location: string | null
     created_at: string
@@ -85,8 +85,7 @@ export function MentorCard({
     setIsVerifying(true)
 
     try {
-      const { error } = await (supabase
-        .from("profiles") as any)
+      const { error } = await (supabase.from("profiles") as any)
         .update({
           verified,
           updated_at: new Date().toISOString(),
@@ -174,13 +173,13 @@ export function MentorCard({
             </div>
 
             {/* Professional Info */}
-            {(mentor.current_position || mentor.current_company) && (
+            {(mentor.job_title || mentor.company) && (
               <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
                 <Briefcase className="h-4 w-4" />
                 <span>
-                  {mentor.current_position}
-                  {mentor.current_position && mentor.current_company && " @ "}
-                  {mentor.current_company}
+                  {mentor.job_title}
+                  {mentor.job_title && mentor.company && " @ "}
+                  {mentor.company}
                 </span>
               </div>
             )}
@@ -193,9 +192,9 @@ export function MentorCard({
               </div>
 
               {mentor.linkedin_url && (
-                <a 
-                  href={mentor.linkedin_url} 
-                  target="_blank" 
+                <a
+                  href={mentor.linkedin_url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
                 >
@@ -205,9 +204,9 @@ export function MentorCard({
               )}
 
               {mentor.cv_url && (
-                <a 
-                  href={mentor.cv_url} 
-                  target="_blank" 
+                <a
+                  href={mentor.cv_url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-sm text-green-600 hover:underline"
                 >
@@ -326,10 +325,11 @@ export function MentorCard({
                     <DialogHeader>
                       <DialogTitle>{mentor.full_name}</DialogTitle>
                       <DialogDescription>
-                        {mentor.current_position} {mentor.current_company && `@ ${mentor.current_company}`}
+                        {mentor.job_title}{" "}
+                        {mentor.company && `@ ${mentor.company}`}
                       </DialogDescription>
                     </DialogHeader>
-                    
+
                     <div className="space-y-6 pt-4">
                       <div className="flex gap-4">
                         <Avatar className="h-20 w-20 border-2">
@@ -342,7 +342,11 @@ export function MentorCard({
                           <div className="flex flex-wrap gap-2">
                             {mentor.linkedin_url && (
                               <Button variant="outline" size="sm" asChild>
-                                <a href={mentor.linkedin_url} target="_blank" rel="noopener noreferrer">
+                                <a
+                                  href={mentor.linkedin_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
                                   <Linkedin className="h-4 w-4 mr-2 text-blue-600" />
                                   LinkedIn
                                 </a>
@@ -350,7 +354,11 @@ export function MentorCard({
                             )}
                             {mentor.cv_url && (
                               <Button variant="outline" size="sm" asChild>
-                                <a href={mentor.cv_url} target="_blank" rel="noopener noreferrer">
+                                <a
+                                  href={mentor.cv_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
                                   <FileText className="h-4 w-4 mr-2 text-green-600" />
                                   Currículo (PDF)
                                 </a>
@@ -364,32 +372,45 @@ export function MentorCard({
                             </Button>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            ID: <code className="bg-muted px-1 rounded">{mentor.id}</code>
+                            ID:{" "}
+                            <code className="bg-muted px-1 rounded">
+                              {mentor.id}
+                            </code>
                           </p>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <h4 className="font-semibold border-b pb-1">Sobre o Mentor</h4>
+                        <h4 className="font-semibold border-b pb-1">
+                          Sobre o Mentor
+                        </h4>
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">
                           {mentor.bio || "Nenhuma biografia informada."}
                         </p>
                       </div>
 
-                      {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
-                        <div className="space-y-2">
-                          <h4 className="font-semibold border-b pb-1">Áreas de Expertise</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {mentor.expertise_areas.map((area, index) => (
-                              <Badge key={index} variant="secondary">{area}</Badge>
-                            ))}
+                      {mentor.expertise_areas &&
+                        mentor.expertise_areas.length > 0 && (
+                          <div className="space-y-2">
+                            <h4 className="font-semibold border-b pb-1">
+                              Áreas de Expertise
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {mentor.expertise_areas.map((area, index) => (
+                                <Badge key={index} variant="secondary">
+                                  {area}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       <div className="pt-4 flex justify-end gap-2 border-t">
                         <Button variant="ghost" asChild>
-                          <Link href={`/mentors/${mentor.slug || mentor.id}`} target="_blank">
+                          <Link
+                            href={`/mentors/${mentor.slug || mentor.id}`}
+                            target="_blank"
+                          >
                             <ExternalLink className="h-4 w-4 mr-2" />
                             Ver Perfil Público
                           </Link>

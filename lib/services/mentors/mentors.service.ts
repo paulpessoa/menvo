@@ -1,9 +1,9 @@
-import { supabase } from '@/lib/services/auth/auth.service'
-import type { 
-  MentorProfile, 
-  MentorFilters, 
-  PaginatedMentors 
-} from '@/lib/types/models/mentor'
+import { supabase } from "@/lib/services/auth/auth.service"
+import type {
+  MentorProfile,
+  MentorFilters,
+  PaginatedMentors
+} from "@/lib/types/models/mentor"
 
 export type { MentorProfile, MentorFilters, PaginatedMentors }
 
@@ -12,9 +12,9 @@ export interface FilterOptions {
   languages: string[]
   educationLevels: string[]
   cities: string[]
-  countries: string[],
+  countries: string[]
   inclusionTags: string[]
-  experienceRanges: { label: string, min: number, max: number }[]
+  experienceRanges: { label: string; min: number; max: number }[]
 }
 
 class MentorService {
@@ -28,84 +28,86 @@ class MentorService {
       educationLevels = [],
       city,
       country,
-      availability,
+      availability_status,
       page = 1,
       limit = 12
     } = filters
 
     let query = supabase
-      .from('mentors_view')
-      .select(`
+      .from("mentors_view")
+      .select(
+        `
         id,
         first_name,
         last_name,
         avatar_url,
         bio,
-        current_position,
-        current_company,
+        job_title,
+        company,
         location,
-        availability,
+        availability_status,
         inclusion_tags,
-        years_experience,
+        experience_years,
         mentor_skills,
         languages,
-        education_level,
+        academic_level,
         active_roles
-      `, { count: 'exact' })
-      .contains('active_roles', ['mentor'])
-      .not('mentor_skills', 'is', null)
-
+      `,
+        { count: "exact" }
+      )
+      .contains("active_roles", ["mentor"])
+      .not("mentor_skills", "is", null)
 
     // Filtro de busca genérica
     if (search) {
       query = query.or(
         `first_name.ilike.%${search}%,` +
-        `last_name.ilike.%${search}%,` +
-        `bio.ilike.%${search}%,` +
-        `current_position.ilike.%${search}%,` +
-        `current_company.ilike.%${search}%,` +
-        `mentor_skills.cs.{${search}}`
+          `last_name.ilike.%${search}%,` +
+          `bio.ilike.%${search}%,` +
+          `job_title.ilike.%${search}%,` +
+          `company.ilike.%${search}%,` +
+          `mentor_skills.cs.{${search}}`
       )
     }
 
     // Filtro por tópicos/skills
     if (topics.length > 0) {
-      query = query.overlaps('mentor_skills', topics)
+      query = query.overlaps("mentor_skills", topics)
     }
 
     // Filtro por idiomas
     if (languages.length > 0) {
-      query = query.overlaps('languages', languages)
+      query = query.overlaps("languages", languages)
     }
-    
+
     // Filtro por Inclusion Tags
     if (inclusionTags.length > 0) {
-      query = query.overlaps('inclusion_tags', inclusionTags)
+      query = query.overlaps("inclusion_tags", inclusionTags)
     }
 
     // Filtro por anos de experiência
     if (experienceYears.length === 2) {
       query = query
-        .gte('years_experience', experienceYears[0])
-        .lte('years_experience', experienceYears[1])
+        .gte("experience_years", experienceYears[0])
+        .lte("experience_years", experienceYears[1])
     }
 
     // Filtro por nível de educação
     if (educationLevels.length > 0) {
-      query = query.in('education_level', educationLevels)
+      query = query.in("academic_level", educationLevels)
     }
 
     // Filtro por localização
     if (city) {
-      query = query.ilike('location', `%${city}%`)
+      query = query.ilike("location", `%${city}%`)
     }
     if (country) {
-      query = query.ilike('location', `%${country}%`)
+      query = query.ilike("location", `%${country}%`)
     }
 
     // Filtro por disponibilidade
-    if (availability && availability !== 'all') {
-      query = query.eq('availability', availability)
+    if (availability_status && availability_status !== "all") {
+      query = query.eq("availability_status", availability_status)
     }
 
     // Paginação
@@ -114,7 +116,7 @@ class MentorService {
     query = query.range(from, to)
 
     // Ordenação
-    query = query.order('first_name', { ascending: true })
+    query = query.order("first_name", { ascending: true })
 
     const { data, error, count } = await (query as any)
 
@@ -138,9 +140,9 @@ class MentorService {
   async getFilterOptions(): Promise<FilterOptions> {
     // Buscar todas as skills únicas dos mentores
     const { data: skillsData, error: skillsError } = await (supabase
-      .from('mentors_view')
-      .select('mentor_skills')
-      .contains('active_roles', ['mentor']) as any)
+      .from("mentors_view")
+      .select("mentor_skills")
+      .contains("active_roles", ["mentor"]) as any)
 
     if (skillsError) {
       throw new Error(`Erro ao buscar skills: ${skillsError.message}`)
@@ -148,58 +150,68 @@ class MentorService {
 
     // Buscar todos os idiomas únicos
     const { data: languagesData, error: languagesError } = await (supabase
-      .from('mentors_view')
-      .select('languages')
-      .contains('active_roles', ['mentor']) as any)
+      .from("mentors_view")
+      .select("languages")
+      .contains("active_roles", ["mentor"]) as any)
 
     if (languagesError) {
       throw new Error(`Erro ao buscar idiomas: ${languagesError.message}`)
     }
 
     // Buscar todos as Tags Inclusivas
-    const { data: inclusionTagsData, error: inclusionTagsError } = await (supabase
-      .from('mentors_view')
-      .select('inclusion_tags')
-      .contains('active_roles', ['mentor']) as any)
+    const { data: inclusionTagsData, error: inclusionTagsError } =
+      await (supabase
+        .from("mentors_view")
+        .select("inclusion_tags")
+        .contains("active_roles", ["mentor"]) as any)
 
     if (inclusionTagsError) {
-      throw new Error(`Erro ao buscar Tags Inclusivas: ${inclusionTagsError.message}`)
+      throw new Error(
+        `Erro ao buscar Tags Inclusivas: ${inclusionTagsError.message}`
+      )
     }
 
     // Buscar localizações únicas
     const { data: locationsData, error: locationsError } = await (supabase
-      .from('mentors_view')
-      .select('location')
-      .contains('active_roles', ['mentor'])
-      .not('location', 'is', null) as any)
+      .from("mentors_view")
+      .select("location")
+      .contains("active_roles", ["mentor"])
+      .not("location", "is", null) as any)
 
     if (locationsError) {
       throw new Error(`Erro ao buscar localizações: ${locationsError.message}`)
     }
 
     // Processar dados
-    const allSkills = (skillsData as any[])?.flatMap(item => item.mentor_skills || []) || []
+    const allSkills =
+      (skillsData as any[])?.flatMap((item) => item.mentor_skills || []) || []
     const uniqueTopics = Array.from(new Set(allSkills))
       .filter(Boolean)
       .sort() as string[]
 
-    const allLanguages = (languagesData as any[])?.flatMap(item => item.languages || []) || []
+    const allLanguages =
+      (languagesData as any[])?.flatMap((item) => item.languages || []) || []
     const uniqueLanguages = Array.from(new Set(allLanguages))
       .filter(Boolean)
       .sort() as string[]
-   
-    const allinclusionTags = (inclusionTagsData as any[])?.flatMap(item => item.inclusion_tags || []) || []
+
+    const allinclusionTags =
+      (inclusionTagsData as any[])?.flatMap(
+        (item) => item.inclusion_tags || []
+      ) || []
     const uniqueInclusionTags = Array.from(new Set(allinclusionTags))
       .filter(Boolean)
       .sort() as string[]
 
-    const allLocations = (locationsData as any[])?.map(item => item.location).filter(Boolean) || []
+    const allLocations =
+      (locationsData as any[])?.map((item) => item.location).filter(Boolean) ||
+      []
     const cities: string[] = []
     const countries: string[] = []
-    
-    allLocations.forEach(location => {
+
+    allLocations.forEach((location) => {
       if (location) {
-        const parts = location.split(',').map((part: string) => part.trim())
+        const parts = location.split(",").map((part: string) => part.trim())
         if (parts.length >= 2) {
           cities.push(parts[0])
           countries.push(parts[parts.length - 1])
@@ -215,57 +227,59 @@ class MentorService {
       inclusionTags: uniqueInclusionTags,
       languages: uniqueLanguages,
       educationLevels: [
-        'Ensino Fundamental',
-        'Ensino Médio',
-        'Técnico',
-        'Superior',
-        'Pós-graduação',
-        'Mestrado',
-        'MBA',
-        'Doutorado',
-        'Pós-doutorado'
+        "Ensino Fundamental",
+        "Ensino Médio",
+        "Técnico",
+        "Superior",
+        "Pós-graduação",
+        "Mestrado",
+        "MBA",
+        "Doutorado",
+        "Pós-doutorado"
       ],
       cities: uniqueCities,
       countries: uniqueCountries,
       experienceRanges: [
-        { label: 'Iniciante (0-2 anos)', min: 0, max: 2 },
-        { label: 'Júnior (3-5 anos)', min: 3, max: 5 },
-        { label: 'Pleno (6-10 anos)', min: 6, max: 10 },
-        { label: 'Sênior (11-15 anos)', min: 11, max: 15 },
-        { label: 'Especialista (16+ anos)', min: 16, max: 50 }
+        { label: "Iniciante (0-2 anos)", min: 0, max: 2 },
+        { label: "Júnior (3-5 anos)", min: 3, max: 5 },
+        { label: "Pleno (6-10 anos)", min: 6, max: 10 },
+        { label: "Sênior (11-15 anos)", min: 11, max: 15 },
+        { label: "Especialista (16+ anos)", min: 16, max: 50 }
       ]
     }
   }
 
   async getMentorById(id: string): Promise<MentorProfile | null> {
     const { data, error } = await (supabase
-      .from('mentors_view')
-      .select(`
+      .from("mentors_view")
+      .select(
+        `
         id,
         first_name,
         last_name,
         avatar_url,
         bio,
-        current_position,
-        current_company,
+        job_title,
+        company,
         location,
-        availability,
-        years_experience,
+        availability_status,
+        experience_years,
         mentor_skills,
         languages,
-        education_level,
+        academic_level,
         active_roles,
         inclusion_tags,
         rating,
         sessions,
         reviews
-      `)
-      .eq('id', id)
-      .contains('active_roles', ['mentor'])
+      `
+      )
+      .eq("id", id)
+      .contains("active_roles", ["mentor"])
       .single() as any)
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null // Mentor não encontrado
       }
       throw new Error(`Erro ao buscar mentor: ${error.message}`)

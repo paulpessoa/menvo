@@ -6,8 +6,8 @@
 
 O formulário de perfil estava enviando campos com nomes incorretos:
 
-- `current_position` → deveria ser `job_title`
-- `current_company` → deveria ser `company`
+- `job_title` → deveria ser `job_title`
+- `company` → deveria ser `company`
 - `personal_website_url` → deveria ser `website_url`
 - `topics` → deveria ser `mentorship_topics`
 
@@ -88,15 +88,15 @@ created_at, updated_at, verified_at
 
 1. **app/profile/page.tsx**
    - Corrigido mapeamento de campos do formulário
-   - `current_position` → `job_title`
-   - `current_company` → `company`
+   - `job_title` → `job_title`
+   - `company` → `company`
    - `personal_website_url` → `website_url`
    - `topics` → `mentorship_topics`
 
 2. **hooks/useFormValidation.ts**
    - Atualizado regras de validação para usar nomes corretos
-   - `current_position` → `job_title`
-   - `current_company` → `company`
+   - `job_title` → `job_title`
+   - `company` → `company`
    - `personal_website_url` → `website_url`
 
 ## Próximos Passos

@@ -1,9 +1,10 @@
--- RECONSTRUÇÃO DEFINITIVA DA VIEW DE MENTORES (STAFF APPROVED)
--- Resolve erros de: inclusion_tags, job_title, session_price_usd e availability_status
+-- RECONSTRUÇÃO DEFINITIVA E SINCRONIZADA DA VIEW DE MENTORES (STAFF APPROVED)
+-- Alinhada com as mudanças de nomenclatura do frontend (abril/2026)
 DROP VIEW IF EXISTS public.mentors_view;
 
 CREATE OR REPLACE VIEW public.mentors_view WITH (security_invoker = true) AS
 SELECT 
+    -- 1. Campos Originais (Nomes reais da tabela profiles)
     p.id,
     p.email,
     p.first_name,
@@ -12,55 +13,62 @@ SELECT
     p.slug,
     p.bio,
     p.avatar_url,
-    -- Cargo e Empresa (Aliases Totais para compatibilidade)
     p.job_title,
-    p.job_title as current_position,
     p.company,
-    p.company as current_company,
-    -- Redes Sociais
+    p.experience_years,
     p.linkedin_url,
     p.github_url,
     p.twitter_url,
     p.website_url,
     p.portfolio_url,
-    -- Localização Individual
+    p.phone,
     p.city,
     p.state,
     p.country,
     p.address,
     p.timezone,
-    -- Dados de Mentoria e Tags (Aliases Totais)
+    p.academic_level,
+    p.institution,
+    p.course,
+    p.expected_graduation,
     p.expertise_areas,
     p.mentorship_topics,
     p.free_topics,
     p.inclusive_tags,
-    p.inclusive_tags as inclusion_tags,
     p.languages,
-    -- Disponibilidade (Aliases Totais)
+    p.mentorship_approach,
+    p.what_to_expect,
+    p.ideal_mentee,
+    p.mentorship_guidelines,
     p.availability_status,
-    p.availability_status as availability,
-    -- Educação e Experiência
-    p.academic_level as education_level,
-    p.institution,
-    p.course,
-    p.expected_graduation,
-    p.experience_years as years_experience,
-    -- Status e Verificação
     p.verified,
     p.verification_status,
     p.is_pending_mentor,
     p.is_public,
-    -- Localização formatada
+    p.is_volunteer,
+    p.chat_enabled,
+    p.show_in_community,
+    p.cv_url,
+    p.average_rating,
+    p.total_sessions,
+    p.total_reviews,
+    p.created_at,
+    p.updated_at,
+    p.origin_platform,
+    p.external_id,
+
+    -- 2. Aliases Estratégicos (Mantidos para compatibilidade com queries dinâmicas/filtros)
+    p.inclusive_tags as inclusion_tags,
     COALESCE(p.city, '') || 
     CASE WHEN p.city IS NOT NULL AND p.state IS NOT NULL THEN ', ' ELSE '' END || COALESCE(p.state, '') ||
     CASE WHEN (p.city IS NOT NULL OR p.state IS NOT NULL) AND p.country IS NOT NULL THEN ', ' ELSE '' END || COALESCE(p.country, '') as location,
-    -- Agregados de Performance
-    (SELECT array_agg(DISTINCT skill) FROM unnest(array_cat(p.expertise_areas, p.mentorship_topics)) as skill WHERE skill IS NOT NULL) as mentor_skills,
-    COALESCE(p.average_rating, 0) as rating,
-    COALESCE(p.total_sessions, 0) as sessions,
-    COALESCE(p.total_reviews, 0) as reviews,
-    p.created_at,
-    p.updated_at
+    
+    -- 3. Agregados
+    (
+        SELECT array_agg(DISTINCT skill)
+        FROM unnest(array_cat(p.expertise_areas, p.mentorship_topics)) as skill
+        WHERE skill IS NOT NULL
+    ) as mentor_skills
 FROM 
     public.profiles p
 WHERE 

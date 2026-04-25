@@ -81,30 +81,32 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    let current = new Date(start.getTime());
-    current.setHours(0, 0, 0, 0);
+    let current = new Date(start.getTime())
+    current.setHours(0, 0, 0, 0)
 
-    const safeEnd = new Date(end.getTime());
-    safeEnd.setHours(23, 59, 59, 999);
+    const safeEnd = new Date(end.getTime())
+    safeEnd.setHours(23, 59, 59, 999)
 
     while (current <= safeEnd) {
-      const dayOfWeek = current.getDay();
+      const dayOfWeek = current.getDay()
       const dayAvailability = availability.filter(
         (avail) => Number(avail.day_of_week) === dayOfWeek
-      );
+      )
 
       if (dayAvailability.length > 0) {
-        const dateStr = current.toISOString().split('T')[0];
-        
+        const dateStr = current.toISOString().split("T")[0]
+
         for (const avail of dayAvailability as any[]) {
-          const [startHour, startMinute] = avail.start_time.split(":").map(Number);
-          const [endHour, endMinute] = avail.end_time.split(":").map(Number);
+          const [startHour, startMinute] = avail.start_time
+            .split(":")
+            .map(Number)
+          const [endHour, endMinute] = avail.end_time.split(":").map(Number)
 
           for (let hour = startHour; hour < endHour; hour++) {
-            const h = hour.toString().padStart(2, '0');
-            const m = startMinute.toString().padStart(2, '0');
-            const slotIso = `${dateStr}T${h}:${m}:00-03:00`;
-            const slotDate = new Date(slotIso);
+            const h = hour.toString().padStart(2, "0")
+            const m = startMinute.toString().padStart(2, "0")
+            const slotIso = `${dateStr}T${h}:${m}:00-03:00`
+            const slotDate = new Date(slotIso)
 
             if (slotDate > new Date()) {
               if (!isSlotBooked(slotDate, 45)) {
@@ -112,17 +114,18 @@ export async function GET(request: NextRequest) {
                   date: dateStr,
                   time: `${h}:${m}`,
                   datetime: slotDate.toISOString()
-                });
+                })
               }
             }
           }
         }
       }
-      current.setDate(current.getDate() + 1);
+      current.setDate(current.getDate() + 1)
     }
 
     availableSlots.sort(
-      (a: any, b: any) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+      (a: any, b: any) =>
+        new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
     )
 
     return NextResponse.json({

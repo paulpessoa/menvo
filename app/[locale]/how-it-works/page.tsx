@@ -4,7 +4,22 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, Calendar, CheckCircle2, Clock, FileText, HandHeart, Mail, MessageSquare, Search, Shield, TrendingUp, User, Users, Video } from "lucide-react"
+import {
+  Building2,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  FileText,
+  HandHeart,
+  Mail,
+  MessageSquare,
+  Search,
+  Shield,
+  TrendingUp,
+  User,
+  Users,
+  Video
+} from "lucide-react"
 import { useTranslations } from "next-intl"
 
 export default function HowItWorksPage() {
@@ -13,7 +28,9 @@ export default function HowItWorksPage() {
   return (
     <div className="container py-8 md:py-12">
       <div className="flex flex-col items-center text-center space-y-4 mb-12">
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">{t("howItWorks.title")}</h1>
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+          {t("howItWorks.title")}
+        </h1>
         <p className="text-muted-foreground max-w-[800px] md:text-xl">
           {t("howItWorks.description")}
         </p>
@@ -22,10 +39,16 @@ export default function HowItWorksPage() {
       <Tabs defaultValue="mentees" className="w-full max-w-4xl mx-auto">
         <div className="flex justify-center mb-8">
           <TabsList className="grid w-full max-w-4xl grid-cols-2 md:grid-cols-4">
-            <TabsTrigger value="mentees">{t("howItWorks.forMentees")}</TabsTrigger>
-            <TabsTrigger value="mentors">{t("howItWorks.forMentors")}</TabsTrigger>
+            <TabsTrigger value="mentees">
+              {t("howItWorks.forMentees")}
+            </TabsTrigger>
+            <TabsTrigger value="mentors">
+              {t("howItWorks.forMentors")}
+            </TabsTrigger>
             <TabsTrigger value="ngos">{t("howItWorks.forNGOs")}</TabsTrigger>
-            <TabsTrigger value="companies">{t("howItWorks.forCompanies")}</TabsTrigger>
+            <TabsTrigger value="companies">
+              {t("howItWorks.forCompanies")}
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -35,7 +58,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <User className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentees.step1.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentees.step1.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentees.step1.description")}
               </p>
@@ -79,7 +104,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Search className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentees.step2.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentees.step2.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentees.step2.description")}
               </p>
@@ -105,7 +132,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Calendar className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentees.step3.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentees.step3.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentees.step3.description")}
               </p>
@@ -149,7 +178,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Video className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentees.step4.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentees.step4.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentees.step4.description")}
               </p>
@@ -183,7 +214,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <User className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentors.step1.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentors.step1.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentors.step1.description")}
               </p>
@@ -227,7 +260,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Shield className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentors.step2.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentors.step2.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentors.step2.description")}
               </p>
@@ -253,7 +288,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Clock className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentors.step3.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentors.step3.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentors.step3.description")}
               </p>
@@ -297,7 +334,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <MessageSquare className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.mentors.step4.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.mentors.step4.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.mentors.step4.description")}
               </p>
@@ -331,7 +370,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <HandHeart className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.ngos.step1.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.ngos.step1.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.ngos.step1.description")}
               </p>
@@ -375,7 +416,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Users className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.ngos.step2.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.ngos.step2.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.ngos.step2.description")}
               </p>
@@ -409,7 +452,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Building2 className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.companies.step1.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.companies.step1.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.companies.step1.description")}
               </p>
@@ -453,7 +498,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <FileText className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.companies.step2.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.companies.step2.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.companies.step2.description")}
               </p>
@@ -479,7 +526,9 @@ export default function HowItWorksPage() {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <TrendingUp className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold">{t("howItWorks.companies.step3.title")}</h2>
+              <h2 className="text-2xl font-bold">
+                {t("howItWorks.companies.step3.title")}
+              </h2>
               <p className="text-muted-foreground">
                 {t("howItWorks.companies.step3.description")}
               </p>
@@ -526,8 +575,6 @@ export default function HowItWorksPage() {
           <Link href="/faq">{t("howItWorks.faq.viewAll")}</Link>
         </Button>
       </div>
-
-
     </div>
   )
 }

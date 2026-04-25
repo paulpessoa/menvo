@@ -1,124 +1,131 @@
-import { Metadata } from 'next'
-import { createClient } from '@/lib/utils/supabase/server'
-import { notFound } from 'next/navigation'
-import MentorProfileClient from './MentorProfileClient'
+import { Metadata } from "next"
+import { createClient } from "@/lib/utils/supabase/server"
+import { notFound } from "next/navigation"
+import MentorProfileClient from "./MentorProfileClient"
 
 interface PageProps {
-    params: Promise<{
-        slug: string
-    }>
+  params: Promise<{
+    slug: string
+  }>
 }
 
 // Buscar dados do mentor e disponibilidade
 async function getMentorData(slug: string) {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    // Buscar mentor
-    const { data: mentor, error } = await (supabase
-        .from('mentors_view')
-        .select('*')
-        .eq('slug', slug)
-        .eq('verified', true)
-        .single() as any)
+  // Buscar mentor
+  const { data: mentor, error } = await (supabase
+    .from("mentors_view")
+    .select("*")
+    .eq("slug", slug)
+    .eq("verified", true)
+    .single() as any)
 
-    if (error || !mentor) {
-        return null
+  if (error || !mentor) {
+    return null
+  }
+
+  // Buscar disponibilidade configurada via API (usa Service Role, bypass RLS)
+  let availability_status = []
+  try {
+    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/mentors/${mentor.id}/availability_status?format=config`
+    const response = await fetch(apiUrl, { cache: "no-store" })
+    if (response.ok) {
+      const data = await response.json()
+      // Se a API retornar o formato novo, extrair availableSlots
+      // Se retornar array direto, usar como está
+      availability_status = Array.isArray(data)
+        ? data
+        : data.weeklyConfig || data.availableSlots || []
     }
+  } catch (error) {
+    console.error("Erro ao buscar disponibilidade:", error)
+  }
 
-    // Buscar disponibilidade configurada via API (usa Service Role, bypass RLS)
-    let availability = []
-    try {
-        const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/mentors/${mentor.id}/availability?format=config`
-        const response = await fetch(apiUrl, { cache: 'no-store' })
-        if (response.ok) {
-            const data = await response.json()
-            // Se a API retornar o formato novo, extrair availableSlots
-            // Se retornar array direto, usar como está
-            availability = Array.isArray(data) ? data : (data.weeklyConfig || data.availableSlots || [])
-        }
-    } catch (error) {
-        console.error('Erro ao buscar disponibilidade:', error)
-    }
-
-
-    return {
-        mentor,
-        availability: availability || []
-    }
+  return {
+    mentor,
+    availability_status: availability_status || []
+  }
 }
 
 // Metadados dinâmicos para SEO e Open Graph
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { slug } = await params
-    const data = await getMentorData(slug)
+export async function generateMetadata({
+  params
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const data = await getMentorData(slug)
 
-    if (!data) {
-        return {
-            title: 'Mentor não encontrado | Menvo',
-            description: 'O mentor que você procura não está disponível.',
-        }
-    }
-
-    const { mentor } = data
-    const title = `${mentor.full_name} - ${mentor.current_position || 'Mentor'} | Menvo`
-    const description = mentor.bio?.substring(0, 160) ||
-        `Conecte-se com ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 3).join(', ') || 'diversas áreas'}. Mentorias 100% gratuitas.`
-
-    const imageUrl = mentor.avatar_url || `${process.env.NEXT_PUBLIC_SITE_URL}/og-default.png`
-    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/mentors/${slug}`
-
+  if (!data) {
     return {
-        title,
-        description,
-        openGraph: {
-            type: 'profile',
-            url,
-            title,
-            description,
-            images: [{ url: imageUrl, width: 1200, height: 630, alt: mentor.full_name }],
-            siteName: 'Menvo',
-            locale: 'pt_BR',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: [imageUrl],
-        },
-        alternates: {
-            canonical: url,
-        },
+      title: "Mentor não encontrado | Menvo",
+      description: "O mentor que você procura não está disponível."
     }
+  }
+
+  const { mentor } = data
+  const title = `${mentor.full_name} - ${mentor.job_title || "Mentor"} | Menvo`
+  const description =
+    mentor.bio?.substring(0, 160) ||
+    `Conecte-se com ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 3).join(", ") || "diversas áreas"}. Mentorias 100% gratuitas.`
+
+  const imageUrl =
+    mentor.avatar_url || `${process.env.NEXT_PUBLIC_SITE_URL}/og-default.png`
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/mentors/${slug}`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "profile",
+      url,
+      title,
+      description,
+      images: [
+        { url: imageUrl, width: 1200, height: 630, alt: mentor.full_name }
+      ],
+      siteName: "Menvo",
+      locale: "pt_BR"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl]
+    },
+    alternates: {
+      canonical: url
+    }
+  }
 }
 
 // ISR: Revalidar a cada 1 hora
 export const revalidate = 3600
 
 export default async function MentorProfilePage({ params }: PageProps) {
-    const { slug } = await params
-    const data = await getMentorData(slug)
+  const { slug } = await params
+  const data = await getMentorData(slug)
 
-    if (!data) {
-        notFound()
-    }
+  if (!data) {
+    notFound()
+  }
 
-    const { mentor, availability } = data
+  const { mentor, availability_status } = data
 
-    // Mapear campos da view para o formato esperado pelo componente
-    const mappedMentor = {
-        ...mentor,
-        job_title: mentor.current_position,
-        company: mentor.current_company,
-        inclusive_tags: mentor.inclusion_tags,
-        average_rating: mentor.rating,
-        total_reviews: mentor.reviews,
-        total_sessions: mentor.sessions,
-    } as any
+  // Mapear campos da view para o formato esperado pelo componente
+  const mappedMentor = {
+    ...mentor,
+    job_title: mentor.job_title,
+    company: mentor.company,
+    inclusive_tags: mentor.inclusion_tags,
+    average_rating: mentor.rating,
+    total_reviews: mentor.reviews,
+    total_sessions: mentor.sessions
+  } as any
 
-    return (
-        <MentorProfileClient
-            mentor={mappedMentor}
-            availability={availability}
-        />
-    )
+  return (
+    <MentorProfileClient
+      mentor={mappedMentor}
+      availability_status={availability_status}
+    />
+  )
 }

@@ -1,14 +1,14 @@
-import { createClient } from '@/lib/utils/supabase/client'
-import { Verification } from '@/lib/types/models/verification'
+import { createClient } from "@/lib/utils/supabase/client"
+import { Verification } from "@/lib/types/models/verification"
 
 class VerificationServiceClass {
   private supabase = createClient()
 
   async getPendingVerifications(adminId: string): Promise<Verification[]> {
     const { data, error } = await this.supabase
-      .from('profiles')
-      .select('*')
-      .eq('verification_status', 'pending')
+      .from("profiles")
+      .select("*")
+      .eq("verification_status", "pending")
       .returns<any>()
 
     if (error) throw error
@@ -16,12 +16,13 @@ class VerificationServiceClass {
     return (data || []).map((profile: any) => ({
       id: profile.id,
       mentor_id: profile.id,
-      mentor_name: profile.full_name || `${profile.first_name} ${profile.last_name}`,
+      mentor_name:
+        profile.full_name || `${profile.first_name} ${profile.last_name}`,
       mentor_email: profile.email,
-      mentor_title: profile.current_position || 'Mentor',
-      mentor_company: profile.current_company || '',
-      verification_type: 'Identity',
-      status: 'pending',
+      mentor_title: profile.job_title || "Mentor",
+      mentor_company: profile.company || "",
+      verification_type: "Identity",
+      status: "pending",
       created_at: profile.created_at,
       updated_at: profile.updated_at
     }))
@@ -38,16 +39,15 @@ class VerificationServiceClass {
     passed: boolean
     notes: string
   }) {
-    const { error } = await (this.supabase
-      .from('profiles') as any)
+    const { error } = await (this.supabase.from("profiles") as any)
       .update({
-        verification_status: passed ? 'approved' : 'rejected',
+        verification_status: passed ? "approved" : "rejected",
         verification_notes: notes,
         verified: passed,
         verified_at: passed ? new Date().toISOString() : null,
         updated_at: new Date().toISOString()
       })
-      .eq('id', verificationId)
+      .eq("id", verificationId)
 
     if (error) throw error
     return true
