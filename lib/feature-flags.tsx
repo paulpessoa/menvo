@@ -16,9 +16,7 @@ import type { Database } from "@/lib/types/supabase"
 export interface FeatureFlags {
   waitingListEnabled: boolean
   feedbackEnabled: boolean
-  maintenanceMode: boolean
   newUserRegistration: boolean
-  mentorVerification: boolean
   newMentorshipUx: boolean
   [key: string]: boolean | undefined
 }
@@ -30,10 +28,8 @@ export interface FeatureFlags {
  */
 export const DEFAULT_FLAGS: FeatureFlags = {
   waitingListEnabled: false,
-  feedbackEnabled: true,
-  maintenanceMode: false,
+  feedbackEnabled: false, // Oculto por padrão conforme solicitado
   newUserRegistration: true,
-  mentorVerification: true,
   newMentorshipUx: false
 }
 

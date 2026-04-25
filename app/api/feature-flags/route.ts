@@ -18,10 +18,20 @@ export async function GET() {
       .select('name, enabled')
 
     const flagsFromDB: Record<string, boolean> = {}
+    
+    // Mapeamento de snake_case (DB) para camelCase (Frontend)
+    const nameMapping: Record<string, string> = {
+      'waiting_list_enabled': 'waitingListEnabled',
+      'feedback_enabled': 'feedbackEnabled',
+      'new_user_registration': 'newUserRegistration',
+      'new_mentorship_ux': 'newMentorshipUx'
+    }
+
     if (dbFlags) {
       dbFlags.forEach(f => {
         if (f.name && f.enabled !== null) {
-          flagsFromDB[f.name] = f.enabled
+          const frontendName = nameMapping[f.name] || f.name
+          flagsFromDB[frontendName] = f.enabled
         }
       })
     }

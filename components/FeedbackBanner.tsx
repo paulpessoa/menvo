@@ -22,10 +22,12 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip"
 import { useAuth } from "@/lib/auth"
+import { useFeatureFlag } from "@/lib/feature-flags"
 
 export function FeedbackBanner() {
   const t = useTranslations()
   const { isAuthenticated } = useAuth()
+  const feedbackEnabled = useFeatureFlag("feedbackEnabled")
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [rating, setRating] = useState<number | null>(null)
@@ -91,8 +93,8 @@ export function FeedbackBanner() {
   // Não renderizar até estar montado no cliente para evitar hydration mismatch
   if (!mounted) return null
 
-  // 🚧 Feature flag: escondido até estar pronto para produção
-  if (!process.env.NEXT_PUBLIC_FEEDBACK_ENABLED) return null
+  // 🚧 Feature flag controlada via Contexto/Banco
+  if (!feedbackEnabled) return null
 
   return (
     <>
