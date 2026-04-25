@@ -63,13 +63,12 @@ export const mentorAvailabilityService = {
 
   // Atualizar disponibilidade
   updateAvailability: async (id: string, updates: Partial<MentorAvailability>): Promise<MentorAvailability> => {
-    const numericId = parseInt(id)
     const { data, error } = await (supabase
-      .from('mentor_availability') as any)
-      .update(updates)
-      .eq('id', isNaN(numericId) ? id : numericId)
+      .from('mentor_availability')
+      .update(updates as any)
+      .eq('id', id)
       .select()
-      .single()
+      .single() as any)
 
     if (error) throw error
     return data as MentorAvailability
@@ -77,11 +76,10 @@ export const mentorAvailabilityService = {
 
   // Remover disponibilidade (soft delete)
   removeAvailability: async (id: string): Promise<void> => {
-    const numericId = parseInt(id)
     const { error } = await (supabase
-      .from('mentor_availability') as any)
-      .update({ is_active: false })
-      .eq('id', isNaN(numericId) ? id : numericId)
+      .from('mentor_availability')
+      .update({ is_active: false } as any)
+      .eq('id', id) as any)
 
     if (error) throw error
   },
@@ -161,7 +159,7 @@ export const mentorshipSessionsService = {
     const { data, error } = await (supabase
       .from('appointments')
       .update(updates as any)
-      .eq('id', parseInt(response.session_id))
+      .eq('id', response.session_id)
       .eq('mentor_id', user.id)
       .select(`
         *,
@@ -236,7 +234,7 @@ export const mentorshipSessionsService = {
         notes_mentor: mentorNotes,
         completed_at: new Date().toISOString()
       } as any)
-      .eq('id', parseInt(sessionId))
+      .eq('id', sessionId)
       .eq('mentor_id', user.id)
       .select()
       .single() as any)
@@ -256,7 +254,7 @@ export const mentorshipSessionsService = {
         status: 'cancelled',
         mentor_response: reason
       } as any)
-      .eq('id', parseInt(sessionId))
+      .eq('id', sessionId)
       .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`)
       .select()
       .single() as any)
@@ -274,7 +272,7 @@ export const mentorshipSessionsService = {
         mentor:profiles!mentor_id(first_name, last_name, email, avatar_url),
         mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `)
-      .eq('id', parseInt(sessionId))
+      .eq('id', sessionId)
       .single() as any)
 
     if (error) throw error
