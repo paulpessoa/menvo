@@ -1,33 +1,33 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import {
   errorResponse,
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
+import type { Database } from "@/lib/types/supabase"
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     const body = await request.json()
-    const { name, email, role, interests, linkedin_url } = body
+    const { name, email, whatsapp, reason } = body
 
     if (!email) {
       return errorResponse("Email is required", "VALIDATION_ERROR", 400)
     }
 
-    const { data, error } = await (supabase
-      .from("waiting_list") as any)
+    const { data, error } = await supabase
+      .from("waiting_list")
       .insert({
-        name: name || null,
-        email,
-        user_role: role || 'mentee',
-        interests: interests || [],
-        linkedin_url: linkedin_url || null,
+        name: name || "Usuário",
+        email: email.toLowerCase().trim(),
+        whatsapp: whatsapp || null,
+        reason: reason || null,
         status: 'pending'
       })
       .select()
-      .single();
+      .single()
 
     if (error) {
       if (error.code === '23505') {
