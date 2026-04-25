@@ -38,6 +38,7 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
             mentee:profiles!reviewer_id(first_name, last_name, avatar_url)
           `)
           .eq("reviewed_id", mentorId)
+          .eq("status", "approved") // Apenas aprovados aparecem publicamente
           .order("created_at", { ascending: false })
 
         if (error) throw error

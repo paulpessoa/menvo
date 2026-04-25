@@ -211,6 +211,34 @@ export async function sendAdminNewMentorNotification(data: {
 }
 
 /**
+ * Notifica o mentor que uma nova avaliação foi publicada no seu perfil
+ */
+export async function sendMentorNewReviewNotification(data: {
+    mentorEmail: string;
+    mentorName: string;
+    menteeName: string;
+    rating: number;
+    comment: string | null;
+}): Promise<void> {
+    const stars = "⭐".repeat(data.rating);
+    const content = `
+        <h2>Você recebeu uma nova avaliação! 🎉</h2>
+        <p>Olá, ${data.mentorName}! Um aluno acaba de deixar um depoimento sobre a sua mentoria.</p>
+        <div class="info-box" style="border-left: 4px solid #F59E0B">
+            <p><strong>De:</strong> ${data.menteeName}</p>
+            <p><strong>Nota:</strong> ${stars} (${data.rating}/5)</p>
+            ${data.comment ? `<p style="margin-top: 10px; font-style: italic;">"${data.comment}"</p>` : ''}
+        </div>
+        <p>Esta avaliação já está visível no seu perfil público e ajuda a atrair novos mentorados.</p>
+        <div class="button-container">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/mentor" class="button">Ver no meu Dashboard</a>
+        </div>
+        <p>Obrigado por compartilhar seu conhecimento na Menvo! 🚀</p>
+    `;
+    await sendEmail(data.mentorEmail, `⭐ Nova avaliação de ${data.menteeName}: ${stars}`, getEmailLayout("Nova Avaliação Recebida", content));
+}
+
+/**
  * Helper para envio via Brevo API
  */
 async function sendEmail(to: string | string[], subject: string, htmlContent: string) {

@@ -1,268 +1,68 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table"
-import { Star, Search, Loader2, RefreshCw } from "lucide-react"
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
-import { createClient } from "@/lib/utils/supabase/client"
-import { toast } from "sonner"
+import { useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MessageSquare, Star, CheckCircle, ListFilter } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
+import { useTranslations } from "next-intl"
+import { AdminFeedbackModeration } from "@/components/admin/AdminFeedbackModeration"
+import { Badge } from "@/components/ui/badge"
 
-interface Feedback {
-  id: string
-  user_id: string | null
-  rating: number
-  comment: string | null
-  created_at: string
-  profiles?: {
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-    avatar_url: string | null
-  } | null
-}
-
-export default function AdminFeedbacks() {
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [ratingFilter, setRatingFilter] = useState<string>("all")
-  const supabase = createClient()
-
-  useEffect(() => {
-    fetchFeedbacks()
-  }, [ratingFilter])
-
-  const fetchFeedbacks = async () => {
-    setLoading(true)
-    try {
-      const { data: feedbackData, error: feedbackError } = await supabase
-        .from("feedback")
-        .select("*")
-        .order("created_at", { ascending: false })
-
-      if (feedbackError) throw feedbackError
-if (feedbackData && feedbackData.length > 0) {
-  // Buscar perfis separadamente para os feedbacks que possuem user_id
-  const validFeedbacks = feedbackData as Feedback[]
-  const userIds = validFeedbacks.map(f => f.user_id).filter(Boolean) as string[]
-
-  if (userIds.length > 0) {
-      const { data: profileData } = await supabase
-          .from("profiles")
-          .select("id, first_name, last_name, email, avatar_url")
-          .in("id", userIds)
-
-      const profilesMap = (profileData || []).reduce((acc: any, curr: any) => {
-          acc[curr.id] = curr
-          return acc
-      }, {})
-
-      const mergedData = validFeedbacks.map(f => ({
-          ...f,
-          profiles: f.user_id ? profilesMap[f.user_id] : null
-      }))
-
-      setFeedbacks(mergedData)
-  } else {
-      setFeedbacks(validFeedbacks)
-  }
-} else {
-  setFeedbacks([])
-}
-    } catch (error) {
-      console.error("Error fetching feedbacks:", error)
-      toast.error("Erro ao carregar feedbacks")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const filteredFeedbacks = feedbacks.filter(
-    (f) =>
-      (f.comment || "")?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (f.profiles?.email || "")?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (f.profiles?.first_name || "")?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const getStats = () => {
-    const total = feedbacks.length
-    const avg =
-      total > 0
-        ? feedbacks.reduce((acc, curr) => acc + curr.rating, 0) / total
-        : 0
-    const promoters = feedbacks.filter((f) => f.rating >= 4).length
-    return { total, avg, promoters }
-  }
-
-  const stats = getStats()
+export default function AdminFeedbacksPage() {
+  const t = useTranslations("dashboard")
 
   return (
     <RequireRole roles={["admin"]}>
-      <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold">Voz da Comunidade</h1>
-            <p className="text-muted-foreground">
-              Gerencie e analise os feedbacks recebidos pela plataforma.
-            </p>
+            <h1 className="text-4xl font-black tracking-tight">Gestão de Feedbacks</h1>
+            <p className="text-muted-foreground text-lg">Modere e analise o que a comunidade está dizendo.</p>
           </div>
-          <Button onClick={fetchFeedbacks} variant="outline" size="sm">
-            <RefreshCw
-              className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
-            />{" "}
-            Sincronizar
-          </Button>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-l-4 border-l-blue-500 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                Total de Feedbacks
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black">{stats.total}</div>
-            </CardContent>
-          </Card>
-          <Card className="border-l-4 border-l-yellow-500 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                Avaliação Média
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black">
-                {stats.avg.toFixed(1)} <span className="text-sm font-normal text-muted-foreground">/ 5.0</span>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-l-4 border-l-green-500 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                Promotores (4-5 ★)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-black">{stats.promoters}</div>
-            </CardContent>
-          </Card>
-        </div>
+          <Tabs defaultValue="sessions" className="space-y-6">
+            <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
+              <TabsTrigger 
+                value="sessions" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+              >
+                <Star className="w-4 h-4" /> Avaliações de Sessões
+              </TabsTrigger>
+              <TabsTrigger 
+                value="platform" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4" /> Voz da Comunidade
+              </TabsTrigger>
+            </TabsList>
 
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col md:flex-row gap-4 justify-between md:items-center">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar nos comentários ou email..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Select value={ratingFilter} onValueChange={setRatingFilter}>
-                    <SelectTrigger className="w-full md:w-[200px]">
-                    <SelectValue placeholder="Filtrar por nota" />
-                    </SelectTrigger>
-                    <SelectContent>
-                    <SelectItem value="all">Todas as notas</SelectItem>
-                    <SelectItem value="5">5 estrelas</SelectItem>
-                    <SelectItem value="4">4 estrelas</SelectItem>
-                    <SelectItem value="3">3 estrelas</SelectItem>
-                    <SelectItem value="2">2 estrelas</SelectItem>
-                    <SelectItem value="1">1 estrela</SelectItem>
-                    </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground animate-pulse">Buscando feedbacks...</p>
-              </div>
-            ) : filteredFeedbacks.length === 0 ? (
-              <div className="text-center py-20 text-muted-foreground italic border-2 border-dashed rounded-xl">
-                Nenhum feedback encontrado com esses filtros.
-              </div>
-            ) : (
-              <div className="rounded-xl border overflow-hidden shadow-sm">
-                <Table>
-                  <TableHeader className="bg-muted/50">
-                    <TableRow>
-                      <TableHead className="w-[150px]">Data</TableHead>
-                      <TableHead>Usuário</TableHead>
-                      <TableHead className="w-[120px]">Nota</TableHead>
-                      <TableHead>Comentário</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredFeedbacks.map((f) => (
-                      <TableRow key={f.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="text-[10px] font-mono text-muted-foreground">
-                          {format(new Date(f.created_at), "dd/MM/yyyy HH:mm", {
-                            locale: ptBR
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {f.profiles ? (
-                                <>
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-sm">
-                                            {f.profiles.first_name} {f.profiles.last_name}
-                                        </span>
-                                        <span className="text-[10px] text-muted-foreground">
-                                            {f.profiles.email}
-                                        </span>
-                                    </div>
-                                </>
-                            ) : (
-                                <span className="text-xs italic text-muted-foreground">Anônimo</span>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Star className={`h-3 w-3 ${f.rating >= 4 ? 'fill-green-500 text-green-500' : 'fill-yellow-400 text-yellow-400'}`} />
-                            <span className="font-bold text-sm">{f.rating}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="max-w-md">
-                          <p className="text-sm italic text-gray-700 leading-relaxed py-2">
-                            {f.comment ? `"${f.comment}"` : <span className="text-muted-foreground italic text-xs">Sem comentário</span>}
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <TabsContent value="sessions" className="animate-in fade-in duration-500">
+               <div className="space-y-6">
+                 <div>
+                   <h2 className="text-2xl font-bold">Moderação de Avaliações</h2>
+                   <p className="text-muted-foreground">Aprove depoimentos reais para exibição nos perfis dos mentores.</p>
+                 </div>
+                 <AdminFeedbackModeration />
+               </div>
+            </TabsContent>
+
+            <TabsContent value="platform" className="animate-in fade-in duration-500">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Feedbacks Gerais da Plataforma</CardTitle>
+                  <CardDescription>Sugestões, críticas e elogios sobre o uso do site.</CardDescription>
+                </CardHeader>
+                <CardContent className="h-64 flex flex-col items-center justify-center text-muted-foreground italic space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-full">
+                    <ListFilter className="w-8 h-8 text-gray-300" />
+                  </div>
+                  <p>O histórico de feedbacks gerais está sendo migrado para este novo painel.</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </RequireRole>
   )
