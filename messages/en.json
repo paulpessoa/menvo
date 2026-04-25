@@ -1344,10 +1344,8 @@
         "startTime": "Start Time",
         "endTime": "End Time",
         "previewTitle": "Availability Preview",
-        "display": {
-            "noAvailability": "No slots defined at the moment.",
-            "noAvailabilityDesc": "This mentor hasn't configured their schedule yet."
-        },
+        "noAvailability": "No slots defined at the moment.",
+        "noAvailabilityDesc": "This mentor hasn't configured their schedule yet.",
         "timezoneWarning": "The times below are based on your timezone:",
         "previewDesc": "How your availability will appear to mentees",
         "noSchedule": "No schedule configured",
@@ -1380,19 +1378,6 @@
             "4": "Thu",
             "5": "Fri",
             "6": "Sat"
-        },
-        "display": {
-            "timezone": "Timezone: {timezone}",
-            "noAvailability": "No availability configured",
-            "noAvailabilityDesc": "The mentor hasn\u0027t defined their available hours yet",
-            "status": {
-                "available": "Available",
-                "busy": "Busy",
-                "past": "Past"
-            },
-            "cardTitle": "Availability",
-            "cardDescription": "Available times for scheduling mentorships",
-            "book": "Book"
         }
     },
     "mentorship": {

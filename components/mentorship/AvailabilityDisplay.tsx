@@ -29,12 +29,12 @@ export function AvailabilityDisplay({
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Clock className="h-5 w-5 text-muted-foreground" />
-            {t("display.noAvailability")}
+            {t("noAvailability")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground italic">
-            {t("display.noAvailabilityDesc")}
+            {t("noAvailabilityDesc")}
           </p>
         </CardContent>
       </Card>

@@ -67,6 +67,7 @@ export default function CommunityPage() {
             const from = currentPage * ITEMS_PER_PAGE
             const to = from + ITEMS_PER_PAGE - 1
 
+            // Query otimizada: Buscamos perfis públicos com bio, filtrando via join simples
             let query = supabase
                 .from('profiles')
                 .select(`
@@ -80,10 +81,9 @@ export default function CommunityPage() {
                     github_url,
                     expertise_areas,
                     slug,
-                    user_roles!inner(roles!inner(name))
+                    user_roles (roles (name))
                 `, { count: 'exact' })
                 .eq('is_public', true)
-                .eq('user_roles.roles.name', 'mentee')
                 .not('bio', 'is', null)
             
             if (searchTerm) {
@@ -97,12 +97,18 @@ export default function CommunityPage() {
             const { data, error, count } = await query
             if (error) throw error
 
-            const formattedData = (data || []).map((p: any) => ({ ...p, role: 'mentee' }))
+            // Filtragem manual leve para garantir o papel de mentee e reduzir carga de RLS
+            const formattedData = (data || [])
+                .filter((p: any) => {
+                    const roles = p.user_roles?.flatMap((ur: any) => ur.roles?.name) || []
+                    return roles.includes('mentee')
+                })
+                .map((p: any) => ({ ...p, role: 'mentee' }))
 
             if (isInitial) setProfiles(formattedData)
             else setProfiles(prev => [...prev, ...formattedData])
 
-            setHasMore((count || 0) > (from + formattedData.length))
+            setHasMore((count || 0) > (from + (data?.length || 0)))
         } catch (error) {
             console.error('Error fetching community profiles:', error)
             toast.error(tCommunity("errorLoading"))

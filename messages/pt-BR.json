@@ -1322,10 +1322,8 @@
     "startTime": "Horário de Início",
     "endTime": "Horário de Fim",
     "previewTitle": "Preview da Disponibilidade",
-    "display": {
-      "noAvailability": "Nenhum horário definido no momento.",
-      "noAvailabilityDesc": "Este mentor ainda não configurou seus horários de atendimento."
-    },
+    "noAvailability": "Nenhum horário definido no momento.",
+    "noAvailabilityDesc": "Este mentor ainda não configurou seus horários de atendimento.",
     "timezoneWarning": "Os horários abaixo estão baseados no seu fuso horário:",
     "previewDesc": "Como sua disponibilidade aparecerá para os mentees",
     "noSchedule": "Nenhum horário configurado",
@@ -1358,19 +1356,6 @@
       "4": "Qui",
       "5": "Sex",
       "6": "Sáb"
-    },
-    "display": {
-      "timezone": "Fuso horário: {timezone}",
-      "noAvailability": "Nenhuma disponibilidade configurada",
-      "noAvailabilityDesc": "O mentor ainda não definiu seus horários disponíveis",
-      "status": {
-        "available": "Disponível",
-        "busy": "Ocupado",
-        "past": "Passado"
-      },
-      "cardTitle": "Disponibilidade",
-      "cardDescription": "Horários disponíveis para agendamento de mentorias",
-      "book": "Agendar"
     }
   },
   "mentorship": {

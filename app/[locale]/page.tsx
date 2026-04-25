@@ -61,24 +61,24 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="w-full py-16 md:py-32 bg-gradient-to-b from-secondary to-background overflow-hidden">
-        <div className="container max-w-7xl px-4 md:px-6 flex flex-col lg:flex-row items-center justify-between min-h-[60vh] gap-12 lg:gap-20">
+      <section className="w-full py-12 md:py-24 bg-gradient-to-b from-secondary/50 to-background overflow-hidden">
+        <div className="container max-w-7xl px-4 md:px-6 flex flex-col lg:flex-row items-center justify-between min-h-[50vh] gap-10">
           {/* Texto */}
           <div className="flex-1 flex flex-col justify-center items-center lg:items-start max-w-2xl">
-            <Badge variant="secondary" className="w-fit mb-6 px-4 py-1 text-sm font-medium rounded-full bg-primary/10 text-primary border-none">
+            <Badge variant="secondary" className="w-fit mb-4 px-3 py-0.5 text-xs font-medium rounded-full bg-primary/10 text-primary border-none">
               {t("badge.freeMentorship")}
             </Badge>
-            <h1 className="text-5xl md:text-6xl xl:text-7xl font-extrabold tracking-tight mb-6 text-center lg:text-left leading-[1.1] text-gray-900">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-center lg:text-left leading-tight text-gray-900">
               {t("hero.title")}
             </h1>
-            <p className="max-w-[540px] text-muted-foreground text-lg md:text-xl mb-10 text-center lg:text-left leading-relaxed">
+            <p className="max-w-[540px] text-muted-foreground text-base md:text-lg mb-8 text-center lg:text-left leading-relaxed">
               {t("hero.description")}
             </p>
-            <div className="flex flex-col gap-4 w-full max-w-sm mx-auto lg:flex-row lg:max-w-none lg:mx-0">
-              <Button size="xl" asChild className="w-full lg:w-auto px-10 h-14 text-lg shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+            <div className="flex flex-col gap-3 w-full max-w-sm mx-auto lg:flex-row lg:max-w-none lg:mx-0">
+              <Button size="lg" asChild className="w-full lg:w-auto px-8 h-12 shadow-lg shadow-primary/10 hover:scale-105 transition-transform font-bold">
                 <Link href="/mentors">{t("hero.findMentor")}</Link>
               </Button>
-              <Button size="xl" variant="outline" asChild className="w-full lg:w-auto px-10 h-14 text-lg border-2 hover:bg-muted">
+              <Button size="lg" variant="outline" asChild className="w-full lg:w-auto px-8 h-12 border-2 hover:bg-muted font-bold">
                 <Link href="/signup">{t("hero.becomeMentor")}</Link>
               </Button>
             </div>
@@ -86,13 +86,13 @@ export default function Home() {
           {/* Imagem */}
           <div className="flex-1 flex justify-center items-center relative">
             <div className="absolute -inset-4 bg-primary/5 rounded-full blur-3xl" />
-            <div className="relative h-[280px] w-[280px] md:h-[400px] md:w-[400px] lg:h-[500px] lg:w-[500px] flex items-center shadow-2xl rounded-3xl overflow-hidden ring-8 ring-white">
+            <div className="relative h-[250px] w-[250px] md:h-[350px] md:w-[350px] lg:h-[450px] lg:w-[450px] flex items-center shadow-xl rounded-3xl overflow-hidden ring-4 ring-white">
               {images.map((src, index) => (
                 <Image
                   key={index}
                   src={src}
-                  width={600}
-                  height={600}
+                  width={500}
+                  height={500}
                   alt={t("hero.title")}
                   className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${
                     index === currentIndex ? "opacity-100" : "opacity-0"
@@ -105,55 +105,55 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="w-full py-20 md:py-32">
+      <section className="w-full py-16 md:py-24">
         <div className="container max-w-7xl px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <div className="space-y-4">
-              <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-gray-900">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-gray-900">
                 {t("howItWorks.title")}
               </h2>
-              <p className="max-w-[700px] text-muted-foreground text-lg md:text-xl mx-auto">
+              <p className="max-w-[700px] text-muted-foreground text-base md:text-lg mx-auto">
                 {t("howItWorks.description")}
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3 lg:gap-16">
-            <div className="flex flex-col items-center space-y-4 text-center p-6 rounded-2xl hover:bg-muted/50 transition-colors">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20 transform -rotate-3 hover:rotate-0 transition-transform">
-                <Search className="h-10 w-10" />
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3 lg:gap-12">
+            <div className="flex flex-col items-center space-y-3 text-center p-6 rounded-2xl hover:bg-muted/30 transition-colors">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/10">
+                <Search className="h-8 w-8" />
               </div>
-              <h3 className="text-2xl font-bold pt-2">
+              <h3 className="text-xl font-bold pt-1">
                 {t("howItWorks.step1.title")}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {t("howItWorks.step1.description")}
               </p>
             </div>
-            <div className="flex flex-col items-center space-y-4 text-center p-6 rounded-2xl hover:bg-muted/50 transition-colors">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20 transform rotate-2 hover:rotate-0 transition-transform">
-                <Calendar className="h-10 w-10" />
+            <div className="flex flex-col items-center space-y-3 text-center p-6 rounded-2xl hover:bg-muted/30 transition-colors">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/10">
+                <Calendar className="h-8 w-8" />
               </div>
-              <h3 className="text-2xl font-bold pt-2">
+              <h3 className="text-xl font-bold pt-1">
                 {t("howItWorks.step2.title")}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {t("howItWorks.step2.description")}
               </p>
             </div>
-            <div className="flex flex-col items-center space-y-4 text-center p-6 rounded-2xl hover:bg-muted/50 transition-colors">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/20 transform -rotate-2 hover:rotate-0 transition-transform">
-                <MessageSquare className="h-10 w-10" />
+            <div className="flex flex-col items-center space-y-3 text-center p-6 rounded-2xl hover:bg-muted/30 transition-colors">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/10">
+                <MessageSquare className="h-8 w-8" />
               </div>
-              <h3 className="text-2xl font-bold pt-2">
+              <h3 className="text-xl font-bold pt-1">
                 {t("howItWorks.step3.title")}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {t("howItWorks.step3.description")}
               </p>
             </div>
           </div>
-          <div className="flex justify-center mt-16">
-            <Button size="lg" variant="outline" asChild className="rounded-full px-8">
+          <div className="flex justify-center mt-12">
+            <Button variant="outline" asChild className="rounded-full px-6">
               <Link href="/how-it-works">{t("howItWorks.learnMore")}</Link>
             </Button>
           </div>
@@ -161,14 +161,14 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="w-full py-20 md:py-32 bg-slate-50">
+      <section className="w-full py-16 md:py-24 bg-slate-50/50">
         <div className="container max-w-7xl px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <div className="space-y-4">
-              <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-gray-900">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-gray-900">
                 {t("testimonials.title")}
               </h2>
-              <p className="max-w-[800px] text-muted-foreground text-lg md:text-xl mx-auto">
+              <p className="max-w-[800px] text-muted-foreground text-base md:text-lg mx-auto">
                 {t("testimonials.description")}
               </p>
             </div>
@@ -178,20 +178,20 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="w-full py-24 bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+      <section className="w-full py-16 md:py-20 bg-primary text-primary-foreground relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
         <div className="container max-w-7xl px-4 md:px-6 relative z-10">
-          <div className="flex flex-col items-center justify-center space-y-8 text-center">
-            <div className="space-y-4">
-              <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+          <div className="flex flex-col items-center justify-center space-y-6 text-center">
+            <div className="space-y-3">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
                 {t("cta.title")}
               </h2>
-              <p className="max-w-[700px] md:text-2xl opacity-90 mx-auto leading-relaxed">
+              <p className="max-w-[600px] md:text-xl opacity-90 mx-auto leading-relaxed">
                 {t("cta.description")}
               </p>
             </div>
             <div className="flex flex-col gap-4 min-[400px]:flex-row">
-              <Button size="xl" variant="secondary" asChild className="px-12 h-16 text-xl shadow-2xl hover:scale-105 transition-transform">
+              <Button size="lg" variant="secondary" asChild className="px-10 h-14 text-lg shadow-xl hover:scale-105 transition-transform font-bold">
                 <Link href="/signup">{t("cta.signup")}</Link>
               </Button>
             </div>
