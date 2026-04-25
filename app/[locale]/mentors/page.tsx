@@ -30,7 +30,7 @@ import {
   Loader2
 } from "lucide-react"
 
-import { useAuth } from '@/lib/auth'
+import { useAuth } from "@/lib/auth"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
 import { MagicSearchBar } from "@/components/mentors/MagicSearchBar"
@@ -53,7 +53,6 @@ interface MentorProfile {
   mentorship_topics: string[] | null
   inclusive_tags: string[] | null
   expertise_areas: string[] | null
-  session_price_usd: number | null
   availability_status: string | null
   average_rating: number | null
   total_reviews: number | null
@@ -99,7 +98,9 @@ export default function MentorsPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
 
-  const [suggestedMentors, setSuggestedMentors] = useState<Record<string, string>>({})
+  const [suggestedMentors, setSuggestedMentors] = useState<
+    Record<string, string>
+  >({})
   const [aiJustification, setAiJustification] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
@@ -142,7 +143,6 @@ export default function MentorsPage() {
           inclusion_tags,
           inclusive_tags,
           expertise_areas,
-          session_price_usd,
           availability_status,
           average_rating,
           total_reviews,
@@ -297,16 +297,19 @@ export default function MentorsPage() {
     fetchMentors(false)
   }
 
-  const handleAIMatch = (suggestions: Array<{mentor_id: string, reason: string}>, justification: string) => {
+  const handleAIMatch = (
+    suggestions: Array<{ mentor_id: string; reason: string }>,
+    justification: string
+  ) => {
     const suggestionsMap: Record<string, string> = {}
-    suggestions.forEach(s => {
+    suggestions.forEach((s) => {
       suggestionsMap[s.mentor_id] = s.reason
     })
     setSuggestedMentors(suggestionsMap)
     setAiJustification(justification)
-    
+
     setTimeout(() => {
-        window.scrollTo({ top: 400, behavior: 'smooth' })
+      window.scrollTo({ top: 400, behavior: "smooth" })
     }, 100)
   }
 
@@ -571,27 +574,35 @@ export default function MentorsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Primeiro os sugeridos pela IA */}
             {mentors
-              .filter(m => m.id && Object.keys(suggestedMentors).includes(m.id))
+              .filter(
+                (m) => m.id && Object.keys(suggestedMentors).includes(m.id)
+              )
               .map((mentor) => (
                 <MentorCard
                   key={`ai-${mentor.id}`}
                   mentor={mentor}
                   isFavorite={!!(mentor.id && favorites.includes(mentor.id))}
-                  onToggleFavorite={() => mentor.id && toggleFavorite(mentor.id)}
+                  onToggleFavorite={() =>
+                    mentor.id && toggleFavorite(mentor.id)
+                  }
                   isAIHighlighted={true}
                   aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
                 />
               ))}
-            
+
             {/* Depois os demais */}
             {mentors
-              .filter(m => !m.id || !Object.keys(suggestedMentors).includes(m.id))
+              .filter(
+                (m) => !m.id || !Object.keys(suggestedMentors).includes(m.id)
+              )
               .map((mentor) => (
                 <MentorCard
-                  key={mentor.id || 'unknown'}
+                  key={mentor.id || "unknown"}
                   mentor={mentor}
                   isFavorite={!!(mentor.id && favorites.includes(mentor.id))}
-                  onToggleFavorite={() => mentor.id && toggleFavorite(mentor.id)}
+                  onToggleFavorite={() =>
+                    mentor.id && toggleFavorite(mentor.id)
+                  }
                 />
               ))}
           </div>

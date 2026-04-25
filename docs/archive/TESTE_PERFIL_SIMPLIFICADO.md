@@ -3,13 +3,16 @@
 ## Mudanças Realizadas
 
 ### Problema Identificado
+
 O formulário de perfil estava enviando campos com nomes incorretos:
+
 - `current_position` → deveria ser `job_title`
 - `current_company` → deveria ser `company`
 - `personal_website_url` → deveria ser `website_url`
 - `topics` → deveria ser `mentorship_topics`
 
 ### Solução Aplicada
+
 Corrigimos o mapeamento de campos no arquivo `app/profile/page.tsx`:
 
 1. **Estado do formulário** - Atualizado para usar os nomes corretos das colunas do banco
@@ -18,30 +21,30 @@ Corrigimos o mapeamento de campos no arquivo `app/profile/page.tsx`:
 
 ### Campos Corrigidos
 
-| Campo no Formulário | Coluna no Banco | Status |
-|---------------------|-----------------|--------|
-| Nome | `first_name` | ✅ OK |
-| Sobrenome | `last_name` | ✅ OK |
-| Slug | `slug` | ✅ OK |
-| Bio | `bio` | ✅ OK |
-| Cargo Atual | `job_title` | ✅ Corrigido |
-| Empresa Atual | `company` | ✅ Corrigido |
-| LinkedIn | `linkedin_url` | ✅ OK |
-| Portfólio | `portfolio_url` | ✅ OK |
-| Site Pessoal | `website_url` | ✅ Corrigido |
-| Endereço | `address` | ✅ OK |
-| Cidade | `city` | ✅ OK |
-| Estado | `state` | ✅ OK |
-| País | `country` | ✅ OK |
-| Áreas de Expertise | `expertise_areas` | ✅ OK |
-| Tópicos de Mentoria | `mentorship_topics` | ✅ Corrigido |
-| Temas Livres | `free_topics` | ✅ OK |
-| Tags Inclusivas | `inclusive_tags` | ✅ OK |
-| Idiomas | `languages` | ✅ OK |
-| Abordagem da Mentoria | `mentorship_approach` | ✅ OK |
-| O que Esperar | `what_to_expect` | ✅ OK |
-| Mentee Ideal | `ideal_mentee` | ✅ OK |
-| CV | `cv_url` | ✅ OK |
+| Campo no Formulário   | Coluna no Banco       | Status       |
+| --------------------- | --------------------- | ------------ |
+| Nome                  | `first_name`          | ✅ OK        |
+| Sobrenome             | `last_name`           | ✅ OK        |
+| Slug                  | `slug`                | ✅ OK        |
+| Bio                   | `bio`                 | ✅ OK        |
+| Cargo Atual           | `job_title`           | ✅ Corrigido |
+| Empresa Atual         | `company`             | ✅ Corrigido |
+| LinkedIn              | `linkedin_url`        | ✅ OK        |
+| Portfólio             | `portfolio_url`       | ✅ OK        |
+| Site Pessoal          | `website_url`         | ✅ Corrigido |
+| Endereço              | `address`             | ✅ OK        |
+| Cidade                | `city`                | ✅ OK        |
+| Estado                | `state`               | ✅ OK        |
+| País                  | `country`             | ✅ OK        |
+| Áreas de Expertise    | `expertise_areas`     | ✅ OK        |
+| Tópicos de Mentoria   | `mentorship_topics`   | ✅ Corrigido |
+| Temas Livres          | `free_topics`         | ✅ OK        |
+| Tags Inclusivas       | `inclusive_tags`      | ✅ OK        |
+| Idiomas               | `languages`           | ✅ OK        |
+| Abordagem da Mentoria | `mentorship_approach` | ✅ OK        |
+| O que Esperar         | `what_to_expect`      | ✅ OK        |
+| Mentee Ideal          | `ideal_mentee`        | ✅ OK        |
+| CV                    | `cv_url`              | ✅ OK        |
 
 ## Como Testar
 
@@ -76,7 +79,7 @@ expertise_areas, mentorship_topics, free_topics, inclusive_tags, languages
 mentorship_approach, what_to_expect, ideal_mentee
 
 -- Campos de sistema
-session_price_usd, availability_status, average_rating, total_reviews, total_sessions
+availability_status, average_rating, total_reviews, total_sessions
 chat_enabled, profile_visibility, mentorship_guidelines, cv_url
 created_at, updated_at, verified_at
 ```
@@ -99,6 +102,7 @@ created_at, updated_at, verified_at
 ## Próximos Passos
 
 ### Para Testar
+
 1. Acesse `/profile` no navegador
 2. Preencha os campos básicos (nome, sobrenome, slug, bio)
 3. Preencha campos profissionais (cargo, empresa)
@@ -107,6 +111,7 @@ created_at, updated_at, verified_at
 6. Recarregue a página e confirme que os dados persistiram
 
 ### Se Ainda Houver Problemas
+
 1. Abra o console do navegador (F12) e verifique erros
 2. Verifique os logs da API em `/api/profile`
 3. Confirme que todas as migrations foram aplicadas no Supabase
