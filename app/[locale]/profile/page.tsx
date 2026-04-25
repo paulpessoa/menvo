@@ -247,7 +247,6 @@ export default function ProfilePage() {
               <TabsTrigger value="address" className="py-2">Endereço</TabsTrigger>
               <TabsTrigger value="interests" className="py-2">Interesses</TabsTrigger>
               <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
-              <TabsTrigger value="visibility" className="py-2">Privacidade</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">

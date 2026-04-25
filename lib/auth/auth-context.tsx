@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { createClient } from '@/lib/utils/supabase/client'
 import { User, Session, Provider } from '@supabase/supabase-js'
 import { toast } from 'sonner'
+import { signInWithOAuthProvider } from '@/lib/auth/oauth-provider-fixes'
 
 export interface AuthContextType {
     user: User | null
@@ -124,13 +125,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signInWithProvider = async (provider: Provider) => {
         try {
             setLoading(true)
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider,
-                options: { redirectTo: `${window.location.origin}/auth/callback` }
+            
+            // Only support google, linkedin, and github
+            if (provider !== 'google' && provider !== 'linkedin' && provider !== 'github') {
+                throw new Error(`Provider ${provider} not supported`)
+            }
+            
+            // Use the fixed OAuth provider function that handles linkedin_oidc mapping
+            const result = await signInWithOAuthProvider(supabase, provider, {
+                redirectTo: `${window.location.origin}/auth/callback`
             })
-            if (error) throw error
+            if (result.error) throw result.error
+            
+            // Redirect to the OAuth URL
+            if (result.data?.url) {
+                window.location.href = result.data.url
+            }
+            
             return { success: true }
-        } catch (error) { return { success: false, error } } finally { setLoading(false) }
+        } catch (error) {
+            console.error('OAuth sign-in error:', error)
+            return { success: false, error }
+        } finally {
+            setLoading(false)
+        }
     }
 
     const signOut = async () => {

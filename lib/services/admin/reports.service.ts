@@ -55,8 +55,8 @@ export const adminReportsService = {
       { count: totalMentees }
     ] = await Promise.all([
       supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      supabase.from('user_roles').select('*, roles!inner(*)', { count: 'exact', head: true }).eq('roles.name', 'mentor'),
-      supabase.from('user_roles').select('*, roles!inner(*)', { count: 'exact', head: true }).eq('roles.name', 'mentee')
+      supabase.from('user_roles').select('*, roles!inner(name)', { count: 'exact', head: true }).eq('roles.name', 'mentor'),
+      supabase.from('user_roles').select('*, roles!inner(name)', { count: 'exact', head: true }).eq('roles.name', 'mentee')
     ])
 
     return {
