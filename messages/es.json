@@ -173,17 +173,6 @@
                 "description": "Crear un cambio positivo empoderando a las personas a través del intercambio de conocimientos y conexiones significativas."
             }
         },
-        "sdg": {
-            "title": "Objetivos de Desarrollo Sostenible",
-            "description": "Nuestra plataforma se alinea con los Objetivos de Desarrollo Sostenible (ODS) de las Naciones Unidas, centrándose particularmente en:",
-            "goalNumber": "ODS {number}",
-            "goals": {
-                "qualityEducation": "Educación de Calidad",
-                "genderEquality": "Igualdad de Género",
-                "decentWork": "Trabajo Decente y Crecimiento Económico",
-                "reducedInequalities": "Reducción de las Desigualdades"
-            }
-        },
         "ourTeam": {
             "title": "Nuestro Equipo",
             "paragraph1": "Somos un equipo diverso de profesionales apasionados por hacer que la mentoría sea accesible para todos. Los miembros de nuestro equipo provienen de diversos orígenes e industrias, aportando una gran experiencia y perspectivas.",
@@ -1001,6 +990,9 @@
             "text": "Conoce a {name}, mentor especializado en {topics}",
             "success": "¡Compartido con éxito!",
             "copySuccess": "¡Enlace copiado al portapapeles!"
+        },
+        "toast": {
+            "featureUnderDevelopment": "Esta funcionalidad aún está en desarrollo. ¡Próximamente!"
         },
         "magicSearch": {
             "placeholder": "Describe tu desafío (ej.: \u0027Quiero ayuda para conseguir mi primera pasantía en Diseño\u0027)",

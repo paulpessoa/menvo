@@ -14,7 +14,10 @@ export default function AboutPage() {
   return (
     <div className="container max-w-7xl mx-auto px-4 py-12 md:py-20">
       <div className="flex flex-col items-center text-center space-y-6 mb-16">
-        <Badge variant="secondary" className="px-3 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary border-none">
+        <Badge
+          variant="secondary"
+          className="px-3 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary border-none"
+        >
           {t("about.badge")}
         </Badge>
         <h1
@@ -98,52 +101,15 @@ export default function AboutPage() {
       </div>
 
       <div className="mb-24">
-        <h2 id="sdg" className="text-3xl font-extrabold text-center mb-4 text-gray-900">
+        <h2
+          id="sdg"
+          className="text-3xl font-extrabold text-center mb-4 text-gray-900"
+        >
           {t("about.sdg.title")}
         </h2>
         <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12 text-lg">
           {t("about.sdg.description")}
         </p>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {[
-            {
-              number: 4,
-              title: t("about.sdg.goals.qualityEducation"),
-              color: "bg-red-50 text-red-900 border-red-100",
-              id: "sdg4"
-            },
-            {
-              number: 5,
-              title: t("about.sdg.goals.genderEquality"),
-              color: "bg-orange-50 text-orange-900 border-orange-100",
-              id: "sdg5"
-            },
-            {
-              number: 8,
-              title: t("about.sdg.goals.decentWork"),
-              color: "bg-green-50 text-green-900 border-green-100",
-              id: "sdg8"
-            },
-            {
-              number: 10,
-              title: t("about.sdg.goals.reducedInequalities"),
-              color: "bg-blue-50 text-blue-900 border-blue-100",
-              id: "sdg10"
-            }
-          ].map((goal) => (
-            <div
-              key={goal.number}
-              id={goal.id}
-              className={`p-6 rounded-3xl border ${goal.color} flex flex-col items-center text-center space-y-2 hover:scale-105 transition-transform`}
-            >
-              <div className="font-black text-2xl">
-                #{goal.number}
-              </div>
-              <div className="text-xs font-bold uppercase tracking-tight leading-tight">{goal.title}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center mb-24">
@@ -158,7 +124,10 @@ export default function AboutPage() {
           />
         </div>
         <div className="space-y-6 text-center md:text-left">
-          <h2 id="team" className="text-3xl font-extrabold text-gray-900 scroll-mt-20">
+          <h2
+            id="team"
+            className="text-3xl font-extrabold text-gray-900 scroll-mt-20"
+          >
             {t("about.ourTeam.title")}
           </h2>
           <div className="space-y-4 text-muted-foreground text-base md:text-lg leading-relaxed">
@@ -166,7 +135,11 @@ export default function AboutPage() {
             <p>{t("about.ourTeam.paragraph2")}</p>
             <p>{t("about.ourTeam.paragraph3")}</p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-4">
-              <Button size="lg" asChild className="rounded-xl font-bold shadow-lg shadow-primary/10">
+              <Button
+                size="lg"
+                asChild
+                className="rounded-xl font-bold shadow-lg shadow-primary/10"
+              >
                 <Link
                   href="https://wa.me/5581995097377?text=Olá!%20Vi%20o%20projeto%20e%20me%20interessei%20bastante.%20Gostaria%20de%20ajudar%20com%20algo%20se%20for%20possível..."
                   target="_blank"
@@ -175,7 +148,12 @@ export default function AboutPage() {
                   {t("about.ourTeam.joinTeam")}
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="rounded-xl font-bold border-2">
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="rounded-xl font-bold border-2"
+              >
                 <Link href="/maps">
                   <Map className="mr-2 h-5 w-5" />
                   {t("about.ourTeam.viewMap")}
@@ -198,10 +176,19 @@ export default function AboutPage() {
           {t("about.joinOurMission.description")}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" asChild className="rounded-xl font-bold px-10 h-14 shadow-xl shadow-primary/10">
+          <Button
+            size="lg"
+            asChild
+            className="rounded-xl font-bold px-10 h-14 shadow-xl shadow-primary/10"
+          >
             <Link href="/signup">{t("about.joinOurMission.signUpNow")}</Link>
           </Button>
-          <Button size="lg" variant="outline" asChild className="rounded-xl font-bold px-10 h-14 border-2">
+          <Button
+            size="lg"
+            variant="outline"
+            asChild
+            className="rounded-xl font-bold px-10 h-14 border-2"
+          >
             <Link href="/contact">{t("about.joinOurMission.contactUs")}</Link>
           </Button>
         </div>

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
-import { MapPin, Briefcase, Calendar, Sparkles } from "lucide-react"
+import { MapPin, Briefcase, Calendar, Sparkles, Heart } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -13,6 +13,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { useFavorites } from "@/hooks/useFavorites"
+import { useAuth } from "@/lib/auth"
 
 interface MentorProfile {
   id: string | null
@@ -50,6 +52,10 @@ export function MentorCard({
 }: MentorCardProps) {
   const t = useTranslations("mentorsPage")
   const router = useRouter()
+  const { user } = useAuth()
+  const { favorites, toggleFavorite } = useFavorites(user?.id)
+
+  const isFavorite = !!(mentor.id && favorites.includes(mentor.id))
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return ""
@@ -90,6 +96,14 @@ export function MentorCard({
     router.push(`/mentors/${mentor.slug || mentor.id || ""}`)
   }
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (mentor.id) {
+        toggleFavorite(mentor.id)
+    }
+  }
+
   return (
     <Card
       className={`hover:shadow-xl transition-all duration-300 flex flex-col h-full relative group border-none shadow-md rounded-[2rem] overflow-hidden bg-white ${
@@ -103,6 +117,19 @@ export function MentorCard({
           <Sparkles className="h-5 w-5" />
         </div>
       )}
+
+      {/* Botão de Favorito - Restaurado */}
+      <button
+        onClick={handleFavoriteClick}
+        className={`absolute top-4 right-4 p-2.5 rounded-full shadow-sm transition-all z-10 ${
+          isFavorite
+            ? "bg-red-50 text-red-500 scale-110"
+            : "bg-white/80 text-gray-400 hover:text-red-400 hover:bg-white"
+        }`}
+        aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+      >
+        <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+      </button>
 
       <CardHeader className="pb-3 px-6 pt-8">
         <div className="flex items-start justify-between">

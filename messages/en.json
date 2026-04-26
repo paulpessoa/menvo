@@ -173,17 +173,6 @@
                 "description": "Creating positive change by empowering individuals through knowledge sharing and meaningful connections."
             }
         },
-        "sdg": {
-            "title": "Sustainable Development Goals",
-            "description": "Our platform aligns with the United Nations\u0027 Sustainable Development Goals (SDGs), particularly focusing on:",
-            "goalNumber": "SDG {number}",
-            "goals": {
-                "qualityEducation": "Quality Education",
-                "genderEquality": "Gender Equality",
-                "decentWork": "Decent Work and Economic Growth",
-                "reducedInequalities": "Reduced Inequalities"
-            }
-        },
         "ourTeam": {
             "title": "Our Team",
             "paragraph1": "We\u0027re a diverse team of professionals passionate about making mentorship accessible to everyone. Our team members come from various backgrounds and industries, bringing together a wealth of experience and perspectives.",
@@ -998,9 +987,12 @@
         },
         "share": {
             "title": "{name} - Mentor at Menvo",
-            "text": "Meet {name}, mentor specialized in {topics}",
+            "text": "Meet {name}, a mentor specialized in {topics}",
             "success": "Shared successfully!",
             "copySuccess": "Link copied to clipboard!"
+        },
+        "toast": {
+            "featureUnderDevelopment": "This feature is still under development. Coming soon!"
         },
         "magicSearch": {
             "placeholder": "Describe your challenge (e.g.: 'I want help to get my first Design internship')",

@@ -34,24 +34,25 @@ export const groqService = {
     }));
 
     const prompt = `
-      Você é o Especialista em Conexões da plataforma MENVO. 
-      Sua missão é sugerir os 3 mentores mais adequados da lista abaixo para a dúvida: "${userQuery}"
+      Você é o Especialista em Conexões Ético da plataforma MENVO. 
+      Sua missão é sugerir mentores da lista abaixo para a dúvida: "${userQuery}"
 
-      MENTORES: ${JSON.stringify(mentorsSummary)}
+      MENTORES DISPONÍVEIS: ${JSON.stringify(mentorsSummary)}
 
-      REGRAS:
-      1. Se não houver match direto (ex: o usuário quer algo que ninguém faz), sugira mentores de "RH", "Carreira" ou "Psicologia" como suporte geral.
-      2. Para CADA mentor sugerido, crie uma justificativa CURTA e PERSONALIZADA (reason).
-      3. Se for um caso de fallback (sem match direto), defina no_match como true mas AINDA ASSIM sugira mentores de carreira.
+      REGRAS CRÍTICAS DE INTEGRIDADE:
+      1. RIGOR TÉCNICO: Se o usuário quer algo que NÃO EXISTE na lista de mentores (ex: "jogador de futebol", "astronauta", "médico") e não há mentores com essa expertise REAL, retorne "no_match": true.
+      2. NUNCA FORÇAR: Não sugira profissões não correlacionadas (ex: NÃO sugira um chaveiro para alguém que quer ser esportista). É melhor não sugerir ninguém do que sugerir algo ridículo.
+      3. JUSTIFICATIVA HONESTA: Se "no_match" for true, na "global_justification", explique educadamente que a rede Menvo ainda não possui especialistas nessa área específica, mas que estamos em busca ativa por esses perfis.
+      4. CORE BUSINESS: Foque em Carreira, Tecnologia, Design, Negócios e Educação. Se o match for parcial (ex: quer ser vendedor e temos mentor de vendas), retorne "no_match": false e sugira.
 
-      FORMATO JSON:
+      FORMATO JSON OBRIGATÓRIO:
       {
         "suggestions": [
-          { "mentor_id": "uuid", "reason": "Ele é especialista em X..." }
+          { "mentor_id": "uuid", "reason": "Justificativa curta baseada em dados REAIS do mentor." }
         ],
-        "global_justification": "Frase curta de efeito sobre a busca.",
-        "suggested_topics": ["tema1", "tema2"],
-        "no_match": false
+        "global_justification": "Frase sobre o resultado da busca.",
+        "suggested_topics": ["temas", "relevantes"],
+        "no_match": boolean
       }
     `;
 

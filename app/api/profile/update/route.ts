@@ -34,7 +34,6 @@ export async function PUT(request: NextRequest) {
     const updateData: any = {
       first_name: body.first_name,
       last_name: body.last_name,
-      full_name: `${body.first_name} ${body.last_name}`,
       bio: body.bio,
       avatar_url: body.avatar_url,
       city: body.city,

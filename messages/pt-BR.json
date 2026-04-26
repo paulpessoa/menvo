@@ -173,17 +173,6 @@
         "description": "Gerar mudanças positivas por meio do compartilhamento de conhecimento e conexões significativas que empoderam pessoas."
       }
     },
-    "sdg": {
-      "title": "Objetivos de Desenvolvimento Sustentável",
-      "description": "Nossa plataforma está alinhada aos Objetivos de Desenvolvimento Sustentável (ODS) da ONU, com foco especial em:",
-      "goalNumber": "ODS {number}",
-      "goals": {
-        "qualityEducation": "Educação de Qualidade",
-        "genderEquality": "Igualdade de Gênero",
-        "decentWork": "Trabalho Decente e Crescimento Econômico",
-        "reducedInequalities": "Redução das Desigualdades"
-      }
-    },
     "ourTeam": {
       "title": "Nosso Time",
       "paragraph1": "Somos uma equipe diversa de profissionais apaixonados por tornar a mentoria acessível a todos. Nossos membros vêm de diferentes origens e setores, trazendo uma riqueza de experiências e perspectivas.",
@@ -1000,8 +989,10 @@
       "success": "Compartilhado com sucesso!",
       "copySuccess": "Link copiado para a área de transferência!"
     },
-    "magicSearch": {
-      "placeholder": "Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')",
+    "toast": {
+      "featureUnderDevelopment": "Esta funcionalidade ainda está em desenvolvimento. Em breve!"
+    },
+    "magicSearch": {      "placeholder": "Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')",
       "button": "Buscar com IA",
       "loading": "Mágica em andamento...",
       "error": "A mágica falhou desta vez. Tente novamente em instantes.",
@@ -1106,9 +1097,10 @@
     "greetings": {
       "morning": "Bom dia",
       "afternoon": "Boa tarde",
-      "evening": "Boa noite"
-    },
-    "mentor": {
+      "evening": "Boa noite",
+      "learningGoals": "Objetivos de Aprendizado",
+      "learningGoalsPlaceholder": "Descreva o que você deseja aprender ou desenvolver..."
+      },    "mentor": {
       "welcome": "Bem-vindo ao seu dashboard de mentor. Gerencie suas mentorias e ajude outros profissionais.",
       "verification": {
         "pending": "Verificação Pendente",
