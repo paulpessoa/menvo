@@ -340,9 +340,16 @@ export default function MentorsPage() {
 
   // Timezone calculations
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const brtTime = currentTime.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" })
-  const localTime = currentTime.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
-  const brtGmt = "-03:00"
+  const brtTime = currentTime.toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+  const localTime = currentTime.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+  const brtGmt = "GMT-3"
   const localGmt = (date: Date) => {
     const offset = -date.getTimezoneOffset() / 60
     return `GMT${offset >= 0 ? "+" : ""}${offset}:00`
@@ -363,29 +370,39 @@ export default function MentorsPage() {
       {/* Timezone Info Banner - Transparente e Preciso */}
       <div className="mb-10 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10 rounded-2xl p-6 shadow-sm">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-                <div className="bg-white p-3 rounded-xl shadow-sm">
-                    <Globe className="h-6 w-6 text-primary" />
-                </div>
-                <div className="space-y-1 text-center md:text-left">
-                    <p className="text-sm font-bold text-gray-900 leading-none">Ajuste Global de Horários</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                        Sua agenda é automaticamente convertida para o seu fuso local para evitar erros de agendamento.
-                    </p>
-                </div>
+          <div className="flex items-start gap-4">
+            <div className="bg-white p-3 rounded-xl shadow-sm">
+              <Globe className="h-6 w-6 text-primary" />
             </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                <div className="flex-1 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Ref. Brasil ({brtGmt})</p>
-                    <p className="text-lg font-bold text-gray-800 tabular-nums">{brtTime}</p>
-                </div>
-                <div className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-center shadow-lg shadow-primary/20">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-0.5">Seu Fuso ({localGmt(currentTime)})</p>
-                    <p className="text-lg font-bold tabular-nums">{localTime}</p>
-                    <p className="text-[9px] font-medium opacity-80 truncate max-w-[120px] mx-auto">{userTimezone}</p>
-                </div>
+            <div className="space-y-1 text-center md:text-left">
+              <p className="text-sm font-bold text-gray-900 leading-none">
+                {t("timezoneBanner.title")}
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t("timezoneBanner.description")}
+              </p>
             </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <div className="flex-1 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50 text-center">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
+                {t("timezoneBanner.referenceLabel")} ({brtGmt})
+              </p>
+              <p className="text-lg font-bold text-gray-800 tabular-nums">
+                {brtTime}
+              </p>
+            </div>
+            <div className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-center shadow-lg shadow-primary/20">
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-0.5">
+                {t("timezoneBanner.localLabel")} ({localGmt(currentTime)})
+              </p>
+              <p className="text-lg font-bold tabular-nums">{localTime}</p>
+              <p className="text-[9px] font-medium opacity-80 truncate max-w-[120px] mx-auto">
+                {userTimezone}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -407,23 +424,23 @@ export default function MentorsPage() {
         </div>
 
         <div className="flex gap-2">
-            <Select 
-                value={filters.sortBy} 
-                onValueChange={(val: any) => setFilters(prev => ({ ...prev, sortBy: val }))}
-            >
-                <SelectTrigger className="w-[140px] h-11 rounded-xl bg-white border-2">
-                    <div className="flex items-center gap-2">
-                        <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                        <SelectValue placeholder="Ordenar" />
-                    </div>
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                    <SelectItem value="relevance">Destaques</SelectItem>
-                    <SelectItem value="experience">Experiência</SelectItem>
-                    <SelectItem value="newest">Novos</SelectItem>
-                    <SelectItem value="name">Nome (A-Z)</SelectItem>
-                </SelectContent>
-            </Select>
+          <Select
+            value={filters.sortBy}
+            onValueChange={(val: any) => setFilters((prev) => ({ ...prev, sortBy: val }))}
+          >
+            <SelectTrigger className="w-[140px] h-11 rounded-xl bg-white border-2">
+              <div className="flex items-center gap-2">
+                <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
+                <SelectValue placeholder={t("sortBy.label")} />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="relevance">{t("sortBy.relevance")}</SelectItem>
+              <SelectItem value="experience">{t("sortBy.experience")}</SelectItem>
+              <SelectItem value="newest">{t("sortBy.newest")}</SelectItem>
+              <SelectItem value="name">{t("sortBy.name")}</SelectItem>
+            </SelectContent>
+          </Select>
 
             <Sheet>
             <SheetTrigger asChild>

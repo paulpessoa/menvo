@@ -967,6 +967,19 @@
             "unavailable": "Unavailable",
             "unknown": "Unknown status"
         },
+        "timezoneBanner": {
+            "title": "Global Time Adjustment",
+            "description": "Your schedule is automatically converted to your local time zone to avoid booking errors.",
+            "referenceLabel": "Brazil",
+            "localLabel": "Your Time"
+        },
+        "sortBy": {
+            "label": "Sort",
+            "relevance": "Featured",
+            "experience": "Experience",
+            "newest": "Newest",
+            "name": "Name (A-Z)"
+        },
         "backToMentors": "Back to Mentors",
         "about": "About",
         "specialties": "Specialties",

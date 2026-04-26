@@ -967,6 +967,19 @@
             "unavailable": "No disponible",
             "unknown": "Estado desconocido"
         },
+        "timezoneBanner": {
+            "title": "Ajuste de Horario Global",
+            "description": "Tu agenda se convierte automáticamente a tu zona horaria local para evitar errores de programación.",
+            "referenceLabel": "Brasil",
+            "localLabel": "Tu Horario"
+        },
+        "sortBy": {
+            "label": "Ordenar",
+            "relevance": "Destacados",
+            "experience": "Experiencia",
+            "newest": "Nuevos",
+            "name": "Nombre (A-Z)"
+        },
         "backToMentors": "Volver a Mentores",
         "about": "Sobre",
         "specialties": "Especialidades",

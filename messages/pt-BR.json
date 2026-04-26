@@ -965,6 +965,19 @@
       "unavailable": "Indisponível",
       "unknown": "Status desconhecido"
     },
+    "timezoneBanner": {
+      "title": "Ajuste de Horário Global",
+      "description": "Sua agenda é automaticamente convertida para o seu fuso local para evitar erros de agendamento.",
+      "referenceLabel": "Brasil",
+      "localLabel": "Seu Horário"
+    },
+    "sortBy": {
+      "label": "Ordenar",
+      "relevance": "Destaques",
+      "experience": "Experiência",
+      "newest": "Novos",
+      "name": "Nome (A-Z)"
+    },
     "backToMentors": "Voltar para Mentores",
     "about": "Sobre",
     "specialties": "Especialidades",
