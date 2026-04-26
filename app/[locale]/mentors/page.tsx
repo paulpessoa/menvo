@@ -27,7 +27,9 @@ import {
   Users,
   Briefcase,
   Heart,
-  Loader2
+  Loader2,
+  ArrowDownUp,
+  Globe
 } from "lucide-react"
 
 import { useAuth } from "@/lib/auth"
@@ -58,6 +60,7 @@ interface MentorProfile {
   total_sessions: number | null
   experience_years: number | null
   slug: string | null
+  created_at?: string | null
 }
 
 interface FilterState {
@@ -71,6 +74,7 @@ interface FilterState {
   priceRange: [number, number]
   availabilityStatus: string
   experienceYears: string
+  sortBy: "relevance" | "experience" | "newest" | "name"
 }
 
 const initialFilters: FilterState = {
@@ -83,7 +87,8 @@ const initialFilters: FilterState = {
   inclusiveTags: [],
   priceRange: [0, 500],
   availabilityStatus: "all",
-  experienceYears: "all"
+  experienceYears: "all",
+  sortBy: "relevance"
 }
 
 const ITEMS_PER_PAGE = 12
@@ -96,6 +101,7 @@ export default function MentorsPage() {
   const [page, setPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   const [suggestedMentors, setSuggestedMentors] = useState<
     Record<string, string>
@@ -114,6 +120,12 @@ export default function MentorsPage() {
 
   const supabase = createClient()
   const { user } = useAuth()
+
+  // Update clock every minute
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+    return () => clearInterval(timer)
+  }, [])
 
   const fetchMentors = async (isInitial = false) => {
     try {
@@ -145,7 +157,8 @@ export default function MentorsPage() {
           total_reviews,
           total_sessions,
           experience_years,
-          slug
+          slug,
+          created_at
         `,
         { count: "exact" }
       )
@@ -199,13 +212,23 @@ export default function MentorsPage() {
         }
       }
 
-      // Pagination
+      // Pagination & Sorting
       const from = currentPage * ITEMS_PER_PAGE
       const to = from + ITEMS_PER_PAGE - 1
 
-      query = query
-        .order("average_rating", { ascending: false })
-        .range(from, to)
+      // Sort Logic
+      if (filters.sortBy === "experience") {
+        query = query.order("experience_years", { ascending: false })
+      } else if (filters.sortBy === "newest") {
+        query = query.order("created_at", { ascending: false })
+      } else if (filters.sortBy === "name") {
+        query = query.order("full_name", { ascending: true })
+      } else {
+        // Default: Relevance (Rating)
+        query = query.order("average_rating", { ascending: false })
+      }
+
+      query = query.range(from, to)
 
       const { data, error, count } = await query
 
@@ -315,7 +338,15 @@ export default function MentorsPage() {
     setAiJustification(null)
   }
 
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Timezone calculations
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const brtTime = currentTime.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" })
+  const localTime = currentTime.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+  const brtGmt = "-03:00"
+  const localGmt = (date: Date) => {
+    const offset = -date.getTimezoneOffset() / 60
+    return `GMT${offset >= 0 ? "+" : ""}${offset}:00`
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -329,12 +360,33 @@ export default function MentorsPage() {
         </p>
       </div>
 
-      {/* Timezone Info Banner */}
-      <div className="mb-8 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center gap-3 text-blue-800">
-        <Clock className="h-5 w-5 shrink-0" />
-        <p className="text-sm">
-          Todos os horários de mentoria são exibidos automaticamente no seu fuso horário local: <strong>{userTimezone}</strong>.
-        </p>
+      {/* Timezone Info Banner - Transparente e Preciso */}
+      <div className="mb-10 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10 rounded-2xl p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-start gap-4">
+                <div className="bg-white p-3 rounded-xl shadow-sm">
+                    <Globe className="h-6 w-6 text-primary" />
+                </div>
+                <div className="space-y-1 text-center md:text-left">
+                    <p className="text-sm font-bold text-gray-900 leading-none">Ajuste Global de Horários</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                        Sua agenda é automaticamente convertida para o seu fuso local para evitar erros de agendamento.
+                    </p>
+                </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                <div className="flex-1 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Ref. Brasil ({brtGmt})</p>
+                    <p className="text-lg font-bold text-gray-800 tabular-nums">{brtTime}</p>
+                </div>
+                <div className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-center shadow-lg shadow-primary/20">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-0.5">Seu Fuso ({localGmt(currentTime)})</p>
+                    <p className="text-lg font-bold tabular-nums">{localTime}</p>
+                    <p className="text-[9px] font-medium opacity-80 truncate max-w-[120px] mx-auto">{userTimezone}</p>
+                </div>
+            </div>
+        </div>
       </div>
 
       {/* Magic AI Search Bar */}
@@ -350,205 +402,225 @@ export default function MentorsPage() {
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, search: e.target.value }))
             }
-            className="pl-10"
+            className="pl-10 h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary"
           />
         </div>
 
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="relative">
-              <Filter className="h-4 w-4 mr-2" />
-              {t("filters")}
-              {activeFiltersCount > 0 && (
-                <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground">
-                  {activeFiltersCount}
-                </Badge>
-              )}
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>{t("sheetTitle")}</SheetTitle>
-              <SheetDescription>{t("sheetDescription")}</SheetDescription>
-            </SheetHeader>
+        <div className="flex gap-2">
+            <Select 
+                value={filters.sortBy} 
+                onValueChange={(val: any) => setFilters(prev => ({ ...prev, sortBy: val }))}
+            >
+                <SelectTrigger className="w-[140px] h-11 rounded-xl bg-white border-2">
+                    <div className="flex items-center gap-2">
+                        <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
+                        <SelectValue placeholder="Ordenar" />
+                    </div>
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                    <SelectItem value="relevance">Destaques</SelectItem>
+                    <SelectItem value="experience">Experiência</SelectItem>
+                    <SelectItem value="newest">Novos</SelectItem>
+                    <SelectItem value="name">Nome (A-Z)</SelectItem>
+                </SelectContent>
+            </Select>
 
-            <div className="mt-6 space-y-6 pb-8">
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <MapPin className="h-4 w-4 mr-2 text-primary" />
-                  {t("state")}
-                </h3>
-                <Select
-                  value={filters.state}
-                  onValueChange={(value) =>
-                    setFilters((prev) => ({ ...prev, state: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("statePlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t("allStates")}</SelectItem>
-                    {availableFilters.states.map((state) => (
-                      <SelectItem key={state} value={state}>
-                        {state}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <Sheet>
+            <SheetTrigger asChild>
+                <Button variant="outline" className="relative h-11 rounded-xl border-2 px-6">
+                <Filter className="h-4 w-4 mr-2" />
+                {t("filters")}
+                {activeFiltersCount > 0 && (
+                    <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground">
+                    {activeFiltersCount}
+                    </Badge>
+                )}
+                </Button>
+            </SheetTrigger>
+            <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                <SheetHeader>
+                <SheetTitle>{t("sheetTitle")}</SheetTitle>
+                <SheetDescription>{t("sheetDescription")}</SheetDescription>
+                </SheetHeader>
 
-              {availableFilters.cities.length > 0 && (
+                <div className="mt-6 space-y-6 pb-8">
                 <div className="space-y-3">
-                  <h3 className="font-medium flex items-center">
+                    <h3 className="font-medium flex items-center">
                     <MapPin className="h-4 w-4 mr-2 text-primary" />
-                    {t("city")}
-                  </h3>
-                  <Select
-                    value={filters.city || "all"}
+                    {t("state")}
+                    </h3>
+                    <Select
+                    value={filters.state}
                     onValueChange={(value) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        city: value === "all" ? "" : value
-                      }))
+                        setFilters((prev) => ({ ...prev, state: value }))
                     }
-                  >
+                    >
                     <SelectTrigger>
-                      <SelectValue placeholder={t("cityPlaceholder")} />
+                        <SelectValue placeholder={t("statePlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("allCities")}</SelectItem>
-                      {availableFilters.cities.map((city) => (
-                        <SelectItem key={city} value={city}>
-                          {city}
+                        <SelectItem value="all">{t("allStates")}</SelectItem>
+                        {availableFilters.states.map((state) => (
+                        <SelectItem key={state} value={state}>
+                            {state}
                         </SelectItem>
-                      ))}
+                        ))}
                     </SelectContent>
-                  </Select>
+                    </Select>
                 </div>
-              )}
 
-              <div className="space-y-3">
-                <h3 className="font-medium">{t("topics")}</h3>
-                <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pt-1">
-                  {availableFilters.topics.map((topic) => (
-                    <Badge
-                      key={topic}
-                      variant={
-                        filters.topics.includes(topic) ? "default" : "outline"
-                      }
-                      className="cursor-pointer"
-                      onClick={() => {
+                {availableFilters.cities.length > 0 && (
+                    <div className="space-y-3">
+                    <h3 className="font-medium flex items-center">
+                        <MapPin className="h-4 w-4 mr-2 text-primary" />
+                        {t("city")}
+                    </h3>
+                    <Select
+                        value={filters.city || "all"}
+                        onValueChange={(value) =>
                         setFilters((prev) => ({
-                          ...prev,
-                          topics: prev.topics.includes(topic)
-                            ? prev.topics.filter((t) => t !== topic)
-                            : [...prev.topics, topic]
+                            ...prev,
+                            city: value === "all" ? "" : value
                         }))
-                      }}
+                        }
                     >
-                      {topic}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+                        <SelectTrigger>
+                        <SelectValue placeholder={t("cityPlaceholder")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="all">{t("allCities")}</SelectItem>
+                        {availableFilters.cities.map((city) => (
+                            <SelectItem key={city} value={city}>
+                            {city}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                    </div>
+                )}
 
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <Heart className="h-4 w-4 mr-2 text-primary" />
-                  {t("inclusiveTags")}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {availableFilters.inclusiveTags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant={
-                        filters.inclusiveTags.includes(tag)
-                          ? "default"
-                          : "outline"
-                      }
-                      className="cursor-pointer"
-                      onClick={() => {
+                <div className="space-y-3">
+                    <h3 className="font-medium">{t("topics")}</h3>
+                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pt-1">
+                    {availableFilters.topics.map((topic) => (
+                        <Badge
+                        key={topic}
+                        variant={
+                            filters.topics.includes(topic) ? "default" : "outline"
+                        }
+                        className="cursor-pointer"
+                        onClick={() => {
+                            setFilters((prev) => ({
+                            ...prev,
+                            topics: prev.topics.includes(topic)
+                                ? prev.topics.filter((t) => t !== topic)
+                                : [...prev.topics, topic]
+                            }))
+                        }}
+                        >
+                        {topic}
+                        </Badge>
+                    ))}
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <h3 className="font-medium flex items-center">
+                    <Heart className="h-4 w-4 mr-2 text-primary" />
+                    {t("inclusiveTags")}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                    {availableFilters.inclusiveTags.map((tag) => (
+                        <Badge
+                        key={tag}
+                        variant={
+                            filters.inclusiveTags.includes(tag)
+                            ? "default"
+                            : "outline"
+                        }
+                        className="cursor-pointer"
+                        onClick={() => {
+                            setFilters((prev) => ({
+                            ...prev,
+                            inclusiveTags: prev.inclusiveTags.includes(tag)
+                                ? prev.inclusiveTags.filter((t) => t !== tag)
+                                : [...prev.inclusiveTags, tag]
+                            }))
+                        }}
+                        >
+                        {tag}
+                        </Badge>
+                    ))}
+                    </div>
+                </div>
+
+                <div className="space-y-3">
+                    <h3 className="font-medium flex items-center">
+                    <Clock className="h-4 w-4 mr-2 text-primary" />
+                    {t("availability")}
+                    </h3>
+                    <Select
+                    value={filters.availabilityStatus}
+                    onValueChange={(value) =>
                         setFilters((prev) => ({
-                          ...prev,
-                          inclusiveTags: prev.inclusiveTags.includes(tag)
-                            ? prev.inclusiveTags.filter((t) => t !== tag)
-                            : [...prev.inclusiveTags, tag]
+                        ...prev,
+                        availabilityStatus: value
                         }))
-                      }}
+                    }
                     >
-                      {tag}
-                    </Badge>
-                  ))}
+                    <SelectTrigger>
+                        <SelectValue placeholder={t("availabilityPlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">{t("anyStatus")}</SelectItem>
+                        <SelectItem value="available">
+                        {t("status.available")}
+                        </SelectItem>
+                        <SelectItem value="busy">{t("status.busy")}</SelectItem>
+                    </SelectContent>
+                    </Select>
                 </div>
-              </div>
 
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <Clock className="h-4 w-4 mr-2 text-primary" />
-                  {t("availability")}
-                </h3>
-                <Select
-                  value={filters.availabilityStatus}
-                  onValueChange={(value) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      availabilityStatus: value
-                    }))
-                  }
+                <div className="space-y-3">
+                    <h3 className="font-medium flex items-center">
+                    <Briefcase className="h-4 w-4 mr-2 text-primary" />
+                    {t("experience")}
+                    </h3>
+                    <Select
+                    value={filters.experienceYears}
+                    onValueChange={(value) =>
+                        setFilters((prev) => ({ ...prev, experienceYears: value }))
+                    }
+                    >
+                    <SelectTrigger>
+                        <SelectValue placeholder={t("experiencePlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">{t("anyExperience")}</SelectItem>
+                        <SelectItem value="0-2">0-2 anos</SelectItem>
+                        <SelectItem value="3-5">3-5 anos</SelectItem>
+                        <SelectItem value="6-10">6-10 anos</SelectItem>
+                        <SelectItem value="11+">10+ anos</SelectItem>
+                    </SelectContent>
+                    </Select>
+                </div>
+
+                <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={() => setFilters(initialFilters)}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("availabilityPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t("anyStatus")}</SelectItem>
-                    <SelectItem value="available">
-                      {t("status.available")}
-                    </SelectItem>
-                    <SelectItem value="busy">{t("status.busy")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <h3 className="font-medium flex items-center">
-                  <Briefcase className="h-4 w-4 mr-2 text-primary" />
-                  {t("experience")}
-                </h3>
-                <Select
-                  value={filters.experienceYears}
-                  onValueChange={(value) =>
-                    setFilters((prev) => ({ ...prev, experienceYears: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("experiencePlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t("anyExperience")}</SelectItem>
-                    <SelectItem value="0-2">0-2 anos</SelectItem>
-                    <SelectItem value="3-5">3-5 anos</SelectItem>
-                    <SelectItem value="6-10">6-10 anos</SelectItem>
-                    <SelectItem value="11+">10+ anos</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                variant="outline"
-                className="w-full mt-4"
-                onClick={() => setFilters(initialFilters)}
-              >
-                {t("clearFilters")}
-              </Button>
-            </div>
-          </SheetContent>
-        </Sheet>
+                    {t("clearFilters")}
+                </Button>
+                </div>
+            </SheetContent>
+            </Sheet>
+        </div>
       </div>
 
       {/* Results Count */}
-      <div className="mb-6 flex justify-between items-center">
-        <p className="text-gray-600">
+      <div className="mb-6 flex justify-between items-center px-2">
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
           {t("resultsFound", { count: totalCount })}
         </p>
       </div>
@@ -561,8 +633,8 @@ export default function MentorsPage() {
           ))}
         </div>
       ) : mentors.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-lg border border-dashed">
-          <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+        <div className="text-center py-24 bg-muted/20 rounded-[2rem] border-2 border-dashed">
+          <Users className="mx-auto h-12 w-12 text-gray-400 mb-4 opacity-20" />
           <h3 className="text-lg font-medium text-gray-900">
             {t("noMentorsTitle")}
           </h3>
@@ -571,6 +643,7 @@ export default function MentorsPage() {
             <Button
               variant="outline"
               onClick={() => setFilters(initialFilters)}
+              className="rounded-xl border-2 font-bold"
             >
               {t("clearFilters")}
             </Button>
@@ -578,7 +651,7 @@ export default function MentorsPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Primeiro os sugeridos pela IA */}
             {mentors
               .filter(

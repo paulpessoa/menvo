@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
-import { Heart, MapPin, MessageCircle, Star, Sparkles } from "lucide-react"
+import { MapPin, Briefcase, Calendar, Sparkles } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -34,6 +34,7 @@ interface MentorProfile {
   total_sessions: number | null
   experience_years: number | null
   slug: string | null
+  created_at?: string | null
 }
 
 interface MentorCardProps {
@@ -49,6 +50,14 @@ export function MentorCard({
 }: MentorCardProps) {
   const t = useTranslations("mentorsPage")
   const router = useRouter()
+
+  const formatDate = (dateString?: string | null) => {
+    if (!dateString) return ""
+    return new Date(dateString).toLocaleDateString("pt-BR", {
+      month: "short",
+      year: "numeric"
+    })
+  }
 
   const getAvailabilityColor = (status: string | null) => {
     switch (status) {
@@ -83,9 +92,9 @@ export function MentorCard({
 
   return (
     <Card
-      className={`hover:shadow-lg transition-all duration-300 flex flex-col h-full relative group ${
+      className={`hover:shadow-xl transition-all duration-300 flex flex-col h-full relative group border-none shadow-md rounded-[2rem] overflow-hidden bg-white ${
         isAIHighlighted
-          ? "ring-2 ring-primary border-primary/20 shadow-primary/10 shadow-xl scale-[1.02]"
+          ? "ring-2 ring-primary/50 shadow-primary/10 scale-[1.02]"
           : ""
       }`}
     >
@@ -95,44 +104,44 @@ export function MentorCard({
         </div>
       )}
 
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 px-6 pt-8">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12 border">
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-14 w-14 border-2 border-white shadow-lg group-hover:scale-105 transition-transform duration-300">
               <AvatarImage
                 src={mentor.avatar_url || undefined}
                 alt={mentor.full_name || undefined}
               />
-              <AvatarFallback>
+              <AvatarFallback className="bg-primary/5 text-primary font-bold">
                 {mentor.full_name
                   ?.split(" ")
                   .map((n) => n[0])
                   .join("") || "M"}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-lg line-clamp-1 pr-8">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">
                   {mentor.full_name}
                 </CardTitle>
                 {isAIHighlighted && (
-                  <Badge className="bg-primary hover:bg-primary text-[10px] py-0 h-4">
-                    Sugestão IA
+                  <Badge className="bg-primary/10 text-primary hover:bg-primary/20 text-[9px] uppercase font-black tracking-widest border-none h-4">
+                    IA Match
                   </Badge>
                 )}
               </div>
-              <CardDescription className="text-sm line-clamp-1">
+              <CardDescription className="text-sm font-semibold text-primary/70 line-clamp-1">
                 {mentor.job_title}
-                {mentor.company && ` @ ${mentor.company}`}
+                {mentor.company && <span className="text-muted-foreground font-medium italic"> @ {mentor.company}</span>}
               </CardDescription>
             </div>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 flex-1 flex flex-col">
+      <CardContent className="space-y-4 flex-1 flex flex-col px-8 pb-8">
         {isAIHighlighted && aiReason && (
-          <div className="p-3 bg-primary/5 rounded-lg border border-primary/10 text-xs text-primary font-medium italic">
+          <div className="p-3 bg-primary/5 rounded-2xl border border-primary/10 text-xs text-primary font-medium italic leading-relaxed">
             "{aiReason}"
           </div>
         )}
@@ -140,69 +149,55 @@ export function MentorCard({
         <div className="flex justify-between items-center">
           <Badge
             variant="secondary"
-            className={`${getAvailabilityColor(mentor.availability_status)} border-none whitespace-nowrap`}
+            className={`${getAvailabilityColor(mentor.availability_status)} border-none text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full`}
           >
             {getAvailabilityText(mentor.availability_status)}
           </Badge>
-          <div className="flex items-center text-xs text-muted-foreground">
-            <Star className="w-3 h-3 text-yellow-400 fill-current mr-1" />
-            {(mentor.average_rating || 0).toFixed(1)} (
-            {mentor.total_reviews || 0})
-          </div>
+          
+          {mentor.experience_years && (
+            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-600">
+               <Briefcase className="h-3.5 w-3.5 text-primary/60" />
+               {mentor.experience_years} {t("years")}
+            </div>
+          )}
         </div>
 
         {mentor.bio && (
-          <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
-            {mentor.bio}
+          <p className="text-sm text-gray-600 line-clamp-3 min-h-[3rem] leading-relaxed italic">
+            "{mentor.bio}"
           </p>
         )}
 
-        {(mentor.city || mentor.country) && (
-          <div className="flex items-center text-sm text-gray-500">
-            <MapPin className="h-3 w-3 mr-1 shrink-0" />
-            <span className="truncate">
-              {[mentor.city, mentor.state, mentor.country]
-                .filter(Boolean)
-                .join(", ")}
-            </span>
-          </div>
-        )}
-
         {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-auto pt-2">
+          <div className="flex flex-wrap gap-1.5 pt-2">
             {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
               <Badge
                 key={index}
-                variant="outline"
-                className="text-[10px] font-normal"
+                variant="secondary"
+                className="text-[9px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-600 border-none"
               >
                 {topic}
               </Badge>
             ))}
-            {mentor.mentorship_topics.length > 3 && (
-              <Badge variant="outline" className="text-[10px] font-normal">
-                +{mentor.mentorship_topics.length - 3}
-              </Badge>
-            )}
           </div>
         )}
 
-        <div className="flex items-center justify-between text-xs text-gray-500 mt-4 border-t pt-4">
-          <div className="flex items-center">
-            <MessageCircle className="h-3.5 w-3.5 mr-1" />
-            <span>
-              {t("sessionsCount", { count: mentor.total_sessions || 0 })}
-            </span>
+        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 mt-auto pt-6 border-t border-gray-50">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="h-3 w-3" />
+            <span>Desde {formatDate(mentor.created_at)}</span>
           </div>
-          {mentor.experience_years && (
-            <span className="font-medium">
-              {mentor.experience_years} {t("years")}
-            </span>
+          
+          {(mentor.city || mentor.country) && (
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              <span className="max-w-[80px] truncate">{mentor.city || mentor.country}</span>
+            </div>
           )}
         </div>
 
         <div className="pt-2">
-          <Button onClick={handleProfileClick} className="w-full">
+          <Button onClick={handleProfileClick} className="w-full rounded-2xl h-11 font-bold shadow-lg shadow-primary/10">
             {t("viewProfile")}
           </Button>
         </div>
