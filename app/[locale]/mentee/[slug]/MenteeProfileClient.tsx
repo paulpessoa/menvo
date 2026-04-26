@@ -86,366 +86,346 @@ export default function MenteeProfileClient({ mentee }: Props) {
   }
 
   const handleChat = () => {
-    // Redirecionar para o chat com o parâmetro de ID do usuário
     router.push(`/messages?userId=${mentee.id}`)
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-6xl">
-      {/* Navigation */}
-      <div className="mb-8 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          asChild
-          className="hover:bg-transparent hover:text-primary p-0"
-        >
-          <Link href="/community">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para Mural de Mentorados
-          </Link>
-        </Button>
-
-        {isOwner && (
-          <Button variant="outline" asChild size="sm">
-            <Link href="/profile">Editar meu Perfil</Link>
+    <div className="min-h-screen bg-gradient-to-br from-secondary/30 via-background to-background">
+      <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        {/* Navigation */}
+        <div className="mb-8 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            asChild
+            className="hover:bg-transparent hover:text-primary p-0 font-bold text-muted-foreground transition-colors"
+          >
+            <Link href="/community">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Mural de Mentorados
+            </Link>
           </Button>
-        )}
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Essential Info & Goals */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Main Header Card */}
-          <Card className="border-none shadow-xl bg-gradient-to-br from-white to-gray-50/50 overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-6 opacity-5">
-              <Quote className="h-24 w-24" />
-            </div>
-            <CardHeader className="pb-8 pt-10 px-8">
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-                <div className="relative">
-                  <Avatar className="h-28 w-28 border-4 border-white shadow-2xl">
-                    <AvatarImage src={mentee.avatar_url} />
-                    <AvatarFallback className="text-2xl font-bold bg-primary/5 text-primary">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1.5 rounded-full border-2 border-white shadow-lg">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                      {fullName}
-                    </h1>
-                    <Badge
-                      variant="secondary"
-                      className="bg-primary/10 text-primary border-none font-bold uppercase tracking-wider text-[10px]"
-                    >
-                      Buscando Mentoria
-                    </Badge>
-                  </div>
-                  <p className="text-xl text-gray-600 font-medium">
-                    {mentee.job_title || "Mentorado"}
-                    {mentee.company && (
-                      <span className="text-gray-400 font-normal">
-                        {" "}
-                        em {mentee.company}
-                      </span>
-                    )}
-                  </p>
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-gray-500 pt-2 font-medium">
-                    {(mentee.city || mentee.country) && (
-                      <div className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-1.5 text-primary/60" />
-                        {[mentee.city, mentee.state, mentee.country]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </div>
-                    )}
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1.5 text-primary/60" />
-                      Na plataforma desde {formatDate(mentee.created_at)}
+          {isOwner && (
+            <Button variant="outline" asChild size="sm" className="rounded-xl font-bold border-2">
+              <Link href="/profile">Editar meu Perfil</Link>
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-24 md:pb-0">
+          {/* Left Column: Essential Info & Goals */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Main Header Card */}
+            <Card className="border-none shadow-2xl shadow-primary/5 bg-white/80 backdrop-blur-md overflow-hidden relative rounded-[2.5rem]">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+                <MessageCircle className="h-32 w-32" />
+              </div>
+              <CardHeader className="pb-10 pt-12 px-8 md:px-12">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-center md:text-left">
+                  <div className="relative">
+                    <Avatar className="h-32 w-32 md:h-40 md:w-40 border-8 border-white shadow-2xl">
+                      <AvatarImage src={mentee.avatar_url} />
+                      <AvatarFallback className="text-4xl font-bold bg-primary/5 text-primary">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full border-4 border-white shadow-lg animate-pulse">
+                      <Sparkles className="h-5 w-5" />
                     </div>
                   </div>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+                  <div className="flex-1 space-y-4">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                        <h1 className="text-4xl font-black tracking-tight text-gray-900">
+                          {fullName}
+                        </h1>
+                        <Badge
+                          variant="secondary"
+                          className="bg-primary/10 text-primary border-none font-black uppercase tracking-widest text-[10px] px-3 py-1"
+                        >
+                          Buscando Mentoria
+                        </Badge>
+                      </div>
+                      <p className="text-2xl text-primary/70 font-bold">
+                        {mentee.job_title || "Mentorado"}
+                        {mentee.company && (
+                          <span className="text-muted-foreground/60 font-medium">
+                            {" "}
+                            @ {mentee.company}
+                          </span>
+                        )}
+                      </p>
+                    </div>
 
-          {/* Proactive Help CTA for Mentors */}
-          {isMentor && !isOwner && (
-            <Card className="bg-primary text-white border-none shadow-lg overflow-hidden group">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold flex items-center gap-2">
-                      <Sparkles className="h-5 w-5" />
-                      Seja o mentor que o {mentee.first_name} precisa!
-                    </h3>
-                    <p className="text-primary-foreground/80 text-sm">
-                      Viu que você pode ajudar com os desafios deste membro?
-                      Inicie uma conversa agora.
-                    </p>
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm text-gray-500 font-bold uppercase tracking-wider">
+                      {(mentee.city || mentee.country) && (
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-1.5 text-primary/40" />
+                          {[mentee.city, mentee.state, mentee.country]
+                            .filter(Boolean)
+                            .join(", ")}
+                        </div>
+                      )}
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1.5 text-primary/40" />
+                        Desde {formatDate(mentee.created_at)}
+                      </div>
+                    </div>
+
+                    {/* Chat CTA Desktop */}
+                    {!isOwner && (
+                      <div className="hidden md:flex pt-4">
+                        <Button
+                          size="xl"
+                          onClick={handleChat}
+                          className="rounded-2xl px-12 font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
+                        >
+                          <MessageCircle className="mr-2 h-6 w-6" />
+                          {isMentor ? "Oferecer Ajuda Agora" : "Iniciar Conversa"}
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                  <Button
-                    size="lg"
-                    onClick={handleChat}
-                    className="bg-white text-primary hover:bg-white/90 font-bold px-8 shadow-xl transition-transform group-hover:scale-105"
-                  >
-                    <MessageCircle className="h-5 w-5 mr-2" />
-                    Oferecer Ajuda
-                  </Button>
                 </div>
-              </CardContent>
+              </CardHeader>
             </Card>
-          )}
 
-          {/* Bio / Story */}
-          {mentee.bio && (
+            {/* Bio / Story */}
+            {mentee.bio && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
+                  <User className="h-4 w-4 text-primary" />
+                  Trajetória e Motivação
+                </h3>
+                <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem]">
+                  <CardContent className="p-8 md:p-10">
+                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap italic">
+                      "{mentee.bio}"
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* What I want to learn */}
             <div className="space-y-4">
-              <h3 className="text-lg font-bold flex items-center gap-2 px-1">
-                <User className="h-5 w-5 text-primary" />
-                Minha História
+               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
+                <BookOpen className="h-4 w-4 text-primary" />
+                Interesses de Mentoria
               </h3>
-              <Card className="border-none shadow-sm bg-white">
-                <CardContent className="p-6">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap italic">
-                    "{mentee.bio}"
-                  </p>
+              <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] overflow-hidden">
+                <CardContent className="p-8 md:p-10">
+                  <div className="space-y-8">
+                    {mentee.mentorship_topics &&
+                    mentee.mentorship_topics.length > 0 ? (
+                      <div className="flex flex-wrap gap-3">
+                        {mentee.mentorship_topics.map((topic, i) => (
+                          <Badge
+                            key={i}
+                            className="px-6 py-2 bg-primary/5 text-primary border-primary/10 text-base font-bold rounded-2xl"
+                          >
+                            {topic}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground italic text-sm">
+                        Nenhum tópico específico listado ainda.
+                      </p>
+                    )}
+
+                    {mentee.career_goals && (
+                      <div className="pt-8 border-t border-gray-50">
+                        <h4 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
+                          <Target className="h-5 w-5 text-primary" />
+                          Onde quero chegar
+                        </h4>
+                        <p className="text-gray-700 text-lg leading-relaxed">
+                          {mentee.career_goals}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>
-          )}
+          </div>
 
-          {/* What I want to learn */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold flex items-center gap-2 px-1">
-              <BookOpen className="h-5 w-5 text-primary" />O que desejo aprender
-            </h3>
-            <Card className="border-none shadow-sm bg-white overflow-hidden">
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                  {mentee.mentorship_topics &&
-                  mentee.mentorship_topics.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {mentee.mentorship_topics.map((topic, i) => (
+          {/* Right Column: Background & Links */}
+          <div className="space-y-8">
+            {/* Education & Experience Sidebar */}
+            <Card className="border-none shadow-xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white">
+              <div className="h-3 bg-gradient-to-r from-primary to-primary-700"></div>
+              <CardHeader className="pb-4 pt-8 px-8">
+                <CardTitle className="text-xl font-black uppercase tracking-tighter">Resumo</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-8 px-8 pb-10">
+                {(mentee.institution || mentee.course) && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-primary">
+                      <GraduationCap className="h-5 w-5" />
+                      <span className="font-black text-[10px] uppercase tracking-[0.2em]">
+                        Acadêmico
+                      </span>
+                    </div>
+                    <div className="pl-7 space-y-1">
+                      {mentee.course && (
+                        <p className="font-bold text-gray-900 text-lg leading-tight">
+                          {mentee.course}
+                        </p>
+                      )}
+                      {mentee.institution && (
+                        <p className="text-base text-muted-foreground font-medium">
+                          {mentee.institution}
+                        </p>
+                      )}
+                      {mentee.academic_level && (
                         <Badge
-                          key={i}
-                          className="px-4 py-1.5 bg-primary/5 text-primary border-primary/20 text-sm font-semibold rounded-full"
+                          variant="outline"
+                          className="mt-3 text-[9px] font-black uppercase border-2"
                         >
-                          {topic}
+                          {mentee.academic_level}
                         </Badge>
-                      ))}
+                      )}
                     </div>
-                  ) : (
-                    <p className="text-muted-foreground italic text-sm">
-                      Nenhum tópico específico listado ainda.
-                    </p>
-                  )}
+                  </div>
+                )}
 
-                  {mentee.career_goals && (
-                    <div className="pt-4 border-t border-gray-100">
-                      <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <Target className="h-4 w-4 text-primary" />
-                        Objetivos de Curto/Médio Prazo
-                      </h4>
-                      <p className="text-gray-700 leading-relaxed">
-                        {mentee.career_goals}
-                      </p>
+                {(mentee.job_title || mentee.company) && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Briefcase className="h-5 w-5" />
+                      <span className="font-black text-[10px] uppercase tracking-[0.2em]">
+                        Profissional
+                      </span>
                     </div>
-                  )}
-                </div>
+                    <div className="pl-7 space-y-1">
+                      {mentee.job_title && (
+                        <p className="font-bold text-gray-900 text-lg leading-tight">
+                          {mentee.job_title}
+                        </p>
+                      )}
+                      {mentee.company && (
+                        <p className="text-base text-muted-foreground font-medium">
+                          {mentee.company}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Resume / CV Section */}
+            {mentee.cv_url && (
+              <Card className="border-2 border-primary/5 shadow-xl shadow-primary/5 bg-white hover:border-primary/20 transition-all rounded-[2rem] overflow-hidden group">
+                <CardHeader className="pb-4 pt-8 px-8">
+                  <CardTitle className="text-lg font-black uppercase tracking-tighter flex items-center gap-3">
+                    <FileText className="h-6 w-6 text-primary" />
+                    Currículo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-8 pb-10">
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full font-black rounded-xl shadow-lg shadow-primary/10 group-hover:scale-[1.02] transition-transform"
+                    onClick={() => setIsPdfViewerOpen(true)}
+                  >
+                    <Eye className="h-5 w-5 mr-2" />
+                    Ver Trajetória
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Social Links */}
+            {(mentee.linkedin_url ||
+              mentee.github_url ||
+              mentee.portfolio_url) && (
+              <Card className="border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white">
+                <CardHeader className="pb-4 pt-8 px-8">
+                  <CardTitle className="text-lg font-black uppercase tracking-tighter">Conecte-se</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-3 gap-3 px-8 pb-10">
+                  {mentee.linkedin_url && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="w-full h-12 rounded-xl text-blue-600 border-blue-50 bg-blue-50/30 hover:bg-blue-100 transition-colors"
+                      asChild
+                    >
+                      <a
+                        href={mentee.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Linkedin className="h-6 w-6 fill-current" />
+                      </a>
+                    </Button>
+                  )}
+                  {mentee.github_url && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="w-full h-12 rounded-xl text-gray-900 border-gray-100 bg-gray-50 hover:bg-gray-200 transition-colors"
+                      asChild
+                    >
+                      <a
+                        href={mentee.github_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Github className="h-6 w-6 fill-current" />
+                      </a>
+                    </Button>
+                  )}
+                  {mentee.portfolio_url && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="w-full h-12 rounded-xl text-primary border-primary/5 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      asChild
+                    >
+                      <a
+                        href={mentee.portfolio_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Globe className="h-6 w-6" />
+                      </a>
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
 
-        {/* Right Column: Background & Links */}
-        <div className="space-y-8">
-          {/* Education & Experience Sidebar */}
-          <Card className="border-none shadow-md overflow-hidden">
-            <div className="h-2 bg-primary"></div>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Formação e Carreira</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {(mentee.institution || mentee.course) && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-primary">
-                    <GraduationCap className="h-5 w-5" />
-                    <span className="font-bold text-sm uppercase tracking-wider">
-                      Acadêmico
-                    </span>
-                  </div>
-                  <div className="pl-7 space-y-1">
-                    {mentee.course && (
-                      <p className="font-bold text-gray-900 leading-tight">
-                        {mentee.course}
-                      </p>
-                    )}
-                    {mentee.institution && (
-                      <p className="text-sm text-gray-600 font-medium">
-                        {mentee.institution}
-                      </p>
-                    )}
-                    {mentee.academic_level && (
-                      <Badge
-                        variant="outline"
-                        className="mt-2 text-[10px] uppercase"
-                      >
-                        {mentee.academic_level}
-                      </Badge>
-                    )}
-                    {mentee.expected_graduation && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Conclusão: {mentee.expected_graduation}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
+        {/* Mobile Sticky Action Bar */}
+        {!isOwner && (
+          <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+            <Button
+              size="xl"
+              onClick={handleChat}
+              className="w-full rounded-2xl font-black shadow-2xl shadow-primary/40"
+            >
+              <MessageCircle className="mr-2 h-6 w-6" />
+              {isMentor ? "Oferecer Ajuda Agora" : "Iniciar Conversa"}
+            </Button>
+          </div>
+        )}
 
-              {(mentee.job_title || mentee.company) && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-primary">
-                    <Briefcase className="h-5 w-5" />
-                    <span className="font-bold text-sm uppercase tracking-wider">
-                      Profissional
-                    </span>
-                  </div>
-                  <div className="pl-7 space-y-1">
-                    {mentee.job_title && (
-                      <p className="font-bold text-gray-900 leading-tight">
-                        {mentee.job_title}
-                      </p>
-                    )}
-                    {mentee.company && (
-                      <p className="text-sm text-gray-600 font-medium">
-                        {mentee.company}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {mentee.languages && mentee.languages.length > 0 && (
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center gap-2 text-primary">
-                    <Languages className="h-5 w-5" />
-                    <span className="font-bold text-sm uppercase tracking-wider">
-                      Idiomas
-                    </span>
-                  </div>
-                  <div className="pl-7 flex flex-wrap gap-1.5">
-                    {mentee.languages.map((lang, i) => (
-                      <span
-                        key={i}
-                        className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded"
-                      >
-                        {lang}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Resume / CV Section */}
-          {mentee.cv_url && (
-            <Card className="border-2 border-primary/10 shadow-md bg-white hover:border-primary/30 transition-colors">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  Currículo / Trajetória
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="default"
-                  className="w-full font-bold shadow-lg shadow-primary/20"
-                  onClick={() => setIsPdfViewerOpen(true)}
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Visualizar PDF
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Social Links */}
-          {(mentee.linkedin_url ||
-            mentee.github_url ||
-            mentee.portfolio_url) && (
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Links e Redes</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-3 gap-2">
-                {mentee.linkedin_url && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-full text-blue-600 border-blue-100 hover:bg-blue-50"
-                    asChild
-                  >
-                    <a
-                      href={mentee.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </a>
-                  </Button>
-                )}
-                {mentee.github_url && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-full text-gray-900 border-gray-100 hover:bg-gray-50"
-                    asChild
-                  >
-                    <a
-                      href={mentee.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Github className="h-5 w-5" />
-                    </a>
-                  </Button>
-                )}
-                {mentee.portfolio_url && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-full text-primary border-primary/10 hover:bg-primary/5"
-                    asChild
-                  >
-                    <a
-                      href={mentee.portfolio_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Globe className="h-5 w-5" />
-                    </a>
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
+        {/* PDF Viewer Dialog */}
+        {mentee.cv_url && (
+          <PdfViewerDialog
+            open={isPdfViewerOpen}
+            onOpenChange={setIsPdfViewerOpen}
+            pdfUrl={mentee.cv_url}
+            title={`Currículo - ${fullName}`}
+          />
+        )}
       </div>
-
-      {/* PDF Viewer Dialog */}
-      {mentee.cv_url && (
-        <PdfViewerDialog
-          open={isPdfViewerOpen}
-          onOpenChange={setIsPdfViewerOpen}
-          pdfUrl={mentee.cv_url}
-          title={`Currículo - ${fullName}`}
-        />
-      )}
     </div>
   )
 }

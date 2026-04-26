@@ -292,44 +292,65 @@
     },
     "ngos": {
       "step1": {
-        "title": "Cadastre sua ONG Gratuitamente",
-        "description": "ONGs e organizações sociais podem se cadastrar gratuitamente na plataforma para conectar os jovens atendidos com mentores voluntários.",
-        "feature1": "Cadastro 100% gratuito para ONGs",
-        "feature2": "Acesso ilimitado à plataforma",
-        "feature3": "Suporte dedicado para organizações"
+        "title": "Registro Institucional",
+        "description": "Cadastre sua organização para começar a indicar jovens para a plataforma.",
+        "feature1": "Perfil verificado",
+        "feature2": "Gestão de beneficiários",
+        "feature3": "Acesso administrativo"
       },
       "step2": {
-        "title": "Conecte Jovens com Mentores",
-        "description": "Cadastre os jovens atendidos pela sua organização e ajude-os a encontrar mentores que possam orientá-los em suas jornadas profissionais e pessoais.",
-        "feature1": "Cadastre múltiplos jovens da sua organização",
-        "feature2": "Acompanhe o progresso das mentorias",
-        "feature3": "Receba relatórios de impacto social"
+        "title": "Conexão de Talentos",
+        "description": "Ajude seus jovens a encontrarem mentores alinhados com seus objetivos de carreira.",
+        "feature1": "Busca inteligente",
+        "feature2": "Filtros por área",
+        "feature3": "Match proativo"
       },
-      "getStarted": "Cadastrar Minha ONG"
+      "step3": {
+        "title": "Acompanhamento e Evolução",
+        "description": "Monitore o progresso das mentorias e veja o impacto real na vida dos seus jovens.",
+        "feature1": "Histórico de sessões",
+        "feature2": "Feedback de mentores",
+        "feature3": "Dashboard de progresso"
+      },
+      "step4": {
+        "title": "Fortalecimento da Causa",
+        "description": "Utilize dados reais para comprovar o impacto social e facilitar a captação de recursos.",
+        "feature1": "Relatórios de impacto",
+        "feature2": "Dados estruturados",
+        "feature3": "Cases de sucesso"
+      },
+      "getStarted": "Começar como ONG"
     },
     "companies": {
       "step1": {
-        "title": "Voluntariado Corporativo através da Mentoria",
-        "description": "Desenvolva programas de voluntariado corporativo permitindo que seus colaboradores se tornem mentores voluntários, fortalecendo o propósito da empresa.",
-        "feature1": "Engaje colaboradores em ações sociais",
-        "feature2": "Desenvolva lideranças através da mentoria",
-        "feature3": "Fortaleça a cultura organizacional"
+        "title": "Voluntariado Corporativo",
+        "description": "Incentive seus colaboradores seniores a compartilharem conhecimento com jovens talentos.",
+        "feature1": "Cultura de aprendizado",
+        "feature2": "Retenção de talentos",
+        "feature3": "Engajamento social"
       },
       "step2": {
-        "title": "Relatórios ESG e Impacto Social",
-        "description": "Receba relatórios detalhados sobre o impacto social das mentorias realizadas pelos seus colaboradores, fortalecendo suas métricas ESG.",
-        "feature1": "Relatórios mensais de impacto social",
-        "feature2": "Métricas para relatórios ESG",
-        "feature3": "Certificados de voluntariado corporativo"
+        "title": "Gestão de Mentoria",
+        "description": "Administre o programa de mentoria da sua empresa de forma simples e automatizada.",
+        "feature1": "Painel de controle",
+        "feature2": "Controle de horas",
+        "feature3": "Métricas de engajamento"
       },
       "step3": {
-        "title": "Políticas de Incentivo e Benefícios",
-        "description": "Crie políticas de incentivo para colaboradores mentores, como folgas remuneradas, reconhecimento interno e desenvolvimento de carreira.",
-        "feature1": "Banco de horas para mentoria voluntária",
-        "feature2": "Reconhecimento e gamificação interna",
-        "feature3": "Desenvolvimento de soft skills"
+        "title": "Desenvolvimento de Liderança",
+        "description": "Mentoria é uma via de mão dupla; seus líderes também evoluem ao ensinar.",
+        "feature1": "Soft skills",
+        "feature2": "Empatia e escuta",
+        "feature3": "Habilidades de coaching"
       },
-      "getStarted": "Tornar-se Parceiro Corporativo"
+      "step4": {
+        "title": "Impacto e Reconhecimento ESG",
+        "description": "Fortaleça as métricas de impacto social da sua empresa com dados reais e auditáveis.",
+        "feature1": "Certificados ESG",
+        "feature2": "Relatórios anuais",
+        "feature3": "Selo de Empresa Amiga"
+      },
+      "getStarted": "Começar como Empresa"
     },
     "faq": {
       "title": "Perguntas Frequentes",
