@@ -628,24 +628,136 @@
     }
   },
   "footer": {
-    "description": "Simplificando a mentoria em conversas abertas. Qualquer pessoa pode compartilhar sua experiência com quem busca, sempre gratuitamente.",
+    "description": "Conectando jovens talentos a mentores experientes para transformar carreiras e vidas.",
     "platform": "Plataforma",
     "findMentors": "Encontrar Mentores",
-    "events": "Eventos & Cursos",
     "howItWorks": "Como Funciona",
-    "store": "Loja",
-    "company": "Empresa",
+    "donate": "Doar",
+    "company": "Institucional",
     "aboutUs": "Sobre Nós",
-    "mission": "Nossa Missão",
-    "team": "Nossa Equipe",
+    "team": "Equipe",
     "partners": "Parceiros",
     "contact": "Contato",
     "subscribe": "Inscreva-se",
-    "newsletter": "Fique atualizado com nossa newsletter",
-    "privacyPolicy": "Política de Privacidade",
-    "termsOfService": "Termos de Serviço",
-    "cookiePolicy": "Política de Cookies",
+    "newsletter": "Receba novidades e atualizações da Menvo.",
+    "privacyPolicy": "Privacidade",
+    "termsOfService": "Termos",
+    "cookiePolicy": "Cookies",
     "allRightsReserved": "Todos os direitos reservados."
+  },
+  "donate": {
+    "hero": {
+      "badge": "Apoie nossa causa",
+      "title": "Ajude a Transformar Vidas Através da Mentoria",
+      "description": "O Menvo é uma plataforma gratuita e voluntária. Sua contribuição nos ajuda a manter a infraestrutura e alcançar mais jovens que precisam de orientação."
+    },
+    "impact": {
+      "mentees": {
+        "title": "Mentorados",
+        "description": "Acesso gratuito a mentores de alto nível para jovens em vulnerabilidade."
+      },
+      "sessions": {
+        "title": "Sessões",
+        "description": "Milhares de horas de conhecimento compartilhado de forma voluntária."
+      },
+      "volunteer": {
+        "title": "Voluntariado",
+        "description": "Fomentamos a cultura do dar e receber na comunidade tecnológica."
+      }
+    },
+    "options": {
+      "title": "Escolha como contribuir",
+      "tabs": {
+        "products": "Contribuição",
+        "pix": "PIX",
+        "crowdfunding": "Campanha"
+      }
+    },
+    "products": {
+      "coffee": {
+        "title": "Café Solidário",
+        "description": "Ajude a manter nossos servidores ativos por um dia.",
+        "price": "R$ 15",
+        "info": "Contribuição pontual",
+        "button": "Contribuir"
+      },
+      "kit": {
+        "title": "Kit Mentoria",
+        "description": "Apoie a produção de materiais educativos para os jovens.",
+        "price": "R$ 50",
+        "info": "Contribuição pontual",
+        "button": "Contribuir"
+      },
+      "supporter": {
+        "badge": "Mais Popular",
+        "title": "Apoiador Oficial",
+        "description": "Ajude o Menvo a escalar e alcançar novas cidades.",
+        "price": "R$ 100",
+        "info": "Contribuição pontual",
+        "button": "Ser um Apoiador"
+      },
+      "disclaimer": "* O Menvo é uma iniciativa sem fins lucrativos. Todo o valor arrecadado é reinvestido na plataforma."
+    },
+    "pix": {
+      "title": "Doação via PIX",
+      "description": "A maneira mais rápida e direta de nos ajudar.",
+      "copyButton": "Copiar Chave PIX",
+      "copySuccess": "Chave PIX copiada!",
+      "instructions": "Escaneie o QR Code ou use a chave e-mail abaixo:"
+    },
+    "crowdfunding": {
+      "title": "Financiamento Coletivo",
+      "description": "Participe da nossa meta de expansão para 2024.",
+      "goal": "Meta: R$ {amount}",
+      "info": "Acompanhe nossa campanha oficial e veja todas as recompensas para apoiadores.",
+      "button": "Ver Campanha"
+    },
+    "usage": {
+      "title": "Como utilizamos seu apoio",
+      "items": {
+        "mentors": {
+          "title": "Treinamento",
+          "description": "Capacitação constante para nossos mentores voluntários."
+        },
+        "events": {
+          "title": "Eventos",
+          "description": "Organização de workshops e encontros presenciais."
+        },
+        "education": {
+          "title": "Conteúdo",
+          "description": "Criação de trilhas de aprendizado e materiais didáticos."
+        },
+        "platform": {
+          "title": "Tecnologia",
+          "description": "Manutenção de servidores e desenvolvimento de novas features."
+        }
+      }
+    },
+    "faq": {
+      "title": "Dúvidas Frequentes",
+      "q1": {
+        "question": "O Menvo é uma ONG?",
+        "answer": "O Menvo é um projeto social que opera de forma independente e transparente, focado em impacto social."
+      },
+      "q2": {
+        "question": "Posso doar qualquer valor?",
+        "answer": "Sim! Toda ajuda é bem-vinda e faz a diferença na vida de muitos jovens."
+      },
+      "q3": {
+        "question": "Recebo algum comprovante?",
+        "answer": "Sim, todas as doações via plataforma geram um recibo de confirmação enviado por e-mail."
+      },
+      "q4": {
+        "question": "Como posso ser um parceiro corporativo?",
+        "answer": "Entre em contato conosco através do e-mail parceiros@menvo.com.br."
+      }
+    },
+    "cta": {
+      "title": "Pronto para fazer a diferença?",
+      "description": "Sua generosidade é o combustível que mantém nossa missão viva.",
+      "primary": "Doar Agora",
+      "secondary": "Saber Mais"
+    }
   },
   "newsletter": {
     "unsubscribe": {

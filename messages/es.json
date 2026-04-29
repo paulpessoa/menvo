@@ -605,24 +605,136 @@
         }
     },
     "footer": {
-        "description": "Simplificando la mentoría en conversaciones abiertas. Cualquier persona puede compartir su experiencia con quienes la buscan, siempre de forma gratuita.",
+        "description": "Conectando jóvenes talentos con mentores experimentados para transformar carreras y vidas.",
         "platform": "Plataforma",
         "findMentors": "Encontrar Mentores",
-        "events": "Eventos y Cursos",
         "howItWorks": "Cómo Funciona",
-        "store": "Tienda",
-        "company": "Empresa",
+        "donate": "Donar",
+        "company": "Institucional",
         "aboutUs": "Sobre Nosotros",
-        "mission": "Nuestra Misión",
-        "team": "Nuestro Equipo",
+        "team": "Equipo",
         "partners": "Socios",
         "contact": "Contacto",
         "subscribe": "Suscríbete",
-        "newsletter": "Mantente actualizado con nuestro boletín",
-        "privacyPolicy": "Política de Privacidad",
-        "termsOfService": "Términos de Servicio",
-        "cookiePolicy": "Política de Cookies",
-        "allRightsReserved": "Todos los derechos reservados."
+        "newsletter": "Recibe noticias y actualizaciones de Menvo.",
+        "allRightsReserved": "Todos los direitos reservados.",
+        "privacyPolicy": "Privacidad",
+        "termsOfService": "Términos",
+        "cookiePolicy": "Cookies"
+    },
+    "donate": {
+        "hero": {
+            "badge": "Apoya nossa causa",
+            "title": "Ayuda a Transformar Vidas a Través de la Mentoría",
+            "description": "Menvo es una plataforma gratuita y voluntaria. Tu contribución nos ayuda a manter a infraestrutura e chegar a mais jovens que precisam de orientação."
+        },
+        "impact": {
+            "mentees": {
+                "title": "Mentorados",
+                "description": "Acceso gratuito a mentores de alto nível para jóvenes en vulnerabilidad."
+            },
+            "sessions": {
+                "title": "Sesiones",
+                "description": "Miles de horas de conocimiento compartido de forma voluntaria."
+            },
+            "volunteer": {
+                "title": "Voluntariado",
+                "description": "Fomentamos a cultura de dar e recibir en la comunidad tecnológica."
+            }
+        },
+        "options": {
+            "title": "Elige cómo contribuir",
+            "tabs": {
+                "products": "Contribución",
+                "pix": "PIX",
+                "crowdfunding": "Campaña"
+            }
+        },
+        "products": {
+            "coffee": {
+                "title": "Café Solidario",
+                "description": "Ayuda a manter nossos servidores activos por um día.",
+                "price": "R$ 15",
+                "info": "Contribución puntual",
+                "button": "Contribuir"
+            },
+            "kit": {
+                "title": "Kit Mentoría",
+                "description": "Apoya a produção de materiais educativos para os jovens.",
+                "price": "R$ 50",
+                "info": "Contribución puntual",
+                "button": "Contribuir"
+            },
+            "supporter": {
+                "badge": "Más Popular",
+                "title": "Colaborador Oficial",
+                "description": "Ayuda a Menvo a escalar e chegar a novas cidades.",
+                "price": "R$ 100",
+                "info": "Contribución puntual",
+                "button": "Ser un Colaborador"
+            },
+            "disclaimer": "* Menvo es una iniciativa sin fines de lucro. Todo o valor arrecadado se reinveste na plataforma."
+        },
+        "pix": {
+            "title": "Donación vía PIX",
+            "description": "La forma mais rápida e direta de nos ajudar.",
+            "copyButton": "Copiar Clave PIX",
+            "copySuccess": "¡Clave PIX copiada!",
+            "instructions": "Escanea el código QR ou use a chave e-mail abaixo:"
+        },
+        "crowdfunding": {
+            "title": "Financiamiento Coletivo",
+            "description": "Únete a nossa meta de expansión para 2024.",
+            "goal": "Meta: R$ {amount}",
+            "info": "Sigue nossa campaña oficial y mira todas las recompensas para colaboradores.",
+            "button": "Ver Campaña"
+        },
+        "usage": {
+            "title": "Cómo utilizamos tu apoio",
+            "items": {
+                "mentors": {
+                    "title": "Capacitación",
+                    "description": "Capacitação constante para nossos mentores voluntarios."
+                },
+                "events": {
+                    "title": "Eventos",
+                    "description": "Organização de workshops e encontros presenciais."
+                },
+                "education": {
+                    "title": "Contenido",
+                    "description": "Criação de trilhas de aprendizado e materiais didáticos."
+                },
+                "platform": {
+                    "title": "Tecnologia",
+                    "description": "Manutenção de servidores e desenvolvimento de novas features."
+                }
+            }
+        },
+        "faq": {
+            "title": "Dúvidas Frequentes",
+            "q1": {
+                "question": "¿Menvo es una ONG?",
+                "answer": "Menvo es un projeto social que opera de forma independente e transparente, focado em impacto social."
+            },
+            "q2": {
+                "question": "¿Puedo doar cualquier valor?",
+                "answer": "¡Sí! Toda ajuda é bem-vinda e faz a diferença na vida de muitos jovens."
+            },
+            "q3": {
+                "question": "¿Recibo algún comprovante?",
+                "answer": "Sí, todas as doações via plataforma geram um recibo de confirmação enviado por e-mail."
+            },
+            "q4": {
+                "question": "¿Cómo posso ser un parceiro corporativo?",
+                "answer": "Entre em contato conosco através do e-mail parceiros@menvo.com.br."
+            }
+        },
+        "cta": {
+            "title": "¿Listo para marcar la diferencia?",
+            "description": "Tu generosidade é o combustível que mantém nossa missão viva.",
+            "primary": "Donar Agora",
+            "secondary": "Saber Mais"
+        }
     },
     "newsletter": {
         "unsubscribe": {

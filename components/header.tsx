@@ -51,7 +51,6 @@ export default function Header() {
   const navigation = [
     { name: t("common.home"), href: "/" },
     { name: t("common.findMentors"), href: "/mentors" },
-    { name: t("common.community"), href: "/community" },
     { name: t("common.aboutUs"), href: "/about" },
     { name: t("common.howItWorks"), href: "/how-it-works" }
   ]
@@ -268,11 +267,8 @@ export default function Header() {
             </div>
           ) : (
             <div className="hidden md:flex items-center gap-2">
-              <Button variant="ghost" asChild size="sm">
+              <Button asChild size="sm" className="shadow-md rounded-xl font-bold px-6">
                 <Link href="/login">{t("common.login")}</Link>
-              </Button>
-              <Button asChild size="sm" className="shadow-md">
-                <Link href="/signup">{t("common.register")}</Link>
               </Button>
             </div>
           )}
@@ -381,15 +377,7 @@ export default function Header() {
                 {!isAuthenticated && (
                   <div className="p-6 mt-auto border-t space-y-3">
                     <Button
-                      className="w-full h-12 text-lg shadow-lg"
-                      asChild
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Link href="/signup">{t("common.register")}</Link>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full h-12 text-lg"
+                      className="w-full h-12 text-lg shadow-lg rounded-xl font-bold"
                       asChild
                       onClick={() => setIsOpen(false)}
                     >

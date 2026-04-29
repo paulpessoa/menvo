@@ -605,24 +605,136 @@
         }
     },
     "footer": {
-        "description": "Simplifying mentorship into open conversations. Anyone can share their experience with those seeking it, always for free.",
+        "description": "Connecting young talent with experienced mentors to transform careers and lives.",
         "platform": "Platform",
         "findMentors": "Find Mentors",
-        "events": "Events \u0026 Courses",
-        "howItWorks": "How It Works",
-        "store": "Store",
-        "company": "Company",
+        "howItWorks": "How it Works",
+        "donate": "Donate",
+        "company": "Institutional",
         "aboutUs": "About Us",
-        "mission": "Our Mission",
-        "team": "Our Team",
+        "team": "Team",
         "partners": "Partners",
         "contact": "Contact",
         "subscribe": "Subscribe",
-        "newsletter": "Stay updated with our newsletter",
-        "privacyPolicy": "Privacy Policy",
-        "termsOfService": "Terms of Service",
-        "cookiePolicy": "Cookie Policy",
-        "allRightsReserved": "All rights reserved."
+        "newsletter": "Receive news and updates from Menvo.",
+        "allRightsReserved": "All rights reserved.",
+        "privacyPolicy": "Privacy",
+        "termsOfService": "Terms",
+        "cookiePolicy": "Cookies"
+    },
+    "donate": {
+        "hero": {
+            "badge": "Support our cause",
+            "title": "Help Transform Lives Through Mentorship",
+            "description": "Menvo is a free and voluntary platform. Your contribution helps us maintain infrastructure and reach more young people who need guidance."
+        },
+        "impact": {
+            "mentees": {
+                "title": "Mentees",
+                "description": "Free access to high-level mentors for vulnerable youth."
+            },
+            "sessions": {
+                "title": "Sessions",
+                "description": "Thousands of hours of knowledge shared voluntarily."
+            },
+            "volunteer": {
+                "title": "Volunteering",
+                "description": "We foster the culture of giving and receiving in the tech community."
+            }
+        },
+        "options": {
+            "title": "Choose how to contribute",
+            "tabs": {
+                "products": "Contribution",
+                "pix": "PIX",
+                "crowdfunding": "Campaign"
+            }
+        },
+        "products": {
+            "coffee": {
+                "title": "Solidarity Coffee",
+                "description": "Help keep our servers active for a day.",
+                "price": "$ 3",
+                "info": "One-time contribution",
+                "button": "Contribute"
+            },
+            "kit": {
+                "title": "Mentoring Kit",
+                "description": "Support the production of educational materials for youth.",
+                "price": "$ 10",
+                "info": "One-time contribution",
+                "button": "Contribute"
+            },
+            "supporter": {
+                "badge": "Most Popular",
+                "title": "Official Supporter",
+                "description": "Help Menvo scale and reach new cities.",
+                "price": "$ 20",
+                "info": "One-time contribution",
+                "button": "Be a Supporter"
+            },
+            "disclaimer": "* Menvo is a non-profit initiative. All collected funds are reinvested in the platform."
+        },
+        "pix": {
+            "title": "Donation via PIX",
+            "description": "The fastest and most direct way to help us.",
+            "copyButton": "Copy PIX Key",
+            "copySuccess": "PIX Key copied!",
+            "instructions": "Scan the QR Code or use the email key below:"
+        },
+        "crowdfunding": {
+            "title": "Crowdfunding",
+            "description": "Join our 2024 expansion goal.",
+            "goal": "Goal: $ {amount}",
+            "info": "Follow our official campaign and see all supporter rewards.",
+            "button": "View Campaign"
+        },
+        "usage": {
+            "title": "How we use your support",
+            "items": {
+                "mentors": {
+                    "title": "Training",
+                    "description": "Constant training for our volunteer mentors."
+                },
+                "events": {
+                    "title": "Events",
+                    "description": "Organization of workshops and in-person meetups."
+                },
+                "education": {
+                    "title": "Content",
+                    "description": "Creation of learning tracks and teaching materials."
+                },
+                "platform": {
+                    "title": "Technology",
+                    "description": "Server maintenance and development of new features."
+                }
+            }
+        },
+        "faq": {
+            "title": "Frequently Asked Questions",
+            "q1": {
+                "question": "Is Menvo an NGO?",
+                "answer": "Menvo is a social project that operates independently and transparently, focused on social impact."
+            },
+            "q2": {
+                "question": "Can I donate any amount?",
+                "answer": "Yes! Every help is welcome and makes a difference in many young lives."
+            },
+            "q3": {
+                "question": "Do I receive a receipt?",
+                "answer": "Yes, all donations via the platform generate a confirmation receipt sent by email."
+            },
+            "q4": {
+                "question": "How can I be a corporate partner?",
+                "answer": "Contact us at partners@menvo.com.br."
+            }
+        },
+        "cta": {
+            "title": "Ready to make a difference?",
+            "description": "Your generosity is the fuel that keeps our mission alive.",
+            "primary": "Donate Now",
+            "secondary": "Learn More"
+        }
     },
     "newsletter": {
         "unsubscribe": {

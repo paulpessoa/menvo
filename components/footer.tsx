@@ -107,14 +107,6 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/community"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    {t("common.community")}
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     href="/how-it-works"
                     className="text-muted-foreground hover:text-foreground"
                   >
