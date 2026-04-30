@@ -19,7 +19,5 @@ export async function GET(request: NextRequest) {
   if (next) apiCallbackUrl.searchParams.set("next", next)
   if (tokenHash) apiCallbackUrl.searchParams.set("token_hash", tokenHash)
 
-  console.log(`[LOCALIZED CALLBACK] Redirecting to: ${apiCallbackUrl.toString()}`)
-  
   return NextResponse.redirect(apiCallbackUrl)
 }

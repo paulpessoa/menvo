@@ -25,8 +25,6 @@ export async function PATCH(
     // 1. Validar se o solicitante é realmente um admin (segurança extra)
     // Nota: O middleware já deve fazer isso, mas aqui reforçamos
     
-    console.log(`🛠️ Admin atualizando usuário ${id}...`)
-
     const { updates, roles } = body
 
     // 2. Atualizar Perfil
@@ -57,8 +55,6 @@ export async function PATCH(
       const sortedNew = [...roles].sort().join(',')
 
       if (sortedCurrent !== sortedNew) {
-        console.log(`🔄 [ROLES] Mudança detectada (${sortedCurrent} -> ${sortedNew}). Atualizando...`)
-        
         // Remover roles atuais
         await supabaseAdmin.from('user_roles').delete().eq('user_id', id)
         
@@ -69,8 +65,6 @@ export async function PATCH(
           const roleInserts = roleObjects.map(r => ({ user_id: id, role_id: r.id }))
           await supabaseAdmin.from('user_roles').insert(roleInserts)
         }
-      } else {
-        console.log(`ℹ️ [ROLES] Nenhuma mudança de papéis para o usuário ${id}.`)
       }
     }
 
@@ -88,7 +82,6 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    console.log(`🗑️ Admin deletando usuário ${id}...`)
 
     // No Supabase, deletar o perfil geralmente dispara o delete no Auth se o cascade estiver ON.
     // Se não, precisamos deletar explicitamente no auth.admin.

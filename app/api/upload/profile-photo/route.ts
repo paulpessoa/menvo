@@ -16,11 +16,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 })
 
 export async function POST(request: NextRequest) {
-  const startTime = Date.now();
-  
   try {
-    console.log("🔄 Starting profile photo upload");
-
     // Check authentication
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {
@@ -31,7 +27,6 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace("Bearer ", "")
-    console.log("🔍 Validating token...");
     
     const {
       data: { user },
@@ -46,10 +41,7 @@ export async function POST(request: NextRequest) {
       }, { status: 401 })
     }
 
-    console.log("✅ User authenticated:", user.id)
-
     // Process the file
-    console.log("📁 Processing form data...");
     const formData = await request.formData()
     const file = formData.get("file") as File
     const targetUserId = formData.get("targetUserId") as string | null
@@ -79,12 +71,6 @@ export async function POST(request: NextRequest) {
       finalUserId = targetUserId
     }
 
-    console.log("📄 File received:", { 
-      name: file.name, 
-      type: file.type, 
-      size: file.size 
-    });
-
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
     if (!allowedTypes.includes(file.type)) {
@@ -106,29 +92,20 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.log("✅ File validation passed")
-
     // Generate unique filename
     const fileExtension = file.name.split(".").pop()
     const timestamp = Date.now();
     const fileName = `${finalUserId}/${timestamp}.${fileExtension}`
-
-    console.log("📤 Uploading to storage:", fileName)
 
     // Convert file to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer()
     const fileBuffer = new Uint8Array(arrayBuffer)
 
     // Check if bucket exists and is accessible
-    console.log("🪣 Checking storage bucket...");
     const { data: buckets, error: bucketError } = await supabaseAdmin.storage.listBuckets();
     
     if (bucketError) {
       console.error("❌ Error checking buckets:", bucketError);
-    } else {
-      const avatarsBucket = buckets.find(b => b.id === 'avatars');
-      console.log("📋 Available buckets:", buckets.map(b => b.id));
-      console.log("✅ Avatars bucket found:", !!avatarsBucket);
     }
 
     // Upload to Supabase Storage
@@ -148,19 +125,14 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    console.log("✅ Upload successful:", uploadData.path)
-
     // Get public URL
-    console.log("🔗 Generating public URL...");
     const { data: urlData } = supabaseAdmin.storage
       .from("avatars")
       .getPublicUrl(fileName)
 
     const publicUrl = urlData.publicUrl
-    console.log("✅ Public URL generated:", publicUrl)
 
     // Update user profile with new photo
-    console.log(`💾 Updating profile ${finalUserId} with new avatar URL...`);
     const { data: profileData, error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
@@ -179,11 +151,6 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    console.log("✅ Profile updated successfully");
-    
-    const duration = Date.now() - startTime;
-    console.log(`🎉 Upload completed in ${duration}ms`);
-
     return NextResponse.json({
       message: "Foto enviada com sucesso",
       url: publicUrl,
@@ -191,14 +158,11 @@ export async function POST(request: NextRequest) {
       profile: profileData,
     })
   } catch (error) {
-    const duration = Date.now() - startTime;
     console.error("❌ Unexpected upload error:", error)
-    console.error(`💥 Upload failed after ${duration}ms`);
     
     return NextResponse.json({ 
       error: "Erro interno do servidor",
-      details: error instanceof Error ? error.message : 'Unknown error',
-      duration 
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

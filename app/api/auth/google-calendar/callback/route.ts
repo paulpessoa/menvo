@@ -21,18 +21,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // IMPORTANTE: Mostrar o código no console do servidor
-  console.log('');
-  console.log('='.repeat(70));
-  console.log('✅ [OAUTH] CÓDIGO RECEBIDO!');
-  console.log('');
-  console.log('📋 Copie este código e cole no terminal:');
-  console.log('');
-  console.log(code);
-  console.log('');
-  console.log('='.repeat(70));
-  console.log('');
-
   // Retornar página HTML que mostra o código
   const html = `
     <!DOCTYPE html>

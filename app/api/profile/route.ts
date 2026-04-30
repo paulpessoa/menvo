@@ -16,11 +16,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 })
 
 export async function PUT(request: NextRequest) {
-  const startTime = Date.now();
-  
   try {
-    console.log("🔄 Starting profile update");
-
     // Check authentication
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {
@@ -31,7 +27,6 @@ export async function PUT(request: NextRequest) {
     }
 
     const token = authHeader.replace("Bearer ", "")
-    console.log("🔍 Validating token...");
     
     const {
       data: { user },
@@ -46,11 +41,8 @@ export async function PUT(request: NextRequest) {
       }, { status: 401 })
     }
 
-    console.log("✅ User authenticated:", user.id)
-
     // Get the profile data from request body
     const profileData = await request.json()
-    console.log("📄 Profile data received:", Object.keys(profileData));
 
     // Validate required fields
     if (profileData.first_name !== undefined && !profileData.first_name?.trim()) {
@@ -65,15 +57,12 @@ export async function PUT(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.log("✅ Validation passed")
-
     // Update profile in database
     const updateData = {
       ...profileData,
       updated_at: new Date().toISOString(),
     }
 
-    console.log("💾 Updating profile in database...");
     const { data: updatedProfile, error: updateError } = await supabaseAdmin
       .from("profiles")
       .update(updateData)
@@ -89,33 +78,23 @@ export async function PUT(request: NextRequest) {
       }, { status: 500 })
     }
 
-    console.log("✅ Profile updated successfully");
-    
-    const duration = Date.now() - startTime;
-    console.log(`🎉 Profile update completed in ${duration}ms`);
-
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
       profile: updatedProfile,
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime;
     console.error("❌ Unexpected profile update error:", error)
-    console.error(`💥 Profile update failed after ${duration}ms`);
     
     return NextResponse.json({ 
       error: "Erro interno do servidor",
-      details: error instanceof Error ? error.message : 'Unknown error',
-      duration 
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("🔄 Starting profile fetch");
-
     // Check authentication
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {

@@ -15,8 +15,6 @@ export default async function ResendConfirmationPage({ params }: { params: { loc
 
   // LÓGICA DE SERVIDOR: Se o usuário já estiver logado e com e-mail confirmado
   if (user && user.email_confirmed_at) {
-    console.log(`[RESEND-CONFIRMATION-SSR] Usuário ${user.email} já está verificado. Exibindo sucesso proativo.`)
-    
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-4">
         <Card className="w-full max-w-md border-primary/20 shadow-xl animate-in zoom-in-95 duration-500">

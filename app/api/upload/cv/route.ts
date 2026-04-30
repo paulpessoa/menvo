@@ -16,11 +16,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 })
 
 export async function POST(request: NextRequest) {
-  const startTime = Date.now();
-  
   try {
-    console.log("🔄 Starting CV upload");
-
     // Check authentication
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {
@@ -31,7 +27,6 @@ export async function POST(request: NextRequest) {
     }
 
     const token = authHeader.replace("Bearer ", "")
-    console.log("🔍 Validating token...");
     
     const {
       data: { user },
@@ -46,10 +41,7 @@ export async function POST(request: NextRequest) {
       }, { status: 401 })
     }
 
-    console.log("✅ User authenticated:", user.id)
-
     // Process the file
-    console.log("📁 Processing form data...");
     const formData = await request.formData()
     const file = formData.get("file") as File
     const enableAnalysis = formData.get("enableAnalysis") === "true"
@@ -60,13 +52,6 @@ export async function POST(request: NextRequest) {
         error: "Nenhum arquivo fornecido" 
       }, { status: 400 })
     }
-
-    console.log("📄 CV file received:", { 
-      name: file.name, 
-      type: file.type, 
-      size: file.size,
-      enableAnalysis 
-    });
 
     // Validate file type (PDF only)
     if (file.type !== "application/pdf") {
@@ -88,10 +73,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.log("✅ File validation passed")
-
     // Check if user already has a CV and remove it
-    console.log("🔍 Checking for existing CV...");
     const { data: existingProfile } = await supabaseAdmin
       .from("profiles")
       .select("cv_url")
@@ -99,7 +81,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existingProfile?.cv_url) {
-      console.log("🗑️ Removing existing CV...");
       // Extract file path from URL
       const urlParts = existingProfile.cv_url.split('/');
       const existingFileName = urlParts[urlParts.length - 1];
@@ -111,8 +92,6 @@ export async function POST(request: NextRequest) {
       
       if (deleteError) {
         console.warn("⚠️ Could not delete existing CV:", deleteError);
-      } else {
-        console.log("✅ Existing CV removed");
       }
     }
 
@@ -121,22 +100,15 @@ export async function POST(request: NextRequest) {
     const fileName = `cv-${timestamp}.pdf`
     const filePath = `${user.id}/${fileName}`
 
-    console.log("📤 Uploading CV to storage:", filePath)
-
     // Convert file to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer()
     const fileBuffer = new Uint8Array(arrayBuffer)
 
     // Check if bucket exists and is accessible
-    console.log("🪣 Checking storage bucket...");
     const { data: buckets, error: bucketError } = await supabaseAdmin.storage.listBuckets();
     
     if (bucketError) {
       console.error("❌ Error checking buckets:", bucketError);
-    } else {
-      const cvsBucket = buckets.find(b => b.id === 'cvs');
-      console.log("📋 Available buckets:", buckets.map(b => b.id));
-      console.log("✅ CVs bucket found:", !!cvsBucket);
     }
 
     // Upload to Supabase Storage
@@ -156,22 +128,14 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    console.log("✅ Upload successful:", uploadData.path)
-
     // Get public URL
-    console.log("🔗 Generating public URL...");
     const { data: urlData } = supabaseAdmin.storage
       .from("cvs")
       .getPublicUrl(filePath)
 
     const publicUrl = urlData.publicUrl
-    console.log("✅ Public URL generated:", publicUrl)
-
-    // Skip analysis for MVP - just store the file
-    console.log("📝 Skipping CV analysis for MVP version");
 
     // Update user profile with new CV URL
-    console.log("💾 Updating profile with new CV URL...");
     const { data: profileData, error: updateError } = await supabaseAdmin
       .from("profiles")
       .update({
@@ -190,11 +154,6 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    console.log("✅ Profile updated successfully");
-    
-    const duration = Date.now() - startTime;
-    console.log(`🎉 CV upload completed in ${duration}ms`);
-
     return NextResponse.json({
       message: "CV enviado com sucesso",
       url: publicUrl,
@@ -205,22 +164,17 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    const duration = Date.now() - startTime;
     console.error("❌ Unexpected CV upload error:", error)
-    console.error(`💥 CV upload failed after ${duration}ms`);
     
     return NextResponse.json({ 
       error: "Erro interno do servidor",
-      details: error instanceof Error ? error.message : 'Unknown error',
-      duration 
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
-    console.log("🗑️ Starting CV deletion");
-
     // Check authentication
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {
@@ -294,8 +248,6 @@ export async function DELETE(request: NextRequest) {
       .from("cv_metadata")
       .delete()
       .eq("user_id", user.id)
-
-    console.log("✅ CV deleted successfully");
 
     return NextResponse.json({
       message: "CV removido com sucesso"
