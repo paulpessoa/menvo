@@ -11,6 +11,19 @@ const handleI18nRouting = createMiddleware(routing)
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const hostname = request.headers.get("host") || ""
+
+  // 0. Enforce www domain
+  if (process.env.NODE_ENV === "production" && !hostname.startsWith("www.")) {
+    const newUrl = new URL(request.url)
+    newUrl.hostname = `www.${hostname}`
+    return NextResponse.redirect(newUrl, 301)
+  }
+
+  // 1. Handle obsolete routes
+  if (pathname.includes("/organizations")) {
+    return NextResponse.redirect(new URL("/mentors", request.url), 301)
+  }
 
   // --- FIX 20-04-26 PRIORITÁRIO ---
   // Permitimos que o callback passe sem interferência do i18n ou redirecionamentos de rota.
@@ -26,14 +39,14 @@ export async function middleware(request: NextRequest) {
       const subPath = pathname.replace(`/${locale}/auth/`, "")
       if (subPath !== "callback") {
         const cleanPath = `/${locale}/${subPath}`
-        return NextResponse.redirect(new URL(cleanPath, request.url))
+        return NextResponse.redirect(new URL(cleanPath, request.url), 301)
       }
     }
   }
 
   if (pathname.startsWith("/auth/") && !pathname.startsWith("/auth/callback")) {
     const cleanPath = pathname.replace("/auth/", "/")
-    return NextResponse.redirect(new URL(cleanPath, request.url))
+    return NextResponse.redirect(new URL(cleanPath, request.url), 301)
   }
 
   // 2. Handle i18n routing

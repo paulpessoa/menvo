@@ -29,7 +29,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "metadata" })
 
   return {
-    metadataBase: new URL("https://menvo.com.br"),
+    metadataBase: new URL("https://www.menvo.com.br"),
     title: {
       default: t("title") || "Menvo",
       template: `%s | ${t("title") || "Menvo"}`
@@ -60,14 +60,10 @@ export async function generateMetadata({
       follow: true
     },
     alternates: {
-      canonical: "/",
       languages: {
-        "pt-BR": "/pt-BR",
+        "pt-BR": "/",
         en: "/en",
-        es: "/es",
-        da: "/da",
-        fr: "/fr",
-        sv: "/sv"
+        es: "/es"
       }
     }
   }
