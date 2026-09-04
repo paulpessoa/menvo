@@ -1,5 +1,3 @@
-> Leia este documento em: [Português (Brasil)](README.pt-br.md)
-
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
