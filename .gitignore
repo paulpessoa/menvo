@@ -50,10 +50,17 @@ yarn-error.log*
 # Kiro IDE
 .kiro/
 
-# Gemini CLI
+# AI & Local Development Tooling
 .gemini/
 .geminirc
+.geminiignore
 GEMINI.md
+AGENTS.md
+implementation-plan.html
+
+# Local scripts & internal documentation (kept locally, not tracked)
+/scripts/
+/docs/
 
 # Supabase CLI
 .supabase/
