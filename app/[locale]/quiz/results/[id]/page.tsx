@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import {
     Card,
     CardContent,
@@ -62,6 +62,7 @@ interface QuizResponse {
 export default function QuizResultsPage() {
     const params = useParams()
     const router = useRouter()
+    const searchParams = useSearchParams()
     const { toast } = useToast()
     const t = useTranslations('quiz');
     const [loading, setLoading] = useState(true)
@@ -174,7 +175,8 @@ export default function QuizResultsPage() {
     }
 
     const analysis = response.ai_analysis
-    const hasGift = true // Sempre mostrar brinde
+    const isEventMode = Boolean(searchParams.get("event") || searchParams.get("stand"))
+    const hasGift = isEventMode
 
     // Se precisa refazer, mostra interface especial
     if (analysis.precisa_refazer) {

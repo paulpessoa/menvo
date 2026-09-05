@@ -85,6 +85,16 @@
       "findMentor": "Find a Mentor",
       "becomeMentor": "Become a Mentor"
     },
+    "quiz": {
+      "badge": "Smart Guidance",
+      "title": "Not sure which mentor to choose?",
+      "subtitle": "Take our 2-minute AI Career Quiz. We analyze your goals and recommend mentors tailored to your current professional journey.",
+      "feature1": "Tailored career diagnosis",
+      "feature2": "Real-time matched mentor recommendations",
+      "feature3": "100% free with no commitment",
+      "ctaButton": "Take Career Quiz",
+      "exploreLink": "Or explore all mentors"
+    },
     "testimonials": {
       "title": "Stories That Inspire",
       "description": "Lives transformed through mentorship"
@@ -1655,6 +1665,8 @@
       "ideal_mentors_description": "Discover which types of mentors can help you achieve your goals",
       "get_a_gift": "Get a Gift!",
       "get_a_gift_description": "Score above 700? Choose between an exclusive pen or button!",
+      "practical_steps": "Action Plan",
+      "practical_steps_description": "Receive actionable guidance and clear next steps to accelerate your professional journey",
       "start_quiz": "Start Questionnaire",
       "responses_confidential": "Your answers will help us better understand the needs of participants and recruit volunteer mentors in the most sought-after areas. In addition to contributing to building a stronger and more accessible mentoring community."
     },

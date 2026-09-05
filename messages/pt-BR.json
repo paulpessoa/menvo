@@ -85,6 +85,16 @@
       "findMentor": "Encontrar um Mentor",
       "becomeMentor": "Torne-se um Mentor"
     },
+    "quiz": {
+      "badge": "Orientação Inteligente",
+      "title": "Em dúvida de qual mentor escolher?",
+      "subtitle": "Faça nosso Quiz de Carreira com IA em apenas 2 minutos. Mapeamos seus objetivos e recomendamos os mentores mais compatíveis com o seu momento profissional.",
+      "feature1": "Diagnóstico de carreira sob medida",
+      "feature2": "Recomendações compatíveis em tempo real",
+      "feature3": "100% gratuito e sem compromisso",
+      "ctaButton": "Fazer Quiz de Carreira",
+      "exploreLink": "Ou explore todos os mentores"
+    },
     "testimonials": {
       "title": "Histórias que Inspiram",
       "description": "Vidas transformadas através da mentoria"
@@ -1655,6 +1665,8 @@
       "ideal_mentors_description": "Descubra quais tipos de mentores podem te ajudar a alcançar seus objetivos",
       "get_a_gift": "Ganhe um Brinde!",
       "get_a_gift_description": "Pontuação acima de 700? Escolha entre caneta ou botton exclusivo!",
+      "practical_steps": "Plano de Ação",
+      "practical_steps_description": "Receba direcionamento prático e próximos passos claros para acelerar sua trajetória profissional",
       "start_quiz": "Começar Questionário",
       "responses_confidential": "Suas respostas nos ajudarão a entender melhor as necessidades dos participantes e a recrutar mentores voluntários nas áreas mais procuradas. Além de contribuir para construir uma comunidade de mentoria mais forte e acessível."
     },

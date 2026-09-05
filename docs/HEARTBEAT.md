@@ -21,24 +21,25 @@
 - [x] `events` — Audited; removed orphaned legacy events components and model (`components/events/`, `lib/types/models/event.ts`). External channels (LinkedIn/Instagram) preferred.
 - [x] `chat mobile` — Hardened mobile real-time chat with visibility resume, silent refresh, and fallback polling (`components/chat/ChatInterface.tsx`).
 - [x] `quiz onboarding` — Integrated into Mentee Dashboard as primary activation CTA. Created `lib/services/quiz/quiz.service.ts`, `components/dashboard/MenteeQuizCTA.tsx`, prefilled auth user details, and added i18n keys across pt-BR, en, and es.
+- [x] `landing quiz CTA` — Added `components/landing/QuizDiscoverySection.tsx` to public homepage (`/`), providing a high-conversion entry point for new visitors.
+- [x] `event mode & gifts` — Conditioned physical gift selection (pen/button) on `?event=<name>` query param (e.g. `?event=recnplay`). Web users receive actionable career steps instead of physical booth gift prompts.
 
 ---
 
-## 🚀 Next Steps (P1)
+## 🚀 Next Steps (P2)
 
-1. **Landing Page Quiz CTA** — Add a dedicated discovery section/banner on the public landing page (`app/[locale]/page.tsx`) linking prospective mentees to `/quiz`.
-2. **Event Mode / QR Code** — Configurable query param (e.g. `?event=recnplay` or `?event=community`) to show/hide gift selection for in-person events without polluting general onboarding.
+1. **Mentor Search & Filtering Polish** — Review mentor filtering performance and UX (`app/[locale]/mentors/page.tsx`).
+2. **Profile & Booking Flow Verification** — Validate scheduling and calendar sync edge cases for newly matched mentees.
 
 ---
 
 ## 🎯 Quiz Module — Current State
 
-The quiz module lives at `/quiz` and `/quiz/results/[id]`. It is a **standalone, publicly accessible flow** with no login requirement:
+The quiz module lives at `/quiz` and `/quiz/results/[id]`. It is fully integrated with:
 
-- **Navigation:** No links currently point to it from the header, footer, sidebar, or dashboard. It is accessible solely via direct URL (`/{locale}/quiz`).
-- **Backend Flow:** Submissions are inserted directly into `quiz_responses`, followed by invocation of the `analyze-quiz` Edge Function for AI recommendations. The results page polls until `processed_at` is set.
-- **Edge Functions:** `analyze-quiz` (AI analysis) and `send-quiz-email` (results delivery).
-- **In-Person Event Flow:** Results offer physical gift selection (pen or button) designed for the **RecNPlay 2025 event in Recife**.
+- **Navigation & Entry Points:** Accessible from Mentee Dashboard (`MenteeQuizCTA`), Landing Page (`QuizDiscoverySection`), and direct URL (`/{locale}/quiz`).
+- **Backend Flow:** Managed by `lib/services/quiz/quiz.service.ts`. Submissions insert into `quiz_responses`, followed by invocation of the `analyze-quiz` Edge Function for AI recommendations.
+- **Dynamic Event Mode:** Physical gift claims (pen/button for RecNPlay or similar events) activate exclusively when URL contains `?event=...` or `?stand=...`. General web traffic receives an "Action Plan" diagnostic flow.
 - **Social Sharing:** WhatsApp and LinkedIn share buttons integrated on results.
 
 ---

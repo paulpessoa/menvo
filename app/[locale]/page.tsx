@@ -8,6 +8,7 @@ import { Calendar, MessageSquare, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { TestimonialsCarousel } from "@/components/TestimonialsCarousel"
+import { QuizDiscoverySection } from "@/components/landing/QuizDiscoverySection"
 
 export default function Home() {
   const t = useTranslations("home")
@@ -159,6 +160,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* AI Quiz Discovery Section */}
+      <QuizDiscoverySection />
 
       {/* Testimonials Section */}
       <section className="w-full py-16 md:py-24 bg-slate-50/50">
