@@ -81,7 +81,7 @@ export async function generateMetadata({
       title,
       description,
       images: [
-        { url: imageUrl, width: 1200, height: 630, alt: mentor.full_name }
+        { url: imageUrl, width: 1200, height: 630, alt: mentor.full_name || title }
       ],
       siteName: "Menvo",
       locale: "pt_BR"
