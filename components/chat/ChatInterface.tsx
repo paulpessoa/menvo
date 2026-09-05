@@ -70,9 +70,72 @@ export function ChatInterface({
         }
     }, [messages.length]);
 
+    const loadMessages = async (showLoadingState = true) => {
+        try {
+            if (showLoadingState) setLoading(true);
+            const response = await fetch(`/api/chat/messages/${mentorId}`);
+
+            if (!response.ok) throw new Error(t('errorLoad'));
+
+            const data = await response.json();
+            const newMessages: Message[] = data.messages || [];
+            
+            // Merge or set messages avoiding duplicate re-renders
+            setMessages((prev) => {
+                if (prev.length === 0) return newMessages;
+                const existingIds = new Set(prev.map(m => m.id));
+                const fresh = newMessages.filter(m => !existingIds.has(m.id));
+                if (fresh.length === 0) return prev;
+                return [...prev, ...fresh];
+            });
+
+            if (data.conversationId) {
+                setConversationId(data.conversationId);
+                markAsRead(data.conversationId);
+            }
+        } catch (error) {
+            console.error('[CHAT] Error loading messages:', error);
+            if (showLoadingState) {
+                toast.error(t('errorLoad'));
+            }
+        } finally {
+            if (showLoadingState) setLoading(false);
+        }
+    };
+
+    // Auto-reconnect & fetch catchup on visibility change (mobile app resume / tab switch) or online event
+    useEffect(() => {
+        const handleResume = () => {
+            if (document.visibilityState === 'visible') {
+                loadMessages(false);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleResume);
+        window.addEventListener('online', handleResume);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleResume);
+            window.removeEventListener('online', handleResume);
+        };
+    }, [mentorId]);
+
+    // Fallback polling: polls quietly every 6s if disconnected or as a safety net on mobile
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                loadMessages(false);
+            }
+        }, 6000);
+
+        return () => clearInterval(interval);
+    }, [mentorId]);
+
     // Realtime subscription
     useEffect(() => {
         if (!conversationId) return;
+
+        let isSubscribed = true;
 
         const channel = supabase
             .channel(`conversation:${conversationId}`, {
@@ -108,37 +171,20 @@ export function ChatInterface({
                 typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
             })
             .subscribe((status: string) => {
-                if (status === 'SUBSCRIBED') setRealtimeStatus('connected');
-                else if (status === 'CLOSED') setRealtimeStatus('disconnected');
+                if (!isSubscribed) return;
+                if (status === 'SUBSCRIBED') {
+                    setRealtimeStatus('connected');
+                } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                    setRealtimeStatus('disconnected');
+                }
             });
 
         return () => {
+            isSubscribed = false;
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
             supabase.removeChannel(channel);
         };
     }, [conversationId, currentUserId, supabase]);
-
-    const loadMessages = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch(`/api/chat/messages/${mentorId}`);
-
-            if (!response.ok) throw new Error(t('errorLoad'));
-
-            const data = await response.json();
-            setMessages(data.messages || []);
-            setConversationId(data.conversationId);
-
-            if (data.conversationId) {
-                markAsRead(data.conversationId);
-            }
-        } catch (error) {
-            console.error('[CHAT] Error loading messages:', error);
-            toast.error(t('errorLoad'));
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const markAsRead = async (convId: string) => {
         try {
