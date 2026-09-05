@@ -18,15 +18,12 @@ import {
   Globe,
   Lock,
   Trash2,
-  Moon,
-  Sun,
   AlertTriangle
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
-import { useTheme } from "next-themes"
 import { createClient } from "@/lib/utils/supabase/client"
 import {
   AlertDialog,
@@ -46,7 +43,6 @@ export default function SettingsPage() {
   const { currentLanguage, changeLanguage } = useLanguage()
   const { user, signOut } = useAuth()
   const { toast } = useToast()
-  const { theme, setTheme } = useTheme()
   const [isChangingPassword, setIsChangingPassword] = useState(false)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
@@ -136,7 +132,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="general" className="flex items-center gap-2">
             <Globe className="h-4 w-4" />
             {t("tabs.general")}
