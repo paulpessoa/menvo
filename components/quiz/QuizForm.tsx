@@ -18,16 +18,18 @@ export type { QuizFormData }
 interface QuizFormProps {
   onSubmit: (data: QuizFormData) => Promise<void>
   onBack: () => void
+  initialData?: Partial<QuizFormData>
 }
 
 const TOTAL_STEPS = 8
 
-export function QuizForm({ onSubmit, onBack }: QuizFormProps) {
+export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
   const t = useTranslations('quiz')
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<Partial<QuizFormData>>({
-    developmentAreas: []
+    developmentAreas: [],
+    ...initialData
   })
 
   const progress = (currentStep / TOTAL_STEPS) * 100

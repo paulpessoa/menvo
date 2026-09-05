@@ -1277,6 +1277,19 @@
         "favoritesDesc": "Quick access to saved mentors",
         "noFavorites": "You haven't saved any mentors yet.",
         "viewDetails": "View Details"
+      },
+      "quiz": {
+        "ctaTitle": "Find Your Ideal Mentor with AI",
+        "ctaDescription": "Take a quick 2-minute assessment to map your career goals and match with the most relevant mentors.",
+        "ctaButton": "Take Career Quiz",
+        "badgeAi": "AI Match",
+        "badgeTime": "2 minutes",
+        "badgeFree": "100% Free",
+        "completedTitle": "Your Career Diagnostic",
+        "completedDescription": "You've completed the assessment! Review your goals analysis and view mentors recommended especially for you.",
+        "viewAnalysis": "View Recommended Mentors",
+        "retakeQuiz": "Retake Assessment",
+        "completedBadge": "Active Diagnostic"
       }
     },
     "gettingStarted": {

@@ -29,7 +29,8 @@ import {
 import Image from "next/image"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
-import { useTranslations } from "next-intl";
+import { useTranslations } from "next-intl"
+import { quizService } from "@/lib/services/quiz/quiz.service"
 
 interface AnalysisResult {
     precisa_refazer?: boolean
@@ -81,14 +82,7 @@ export default function QuizResultsPage() {
 
         setSendingEmail(true)
         try {
-            const { createClient } = await import("@/lib/utils/supabase/client")
-            const supabase = createClient()
-
-            const { error } = await supabase.functions.invoke("send-quiz-email", {
-                body: { responseId: response.id }
-            })
-
-            if (error) throw error
+            await quizService.sendResultsEmail(response.id)
 
             toast({
                 title: t('quiz_results.email_sent_toast_title'),
@@ -131,16 +125,8 @@ export default function QuizResultsPage() {
     const loadResults = async () => {
         if (!params.id) return
         try {
-            const { createClient } = await import("@/lib/utils/supabase/client")
-            const supabase = createClient()
-
-            const { data, error } = await supabase
-                .from("quiz_responses")
-                .select("*")
-                .eq("id", params.id as string)
-                .single()
-
-            if (error) throw error
+            const data = await quizService.getQuizResponseById(params.id as string)
+            if (!data) throw new Error("Quiz response not found")
 
             const res = data as unknown as QuizResponse;
 

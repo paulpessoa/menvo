@@ -31,6 +31,9 @@ import { useLocale, useTranslations } from "next-intl"
 import { useFavorites } from "@/hooks/useFavorites"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/dashboard/FeedbackManagement"
+import { MenteeQuizCTA } from "@/components/dashboard/MenteeQuizCTA"
+import { quizService } from "@/lib/services/quiz/quiz.service"
+import type { QuizResponseSummary } from "@/lib/types/models/quiz"
 
 interface MenteeStats {
   totalAppointments: number
@@ -77,6 +80,8 @@ export default function MenteeDashboard() {
   const [favoriteMentorsData, setFavoriteMentorsData] = useState<FavoriteMentor[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingFavorites, setLoadingFavorites] = useState(false)
+  const [quizSummary, setQuizSummary] = useState<QuizResponseSummary | null>(null)
+  const [loadingQuiz, setLoadingQuiz] = useState(true)
 
   const supabase = createClient()
   const { favorites } = useFavorites(user?.id)
@@ -171,12 +176,28 @@ export default function MenteeDashboard() {
     }
   }
 
+  const fetchQuizStatus = async () => {
+    if (!user?.email) {
+      setLoadingQuiz(false)
+      return
+    }
+    try {
+      const summary = await quizService.getLatestQuizResponseByEmail(user.email)
+      setQuizSummary(summary)
+    } catch (error) {
+      console.error("Error checking mentee quiz status:", error)
+    } finally {
+      setLoadingQuiz(false)
+    }
+  }
+
   useEffect(() => {
     if (user?.id) {
       fetchMenteeStats()
       fetchUpcomingAppointments()
+      fetchQuizStatus()
     }
-  }, [user?.id, profile])
+  }, [user?.id, user?.email, profile])
 
   useEffect(() => {
     if (user?.id && favorites.length > 0) fetchFavoriteMentorsDetails()
@@ -220,6 +241,9 @@ export default function MenteeDashboard() {
 
             {/* TAB: OVERVIEW */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
+              {/* Quiz Onboarding & Activation CTA */}
+              <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Agendados" value={stats.upcomingAppointments} icon={<Calendar className="h-5 w-5" />} description="Próximas sessões" />
                 <StatCard title="Mentores" value={stats.totalMentors} icon={<Users className="h-5 w-5" />} description="Mentores diferentes" />

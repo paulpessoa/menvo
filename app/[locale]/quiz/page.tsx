@@ -14,56 +14,36 @@ import { Gift, Sparkles, Users, Target, Clock } from "lucide-react"
 import { QuizForm, QuizFormData } from "@/components/quiz/QuizForm"
 import { useToast } from "@/hooks/use-toast"
 import { AnimatedBackground } from "@/components/ui/animated-background"
-import { useTranslations } from "next-intl";
+import { useTranslations } from "next-intl"
+import { useAuth } from "@/lib/auth"
+import { quizService } from "@/lib/services/quiz/quiz.service"
 
 export default function QuizPage() {
   const [showQuiz, setShowQuiz] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const t = useTranslations('quiz');
+  const t = useTranslations('quiz')
+  const { user, profile } = useAuth()
 
   const handleQuizSubmit = async (data: QuizFormData) => {
     try {
-      const { createClient } = await import("@/lib/utils/supabase/client")
-      const supabase = createClient()
-
-      // Save quiz response to database
-      const { data: response, error } = await supabase
-        .from("quiz_responses")
-        .insert({
-          name: data.name,
-          email: data.email,
-          linkedin_url: data.linkedinUrl || null,
-          career_moment: data.careerMoment,
-          mentorship_experience: data.mentorshipExperience,
-          development_areas: data.developmentAreas,
-          current_challenge: data.currentChallenge,
-          future_vision: data.futureVision,
-          share_knowledge: data.shareKnowledge,
-          personal_life_help: data.personalLifeHelp
-        })
-        .select()
-        .single()
-
-      if (error) {
-        throw error
-      }
-
-      const res = response
+      const res = await quizService.submitQuiz({
+        name: data.name,
+        email: data.email,
+        linkedin_url: data.linkedinUrl || null,
+        career_moment: data.careerMoment,
+        mentorship_experience: data.mentorshipExperience,
+        development_areas: data.developmentAreas,
+        current_challenge: data.currentChallenge,
+        future_vision: data.futureVision,
+        share_knowledge: data.shareKnowledge,
+        personal_life_help: data.personalLifeHelp
+      })
 
       toast({
         title: t('quiz_form.submit_success_title'),
         description: t('quiz_form.submit_success_description')
       })
-
-      // Call Edge Function to process with AI
-      try {
-        await supabase.functions.invoke("analyze-quiz", {
-          body: { responseId: res.id }
-        })
-      } catch (analysisError) {
-          // ignore
-      }
 
       // Redirect to results page with response ID
       router.push(`/quiz/results/${res.id}`)
@@ -78,8 +58,18 @@ export default function QuizPage() {
   }
 
   if (showQuiz) {
+    const initialData: Partial<QuizFormData> = {
+      name: profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : '',
+      email: user?.email || '',
+      linkedinUrl: profile?.linkedin_url || ''
+    }
+
     return (
-      <QuizForm onSubmit={handleQuizSubmit} onBack={() => setShowQuiz(false)} />
+      <QuizForm
+        onSubmit={handleQuizSubmit}
+        onBack={() => setShowQuiz(false)}
+        initialData={initialData}
+      />
     )
   }
 

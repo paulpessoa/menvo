@@ -1277,6 +1277,19 @@
         "favoritesDesc": "Acceso rápido a mentores guardados",
         "noFavorites": "Aún no has guardado ningún mentor.",
         "viewDetails": "Ver Detalles"
+      },
+      "quiz": {
+        "ctaTitle": "Descubre tu Mentor Ideal con IA",
+        "ctaDescription": "Haz una evaluación rápida de 2 minutos para mapear tus metas profesionales y conectarte con los mentores más compatibles.",
+        "ctaButton": "Hacer Quiz de Carrera",
+        "badgeAi": "Match con IA",
+        "badgeTime": "2 minutos",
+        "badgeFree": "100% Gratis",
+        "completedTitle": "Tu Diagnóstico de Carrera",
+        "completedDescription": "¡Ya realizaste la evaluación! Revisa el análisis de tus objetivos y los mentores recomendados especialmente para ti.",
+        "viewAnalysis": "Ver Mentores Recomendados",
+        "retakeQuiz": "Repetir Evaluación",
+        "completedBadge": "Diagnóstico Activo"
       }
     },
     "gettingStarted": {
