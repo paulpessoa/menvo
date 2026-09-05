@@ -25,8 +25,8 @@ class QuizService {
     try {
       const normalizedEmail = email.trim().toLowerCase()
 
-      const { data, error } = await this.supabase
-        .from("quiz_responses")
+      const { data, error } = await (this.supabase
+        .from("quiz_responses") as any)
         .select("id, name, email, score, processed_at, created_at, development_areas, career_moment, ai_analysis")
         .eq("email", normalizedEmail)
         .order("created_at", { ascending: false })
@@ -67,8 +67,8 @@ class QuizService {
     if (!id) return null
 
     try {
-      const { data, error } = await this.supabase
-        .from("quiz_responses")
+      const { data, error } = await (this.supabase
+        .from("quiz_responses") as any)
         .select("*")
         .eq("id", id)
         .single()
@@ -92,8 +92,8 @@ class QuizService {
    * @returns Created QuizResponseRow
    */
   async submitQuiz(payload: QuizResponseInsert): Promise<QuizResponseRow> {
-    const { data: response, error } = await this.supabase
-      .from("quiz_responses")
+    const { data: response, error } = await (this.supabase
+      .from("quiz_responses") as any)
       .insert({
         ...payload,
         email: payload.email.trim().toLowerCase()

@@ -50,8 +50,8 @@ class VerificationServiceClass {
       updated_at: new Date().toISOString()
     }
 
-    const { error } = await this.supabase
-      .from("profiles")
+    const { error } = await (this.supabase
+      .from("profiles") as any)
       .update(updatePayload)
       .eq("id", verificationId)
 
@@ -70,8 +70,8 @@ class VerificationServiceClass {
       updated_at: new Date().toISOString()
     }
 
-    const { error } = await this.supabase
-      .from("profiles")
+    const { error } = await (this.supabase
+      .from("profiles") as any)
       .update(updatePayload)
       .eq("id", mentorId)
 

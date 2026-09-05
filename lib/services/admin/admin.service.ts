@@ -31,8 +31,8 @@ class AdminService {
             updated_at: new Date().toISOString()
         }
 
-        const { data, error } = await this.supabase
-            .from('profiles')
+        const { data, error } = await (this.supabase
+            .from('profiles') as any)
             .update(updatePayload)
             .eq('id', userId)
             .select()
