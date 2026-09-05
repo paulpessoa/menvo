@@ -3,6 +3,24 @@
 
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# AI Search & LLM Crawlers (Allowed)
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: GoogleOther
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: CCBot
+User-agent: Diffbot
+User-agent: Cohere-ai
+Allow: /
 
 # Disallow private and technical areas
 Disallow: /api/
@@ -15,5 +33,7 @@ Disallow: /appointments/
 Disallow: /_next/
 Disallow: /callback
 
-# Sitemap
+# Sitemap & LLM Knowledge
 Sitemap: https://www.menvo.com.br/sitemap.xml
+# LLM Information: https://www.menvo.com.br/llms.txt
+# LLM Full Knowledge: https://www.menvo.com.br/llms-full.txt

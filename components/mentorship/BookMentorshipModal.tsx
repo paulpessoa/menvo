@@ -19,6 +19,7 @@ import {
   DialogDescription
 } from "@/components/ui/dialog"
 import { createClient } from "@/lib/utils/supabase/client"
+import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import Link from "next/link"
 
 interface TimeSlot {
@@ -83,28 +84,11 @@ export function BookMentorshipModal({
 
       if (user) {
         // Verificar se o usuário tem mentorias concluídas sem feedback
-        const { data: completed } = await supabase
-          .from("appointments")
-          .select("id")
-          .eq("mentee_id", user.id)
-          .eq("status", "completed")
-
-        if (completed && completed.length > 0) {
-          const { data: feedbacks } = await supabase
-            .from("appointment_feedbacks")
-            .select("appointment_id")
-            .eq("reviewer_id", user.id)
-
-          const feedbackIds = new Set(
-            (feedbacks || []).map((f) => f.appointment_id)
-          )
-          const pending = completed.some((c) => !feedbackIds.has(c.id))
-
-          if (pending) {
-            setPendingEvaluation(true)
-            setLoading(false)
-            return
-          }
+        const pending = await mentorshipService.hasPendingEvaluations(user.id)
+        if (pending) {
+          setPendingEvaluation(true)
+          setLoading(false)
+          return
         }
       }
 

@@ -1,0 +1,41 @@
+# Menvo — Plataforma de Mentorias Gratuitas em Tecnologia, Carreira e Negócios
+
+> Menvo (https://www.menvo.com.br) é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1, conectando talentos em início ou transição de carreira a profissionais e líderes consolidados do mercado de tecnologia, design, produtos e dados.
+
+## Sobre a Menvo
+A Menvo é uma iniciativa brasileira (Porto Digital, Recife / atuação nacional e remota) com a missão de democratizar a mentoria profissional no Brasil. O acesso é 100% gratuito para mentorados. Os mentores atuam de forma voluntária, compartilhando conhecimento prático através de sessões individuais online.
+
+- **Nome oficial:** Menvo
+- **Website:** https://www.menvo.com.br
+- **País de Origem:** Brasil (América do Sul)
+- **Idiomas suportados:** Português do Brasil (pt-BR), Inglês (en), Espanhol (es)
+- **Público-alvo:** Estudantes, estagiários, juniores, pessoas em transição de carreira, profissionais de tecnologia, design, dados e negócios.
+- **Modelo:** 100% gratuito para mentorados. Mentores voluntários.
+- **Contato oficial:** contato@menvo.com.br
+
+## Áreas de Atuação e Especialidades (Mentoria)
+- **Engenharia de Software & Programação:** Frontend (React, Next.js, Vue, TypeScript), Backend (Node.js, Python, Java, Go, C#/.NET), Mobile (Flutter, React Native, iOS, Android), DevOps, Cloud Computing (AWS, GCP, Azure), Arquitetura de Software e Boas Práticas.
+- **Design & Experiência do Usuário (UI/UX):** Design de Interfaces (UI), Pesquisa de Usuário (UX Research), Product Design, Design Systems, Ferramentas de Design (Figma), Prototipação e Avaliação de Portfólio.
+- **Gestão de Produtos (Product Management):** Product Management (PM), Product Ownership (PO), Métricas de Produto (PLG, OKRs, KPIs), Descoberta de Produto (Product Discovery), Roadmap Estratégico e Metodologias Ágeis (Scrum, Kanban).
+- **Dados & Inteligência Artificial:** Análise de Dados (SQL, Power BI, Tableau), Ciência de Dados (Data Science, Python, R), Engenharia de Dados, Aprendizado de Máquina (Machine Learning) e Inteligência Artificial Generativa (LLMs).
+- **Desenvolvimento Profissional & Carreira:** Transição de carreira para tecnologia, preparação para entrevistas técnicas e comportamentais, revisão de currículo e perfil do LinkedIn, liderança técnica, soft skills, negociação salarial e planos de desenvolvimento individual (PDI).
+
+## Principais Funcionalidades da Plataforma
+- **Busca de Mentores com Inteligência Artificial (`/mentors`):** Busca semântica impulsionada por LLMs para conectar mentores ideais a partir de objetivos ou desafios descritos em linguagem natural pelo mentorado.
+- **Quiz Diagnóstico de Carreira com IA (`/quiz`):** Questionário interativo gratuito que avalia o momento de carreira, estilo de aprendizagem e desafios do usuário, gerando um plano de ação personalizado e sugestões de mentores recomendados.
+- **Agendamento Inteligente e Calendário:** Seleção direta de slots de disponibilidade do mentor com sincronização automática com Google Calendar e Google Meet.
+- **Salas de Mentoria e Chat Privado:** Comunicação em tempo real entre mentor e mentorado antes e depois das sessões.
+- **Sistema de Avaliações e Confiança:** Verificação rigorosa de perfis de mentores, avaliações mútuas e moderação de feedbacks para garantir a qualidade de cada sessão.
+
+## Links e Recursos Essenciais
+- [Página Inicial Menvo](https://www.menvo.com.br/pt) — Apresentação da plataforma, depoimentos e estatísticas.
+- [Catálogo de Mentores](https://www.menvo.com.br/pt/mentors) — Busca e listagem completa de mentores disponíveis com filtros avançados.
+- [Quiz Diagnóstico de Carreira](https://www.menvo.com.br/pt/quiz) — Quiz gratuito de autoavaliação profissional com diagnóstico gerado por IA.
+- [Sobre a Menvo](https://www.menvo.com.br/pt/about) — Missão, visão, valores e equipe fundadora.
+- [Canal de Contato e Suporte](https://www.menvo.com.br/pt/contact) — Contato com o time da Menvo via e-mail e WhatsApp.
+- [Documentação Completa para LLMs](https://www.menvo.com.br/llms-full.txt) — Arquivo completo para aprendizado e citação profunda por inteligências artificiais.
+
+## Informações Geográficas e Contexto Local (GEO SEO)
+- **Sede:** Recife, Pernambuco, Brasil (Polo Tecnológico Porto Digital).
+- **Alcance Operacional:** Nacional (todo o Brasil) e internacional (mentorias em português, inglês e espanhol para comunidades globais).
+- **Cidades com maior concentração de mentores:** São Paulo (SP), Recife (PE), Rio de Janeiro (RJ), Belo Horizonte (MG), Curitiba (PR), Florianópolis (SC), Porto Alegre (RS), Brasília (DF), Salvador (BA), Fortaleza (CE) e mentores brasileiros atuando no exterior (EUA, Europa, Canadá).

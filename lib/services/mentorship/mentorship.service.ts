@@ -461,6 +461,25 @@ export const mentorshipSessionsService = {
       .eq("id", feedbackId)
 
     if (error) throw error
+  },
+
+  // Verificar se o usuário tem mentorias concluídas sem avaliação
+  hasPendingEvaluations: async (userId: string): Promise<boolean> => {
+    const { data: completed } = await (supabase
+      .from("appointments") as any)
+      .select("id")
+      .eq("mentee_id", userId)
+      .eq("status", "completed")
+
+    if (!completed || completed.length === 0) return false
+
+    const { data: feedbacks } = await (supabase
+      .from("appointment_feedbacks") as any)
+      .select("appointment_id")
+      .eq("reviewer_id", userId)
+
+    const feedbackIds = new Set((feedbacks || []).map((f: any) => f.appointment_id))
+    return completed.some((c: any) => !feedbackIds.has(c.id))
   }
 }
 

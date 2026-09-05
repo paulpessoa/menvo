@@ -33,6 +33,8 @@
 - [x] `complete appointment modal fix` — Decoupled direct feedback and appointment mutation from component into `mentorshipService.submitFeedbackAndComplete`, eliminating `never` type error.
 - [x] `profile completion modal fix` — Decoupled direct profile update from component into `profileService.updateProfile` in `auth.service.ts`, resolving `never` type error.
 - [x] `feedback management fix` — Decoupled appointment feedback update from component into `mentorshipService.updateFeedback`, resolving `never` type error.
+- [x] `booking modal evaluations fix` — Decoupled appointments and feedback check from `BookMentorshipModal` into `mentorshipService.hasPendingEvaluations`, resolving `never` type error.
+- [x] `llms.txt & geo seo` — Created `public/llms.txt` and `public/llms-full.txt` following standard LLM specifications for AI engines (ChatGPT, Claude, Gemini, Perplexity, Kimi, Manus); updated `public/robots.txt` to permit AI crawlers.
 
 ---
 
