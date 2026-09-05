@@ -36,6 +36,7 @@
 - [x] `booking modal evaluations fix` — Decoupled appointments and feedback check from `BookMentorshipModal` into `mentorshipService.hasPendingEvaluations`, resolving `never` type error.
 - [x] `llms.txt & geo seo` — Created `public/llms.txt` and `public/llms-full.txt` following standard LLM specifications for AI engines (ChatGPT, Claude, Gemini, Perplexity, Kimi, Manus); updated `public/robots.txt` to permit AI crawlers.
 - [x] `full typescript verification` — Verified entire repository with `npx tsc --noEmit`; eliminated all remaining Postgrest overload typing mismatches in `admin.service.ts`, `verifications.service.ts`, and `quiz.service.ts` with 0 errors.
+- [x] `react best practices & typecheck script` — Configured `experimental.optimizePackageImports` in `next.config.mjs` for tree-shaking barrel dependencies (`lucide-react`, `date-fns`, Radix UI); added dedicated `npm run typecheck` script to `package.json`.
 
 ---
 

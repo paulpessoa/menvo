@@ -23,8 +23,19 @@ const nextConfig = {
     }
     return config
   },
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "date-fns",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-select"
+    ]
+  },
   images: {
-    domains: ["localhost", "supabase.co", "images.unsplash.com"],
     remotePatterns: [
       {
         protocol: "https",
