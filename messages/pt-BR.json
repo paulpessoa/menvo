@@ -1414,8 +1414,7 @@
     "title": "Configurações",
     "tabs": {
       "general": "Geral",
-      "security": "Segurança",
-      "appearance": "Aparência"
+      "security": "Segurança"
     },
     "language": {
       "title": "Idioma",
@@ -1450,13 +1449,6 @@
       "confirmDesc": "Esta ação não pode ser desfeita. Isso irá deletar permanentemente sua conta e remover todos os seus dados dos nossos servidores.",
       "cancel": "Cancelar",
       "confirmAction": "Sim, deletar minha conta"
-    },
-    "appearance": {
-      "title": "Tema",
-      "description": "Escolha o tema da interface",
-      "light": "Claro",
-      "dark": "Escuro",
-      "system": "Sistema"
     }
   },
   "availability": {

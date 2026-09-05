@@ -145,10 +145,6 @@ export default function SettingsPage() {
             <Lock className="h-4 w-4" />
             {t("tabs.security")}
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
-            <Sun className="h-4 w-4" />
-            {t("tabs.appearance")}
-          </TabsTrigger>
         </TabsList>
 
         {/* General Tab */}
@@ -311,47 +307,6 @@ export default function SettingsPage() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Appearance Tab */}
-        <TabsContent value="appearance" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sun className="h-5 w-5" />
-                {t("appearance.title")}
-              </CardTitle>
-              <CardDescription>{t("appearance.description")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button
-                  variant={theme === "light" ? "default" : "outline"}
-                  onClick={() => setTheme("light")}
-                  className="w-full flex items-center gap-2"
-                >
-                  <Sun className="h-4 w-4" />
-                  {t("appearance.light")}
-                </Button>
-                <Button
-                  variant={theme === "dark" ? "default" : "outline"}
-                  onClick={() => setTheme("dark")}
-                  className="w-full flex items-center gap-2"
-                >
-                  <Moon className="h-4 w-4" />
-                  {t("appearance.dark")}
-                </Button>
-                <Button
-                  variant={theme === "system" ? "default" : "outline"}
-                  onClick={() => setTheme("system")}
-                  className="w-full flex items-center gap-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  {t("appearance.system")}
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>

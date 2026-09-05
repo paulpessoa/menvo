@@ -1414,8 +1414,7 @@
     "title": "Settings",
     "tabs": {
       "general": "General",
-      "security": "Security",
-      "appearance": "Appearance"
+      "security": "Security"
     },
     "language": {
       "title": "Language",
@@ -1450,13 +1449,6 @@
       "confirmDesc": "This action cannot be undone. This will permanently delete your account and remove all your data from our servers.",
       "cancel": "Cancel",
       "confirmAction": "Yes, delete my account"
-    },
-    "appearance": {
-      "title": "Theme",
-      "description": "Choose the interface theme",
-      "light": "Light",
-      "dark": "Dark",
-      "system": "System"
     }
   },
   "availability": {
