@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/services/auth/auth.service"
+import type { Database } from "@/lib/types/supabase"
 import type {
   Appointment,
   AppointmentWithProfiles,
@@ -12,6 +13,9 @@ export type {
   MentorAvailability,
   AppointmentStatus
 }
+
+type MentorAvailabilityInsert = Database["public"]["Tables"]["mentor_availability"]["Insert"]
+type MentorAvailabilityUpdate = Database["public"]["Tables"]["mentor_availability"]["Update"]
 
 // =============================================
 // INTERFACES E TIPOS
@@ -44,33 +48,50 @@ export const mentorAvailabilityService = {
   getMentorAvailability: async (
     mentorId: string
   ): Promise<MentorAvailability[]> => {
-    const { data, error } = await (supabase
+    const { data, error } = await supabase
       .from("mentor_availability")
       .select("*")
       .eq("mentor_id", mentorId)
-      .eq("is_active", true)
       .order("day_of_week", { ascending: true })
-      .order("start_time", { ascending: true }) as any)
+      .order("start_time", { ascending: true })
 
     if (error) throw error
-    return data as MentorAvailability[]
+    return (data || []).map((slot) => ({
+      ...slot,
+      id: slot.id as unknown as number,
+      is_active: true,
+      timezone: slot.timezone || "America/Sao_Paulo"
+    })) as MentorAvailability[]
   },
 
   // Adicionar horário de disponibilidade
   addAvailability: async (
-    availability_status: Omit<
+    availabilityStatus: Omit<
       MentorAvailability,
       "id" | "created_at" | "updated_at"
     >
   ): Promise<MentorAvailability> => {
-    const { data, error } = await (supabase
+    const payload: MentorAvailabilityInsert = {
+      mentor_id: availabilityStatus.mentor_id,
+      day_of_week: availabilityStatus.day_of_week,
+      start_time: availabilityStatus.start_time,
+      end_time: availabilityStatus.end_time,
+      timezone: availabilityStatus.timezone || "America/Sao_Paulo"
+    }
+
+    const { data, error } = await supabase
       .from("mentor_availability")
-      .insert([availability_status])
+      .insert(payload)
       .select()
-      .single() as any)
+      .single()
 
     if (error) throw error
-    return data as MentorAvailability
+    return {
+      ...data,
+      id: data.id as unknown as number,
+      is_active: true,
+      timezone: data.timezone || "America/Sao_Paulo"
+    } as MentorAvailability
   },
 
   // Atualizar disponibilidade
@@ -78,23 +99,35 @@ export const mentorAvailabilityService = {
     id: string,
     updates: Partial<MentorAvailability>
   ): Promise<MentorAvailability> => {
-    const { data, error } = await (supabase
+    const payload: MentorAvailabilityUpdate = {
+      day_of_week: updates.day_of_week,
+      start_time: updates.start_time,
+      end_time: updates.end_time,
+      timezone: updates.timezone
+    }
+
+    const { data, error } = await supabase
       .from("mentor_availability")
-      .update(updates as any)
+      .update(payload)
       .eq("id", id)
       .select()
-      .single() as any)
+      .single()
 
     if (error) throw error
-    return data as MentorAvailability
+    return {
+      ...data,
+      id: data.id as unknown as number,
+      is_active: true,
+      timezone: data.timezone || "America/Sao_Paulo"
+    } as MentorAvailability
   },
 
-  // Remover disponibilidade (soft delete)
+  // Remover disponibilidade
   removeAvailability: async (id: string): Promise<void> => {
-    const { error } = await (supabase
+    const { error } = await supabase
       .from("mentor_availability")
-      .update({ is_active: false } as any)
-      .eq("id", id) as any)
+      .delete()
+      .eq("id", id)
 
     if (error) throw error
   },
@@ -107,25 +140,37 @@ export const mentorAvailabilityService = {
       "id" | "mentor_id" | "created_at" | "updated_at"
     >[]
   ): Promise<MentorAvailability[]> => {
-    // Primeiro, desativar todas as disponibilidades existentes
-    await (supabase
+    // 1. Remover disponibilidades antigas do mentor
+    const { error: deleteError } = await supabase
       .from("mentor_availability")
-      .update({ is_active: false } as any)
-      .eq("mentor_id", mentorId) as any)
+      .delete()
+      .eq("mentor_id", mentorId)
 
-    // Depois, inserir as novas disponibilidades
-    const newAvailabilities = availabilities.map((av) => ({
-      ...av,
-      mentor_id: mentorId
+    if (deleteError) throw deleteError
+
+    if (availabilities.length === 0) return []
+
+    // 2. Inserir as novas disponibilidades
+    const newAvailabilities: MentorAvailabilityInsert[] = availabilities.map((av) => ({
+      mentor_id: mentorId,
+      day_of_week: av.day_of_week,
+      start_time: av.start_time,
+      end_time: av.end_time,
+      timezone: av.timezone || "America/Sao_Paulo"
     }))
 
-    const { data, error } = await (supabase
+    const { data, error } = await supabase
       .from("mentor_availability")
-      .insert(newAvailabilities as any)
-      .select() as any)
+      .insert(newAvailabilities)
+      .select()
 
     if (error) throw error
-    return data as MentorAvailability[]
+    return (data || []).map((item) => ({
+      ...item,
+      id: item.id as unknown as number,
+      is_active: true,
+      timezone: item.timezone || "America/Sao_Paulo"
+    })) as MentorAvailability[]
   }
 }
 
@@ -151,7 +196,7 @@ export const mentorshipSessionsService = {
       requested_end_time: request.requested_end_time,
       topic: request.topic,
       notes_mentee: request.mentee_notes,
-      timezone: request.timezone || "America/Sao_Paulo",
+      duration_minutes: 60,
       status: "pending"
     }
 
@@ -161,8 +206,8 @@ export const mentorshipSessionsService = {
       .select(
         `
         *,
-        mentor:profiles!mentor_id(first_name, last_name, email),
-        mentee:profiles!mentee_id(first_name, last_name, email)
+        mentor:profiles!mentor_id(first_name, last_name, email, avatar_url),
+        mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `
       )
       .single() as any)
@@ -183,8 +228,7 @@ export const mentorshipSessionsService = {
     const updates = {
       status: response.status,
       mentor_response: response.mentor_response,
-      meeting_link: response.meeting_link,
-      responded_at: new Date().toISOString()
+      meeting_link: response.meeting_link
     }
 
     const { data, error } = await (supabase
@@ -195,8 +239,8 @@ export const mentorshipSessionsService = {
       .select(
         `
         *,
-        mentor:profiles!mentor_id(first_name, last_name, email),
-        mentee:profiles!mentee_id(first_name, last_name, email)
+        mentor:profiles!mentor_id(first_name, last_name, email, avatar_url),
+        mentee:profiles!mentee_id(first_name, last_name, email, avatar_url)
       `
       )
       .single() as any)
@@ -234,7 +278,7 @@ export const mentorshipSessionsService = {
 
     const { data, error } = await query
     if (error) throw error
-    return data as any as AppointmentWithProfiles[]
+    return (data as any) || []
   },
 
   // Obter sessões do mentorado
@@ -266,7 +310,7 @@ export const mentorshipSessionsService = {
 
     const { data, error } = await query
     if (error) throw error
-    return data as any as AppointmentWithProfiles[]
+    return (data as any) || []
   },
 
   // Marcar sessão como completa
@@ -309,7 +353,9 @@ export const mentorshipSessionsService = {
       .from("appointments")
       .update({
         status: "cancelled",
-        mentor_response: reason
+        cancellation_reason: reason,
+        cancelled_at: new Date().toISOString(),
+        cancelled_by: user.id
       } as any)
       .eq("id", sessionId)
       .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`)
@@ -340,14 +386,14 @@ export const mentorshipSessionsService = {
 
   // Obter estatísticas do mentor
   getMentorStats: async (mentorId: string) => {
-    const { data: sessions, error } = await (supabase
+    const { data: sessions, error } = await supabase
       .from("appointments")
       .select("status")
-      .eq("mentor_id", mentorId) as any)
+      .eq("mentor_id", mentorId)
 
     if (error) throw error
 
-    const s = (sessions as any[]) || []
+    const s = (sessions as { status: string | null }[]) || []
 
     return {
       total: s.length,
@@ -399,12 +445,12 @@ export const mentorshipUtils = {
 
   // Verificar se horário está disponível
   isTimeSlotAvailable: (
-    availability_status: MentorAvailability[],
+    availabilityStatus: MentorAvailability[],
     dayOfWeek: number,
     startTime: string,
     endTime: string
   ) => {
-    return availability_status.some(
+    return availabilityStatus.some(
       (slot) =>
         slot.day_of_week === dayOfWeek &&
         slot.start_time <= startTime &&
@@ -441,12 +487,12 @@ export const mentorshipUtils = {
 
   // Gerar slots de horário disponíveis
   generateTimeSlots: (
-    availability_status: MentorAvailability[],
+    availabilityStatus: MentorAvailability[],
     duration: number = 60
   ) => {
     const slots: { day: number; time: string; endTime: string }[] = []
 
-    availability_status.forEach((slot) => {
+    availabilityStatus.forEach((slot) => {
       const start = new Date(`2000-01-01T${slot.start_time}`)
       const end = new Date(`2000-01-01T${slot.end_time}`)
 

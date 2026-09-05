@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/services/auth/auth.service"
+import type { Database } from "@/lib/types/supabase"
 import type {
   MentorProfile,
   MentorFilters,
@@ -16,6 +17,8 @@ export interface FilterOptions {
   inclusionTags: string[]
   experienceRanges: { label: string; min: number; max: number }[]
 }
+
+type MentorViewRow = Database["public"]["Views"]["mentors_view"]["Row"]
 
 class MentorService {
   async getMentors(filters: MentorFilters = {}): Promise<PaginatedMentors> {
@@ -46,12 +49,15 @@ class MentorService {
         company,
         location,
         availability_status,
-        inclusion_tags,
+        inclusive_tags,
         experience_years,
         mentor_skills,
         languages,
         academic_level,
-        active_roles
+        active_roles,
+        average_rating,
+        total_sessions,
+        total_reviews
       `,
         { count: "exact" }
       )
@@ -82,7 +88,7 @@ class MentorService {
 
     // Filtro por Inclusion Tags
     if (inclusionTags.length > 0) {
-      query = query.overlaps("inclusion_tags", inclusionTags)
+      query = query.overlaps("inclusive_tags", inclusionTags)
     }
 
     // Filtro por anos de experiência
@@ -118,7 +124,7 @@ class MentorService {
     // Ordenação
     query = query.order("first_name", { ascending: true })
 
-    const { data, error, count } = await (query as any)
+    const { data, error, count } = await query
 
     if (error) {
       throw new Error(`Erro ao buscar mentores: ${error.message}`)
@@ -127,8 +133,30 @@ class MentorService {
     const totalCount = count || 0
     const totalPages = Math.ceil(totalCount / limit)
 
+    const mentors: MentorProfile[] = ((data as unknown as MentorViewRow[]) || []).map((row) => ({
+      id: row.id || "",
+      first_name: row.first_name,
+      last_name: row.last_name,
+      avatar_url: row.avatar_url,
+      bio: row.bio,
+      job_title: row.job_title,
+      company: row.company,
+      location: row.location,
+      availability_status: (row.availability_status as MentorProfile["availability_status"]) || null,
+      availability: null,
+      experience_years: row.experience_years,
+      mentor_skills: row.mentor_skills,
+      languages: row.languages,
+      academic_level: row.academic_level,
+      inclusion_tags: row.inclusive_tags,
+      inclusive_tags: row.inclusive_tags,
+      average_rating: row.average_rating || 0,
+      total_sessions: row.total_sessions || 0,
+      total_reviews: row.total_reviews || 0
+    }))
+
     return {
-      mentors: (data as any as MentorProfile[]) || [],
+      mentors,
       totalCount,
       currentPage: page,
       totalPages,
@@ -139,31 +167,30 @@ class MentorService {
 
   async getFilterOptions(): Promise<FilterOptions> {
     // Buscar todas as skills únicas dos mentores
-    const { data: skillsData, error: skillsError } = await (supabase
+    const { data: skillsData, error: skillsError } = await supabase
       .from("mentors_view")
       .select("mentor_skills")
-      .contains("active_roles", ["mentor"]) as any)
+      .contains("active_roles", ["mentor"])
 
     if (skillsError) {
       throw new Error(`Erro ao buscar skills: ${skillsError.message}`)
     }
 
     // Buscar todos os idiomas únicos
-    const { data: languagesData, error: languagesError } = await (supabase
+    const { data: languagesData, error: languagesError } = await supabase
       .from("mentors_view")
       .select("languages")
-      .contains("active_roles", ["mentor"]) as any)
+      .contains("active_roles", ["mentor"])
 
     if (languagesError) {
       throw new Error(`Erro ao buscar idiomas: ${languagesError.message}`)
     }
 
-    // Buscar todos as Tags Inclusivas
-    const { data: inclusionTagsData, error: inclusionTagsError } =
-      await (supabase
-        .from("mentors_view")
-        .select("inclusion_tags")
-        .contains("active_roles", ["mentor"]) as any)
+    // Buscar todas as Tags Inclusivas
+    const { data: inclusionTagsData, error: inclusionTagsError } = await supabase
+      .from("mentors_view")
+      .select("inclusive_tags")
+      .contains("active_roles", ["mentor"])
 
     if (inclusionTagsError) {
       throw new Error(
@@ -172,11 +199,11 @@ class MentorService {
     }
 
     // Buscar localizações únicas
-    const { data: locationsData, error: locationsError } = await (supabase
+    const { data: locationsData, error: locationsError } = await supabase
       .from("mentors_view")
       .select("location")
       .contains("active_roles", ["mentor"])
-      .not("location", "is", null) as any)
+      .not("location", "is", null)
 
     if (locationsError) {
       throw new Error(`Erro ao buscar localizações: ${locationsError.message}`)
@@ -184,28 +211,27 @@ class MentorService {
 
     // Processar dados
     const allSkills =
-      (skillsData as any[])?.flatMap((item) => item.mentor_skills || []) || []
+      (skillsData as { mentor_skills: string[] | null }[])?.flatMap((item) => item.mentor_skills || []) || []
     const uniqueTopics = Array.from(new Set(allSkills))
       .filter(Boolean)
       .sort() as string[]
 
     const allLanguages =
-      (languagesData as any[])?.flatMap((item) => item.languages || []) || []
+      (languagesData as { languages: string[] | null }[])?.flatMap((item) => item.languages || []) || []
     const uniqueLanguages = Array.from(new Set(allLanguages))
       .filter(Boolean)
       .sort() as string[]
 
-    const allinclusionTags =
-      (inclusionTagsData as any[])?.flatMap(
-        (item) => item.inclusion_tags || []
+    const allInclusionTags =
+      (inclusionTagsData as { inclusive_tags: string[] | null }[])?.flatMap(
+        (item) => item.inclusive_tags || []
       ) || []
-    const uniqueInclusionTags = Array.from(new Set(allinclusionTags))
+    const uniqueInclusionTags = Array.from(new Set(allInclusionTags))
       .filter(Boolean)
       .sort() as string[]
 
     const allLocations =
-      (locationsData as any[])?.map((item) => item.location).filter(Boolean) ||
-      []
+      (locationsData as { location: string | null }[])?.map((item) => item.location).filter(Boolean) || []
     const cities: string[] = []
     const countries: string[] = []
 
@@ -250,7 +276,7 @@ class MentorService {
   }
 
   async getMentorById(id: string): Promise<MentorProfile | null> {
-    const { data, error } = await (supabase
+    const { data, error } = await supabase
       .from("mentors_view")
       .select(
         `
@@ -268,24 +294,45 @@ class MentorService {
         languages,
         academic_level,
         active_roles,
-        inclusion_tags,
-        rating,
-        sessions,
-        reviews
+        inclusive_tags,
+        average_rating,
+        total_sessions,
+        total_reviews
       `
       )
       .eq("id", id)
       .contains("active_roles", ["mentor"])
-      .single() as any)
+      .maybeSingle()
 
     if (error) {
-      if (error.code === "PGRST116") {
-        return null // Mentor não encontrado
-      }
       throw new Error(`Erro ao buscar mentor: ${error.message}`)
     }
 
-    return data as MentorProfile
+    if (!data) return null
+
+    const row = data as unknown as MentorViewRow
+
+    return {
+      id: row.id || id,
+      first_name: row.first_name,
+      last_name: row.last_name,
+      avatar_url: row.avatar_url,
+      bio: row.bio,
+      job_title: row.job_title,
+      company: row.company,
+      location: row.location,
+      availability_status: (row.availability_status as MentorProfile["availability_status"]) || null,
+      availability: null,
+      experience_years: row.experience_years,
+      mentor_skills: row.mentor_skills,
+      languages: row.languages,
+      academic_level: row.academic_level,
+      inclusion_tags: row.inclusive_tags,
+      inclusive_tags: row.inclusive_tags,
+      average_rating: row.average_rating || 0,
+      total_sessions: row.total_sessions || 0,
+      total_reviews: row.total_reviews || 0
+    }
   }
 }
 
