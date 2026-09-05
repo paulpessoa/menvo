@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
 import { handleApiError, errorResponse, successResponse } from "@/lib/api/error-handler"
+import { feedbackSubmissionSchema } from "@/lib/schemas/feedback"
 
 export async function GET(request: NextRequest) {
   try {
@@ -74,27 +75,32 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     const body = await request.json()
-    const { rating, comment, email } = body
-
-    if (!rating) {
-      return errorResponse("Rating is required", "VALIDATION_ERROR", 400)
+    const parsed = feedbackSubmissionSchema.safeParse(body)
+    
+    if (!parsed.success) {
+      const errorMessage = parsed.error.issues[0]?.message || "Dados de feedback inválidos"
+      return errorResponse(errorMessage, "VALIDATION_ERROR", 400)
     }
+
+    const { rating, comment, email, page_url, user_agent } = parsed.data
 
     if (!user && !email) {
       return errorResponse("Email is required for anonymous feedback", "VALIDATION_ERROR", 400)
     }
 
     // Create feedback
-    const insertData: any = {
+    const insertData: Record<string, any> = {
       user_id: user?.id || null,
-      rating: Number(rating),
+      rating,
       comment: comment || null,
       email: user ? null : email,
+      page_url: page_url || null,
+      user_agent: user_agent || null
     };
 
     const { data: feedback, error } = await supabase
       .from("feedback")
-      .insert(insertData)
+      .insert(insertData as any)
       .select()
       .single();
 
