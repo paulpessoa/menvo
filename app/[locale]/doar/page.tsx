@@ -13,25 +13,33 @@ import {
 } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
 import {
   Heart,
-  Coffee,
   Gift,
   BookOpen,
   Users,
   Trophy,
   ArrowRight,
-  Copy
+  Copy,
+  Sparkles,
+  ShieldCheck,
+  Check
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
+import { useState } from "react"
 
 export default function DonatePage() {
   const t = useTranslations("donate")
+  const [copied, setCopied] = useState(false)
+  const pixKey = "pix@menvo.com.br"
 
   const copyPixKey = () => {
-    navigator.clipboard.writeText("contato@menvo.com.br")
-    toast.success(t("pix.copySuccess"))
+    navigator.clipboard.writeText(pixKey)
+    setCopied(true)
+    toast.success("Chave PIX copiada com sucesso!")
+    setTimeout(() => setCopied(false), 3000)
   }
 
   return (
@@ -88,169 +96,94 @@ export default function DonatePage() {
         </div>
       </div>
 
-      {/* Donation Options */}
-      <div className="mb-24">
-        <h2 className="text-3xl font-extrabold text-center mb-12 tracking-tight text-gray-900">
-          {t("options.title")}
-        </h2>
+      {/* Donation Section - Only PIX & Transparent Support */}
+      <div id="pix-card" className="max-w-2xl mx-auto mb-24 scroll-mt-24">
+        <Card className="rounded-[2.5rem] border-primary/20 shadow-2xl overflow-hidden bg-white relative">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary/80 via-primary to-primary/60" />
+          
+          <CardHeader className="text-center pt-8 pb-4">
+            <Badge variant="secondary" className="w-fit mx-auto mb-3 bg-primary/10 text-primary border-none px-3.5 py-1 font-semibold rounded-full">
+              <Heart className="h-3.5 w-3.5 mr-1.5 fill-primary text-primary" /> Apoio Voluntário
+            </Badge>
+            <CardTitle className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+              Doe Qualquer Valor via PIX
+            </CardTitle>
+            <CardDescription className="text-base text-muted-foreground max-w-md mx-auto pt-2 leading-relaxed">
+              Contribua de forma rápida e segura. Toda doação é investida diretamente na infraestrutura e nos servidores do Menvo.
+            </CardDescription>
+          </CardHeader>
 
-        <Tabs defaultValue="products" className="max-w-4xl mx-auto">
-          <div className="flex justify-center mb-10">
-            <TabsList className="grid w-full max-w-md h-auto p-1 bg-muted/50 rounded-2xl grid-cols-3 gap-1">
-              <TabsTrigger
-                value="products"
-                className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
-              >
-                {t("options.tabs.products")}
-              </TabsTrigger>
-              <TabsTrigger
-                value="pix"
-                className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
-              >
-                {t("options.tabs.pix")}
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="products" className="space-y-4 outline-none">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                <CardHeader className="pb-4">
-                  <div className="bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
-                    <Coffee className="h-5 w-5 text-orange-600" />
-                  </div>
-                  <CardTitle className="text-xl">
-                    {t("products.coffee.title")}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("products.coffee.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="text-4xl font-extrabold text-gray-900 mb-2">
-                    {t("products.coffee.price")}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {t("products.coffee.info")}
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button className="w-full rounded-xl h-12 font-bold">
-                    {t("products.coffee.button")}
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              <Card className="rounded-3xl border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                <CardHeader className="pb-4">
-                  <div className="bg-blue-50 w-10 h-10 rounded-lg flex items-center justify-center mb-2">
-                    <Gift className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-xl">
-                    {t("products.kit.title")}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("products.kit.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="text-4xl font-extrabold text-gray-900 mb-2">
-                    {t("products.kit.price")}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {t("products.kit.info")}
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button className="w-full rounded-xl h-12 font-bold">
-                    {t("products.kit.button")}
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              <Card className="rounded-3xl border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/20 overflow-hidden flex flex-col relative scale-105 z-10">
-                <div className="absolute top-0 right-0 p-4">
-                  <Badge className="bg-white/20 text-white border-none backdrop-blur-md">
-                    {t("products.supporter.badge")}
-                  </Badge>
-                </div>
-                <CardHeader className="pb-4">
-                  <div className="bg-white/10 w-10 h-10 rounded-lg flex items-center justify-center mb-2 backdrop-blur-md">
-                    <Heart className="h-5 w-5 text-white fill-white" />
-                  </div>
-                  <CardTitle className="text-xl text-white">
-                    {t("products.supporter.title")}
-                  </CardTitle>
-                  <CardDescription className="text-primary-50/80">
-                    {t("products.supporter.description")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="text-4xl font-extrabold text-white mb-2">
-                    {t("products.supporter.price")}
-                  </div>
-                  <p className="text-sm text-primary-50/70">
-                    {t("products.supporter.info")}
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button className="w-full rounded-xl h-12 font-bold bg-white text-primary hover:bg-white/90 shadow-2xl">
-                    {t("products.supporter.button")}
-                  </Button>
-                </CardFooter>
-              </Card>
+          <CardContent className="flex flex-col items-center px-6 sm:px-12 pb-10 space-y-6">
+            {/* QR Code Container */}
+            <div className="p-5 bg-gradient-to-b from-gray-50 to-white rounded-3xl border-2 border-dashed border-gray-200 shadow-sm flex flex-col items-center">
+              <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center">
+                <Image
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=pix@menvo.com.br`}
+                  alt="QR Code PIX Menvo"
+                  width={200}
+                  height={200}
+                  className="rounded-xl"
+                  unoptimized
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-3 font-medium flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Abra o app do seu banco e aponte a câmera
+              </p>
             </div>
 
-            <div className="text-center mt-12 text-sm text-muted-foreground italic">
-              <p>{t("products.disclaimer")}</p>
+            {/* Chave PIX Copy Field */}
+            <div className="w-full max-w-md space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Chave PIX Oficial
+              </Label>
+              <div className="flex items-center gap-2 p-2 bg-muted/60 border border-border/80 rounded-2xl">
+                <code className="text-sm font-semibold text-gray-800 px-3 flex-1 select-all overflow-hidden text-ellipsis">
+                  {pixKey}
+                </code>
+                <Button
+                  onClick={copyPixKey}
+                  className="rounded-xl px-4 h-10 font-bold shadow-sm shrink-0"
+                  size="sm"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1.5 text-green-400" /> Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1.5" /> Copiar
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </TabsContent>
 
-          <TabsContent value="pix" className="space-y-4">
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle>{t("pix.title")}</CardTitle>
-                <CardDescription>{t("pix.description")}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <div className="bg-white p-4 rounded-lg mb-4 border">
-                  <Image
-                    src="/placeholder.svg?height=200&width=200"
-                    alt="QR Code PIX"
-                    width={200}
-                    height={200}
-                    className="mx-auto"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 p-3 bg-muted rounded-md w-full max-w-xs mb-4">
-                  <code className="text-sm flex-1 overflow-hidden text-ellipsis">
-                    email@exemplo.com
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={copyPixKey}
+            {/* Valores Sugeridos */}
+            <div className="w-full max-w-md pt-2 border-t border-gray-100">
+              <p className="text-xs font-medium text-center text-muted-foreground mb-3">
+                Sugestões de contribuição espontânea:
+              </p>
+              <div className="grid grid-cols-4 gap-2 text-center">
+                {["R$ 5", "R$ 15", "R$ 30", "R$ 50"].map((val) => (
+                  <div
+                    key={val}
+                    className="py-2.5 px-2 rounded-xl border border-border/60 bg-muted/30 text-xs font-bold text-gray-800 hover:border-primary hover:bg-primary/5 transition-all cursor-default"
                   >
-                    <Copy className="h-4 w-4" />
-                    <span className="sr-only">{t("pix.copyButton")}</span>
-                  </Button>
-                </div>
+                    {val}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                <p className="text-sm text-muted-foreground text-center max-w-md">
-                  {t("pix.instructions")}
-                  <a
-                    href="mailto:contato@menvo.com"
-                    className="text-primary ml-1"
-                  >
-                    contato@menvo.com
-                  </a>
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            {/* Segurança e Confidencialidade */}
+            <div className="flex items-center gap-2.5 text-xs text-muted-foreground bg-primary/5 p-3.5 rounded-2xl w-full max-w-md border border-primary/10">
+              <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
+              <span>
+                Doação 100% segura e voluntária. O Menvo é gratuito e mantido pela comunidade.
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* How We Use Donations */}
@@ -371,7 +304,7 @@ export default function DonatePage() {
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <Button size="lg" asChild>
-            <Link href="#doar">
+            <Link href="#pix-card">
               {t("cta.primary")} <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

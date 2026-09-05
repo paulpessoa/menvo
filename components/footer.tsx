@@ -57,7 +57,7 @@ export default function Footer() {
                   aria-label="YouTube"
                   asChild
                 >
-                  <Link href="https://youtube.com/@menvo" target="_blank">
+                  <Link href="https://youtube.com/@menvobr" target="_blank">
                     <Youtube className="h-4 w-4" />
                   </Link>
                 </Button>

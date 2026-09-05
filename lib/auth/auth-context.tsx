@@ -169,12 +169,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signOut = async () => {
         try {
             setLoading(true)
-            await supabase.auth.signOut()
+            // 1. Invalida sessão no servidor e remove cookies HTTP
+            await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+
+            // 2. Invalida sessão localmente no Supabase client
+            await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+        } catch (error) {
+            console.error('[Auth] Logout warning:', error)
+        } finally {
+            // 3. Limpeza infalível de estado e storage local
+            setUser(null)
+            setSession(null)
+            setProfile(null)
+            setCachedRoles({
+                admin: false,
+                mentor: false,
+                mentee: true,
+                moderator: false,
+                role: null,
+                isVerified: false,
+                roles: [],
+                isPending: false
+            })
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('menvo_roles')
-                window.location.href = '/'
+                window.location.replace('/')
             }
-        } catch (error) { toast.error('Erro ao sair da conta') } finally { setLoading(false) }
+            setLoading(false)
+        }
     }
 
     const hasRole = useCallback((role: string | string[]) => {
