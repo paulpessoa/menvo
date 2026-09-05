@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Globe, Heart, Users, Map } from "lucide-react"
+import { Globe, Heart, Users } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Partners } from "@/components/Partners"
 
@@ -148,17 +148,6 @@ export default function AboutPage() {
                   {t("about.ourTeam.joinTeam")}
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="rounded-xl font-bold border-2"
-              >
-                <Link href="/maps">
-                  <Map className="mr-2 h-5 w-5" />
-                  {t("about.ourTeam.viewMap")}
-                </Link>
-              </Button>
             </div>
           </div>
         </div>
@@ -189,7 +178,7 @@ export default function AboutPage() {
             asChild
             className="rounded-xl font-bold px-10 h-14 border-2"
           >
-            <Link href="/contact">{t("about.joinOurMission.contactUs")}</Link>
+            <a href="mailto:contato@menvo.com.br">{t("about.joinOurMission.contactUs")}</a>
           </Button>
         </div>
       </div>

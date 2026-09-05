@@ -23,6 +23,9 @@
 - [x] `quiz onboarding` — Integrated into Mentee Dashboard as primary activation CTA. Created `lib/services/quiz/quiz.service.ts`, `components/dashboard/MenteeQuizCTA.tsx`, prefilled auth user details, and added i18n keys across pt-BR, en, and es.
 - [x] `landing quiz CTA` — Added `components/landing/QuizDiscoverySection.tsx` to public homepage (`/`), providing a high-conversion entry point for new visitors.
 - [x] `event mode & gifts` — Conditioned physical gift selection (pen/button) on `?event=<name>` query param (e.g. `?event=recnplay`). Web users receive actionable career steps instead of physical booth gift prompts.
+- [x] `ai mentor match` — Upgraded `/api/ai/match` and `lib/services/ai/groq.service.ts` to use OpenAI `gpt-4o-mini` with native `fetch`, multi-provider support (`OPENAI_API_KEY`, `OPEN_AI_KEY`, `GROQ_API_KEY`), and deterministic keyword matching fallback.
+- [x] `contact resolution` — Created official `app/[locale]/contact/page.tsx` (email + WhatsApp channels) and replaced dead links in `about` and `unauthorized` with `mailto:contato@menvo.com.br`.
+- [x] `maps audit` — Audited `/maps` (static mock of 6 volunteers); removed dead navigation from `about/page.tsx`.
 
 ---
 

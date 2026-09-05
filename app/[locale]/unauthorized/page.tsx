@@ -32,10 +32,10 @@ export default function UnauthorizedPage() {
               Ir para Dashboard
             </Link>
           </Button>
-          <Button asChild className="w-full mt-2">
-            <Link href="/contact">
+          <Button asChild variant="ghost" className="w-full mt-2 text-muted-foreground hover:text-foreground">
+            <a href="mailto:contato@menvo.com.br">
               Contatar Suporte
-            </Link>
+            </a>
           </Button>
         </CardContent>
       </Card>
