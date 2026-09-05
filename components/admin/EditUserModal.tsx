@@ -70,7 +70,7 @@ export function EditUserModal({
         course: user.course || "",
         academic_level: user.academic_level || "",
         expected_graduation: user.expected_graduation || ""
-      } as any)
+      })
       setSelectedRoles(user.roles || [])
     }
   }, [user])
@@ -312,12 +312,12 @@ export function EditUserModal({
                 <Label htmlFor="institution">Instituição</Label>
                 <Input
                   id="institution"
-                  value={(formData as any).institution}
+                  value={formData.institution || ""}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
                       institution: e.target.value
-                    } as any)
+                    })
                   }
                   className="bg-white"
                 />
@@ -326,9 +326,9 @@ export function EditUserModal({
                 <Label htmlFor="course">Curso</Label>
                 <Input
                   id="course"
-                  value={(formData as any).course}
+                  value={formData.course || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, course: e.target.value } as any)
+                    setFormData({ ...formData, course: e.target.value })
                   }
                   className="bg-white"
                 />

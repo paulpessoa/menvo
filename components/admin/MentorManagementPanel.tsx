@@ -80,18 +80,33 @@ export function MentorManagementPanel() {
 
     try {
       // Use mentors_admin_view to get all mentors (verified and unverified)
-      const { data, error } = await (supabase.from("mentors_admin_view") as any)
+      const { data, error } = await supabase
+        .from("mentors_admin_view")
         .select("*")
         .order("created_at", { ascending: false })
 
       if (error) throw error
 
-      const mentorData = data || []
+      const mentorData: Mentor[] = (data || []).map((m) => ({
+        id: m.id || "",
+        email: m.email || "",
+        first_name: m.first_name || "",
+        last_name: m.last_name || "",
+        full_name: m.full_name || `${m.first_name || ""} ${m.last_name || ""}`.trim(),
+        bio: m.bio,
+        avatar_url: m.avatar_url,
+        verified: !!m.verified,
+        job_title: m.job_title,
+        company: m.company,
+        expertise_areas: m.expertise_areas,
+        location: m.location,
+        created_at: m.created_at || ""
+      }))
       setMentors(mentorData)
 
       // Calculate stats
       const total = mentorData.length
-      const verified = mentorData.filter((m: any) => m.verified).length
+      const verified = mentorData.filter((m) => m.verified).length
       const pending = total - verified
 
       setStats({ total, verified, pending })

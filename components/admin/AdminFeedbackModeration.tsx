@@ -40,7 +40,7 @@ export function AdminFeedbackModeration() {
         .order('created_at', { ascending: true })
 
       if (error) throw error
-      setFeedbacks((data as any[]) || [])
+      setFeedbacks((data as unknown as AdminFeedback[]) || [])
     } catch (err) {
       console.error("Error fetching feedbacks:", err)
     } finally {

@@ -50,13 +50,14 @@ export function RoleSelectionModal({ open, onClose, userId, onSuccess }: RoleSel
         .single()
 
       if (roleQueryError) throw roleQueryError
+      if (!roleData) throw new Error("Role não encontrada")
 
       // 2. Criar atribuição de role
       const { error: insertError } = await (supabase
         .from("user_roles") as any)
         .insert({
           user_id: userId,
-          role_id: (roleData as any).id
+          role_id: (roleData as { id: string }).id
         })
 
       if (insertError) throw insertError

@@ -12,6 +12,10 @@ export interface AdminUserUpdate {
     verified?: boolean
     verification_notes?: string
     is_public?: boolean
+    institution?: string
+    course?: string
+    academic_level?: string
+    expected_graduation?: string
 }
 
 class AdminService {

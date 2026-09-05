@@ -263,7 +263,7 @@ export function AppointmentCard({
         <div className="flex gap-2 flex-wrap">
           {(canChat || canConfirm) && (
             <ChatButton
-              appointment={appointment as any}
+              appointment={appointment}
               currentUserId={currentUserId}
               isMentor={isMentor}
             />
@@ -284,14 +284,14 @@ export function AppointmentCard({
 
           {canConfirm && (
             <ConfirmAppointmentButton
-              appointment={appointment as any}
+              appointment={appointment}
               onConfirmed={() => onAppointmentUpdate?.(appointment)}
             />
           )}
 
           {canCancel && (
             <CancelAppointmentButton
-              appointment={appointment as any}
+              appointment={appointment}
               onCancelled={() => onAppointmentUpdate?.(appointment)}
               variant="outline"
             />
@@ -319,7 +319,7 @@ export function AppointmentCard({
       <CompleteAppointmentModal
         open={isCompleteModalOpen}
         onOpenChange={setIsCompleteModalOpen}
-        appointment={appointment as any}
+        appointment={appointment}
         currentUserId={currentUserId}
         isMentor={isMentor}
         onCompleted={() => {

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Globe, Check } from "lucide-react"
-import { usePathname, useRouter } from "@/i18n/routing"
+import { usePathname, useRouter, type Locale } from "@/i18n/routing"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,15 +18,15 @@ export function LanguageSelector() {
   const pathname = usePathname()
   const router = useRouter()
 
-  const languages = [
+  const languages: { code: Locale; label: string }[] = [
     { code: "pt-BR", label: t("portuguese") },
     { code: "en", label: t("english") },
     { code: "es", label: t("spanish") }
   ]
 
-  const handleLanguageChange = (newLocale: string) => {
+  const handleLanguageChange = (newLocale: Locale) => {
     // next-intl handling: router.replace keeps the same path but changes the locale
-    router.replace(pathname, { locale: newLocale as any })
+    router.replace(pathname, { locale: newLocale })
   }
 
   return (

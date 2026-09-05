@@ -49,9 +49,9 @@ export function NewsletterDashboard() {
         sub.email,
         sub.name || '',
         sub.whatsapp || '',
-        format(new Date((sub as any).subscribed_at || sub.created_at || ''), 'dd/MM/yyyy HH:mm'),
+        format(new Date(sub.subscribed_at || ''), 'dd/MM/yyyy HH:mm'),
         sub.marketing_consent ? 'Sim' : 'Não',
-        (sub as any).status || ''
+        sub.status || ''
       ].join(','))
     ].join('\n')
 
@@ -203,7 +203,7 @@ export function NewsletterDashboard() {
                         <Calendar className="h-3 w-3 text-muted-foreground" />
                         <span className="text-sm">
                           {format(
-                            new Date((subscription as any).subscribed_at || subscription.created_at), 
+                            new Date(subscription.subscribed_at || ''), 
                             'dd/MM/yyyy HH:mm',
                             { locale: ptBR }
                           )}
@@ -226,9 +226,9 @@ export function NewsletterDashboard() {
                     </TableCell>
                     <TableCell>
                       <Badge 
-                        variant={(subscription as any).status === 'active' ? 'default' : 'secondary'}
+                        variant={subscription.status === 'active' ? 'default' : 'secondary'}
                       >
-                        {(subscription as any).status === 'active' ? 'Ativo' : 'Cancelado'}
+                        {subscription.status === 'active' ? 'Ativo' : 'Cancelado'}
                       </Badge>
                     </TableCell>
                   </TableRow>

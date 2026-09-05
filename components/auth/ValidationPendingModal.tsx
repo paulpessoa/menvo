@@ -18,7 +18,7 @@ export function ValidationPendingModal({ open, onClose }: ValidationPendingModal
   const getStatusInfo = () => {
     if (!profile) return null
 
-    const status = (profile as any).verification_status || (profile.verified ? 'approved' : 'pending')
+    const status = (profile.verification_status as string) || (profile.verified ? 'approved' : 'pending')
 
     switch (status) {
       case "pending":
@@ -56,7 +56,7 @@ export function ValidationPendingModal({ open, onClose }: ValidationPendingModal
   const statusInfo = getStatusInfo()
   if (!statusInfo || !profile) return null
 
-  const status = (profile as any).verification_status || (profile.verified ? 'approved' : 'pending')
+  const status = (profile.verification_status as string) || (profile.verified ? 'approved' : 'pending')
   const Icon = statusInfo.icon
 
   return (

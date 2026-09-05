@@ -65,7 +65,7 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
 
       const { data, error } = await query.order('created_at', { ascending: false })
       if (error) throw error
-      setFeedback((data as any[]) || [])
+      setFeedback((data as unknown as Feedback[]) || [])
     } catch (err) {
       console.error("Error fetching feedbacks:", err)
     } finally {
@@ -87,8 +87,8 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
     setIsSubmitting(true)
 
     try {
-      const { error } = await (supabase
-        .from("appointment_feedbacks") as any)
+      const { error } = await supabase
+        .from("appointment_feedbacks")
         .update({ 
           public_feedback: newComment,
           status: 'pending', // Volta para análise após editar

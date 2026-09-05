@@ -42,7 +42,7 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
           .order("created_at", { ascending: false })
 
         if (error) throw error
-        setReviews((data as any[]) || [])
+        setReviews((data as unknown as Review[]) || [])
       } catch (err) {
         console.error("Error fetching reviews:", err)
       } finally {

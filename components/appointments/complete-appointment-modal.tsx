@@ -56,10 +56,10 @@ export function CompleteAppointmentModal({
 
         try {
             // 1. Criar feedback
-            const { error: feedbackError } = await (supabase
-                .from('appointment_feedbacks') as any)
+            const { error: feedbackError } = await supabase
+                .from('appointment_feedbacks')
                 .insert({
-                    appointment_id: appointment.id,
+                    appointment_id: String(appointment.id),
                     reviewer_id: currentUserId,
                     reviewed_id: otherPerson.id,
                     rating,
@@ -71,13 +71,13 @@ export function CompleteAppointmentModal({
 
             // 2. Marcar appointment como completed
             // Como apenas o mentee avalia, marcamos como completed imediatamente
-            const { error: updateError } = await (supabase
-                .from('appointments') as any)
+            const { error: updateError } = await supabase
+                .from('appointments')
                 .update({
                     status: 'completed',
                     updated_at: new Date().toISOString()
                 })
-                .eq('id', appointment.id)
+                .eq('id', String(appointment.id))
 
             if (updateError) throw updateError
 

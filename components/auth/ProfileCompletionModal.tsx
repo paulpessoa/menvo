@@ -34,14 +34,17 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
     setIsSubmitting(true)
     try {
       const updateData = {
-        ...formData,
-        status: 'completed',
-        updated_at: new Date().toISOString(),
+        full_name: formData.full_name,
+        bio: formData.bio,
+        expertise_areas: formData.expertise_areas
+          ? formData.expertise_areas.split(",").map((s) => s.trim()).filter(Boolean)
+          : null,
+        linkedin_url: formData.linkedin_url || null,
+        updated_at: new Date().toISOString()
       }
 
-      // Cast here is necessary for build time discovery
-      const { error } = await (supabase
-        .from("profiles") as any)
+      const { error } = await supabase
+        .from("profiles")
         .update(updateData)
         .eq("id", user.id)
 
