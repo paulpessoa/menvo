@@ -56,3 +56,22 @@ export const auth = {
     if (error) throw error
   }
 }
+
+type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
+
+export const profileService = {
+  updateProfile: async (userId: string, updates: ProfileUpdate) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", userId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+}

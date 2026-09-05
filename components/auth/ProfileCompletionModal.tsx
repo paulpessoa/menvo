@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { createClient } from "@/lib/utils/supabase/client"
+import { profileService } from "@/lib/services/auth/auth.service"
 import { useAuth } from "@/lib/auth"
 
 interface ProfileCompletionModalProps {
@@ -25,7 +25,6 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { user, profile, isMentor, refreshProfile } = useAuth()
-  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,16 +38,10 @@ export function ProfileCompletionModal({ isOpen, onClose }: ProfileCompletionMod
         expertise_areas: formData.expertise_areas
           ? formData.expertise_areas.split(",").map((s) => s.trim()).filter(Boolean)
           : null,
-        linkedin_url: formData.linkedin_url || null,
-        updated_at: new Date().toISOString()
+        linkedin_url: formData.linkedin_url || null
       }
 
-      const { error } = await supabase
-        .from("profiles")
-        .update(updateData)
-        .eq("id", user.id)
-
-      if (error) throw error
+      await profileService.updateProfile(user.id, updateData)
 
       await refreshProfile()
       onClose()
