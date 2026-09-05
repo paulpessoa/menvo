@@ -3,6 +3,7 @@ import type { Database } from '@/lib/types/supabase'
 
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
 export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
+export type MentorViewRow = Database['public']['Views']['mentors_view']['Row']
 
 export interface AdminUserUpdate {
     first_name?: string
@@ -89,6 +90,19 @@ class AdminService {
 
         if (error) throw error
         return true
+    }
+
+    /**
+     * Busca todos os mentores para o painel administrativo através da view mentors_view
+     */
+    async getAllMentors(): Promise<MentorViewRow[]> {
+        const { data, error } = await this.supabase
+            .from('mentors_view')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+        if (error) throw error
+        return data || []
     }
 }
 

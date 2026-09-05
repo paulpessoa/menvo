@@ -22,7 +22,7 @@ import {
   RefreshCw,
   AlertTriangle
 } from "lucide-react"
-import { createClient } from "@/lib/utils/supabase/client"
+import { adminService } from "@/lib/services/admin/admin.service"
 import { MentorCard } from "./MentorCard"
 import { toast } from "sonner"
 
@@ -60,32 +60,19 @@ export function MentorManagementPanel() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("all")
 
-  const supabase = createClient()
-
   useEffect(() => {
-    if (supabase) {
-      fetchMentors()
-    } else {
-      setLoading(false)
-    }
-  }, [supabase])
+    fetchMentors()
+  }, [])
 
   useEffect(() => {
     filterMentors()
   }, [mentors, searchTerm, activeTab])
 
   const fetchMentors = async () => {
-    if (!supabase) return
     setLoading(true)
 
     try {
-      // Use mentors_admin_view to get all mentors (verified and unverified)
-      const { data, error } = await supabase
-        .from("mentors_admin_view")
-        .select("*")
-        .order("created_at", { ascending: false })
-
-      if (error) throw error
+      const data = await adminService.getAllMentors()
 
       const mentorData: Mentor[] = (data || []).map((m) => ({
         id: m.id || "",
@@ -183,28 +170,6 @@ export function MentorManagementPanel() {
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin" />
         <span className="ml-2">Carregando mentores...</span>
-      </div>
-    )
-  }
-
-  if (!supabase) {
-    return (
-      <div className="p-6">
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-              <CardTitle className="text-red-800">
-                Erro de Configuração
-              </CardTitle>
-            </div>
-            <CardDescription className="text-red-700">
-              As variáveis de ambiente do Supabase não foram configuradas
-              corretamente. Por favor, verifique o arquivo .env ou as
-              configurações do Vercel.
-            </CardDescription>
-          </CardHeader>
-        </Card>
       </div>
     )
   }

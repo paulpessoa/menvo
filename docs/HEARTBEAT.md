@@ -28,6 +28,7 @@
 - [x] `maps cleanup` — Deleted obsolete `/maps` route and `components/maps/VolunteerMap.tsx`; removed `leaflet`, `@types/leaflet`, and `react-leaflet` dependencies from `package.json`.
 - [x] `build fix` — Resolved Next.js build type error in `app/[locale]/mentors/[slug]/page.tsx` (`openGraph` image `alt` nullable typing).
 - [x] `admin mentor card & eslint fix` — Moved mentor verification to `VerificationService.setMentorVerification` resolving strict `never` typing error; set `ignoreDuringBuilds: true` in `next.config.mjs` to bypass ESLint 9 options mismatch during Next.js production builds.
+- [x] `mentor management panel fix` — Resolved `never` typing error by querying `mentors_view` via `adminService.getAllMentors()` instead of non-existent `mentors_admin_view`.
 
 ---
 
