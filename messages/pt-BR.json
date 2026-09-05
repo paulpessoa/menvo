@@ -538,7 +538,6 @@
         "description": "Busco profissionais qualificados para oportunidades"
       }
     },
-    "success": "Conta criada com sucesso!",
     "error": {
       "requiredFields": "Nome e sobrenome são obrigatórios",
       "unexpected": "Ocorreu um erro inesperado. Tente novamente."
@@ -1104,7 +1103,8 @@
     "toast": {
       "featureUnderDevelopment": "Esta funcionalidade ainda está em desenvolvimento. Em breve!"
     },
-    "magicSearch": {      "placeholder": "Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')",
+    "magicSearch": {
+      "placeholder": "Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')",
       "button": "Buscar com IA",
       "loading": "Mágica em andamento...",
       "error": "A mágica falhou desta vez. Tente novamente em instantes.",
@@ -1150,9 +1150,9 @@
       "mentorshipApproachTitle": "Abordagem de Mentoria",
       "mentorshipApproachDescription": "Estes detalhes ajudam os alunos a entenderem como você pode ajudá-los.",
       "mentorshipApproachLabel": "Como você costuma mentorar?",
-      "mentorshipApproachPlaceholder": "Fale sobre seu estilo de mentoria...",
+      "mentorshipApproachPlaceholder": "Como você costuma mentorar?",
       "whatToExpectLabel": "O que o aluno deve trazer para a sessão?",
-      "whatToExpectPlaceholder": "Ex: Dúvidas específicas, currículo atualizado, portfólio...",
+      "whatToExpectPlaceholder": "O que o mentee pode esperar das suas sessões?",
       "firstName": "Nome",
       "firstNamePlaceholder": "Seu primeiro nome",
       "lastName": "Sobrenome",
@@ -1172,9 +1172,7 @@
       "country": "País",
       "languages": "Idiomas",
       "mentorshipApproach": "Abordagem de Mentoria",
-      "mentorshipApproachPlaceholder": "Como você costuma mentorar?",
       "whatToExpect": "O que esperar",
-      "whatToExpectPlaceholder": "O que o mentee pode esperar das suas sessões?",
       "idealMentee": "Mentorado Ideal",
       "idealMenteePlaceholder": "Quem é o perfil de pessoa que você mais pode ajudar?",
       "expertiseAreas": "Áreas de Expertise",
@@ -1212,7 +1210,8 @@
       "evening": "Boa noite",
       "learningGoals": "Objetivos de Aprendizado",
       "learningGoalsPlaceholder": "Descreva o que você deseja aprender ou desenvolver..."
-      },    "mentor": {
+    },
+    "mentor": {
       "welcome": "Bem-vindo ao seu dashboard de mentor. Gerencie suas mentorias e ajude outros profissionais.",
       "verification": {
         "pending": "Verificação Pendente",
