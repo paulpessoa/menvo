@@ -36,6 +36,10 @@ export async function GET(request: NextRequest) {
                     full_name,
                     email,
                     avatar_url
+                ),
+                feedbacks:appointment_feedbacks(
+                    id,
+                    reviewer_id
                 )
             `)
             .order('scheduled_at', { ascending: false })

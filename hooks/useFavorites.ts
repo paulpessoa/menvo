@@ -1,45 +1,33 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/utils/supabase/client';
 import { toast } from 'sonner';
 
 export function useFavorites(userId?: string) {
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const supabase = createClient();
 
-  const fetchFavorites = useCallback(async () => {
-    if (!userId) return;
-    setLoading(true);
-    try {
+  const { data: favorites = [], isLoading: loading } = useQuery<string[]>({
+    queryKey: ['favorites', userId],
+    queryFn: async () => {
+      if (!userId) return [];
       const { data, error } = await supabase
         .from('user_favorites')
         .select('mentor_id')
         .eq('user_id', userId);
 
       if (error) throw error;
-      setFavorites((data as any[])?.map(f => f.mentor_id) || []);
-    } catch (error) {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, supabase]);
+      return (data as { mentor_id: string }[])?.map(f => f.mentor_id) || [];
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache fresco
+  });
 
-  useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+  const mutation = useMutation({
+    mutationFn: async ({ mentorId, isFavorite }: { mentorId: string; isFavorite: boolean }) => {
+      if (!userId) throw new Error('Não autenticado');
 
-  const toggleFavorite = async (mentorId: string) => {
-    if (!userId) {
-      toast.error('Faça login para salvar favoritos');
-      return;
-    }
-
-    const isFavorite = favorites.includes(mentorId);
-
-    try {
       if (isFavorite) {
         const { error } = await supabase
           .from('user_favorites')
@@ -47,25 +35,53 @@ export function useFavorites(userId?: string) {
           .eq('user_id', userId)
           .eq('mentor_id', mentorId);
         if (error) throw error;
-        setFavorites(prev => prev.filter(id => id !== mentorId));
-        toast.success('Removido dos favoritos');
       } else {
         const { error } = await supabase
           .from('user_favorites')
           .insert({ user_id: userId, mentor_id: mentorId } as any);
         if (error) throw error;
-        setFavorites(prev => [...prev, mentorId]);
-        toast.success('Adicionado aos favoritos');
       }
-    } catch (error) {
+      return { mentorId, isFavorite };
+    },
+    onMutate: async ({ mentorId, isFavorite }) => {
+      await queryClient.cancelQueries({ queryKey: ['favorites', userId] });
+      const previousFavorites = queryClient.getQueryData<string[]>(['favorites', userId]) || [];
+
+      // Optimistic update para feedback instantâneo
+      const updatedFavorites = isFavorite
+        ? previousFavorites.filter(id => id !== mentorId)
+        : [...previousFavorites, mentorId];
+
+      queryClient.setQueryData(['favorites', userId], updatedFavorites);
+      return { previousFavorites };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(['favorites', userId], context.previousFavorites);
+      }
       toast.error('Erro ao atualizar favoritos');
+    },
+    onSuccess: (_, { isFavorite }) => {
+      toast.success(isFavorite ? 'Removido dos favoritos' : 'Adicionado aos favoritos');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites', userId] });
     }
+  });
+
+  const toggleFavorite = async (mentorId: string) => {
+    if (!userId) {
+      toast.error('Faça login para salvar favoritos');
+      return;
+    }
+    const isFavorite = favorites.includes(mentorId);
+    await mutation.mutateAsync({ mentorId, isFavorite });
   };
 
   return {
     favorites,
     loading,
     toggleFavorite,
-    refreshFavorites: fetchFavorites
+    refreshFavorites: () => queryClient.invalidateQueries({ queryKey: ['favorites', userId] })
   };
 }

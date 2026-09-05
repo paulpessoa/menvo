@@ -18,9 +18,13 @@ import { ConfirmAppointmentButton } from "./confirm-appointment-button"
 import { CancelAppointmentButton } from "./cancel-appointment-button"
 import { ChatButton } from "./chat-button"
 import { CompleteAppointmentModal } from "./complete-appointment-modal"
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/utils/supabase/client"
+import { useState } from "react"
 import { useTranslations, useFormatter } from "next-intl"
+
+interface AppointmentFeedbackItem {
+  id: string | number
+  reviewer_id: string
+}
 
 interface Appointment {
   id: string | number
@@ -33,6 +37,7 @@ interface Appointment {
   cancellation_reason?: string
   cancelled_at?: string
   cancelled_by?: string
+  feedbacks?: AppointmentFeedbackItem[]
   mentor: {
     id: string
     full_name: string
@@ -62,8 +67,6 @@ export function AppointmentCard({
   const commonT = useTranslations("common")
   const format = useFormatter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
-  const [hasUserEvaluated, setHasUserEvaluated] = useState(false)
-  const [loading, setLoading] = useState(true)
 
   const mentor = Array.isArray(appointment.mentor)
     ? appointment.mentor[0]
@@ -76,27 +79,11 @@ export function AppointmentCard({
   const otherPerson = (isMentor ? mentee : mentor) || { id: "", full_name: "Usuário", avatar_url: null }
   const userRole = isMentor ? "mentor" : "mentee"
 
-  useEffect(() => {
-    const checkEvaluation = async () => {
-      if (isMentor || appointment.status !== "confirmed") {
-        setLoading(false)
-        return
-      }
-
-      const supabase = createClient()
-      const { data } = await supabase
-        .from("appointment_feedbacks")
-        .select("id")
-        .eq("appointment_id", appointment.id)
-        .eq("reviewer_id", currentUserId)
-        .maybeSingle()
-
-      setHasUserEvaluated(!!data)
-      setLoading(false)
-    }
-
-    checkEvaluation()
-  }, [appointment.id, appointment.status, currentUserId, isMentor])
+  // Avaliação calculada diretamente dos dados da consulta mãe, sem query N+1
+  const hasUserEvaluated = Boolean(
+    appointment.feedbacks &&
+      appointment.feedbacks.some((f) => f.reviewer_id === currentUserId)
+  )
 
   const dateObj = new Date(appointment.scheduled_at)
   const now = new Date()
@@ -144,8 +131,7 @@ export function AppointmentCard({
     !isMentor &&
     appointment.status === "confirmed" &&
     isPast &&
-    !hasUserEvaluated &&
-    !loading
+    !hasUserEvaluated
 
   const handleProfileClick = async () => {
     const rolePath = isMentor ? "mentee" : "mentors"

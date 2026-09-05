@@ -1,0 +1,101 @@
+{
+  "version": 2,
+  "skills": {
+    "react-composition-patterns": {
+      "name": "react-composition-patterns",
+      "source": "local",
+      "contentHash": "171c6a35a0a74a6b37facf2a6e3883a02f53e3f2d429e6aa5834412c65d38dc7",
+      "installedAt": "2026-09-05T02:59:43.509Z",
+      "updatedAt": "2026-09-05T02:59:43.509Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "react-best-practices": {
+      "name": "react-best-practices",
+      "source": "local",
+      "contentHash": "e96f99e13dc2acc75efc1793aee08fe244802a97a4e190af38bd5a871a5c9636",
+      "installedAt": "2026-09-05T03:00:35.862Z",
+      "updatedAt": "2026-09-05T03:00:35.862Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "coupling-analysis": {
+      "name": "coupling-analysis",
+      "source": "local",
+      "contentHash": "a33a142a73ac2e6b8db300acb3d13dba5077e225cbfad7599b0ac431290ab5c7",
+      "installedAt": "2026-09-05T03:00:35.873Z",
+      "updatedAt": "2026-09-05T03:00:35.873Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "modular-decomposition": {
+      "name": "modular-decomposition",
+      "source": "local",
+      "contentHash": "b536c1851c862516e5fc111502311343b952073a992ea07c9f8f9b42fbbc2a44",
+      "installedAt": "2026-09-05T03:00:35.902Z",
+      "updatedAt": "2026-09-05T03:00:35.902Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "frontend-blueprint": {
+      "name": "frontend-blueprint",
+      "source": "local",
+      "contentHash": "c79c5acbf69e88e1b0c848e64afb671f33091e32b6dcb1b2e6f9c78213a10ec3",
+      "installedAt": "2026-09-05T03:00:35.918Z",
+      "updatedAt": "2026-09-05T03:00:35.918Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "web-quality-audit": {
+      "name": "web-quality-audit",
+      "source": "local",
+      "contentHash": "8af5bd3453984bdcef903709b6ef0606b12ae1badb6dd5b5b382b930d2594d7c",
+      "installedAt": "2026-09-05T03:00:35.930Z",
+      "updatedAt": "2026-09-05T03:00:35.930Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "tlc-spec-driven": {
+      "name": "tlc-spec-driven",
+      "source": "local",
+      "contentHash": "9f4c793556001f3210a2d9fe3b41bf24e82e581c522d8dd50f65addfee169a29",
+      "installedAt": "2026-09-05T03:00:35.974Z",
+      "updatedAt": "2026-09-05T03:00:35.974Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "create-adr": {
+      "name": "create-adr",
+      "source": "local",
+      "contentHash": "47ec663c849e8c1620c6f33a7be0055acdcf838c27ab7c16f44260244b80195a",
+      "installedAt": "2026-09-05T03:00:35.989Z",
+      "updatedAt": "2026-09-05T03:00:35.989Z",
+      "agents": [
+        "antigravity"
+      ],
+      "method": "copy",
+      "global": false
+    }
+  }
+}

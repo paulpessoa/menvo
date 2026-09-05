@@ -1,49 +1,28 @@
 "use client"
 
 import { useState } from "react"
-import { Link, usePathname, useRouter } from "@/i18n/routing"
+import { Link, usePathname } from "@/i18n/routing"
 import Image from "next/image"
 import {
-  Menu,
   User,
-  LogOut,
   Settings,
   MessageSquare,
   Shield,
   LayoutDashboard,
-  Building2,
   Loader2,
-  ChevronRight,
   Heart
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger
-} from "@/components/ui/sheet"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/lib/auth"
 import { LanguageSelector } from "./LanguageSelector"
 import { MessagesBadge } from "./MessagesBadge"
-import { Separator } from "@/components/ui/separator"
+import { UserNavDropdown } from "./header/UserNavDropdown"
+import { MobileNavSheet } from "./header/MobileNavSheet"
+import { UserNavigationItem } from "./header/types"
 
 export default function Header() {
-  const { user, profile, isAuthenticated, loading, role, isAdmin, signOut } =
-    useAuth()
-  const router = useRouter()
+  const { user, profile, isAuthenticated, loading, role, isAdmin, signOut } = useAuth()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
@@ -55,11 +34,9 @@ export default function Header() {
     { name: t("common.howItWorks"), href: "/how-it-works" }
   ]
 
-  // Montagem LINEAR e SEGURA do menu para evitar erros de iterabilidade
-  const userNavigation: any[] = []
+  const userNavigation: UserNavigationItem[] = []
 
   if (isAuthenticated) {
-    // Todos os usuários autenticados vão para /dashboard, o middleware cuida do resto
     userNavigation.push({
       name: t("header.userMenu.dashboard"),
       href: "/dashboard",
@@ -72,7 +49,6 @@ export default function Header() {
       icon: User,
       color: "text-gray-700"
     })
-
     userNavigation.push({
       name: t("header.userMenu.messages"),
       href: "/messages",
@@ -86,9 +62,8 @@ export default function Header() {
       color: "text-gray-700"
     })
 
-    // Itens de Administração (Somente para Admins)
     if (isAdmin) {
-      userNavigation.push({ type: 'separator' })
+      userNavigation.push({ type: "separator" })
       userNavigation.push({
         name: "Gerenciar Usuários",
         href: "/dashboard/admin/users",
@@ -109,7 +84,6 @@ export default function Header() {
     setIsOpen(false)
   }
 
-  // Helper para obter o nome de exibição mais amigável
   const displayName =
     profile?.full_name ||
     user?.user_metadata?.full_name ||
@@ -167,10 +141,10 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Direita: Ferramentas */}
+        {/* Direita: Ferramentas e Usuário */}
         <div className="w-3/4 lg:w-1/4 flex justify-end items-center gap-2">
           <LanguageSelector />
-          
+
           {isAuthenticated && role === "mentee" && (
             <Button
               variant="ghost"
@@ -192,79 +166,16 @@ export default function Header() {
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : isAuthenticated ? (
-            <div className="hidden md:block">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full h-9 w-9 border shadow-sm"
-                  >
-                    <Avatar className="h-full w-full">
-                      <AvatarImage
-                        src={
-                          profile?.avatar_url || user?.user_metadata?.avatar_url
-                        }
-                        alt={displayName}
-                      />
-                      <AvatarFallback className="bg-primary/5 text-primary font-bold">
-                        {displayInitial}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64 p-2" align="end">
-                  <DropdownMenuLabel className="font-normal px-2 py-3">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-bold leading-none">
-                        {displayName}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
-                      <Badge
-                        variant="secondary"
-                        className="w-fit mt-2 text-[10px] uppercase tracking-wider"
-                      >
-                        {isAdmin
-                          ? "Administrador"
-                          : role === "mentor"
-                            ? "Mentor"
-                            : "Mentorado"}
-                      </Badge>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {userNavigation.map((item, index) => (
-                    item.type === 'separator' ? (
-                      <DropdownMenuSeparator key={`sep-${index}`} />
-                    ) : (
-                      <DropdownMenuItem
-                        key={item.name}
-                        asChild
-                        className="cursor-pointer rounded-md"
-                      >
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-3 py-2"
-                        >
-                          <item.icon className={`h-4 w-4 ${item.color || ""}`} />
-                          <span className="font-medium">{item.name}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    )
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleSignOut}
-                    className="text-red-600 focus:text-red-600 cursor-pointer rounded-md"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />{" "}
-                    {t("header.userMenu.logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <UserNavDropdown
+              displayName={displayName}
+              displayInitial={displayInitial}
+              email={user?.email}
+              avatarUrl={profile?.avatar_url || user?.user_metadata?.avatar_url}
+              isAdmin={isAdmin}
+              role={role}
+              userNavigation={userNavigation}
+              onSignOut={handleSignOut}
+            />
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Button asChild size="sm" className="shadow-md rounded-xl font-bold px-6">
@@ -273,132 +184,20 @@ export default function Header() {
             </div>
           )}
 
-          {/* Hamburger Mobile */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden h-10 w-10"
-              >
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-[300px] sm:w-[350px] p-0 flex flex-col"
-            >
-              <SheetHeader className="p-6 text-left border-b bg-muted/20">
-                <SheetTitle className="flex items-center gap-3">
-                  {isAuthenticated ? (
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-primary/20">
-                        <AvatarImage src={profile?.avatar_url || ""} />
-                        <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                          {displayInitial}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-lg leading-tight truncate max-w-[180px]">
-                          {displayName}
-                        </span>
-                        <span className="text-xs text-muted-foreground truncate max-w-[180px]">
-                          {user?.email}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="relative h-8 w-24">
-                      <Image
-                        src="/menvo-logo-light.png"
-                        alt="Menvo"
-                        fill
-                        className="object-contain dark:hidden"
-                        priority
-                      />
-                      <Image
-                        src="/menvo-logo-dark.png"
-                        alt="Menvo"
-                        fill
-                        className="object-contain hidden dark:block"
-                        priority
-                      />
-                    </div>
-                  )}
-                </SheetTitle>
-              </SheetHeader>
-
-              <div className="flex-1 overflow-y-auto">
-                <div className="p-4 space-y-1">
-                  <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-                    Navegação
-                  </p>
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`flex items-center justify-between px-3 py-3 rounded-xl text-base font-medium transition-colors ${
-                        pathname === item.href
-                          ? "bg-primary/10 text-primary"
-                          : "text-gray-700 hover:bg-muted"
-                      }`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                      <ChevronRight className="h-4 w-4 opacity-50" />
-                    </Link>
-                  ))}
-                </div>
-
-                {isAuthenticated && userNavigation.length > 0 && (
-                  <>
-                    <Separator className="my-2" />
-                    <div className="p-4 space-y-1">
-                      <p className="px-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-                        Minha Conta
-                      </p>
-                      {userNavigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className="flex items-center gap-4 px-3 py-3 rounded-xl text-base font-medium text-gray-700 hover:bg-muted transition-colors"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <item.icon
-                            className={`h-5 w-5 ${item.color || ""}`}
-                          />
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {!isAuthenticated && (
-                  <div className="p-6 mt-auto border-t space-y-3">
-                    <Button
-                      className="w-full h-12 text-lg shadow-lg rounded-xl font-bold"
-                      asChild
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Link href="/login">{t("common.login")}</Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {isAuthenticated && (
-                <div className="p-4 border-t bg-muted/10 mt-auto">
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-4 w-full px-3 py-3 rounded-xl text-base font-bold text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut className="h-5 w-5" /> {t("header.userMenu.logout")}
-                  </button>
-                </div>
-              )}
-            </SheetContent>
-          </Sheet>
+          {/* Drawer Mobile */}
+          <MobileNavSheet
+            isOpen={isOpen}
+            onOpenChange={setIsOpen}
+            isAuthenticated={isAuthenticated}
+            displayName={displayName}
+            displayInitial={displayInitial}
+            email={user?.email}
+            avatarUrl={profile?.avatar_url || user?.user_metadata?.avatar_url}
+            navigation={navigation}
+            userNavigation={userNavigation}
+            currentPathname={pathname}
+            onSignOut={handleSignOut}
+          />
         </div>
       </div>
     </header>
