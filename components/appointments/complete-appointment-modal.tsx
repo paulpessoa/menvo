@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Star, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/utils/supabase/client'
+import { mentorshipService } from '@/lib/services/mentorship/mentorship.service'
 
 interface CompleteAppointmentModalProps {
     open: boolean
@@ -42,7 +42,6 @@ export function CompleteAppointmentModal({
     const [publicFeedback, setPublicFeedback] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const supabase = createClient()
     const otherPerson = isMentor ? appointment.mentee : appointment.mentor
     const otherPersonRole = isMentor ? 'mentee' : 'mentor'
 
@@ -55,31 +54,14 @@ export function CompleteAppointmentModal({
         setIsSubmitting(true)
 
         try {
-            // 1. Criar feedback
-            const { error: feedbackError } = await supabase
-                .from('appointment_feedbacks')
-                .insert({
-                    appointment_id: String(appointment.id),
-                    reviewer_id: currentUserId,
-                    reviewed_id: otherPerson.id,
-                    rating,
-                    private_notes: privateNotes.trim() || null,
-                    public_feedback: publicFeedback.trim() || null
-                })
-
-            if (feedbackError) throw feedbackError
-
-            // 2. Marcar appointment como completed
-            // Como apenas o mentee avalia, marcamos como completed imediatamente
-            const { error: updateError } = await supabase
-                .from('appointments')
-                .update({
-                    status: 'completed',
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', String(appointment.id))
-
-            if (updateError) throw updateError
+            await mentorshipService.submitFeedbackAndComplete({
+                appointmentId: String(appointment.id),
+                reviewerId: currentUserId,
+                reviewedId: otherPerson.id,
+                rating,
+                privateNotes: privateNotes.trim() || null,
+                publicFeedback: publicFeedback.trim() || null
+            })
 
             toast.success('Mentoria avaliada com sucesso!', {
                 description: 'Seu feedback foi registrado.'

@@ -30,6 +30,7 @@
 - [x] `admin mentor card & eslint fix` — Moved mentor verification to `VerificationService.setMentorVerification` resolving strict `never` typing error; set `ignoreDuringBuilds: true` in `next.config.mjs` to bypass ESLint 9 options mismatch during Next.js production builds.
 - [x] `mentor management panel fix` — Resolved `never` typing error by querying `mentors_view` via `adminService.getAllMentors()` instead of non-existent `mentors_admin_view`.
 - [x] `newsletter dashboard fix` — Replaced invalid property `subscribed_at` with schema-defined `created_at` in `NewsletterDashboard.tsx` and `newsletter.service.ts`.
+- [x] `complete appointment modal fix` — Decoupled direct feedback and appointment mutation from component into `mentorshipService.submitFeedbackAndComplete`, eliminating `never` type error.
 
 ---
 
