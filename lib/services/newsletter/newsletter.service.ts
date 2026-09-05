@@ -5,6 +5,7 @@ export interface NewsletterSubscription {
   email: string
   name?: string
   whatsapp?: string
+  created_at?: string
   subscribed_at?: string
   consent_given: boolean
   consent_date: string
@@ -95,7 +96,7 @@ export const newsletterService = {
       .from('newsletter_subscriptions')
       .select('*')
       .eq('status', 'active')
-      .order('subscribed_at', { ascending: false })
+      .order('created_at', { ascending: false })
 
     if (error) throw error
     return data

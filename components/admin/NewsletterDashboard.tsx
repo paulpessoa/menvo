@@ -49,7 +49,7 @@ export function NewsletterDashboard() {
         sub.email,
         sub.name || '',
         sub.whatsapp || '',
-        format(new Date(sub.subscribed_at || ''), 'dd/MM/yyyy HH:mm'),
+        format(new Date(sub.created_at || ''), 'dd/MM/yyyy HH:mm'),
         sub.marketing_consent ? 'Sim' : 'Não',
         sub.status || ''
       ].join(','))
@@ -203,7 +203,7 @@ export function NewsletterDashboard() {
                         <Calendar className="h-3 w-3 text-muted-foreground" />
                         <span className="text-sm">
                           {format(
-                            new Date(subscription.subscribed_at || ''), 
+                            new Date(subscription.created_at || ''), 
                             'dd/MM/yyyy HH:mm',
                             { locale: ptBR }
                           )}
