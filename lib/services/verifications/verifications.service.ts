@@ -58,6 +58,26 @@ class VerificationServiceClass {
     if (error) throw error
     return true
   }
+
+  /**
+   * Directly sets or removes mentor verification status with correct typing.
+   */
+  async setMentorVerification(mentorId: string, verified: boolean): Promise<boolean> {
+    const updatePayload: ProfileUpdate = {
+      verified,
+      verification_status: verified ? "approved" : "rejected",
+      verified_at: verified ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    }
+
+    const { error } = await this.supabase
+      .from("profiles")
+      .update(updatePayload)
+      .eq("id", mentorId)
+
+    if (error) throw error
+    return true
+  }
 }
 
 export const VerificationService = new VerificationServiceClass()

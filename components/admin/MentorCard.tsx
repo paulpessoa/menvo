@@ -19,9 +19,9 @@ import {
   FileText,
   ExternalLink
 } from "lucide-react"
-import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import { Link } from "@/i18n/routing"
+import { VerificationService } from "@/lib/services/verifications/verifications.service"
 import {
   Dialog,
   DialogContent,
@@ -61,7 +61,6 @@ export function MentorCard({
   showActions = true
 }: MentorCardProps) {
   const [isVerifying, setIsVerifying] = useState(false)
-  const supabase = createClient()
 
   // Check if profile is complete
   const isProfileComplete = () => {
@@ -85,15 +84,7 @@ export function MentorCard({
     setIsVerifying(true)
 
     try {
-      const { error } = await supabase.from("profiles")
-        .update({
-          verified,
-          updated_at: new Date().toISOString(),
-          verified_at: verified ? new Date().toISOString() : null
-        })
-        .eq("id", mentor.id)
-
-      if (error) throw error
+      await VerificationService.setMentorVerification(mentor.id, verified)
 
       toast.success(
         verified
