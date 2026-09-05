@@ -1,4 +1,8 @@
 import { createClient } from '@/lib/utils/supabase/client'
+import type { Database } from '@/lib/types/supabase'
+
+export type ProfileRow = Database['public']['Tables']['profiles']['Row']
+export type ProfileUpdate = Database['public']['Tables']['profiles']['Update']
 
 export interface AdminUserUpdate {
     first_name?: string
@@ -16,41 +20,45 @@ class AdminService {
     /**
      * Atualiza dados de qualquer perfil (apenas admins via RLS)
      */
-    async updateUserProfile(userId: string, updates: AdminUserUpdate) {
-        const { data, error } = await (this.supabase
-            .from('profiles') as any)
-            .update({
-                ...updates,
-                updated_at: new Date().toISOString()
-            })
+    async updateUserProfile(userId: string, updates: AdminUserUpdate): Promise<ProfileRow> {
+        const updatePayload: ProfileUpdate = {
+            ...updates,
+            updated_at: new Date().toISOString()
+        }
+
+        const { data, error } = await this.supabase
+            .from('profiles')
+            .update(updatePayload)
             .eq('id', userId)
             .select()
             .single()
 
         if (error) throw error
-        return data
+        return data as ProfileRow
     }
 
     /**
-     * Gerencia roles de um usuário
+     * Gerencia roles de um usuário de forma consistente
      */
-    async setUserRoles(userId: string, roleNames: string[]) {
+    async setUserRoles(userId: string, roleNames: string[]): Promise<boolean> {
         // 1. Buscar os IDs das roles solicitadas
-        const { data: rolesRaw, error: rolesError } = await (this.supabase
+        const { data: rolesRaw, error: rolesError } = await this.supabase
             .from('roles')
             .select('id, name')
-            .in('name', roleNames) as any)
+            .in('name', roleNames)
 
         if (rolesError) throw rolesError
-        const roles = (rolesRaw as any[]) || []
+        const roles = (rolesRaw as { id: string; name: string }[]) || []
 
         // 2. Remover roles atuais
-        const { error: deleteError } = await (this.supabase
+        const { error: deleteError } = await this.supabase
             .from('user_roles')
             .delete()
-            .eq('user_id', userId) as any)
+            .eq('user_id', userId)
 
         if (deleteError) throw deleteError
+
+        if (roles.length === 0) return true
 
         // 3. Inserir novas roles
         const inserts = roles.map(role => ({
@@ -67,11 +75,9 @@ class AdminService {
     }
 
     /**
-     * Deleta um usuário permanentemente (Cuidado!)
+     * Deleta um usuário permanentemente
      */
-    async deleteUser(userId: string) {
-        // Nota: No Supabase, deletar do auth.users requer service_role ou API específica.
-        // Aqui deletamos o perfil, o que acionará o cascade se configurado.
+    async deleteUser(userId: string): Promise<boolean> {
         const { error } = await this.supabase
             .from('profiles')
             .delete()
