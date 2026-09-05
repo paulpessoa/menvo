@@ -152,8 +152,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    target="_blank"
-                    href="https://wa.me/5581995097377"
+                    href="/contact"
                     className="text-muted-foreground hover:text-foreground"
                   >
                     {t("footer.contact")}

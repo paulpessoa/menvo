@@ -48,11 +48,11 @@ export default function CommunityPage() {
     const [isChatOpen, setIsChatOpen] = useState(false)
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
 
-    const { user, profile: currentUserProfile } = useAuth()
+    const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
     const router = useRouter()
     const supabase = createClient()
     
-    const isMentor = currentUserProfile?.roles?.includes('mentor') || false
+    const isMentor = authIsMentor || cachedRoles?.mentor || cachedRoles?.roles?.includes('mentor') || false
 
     const fetchProfiles = useCallback(async (isInitial = false) => {
         try {

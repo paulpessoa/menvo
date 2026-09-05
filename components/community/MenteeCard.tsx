@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { MessageCircle, Linkedin, Github, AlertCircle, X, Eye } from "lucide-react"
+import { MessageCircle, Linkedin, Github, AlertCircle, X, Eye, Sparkles, User } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -47,10 +47,19 @@ interface MenteeCardProps {
 
 export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
   const tCommunity = useTranslations("community")
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
   const [showDisclaimer, setShowDisclaimer] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
+
+  const effectiveIsMentor =
+    isMentor ||
+    authIsMentor ||
+    cachedRoles?.mentor ||
+    cachedRoles?.roles?.includes("mentor") ||
+    false
+
+  const isSelf = user?.id === profile.id
 
   const handleProtectedAction = (e: React.MouseEvent, callback: () => void) => {
     e.preventDefault()
@@ -77,7 +86,12 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
       return
     }
 
-    if (!isMentor) {
+    if (isSelf) {
+      router.push("/profile")
+      return
+    }
+
+    if (!effectiveIsMentor) {
       setShowDisclaimer(true)
     } else {
       onChat(profile.id)
@@ -179,9 +193,22 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
             <Button
               size="lg"
               onClick={handleHelpClick}
-              className="w-full gap-2 font-bold shadow-lg shadow-primary/20 rounded-xl h-12"
+              variant={isSelf ? "outline" : "default"}
+              className={`w-full gap-2 font-bold rounded-xl h-12 transition-all ${
+                isSelf
+                  ? "border-primary/30 text-primary hover:bg-primary/5 hover:border-primary"
+                  : "shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01]"
+              }`}
             >
-              <MessageCircle className="h-5 w-5" /> {tCommunity("offerHelp")}
+              {isSelf ? (
+                <>
+                  <User className="h-5 w-5 text-primary" /> Meu Perfil
+                </>
+              ) : (
+                <>
+                  <MessageCircle className="h-5 w-5" /> {tCommunity("offerHelp")}
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
@@ -195,32 +222,37 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
 
       {/* Disclaimer Modal (Para usuários logados que não são mentores) */}
       <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <div className="bg-yellow-100 w-14 h-14 rounded-full flex items-center justify-center mb-4 text-yellow-600 shadow-inner">
-              <AlertCircle className="h-8 w-8" />
+        <DialogContent className="max-w-md p-6 sm:p-8 rounded-3xl border shadow-2xl">
+          <DialogHeader className="text-left space-y-3">
+            <div className="bg-amber-500/10 text-amber-600 border border-amber-500/20 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm">
+              <AlertCircle className="h-6 w-6" />
             </div>
-            <DialogTitle className="text-2xl font-bold text-gray-900">
-              {tCommunity("disclaimer.title")}
-            </DialogTitle>
-            <DialogDescription className="text-base pt-2 text-gray-600 leading-relaxed">
-              {tCommunity("disclaimer.description", {
-                name: profile.full_name || "este membro"
-              })}
-            </DialogDescription>
+            <div>
+              <DialogTitle className="text-2xl font-black text-gray-900 tracking-tight">
+                {tCommunity("disclaimer.title")}
+              </DialogTitle>
+              <DialogDescription className="text-sm pt-2 text-muted-foreground leading-relaxed">
+                {tCommunity("disclaimer.description", {
+                  name: profile.full_name || "este membro"
+                })}
+              </DialogDescription>
+            </div>
           </DialogHeader>
-          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-sm space-y-2 mt-2">
-            <p className="font-bold text-gray-900">
+
+          <div className="bg-muted/40 p-4 rounded-2xl border border-border/50 text-sm space-y-1.5 mt-2">
+            <p className="font-bold text-gray-900 flex items-center gap-1.5 text-xs uppercase tracking-wider">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
               {tCommunity("disclaimer.whyTitle")}
             </p>
-            <p className="text-gray-500 leading-snug">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {tCommunity("disclaimer.whyDescription")}
             </p>
           </div>
-          <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-6 sm:space-x-0">
             <Button
               variant="outline"
-              className="sm:flex-1 h-11 font-semibold"
+              className="sm:flex-1 h-12 rounded-xl font-bold border-2 hover:bg-muted"
               onClick={() => {
                 setShowDisclaimer(false)
                 onChat(profile.id)
@@ -229,7 +261,7 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
               {tCommunity("disclaimer.chatAnyway")}
             </Button>
             <Button
-              className="sm:flex-1 h-11 bg-green-600 hover:bg-green-700 font-bold shadow-lg"
+              className="sm:flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 rounded-xl"
               asChild
             >
               <Link href="/profile">

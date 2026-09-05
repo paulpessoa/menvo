@@ -656,8 +656,7 @@
       "title": "Choose how to contribute",
       "tabs": {
         "products": "Contribution",
-        "pix": "PIX",
-        "crowdfunding": "Campaign"
+        "pix": "PIX"
       }
     },
     "products": {
@@ -691,13 +690,6 @@
       "copyButton": "Copy PIX Key",
       "copySuccess": "PIX Key copied!",
       "instructions": "Scan the QR Code or use the email key below:"
-    },
-    "crowdfunding": {
-      "title": "Crowdfunding",
-      "description": "Join our 2024 expansion goal.",
-      "goal": "Goal: $ {amount}",
-      "info": "Follow our official campaign and see all supporter rewards.",
-      "button": "View Campaign"
     },
     "usage": {
       "title": "How we use your support",

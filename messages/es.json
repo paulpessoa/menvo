@@ -656,8 +656,7 @@
       "title": "Elige cómo contribuir",
       "tabs": {
         "products": "Contribución",
-        "pix": "PIX",
-        "crowdfunding": "Campaña"
+        "pix": "PIX"
       }
     },
     "products": {
@@ -691,13 +690,6 @@
       "copyButton": "Copiar Clave PIX",
       "copySuccess": "¡Clave PIX copiada!",
       "instructions": "Escanea el código QR ou use a chave e-mail abaixo:"
-    },
-    "crowdfunding": {
-      "title": "Financiamiento Coletivo",
-      "description": "Únete a nossa meta de expansión para 2024.",
-      "goal": "Meta: R$ {amount}",
-      "info": "Sigue nossa campaña oficial y mira todas las recompensas para colaboradores.",
-      "button": "Ver Campaña"
     },
     "usage": {
       "title": "Cómo utilizamos tu apoio",

@@ -21,7 +21,6 @@ import {
   Users,
   Trophy,
   ArrowRight,
-  ExternalLink,
   Copy
 } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -109,12 +108,6 @@ export default function DonatePage() {
                 className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
               >
                 {t("options.tabs.pix")}
-              </TabsTrigger>
-              <TabsTrigger
-                value="vaquinha"
-                className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
-              >
-                {t("options.tabs.crowdfunding")}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -254,45 +247,6 @@ export default function DonatePage() {
                     contato@menvo.com
                   </a>
                 </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="vaquinha" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("crowdfunding.title")}</CardTitle>
-                <CardDescription>
-                  {t("crowdfunding.description")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-muted rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">
-                      {t("crowdfunding.goal", { amount: "5.000" })}
-                    </span>
-                    <span className="text-sm font-medium">65%</span>
-                  </div>
-                  <div className="w-full bg-secondary h-2 rounded-full">
-                    <div className="bg-primary h-2 rounded-full w-[65%]"></div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-muted-foreground">
-                  {t("crowdfunding.info")}
-                </p>
-
-                <Button className="w-full" asChild>
-                  <Link
-                    href="https://www.vakinha.com.br"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t("crowdfunding.button")}{" "}
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
               </CardContent>
             </Card>
           </TabsContent>

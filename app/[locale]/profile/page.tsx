@@ -218,6 +218,62 @@ export default function ProfilePage() {
     else toast.error("Erro ao salvar perfil")
   }
 
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false)
+
+  const handleDetectLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocalização não é suportada pelo seu navegador.")
+      return
+    }
+
+    setIsDetectingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
+            {
+              headers: {
+                "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"
+              }
+            }
+          )
+          if (!response.ok) throw new Error("Falha na geocodificação")
+          const data = await response.json()
+          const addr = data.address || {}
+          const detectedCity =
+            addr.city || addr.town || addr.municipality || addr.village || addr.county || ""
+          const detectedState = addr.state || ""
+          const detectedCountry = addr.country || ""
+
+          setFormData((prev) => ({
+            ...prev,
+            city: detectedCity || prev.city,
+            state: detectedState || prev.state,
+            country: detectedCountry || prev.country
+          }))
+
+          toast.success("Localização preenchida com sucesso!")
+        } catch (err) {
+          console.error("Erro ao detectar localização:", err)
+          toast.error("Não foi possível identificar sua cidade automaticamente. Preencha manualmente.")
+        } finally {
+          setIsDetectingLocation(false)
+        }
+      },
+      (error) => {
+        setIsDetectingLocation(false)
+        if (error.code === error.PERMISSION_DENIED) {
+          toast.error("Permissão de localização negada pelo navegador.")
+        } else {
+          toast.error("Não foi possível obter a sua localização GPS.")
+        }
+      },
+      { timeout: 10000, enableHighAccuracy: false }
+    )
+  }
+
   if (authLoading || profileLoading || !profile) {
     return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
   }
@@ -241,10 +297,10 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSubmit}>
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 bg-muted/50 p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto">
               <TabsTrigger value="basic" className="py-2">Pessoal</TabsTrigger>
               <TabsTrigger value="career" className="py-2">Carreira</TabsTrigger>
-              <TabsTrigger value="address" className="py-2">Endereço</TabsTrigger>
+              <TabsTrigger value="address" className="py-2">Localização</TabsTrigger>
               <TabsTrigger value="interests" className="py-2">Interesses</TabsTrigger>
               <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
             </TabsList>
@@ -308,14 +364,73 @@ export default function ProfilePage() {
 
             <TabsContent value="address" className="space-y-6">
               <Card>
-                <CardHeader><CardTitle>Localização</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-1"><Label>Endereço</Label><Input value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} /></div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="space-y-1"><Label>Cidade</Label><Input value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} /></div>
-                        <div className="space-y-1"><Label>Estado</Label><Input value={formData.state} onChange={(e) => setFormData({...formData, state: e.target.value})} /></div>
-                        <div className="space-y-1"><Label>País</Label><Input value={formData.country} onChange={(e) => setFormData({...formData, country: e.target.value})} /></div>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-primary" /> Localização
+                    </CardTitle>
+                    <CardDescription>
+                      Informe sua cidade, estado e país para facilitar conexões regionais. O endereço exato é opcional.
+                    </CardDescription>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDetectLocation}
+                    disabled={isDetectingLocation}
+                    className="gap-2 shrink-0 border-primary/30 hover:bg-primary/5 hover:text-primary rounded-xl font-semibold self-start sm:self-auto"
+                  >
+                    {isDetectingLocation ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    ) : (
+                      <MapPin className="h-4 w-4 text-primary" />
+                    )}
+                    {isDetectingLocation ? "Detectando..." : "Detectar Localização"}
+                  </Button>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold">Cidade</Label>
+                      <Input
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        placeholder="Ex: São Paulo, Recife, Porto..."
+                      />
                     </div>
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold">Estado / Província</Label>
+                      <Input
+                        value={formData.state}
+                        onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                        placeholder="Ex: PE, SP, RJ..."
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="font-semibold">País</Label>
+                      <Input
+                        value={formData.country}
+                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                        placeholder="Ex: Brasil, Portugal..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 pt-2 border-t">
+                    <div className="flex items-center justify-between">
+                      <Label className="font-semibold">Endereço / Logradouro</Label>
+                      <span className="text-xs text-muted-foreground font-normal">Opcional</span>
+                    </div>
+                    <Input
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      placeholder="Ex: Bairro, Rua ou número (opcional — não exibido publicamente)"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Seu endereço exato nunca é compartilhado publicamente. Apenas sua cidade, estado e país aparecem nos perfis e nas buscas.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
