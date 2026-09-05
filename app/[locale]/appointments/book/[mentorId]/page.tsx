@@ -1,23 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { createClient } from '@/lib/utils/supabase/client';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
+import { mentorService } from '@/lib/services/mentors/mentors.service';
+import type { MentorProfile } from '@/lib/types/models/mentor';
 import BookingForm from '@/components/appointments/BookingForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, User } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface MentorProfile {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    full_name: string;
-    avatar_url?: string;
-    verified: boolean;
-}
 
 export default function BookAppointmentPage() {
     const params = useParams();
@@ -31,22 +23,10 @@ export default function BookAppointmentPage() {
     useEffect(() => {
         const fetchMentor = async () => {
             try {
-                const supabase = createClient();
+                const mentorData = await mentorService.getMentorById(mentorId);
 
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('id, email, first_name, last_name, full_name, avatar_url, verified')
-                    .eq('id', mentorId)
-                    .single();
-
-                if (error) {
-                    throw error;
-                }
-
-                const mentorData = data as unknown as MentorProfile;
-
-                if (!mentorData?.verified) {
-                    setError('Este mentor ainda não foi verificado');
+                if (!mentorData) {
+                    setError('Mentor não encontrado');
                     return;
                 }
 

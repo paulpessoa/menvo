@@ -41,7 +41,7 @@ export default function QuizPage() {
           future_vision: data.futureVision,
           share_knowledge: data.shareKnowledge,
           personal_life_help: data.personalLifeHelp
-        } as any)
+        })
         .select()
         .single()
 
@@ -49,7 +49,7 @@ export default function QuizPage() {
         throw error
       }
 
-      const res = response as any;
+      const res = response
 
       toast({
         title: t('quiz_form.submit_success_title'),

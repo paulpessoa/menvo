@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@/lib/utils/supabase/client"
 import {
   Card,
   CardContent,
@@ -41,7 +40,7 @@ import { MentorshipReviews } from "@/components/mentors/MentorshipReviews"
 import { useFavorites } from "@/hooks/useFavorites"
 import { useAuth } from "@/lib/auth"
 
-interface MentorProfile {
+export interface MentorProfile {
   id: string
   full_name: string
   avatar_url: string | null

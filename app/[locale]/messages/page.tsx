@@ -126,8 +126,16 @@ function MessagesContent() {
               .neq('sender_id', user.id)
               .is('read_at', null)
 
-            const roles = (otherUser as any)?.user_roles || []
-            const roleNames = roles.map((ur: any) => ur.roles?.name).filter(Boolean)
+            interface OtherUserProfile {
+              id: string
+              full_name: string | null
+              avatar_url: string | null
+              user_roles?: Array<{ roles?: { name?: string } | null }> | null
+            }
+
+            const profileData = otherUser as unknown as OtherUserProfile | null
+            const roles = profileData?.user_roles || []
+            const roleNames = roles.map((ur) => ur.roles?.name).filter(Boolean)
             let primaryRole = 'mentee'
             if (roleNames.includes('admin')) primaryRole = 'admin'
             else if (roleNames.includes('mentor')) primaryRole = 'mentor'
@@ -141,8 +149,8 @@ function MessagesContent() {
               unread_count: unreadCount || 0,
               other_user: {
                 id: otherUserId,
-                full_name: (otherUser as any)?.full_name || 'Usuário',
-                avatar_url: (otherUser as any)?.avatar_url || null,
+                full_name: profileData?.full_name || 'Usuário',
+                avatar_url: profileData?.avatar_url || null,
                 role_name: primaryRole
               }
             })
@@ -151,7 +159,7 @@ function MessagesContent() {
           }
         }
 
-        setConversations(conversationsWithDetails as Conversation[])
+        setConversations(conversationsWithDetails)
       }
     } catch (error) {
     } finally {

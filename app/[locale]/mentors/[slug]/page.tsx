@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { createClient } from "@/lib/utils/supabase/server"
 import { notFound } from "next/navigation"
-import MentorProfileClient from "./MentorProfileClient"
+import MentorProfileClient, { type MentorProfile } from "./MentorProfileClient"
 
 interface PageProps {
   params: Promise<{
@@ -14,12 +14,12 @@ async function getMentorData(slug: string) {
   const supabase = await createClient()
 
   // Buscar mentor
-  const { data: mentor, error } = await (supabase
+  const { data: mentor, error } = await supabase
     .from("mentors_view")
     .select("*")
     .eq("slug", slug)
     .eq("verified", true)
-    .single() as any)
+    .single()
 
   if (error || !mentor) {
     return null
@@ -112,15 +112,34 @@ export default async function MentorProfilePage({ params }: PageProps) {
   const { mentor, availability } = data
 
   // Mapear campos da view para o formato esperado pelo componente
-  const mappedMentor = {
-    ...mentor,
+  const mappedMentor: MentorProfile = {
+    id: mentor.id || "",
+    full_name: mentor.full_name || `${mentor.first_name || ""} ${mentor.last_name || ""}`.trim(),
+    avatar_url: mentor.avatar_url,
+    bio: mentor.bio,
     job_title: mentor.job_title,
     company: mentor.company,
-    inclusive_tags: mentor.inclusion_tags,
-    average_rating: mentor.rating,
-    total_reviews: mentor.reviews,
-    total_sessions: mentor.sessions
-  } as any
+    city: mentor.city,
+    state: mentor.state,
+    country: mentor.country,
+    languages: mentor.languages,
+    mentorship_topics: mentor.mentorship_topics,
+    inclusive_tags: mentor.inclusive_tags,
+    expertise_areas: mentor.expertise_areas,
+    availability_status: mentor.availability_status || "available",
+    average_rating: mentor.average_rating || 0,
+    total_reviews: mentor.total_reviews || 0,
+    total_sessions: mentor.total_sessions || 0,
+    chat_enabled: !!mentor.chat_enabled,
+    experience_years: mentor.experience_years,
+    linkedin_url: mentor.linkedin_url,
+    github_url: mentor.github_url,
+    twitter_url: mentor.twitter_url,
+    website_url: mentor.website_url,
+    timezone: mentor.timezone,
+    slug: mentor.slug,
+    created_at: mentor.created_at || undefined
+  }
 
   return (
     <MentorProfileClient

@@ -99,10 +99,11 @@ export default function SettingsPage() {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t("security.error")
       toast({
         title: commonT("error"),
-        description: error.message || t("security.error"),
+        description: message,
         variant: "destructive"
       })
     } finally {

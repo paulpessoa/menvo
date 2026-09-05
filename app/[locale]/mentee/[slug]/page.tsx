@@ -52,28 +52,16 @@ async function getMenteeData(slug: string, currentUserId: string): Promise<{ men
     }
 
     // Verificar se o usuário atual é mentor
-    let isMentor = false
-
-    const { data: mentorData } = await supabase
-        .from('mentors' as any)
+    const { data: mentorView } = await supabase
+        .from('mentors_view')
         .select('id')
         .eq('id', currentUserId)
         .maybeSingle()
 
-    if (mentorData) {
-        isMentor = true
-    } else {
-        const { data: mentorView } = await supabase
-            .from('mentors_view' as any)
-            .select('id')
-            .eq('id', currentUserId)
-            .maybeSingle()
-
-        isMentor = !!mentorView
-    }
+    const isMentor = !!mentorView
 
     return {
-        mentee: mentee as any as MenteeProfile,
+        mentee: mentee as unknown as MenteeProfile,
         isMentor
     }
 }

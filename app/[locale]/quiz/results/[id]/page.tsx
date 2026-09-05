@@ -142,7 +142,7 @@ export default function QuizResultsPage() {
 
             if (error) throw error
 
-            const res = data as any;
+            const res = data as unknown as QuizResponse;
 
             // Wait for processing if not done yet
             if (!res.processed_at) {
@@ -150,7 +150,7 @@ export default function QuizResultsPage() {
                 return
             }
 
-            setResponse(res as QuizResponse)
+            setResponse(res)
         } catch (error) {
             console.error("Error loading results:", error)
             toast({

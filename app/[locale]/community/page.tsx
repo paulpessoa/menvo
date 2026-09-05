@@ -98,12 +98,39 @@ export default function CommunityPage() {
             if (error) throw error
 
             // Filtragem manual leve para garantir o papel de mentee e reduzir carga de RLS
-            const formattedData = (data || [])
-                .filter((p: any) => {
-                    const roles = p.user_roles?.flatMap((ur: any) => ur.roles?.name) || []
+            interface RawProfileRow {
+                id: string
+                full_name: string | null
+                avatar_url: string | null
+                bio: string | null
+                job_title: string | null
+                company: string | null
+                linkedin_url: string | null
+                github_url: string | null
+                expertise_areas: string[] | null
+                slug: string | null
+                user_roles?: Array<{ roles?: { name?: string } | null }> | null
+            }
+
+            const rawData = (data as unknown as RawProfileRow[]) || []
+            const formattedData: UserProfile[] = rawData
+                .filter((p) => {
+                    const roles = p.user_roles?.flatMap((ur) => ur.roles?.name || []) || []
                     return roles.includes('mentee')
                 })
-                .map((p: any) => ({ ...p, role: 'mentee' }))
+                .map((p) => ({
+                    id: p.id,
+                    full_name: p.full_name,
+                    avatar_url: p.avatar_url,
+                    bio: p.bio,
+                    job_title: p.job_title,
+                    company: p.company,
+                    linkedin_url: p.linkedin_url,
+                    github_url: p.github_url,
+                    expertise_areas: p.expertise_areas,
+                    slug: p.slug,
+                    role: 'mentee'
+                }))
 
             if (isInitial) setProfiles(formattedData)
             else setProfiles(prev => [...prev, ...formattedData])
