@@ -18,7 +18,7 @@ import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], display: "swap" })
 
 export async function generateMetadata({
   params
@@ -44,7 +44,7 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       locale: locale,
-      url: "https://menvo.com.br",
+      url: "https://www.menvo.com.br",
       title: t("og.title") || t("title"),
       description: t("og.description") || t("description"),
       siteName: t("og.siteName") || "MENVO"
@@ -84,6 +84,36 @@ export default async function RootLayout({
 
   const messages = await getMessages()
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.menvo.com.br/#organization",
+        "name": "Menvo",
+        "url": "https://www.menvo.com.br",
+        "logo": "https://www.menvo.com.br/icon-512x512.png",
+        "description":
+          "Plataforma gratuita conectando pessoas a mentorias voluntárias de carreira e desenvolvimento profissional.",
+        "sameAs": ["https://github.com/paulpessoa"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.menvo.com.br/#website",
+        "url": "https://www.menvo.com.br",
+        "name": "Menvo",
+        "publisher": {
+          "@id": "https://www.menvo.com.br/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://www.menvo.com.br/mentors?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -100,8 +130,18 @@ export default async function RootLayout({
             })(window, document, "clarity", "script", "rz28fusa38");`
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className={inter.className} suppressHydrationWarning>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-md focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          Pular para o conteúdo principal
+        </a>
         <Suspense fallback={null}>
           <DebugUrlCapturer />
         </Suspense>
@@ -110,7 +150,7 @@ export default async function RootLayout({
             <div className="flex min-h-screen flex-col">
               <ConsoleEasterEgg />
               <Header />
-              <main className="flex-1">
+              <main id="main-content" className="flex-1">
                 <MaintenanceGuard>
                   {children}
                 </MaintenanceGuard>

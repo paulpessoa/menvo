@@ -463,6 +463,29 @@ export const mentorshipSessionsService = {
     if (error) throw error
   },
 
+  /**
+   * Obtém lista de feedbacks recebidos ou enviados por um usuário.
+   * @param userId - ID do usuário
+   * @param type - 'received' ou 'sent'
+   */
+  getUserFeedbacks: async (userId: string, type: "received" | "sent"): Promise<any[]> => {
+    let query = (supabase.from("appointment_feedbacks") as any).select(`
+      id, rating, public_feedback, status, created_at, rejection_reason,
+      mentee:profiles!reviewer_id(full_name, email),
+      mentor:profiles!reviewed_id(full_name)
+    `)
+
+    if (type === "received") {
+      query = query.eq("reviewed_id", userId)
+    } else {
+      query = query.eq("reviewer_id", userId)
+    }
+
+    const { data, error } = await query.order("created_at", { ascending: false })
+    if (error) throw error
+    return data || []
+  },
+
   // Verificar se o usuário tem mentorias concluídas sem avaliação
   hasPendingEvaluations: async (userId: string): Promise<boolean> => {
     const { data: completed } = await (supabase

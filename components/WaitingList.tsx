@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
 import type { UserType } from "@/hooks/useSignupForm"
+import { waitingListService } from "@/lib/services/waiting-list/waiting-list.service"
 import { toast } from "sonner"
 
 interface WaitingListProps {
@@ -26,7 +26,6 @@ interface WaitingListProps {
 
 export function WaitingList({ isOpen, onClose }: WaitingListProps) {
   const t = useTranslations()
-  const supabase = createClientComponentClient()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -40,17 +39,13 @@ export function WaitingList({ isOpen, onClose }: WaitingListProps) {
     setIsSubmitting(true)
 
     try {
-      const { error } = await supabase.from("waiting_list").insert([
-        {
-          name,
-          email,
-          whatsapp: whatsapp || null,
-          reason,
-          user_type: userType
-        }
-      ])
-
-      if (error) throw error
+      await waitingListService.join({
+        name,
+        email,
+        whatsapp: whatsapp || null,
+        reason,
+        user_type: userType
+      })
 
       toast.success(
         t("waitingList.successMessage") || "Thank you for your interest!"

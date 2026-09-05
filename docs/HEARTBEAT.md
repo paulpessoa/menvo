@@ -37,6 +37,8 @@
 - [x] `llms.txt & geo seo` — Created `public/llms.txt` and `public/llms-full.txt` following standard LLM specifications for AI engines (ChatGPT, Claude, Gemini, Perplexity, Kimi, Manus); updated `public/robots.txt` to permit AI crawlers.
 - [x] `full typescript verification` — Verified entire repository with `npx tsc --noEmit`; eliminated all remaining Postgrest overload typing mismatches in `admin.service.ts`, `verifications.service.ts`, and `quiz.service.ts` with 0 errors.
 - [x] `react best practices & typecheck script` — Configured `experimental.optimizePackageImports` in `next.config.mjs` for tree-shaking barrel dependencies (`lucide-react`, `date-fns`, Radix UI); added dedicated `npm run typecheck` script to `package.json`.
+- [x] `web-quality-audit & accessibility` — Added `display: "swap"` to Google Font Inter, injected Schema.org JSON-LD structured data (`Organization` and `WebSite` with SearchAction), added accessibility skip-to-content link and `<main id="main-content">` in `app/[locale]/layout.tsx`. Boosted LCP on homepage with `priority={index === 0}` on hero image and cleaned up dead mock data in `app/[locale]/page.tsx`.
+- [x] `architectural decoupling (coupling analysis)` — Enforced zero direct database queries across UI components per `AGENTS.md`: decoupled `WaitingList.tsx` to `waitingListService.join`, `FeedbackManagement.tsx` to `mentorshipService.getUserFeedbacks`, and `app/[locale]/mentors/page.tsx` to `mentorService.searchCatalog` and `mentorService.getCatalogFilterOptions`. 100% clean `npm run typecheck` with 0 errors.
 
 ---
 

@@ -52,20 +52,7 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
     if (!user) return
 
     try {
-      let query = supabase.from("appointment_feedbacks").select(`
-        id, rating, public_feedback, status, created_at, rejection_reason,
-        mentee:profiles!reviewer_id(full_name, email),
-        mentor:profiles!reviewed_id(full_name)
-      `)
-
-      if (type === 'received') {
-        query = query.eq('reviewed_id', user.id)
-      } else {
-        query = query.eq('reviewer_id', user.id)
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false })
-      if (error) throw error
+      const data = await mentorshipService.getUserFeedbacks(user.id, type)
       setFeedback((data as unknown as Feedback[]) || [])
     } catch (err) {
       console.error("Error fetching feedbacks:", err)

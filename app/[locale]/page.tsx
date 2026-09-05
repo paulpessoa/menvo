@@ -28,37 +28,6 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [images.length])
 
-  // MOCK de mentores em destaque
-  const featuredMentorsMock = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      field: "Engenharia de Software",
-      tags: ["Carreira", "Tecnologia", "Liderança"],
-      bio: "Mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
-      languages: "Inglês, Espanhol",
-      imageUrl: "/images/mockMentors/9963087.jpg"
-    },
-    {
-      id: 2,
-      name: "Carlos Silva",
-      field: "Gestão de Projetos",
-      tags: ["Gestão", "Agile", "Carreira"],
-      bio: "Especialista em gestão de projetos e mentor de equipes ágeis, apaixonado por ajudar profissionais a crescerem.",
-      languages: "Português, Inglês",
-      imageUrl: "/images/mockMentors/10879746.jpg"
-    },
-    {
-      id: 3,
-      name: "Maria López",
-      field: "Data Science",
-      tags: ["Dados", "Python", "Academia"],
-      bio: "Cientista de dados e professora universitária, dedicada a orientar novos talentos na área de dados.",
-      languages: "Espanhol, Inglês",
-      imageUrl: "/images/mockMentors/8681238.jpg"
-    }
-  ]
-
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -95,6 +64,7 @@ export default function Home() {
                   width={500}
                   height={500}
                   alt={t("hero.title")}
+                  priority={index === 0}
                   className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${
                     index === currentIndex ? "opacity-100" : "opacity-0"
                   }`}
