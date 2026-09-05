@@ -403,6 +403,50 @@ export const mentorshipSessionsService = {
       rejected: s.filter((i) => i.status === "rejected").length,
       cancelled: s.filter((i) => i.status === "cancelled").length
     }
+  },
+
+  // Enviar feedback e completar agendamento
+  submitFeedbackAndComplete: async ({
+    appointmentId,
+    reviewerId,
+    reviewedId,
+    rating,
+    privateNotes,
+    publicFeedback
+  }: {
+    appointmentId: string
+    reviewerId: string
+    reviewedId: string
+    rating: number
+    privateNotes?: string | null
+    publicFeedback?: string | null
+  }): Promise<void> => {
+    const feedbackPayload: Database["public"]["Tables"]["appointment_feedbacks"]["Insert"] = {
+      appointment_id: appointmentId,
+      reviewer_id: reviewerId,
+      reviewed_id: reviewedId,
+      rating,
+      private_notes: privateNotes || null,
+      public_feedback: publicFeedback || null
+    }
+
+    const { error: feedbackError } = await (supabase
+      .from("appointment_feedbacks") as any)
+      .insert(feedbackPayload)
+
+    if (feedbackError) throw feedbackError
+
+    const appointmentPayload: Database["public"]["Tables"]["appointments"]["Update"] = {
+      status: "completed",
+      updated_at: new Date().toISOString()
+    }
+
+    const { error: updateError } = await (supabase
+      .from("appointments") as any)
+      .update(appointmentPayload)
+      .eq("id", appointmentId)
+
+    if (updateError) throw updateError
   }
 }
 
@@ -510,49 +554,8 @@ export const mentorshipUtils = {
     })
 
     return slots
-  },
-
-  // Enviar feedback e completar agendamento
-  submitFeedbackAndComplete: async ({
-    appointmentId,
-    reviewerId,
-    reviewedId,
-    rating,
-    privateNotes,
-    publicFeedback
-  }: {
-    appointmentId: string
-    reviewerId: string
-    reviewedId: string
-    rating: number
-    privateNotes?: string | null
-    publicFeedback?: string | null
-  }): Promise<void> => {
-    const feedbackPayload: Database["public"]["Tables"]["appointment_feedbacks"]["Insert"] = {
-      appointment_id: appointmentId,
-      reviewer_id: reviewerId,
-      reviewed_id: reviewedId,
-      rating,
-      private_notes: privateNotes || null,
-      public_feedback: publicFeedback || null
-    }
-
-    const { error: feedbackError } = await (supabase
-      .from("appointment_feedbacks") as any)
-      .insert(feedbackPayload)
-
-    if (feedbackError) throw feedbackError
-
-    const appointmentPayload: Database["public"]["Tables"]["appointments"]["Update"] = {
-      status: "completed",
-      updated_at: new Date().toISOString()
-    }
-
-    const { error: updateError } = await (supabase
-      .from("appointments") as any)
-      .update(appointmentPayload)
-      .eq("id", appointmentId)
-
-    if (updateError) throw updateError
   }
 }
+
+// Aliases para exportação unificada
+export const mentorshipService = mentorshipSessionsService
