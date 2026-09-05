@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { sendAppointmentRequest } from "@/lib/email/brevo"
+import { createAppointmentSchema } from "@/lib/schemas/appointment"
 import crypto from "crypto"
 
 export async function POST(request: NextRequest) {
@@ -17,11 +18,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { mentor_id, scheduled_at, duration_minutes, mentorship_topics, notes_mentee } = body
+    const parsed = createAppointmentSchema.safeParse(body)
 
-    if (!mentor_id || !scheduled_at) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!parsed.success) {
+      const errorMessage = parsed.error.issues[0]?.message || "Dados de agendamento inválidos"
+      return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
+
+    const { mentor_id, scheduled_at, duration_minutes, mentorship_topics, notes_mentee } = parsed.data
 
     // Gerar token único para confirmação via email
     const actionToken = crypto.randomBytes(32).toString("hex")
@@ -29,7 +33,6 @@ export async function POST(request: NextRequest) {
     // Criar agendamento
     const { data: appointment, error: insertError } = await (supabase
       .from("appointments" as any)
-      // @ts-ignore
       .insert({
         mentor_id,
         mentee_id: user.id,
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
         notes_mentee: notes_mentee || "",
         action_token: actionToken,
         status: "pending"
-      })
+      } as any)
       .select(`
         *,
         mentor:profiles!mentor_id(full_name, avatar_url, email),
@@ -69,28 +72,29 @@ export async function POST(request: NextRequest) {
 
     // Notificar Admin (MENVO)
     try {
-      const { sendAppointmentConfirmation } = await import("@/lib/email/brevo")
-      // Reutilizando lógica de envio para admin de forma simplificada
-      const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "api-key": process.env.BREVO_API_KEY || ""
-        },
-        body: JSON.stringify({
-          sender: { name: "Menvo Sistema", email: "contato@menvo.com.br" },
-          to: [{ email: "contato@menvo.com.br", name: "Admin Menvo" }],
-          subject: `🚨 Nova Solicitação: ${appointment.mentee.full_name} -> ${appointment.mentor.full_name}`,
-          htmlContent: `
-            <h3>Nova solicitação de mentoria no sistema</h3>
-            <p><strong>Mentor:</strong> ${appointment.mentor.full_name} (${appointment.mentor.email})</p>
-            <p><strong>Mentee:</strong> ${appointment.mentee.full_name} (${appointment.mentee.email})</p>
-            <p><strong>Data:</strong> ${new Date(appointment.scheduled_at).toLocaleString("pt-BR")}</p>
-            <p><strong>Notas:</strong> ${appointment.notes_mentee}</p>
-          `
+      const brevoKey = process.env.BREVO_API_KEY
+      if (brevoKey) {
+        await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "api-key": brevoKey
+          },
+          body: JSON.stringify({
+            sender: { name: "Menvo Sistema", email: "contato@menvo.com.br" },
+            to: [{ email: "contato@menvo.com.br", name: "Admin Menvo" }],
+            subject: `🚨 Nova Solicitação: ${appointment.mentee.full_name} -> ${appointment.mentor.full_name}`,
+            htmlContent: `
+              <h3>Nova solicitação de mentoria no sistema</h3>
+              <p><strong>Mentor:</strong> ${appointment.mentor.full_name} (${appointment.mentor.email})</p>
+              <p><strong>Mentee:</strong> ${appointment.mentee.full_name} (${appointment.mentee.email})</p>
+              <p><strong>Data:</strong> ${new Date(appointment.scheduled_at).toLocaleString("pt-BR")}</p>
+              <p><strong>Notas:</strong> ${appointment.notes_mentee}</p>
+            `
+          })
         })
-      })
+      }
     } catch (adminNotifyError) {
       console.error("❌ [CREATE APPOINTMENT] Erro ao notificar admin:", adminNotifyError)
     }

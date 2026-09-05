@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { updateProfileSchema } from "@/lib/schemas/profile"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -20,7 +21,6 @@ export async function PUT(request: NextRequest) {
     // Check authentication
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {
-      console.error("❌ No authorization token provided")
       return NextResponse.json({ 
         error: "Token de autorização necessário" 
       }, { status: 401 })
@@ -34,32 +34,24 @@ export async function PUT(request: NextRequest) {
     } = await supabaseAdmin.auth.getUser(token)
 
     if (authError || !user) {
-      console.error("❌ Authentication error:", authError)
       return NextResponse.json({ 
         error: "Token inválido",
         details: authError?.message 
       }, { status: 401 })
     }
 
-    // Get the profile data from request body
-    const profileData = await request.json()
+    // Get and validate the profile data from request body
+    const body = await request.json()
+    const parsed = updateProfileSchema.safeParse(body)
 
-    // Validate required fields
-    if (profileData.first_name !== undefined && !profileData.first_name?.trim()) {
-      return NextResponse.json({ 
-        error: "Nome é obrigatório" 
-      }, { status: 400 })
-    }
-
-    if (profileData.last_name !== undefined && !profileData.last_name?.trim()) {
-      return NextResponse.json({ 
-        error: "Sobrenome é obrigatório" 
-      }, { status: 400 })
+    if (!parsed.success) {
+      const errorMessage = parsed.error.issues[0]?.message || "Dados de perfil inválidos"
+      return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
     // Update profile in database
     const updateData = {
-      ...profileData,
+      ...parsed.data,
       updated_at: new Date().toISOString(),
     }
 
@@ -88,7 +80,7 @@ export async function PUT(request: NextRequest) {
     
     return NextResponse.json({ 
       error: "Erro interno do servidor",
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
 }
@@ -167,7 +159,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ 
       error: "Erro interno do servidor",
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
 }
