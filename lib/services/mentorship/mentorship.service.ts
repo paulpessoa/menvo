@@ -447,6 +447,20 @@ export const mentorshipSessionsService = {
       .eq("id", appointmentId)
 
     if (updateError) throw updateError
+  },
+
+  // Atualizar feedback público de agendamento
+  updateFeedback: async (feedbackId: string, publicFeedback: string): Promise<void> => {
+    const { error } = await (supabase
+      .from("appointment_feedbacks") as any)
+      .update({
+        public_feedback: publicFeedback,
+        status: "pending",
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", feedbackId)
+
+    if (error) throw error
   }
 }
 

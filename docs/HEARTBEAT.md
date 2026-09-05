@@ -32,6 +32,7 @@
 - [x] `newsletter dashboard fix` — Replaced invalid property `subscribed_at` with schema-defined `created_at` in `NewsletterDashboard.tsx` and `newsletter.service.ts`.
 - [x] `complete appointment modal fix` — Decoupled direct feedback and appointment mutation from component into `mentorshipService.submitFeedbackAndComplete`, eliminating `never` type error.
 - [x] `profile completion modal fix` — Decoupled direct profile update from component into `profileService.updateProfile` in `auth.service.ts`, resolving `never` type error.
+- [x] `feedback management fix` — Decoupled appointment feedback update from component into `mentorshipService.updateFeedback`, resolving `never` type error.
 
 ---
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/utils/supabase/client"
+import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -87,16 +88,7 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
     setIsSubmitting(true)
 
     try {
-      const { error } = await supabase
-        .from("appointment_feedbacks")
-        .update({ 
-          public_feedback: newComment,
-          status: 'pending', // Volta para análise após editar
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', editingFeedback.id)
-
-      if (error) throw error
+      await mentorshipService.updateFeedback(editingFeedback.id, newComment)
 
       toast({ title: "Avaliação atualizada!", description: "Sua edição foi enviada para análise." })
       setEditingFeedback(null)
