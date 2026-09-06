@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger
@@ -62,6 +63,9 @@ export function MobileNavSheet({
         className="w-[300px] sm:w-[350px] p-0 flex flex-col"
       >
         <SheetHeader className="p-6 text-left border-b bg-muted/20">
+          <SheetDescription className="sr-only">
+            Menu de navegação da plataforma
+          </SheetDescription>
           <SheetTitle className="flex items-center gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">

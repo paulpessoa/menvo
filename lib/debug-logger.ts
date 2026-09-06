@@ -36,9 +36,11 @@ export const debugLog = (message: string, data?: any, level: LogEntry['level'] =
     
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmedLogs))
     
-    // Also log to console for real-time viewing
-    const consoleMethod = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log'
-    console[consoleMethod](`[DEBUG] ${message}`, data || '')
+    // Also log to console for real-time viewing in development only
+    if (process.env.NODE_ENV === 'development') {
+      const consoleMethod = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log'
+      console[consoleMethod](`[DEBUG] ${message}`, data || '')
+    }
   } catch (e) {
     console.error('Failed to save debug log', e)
   }

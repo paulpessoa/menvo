@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
@@ -213,6 +214,9 @@ export default function CommunityPage() {
       <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
         <SheetContent className="sm:max-w-md p-0 flex flex-col h-full border-l shadow-2xl">
           <SheetHeader className="p-4 border-b bg-white">
+            <SheetDescription className="sr-only">
+              Conversa com {selectedUser?.full_name || "membro"}
+            </SheetDescription>
             <SheetTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-primary" />
               Chat com {selectedUser?.full_name}

@@ -37,9 +37,9 @@ export function DebugUrlCapturer() {
       debugLog(`Navigation to ${pathname}`, { params }, 'debug')
     }
     
-    // Check for hash parameters (sometimes used by Supabase)
-    if (typeof window !== 'undefined' && window.location.hash) {
-      debugLog(`URL Hash detected: ${window.location.hash}`, null, 'debug')
+    // Only log auth callback hashes (e.g. from OAuth or password recovery)
+    if (typeof window !== 'undefined' && window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error='))) {
+      debugLog(`Auth Hash detected: ${window.location.hash}`, null, 'debug')
     }
   }, [pathname, searchParams])
 

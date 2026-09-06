@@ -35,7 +35,9 @@ export const adminReportsService = {
     const counts: Record<string, number> = {}
     
     data.forEach((profile: any) => {
+        if (!profile?.created_at) return
         const date = new Date(profile.created_at)
+        if (isNaN(date.getTime())) return
         const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD
         counts[dateKey] = (counts[dateKey] || 0) + 1
     })

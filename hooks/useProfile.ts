@@ -58,7 +58,6 @@ export function useProfile() {
     if (result.data) {
       setProfile(result.data);
       setError(null);
-      console.log('✅ Profile loaded successfully');
     } else {
       console.error('❌ Profile fetch failed:', result.error);
       setError(result.error || 'Error fetching profile');
