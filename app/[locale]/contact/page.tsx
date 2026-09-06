@@ -1,8 +1,49 @@
+import { Metadata } from "next"
 import { Mail, MessageCircle, ArrowRight, HeartHandshake } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { getTranslations } from "next-intl/server"
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "contact" })
+
+  const title = t("title") || "Fale Conosco"
+  const description = t("description") || "Entre em contato com a equipe do Menvo para dúvidas, suporte ou parcerias."
+  const path = locale === "pt-BR" ? "/contact" : `/${locale}/contact`
+  const url = `https://www.menvo.com.br${path}`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        "pt-BR": "/contact",
+        en: "/en/contact",
+        es: "/es/contact"
+      }
+    },
+    openGraph: {
+      title: `${title} | Menvo`,
+      description,
+      url,
+      siteName: "Menvo",
+      locale,
+      type: "website"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | Menvo`,
+      description
+    }
+  }
+}
 
 /**
  * Official Contact Page for Menvo.
