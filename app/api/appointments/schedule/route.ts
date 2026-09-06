@@ -48,6 +48,11 @@ export async function POST(request: NextRequest) {
       return errorResponse("Missing required fields", "VALIDATION_ERROR", 400)
     }
 
+    // Prevenir auto-agendamento
+    if (resolvedMentorId === user.id) {
+      return errorResponse("Você não pode agendar uma mentoria consigo mesmo", "FORBIDDEN", 400)
+    }
+
     // 2. Verificar se o mentor existe, está verificado e buscar email para notificação
     const { data: mentor, error: mentorError } = await (supabase
       .from("profiles")
@@ -61,6 +66,23 @@ export async function POST(request: NextRequest) {
 
     if (!mentor.verified) {
       return errorResponse("Mentor is not verified", "FORBIDDEN", 403)
+    }
+
+    // Verificar conflito de horário simultâneo (pending ou confirmed)
+    const { data: existingAppt } = await (supabase
+      .from("appointments")
+      .select("id")
+      .eq("mentor_id", resolvedMentorId)
+      .eq("scheduled_at", resolvedScheduledAt)
+      .in("status", ["pending", "confirmed"])
+      .maybeSingle() as any)
+
+    if (existingAppt) {
+      return errorResponse(
+        "Este horário acabou de ser reservado. Por favor, escolha outro horário.",
+        "CONFLICT",
+        409
+      )
     }
 
     // Buscar nome do mentee para o email

@@ -8,7 +8,8 @@ import {
   Loader2,
   Star,
   Plus,
-  CheckCircle
+  CheckCircle,
+  AlertCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,8 +19,9 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog"
-import { createClient } from "@/lib/utils/supabase/client"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
+import { useAuth } from "@/lib/auth"
+import { useLocale } from "next-intl"
 import Link from "next/link"
 
 interface TimeSlot {
@@ -38,22 +40,15 @@ interface BookMentorshipModalProps {
   mentorName: string
 }
 
-const DAYS_OF_WEEK = [
-  "Domingo",
-  "Segunda",
-  "Terça",
-  "Quarta",
-  "Quinta",
-  "Sexta",
-  "Sábado"
-]
-
 export function BookMentorshipModal({
   isOpen,
   onClose,
   mentorId,
   mentorName
 }: BookMentorshipModalProps) {
+  const locale = useLocale()
+  const intlLocale = locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR"
+  const { user } = useAuth()
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
@@ -76,13 +71,7 @@ export function BookMentorshipModal({
       setPendingEvaluation(false)
       setAvailableSlots([])
 
-      const supabase = createClient()
-      const {
-        data: { session }
-      } = await supabase.auth.getSession()
-      const user = session?.user
-
-      if (user) {
+      if (user?.id) {
         // Verificar se o usuário tem mentorias concluídas sem feedback
         const pending = await mentorshipService.hasPendingEvaluations(user.id)
         if (pending) {
@@ -108,18 +97,18 @@ export function BookMentorshipModal({
 
       const data = await response.json()
 
-      // Converter para o formato TimeSlot esperado
+      // Converter para o formato TimeSlot esperado com suporte dinâmico a idioma
       const slots: TimeSlot[] = (data.availableSlots || []).map((slot: any) => {
         const date = new Date(slot.datetime)
         return {
           date,
           day_of_week: date.getDay(),
-          formatted_date: date.toLocaleDateString("pt-BR", {
+          formatted_date: date.toLocaleDateString(intlLocale, {
             weekday: "short",
             day: "numeric",
             month: "short"
           }),
-          formatted_time: date.toLocaleTimeString("pt-BR", {
+          formatted_time: date.toLocaleTimeString(intlLocale, {
             hour: "2-digit",
             minute: "2-digit"
           }),
@@ -171,6 +160,10 @@ export function BookMentorshipModal({
 
       if (!response.ok) {
         const data = await response.json()
+        if (response.status === 409) {
+          loadAvailability()
+          setSelectedSlot(null)
+        }
         throw new Error(data.error || "Erro ao agendar mentoria")
       }
 
@@ -292,7 +285,7 @@ export function BookMentorshipModal({
                           </div>
                           <div>
                             <p className="font-bold text-gray-900 capitalize">
-                              {DAYS_OF_WEEK[slot.day_of_week]}
+                              {slot.date.toLocaleDateString(intlLocale, { weekday: "long" })}
                             </p>
                             <p className="text-sm text-muted-foreground flex items-center gap-1.5 mt-0.5">
                               <Clock className="w-3.5 h-3.5" />
@@ -324,7 +317,7 @@ export function BookMentorshipModal({
                     </div>
                     <div>
                       <p className="font-bold text-gray-900 text-lg capitalize">
-                        {DAYS_OF_WEEK[selectedSlot.day_of_week]},{" "}
+                        {selectedSlot.date.toLocaleDateString(intlLocale, { weekday: "long" })},{" "}
                         {selectedSlot.formatted_date}
                       </p>
                       <p className="text-primary font-medium">
