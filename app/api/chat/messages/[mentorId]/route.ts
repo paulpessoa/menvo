@@ -3,7 +3,9 @@ import { createClient } from '@/lib/utils/supabase/server';
 import { getOrCreateConversation, getMessages } from '@/lib/chat/chat-service';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
+    mentorId: string;
+  }> | {
     mentorId: string;
   };
 }
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const { mentorId } = params;
+    const { mentorId } = await Promise.resolve(params);
     console.log('[CHAT] Buscando conversa entre:', { mentorId, userId: user.id });
 
     // Buscar ou criar conversa (a função agora busca em qualquer ordem)

@@ -1,11 +1,10 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Search, Users, Loader2, Info, MessageCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { MenteeCard } from "@/components/community/MenteeCard"
-import { createClient } from "@/lib/utils/supabase/client"
 import { useAuth } from "@/lib/auth"
 import { useRouter } from "@/i18n/routing"
 import { useTranslations } from "next-intl"
@@ -17,248 +16,221 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { ChatInterface } from "@/components/chat/ChatInterface"
-
-interface UserProfile {
-    id: string
-    full_name: string | null
-    avatar_url: string | null
-    bio: string | null
-    job_title: string | null
-    company: string | null
-    linkedin_url: string | null
-    github_url: string | null
-    expertise_areas: string[] | null
-    slug: string | null
-    role: string
-}
+import {
+  communityService,
+  CommunityProfile,
+} from "@/lib/services/community/community.service"
 
 const ITEMS_PER_PAGE = 12
 
 export default function CommunityPage() {
-    const tCommunity = useTranslations("community")
-    const tCommon = useTranslations("common")
-    const [profiles, setProfiles] = useState<UserProfile[]>([])
-    const [loading, setLoading] = useState(true)
-    const [loadingMore, setLoadingMore] = useState(false)
-    const [searchTerm, setSearchTerm] = useState("")
-    const [page, setPage] = useState(0)
-    const [hasMore, setHasMore] = useState(false)
-    
-    // Chat Sidebar State
-    const [isChatOpen, setIsChatOpen] = useState(false)
-    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
+  const tCommunity = useTranslations("community")
+  const tCommon = useTranslations("common")
+  const [profiles, setProfiles] = useState<CommunityProfile[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
 
-    const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
-    const router = useRouter()
-    const supabase = createClient()
-    
-    const isMentor = authIsMentor || cachedRoles?.mentor || cachedRoles?.roles?.includes('mentor') || false
+  // Chat Sidebar State
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<CommunityProfile | null>(null)
 
-    const fetchProfiles = useCallback(async (isInitial = false) => {
-        try {
-            const currentPage = isInitial ? 0 : page
-            if (isInitial) {
-                setLoading(true)
-                setPage(0)
-            } else {
-                setLoadingMore(true)
-            }
+  const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
+  const router = useRouter()
 
-            const from = currentPage * ITEMS_PER_PAGE
-            const to = from + ITEMS_PER_PAGE - 1
+  const isMentor =
+    authIsMentor ||
+    cachedRoles?.mentor ||
+    cachedRoles?.roles?.includes("mentor") ||
+    false
 
-            // Query otimizada: Buscamos perfis públicos com bio, filtrando via join simples
-            let query = supabase
-                .from('profiles')
-                .select(`
-                    id,
-                    full_name,
-                    avatar_url,
-                    bio,
-                    job_title,
-                    company,
-                    linkedin_url,
-                    github_url,
-                    expertise_areas,
-                    slug,
-                    user_roles (roles (name))
-                `, { count: 'exact' })
-                .eq('is_public', true)
-                .not('bio', 'is', null)
-            
-            if (searchTerm) {
-                query = query.or(`full_name.ilike.%${searchTerm}%,bio.ilike.%${searchTerm}%,job_title.ilike.%${searchTerm}%`)
-            }
+  // Tracking query ID to safely discard out-of-order responses and avoid race conditions
+  const queryIdRef = useRef(0)
 
-            query = query
-                .order('created_at', { ascending: false })
-                .range(from, to)
+  const loadProfiles = async (
+    isInitial: boolean,
+    search: string,
+    pageNum: number
+  ) => {
+    const currentQueryId = ++queryIdRef.current
 
-            const { data, error, count } = await query
-            if (error) throw error
-
-            // Filtragem manual leve para garantir o papel de mentee e reduzir carga de RLS
-            interface RawProfileRow {
-                id: string
-                full_name: string | null
-                avatar_url: string | null
-                bio: string | null
-                job_title: string | null
-                company: string | null
-                linkedin_url: string | null
-                github_url: string | null
-                expertise_areas: string[] | null
-                slug: string | null
-                user_roles?: Array<{ roles?: { name?: string } | null }> | null
-            }
-
-            const rawData = (data as unknown as RawProfileRow[]) || []
-            const formattedData: UserProfile[] = rawData
-                .filter((p) => {
-                    const roles = p.user_roles?.flatMap((ur) => ur.roles?.name || []) || []
-                    return roles.includes('mentee')
-                })
-                .map((p) => ({
-                    id: p.id,
-                    full_name: p.full_name,
-                    avatar_url: p.avatar_url,
-                    bio: p.bio,
-                    job_title: p.job_title,
-                    company: p.company,
-                    linkedin_url: p.linkedin_url,
-                    github_url: p.github_url,
-                    expertise_areas: p.expertise_areas,
-                    slug: p.slug,
-                    role: 'mentee'
-                }))
-
-            if (isInitial) setProfiles(formattedData)
-            else setProfiles(prev => [...prev, ...formattedData])
-
-            setHasMore((count || 0) > (from + (data?.length || 0)))
-        } catch (error) {
-            console.error('Error fetching community profiles:', error)
-            toast.error(tCommunity("errorLoading"))
-        } finally {
-            setLoading(false)
-            setLoadingMore(false)
-        }
-    }, [searchTerm, page, supabase, tCommunity])
-
-    useEffect(() => {
-        fetchProfiles(true)
-    }, [searchTerm, fetchProfiles])
-
-    const handleChat = (targetUserId: string) => {
-        if (!user) {
-            toast.info(tCommon("loginRequired"))
-            router.push("/login")
-            return
-        }
-        
-        const targetProfile = profiles.find(p => p.id === targetUserId)
-        if (targetProfile) {
-            setSelectedUser(targetProfile)
-            setIsChatOpen(true)
-        }
+    if (isInitial) {
+      setLoading(true)
+    } else {
+      setLoadingMore(true)
     }
 
-    return (
-        <div className="container mx-auto px-4 py-12">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                <div>
-                    <h1 className="text-4xl font-bold tracking-tight mb-2">Mural de Mentorados</h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl">
-                        Conheça pessoas que buscam aprender e ofereça sua mentoria de forma proativa.
-                    </p>
-                </div>
-                <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
-                    <Info className="h-5 w-5 text-primary shrink-0" />
-                    <p className="text-xs text-primary/80 leading-snug">
-                        Dica: Mentores proativos que ajudam quem busca conhecimento ganham 3x mais visibilidade.
-                    </p>
-                </div>
-            </div>
+    try {
+      const result = await communityService.getCommunityProfiles({
+        search,
+        page: pageNum,
+        limit: ITEMS_PER_PAGE,
+      })
 
-            {/* Search */}
-            <div className="relative max-w-md mb-12">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Buscar por nome, objetivo ou interesse..."
-                    className="pl-10 h-11"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+      // If a newer query was initiated while this one was in flight, discard this result
+      if (currentQueryId !== queryIdRef.current) return
 
-            {/* Results Grid */}
-            {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[1, 2, 3, 4, 5, 6].map(i => (
-                        <div key={i} className="h-64 rounded-xl bg-muted animate-pulse border shadow-sm" />
-                    ))}
-                </div>
-            ) : profiles.length === 0 ? (
-                <div className="text-center py-24 bg-muted/20 rounded-2xl border-2 border-dashed">
-                    <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
-                    <h3 className="text-lg font-semibold">{tCommunity("noResults")}</h3>
-                    <Button variant="outline" className="mt-4" onClick={() => setSearchTerm("")}>
-                        {tCommunity("clearSearch")}
-                    </Button>
-                </div>
-            ) : (
-                <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {profiles.map((profile) => (
-                            <MenteeCard 
-                                key={profile.id} 
-                                profile={profile} 
-                                isMentor={isMentor}
-                                onChat={handleChat}
-                            />
-                        ))}
-                    </div>
+      if (isInitial) {
+        setProfiles(result.profiles)
+      } else {
+        setProfiles((prev) => [...prev, ...result.profiles])
+      }
 
-                    {hasMore && (
-                        <div className="mt-12 text-center">
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                onClick={() => {setPage(p => p + 1); fetchProfiles(false)}}
-                                disabled={loadingMore}
-                                className="px-8 shadow-sm"
-                            >
-                                {loadingMore ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                {tCommunity("loadMore")}
-                            </Button>
-                        </div>
-                    )}
-                </>
-            )}
+      setHasMore(result.hasMore)
+      setPage(pageNum)
+    } catch (error) {
+      if (currentQueryId === queryIdRef.current) {
+        console.error("[CommunityPage] Error loading profiles:", error)
+        toast.error(tCommunity("errorLoading"))
+      }
+    } finally {
+      if (currentQueryId === queryIdRef.current) {
+        setLoading(false)
+        setLoadingMore(false)
+      }
+    }
+  }
 
-            {/* Inline Chat Drawer */}
-            <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
-                <SheetContent className="sm:max-w-md p-0 flex flex-col h-full border-l shadow-2xl">
-                    <SheetHeader className="p-4 border-b bg-white">
-                        <SheetTitle className="flex items-center gap-2">
-                           <MessageCircle className="h-5 w-5 text-primary" />
-                           Chat com {selectedUser?.full_name}
-                        </SheetTitle>
-                    </SheetHeader>
-                    
-                    {selectedUser && user && (
-                        <div className="flex-1 overflow-hidden">
-                            <ChatInterface 
-                                mentorId={selectedUser.id}
-                                currentUserId={user.id}
-                                mentorName={selectedUser.full_name || "Membro"}
-                                mentorAvatar={selectedUser.avatar_url || undefined}
-                            />
-                        </div>
-                    )}
-                </SheetContent>
-            </Sheet>
+  // Initial load on mount and debounced search updates
+  useEffect(() => {
+    const delay = searchTerm ? 300 : 0
+    const timer = setTimeout(() => {
+      loadProfiles(true, searchTerm, 0)
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  const handleLoadMore = () => {
+    if (loadingMore || !hasMore) return
+    loadProfiles(false, searchTerm, page + 1)
+  }
+
+  const handleChat = (targetUserId: string) => {
+    if (!user) {
+      toast.info(tCommon("loginRequired"))
+      router.push("/login")
+      return
+    }
+
+    const targetProfile = profiles.find((p) => p.id === targetUserId)
+    if (targetProfile) {
+      setSelectedUser(targetProfile)
+      setIsChatOpen(true)
+    }
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">
+            Mural de Mentorados
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl">
+            Conheça pessoas que buscam aprender e ofereça sua mentoria de forma
+            proativa.
+          </p>
         </div>
-    )
+        <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
+          <Info className="h-5 w-5 text-primary shrink-0" />
+          <p className="text-xs text-primary/80 leading-snug">
+            Dica: Mentores proativos que ajudam quem busca conhecimento ganham
+            3x mais visibilidade.
+          </p>
+        </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-md mb-12">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar por nome, objetivo ou interesse..."
+          className="pl-10 h-11"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Results Grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="h-64 rounded-xl bg-muted animate-pulse border shadow-sm"
+            />
+          ))}
+        </div>
+      ) : profiles.length === 0 ? (
+        <div className="text-center py-24 bg-muted/20 rounded-2xl border-2 border-dashed">
+          <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
+          <h3 className="text-lg font-semibold">{tCommunity("noResults")}</h3>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => setSearchTerm("")}
+          >
+            {tCommunity("clearSearch")}
+          </Button>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {profiles.map((profile) => (
+              <MenteeCard
+                key={profile.id}
+                profile={profile}
+                isMentor={isMentor}
+                onChat={handleChat}
+              />
+            ))}
+          </div>
+
+          {hasMore && (
+            <div className="mt-12 text-center">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 shadow-sm"
+              >
+                {loadingMore ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {tCommunity("loadMore")}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Inline Chat Drawer */}
+      <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
+        <SheetContent className="sm:max-w-md p-0 flex flex-col h-full border-l shadow-2xl">
+          <SheetHeader className="p-4 border-b bg-white">
+            <SheetTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-primary" />
+              Chat com {selectedUser?.full_name}
+            </SheetTitle>
+          </SheetHeader>
+
+          {selectedUser && user && (
+            <div className="flex-1 overflow-hidden">
+              <ChatInterface
+                mentorId={selectedUser.id}
+                currentUserId={user.id}
+                mentorName={selectedUser.full_name || "Membro"}
+                mentorAvatar={selectedUser.avatar_url || undefined}
+              />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+    </div>
+  )
 }
