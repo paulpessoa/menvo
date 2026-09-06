@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/routing"
 import { MapPin, Briefcase, Calendar, Sparkles, Heart } from "lucide-react"
 import {
   Card,
@@ -56,6 +56,7 @@ export function MentorCard({
   const { favorites, toggleFavorite } = useFavorites(user?.id)
 
   const isFavorite = !!(mentor.id && favorites.includes(mentor.id))
+  const isOwnCard = !!(user?.id && mentor.id && user.id === mentor.id)
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return ""
@@ -119,17 +120,19 @@ export function MentorCard({
       )}
 
       {/* Botão de Favorito - Restaurado */}
-      <button
-        onClick={handleFavoriteClick}
-        className={`absolute top-4 right-4 p-2.5 rounded-full shadow-sm transition-all z-10 ${
-          isFavorite
-            ? "bg-red-50 text-red-500 scale-110"
-            : "bg-white/80 text-gray-400 hover:text-red-400 hover:bg-white"
-        }`}
-        aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-      >
-        <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-      </button>
+      {!isOwnCard && (
+        <button
+          onClick={handleFavoriteClick}
+          className={`absolute top-4 right-4 p-2.5 rounded-full shadow-sm transition-all z-10 ${
+            isFavorite
+              ? "bg-red-50 text-red-500 scale-110"
+              : "bg-white/80 text-gray-400 hover:text-red-400 hover:bg-white"
+          }`}
+          aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        >
+          <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+        </button>
+      )}
 
       <CardHeader className="pb-3 px-6 pt-8">
         <div className="flex items-start justify-between">
@@ -151,6 +154,11 @@ export function MentorCard({
                 <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">
                   {mentor.full_name}
                 </CardTitle>
+                {isOwnCard && (
+                  <Badge className="bg-amber-100 text-amber-800 text-[9px] uppercase font-bold tracking-wider border-none h-4">
+                    Você
+                  </Badge>
+                )}
                 {isAIHighlighted && (
                   <Badge className="bg-primary/10 text-primary hover:bg-primary/20 text-[9px] uppercase font-black tracking-widest border-none h-4">
                     IA Match

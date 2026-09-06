@@ -13,13 +13,17 @@ interface PageProps {
 async function getMentorData(slug: string) {
   const supabase = await createClient()
 
-  // Buscar mentor
-  const { data: mentor, error } = await supabase
+  // Buscar mentor por slug ou ID (UUID)
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+  const query = supabase
     .from("mentors_view")
     .select("*")
-    .eq("slug", slug)
     .eq("verified", true)
-    .single()
+
+  const { data: mentor, error } = await (isUuid
+    ? query.eq("id", slug)
+    : query.eq("slug", slug)
+  ).maybeSingle()
 
   if (error || !mentor) {
     return null

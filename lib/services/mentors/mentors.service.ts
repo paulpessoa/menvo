@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/services/auth/auth.service"
+import { createClient } from "@/lib/utils/supabase/client"
 import type { Database } from "@/lib/types/supabase"
 import type {
   MentorProfile,
@@ -21,6 +21,10 @@ export interface FilterOptions {
 type MentorViewRow = Database["public"]["Views"]["mentors_view"]["Row"]
 
 class MentorService {
+  private get supabase() {
+    return createClient()
+  }
+
   async getMentors(filters: MentorFilters = {}): Promise<PaginatedMentors> {
     const {
       search,
@@ -36,7 +40,7 @@ class MentorService {
       limit = 12
     } = filters
 
-    let query = supabase
+    let query = this.supabase
       .from("mentors_view")
       .select(
         `
@@ -54,14 +58,12 @@ class MentorService {
         mentor_skills,
         languages,
         academic_level,
-        active_roles,
         average_rating,
         total_sessions,
         total_reviews
       `,
         { count: "exact" }
       )
-      .contains("active_roles", ["mentor"])
       .not("mentor_skills", "is", null)
 
     // Filtro de busca genérica
@@ -167,30 +169,27 @@ class MentorService {
 
   async getFilterOptions(): Promise<FilterOptions> {
     // Buscar todas as skills únicas dos mentores
-    const { data: skillsData, error: skillsError } = await supabase
+    const { data: skillsData, error: skillsError } = await this.supabase
       .from("mentors_view")
       .select("mentor_skills")
-      .contains("active_roles", ["mentor"])
 
     if (skillsError) {
       throw new Error(`Erro ao buscar skills: ${skillsError.message}`)
     }
 
     // Buscar todos os idiomas únicos
-    const { data: languagesData, error: languagesError } = await supabase
+    const { data: languagesData, error: languagesError } = await this.supabase
       .from("mentors_view")
       .select("languages")
-      .contains("active_roles", ["mentor"])
 
     if (languagesError) {
       throw new Error(`Erro ao buscar idiomas: ${languagesError.message}`)
     }
 
     // Buscar todas as Tags Inclusivas
-    const { data: inclusionTagsData, error: inclusionTagsError } = await supabase
+    const { data: inclusionTagsData, error: inclusionTagsError } = await this.supabase
       .from("mentors_view")
       .select("inclusive_tags")
-      .contains("active_roles", ["mentor"])
 
     if (inclusionTagsError) {
       throw new Error(
@@ -199,10 +198,9 @@ class MentorService {
     }
 
     // Buscar localizações únicas
-    const { data: locationsData, error: locationsError } = await supabase
+    const { data: locationsData, error: locationsError } = await this.supabase
       .from("mentors_view")
       .select("location")
-      .contains("active_roles", ["mentor"])
       .not("location", "is", null)
 
     if (locationsError) {
@@ -276,7 +274,7 @@ class MentorService {
   }
 
   async getMentorById(id: string): Promise<MentorProfile | null> {
-    const { data, error } = await supabase
+    const { data, error } = await this.supabase
       .from("mentors_view")
       .select(
         `
@@ -293,7 +291,6 @@ class MentorService {
         mentor_skills,
         languages,
         academic_level,
-        active_roles,
         inclusive_tags,
         average_rating,
         total_sessions,
@@ -301,7 +298,6 @@ class MentorService {
       `
       )
       .eq("id", id)
-      .contains("active_roles", ["mentor"])
       .maybeSingle()
 
     if (error) {
@@ -355,7 +351,7 @@ class MentorService {
     limit: number
   }): Promise<{ data: any[]; count: number }> {
     const { filters, page, limit } = params
-    let query = (supabase.from("mentors_view") as any).select(
+    let query = (this.supabase.from("mentors_view") as any).select(
       `
         id,
         full_name,
@@ -402,15 +398,15 @@ class MentorService {
     }
 
     if (filters.languages && filters.languages.length > 0) {
-      query = query.contains("languages", filters.languages)
+      query = query.overlaps("languages", filters.languages)
     }
 
     if (filters.topics && filters.topics.length > 0) {
-      query = query.contains("mentorship_topics", filters.topics)
+      query = query.overlaps("mentorship_topics", filters.topics)
     }
 
     if (filters.inclusiveTags && filters.inclusiveTags.length > 0) {
-      query = query.contains("inclusive_tags", filters.inclusiveTags)
+      query = query.overlaps("inclusive_tags", filters.inclusiveTags)
     }
 
     if (filters.availabilityStatus && filters.availabilityStatus !== "all") {
@@ -462,7 +458,7 @@ class MentorService {
     topics: string[]
     inclusiveTags: string[]
   }> {
-    const { data, error } = await (supabase.from("mentors_view") as any).select(
+    const { data, error } = await (this.supabase.from("mentors_view") as any).select(
       "country, state, city, languages, mentorship_topics, inclusive_tags"
     )
 
@@ -508,7 +504,7 @@ class MentorService {
       avatar_url: string | null
     } | null
   }[]> {
-    const { data, error } = await supabase
+    const { data, error } = await this.supabase
       .from("appointment_feedbacks")
       .select(`
         id,
