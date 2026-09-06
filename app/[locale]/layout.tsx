@@ -119,6 +119,8 @@ export default async function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="manifest" href="/site.webmanifest" />
+        <link rel="preconnect" href="https://www.clarity.ms" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <Script
           id="clarity-script"
           strategy="afterInteractive"

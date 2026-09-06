@@ -36,6 +36,7 @@ const nextConfig = {
     ]
   },
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -48,9 +49,20 @@ const nextConfig = {
         hostname: "images.unsplash.com",
         port: "",
         pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+        pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        port: "",
+        pathname: "/**"
       }
-    ],
-    unoptimized: true
+    ]
   },
   eslint: {
     ignoreDuringBuilds: true

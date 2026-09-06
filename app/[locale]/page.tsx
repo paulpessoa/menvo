@@ -65,6 +65,7 @@ export default function Home() {
                   height={500}
                   alt={t("hero.title")}
                   priority={index === 0}
+                  sizes="(max-width: 768px) 250px, (max-width: 1024px) 350px, 450px"
                   className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${
                     index === currentIndex ? "opacity-100" : "opacity-0"
                   }`}
