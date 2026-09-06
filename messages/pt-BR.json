@@ -1113,6 +1113,11 @@
     "about": "Sobre",
     "specialties": "Especialidades",
     "languagesAndInclusion": "Idiomas e Inclusão",
+    "cultureAndInclusion": "Cultura e Inclusão",
+    "inclusion": "Inclusão",
+    "connect": "Conecte-se",
+    "meetInfo": "Sua sessão de mentoria será agendada via Google Meet. Um convite será enviado para ambos os e-mails após a confirmação do mentor.",
+    "editMyProfile": "Editar meu Perfil",
     "languages": "Idiomas",
     "scheduleSession": "Agendar Sessão",
     "freeMentorships": "Mentorias 100% gratuitas",
@@ -1288,27 +1293,47 @@
     "mentee": {
       "welcome": "Bem-vindo ao seu dashboard. Encontre mentores e acelere seu crescimento profissional.",
       "stats": {
-        "hours": "Horas de Mentoria",
-        "hoursDesc": "Total de aprendizado",
+        "scheduled": "Agendados",
+        "scheduledDesc": "Próximas sessões",
+        "hours": "Horas",
+        "hoursDesc": "Tempo em mentoria",
         "mentors": "Mentores",
-        "mentorsDesc": "Mentores conectados"
+        "mentorsDesc": "Mentores diferentes",
+        "completed": "Concluídas",
+        "completedDesc": "Total de sessões"
       },
+      "defaultName": "Mentorado",
       "actions": {
         "find": "Buscar Mentores",
         "findDesc": "Encontre especialistas para acelerar sua carreira",
         "myMentorships": "Minhas Mentorias",
         "myMentorshipsDesc": "Veja seus agendamentos e avalie sessões concluídas",
         "access": "Acessar Mentorias",
-        "viewAll": "Ver Mentores"
+        "viewAll": "Ver Mentores",
+        "myMentorshipsAction": "Minhas Mentorias",
+        "myMentorshipsActionDesc": "Acesse o histórico e detalhes das suas sessões.",
+        "exploreMentorsAction": "Explorar Mentores",
+        "exploreMentorsActionDesc": "Encontre novos profissionais para te ajudar."
       },
       "sections": {
         "upcoming": "Próximas Sessões",
         "noSessions": "Nenhuma sessão agendada.",
         "bookNow": "Agendar agora",
-        "favorites": "Mentores Favoritos",
-        "favoritesDesc": "Acesso rápido aos mentores salvos",
+        "favorites": "Seus Favoritos",
+        "favoritesDesc": "Acesso rápido aos seus mentores preferidos.",
         "noFavorites": "Você ainda não salvou nenhum mentor.",
-        "viewDetails": "Ver Detalhes"
+        "noFavoritesDesc": "Explore a lista de mentores e favorite os que mais combinam com você.",
+        "noAppointments": "Nenhuma mentoria agendada",
+        "noAppointmentsDesc": "Dê o próximo passo na sua carreira. Encontre um mentor voluntário e agende sua primeira conversa gratuita.",
+        "viewDetails": "Ver Detalhes",
+        "viewAll": "Ver Todos",
+        "exploreMentors": "Explorar Mentores"
+      },
+      "tabs": {
+        "overview": "Visão Geral",
+        "feedbacks": "Minhas Avaliações",
+        "feedbacksTitle": "Avaliações Enviadas",
+        "feedbacksDesc": "Gerencie os depoimentos que você deixou para seus mentores."
       },
       "quiz": {
         "ctaTitle": "Descubra seu Mentor Ideal com IA",
@@ -1560,6 +1585,30 @@
   "mentorship": {
     "title": "Minhas Mentorias",
     "description": "Gerencie todas as suas mentorias - recebidas e solicitadas",
+    "menteePage": {
+      "backToDashboard": "Voltar ao Dashboard",
+      "title": "Minhas Mentorias",
+      "description": "Acompanhe suas solicitações e sessões de mentoria agendadas"
+    },
+    "newUx": {
+      "nextMeeting": "Próximo Encontro",
+      "heroTitle": "Prepare-se para crescer!",
+      "heroDesc": "Você tem uma sessão agendada em breve. Revise suas perguntas e aproveite cada minuto.",
+      "viewDetails": "Ver Detalhes",
+      "myGoals": "Meus Objetivos",
+      "timelineTitle": "Cronograma de Mentorias",
+      "awaitingConfirmation": "Aguardando Confirmação",
+      "confirmed": "Confirmadas",
+      "recentHistory": "Histórico Recente",
+      "eliteTitle": "Seja um Mentee Elite",
+      "eliteDesc": "Complete suas avaliações para ganhar selos de pontualidade e dedicação.",
+      "viewBadges": "Ver minhas medalhas",
+      "usefulResources": "Recursos Úteis",
+      "howToLeverage": "Como aproveitar a mentoria",
+      "networkingTips": "Dicas de Networking",
+      "careerTrack": "Trilha de Carreira",
+      "exploreMentors": "Explorar Novos Mentores"
+    },
     "received": {
       "title": "Mentorias Recebidas",
       "asMentor": "(você como mentor)",
@@ -1595,6 +1644,25 @@
       "description": "Compartilhe materiais e recursos com seus mentees",
       "inDevelopment": "Em desenvolvimento",
       "comingSoon": "Em breve: biblioteca de materiais, templates e recursos para compartilhar com mentees"
+    },
+    "booking": {
+      "modalTitle": "Agendar Mentoria",
+      "standardDuration": "As mentorias de {name} têm duração padrão de 45 minutos. Selecione um horário abaixo para prosseguir.",
+      "noSlotsTitle": "Nenhum horário disponível",
+      "noSlotsDesc": "Não encontramos horários livres nas próximas 2 semanas. Tente novamente mais tarde.",
+      "selectedSlot": "Horário Selecionado",
+      "atTime": "Às {time} (Duração: 45 min)",
+      "messageLabel": "O que você gostaria de discutir nessa mentoria?",
+      "messagePlaceholder": "Ex: Gostaria de tirar dúvidas sobre carreira em tecnologia, boas práticas de código e receber dicas para entrevistas...",
+      "charCounter": "Mínimo de 20 caracteres: {count}/20",
+      "requiredNote": "Campos com * são obrigatórios",
+      "chooseOtherSlot": "Escolher outro horário",
+      "confirmButton": "Confirmar Agendamento",
+      "submitting": "Agendando...",
+      "successMessage": "Solicitação enviada! Redirecionando...",
+      "pendingEvaluationsTitle": "Você possui avaliações pendentes!",
+      "pendingEvaluationsDesc": "Para manter a comunidade ativa e com alto padrão de qualidade, por favor avalie suas sessões concluídas antes de agendar uma nova mentoria.",
+      "evaluateNow": "Avaliar Agora"
     }
   },
   "appointments": {

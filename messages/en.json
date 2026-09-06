@@ -1119,6 +1119,11 @@
     "about": "About",
     "specialties": "Specialties",
     "languagesAndInclusion": "Languages and Inclusion",
+    "cultureAndInclusion": "Culture and Inclusion",
+    "inclusion": "Inclusion",
+    "connect": "Connect",
+    "meetInfo": "Your mentorship session will be held via Google Meet. An invitation will be sent to both email addresses upon mentor confirmation.",
+    "editMyProfile": "Edit my Profile",
     "languages": "Languages",
     "scheduleSession": "Schedule Session",
     "freeMentorships": "100% free mentorships",
@@ -1294,27 +1299,47 @@
     "mentee": {
       "welcome": "Welcome to your dashboard. Find mentors and accelerate your professional growth.",
       "stats": {
-        "hours": "Mentorship Hours",
-        "hoursDesc": "Total learning",
+        "scheduled": "Scheduled",
+        "scheduledDesc": "Upcoming sessions",
+        "hours": "Hours",
+        "hoursDesc": "Mentorship time",
         "mentors": "Mentors",
-        "mentorsDesc": "Connected mentors"
+        "mentorsDesc": "Connected mentors",
+        "completed": "Completed",
+        "completedDesc": "Total sessions"
       },
+      "defaultName": "Mentee",
       "actions": {
         "find": "Find Mentors",
         "findDesc": "Find experts to accelerate your career",
         "myMentorships": "My Mentorships",
         "myMentorshipsDesc": "View your appointments and evaluate completed sessions",
         "access": "Access Mentorships",
-        "viewAll": "View Mentors"
+        "viewAll": "View Mentors",
+        "myMentorshipsAction": "My Mentorships",
+        "myMentorshipsActionDesc": "Access session history and details.",
+        "exploreMentorsAction": "Explore Mentors",
+        "exploreMentorsActionDesc": "Find new professionals to support your journey."
       },
       "sections": {
         "upcoming": "Upcoming Sessions",
         "noSessions": "No sessions scheduled.",
         "bookNow": "Book now",
-        "favorites": "Favorite Mentors",
-        "favoritesDesc": "Quick access to saved mentors",
+        "favorites": "Your Favorites",
+        "favoritesDesc": "Quick access to your preferred mentors.",
         "noFavorites": "You haven't saved any mentors yet.",
-        "viewDetails": "View Details"
+        "noFavoritesDesc": "Explore the mentor directory and save your favorites to stay inspired.",
+        "noAppointments": "No mentorship sessions scheduled",
+        "noAppointmentsDesc": "Take the next step in your career. Find a volunteer mentor and book your first free session.",
+        "viewDetails": "View Details",
+        "viewAll": "View All",
+        "exploreMentors": "Explore Mentors"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "feedbacks": "My Reviews",
+        "feedbacksTitle": "Submitted Reviews",
+        "feedbacksDesc": "Manage the testimonials you left for your mentors."
       },
       "quiz": {
         "ctaTitle": "Find Your Ideal Mentor with AI",
@@ -1566,6 +1591,30 @@
   "mentorship": {
     "title": "My Mentorships",
     "description": "Manage all your mentorships - received and requested",
+    "menteePage": {
+      "backToDashboard": "Back to Dashboard",
+      "title": "My Mentorships",
+      "description": "Track your requests and scheduled mentorship sessions"
+    },
+    "newUx": {
+      "nextMeeting": "Next Meeting",
+      "heroTitle": "Get ready to grow!",
+      "heroDesc": "You have a session scheduled soon. Review your questions and make the most of every minute.",
+      "viewDetails": "View Details",
+      "myGoals": "My Goals",
+      "timelineTitle": "Mentorship Timeline",
+      "awaitingConfirmation": "Awaiting Confirmation",
+      "confirmed": "Confirmed",
+      "recentHistory": "Recent History",
+      "eliteTitle": "Become an Elite Mentee",
+      "eliteDesc": "Complete your evaluations to earn punctuality and dedication badges.",
+      "viewBadges": "View my badges",
+      "usefulResources": "Useful Resources",
+      "howToLeverage": "How to get the most out of mentorship",
+      "networkingTips": "Networking Tips",
+      "careerTrack": "Career Track",
+      "exploreMentors": "Explore New Mentors"
+    },
     "received": {
       "title": "Mentorships Received",
       "asMentor": "(you as mentor)",
@@ -1601,6 +1650,25 @@
       "description": "Share materials and resources with your mentees",
       "inDevelopment": "In development",
       "comingSoon": "Coming soon: library of materials, templates and resources to share with mentees"
+    },
+    "booking": {
+      "modalTitle": "Book Mentorship",
+      "standardDuration": "{name}'s mentorship sessions have a standard duration of 45 minutes. Select a time below to proceed.",
+      "noSlotsTitle": "No available slots",
+      "noSlotsDesc": "We couldn't find any open slots in the next 2 weeks. Please try again later.",
+      "selectedSlot": "Selected Time",
+      "atTime": "At {time} (Duration: 45 min)",
+      "messageLabel": "What would you like to discuss in this session?",
+      "messagePlaceholder": "E.g.: I'd like to ask questions about tech career transition, code architecture, and get portfolio review tips...",
+      "charCounter": "Minimum 20 characters: {count}/20",
+      "requiredNote": "Fields marked with * are required",
+      "chooseOtherSlot": "Choose another slot",
+      "confirmButton": "Confirm Booking",
+      "submitting": "Booking...",
+      "successMessage": "Request sent! Redirecting...",
+      "pendingEvaluationsTitle": "You have pending evaluations!",
+      "pendingEvaluationsDesc": "To keep our community thriving and high quality, please evaluate your completed sessions before scheduling a new mentorship.",
+      "evaluateNow": "Evaluate Now"
     }
   },
   "appointments": {

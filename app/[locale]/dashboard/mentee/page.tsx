@@ -23,7 +23,7 @@ import {
   TrendingUp,
   LayoutDashboard
 } from "lucide-react"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/lib/utils/supabase/client"
@@ -219,12 +219,12 @@ export default function MenteeDashboard() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || "Mentorado"}!</h1>
-              <p className="text-muted-foreground text-lg">{t("mentee.welcome")}</p>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
+              <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
             </div>
-            <Button asChild className="rounded-full px-6">
+            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all">
               <Link href="/mentors">
-                <Search className="h-4 w-4 mr-2" /> Buscar Mentores
+                <Search className="h-4 w-4 mr-2" /> {t("mentee.actions.find")}
               </Link>
             </Button>
           </div>
@@ -232,10 +232,10 @@ export default function MenteeDashboard() {
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
               <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4" /> Visão Geral
+                <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
               </TabsTrigger>
               <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" /> Minhas Avaliações
+                <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
               </TabsTrigger>
             </TabsList>
 
@@ -245,39 +245,39 @@ export default function MenteeDashboard() {
               <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title="Agendados" value={stats.upcomingAppointments} icon={<Calendar className="h-5 w-5" />} description="Próximas sessões" />
-                <StatCard title="Mentores" value={stats.totalMentors} icon={<Users className="h-5 w-5" />} description="Mentores diferentes" />
-                <StatCard title="Concluídas" value={stats.completedSessions} icon={<CheckCircle className="h-5 w-5 text-green-500" />} description="Total de sessões" />
-                <StatCard title="Horas" value={`${stats.totalHours}h`} icon={<Clock className="h-5 w-5 text-blue-500" />} description="Tempo em mentoria" />
+                <StatCard title={t("mentee.stats.scheduled")} value={stats.upcomingAppointments} icon={<Calendar className="h-5 w-5" />} description={t("mentee.stats.scheduledDesc")} />
+                <StatCard title={t("mentee.stats.mentors")} value={stats.totalMentors} icon={<Users className="h-5 w-5" />} description={t("mentee.stats.mentorsDesc")} />
+                <StatCard title={t("mentee.stats.completed")} value={stats.completedSessions} icon={<CheckCircle className="h-5 w-5 text-green-500" />} description={t("mentee.stats.completedDesc")} />
+                <StatCard title={t("mentee.stats.hours")} value={`${stats.totalHours}h`} icon={<Clock className="h-5 w-5 text-blue-500" />} description={t("mentee.stats.hoursDesc")} />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <QuickActionCard 
-                      title="Minhas Mentorias" 
-                      desc="Acesse o histórico e detalhes das suas sessões." 
+                      title={t("mentee.actions.myMentorshipsAction")} 
+                      desc={t("mentee.actions.myMentorshipsActionDesc")} 
                       link="/mentorship/mentee" 
                       icon={<Calendar className="w-6 h-6 text-green-500" />}
                     />
                     <QuickActionCard 
-                      title="Explorar Mentores" 
-                      desc="Encontre novos profissionais para te ajudar." 
+                      title={t("mentee.actions.exploreMentorsAction")} 
+                      desc={t("mentee.actions.exploreMentorsActionDesc")} 
                       link="/mentors" 
                       icon={<Search className="w-6 h-6 text-blue-500" />}
                     />
                   </div>
 
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
+                  <Card className="rounded-2xl border border-gray-100 shadow-xs">
+                    <CardHeader className="flex flex-row items-center justify-between pb-4">
                       <div>
-                        <CardTitle className="text-xl flex items-center gap-2">
-                          <Heart className="h-5 w-5 text-red-500 fill-current" /> Seus Favoritos
+                        <CardTitle className="text-xl font-bold flex items-center gap-2">
+                          <Heart className="h-5 w-5 text-red-500 fill-current" /> {t("mentee.sections.favorites")}
                         </CardTitle>
-                        <CardDescription>Acesso rápido aos seus mentores preferidos.</CardDescription>
+                        <CardDescription>{t("mentee.sections.favoritesDesc")}</CardDescription>
                       </div>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href="/mentors">Ver Todos</Link>
+                      <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium">
+                        <Link href="/mentors">{t("mentee.sections.viewAll")}</Link>
                       </Button>
                     </CardHeader>
                     <CardContent>
@@ -288,17 +288,17 @@ export default function MenteeDashboard() {
                           <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">
                             <Heart className="h-6 w-6 text-red-400" />
                           </div>
-                          <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.noFavorites")}</p>
-                          <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.noFavoritesDesc")}</p>
+                          <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.sections.noFavorites")}</p>
+                          <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.sections.noFavoritesDesc")}</p>
                           <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold hover:border-primary/40 hover:text-primary">
-                            <Link href="/mentors">Explorar Mentores</Link>
+                            <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
                           </Button>
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {favoriteMentorsData.map((m) => (
                             <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
-                              <div className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
+                              <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
                                 <Avatar className="h-12 w-12 border">
                                   <AvatarImage src={m.avatar_url || undefined} />
                                   <AvatarFallback>{m.full_name[0]}</AvatarFallback>
@@ -317,26 +317,26 @@ export default function MenteeDashboard() {
                 </div>
 
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">Próximas Sessões</h2>
+                  <h2 className="text-2xl font-bold">{t("mentee.sections.upcoming")}</h2>
                   {upcomingAppointments.length === 0 ? (
                     <Card className="bg-gradient-to-b from-gray-50/60 to-white/40 border border-dashed border-gray-200 rounded-2xl overflow-hidden shadow-xs">
                       <CardContent className="py-10 px-6 text-center flex flex-col items-center justify-center">
                         <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 shadow-xs">
                           <Calendar className="h-7 w-7 text-primary" />
                         </div>
-                        <h3 className="font-bold text-gray-900 text-base mb-1">{t("mentee.noAppointments")}</h3>
+                        <h3 className="font-bold text-gray-900 text-base mb-1">{t("mentee.sections.noAppointments")}</h3>
                         <p className="text-xs text-muted-foreground max-w-sm mb-5 leading-relaxed">
-                          {t("mentee.noAppointmentsDesc")}
+                          {t("mentee.sections.noAppointmentsDesc")}
                         </p>
-                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm px-5">
-                          <Link href="/mentors">{t("mentee.bookNow")}</Link>
+                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all px-5 h-10">
+                          <Link href="/mentors">{t("mentee.sections.bookNow")}</Link>
                         </Button>
                       </CardContent>
                     </Card>
                   ) : (
                     <div className="space-y-4">
                       {upcomingAppointments.map((appt) => (
-                        <Card key={appt.id} className="border-l-4 border-l-primary overflow-hidden">
+                        <Card key={appt.id} className="border-l-4 border-l-primary overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-3 mb-3">
                               <Avatar className="h-10 w-10 border">
@@ -350,8 +350,8 @@ export default function MenteeDashboard() {
                                 </p>
                               </div>
                             </div>
-                            <Button asChild size="sm" variant="secondary" className="w-full font-bold">
-                              <Link href="/mentorship/mentee">Ver Detalhes</Link>
+                            <Button asChild size="sm" variant="secondary" className="w-full font-bold rounded-xl h-9">
+                              <Link href="/mentorship/mentee">{t("mentee.sections.viewDetails")}</Link>
                             </Button>
                           </CardContent>
                         </Card>
@@ -366,8 +366,8 @@ export default function MenteeDashboard() {
             <TabsContent value="feedbacks" className="animate-in fade-in slide-in-from-left-4 duration-500">
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold">Avaliações Enviadas</h2>
-                  <p className="text-muted-foreground">Gerencie os depoimentos que você deixou para seus mentores.</p>
+                  <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacksTitle")}</h2>
+                  <p className="text-muted-foreground">{t("mentee.tabs.feedbacksDesc")}</p>
                 </div>
                 <FeedbackManagement type="sent" />
               </div>
@@ -381,10 +381,10 @@ export default function MenteeDashboard() {
 
 function StatCard({ title, value, icon, description }: { title: string, value: any, icon: any, description: string }) {
   return (
-    <Card className="border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+    <Card className="rounded-2xl border border-gray-100 shadow-xs bg-white hover:shadow-md transition-all">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-bold text-gray-500 uppercase tracking-wider">{title}</CardTitle>
-        <div className="p-2 bg-primary/5 rounded-lg text-primary">{icon}</div>
+        <CardTitle className="text-xs font-bold text-gray-500 uppercase tracking-wider">{title}</CardTitle>
+        <div className="p-2 bg-primary/5 rounded-xl text-primary">{icon}</div>
       </CardHeader>
       <CardContent>
         <div className="text-3xl font-black">{value}</div>
@@ -397,9 +397,9 @@ function StatCard({ title, value, icon, description }: { title: string, value: a
 function QuickActionCard({ title, desc, link, icon }: { title: string, desc: string, link: string, icon: any }) {
   return (
     <Link href={link}>
-      <Card className="hover:border-primary/50 transition-all cursor-pointer h-full border-gray-100 shadow-sm hover:shadow-md group">
+      <Card className="rounded-2xl hover:border-primary/40 transition-all cursor-pointer h-full border-gray-100 shadow-xs hover:shadow-md group bg-white">
         <CardContent className="p-6 flex items-start gap-4">
-          <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-primary/10 transition-colors">{icon}</div>
+          <div className="p-3 bg-gray-50 rounded-2xl group-hover:bg-primary/10 transition-colors">{icon}</div>
           <div>
             <h3 className="font-bold text-gray-900 group-hover:text-primary transition-colors">{title}</h3>
             <p className="text-sm text-gray-500 leading-tight mt-1">{desc}</p>

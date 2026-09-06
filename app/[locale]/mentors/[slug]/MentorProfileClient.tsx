@@ -180,7 +180,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
 
           {isOwner && (
             <Button variant="outline" asChild size="sm" className="rounded-xl font-bold border-2">
-              <Link href="/profile">Editar meu Perfil</Link>
+              <Link href="/profile">{t("editMyProfile")}</Link>
             </Button>
           )}
         </div>
@@ -323,7 +323,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     <div className="space-y-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
                             <Award className="h-4 w-4 text-primary" />
-                            Cultura e Inclusão
+                            {t("cultureAndInclusion")}
                         </h3>
                         <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
                             <CardContent className="p-8 space-y-6">
@@ -341,7 +341,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                                 )}
                                 {mentor.inclusive_tags && mentor.inclusive_tags.length > 0 && (
                                     <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">Inclusão</p>
+                                        <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">{t("inclusion")}</p>
                                         <div className="flex flex-wrap gap-2">
                                             {mentor.inclusive_tags.map((tag, i) => (
                                                 <Badge key={i} className="bg-purple-50 text-purple-700 border-none font-bold px-3 py-1 rounded-xl">
@@ -364,7 +364,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
           <div className="space-y-8">
             {/* Booking Card */}
             <Card className="border-none shadow-2xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white relative">
-              <div className="h-3 bg-gradient-to-r from-primary to-primary-700"></div>
+              <div className="h-3 bg-gradient-to-r from-blue-600 to-purple-600"></div>
               <CardHeader className="pb-4 pt-8 px-8">
                 <CardTitle className="text-xl font-black uppercase tracking-tighter">{t("scheduleSession")}</CardTitle>
                 <CardDescription className="font-bold text-primary">{t("freeMentorships")}</CardDescription>
@@ -378,7 +378,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   </div>
                 ) : (
                   <Button
-                    className="w-full rounded-2xl h-14 font-black shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform text-lg"
+                    className="w-full rounded-2xl h-14 font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-lg"
                     disabled={
                       mentor.availability_status === "busy" ||
                       mentor.availability_status === "unavailable"
@@ -401,8 +401,8 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 
                 <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-2xl">
                     <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-muted-foreground leading-relaxed">
-                        Sua sessão de mentoria será agendada via Google Meet. Um convite será enviado para ambos os e-mails após a confirmação do mentor.
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                        {t("meetInfo")}
                     </p>
                 </div>
               </CardContent>
@@ -421,7 +421,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 <CardHeader className="pb-4 pt-8 px-8">
                   <CardTitle className="text-lg font-black uppercase tracking-tighter flex items-center gap-2">
                     <Globe className="h-5 w-5 text-primary" />
-                    Conecte-se
+                    {t("connect")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 gap-3 px-8 pb-10">

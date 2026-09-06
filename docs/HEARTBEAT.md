@@ -92,6 +92,27 @@
     - **Multi-Tag Overlaps**: Changed `.contains()` to `.overlaps()` on `languages`, `mentorship_topics`, and `inclusive_tags`, allowing multi-select filters without returning 0 matches.
     - **Profile Routing & UUID Support**: Switched `useRouter` in `MentorCard.tsx` to `@/i18n/routing` for locale preservation; added fallback in `getMentorData` to query by UUID `id` or `slug`.
     - **Role Recognition**: Added "Você" badge on mentor's own card, hidden favorite button for self, and kept self-booking disabled on owner's profile. 0 type errors.
+- [x] `end-to-end onboarding, dynamic role recognition & auth resilience` — Perfected the entire entry journey:
+    - **Central Auth Callback Resolution**: Fixed `app/[locale]/(auth)/callback/route.ts` which erroneously routed to a missing `/api/auth/callback` 404 endpoint; it now seamlessly forwards code, tokens, and type parameters to `/auth/callback`.
+    - **Smart Unassigned User Redirection**: Replaced PostgREST inner join (`!inner`) with left join on `user_roles` in `app/auth/callback/route.ts`; new users with 0 assigned roles are guided to `/${locale}/onboarding` instead of raw `/profile`.
+    - **Elimination of Hardcoded Role Fallback**: In `lib/auth/auth-context.tsx`, removed the automatic fallback that forced all new signups into `'mentee'` by default; dynamic `needsRoleSelection()` now returns true for unassigned accounts, and `getDefaultRedirectPath()` resolves directly to `'/onboarding'`.
+    - **Complete Onboarding Experience (`app/[locale]/onboarding/page.tsx`)**: Created a modern, accessible 2-step onboarding wizard:
+        - **Step 1 (Role Selection)**: High-fidelity interactive cards for "Mentorado" and "Mentor" with benefits, keyboard navigation, and ARIA attributes.
+        - **Step 2 (Micro Profile Setup)**: Dynamic fields based on selected role — interest topic chips, goal selection, and one-click geolocation auto-detect for mentees; professional job title, company, LinkedIn URL, mentorship topics, and short bio for mentors.
+        - **Atomic Server Update (`POST /api/profile/role`)**: Enriched API to atomically save the assigned role, RBAC permissions (`user_roles`), mentor verification request (`validation_requests`), and profile metadata in a single roundtrip.
+    - **Locale-Preserving Routing**: Replaced `next/navigation` with `@/i18n/routing` in `signup/page.tsx`, `confirmation/page.tsx`, `confirmed/page.tsx`, and `profile/page.tsx`. Enhanced `middleware.ts` to preserve locale and `next` query parameter during login redirects.
+    - **Automated Test Coverage**: Added `app/api/profile/role/route.test.ts` verifying 401 unauthenticated requests, 400 validation guards, mentee assignment, and mentor verification request creation. 45/45 tests passing (6 test suites passing in Jest), 0 TypeScript errors (`tsc --noEmit`).
+- [x] `mentee flow, visual identity & don't make me think harmonization` — Refactored the entire mentee journey to match Menvo's visual identity and `/quiz` design tokens:
+    - **Quiz Design Token Parity**: Aligned primary action buttons across the mentee flow (`bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg rounded-xl h-12`) and card containers (`rounded-2xl border border-gray-100 shadow-xs`).
+    - **Mentee Dashboard (`app/[locale]/dashboard/mentee/page.tsx`)**: Replaced raw `next/link` with `@/i18n/routing` `Link`. Fully internationalized greeting headers, dynamic time-of-day greetings (`greetings.morning/afternoon/evening`), stat cards, quick action cards, favorite mentor cards, and upcoming session cards.
+    - **Activation CTA (`components/dashboard/MenteeQuizCTA.tsx`)**: Upgraded to `@/i18n/routing` `Link` ensuring locale persistence on both first-time quiz activation and diagnostic review cards.
+    - **Mentee Mentorships Page (`app/[locale]/mentorship/mentee/page.tsx`) & New UX (`components/mentorship/MenteeMentorshipNewUX.tsx`)**: Converted navigation to `@/i18n/routing`. Standardized tab lists with `rounded-xl`, converted all hardcoded Portuguese labels into `t("...")` keys across `pt-BR.json`, `en.json`, and `es.json`.
+    - **Mentor Profile Booking Experience (`MentorProfileClient.tsx`) & Modal (`BookMentorshipModal.tsx`)**:
+        - Applied `/quiz` gradient button styling to the primary "Agendar Mentoria" action and modal submit button.
+        - Integrated character counter indicator (`min 20 chars`) with live validation feedback.
+        - Standardized time-slot selection cards to match the `/quiz` interactive option cards (`rounded-2xl`, check badges, hover states).
+        - Internationalized Google Meet meeting disclaimers, culture & inclusion badges, and modal headers across all three supported locales (`pt-BR`, `en`, `es`).
+    - **Quality Verification**: 45/45 unit tests green (6 test suites in Jest), 0 TypeScript errors (`tsc --noEmit`), and full browser subagent visual validation of the mentee journey and booking modals.
 
 ---
 
