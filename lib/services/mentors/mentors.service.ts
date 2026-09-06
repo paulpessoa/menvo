@@ -382,7 +382,8 @@ class MentorService {
     )
 
     if (filters.search && filters.search.trim() !== "") {
-      const searchTerm = `%${filters.search.trim()}%`
+      const sanitized = filters.search.trim().replace(/[,()]/g, " ")
+      const searchTerm = `%${sanitized}%`
       query = query.or(
         `full_name.ilike.${searchTerm},job_title.ilike.${searchTerm},company.ilike.${searchTerm},bio.ilike.${searchTerm}`
       )

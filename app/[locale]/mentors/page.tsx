@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import {
   Select,
   SelectContent,
@@ -32,7 +32,8 @@ import {
   ArrowDownUp,
   Globe,
   SearchX,
-  Sparkles
+  Sparkles,
+  X
 } from "lucide-react"
 
 import { useAuth } from "@/lib/auth"
@@ -42,6 +43,7 @@ import { MagicSearchBar } from "@/components/mentors/MagicSearchBar"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
+import { useDebounce } from "@/hooks/useDebounce"
 
 interface MentorProfile {
   id: string | null
@@ -129,9 +131,13 @@ export default function MentorsPage() {
     return () => clearInterval(timer)
   }, [])
 
-  const fetchMentors = async (isInitial = false) => {
+  const debouncedSearch = useDebounce(filters.search, 350)
+  const latestRequestIdRef = useRef(0)
+
+  const fetchMentors = useCallback(async (isInitial = false, overridePage?: number) => {
+    const currentRequestId = ++latestRequestIdRef.current
     try {
-      const currentPage = isInitial ? 0 : page
+      const currentPage = isInitial ? 0 : (overridePage ?? page)
       if (isInitial) {
         setLoading(true)
         setPage(0)
@@ -141,7 +147,7 @@ export default function MentorsPage() {
 
       const { data, count } = await mentorService.searchCatalog({
         filters: {
-          search: filters.search,
+          search: debouncedSearch,
           country: filters.country,
           state: filters.state,
           city: filters.city,
@@ -156,6 +162,11 @@ export default function MentorsPage() {
         limit: ITEMS_PER_PAGE
       })
 
+      // Ignore stale responses from earlier requests
+      if (currentRequestId !== latestRequestIdRef.current) {
+        return
+      }
+
       if (isInitial) {
         setMentors((data as unknown as MentorProfile[]) || [])
       } else {
@@ -166,13 +177,30 @@ export default function MentorsPage() {
       setTotalCount(count || 0)
       setHasMore((count || 0) > from + (data?.length || 0))
     } catch (error) {
-      console.error("Error fetching mentors:", error)
-      toast.error(t("errorLoadingMentors"))
+      if (currentRequestId === latestRequestIdRef.current) {
+        console.error("Error fetching mentors:", error)
+        toast.error(t("errorLoadingMentors"))
+      }
     } finally {
-      setLoading(false)
-      setLoadingMore(false)
+      if (currentRequestId === latestRequestIdRef.current) {
+        setLoading(false)
+        setLoadingMore(false)
+      }
     }
-  }
+  }, [
+    debouncedSearch,
+    filters.country,
+    filters.state,
+    filters.city,
+    filters.languages,
+    filters.topics,
+    filters.inclusiveTags,
+    filters.availabilityStatus,
+    filters.experienceYears,
+    filters.sortBy,
+    page,
+    t
+  ])
 
   const fetchFilterOptions = async () => {
     try {
@@ -189,7 +217,18 @@ export default function MentorsPage() {
 
   useEffect(() => {
     fetchMentors(true)
-  }, [filters])
+  }, [
+    debouncedSearch,
+    filters.country,
+    filters.state,
+    filters.city,
+    filters.languages,
+    filters.topics,
+    filters.inclusiveTags,
+    filters.availabilityStatus,
+    filters.experienceYears,
+    filters.sortBy
+  ])
 
   const activeFiltersCount = useMemo(() => {
     let count = 0
@@ -206,8 +245,9 @@ export default function MentorsPage() {
   }, [filters])
 
   const handleLoadMore = () => {
-    setPage((prev) => prev + 1)
-    fetchMentors(false)
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchMentors(false, nextPage)
   }
 
   const handleAIMatch = (
@@ -273,8 +313,20 @@ export default function MentorsPage() {
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, search: e.target.value }))
             }
-            className="pl-10 h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary"
+            className={`pl-10 h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary ${
+              filters.search ? "pr-10" : ""
+            }`}
           />
+          {filters.search && (
+            <button
+              type="button"
+              onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-black/5 transition-colors cursor-pointer"
+              aria-label="Limpar busca"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         <div className="flex gap-2">
