@@ -1,6 +1,6 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Download, ExternalLink } from 'lucide-react'
 
@@ -19,8 +19,9 @@ export function PdfViewerDialog({
 }: PdfViewerDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
+            <DialogContent aria-describedby="pdf-viewer-desc" className="max-w-4xl h-[90vh] flex flex-col">
                 <DialogHeader>
+                    <DialogDescription id="pdf-viewer-desc" className="sr-only">Visualizador de documento PDF</DialogDescription>
                     <DialogTitle className="flex items-center justify-between">
                         <span>{title}</span>
                         <div className="flex gap-2">

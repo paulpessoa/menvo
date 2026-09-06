@@ -67,9 +67,18 @@ export function RoleSelectionModal({ open, onClose, userId, onSuccess }: RoleSel
           {roles.map((role) => (
             <Card
               key={role.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${selectedRole === role.id ? "ring-2 ring-primary border-primary" : ""
+              role="button"
+              tabIndex={0}
+              aria-pressed={selectedRole === role.id}
+              className={`cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary ${selectedRole === role.id ? "ring-2 ring-primary border-primary" : ""
                 }`}
               onClick={() => setSelectedRole(role.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault()
+                  setSelectedRole(role.id)
+                }
+              }}
             >
               <CardHeader>
                 <div className="flex items-center justify-between">

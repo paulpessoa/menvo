@@ -110,7 +110,8 @@ export function CompleteAppointmentModal({
                                     onClick={() => setRating(star)}
                                     onMouseEnter={() => setHoveredRating(star)}
                                     onMouseLeave={() => setHoveredRating(0)}
-                                    className="transition-transform hover:scale-110"
+                                    className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary rounded-md p-1 cursor-pointer"
+                                    aria-label={`${star} ${star === 1 ? "estrela" : "estrelas"}`}
                                 >
                                     <Star
                                         className={`h-8 w-8 ${star <= (hoveredRating || rating)

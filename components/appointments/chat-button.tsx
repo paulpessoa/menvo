@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogTitle,
+    DialogDescription
 } from '@/components/ui/dialog';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 
@@ -45,7 +47,9 @@ export function ChatButton({ appointment, currentUserId, isMentor }: ChatButtonP
             </Button>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="max-w-2xl p-0 overflow-hidden border-none bg-transparent shadow-none max-h-[90vh] flex flex-col">
+                <DialogContent aria-describedby="chat-dialog-desc" className="max-w-2xl p-0 overflow-hidden border-none bg-transparent shadow-none max-h-[90vh] flex flex-col">
+                    <DialogTitle className="sr-only">Chat com {otherPerson.full_name}</DialogTitle>
+                    <DialogDescription id="chat-dialog-desc" className="sr-only">Conversa em tempo real sobre a mentoria</DialogDescription>
                     {/* 
                       Forçamos o remount do ChatInterface toda vez que o modal abre
                       usando isOpen no key, além de garantir que o ID seja o da outra pessoa.
