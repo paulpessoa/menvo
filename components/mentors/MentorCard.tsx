@@ -134,10 +134,10 @@ export function MentorCard({
         </button>
       )}
 
-      <CardHeader className="pb-3 px-6 pt-8">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-14 w-14 border-2 border-white shadow-lg group-hover:scale-105 transition-transform duration-300">
+      <CardHeader className="pb-3 px-5 sm:px-6 pt-5 sm:pt-7">
+        <div className="flex items-start justify-between pr-8">
+          <div className="flex items-center space-x-3.5 sm:space-x-4">
+            <Avatar className="h-12 w-12 sm:h-14 sm:w-14 border-2 border-white shadow-md group-hover:scale-105 transition-transform duration-300 shrink-0">
               <AvatarImage
                 src={mentor.avatar_url || undefined}
                 alt={mentor.full_name || undefined}
@@ -149,9 +149,9 @@ export function MentorCard({
                   .join("") || "M"}
               </AvatarFallback>
             </Avatar>
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <CardTitle className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <CardTitle className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-primary transition-colors truncate">
                   {mentor.full_name}
                 </CardTitle>
                 {isOwnCard && (
@@ -165,7 +165,7 @@ export function MentorCard({
                   </Badge>
                 )}
               </div>
-              <CardDescription className="text-sm font-semibold text-primary/70 line-clamp-1">
+              <CardDescription className="text-xs sm:text-sm font-semibold text-primary/70 line-clamp-1">
                 {mentor.job_title}
                 {mentor.company && <span className="text-muted-foreground font-medium italic"> @ {mentor.company}</span>}
               </CardDescription>
@@ -174,7 +174,7 @@ export function MentorCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 flex-1 flex flex-col px-8 pb-8">
+      <CardContent className="space-y-3.5 sm:space-y-4 flex-1 flex flex-col px-5 sm:px-7 pb-5 sm:pb-7">
         {isAIHighlighted && aiReason && (
           <div className="p-3 bg-primary/5 rounded-2xl border border-primary/10 text-xs text-primary font-medium italic leading-relaxed">
             "{aiReason}"

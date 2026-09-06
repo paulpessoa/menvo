@@ -114,6 +114,7 @@ export default function MentorsPage() {
   const [aiJustification, setAiJustification] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
   const [availableFilters, setAvailableFilters] = useState({
     countries: [] as string[],
     states: [] as string[],
@@ -244,6 +245,19 @@ export default function MentorsPage() {
     return count
   }, [filters])
 
+  const activeFacetCount = useMemo(() => {
+    let count = 0
+    if (filters.country !== "all") count++
+    if (filters.state !== "all") count++
+    if (filters.city) count++
+    if (filters.languages.length > 0) count += filters.languages.length
+    if (filters.topics.length > 0) count += filters.topics.length
+    if (filters.inclusiveTags.length > 0) count += filters.inclusiveTags.length
+    if (filters.availabilityStatus !== "all") count++
+    if (filters.experienceYears !== "all") count++
+    return count
+  }, [filters])
+
   const handleLoadMore = () => {
     const nextPage = page + 1
     setPage(nextPage)
@@ -304,251 +318,346 @@ export default function MentorsPage() {
       <MagicSearchBar onMatch={handleAIMatch} onClear={handleClearAI} />
 
       {/* Search and Filter Bar */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder={t("searchPlaceholder")}
-            value={filters.search}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, search: e.target.value }))
-            }
-            className={`pl-10 h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary ${
-              filters.search ? "pr-10" : ""
-            }`}
-          />
-          {filters.search && (
-            <button
-              type="button"
-              onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-black/5 transition-colors cursor-pointer"
-              aria-label="Limpar busca"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        <div className="flex gap-2">
-          <Select
-            value={filters.sortBy}
-            onValueChange={(val: any) =>
-              setFilters((prev) => ({ ...prev, sortBy: val }))
-            }
-          >
-            <SelectTrigger className="w-[140px] h-11 rounded-xl bg-white border-2">
-              <div className="flex items-center gap-2">
-                <ArrowDownUp className="h-4 w-4 text-muted-foreground" />
-                <SelectValue placeholder={t("sortBy.label")} />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="relevance">{t("sortBy.relevance")}</SelectItem>
-              <SelectItem value="experience">
-                {t("sortBy.experience")}
-              </SelectItem>
-              <SelectItem value="newest">{t("sortBy.newest")}</SelectItem>
-              <SelectItem value="name">{t("sortBy.name")}</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                className="relative h-11 rounded-xl border-2 px-6"
+      <div className="mb-4 sm:mb-6 space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+          {/* Main Search Input */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
+            <Input
+              placeholder={t("searchPlaceholder")}
+              value={filters.search}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
+              className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
+                filters.search ? "pr-10" : ""
+              }`}
+            />
+            {filters.search && (
+              <button
+                type="button"
+                onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                aria-label="Limpar busca"
               >
-                <Filter className="h-4 w-4 mr-2" />
-                {t("filters")}
-                {activeFiltersCount > 0 && (
-                  <Badge className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground">
-                    {activeFiltersCount}
-                  </Badge>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>{t("sheetTitle")}</SheetTitle>
-                <SheetDescription>{t("sheetDescription")}</SheetDescription>
-              </SheetHeader>
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
-              <div className="mt-6 space-y-6 pb-8">
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center">
-                    <MapPin className="h-4 w-4 mr-2 text-primary" />
-                    {t("state")}
-                  </h3>
-                  <Select
-                    value={filters.state}
-                    onValueChange={(value) =>
-                      setFilters((prev) => ({ ...prev, state: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("statePlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("allStates")}</SelectItem>
-                      {availableFilters.states.map((state) => (
-                        <SelectItem key={state} value={state}>
-                          {state}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+          {/* Sort & Filters Action Row (balanced 50-50 on mobile, compact on desktop) */}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
+            <Select
+              value={filters.sortBy}
+              onValueChange={(val: any) =>
+                setFilters((prev) => ({ ...prev, sortBy: val }))
+              }
+            >
+              <SelectTrigger className="w-full sm:w-[155px] h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
+                <div className="flex items-center gap-1.5 truncate">
+                  <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <SelectValue placeholder={t("sortBy.label")} />
                 </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="relevance">{t("sortBy.relevance")}</SelectItem>
+                <SelectItem value="experience">
+                  {t("sortBy.experience")}
+                </SelectItem>
+                <SelectItem value="newest">{t("sortBy.newest")}</SelectItem>
+                <SelectItem value="name">{t("sortBy.name")}</SelectItem>
+              </SelectContent>
+            </Select>
 
-                {availableFilters.cities.length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="font-medium flex items-center">
-                      <MapPin className="h-4 w-4 mr-2 text-primary" />
-                      {t("city")}
+            <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto h-11 sm:h-12 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40"
+                >
+                  <Filter className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <span>{t("filters")}</span>
+                  {activeFacetCount > 0 && (
+                    <Badge className="ml-1 h-5 min-w-5 px-1.5 rounded-full text-[10px] flex items-center justify-center bg-primary text-primary-foreground">
+                      {activeFacetCount}
+                    </Badge>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-md p-0 flex flex-col h-full bg-background border-l border-border/60">
+                {/* Fixed Sheet Header */}
+                <SheetHeader className="p-5 pb-4 border-b border-border/60 shrink-0 text-left">
+                  <div className="flex items-center justify-between">
+                    <SheetTitle className="text-lg font-bold flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-primary" />
+                      {t("sheetTitle")}
+                    </SheetTitle>
+                    {activeFacetCount > 0 && (
+                      <Badge variant="secondary" className="text-xs font-semibold">
+                        {activeFacetCount} {activeFacetCount === 1 ? "filtro ativo" : "filtros ativos"}
+                      </Badge>
+                    )}
+                  </div>
+                  <SheetDescription className="text-xs sm:text-sm text-muted-foreground">
+                    {t("sheetDescription")}
+                  </SheetDescription>
+                </SheetHeader>
+
+                {/* Scrollable Sheet Content */}
+                <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                  {/* Estado */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground flex items-center">
+                      <MapPin className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                      {t("state")}
                     </h3>
                     <Select
-                      value={filters.city || "all"}
+                      value={filters.state}
                       onValueChange={(value) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          city: value === "all" ? "" : value
-                        }))
+                        setFilters((prev) => ({ ...prev, state: value }))
                       }
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("cityPlaceholder")} />
+                      <SelectTrigger className="h-11 rounded-xl">
+                        <SelectValue placeholder={t("statePlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">{t("allCities")}</SelectItem>
-                        {availableFilters.cities.map((city) => (
-                          <SelectItem key={city} value={city}>
-                            {city}
+                        <SelectItem value="all">{t("allStates")}</SelectItem>
+                        {availableFilters.states.map((state) => (
+                          <SelectItem key={state} value={state}>
+                            {state}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                )}
 
-                <div className="space-y-3">
-                  <h3 className="font-medium">{t("topics")}</h3>
-                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pt-1">
-                    {availableFilters.topics.map((topic) => (
-                      <Badge
-                        key={topic}
-                        variant={
-                          filters.topics.includes(topic) ? "default" : "outline"
-                        }
-                        className="cursor-pointer"
-                        onClick={() => {
+                  {/* Cidade */}
+                  {availableFilters.cities.length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground flex items-center">
+                        <MapPin className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                        {t("city")}
+                      </h3>
+                      <Select
+                        value={filters.city || "all"}
+                        onValueChange={(value) =>
                           setFilters((prev) => ({
                             ...prev,
-                            topics: prev.topics.includes(topic)
-                              ? prev.topics.filter((t) => t !== topic)
-                              : [...prev.topics, topic]
+                            city: value === "all" ? "" : value
                           }))
-                        }}
+                        }
                       >
-                        {topic}
-                      </Badge>
-                    ))}
+                        <SelectTrigger className="h-11 rounded-xl">
+                          <SelectValue placeholder={t("cityPlaceholder")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">{t("allCities")}</SelectItem>
+                          {availableFilters.cities.map((city) => (
+                            <SelectItem key={city} value={city}>
+                              {city}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Temas de Mentoria */}
+                  <div className="space-y-2.5">
+                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                      {t("topics")}
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
+                      {availableFilters.topics.map((topic) => {
+                        const isSelected = filters.topics.includes(topic)
+                        return (
+                          <button
+                            key={topic}
+                            type="button"
+                            onClick={() => {
+                              setFilters((prev) => ({
+                                ...prev,
+                                topics: isSelected
+                                  ? prev.topics.filter((t) => t !== topic)
+                                  : [...prev.topics, topic]
+                              }))
+                            }}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer border ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                                : "bg-card hover:bg-muted text-muted-foreground border-border/80"
+                            }`}
+                          >
+                            {topic}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Tags Inclusivas */}
+                  <div className="space-y-2.5">
+                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground flex items-center">
+                      <Heart className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                      {t("inclusiveTags")}
+                    </h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {availableFilters.inclusiveTags.map((tag) => {
+                        const isSelected = filters.inclusiveTags.includes(tag)
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                              setFilters((prev) => ({
+                                ...prev,
+                                inclusiveTags: isSelected
+                                  ? prev.inclusiveTags.filter((t) => t !== tag)
+                                  : [...prev.inclusiveTags, tag]
+                              }))
+                            }}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer border ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                                : "bg-card hover:bg-muted text-muted-foreground border-border/80"
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Disponibilidade */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground flex items-center">
+                      <Clock className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                      {t("availability")}
+                    </h3>
+                    <Select
+                      value={filters.availabilityStatus}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          availabilityStatus: value
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="h-11 rounded-xl">
+                        <SelectValue placeholder={t("availabilityPlaceholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t("anyStatus")}</SelectItem>
+                        <SelectItem value="available">
+                          {t("status.available")}
+                        </SelectItem>
+                        <SelectItem value="busy">{t("status.busy")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Experiência */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground flex items-center">
+                      <Briefcase className="h-3.5 w-3.5 mr-1.5 text-primary" />
+                      {t("experience")}
+                    </h3>
+                    <Select
+                      value={filters.experienceYears}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          experienceYears: value
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="h-11 rounded-xl">
+                        <SelectValue placeholder={t("experiencePlaceholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t("anyExperience")}</SelectItem>
+                        <SelectItem value="0-2">0-2 anos</SelectItem>
+                        <SelectItem value="3-5">3-5 anos</SelectItem>
+                        <SelectItem value="6-10">6-10 anos</SelectItem>
+                        <SelectItem value="11+">10+ anos</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center">
-                    <Heart className="h-4 w-4 mr-2 text-primary" />
-                    {t("inclusiveTags")}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {availableFilters.inclusiveTags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant={
-                          filters.inclusiveTags.includes(tag)
-                            ? "default"
-                            : "outline"
-                        }
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setFilters((prev) => ({
-                            ...prev,
-                            inclusiveTags: prev.inclusiveTags.includes(tag)
-                              ? prev.inclusiveTags.filter((t) => t !== tag)
-                              : [...prev.inclusiveTags, tag]
-                          }))
-                        }}
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center">
-                    <Clock className="h-4 w-4 mr-2 text-primary" />
-                    {t("availability")}
-                  </h3>
-                  <Select
-                    value={filters.availabilityStatus}
-                    onValueChange={(value) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        availabilityStatus: value
-                      }))
-                    }
+                {/* Sticky Sheet Footer */}
+                <div className="sticky bottom-0 bg-background/95 backdrop-blur-md border-t border-border/60 p-4 flex items-center gap-2.5 shrink-0 z-10">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-11 rounded-xl text-xs sm:text-sm font-semibold"
+                    onClick={() => setFilters(initialFilters)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("availabilityPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("anyStatus")}</SelectItem>
-                      <SelectItem value="available">
-                        {t("status.available")}
-                      </SelectItem>
-                      <SelectItem value="busy">{t("status.busy")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center">
-                    <Briefcase className="h-4 w-4 mr-2 text-primary" />
-                    {t("experience")}
-                  </h3>
-                  <Select
-                    value={filters.experienceYears}
-                    onValueChange={(value) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        experienceYears: value
-                      }))
-                    }
+                    {t("clearFilters")}
+                  </Button>
+                  <Button
+                    className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-xs sm:text-sm shadow-md"
+                    onClick={() => setIsFilterSheetOpen(false)}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("experiencePlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("anyExperience")}</SelectItem>
-                      <SelectItem value="0-2">0-2 anos</SelectItem>
-                      <SelectItem value="3-5">3-5 anos</SelectItem>
-                      <SelectItem value="6-10">6-10 anos</SelectItem>
-                      <SelectItem value="11+">10+ anos</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    Ver Mentores ({totalCount})
+                  </Button>
                 </div>
-
-                <Button
-                  variant="outline"
-                  className="w-full mt-4"
-                  onClick={() => setFilters(initialFilters)}
-                >
-                  {t("clearFilters")}
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
+
+        {/* Active Filter Badges Bar */}
+        {activeFacetCount > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto py-1 text-xs scrollbar-none">
+            <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider shrink-0 mr-1">
+              Ativos:
+            </span>
+            {filters.state !== "all" && (
+              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+                <span>Estado: {filters.state}</span>
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, state: "all", city: "" }))} />
+              </Badge>
+            )}
+            {filters.city && (
+              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+                <span>Cidade: {filters.city}</span>
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, city: "" }))} />
+              </Badge>
+            )}
+            {filters.topics.map((topic) => (
+              <Badge key={topic} variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+                <span>{topic}</span>
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, topics: p.topics.filter(t => t !== topic) }))} />
+              </Badge>
+            ))}
+            {filters.inclusiveTags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+                <span>{tag}</span>
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, inclusiveTags: p.inclusiveTags.filter(t => t !== tag) }))} />
+              </Badge>
+            ))}
+            {filters.availabilityStatus !== "all" && (
+              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+                <span>{filters.availabilityStatus === "available" ? t("status.available") : t("status.busy")}</span>
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, availabilityStatus: "all" }))} />
+              </Badge>
+            )}
+            {filters.experienceYears !== "all" && (
+              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+                <span>{filters.experienceYears} anos</span>
+                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, experienceYears: "all" }))} />
+              </Badge>
+            )}
+            <button
+              type="button"
+              onClick={() => setFilters(initialFilters)}
+              className="text-[11px] font-semibold text-primary hover:underline shrink-0 ml-1.5 cursor-pointer"
+            >
+              {t("clearFilters")}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Results Count */}
