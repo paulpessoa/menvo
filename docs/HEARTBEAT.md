@@ -50,13 +50,35 @@
     - **Messages (`/messages`)**: Added responsive empty conversation state with `MessageCircle` badge, search-specific clear button, and "Explorar Mentores" CTA.
     - **Mentee Dashboard (`/dashboard/mentee`)**: Elevated empty favorites with `Heart` icon and explore action; revamped empty upcoming sessions with `Calendar` icon and direct booking CTA. Fixed date formatting with dynamic locale resolution (`locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR"`).
     - **i18n Parity**: 100% key parity maintained across `pt-BR`, `en`, and `es`. Strictly verified with `tsc --noEmit` with 0 errors.
+- [x] `mentor search performance, debounce & race condition guards` — Implemented reusable `hooks/useDebounce.ts` (350ms delay) on mentor catalog search; added `latestRequestIdRef` to discard stale in-flight responses on fast filter changes; added 1-click `X` clear search button inside the search input; sanitized search inputs against punctuation that breaks PostgREST `.or()` queries; fixed asynchronous `page` state race condition in `handleLoadMore`. 0 type errors.
+- [x] `booking edge cases, conflict guards & modal decoupling` — Enhanced mentorship scheduling:
+    - **Self-Booking Protection**: Prevented users from booking sessions with their own profile (`resolvedMentorId === user.id` -> 400).
+    - **Concurrent Slot Conflict Protection**: In `POST /api/appointments/schedule`, validated slot availability against existing `pending` or `confirmed` appointments, returning HTTP 409 `CONFLICT`.
+    - **Architectural Decoupling**: Removed direct `createClient().auth.getSession()` inside `BookMentorshipModal.tsx`, replacing it with `useAuth()` per `AGENTS.md`.
+    - **Dynamic Localization**: Replaced static Portuguese day-of-week strings with locale-aware formatting (`toLocaleDateString`) based on active locale (`pt-BR`, `en-US`, `es-ES`).
+    - **Automatic Conflict Recovery**: Automatically reloads available slots and resets selection when a 409 conflict is encountered, preventing stale slot locks. 0 type errors.
+- [x] `web accessibility (WCAG AA) & semantic improvements` — Enhanced accessibility and eliminated Radix UI warnings:
+    - **Skip-to-Content Localization**: Dynamically localized skip link in `app/[locale]/layout.tsx` for `pt-BR`, `en`, and `es`.
+    - **Radix UI Dialog Compliance**: Added screen-reader accessible `DialogTitle` and `DialogDescription` in `components/appointments/chat-button.tsx` and `components/ui/pdf-viewer-dialog.tsx`, resolving `Missing Description or aria-describedby` warnings.
+    - **Star Rating Accessibility**: Added descriptive `aria-label` ("1 estrela", "2 estrelas", etc.) and keyboard focus rings to interactive rating stars in `complete-appointment-modal.tsx`.
+    - **Keyboard Navigation in Role Selection**: Enabled full keyboard navigation (Tab focus + Enter/Space selection with `role="button"`, `tabIndex={0}`, and `aria-pressed`) in `components/auth/RoleSelectionModal.tsx`. 0 type errors.
+- [x] `lcp & core web vitals performance optimizations` — Boosted asset loading and page responsiveness:
+    - **Image Optimization & Modern Formats**: Configured `formats: ["image/avif", "image/webp"]` and removed `unoptimized: true` in `next.config.mjs` for automatic modern compression.
+    - **OAuth Avatar Remote Patterns**: Added `lh3.googleusercontent.com` and `avatars.githubusercontent.com` to `remotePatterns`.
+    - **Hero Carousel LCP & Responsive Sizes**: Configured responsive `sizes="(max-width: 768px) 250px, (max-width: 1024px) 350px, 450px"` on `app/[locale]/page.tsx`.
+    - **Third-Party Preconnects**: Injected `<link rel="preconnect">` for `https://www.clarity.ms` and `https://www.googletagmanager.com` in `app/[locale]/layout.tsx`. 0 type errors.
+- [x] `comprehensive seo, opengraph & canonical consistency` — Harmonized metadata across secondary routes:
+    - **How It Works Layout**: Fixed namespace mismatch (`how-it-works` -> `howItWorks`) enabling accurate dynamic titles and descriptions.
+    - **OpenGraph & Twitter Cards**: Added full `openGraph` (title, description, url, siteName, locale, type) and `twitter:card` across `/about`, `/how-it-works`, `/community`, `/mentors`, `/faq`, `/doar`, and `/contact`.
+    - **Absolute Canonical URLs & Multi-lang Alternates**: Enforced absolute canonical URLs (`https://www.menvo.com.br/...`) and `languages` alternates (`pt-BR`, `en`, `es`) on all public pages. 0 type errors.
+- [x] `test environment configuration & oauth validator suite` — Configured `jest.config.mjs` using `next/jest.js` and `jest.setup.js` with `@testing-library/jest-dom`. Fixed `isOAuthReadyForProduction` provider evaluation and localhost redirect checks in `lib/auth/oauth-config-validator.ts`. 22/22 unit tests passing, 0 TypeScript errors.
 
 ---
 
 ## 🚀 Next Steps (P2)
 
-1. **Mentor Search & Filtering Polish** — Review mentor filtering performance and UX (`app/[locale]/mentors/page.tsx`).
-2. **Profile & Booking Flow Verification** — Validate scheduling and calendar sync edge cases for newly matched mentees.
+1. **Automated End-to-End / Integration Testing** — Establish comprehensive tests for booking, authentication, and mentor search.
+2. **Observability & Analytics Dashboard** — Verify Sentry or error boundary telemetry and review core user journeys.
 
 ---
 

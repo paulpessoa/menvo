@@ -247,13 +247,18 @@ export function isOAuthReadyForProduction(): boolean {
   // At least one provider must be valid
   const hasValidProvider = validations.some(v => v.isValid && v.config?.enabled)
   
-  // Must have production redirect URIs
-  const hasProductionRedirect = env.expectedRedirectUris.some(uri => 
-    !uri.includes('localhost') && !uri.includes('127.0.0.1')
-  )
+  // Must have production redirect URIs and not point to localhost
+  const hasProductionRedirect = 
+    !env.siteUrl.includes('localhost') && 
+    !env.siteUrl.includes('127.0.0.1') &&
+    env.expectedRedirectUris.some(uri => 
+      !uri.includes('localhost') && !uri.includes('127.0.0.1')
+    )
   
-  // No critical errors
-  const hasCriticalErrors = validations.some(v => v.errors.length > 0)
+  // No critical errors in enabled or partially configured providers
+  const hasCriticalErrors = validations.some(v => 
+    Boolean((v.config?.clientId || v.config?.clientSecret) && v.errors.length > 0)
+  )
   
   return hasValidProvider && hasProductionRedirect && !hasCriticalErrors
 }
