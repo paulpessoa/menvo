@@ -25,7 +25,6 @@ export function useProfile() {
   const fetchProfile = useCallback(async () => {
     if (!user) return
 
-    console.log('🔍 Starting fetchProfile for user:', user.id);
     const supabase = createClient()
     
     const result = await handleAsyncOperation(
@@ -55,7 +54,6 @@ export function useProfile() {
     );
 
     setLoading(false);
-    console.log('📋 fetchProfile result:', result);
 
     if (result.data) {
       setProfile(result.data);

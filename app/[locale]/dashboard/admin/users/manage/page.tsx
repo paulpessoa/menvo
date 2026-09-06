@@ -395,12 +395,14 @@ export default function ManageUsersPage() {
                                         Adicione um novo usuário à plataforma
                                     </DialogDescription>
                                 </DialogHeader>
-                                <div className="space-y-4">
+                                <form onSubmit={(e) => { e.preventDefault(); createUser(); }} className="space-y-4">
                                     <div>
                                         <Label htmlFor="email">Email</Label>
                                         <Input
                                             id="email"
+                                            name="email"
                                             type="email"
+                                            autoComplete="email"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             placeholder="usuario@exemplo.com"
@@ -410,7 +412,9 @@ export default function ManageUsersPage() {
                                         <Label htmlFor="password">Senha</Label>
                                         <Input
                                             id="password"
+                                            name="password"
                                             type="password"
+                                            autoComplete="new-password"
                                             value={formData.password}
                                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                             placeholder="Senha temporária"
@@ -420,6 +424,8 @@ export default function ManageUsersPage() {
                                         <Label htmlFor="full_name">Nome Completo</Label>
                                         <Input
                                             id="full_name"
+                                            name="full_name"
+                                            autoComplete="name"
                                             value={formData.full_name}
                                             onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                                             placeholder="Nome do usuário"
@@ -440,13 +446,13 @@ export default function ManageUsersPage() {
                                             </SelectContent>
                                         </Select>
                                     </div>
-                                </div>
-                                <DialogFooter>
-                                    <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                                        Cancelar
-                                    </Button>
-                                    <Button onClick={createUser}>Criar Usuário</Button>
-                                </DialogFooter>
+                                    <DialogFooter>
+                                        <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)}>
+                                            Cancelar
+                                        </Button>
+                                        <Button type="submit">Criar Usuário</Button>
+                                    </DialogFooter>
+                                </form>
                             </DialogContent>
                         </Dialog>
                     </div>

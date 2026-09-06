@@ -48,7 +48,8 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const handleChangePassword = async () => {
+  const handleChangePassword = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     if (newPassword !== confirmPassword) {
       toast({
         title: commonT("error"),
@@ -211,57 +212,65 @@ export default function SettingsPage() {
               </CardTitle>
               <CardDescription>{t("security.description")}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password">
-                  {t("security.currentPassword")}
-                </Label>
-                <Input
-                  id="current-password"
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder={t("security.currentPasswordPlaceholder")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password">
-                  {t("security.newPassword")}
-                </Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder={t("security.newPasswordPlaceholder")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">
-                  {t("security.confirmPassword")}
-                </Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={t("security.confirmPasswordPlaceholder")}
-                />
-              </div>
-              <Button
-                onClick={handleChangePassword}
-                disabled={
-                  isChangingPassword ||
-                  !currentPassword ||
-                  !newPassword ||
-                  !confirmPassword
-                }
-                className="w-full"
-              >
-                {isChangingPassword
-                  ? t("security.changing")
-                  : t("security.title")}
-              </Button>
+            <CardContent>
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">
+                    {t("security.currentPassword")}
+                  </Label>
+                  <Input
+                    id="current-password"
+                    name="current-password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder={t("security.currentPasswordPlaceholder")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">
+                    {t("security.newPassword")}
+                  </Label>
+                  <Input
+                    id="new-password"
+                    name="new-password"
+                    type="password"
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder={t("security.newPasswordPlaceholder")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">
+                    {t("security.confirmPassword")}
+                  </Label>
+                  <Input
+                    id="confirm-password"
+                    name="confirm-password"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder={t("security.confirmPasswordPlaceholder")}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={
+                    isChangingPassword ||
+                    !currentPassword ||
+                    !newPassword ||
+                    !confirmPassword
+                  }
+                  className="w-full"
+                >
+                  {isChangingPassword
+                    ? t("security.changing")
+                    : t("security.title")}
+                </Button>
+              </form>
             </CardContent>
           </Card>
 
