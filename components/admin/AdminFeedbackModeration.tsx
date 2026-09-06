@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@/lib/utils/supabase/client"
+import { adminService } from "@/lib/services/admin/admin.service"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,22 +24,11 @@ interface AdminFeedback {
 export function AdminFeedbackModeration() {
   const [feedbacks, setFeedbacks] = useState<AdminFeedback[]>([])
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
   const { toast } = useToast()
 
   const fetchPendingFeedbacks = async () => {
     try {
-      const { data, error } = await supabase
-        .from("appointment_feedbacks")
-        .select(`
-          id, rating, comment, status, created_at,
-          mentee:profiles!reviewer_id(full_name, avatar_url),
-          mentor:profiles!reviewed_id(full_name, avatar_url)
-        `)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: true })
-
-      if (error) throw error
+      const data = await adminService.getPendingFeedbacks()
       setFeedbacks((data as unknown as AdminFeedback[]) || [])
     } catch (err) {
       console.error("Error fetching feedbacks:", err)

@@ -86,6 +86,7 @@ export default function HowItWorksPage() {
                 <Image 
                   src={`/images/how-it-works/${step === 1 ? 'register-mentee.jpg' : step === 2 ? 'find.jpg' : step === 3 ? 'schedule.jpg' : 'grow-together.jpg'}`} 
                   width={450} height={350} alt={`Mentee Step ${step}`} 
+                  sizes="(max-width: 768px) 100vw, 450px"
                   className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
                 />
               </div>
@@ -127,6 +128,7 @@ export default function HowItWorksPage() {
                 <Image 
                   src={`/images/how-it-works/${step === 1 ? 'register-mentor.jpg' : step === 2 ? 'verify.jpg' : step === 3 ? 'availability.jpg' : 'conduct.jpg'}`} 
                   width={450} height={350} alt={`Mentor Step ${step}`} 
+                  sizes="(max-width: 768px) 100vw, 450px"
                   className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
                 />
               </div>
@@ -168,6 +170,7 @@ export default function HowItWorksPage() {
                 <Image 
                   src={`/images/how-it-works/${step === 1 ? 'ngo-register.jpg' : step === 2 ? 'ngo-connect.jpg' : 'find.jpg'}`} 
                   width={450} height={350} alt={`NGO Step ${step}`} 
+                  sizes="(max-width: 768px) 100vw, 450px"
                   className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
                 />
               </div>
@@ -209,6 +212,7 @@ export default function HowItWorksPage() {
                 <Image 
                   src={`/images/how-it-works/${step === 1 ? 'company-volunteer.jpg' : step === 2 ? 'company-esg.jpg' : step === 3 ? 'company-benefits.jpg' : 'conduct.jpg'}`} 
                   width={450} height={350} alt={`Company Step ${step}`} 
+                  sizes="(max-width: 768px) 100vw, 450px"
                   className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
                 />
               </div>

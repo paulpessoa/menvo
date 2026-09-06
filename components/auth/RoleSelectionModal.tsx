@@ -5,8 +5,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, GraduationCap, CheckCircle } from "lucide-react"
-import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
+import { auth } from "@/lib/services/auth/auth.service"
 
 interface RoleSelectionModalProps {
   open: boolean
@@ -35,33 +35,13 @@ const roles = [
 export function RoleSelectionModal({ open, onClose, userId, onSuccess }: RoleSelectionModalProps) {
   const [selectedRole, setSelectedRole] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
-  const supabase = createClient()
 
   const handleRoleSelection = async () => {
     if (!selectedRole || !userId) return
 
     setIsLoading(true)
     try {
-      // 1. Buscar ID da role
-      const { data: roleData, error: roleQueryError } = await supabase
-        .from("roles")
-        .select("id")
-        .eq("name", selectedRole)
-        .single()
-
-      if (roleQueryError) throw roleQueryError
-      if (!roleData) throw new Error("Role não encontrada")
-
-      // 2. Criar atribuição de role
-      const { error: insertError } = await (supabase
-        .from("user_roles") as any)
-        .insert({
-          user_id: userId,
-          role_id: (roleData as { id: string }).id
-        })
-
-      if (insertError) throw insertError
-
+      await auth.assignUserRole(userId, selectedRole)
       toast.success("Perfil configurado com sucesso!")
       if (onSuccess) onSuccess()
       onClose()

@@ -104,6 +104,32 @@ class AdminService {
         if (error) throw error
         return data || []
     }
+
+    /**
+     * Busca avaliações pendentes de moderação
+     */
+    async getPendingFeedbacks(): Promise<{
+        id: string
+        rating: number
+        comment: string | null
+        status: 'pending' | 'approved' | 'rejected'
+        created_at: string
+        mentee: { full_name: string | null; avatar_url: string | null } | null
+        mentor: { full_name: string | null; avatar_url: string | null } | null
+    }[]> {
+        const { data, error } = await this.supabase
+            .from('appointment_feedbacks')
+            .select(`
+                id, rating, comment, status, created_at,
+                mentee:profiles!reviewer_id(full_name, avatar_url),
+                mentor:profiles!reviewed_id(full_name, avatar_url)
+            `)
+            .eq('status', 'pending')
+            .order('created_at', { ascending: true })
+
+        if (error) throw error
+        return (data as any) || []
+    }
 }
 
 export const adminService = new AdminService()

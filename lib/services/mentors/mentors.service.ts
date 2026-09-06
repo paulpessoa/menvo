@@ -492,6 +492,37 @@ class MentorService {
       inclusiveTags: Array.from(inclusiveTags).sort()
     }
   }
+
+  /**
+   * Fetches public approved reviews for a specific mentor
+   */
+  async getMentorReviews(mentorId: string): Promise<{
+    id: string
+    rating: number
+    public_feedback: string | null
+    created_at: string
+    mentee: {
+      first_name: string | null
+      last_name: string | null
+      avatar_url: string | null
+    } | null
+  }[]> {
+    const { data, error } = await supabase
+      .from("appointment_feedbacks")
+      .select(`
+        id,
+        rating,
+        public_feedback,
+        created_at,
+        mentee:profiles!reviewer_id(first_name, last_name, avatar_url)
+      `)
+      .eq("reviewed_id", mentorId)
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+
+    if (error) throw error
+    return (data as any) || []
+  }
 }
 
 export const mentorService = new MentorService()

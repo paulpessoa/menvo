@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@/lib/utils/supabase/client"
+import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Star, MessageCircle, User } from "lucide-react"
 import { format } from "date-fns"
@@ -23,25 +23,11 @@ interface Review {
 export function MentorshipReviews({ mentorId }: { mentorId: string }) {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
 
   useEffect(() => {
     async function fetchReviews() {
       try {
-        const { data, error } = await supabase
-          .from("appointment_feedbacks")
-          .select(`
-            id,
-            rating,
-            public_feedback,
-            created_at,
-            mentee:profiles!reviewer_id(first_name, last_name, avatar_url)
-          `)
-          .eq("reviewed_id", mentorId)
-          .eq("status", "approved") // Apenas aprovados aparecem publicamente
-          .order("created_at", { ascending: false })
-
-        if (error) throw error
+        const data = await mentorService.getMentorReviews(mentorId)
         setReviews((data as unknown as Review[]) || [])
       } catch (err) {
         console.error("Error fetching reviews:", err)
@@ -51,7 +37,7 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
     }
 
     if (mentorId) fetchReviews()
-  }, [mentorId, supabase])
+  }, [mentorId])
 
   if (loading) return null
   if (reviews.length === 0) return null

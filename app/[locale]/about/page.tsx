@@ -48,6 +48,7 @@ export default function AboutPage() {
             src="/images/about/hackathon-latinoware-paul-ismaela-italo.jpg"
             width={550}
             height={450}
+            sizes="(max-width: 768px) 100vw, 550px"
             alt={t("about.ourStoryImageAlt")}
             className="rounded-3xl object-cover shadow-2xl relative z-10 ring-4 ring-white"
           />
@@ -119,6 +120,7 @@ export default function AboutPage() {
             src="/images/about/menvo-team.png"
             width={550}
             height={450}
+            sizes="(max-width: 768px) 100vw, 550px"
             alt={t("about.ourStoryImageAlt")}
             className="rounded-3xl object-cover shadow-2xl relative z-10 ring-4 ring-white"
           />

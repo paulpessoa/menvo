@@ -6,6 +6,7 @@ import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/utils/supabase/client';
 import { useAuth } from '@/lib/auth';
+import { chatService } from '@/lib/services/chat/chat.service';
 
 export function MessagesBadge() {
     const { user, isAuthenticated } = useAuth();
@@ -14,38 +15,9 @@ export function MessagesBadge() {
 
     const loadUnreadCount = useCallback(async () => {
         if (!user?.id) return;
-
-        try {
-            // 1. Buscar todas as conversas onde o usuário participa
-            const { data: conversations, error: convError } = await supabase
-                .from('conversations')
-                .select('id')
-                .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`);
-
-            if (convError) throw convError;
-
-            if (!conversations || conversations.length === 0) {
-                setUnreadCount(0);
-                return;
-            }
-
-            const conversationIds = conversations.map((c: any) => c.id);
-
-            // 2. Contar mensagens não lidas enviadas por OUTRA pessoa
-            const { count, error: msgError } = await supabase
-                .from('messages')
-                .select('*', { count: 'exact', head: true })
-                .in('conversation_id', conversationIds)
-                .neq('sender_id', user.id)
-                .is('read_at', null);
-
-            if (msgError) throw msgError;
-
-            setUnreadCount(count || 0);
-        } catch (error) {
-            console.error('[BADGE] Erro ao carregar contador:', error);
-        }
-    }, [user?.id, supabase]);
+        const count = await chatService.getUnreadCount(user.id);
+        setUnreadCount(count);
+    }, [user?.id]);
 
     useEffect(() => {
         if (!isAuthenticated || !user?.id) return;

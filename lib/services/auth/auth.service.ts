@@ -54,6 +54,25 @@ export const auth = {
       }
     })
     if (error) throw error
+  },
+  assignUserRole: async (userId: string, roleName: string) => {
+    const { data: roleData, error: roleQueryError } = await supabase
+      .from("roles")
+      .select("id")
+      .eq("name", roleName)
+      .single()
+
+    if (roleQueryError) throw roleQueryError
+    if (!roleData) throw new Error("Role não encontrada")
+
+    const { error: insertError } = await (supabase
+      .from("user_roles") as any)
+      .insert({
+        user_id: userId,
+        role_id: (roleData as any).id
+      })
+
+    if (insertError) throw insertError
   }
 }
 

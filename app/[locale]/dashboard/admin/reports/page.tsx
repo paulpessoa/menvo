@@ -23,6 +23,7 @@ import {
   type TimeSeriesData,
   type AdminStats
 } from "@/lib/services/admin/reports.service"
+import dynamic from "next/dynamic"
 import {
   Users,
   TrendingUp,
@@ -33,21 +34,19 @@ import {
   PieChart as PieIcon
 } from "lucide-react"
 import { toast } from "sonner"
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend
-} from "recharts"
 
-const COLORS = ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"]
+const AdminReportsCharts = dynamic(
+  () => import("@/components/admin/AdminReportsCharts").then((mod) => mod.AdminReportsCharts),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="h-[380px] bg-muted/20 animate-pulse rounded-2xl" />
+        <div className="h-[380px] bg-muted/20 animate-pulse rounded-2xl" />
+      </div>
+    )
+  }
+)
 
 export default function AdminReportsPage() {
   // Default para últimos 30 dias
@@ -162,75 +161,11 @@ export default function AdminReportsPage() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Growth Chart */}
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    Fluxo de Novos Usuários
-                </CardTitle>
-                <CardDescription>Novos cadastros no período selecionado</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[300px] pt-4">
-                {loading ? (
-                    <div className="h-full flex items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                ) : (
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={growthData}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                            <XAxis dataKey="date" fontSize={10} tickMargin={10} />
-                            <YAxis fontSize={10} />
-                            <Tooltip 
-                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                            />
-                            <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Novos Usuários" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Distribution Chart */}
-            <Card className="shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <PieIcon className="h-5 w-5 text-primary" />
-                    Distribuição de Perfis
-                </CardTitle>
-                <CardDescription>Base total de usuários por papel</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[300px] pt-4">
-                {loading ? (
-                    <div className="h-full flex items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                ) : (
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={pieData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                paddingAngle={5}
-                                dataKey="value"
-                            >
-                                {pieData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend verticalAlign="bottom" height={36}/>
-                        </PieChart>
-                    </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          <AdminReportsCharts
+            growthData={growthData}
+            pieData={pieData}
+            loading={loading}
+          />
         </div>
       </div>
     </RequireRole>
