@@ -13,7 +13,22 @@ import { useAuth } from "@/lib/auth"
 import { Separator } from "@/components/ui/separator"
 import { useTranslations } from "next-intl"
 
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
+
 export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
+  )
+}
+
+function LoginFormContent() {
   const t = useTranslations("login")
   const tc = useTranslations("common")
   const [email, setEmail] = useState("")
@@ -22,16 +37,20 @@ export default function LoginPage() {
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { signIn, signInWithProvider, user, role, loading, getDefaultRedirectPath } = useAuth()
+  const searchParams = useSearchParams()
+  const nextParam = searchParams.get("next")
+  const { signIn, signInWithProvider, user, role, loading, isInitializing, getDefaultRedirectPath } = useAuth()
 
-  const isAuthenticated = !!user && !loading
-  const needsRoleSelection = () => user && !role
+  const isAuthenticated = !!user && !loading && !isInitializing
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(getDefaultRedirectPath())
+      const target = nextParam && nextParam.startsWith("/") && !nextParam.includes("/login")
+        ? nextParam
+        : getDefaultRedirectPath()
+      router.push(target)
     }
-  }, [isAuthenticated, router, getDefaultRedirectPath])
+  }, [isAuthenticated, router, getDefaultRedirectPath, nextParam])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,7 +58,24 @@ export default function LoginPage() {
     setError("")
 
     try {
-      await signIn(email, password)
+      const res = await signIn(email, password)
+      if (res && !res.success && res.error) {
+        const msg = (res.error as any)?.message || ""
+        if (msg.includes("Email not confirmed")) {
+          setError("email_not_confirmed")
+        } else if (msg.includes("Invalid login credentials")) {
+          setError(t("error.invalidCredentials"))
+        } else {
+          setError(msg || t("error.unexpected"))
+        }
+        return
+      }
+
+      // Redireciona com destino seguro se o signIn foi síncrono
+      const target = nextParam && nextParam.startsWith("/") && !nextParam.includes("/login")
+        ? nextParam
+        : getDefaultRedirectPath()
+      router.push(target)
     } catch (err: any) {
       console.error("Login error:", err)
       if (err.message?.includes("Email not confirmed")) {

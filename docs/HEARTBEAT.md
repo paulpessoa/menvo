@@ -1,14 +1,20 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
-## 📅 Last Updated: 2026-09-05
-**Current Status:** Codebase refactoring completed across hooks, services, API routes, components, and pages. Obsolete docs archived.
+## 📅 Last Updated: 2026-09-06
+**Current Status:** Auth loop fixed, waiting list disabled (open registration enabled), test users verified via Supabase Service Role, and 404 page implemented according to Menvo design tokens and i18n standards.
 
 ---
 
 ## 📍 Where We Left Off
 
 ### Completed Refactoring (this session)
-1. **Hooks (`hooks/`)** — Renamed `use-feedback.ts` → `useFeedback.ts`, removed orphaned `useProfiles.ts`. `useFavorites.ts` migrated to TanStack Query (N+1 queries eliminated).
+- [x] `test accounts & waiting list deactivation` — Disabled `waiting_list_flag` in Supabase `feature_flags` table and updated `.env.local` to allow immediate new user registrations. Created & verified 4 test accounts via Supabase Service Role API: `mentee@menvo.com.br` (role: mentee), `mentor@menvo.com.br` (role: mentor), `admin@menvo.com.br` (role: admin), and `demo@menvo.com.br` (role: mentee), all confirmed with password `Menvo@2026!`.
+- [x] `auth loop resolution` — Fixed infinite login loop and redirection storm:
+    - `lib/auth/auth-guard.tsx`: Swapped `next/navigation` `useRouter` for `@/i18n/routing` `useRouter`, preserving `/pt-BR` and preventing middleware redirection ping-pong.
+    - `app/[locale]/dashboard/page.tsx`: Replaced stuck `AuthGuard` with deterministic redirection logic based on user authentication and role, eliminating infinite loading spinners.
+    - `app/[locale]/(auth)/login/page.tsx`: Added `Suspense` boundary, inspected `signIn` return value for errors, and sanitized redirect target to prevent self-referencing `/login` bounces.
+- [x] `404 not found page (ux/ui & i18n)` — Created localized `app/[locale]/not-found.tsx` and root `app/not-found.tsx` conforming to "Don't Make Me Think" UX principles and Menvo's design system tokens (ambient glow, gradient 404 number, i18n translations via `common.notFound`, "Página Inicial" primary action, "Encontrar Mentores" secondary action, and discovery cards for "Match com IA" and "Comunidade"). Tested and verified in browser.
+
 2. **Services (`lib/services/`)** — Enforced strict Supabase typing across `admin`, `verifications`, `mentors`, and `mentorship` services. Removed loose `as any` casts and typed all queries against the remote database schema.
 3. **API Routes (`app/api/`)** — Enforced Zod schemas on `POST /api/feedback`, `POST /api/appointments`, and user profile updates. Strict input validation across endpoints.
 4. **Components (`components/`)** — Removed loose `as any` casts across `admin/`, `appointments/`, `auth/`, `dashboard/`, `mentors/`, and `LanguageSelector`. Modularized `QuizForm` with step subcomponents and Zod validation. Decoupled `Header` and `AppointmentCard`.
