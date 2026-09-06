@@ -308,7 +308,21 @@
         "feature2": "Track mentorship progress",
         "feature3": "Receive social impact reports"
       },
-      "getStarted": "Register My NGO"
+      "getStarted": "Register My NGO",
+      "step3": {
+        "title": "Tracking and Evolution",
+        "description": "Monitor mentorship progress and see the real impact on the lives of your youth.",
+        "feature1": "Session history",
+        "feature2": "Mentor feedback",
+        "feature3": "Progress dashboard"
+      },
+      "step4": {
+        "title": "Strengthening the Cause",
+        "description": "Use real data to demonstrate social impact and facilitate fundraising.",
+        "feature1": "Impact reports",
+        "feature2": "Structured data",
+        "feature3": "Success stories"
+      }
     },
     "companies": {
       "step1": {
@@ -332,7 +346,14 @@
         "feature2": "Recognition and internal gamification",
         "feature3": "Soft skills development"
       },
-      "getStarted": "Become a Corporate Partner"
+      "getStarted": "Become a Corporate Partner",
+      "step4": {
+        "title": "ESG Impact and Recognition",
+        "description": "Strengthen your company social impact metrics with real and auditable data.",
+        "feature1": "ESG Certificates",
+        "feature2": "Annual reports",
+        "feature3": "Partner Company Seal"
+      }
     },
     "faq": {
       "title": "Frequently Asked Questions",
@@ -438,7 +459,8 @@
       "tooManyAttempts": "Too many login attempts. Please wait a few minutes before trying again.",
       "networkError": "Connection error. Please check your internet and try again.",
       "unexpected": "Unexpected error. Please try again.",
-      "loginFailed": "Error signing in. Please try again."
+      "loginFailed": "Error signing in. Please try again.",
+      "resendConfirmation": "Resend confirmation email"
     },
     "orContinueWith": "or continue with",
     "success": "Login successful!"
@@ -689,11 +711,17 @@
       "disclaimer": "* Menvo is a non-profit initiative. All collected funds are reinvested in the platform."
     },
     "pix": {
-      "title": "Donation via PIX",
-      "description": "The fastest and most direct way to help us.",
-      "copyButton": "Copy PIX Key",
-      "copySuccess": "PIX Key copied!",
-      "instructions": "Scan the QR Code or use the email key below:"
+      "title": "Donate Any Amount via PIX",
+      "description": "Contribute quickly and securely. Every donation is invested directly into Menvo infrastructure and servers.",
+      "copyButton": "Copy",
+      "copySuccess": "PIX key copied successfully!",
+      "instructions": "Scan the QR Code or use the email key below:",
+      "badge": "Volunteer Support",
+      "scanQr": "Open your banking app and scan the QR code",
+      "officialKey": "Official PIX Key",
+      "copiedButton": "Copied!",
+      "suggestedAmounts": "Suggested voluntary contributions:",
+      "securityNote": "100% secure and voluntary donation. Menvo is free and maintained by the community."
     },
     "usage": {
       "title": "How we use your support",
@@ -1216,7 +1244,9 @@
     "greetings": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
-      "evening": "Good evening"
+      "evening": "Good evening",
+      "learningGoals": "Learning Goals",
+      "learningGoalsPlaceholder": "Describe what you want to learn or develop..."
     },
     "mentor": {
       "welcome": "Welcome to your mentor dashboard. Manage your mentorships and help other professionals.",
@@ -1344,7 +1374,8 @@
       "sessionExpired": "Session expired. Please log in again.",
       "saveError": "Error saving profile. Check your connection.",
       "selectRequired": "Please select a profile"
-    }
+    },
+    "benefitsLabel": "Benefits:"
   },
   "auth": {
     "confirmed": {
@@ -1571,7 +1602,18 @@
     "reason": "Reason:",
     "cancelledAt": "Cancelled on {date}",
     "evaluate": "Evaluate",
-    "joinMeet": "Join Meet"
+    "joinMeet": "Join Meet",
+    "confirm": {
+      "title": "Confirming Appointment...",
+      "successTitle": "Appointment Confirmed!",
+      "errorTitle": "Confirmation Error",
+      "waitingMessage": "Please wait while we confirm your session...",
+      "viewAppointment": "View My Appointments",
+      "goToDashboard": "Go to Dashboard",
+      "contactSupport": "Contact Support",
+      "invalidToken": "Invalid or missing token",
+      "networkError": "Error connecting to server. Please try again."
+    }
   },
   "events": {
     "title": "Events & Learning",
@@ -1771,5 +1813,51 @@
     "quiz_flow": {
       "how_it_works": "How the Quiz Works"
     }
+  },
+  "contact": {
+    "badge": "Official Channels",
+    "title": "Contact Menvo",
+    "description": "We are ready to assist you with questions, feedback, technical support, or institutional partnership proposals.",
+    "email": {
+      "title": "Support Email",
+      "description": "For general inquiries, technical issues, suggestions, or scheduling support.",
+      "action": "Send Email Message"
+    },
+    "whatsapp": {
+      "title": "Official WhatsApp",
+      "description": "Prompt support for our community, new volunteers, and event attendees.",
+      "action": "Chat on WhatsApp"
+    },
+    "partnerships": {
+      "title": "Institutional Partnerships & Companies",
+      "description": "Looking to bring volunteer mentoring to your company, university, or organization? Reach out via our institutional email.",
+      "action": "Propose Partnership"
+    }
+  },
+  "unauthorized": {
+    "title": "Access Denied",
+    "description": "You do not have permission to access this page.",
+    "back": "Go Back",
+    "dashboard": "Go to Dashboard",
+    "support": "Contact Support"
+  },
+  "resetPassword": {
+    "title": "New Password",
+    "description": "Enter your new password",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "confirmPasswordLabel": "Confirm new password",
+    "confirmPasswordPlaceholder": "Confirm your new password",
+    "submit": "Update password",
+    "submitting": "Updating...",
+    "successTitle": "Password updated!",
+    "successDescription": "Your password has been updated successfully. Redirecting to login...",
+    "errors": {
+      "mismatch": "Passwords do not match",
+      "minLength": "Password must be at least 6 characters long",
+      "generic": "Error updating password",
+      "invalidLink": "Invalid or expired link"
+    },
+    "toastSuccess": "Password updated successfully!"
   }
 }

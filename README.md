@@ -54,7 +54,6 @@ Through video calls, we connect experienced professionals to young people seekin
 - [x] [Npm](https://npmjs.com/) - A package and dependency manager.
 - [x] [Sass](https://sass-lang.com/install) - A CSS pre-processor with advanced features.
 - [x] [Axios](https://axios-http.com/docs/intro) - A promise-based HTTP client for the browser and Node.js.
-- [x] [MUI Material](https://mui.com/) - Intuitive React UI tools for faster development.
 - [x] [React Icons](https://react-icons.github.io/react-icons/) - A package for including popular icons in React projects.
 
 # 🗺️ Menvo Platform Architecture (2026)

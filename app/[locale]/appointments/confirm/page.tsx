@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 export default function ConfirmAppointmentPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const t = useTranslations('appointments.confirm');
     const token = searchParams.get('token');
 
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -14,16 +16,15 @@ export default function ConfirmAppointmentPage() {
     useEffect(() => {
         if (!token) {
             setStatus('error');
-            setMessage('Token inválido ou ausente');
+            setMessage(t('invalidToken'));
             return;
         }
 
         confirmAppointment();
-    }, [token]);
+    }, [token, t]);
 
     async function confirmAppointment() {
         try {
-            // Chamar API passando o token - ela faz todo o trabalho
             const response = await fetch('/api/appointments/confirm', {
                 method: 'POST',
                 headers: {
@@ -38,16 +39,16 @@ export default function ConfirmAppointmentPage() {
 
             if (!response.ok) {
                 setStatus('error');
-                setMessage(data.error || 'Erro ao confirmar agendamento');
+                setMessage(data.error || t('errorTitle'));
                 return;
             }
 
             setStatus('success');
-            setMessage(data.message || 'Agendamento confirmado com sucesso! Você receberá um email de confirmação em breve.');
+            setMessage(data.message || t('successTitle'));
         } catch (error) {
             console.error('[CONFIRM] Erro inesperado:', error);
             setStatus('error');
-            setMessage('Erro ao conectar com o servidor. Tente novamente.');
+            setMessage(t('networkError'));
         }
     }
 
@@ -56,11 +57,11 @@ export default function ConfirmAppointmentPage() {
             <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
                 {status === 'loading' && (
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                         <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                            Confirmando agendamento...
+                            {t('title')}
                         </h2>
-                        <p className="text-gray-600">Por favor, aguarde.</p>
+                        <p className="text-gray-600">{t('waitingMessage')}</p>
                     </div>
                 )}
 
@@ -82,14 +83,14 @@ export default function ConfirmAppointmentPage() {
                             </svg>
                         </div>
                         <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                            Sucesso!
+                            {t('successTitle')}
                         </h2>
                         <p className="text-gray-600 mb-6">{message}</p>
                         <button
                             onClick={() => router.push('/mentorship/mentor')}
-                            className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+                            className="w-full bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
                         >
-                            Ver meus agendamentos
+                            {t('viewAppointment')}
                         </button>
                     </div>
                 )}
@@ -112,14 +113,14 @@ export default function ConfirmAppointmentPage() {
                             </svg>
                         </div>
                         <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                            Erro
+                            {t('errorTitle')}
                         </h2>
                         <p className="text-gray-600 mb-6">{message}</p>
                         <button
                             onClick={() => router.push('/')}
-                            className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+                            className="w-full bg-muted-foreground text-white font-semibold px-4 py-2 rounded-md hover:bg-muted-foreground/90 transition-colors"
                         >
-                            Voltar para início
+                            {t('goToDashboard')}
                         </button>
                     </div>
                 )}

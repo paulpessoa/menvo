@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Shield, ArrowLeft, Home } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 
 export default function UnauthorizedPage() {
   const router = useRouter()
+  const t = useTranslations("unauthorized")
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -16,25 +18,25 @@ export default function UnauthorizedPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
             <Shield className="h-8 w-8 text-destructive" />
           </div>
-          <CardTitle className="text-2xl font-bold">Acesso Negado</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t("title")}</CardTitle>
           <CardDescription>
-            Você não tem permissão para acessar esta página.
-           </CardDescription>
+            {t("description")}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button onClick={() => router.back()} variant="outline" className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
+            {t("back")}
           </Button>
           <Button asChild className="w-full">
             <Link href="/dashboard">
               <Home className="h-4 w-4 mr-2" />
-              Ir para Dashboard
+              {t("dashboard")}
             </Link>
           </Button>
           <Button asChild variant="ghost" className="w-full mt-2 text-muted-foreground hover:text-foreground">
             <a href="mailto:contato@menvo.com.br">
-              Contatar Suporte
+              {t("support")}
             </a>
           </Button>
         </CardContent>

@@ -38,7 +38,7 @@ export default function DonatePage() {
   const copyPixKey = () => {
     navigator.clipboard.writeText(pixKey)
     setCopied(true)
-    toast.success("Chave PIX copiada com sucesso!")
+    toast.success(t("pix.copySuccess"))
     setTimeout(() => setCopied(false), 3000)
   }
 
@@ -103,13 +103,13 @@ export default function DonatePage() {
           
           <CardHeader className="text-center pt-8 pb-4">
             <Badge variant="secondary" className="w-fit mx-auto mb-3 bg-primary/10 text-primary border-none px-3.5 py-1 font-semibold rounded-full">
-              <Heart className="h-3.5 w-3.5 mr-1.5 fill-primary text-primary" /> Apoio Voluntário
+              <Heart className="h-3.5 w-3.5 mr-1.5 fill-primary text-primary" /> {t("pix.badge")}
             </Badge>
             <CardTitle className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Doe Qualquer Valor via PIX
+              {t("pix.title")}
             </CardTitle>
             <CardDescription className="text-base text-muted-foreground max-w-md mx-auto pt-2 leading-relaxed">
-              Contribua de forma rápida e segura. Toda doação é investida diretamente na infraestrutura e nos servidores do Menvo.
+              {t("pix.description")}
             </CardDescription>
           </CardHeader>
 
@@ -127,14 +127,14 @@ export default function DonatePage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground mt-3 font-medium flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-primary" /> Abra o app do seu banco e aponte a câmera
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> {t("pix.scanQr")}
               </p>
             </div>
 
             {/* Chave PIX Copy Field */}
             <div className="w-full max-w-md space-y-2">
               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Chave PIX Oficial
+                {t("pix.officialKey")}
               </Label>
               <div className="flex items-center gap-2 p-2 bg-muted/60 border border-border/80 rounded-2xl">
                 <code className="text-sm font-semibold text-gray-800 px-3 flex-1 select-all overflow-hidden text-ellipsis">
@@ -147,11 +147,11 @@ export default function DonatePage() {
                 >
                   {copied ? (
                     <>
-                      <Check className="h-4 w-4 mr-1.5 text-green-400" /> Copiado!
+                      <Check className="h-4 w-4 mr-1.5 text-green-400" /> {t("pix.copiedButton")}
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4 mr-1.5" /> Copiar
+                      <Copy className="h-4 w-4 mr-1.5" /> {t("pix.copyButton")}
                     </>
                   )}
                 </Button>
@@ -161,7 +161,7 @@ export default function DonatePage() {
             {/* Valores Sugeridos */}
             <div className="w-full max-w-md pt-2 border-t border-gray-100">
               <p className="text-xs font-medium text-center text-muted-foreground mb-3">
-                Sugestões de contribuição espontânea:
+                {t("pix.suggestedAmounts")}
               </p>
               <div className="grid grid-cols-4 gap-2 text-center">
                 {["R$ 5", "R$ 15", "R$ 30", "R$ 50"].map((val) => (
@@ -179,7 +179,7 @@ export default function DonatePage() {
             <div className="flex items-center gap-2.5 text-xs text-muted-foreground bg-primary/5 p-3.5 rounded-2xl w-full max-w-md border border-primary/10">
               <ShieldCheck className="h-5 w-5 text-primary shrink-0" />
               <span>
-                Doação 100% segura e voluntária. O Menvo é gratuito e mantido pela comunidade.
+                {t("pix.securityNote")}
               </span>
             </div>
           </CardContent>

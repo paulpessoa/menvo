@@ -308,7 +308,21 @@
         "feature2": "Sigue el progreso de las mentorías",
         "feature3": "Recibe informes de impacto social"
       },
-      "getStarted": "Registrar Mi ONG"
+      "getStarted": "Registrar Mi ONG",
+      "step3": {
+        "title": "Seguimiento y Evolución",
+        "description": "Monitorea el progreso de las mentorías y observa el impacto real en la vida de tus jóvenes.",
+        "feature1": "Historial de sesiones",
+        "feature2": "Comentarios de mentores",
+        "feature3": "Panel de progreso"
+      },
+      "step4": {
+        "title": "Fortalecimiento de la Causa",
+        "description": "Utiliza datos reales para demostrar el impacto social y facilitar la recaudación de fondos.",
+        "feature1": "Informes de impacto",
+        "feature2": "Datos estructurados",
+        "feature3": "Casos de éxito"
+      }
     },
     "companies": {
       "step1": {
@@ -332,7 +346,14 @@
         "feature2": "Reconocimiento y gamificación interna",
         "feature3": "Desarrollo de habilidades blandas"
       },
-      "getStarted": "Conviértete en Socio Corporativo"
+      "getStarted": "Conviértete en Socio Corporativo",
+      "step4": {
+        "title": "Impacto y Reconocimiento ESG",
+        "description": "Fortalece las métricas de impacto social de tu empresa con datos reales y auditables.",
+        "feature1": "Certificados ESG",
+        "feature2": "Informes anuales",
+        "feature3": "Sello de Empresa Amiga"
+      }
     },
     "faq": {
       "title": "Preguntas Frecuentes",
@@ -438,7 +459,8 @@
       "tooManyAttempts": "Demasiados intentos de inicio de sesión. Por favor, espera unos minutos antes de intentar de nuevo.",
       "networkError": "Error de conexión. Por favor, revisa tu internet e inténtalo de nuevo.",
       "unexpected": "Error inesperado. Por favor, inténtalo de nuevo.",
-      "loginFailed": "Error al iniciar sesión. Por favor, inténtalo de nuevo."
+      "loginFailed": "Error al iniciar sesión. Por favor, inténtalo de nuevo.",
+      "resendConfirmation": "Reenviar correo de confirmación"
     },
     "orContinueWith": "o continuar con",
     "success": "¡Inicio de sesión exitoso!"
@@ -689,11 +711,17 @@
       "disclaimer": "* Menvo es una iniciativa sin fines de lucro. Todo o valor arrecadado se reinveste na plataforma."
     },
     "pix": {
-      "title": "Donación vía PIX",
-      "description": "La forma mais rápida e direta de nos ajudar.",
-      "copyButton": "Copiar Clave PIX",
-      "copySuccess": "¡Clave PIX copiada!",
-      "instructions": "Escanea el código QR ou use a chave e-mail abaixo:"
+      "title": "Dona Cualquier Monto vía PIX",
+      "description": "Contribuye de forma rápida y segura. Toda donación se invierte directamente en la infraestructura y servidores de Menvo.",
+      "copyButton": "Copiar",
+      "copySuccess": "¡Clave PIX copiada con éxito!",
+      "instructions": "Escanea el código QR o usa la clave de correo a continuación:",
+      "badge": "Apoyo Voluntario",
+      "scanQr": "Abre la app de tu banco y apunta la cámara",
+      "officialKey": "Clave PIX Oficial",
+      "copiedButton": "¡Copiado!",
+      "suggestedAmounts": "Sugerencias de contribución voluntaria:",
+      "securityNote": "Donación 100% segura y voluntaria. Menvo es gratuito y mantenido por la comunidad."
     },
     "usage": {
       "title": "Cómo utilizamos tu apoio",
@@ -1216,7 +1244,9 @@
     "greetings": {
       "morning": "Buenos días",
       "afternoon": "Buenas tardes",
-      "evening": "Buenas noches"
+      "evening": "Buenas noches",
+      "learningGoals": "Objetivos de Aprendizaje",
+      "learningGoalsPlaceholder": "Describe lo que deseas aprender o desarrollar..."
     },
     "mentor": {
       "welcome": "Bienvenido a tu dashboard de mentor. Gestiona tus mentorías y ayuda a otros profesionales.",
@@ -1344,7 +1374,8 @@
       "sessionExpired": "La sesión expiró. Por favor, inicia sesión de nuevo.",
       "saveError": "Error al guardar el perfil. Revisa tu conexión.",
       "selectRequired": "Por favor, selecciona un perfil"
-    }
+    },
+    "benefitsLabel": "Beneficios:"
   },
   "auth": {
     "confirmed": {
@@ -1571,7 +1602,18 @@
     "reason": "Razón:",
     "cancelledAt": "Cancelada el {date}",
     "evaluate": "Evaluar",
-    "joinMeet": "Entrar al Meet"
+    "joinMeet": "Entrar al Meet",
+    "confirm": {
+      "title": "Confirmando Cita...",
+      "successTitle": "¡Cita Confirmada!",
+      "errorTitle": "Error en la Confirmación",
+      "waitingMessage": "Por favor, espera mientras confirmamos tu sesión...",
+      "viewAppointment": "Ver Mis Citas",
+      "goToDashboard": "Ir al Panel",
+      "contactSupport": "Contactar Soporte",
+      "invalidToken": "Token inválido o ausente",
+      "networkError": "Error al conectar con el servidor. Inténtalo de nuevo."
+    }
   },
   "events": {
     "title": "Eventos y Aprendizaje",
@@ -1771,5 +1813,51 @@
     "quiz_flow": {
       "how_it_works": "Cómo funciona el Cuestionario"
     }
+  },
+  "contact": {
+    "badge": "Canales Oficiales",
+    "title": "Contacta a Menvo",
+    "description": "Estamos listos para ayudarte con preguntas, comentarios, soporte técnico o propuestas de alianzas institucionales.",
+    "email": {
+      "title": "Correo de Soporte",
+      "description": "Para consultas generales, problemas técnicos, sugerencias o soporte con citas.",
+      "action": "Enviar Mensaje por Correo"
+    },
+    "whatsapp": {
+      "title": "WhatsApp Oficial",
+      "description": "Atención ágil para la comunidad, nuevos voluntarios y asistentes a eventos.",
+      "action": "Chatear por WhatsApp"
+    },
+    "partnerships": {
+      "title": "Alianzas Institucionales y Empresas",
+      "description": "¿Deseas llevar mentorías voluntarias a tu empresa, universidad o comunidad? Contáctanos por correo institucional.",
+      "action": "Proponer Alianza"
+    }
+  },
+  "unauthorized": {
+    "title": "Acceso Denegado",
+    "description": "No tienes permiso para acceder a esta página.",
+    "back": "Volver",
+    "dashboard": "Ir al Panel",
+    "support": "Contactar Soporte"
+  },
+  "resetPassword": {
+    "title": "Nueva contraseña",
+    "description": "Ingresa tu nueva contraseña",
+    "newPasswordLabel": "Nueva contraseña",
+    "newPasswordPlaceholder": "Ingresa tu nueva contraseña",
+    "confirmPasswordLabel": "Confirmar nueva contraseña",
+    "confirmPasswordPlaceholder": "Confirma tu nueva contraseña",
+    "submit": "Actualizar contraseña",
+    "submitting": "Actualizando...",
+    "successTitle": "¡Contraseña actualizada!",
+    "successDescription": "Tu contraseña ha sido actualizada con éxito. Redirigiendo al inicio de sesión...",
+    "errors": {
+      "mismatch": "Las contraseñas no coinciden",
+      "minLength": "La contraseña debe tener al menos 6 caracteres",
+      "generic": "Error al actualizar contraseña",
+      "invalidLink": "Enlace inválido o expirado"
+    },
+    "toastSuccess": "¡Contraseña actualizada con éxito!"
   }
 }
