@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MessageCircle, ArrowLeft, User, Search, Archive, MoreVertical, RotateCcw } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
+import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/chat/ChatInterface"
 import { createClient } from "@/lib/utils/supabase/client"
@@ -253,16 +254,32 @@ function MessagesContent() {
             {isLoading && conversations.length === 0 ? (
                 <div className="space-y-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
             ) : filteredConversations.length === 0 ? (
-              <div className="p-12 text-center">
-                <div className="bg-primary/5 p-4 rounded-full w-fit mx-auto mb-4">
-                  <MessageCircle className="h-8 w-8 text-primary/40" />
+              <div className="p-8 text-center flex flex-col items-center justify-center">
+                <div className="bg-primary/10 p-3.5 rounded-2xl w-fit mx-auto mb-3.5 border border-primary/20 shadow-xs">
+                  <MessageCircle className="h-7 w-7 text-primary" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">
+                <h3 className="font-bold text-gray-900 mb-1 text-sm">
                   {searchTerm ? t("noConversationsFound") : t("noConversationsYet")}
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                  {searchTerm ? "Tente outro nome ou limpe a busca." : "Suas novas conversas aparecerão aqui."}
+                <p className="text-xs text-muted-foreground max-w-xs mb-4">
+                  {searchTerm ? "Tente outro nome ou limpe a busca." : t("emptyStateHelp")}
                 </p>
+                {searchTerm ? (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setSearchTerm("")}
+                    className="rounded-xl text-xs font-semibold hover:bg-muted/80"
+                  >
+                    Limpar busca
+                  </Button>
+                ) : (
+                  <Button asChild size="sm" className="rounded-xl font-semibold text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
+                    <Link href="/mentors">
+                      {t("exploreMentorsAction")}
+                    </Link>
+                  </Button>
+                )}
               </div>
             ) : (
               <>

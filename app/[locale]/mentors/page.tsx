@@ -19,6 +19,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "@/components/ui/sheet"
+import Link from "next/link"
 import {
   Search,
   Filter,
@@ -29,7 +30,9 @@ import {
   Heart,
   Loader2,
   ArrowDownUp,
-  Globe
+  Globe,
+  SearchX,
+  Sparkles
 } from "lucide-react"
 
 import { useAuth } from "@/lib/auth"
@@ -511,19 +514,55 @@ export default function MentorsPage() {
           ))}
         </div>
       ) : mentors.length === 0 ? (
-        <div className="text-center py-24 bg-muted/20 rounded-[2rem] border-2 border-dashed">
-          <Users className="mx-auto h-12 w-12 text-gray-400 mb-4 opacity-20" />
-          <h3 className="text-lg font-medium text-gray-900">
+        <div className="relative text-center py-16 px-6 sm:px-12 bg-gradient-to-b from-primary/5 via-background to-muted/20 rounded-[2.5rem] border border-border/80 shadow-sm max-w-3xl mx-auto my-8 overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-2 bg-gradient-to-r from-transparent via-primary/50 to-transparent rounded-full" />
+          
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-sm">
+            <SearchX className="h-8 w-8" />
+          </div>
+
+          <h3 className="text-2xl font-black tracking-tight text-gray-900 mb-2">
             {t("noMentorsTitle")}
           </h3>
-          <p className="text-gray-600 mt-2 mb-6">{t("noMentorsDescription")}</p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto mb-8 leading-relaxed">
+            {t("noMentorsDescription")}
+          </p>
+
+          {/* Sugestões de áreas populares */}
+          <div className="mb-8">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              {t("popularSuggestions")}
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
+              {["Frontend", "Backend", "UX / UI", "Carreira", "Produto", "Data Science"].map((topic) => (
+                <button
+                  key={topic}
+                  type="button"
+                  onClick={() => setFilters((prev) => ({ ...initialFilters, search: topic }))}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-white hover:border-primary hover:text-primary hover:bg-primary/5 transition-all shadow-2xs cursor-pointer"
+                >
+                  {topic}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
               variant="outline"
               onClick={() => setFilters(initialFilters)}
-              className="rounded-xl border-2 font-bold"
+              className="rounded-xl border-2 font-bold px-6 h-11 w-full sm:w-auto"
             >
               {t("clearFilters")}
+            </Button>
+            <Button
+              asChild
+              className="rounded-xl font-bold px-6 h-11 shadow-sm w-full sm:w-auto"
+            >
+              <Link href="/quiz">
+                <Sparkles className="h-4 w-4 mr-2" />
+                {t("takeQuizCTA")}
+              </Link>
             </Button>
           </div>
         </div>

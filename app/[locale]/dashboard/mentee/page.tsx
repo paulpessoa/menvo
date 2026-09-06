@@ -281,8 +281,19 @@ export default function MenteeDashboard() {
                       </Button>
                     </CardHeader>
                     <CardContent>
-                      {loadingFavorites ? <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div> : favoriteMentorsData.length === 0 ? (
-                        <div className="text-center py-4 text-muted-foreground text-sm italic">Você ainda não favoritou nenhum mentor.</div>
+                      {loadingFavorites ? (
+                        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                      ) : favoriteMentorsData.length === 0 ? (
+                        <div className="py-8 px-4 text-center rounded-2xl border border-dashed border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">
+                          <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">
+                            <Heart className="h-6 w-6 text-red-400" />
+                          </div>
+                          <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.noFavorites")}</p>
+                          <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.noFavoritesDesc")}</p>
+                          <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold hover:border-primary/40 hover:text-primary">
+                            <Link href="/mentors">Explorar Mentores</Link>
+                          </Button>
+                        </div>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {favoriteMentorsData.map((m) => (
@@ -308,12 +319,17 @@ export default function MenteeDashboard() {
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold">Próximas Sessões</h2>
                   {upcomingAppointments.length === 0 ? (
-                    <Card className="bg-gray-50/50 border-dashed">
-                      <CardContent className="py-8 text-center">
-                        <Calendar className="h-10 w-10 mx-auto mb-4 text-muted-foreground opacity-20" />
-                        <p className="text-sm text-muted-foreground italic">Nenhuma sessão agendada.</p>
-                        <Button asChild variant="link" className="mt-2 text-primary font-bold">
-                          <Link href="/mentors">Agendar Agora</Link>
+                    <Card className="bg-gradient-to-b from-gray-50/60 to-white/40 border border-dashed border-gray-200 rounded-2xl overflow-hidden shadow-xs">
+                      <CardContent className="py-10 px-6 text-center flex flex-col items-center justify-center">
+                        <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 shadow-xs">
+                          <Calendar className="h-7 w-7 text-primary" />
+                        </div>
+                        <h3 className="font-bold text-gray-900 text-base mb-1">{t("mentee.noAppointments")}</h3>
+                        <p className="text-xs text-muted-foreground max-w-sm mb-5 leading-relaxed">
+                          {t("mentee.noAppointmentsDesc")}
+                        </p>
+                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm px-5">
+                          <Link href="/mentors">{t("mentee.bookNow")}</Link>
                         </Button>
                       </CardContent>
                     </Card>
@@ -330,7 +346,7 @@ export default function MenteeDashboard() {
                               <div className="min-w-0">
                                 <p className="text-sm font-bold truncate">{appt.mentor.full_name}</p>
                                 <p className="text-[11px] text-muted-foreground">
-                                  {new Date(appt.scheduled_at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                  {new Date(appt.scheduled_at).toLocaleString(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                                 </p>
                               </div>
                             </div>

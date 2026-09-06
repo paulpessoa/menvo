@@ -1151,7 +1151,9 @@
       "disclaimer": "Our AI analyzes bios and skills of all mentors for you.",
       "loginRequired": "AI Magic Search is exclusive to logged-in users.",
       "loginLink": "Login or sign up to use it"
-    }
+    },
+    "popularSuggestions": "Or explore these trending fields:",
+    "takeQuizCTA": "Find Your Mentor via Quiz"
   },
   "profile": {
     "title": "My Profile",
@@ -1326,7 +1328,12 @@
         "viewAnalysis": "View Recommended Mentors",
         "retakeQuiz": "Retake Assessment",
         "completedBadge": "Active Diagnostic"
-      }
+      },
+      "noFavorites": "You haven't bookmarked any mentors yet.",
+      "noFavoritesDesc": "Bookmark mentors you would like to schedule sessions with in the future.",
+      "noAppointments": "No sessions scheduled at the moment.",
+      "noAppointmentsDesc": "Find the ideal mentor for your career journey and schedule a free session.",
+      "bookNow": "Schedule Now"
     },
     "gettingStarted": {
       "title": "First Steps",
@@ -1435,7 +1442,9 @@
     "selectConversationDesc": "Choose a conversation in the sidebar to start messaging",
     "roleMentor": "Mentor",
     "roleMentee": "Mentee",
-    "roleAdmin": "Administrator"
+    "roleAdmin": "Administrator",
+    "exploreMentorsAction": "Explore Mentors",
+    "emptyStateHelp": "Connect with mentors to ask career questions, schedule sessions, and get valuable advice."
   },
   "settings": {
     "title": "Settings",

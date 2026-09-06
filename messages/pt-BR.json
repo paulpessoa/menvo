@@ -1145,7 +1145,9 @@
       "disclaimer": "Nossa IA analisa as bios e habilidades de todos os mentores para você.",
       "loginRequired": "A busca mágica com IA é exclusiva para usuários logados.",
       "loginLink": "Entre ou cadastre-se para usar"
-    }
+    },
+    "popularSuggestions": "Ou explore estas áreas em alta:",
+    "takeQuizCTA": "Descobrir Mentor via Quiz"
   },
   "profile": {
     "title": "Meu Perfil",
@@ -1320,7 +1322,12 @@
         "viewAnalysis": "Ver Mentores Recomendados",
         "retakeQuiz": "Refazer Avaliação",
         "completedBadge": "Diagnóstico Ativo"
-      }
+      },
+      "noFavorites": "Você ainda não favoritou nenhum mentor.",
+      "noFavoritesDesc": "Salve mentores com quem você deseja agendar sessões no futuro.",
+      "noAppointments": "Nenhuma sessão agendada no momento.",
+      "noAppointmentsDesc": "Encontre o mentor ideal para o seu momento de carreira e agende uma conversa gratuita.",
+      "bookNow": "Agendar Agora"
     },
     "gettingStarted": {
       "title": "Primeiros Passos",
@@ -1429,7 +1436,9 @@
     "selectConversationDesc": "Escolha uma conversa na sidebar para começar a trocar mensagens",
     "roleMentor": "Mentor",
     "roleMentee": "Mentorado",
-    "roleAdmin": "Administrador"
+    "roleAdmin": "Administrador",
+    "exploreMentorsAction": "Explorar Mentores",
+    "emptyStateHelp": "Conecte-se com mentores para tirar dúvidas de carreira, agendar sessões e receber conselhos valiosos."
   },
   "settings": {
     "title": "Configurações",
