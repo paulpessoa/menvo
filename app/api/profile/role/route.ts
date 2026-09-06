@@ -13,23 +13,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const { role } = await request.json()
+    const body = await request.json().catch(() => ({}))
+    const { role, profileData } = body
 
     if (!role || !["mentor", "mentee"].includes(role)) {
       return NextResponse.json({ error: "Role inválida" }, { status: 400 })
     }
 
     // 1. Atualizar o perfil do usuário
+    const profileUpdates: Record<string, any> = {
+      user_role: role,
+      verification_status: role === "mentor" ? "pending" : "approved",
+      updated_at: new Date().toISOString(),
+    }
+
+    if (profileData && typeof profileData === "object") {
+      if (typeof profileData.bio === "string") profileUpdates.bio = profileData.bio
+      if (typeof profileData.job_title === "string") profileUpdates.job_title = profileData.job_title
+      if (typeof profileData.company === "string") profileUpdates.company = profileData.company
+      if (typeof profileData.linkedin_url === "string") profileUpdates.linkedin_url = profileData.linkedin_url
+      if (typeof profileData.city === "string") profileUpdates.city = profileData.city
+      if (typeof profileData.state === "string") profileUpdates.state = profileData.state
+      if (typeof profileData.country === "string") profileUpdates.country = profileData.country
+      if (typeof profileData.learning_goals === "string") profileUpdates.learning_goals = profileData.learning_goals
+      if (Array.isArray(profileData.expertise_areas)) profileUpdates.expertise_areas = profileData.expertise_areas
+      if (Array.isArray(profileData.mentorship_topics)) profileUpdates.mentorship_topics = profileData.mentorship_topics
+      if (Array.isArray(profileData.inclusive_tags)) profileUpdates.inclusive_tags = profileData.inclusive_tags
+    }
+
     const { error: updateError } = await (supabase
       .from("profiles") as any)
-      .update({
-        user_role: role,
-        verification_status: role === "mentor" ? "pending" : "approved",
-        updated_at: new Date().toISOString(),
-      })
+      .update(profileUpdates)
       .eq("id", user.id);
 
     if (updateError) {
+      console.error("❌ Erro ao salvar perfil:", updateError)
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
     }
 
@@ -61,7 +79,7 @@ export async function POST(request: NextRequest) {
         .upsert({ 
           user_id: user.id, 
           role_id: (roleData as any).id 
-        });
+        }, { onConflict: "user_id,role_id" });
     }
 
     return NextResponse.json({

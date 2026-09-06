@@ -1382,7 +1382,24 @@
       "saveError": "Error saving profile. Check your connection.",
       "selectRequired": "Please select a profile"
     },
-    "benefitsLabel": "Benefits:"
+    "benefitsLabel": "Benefits:",
+    "step1": "Step 1 of 2",
+    "step2": "Step 2 of 2",
+    "customizeTitle": "Personalize your journey",
+    "menteeSubtitle": "Tell us what you want to learn so we can suggest the best mentors.",
+    "mentorSubtitle": "Share your experience so we can connect you with compatible mentees.",
+    "interestsLabel": "Areas of Interest / Focus",
+    "goalLabel": "Main Goal",
+    "jobTitleLabel": "Current Job Title / Role",
+    "companyLabel": "Company or Organization",
+    "linkedinLabel": "LinkedIn Profile",
+    "locationLabel": "City and State",
+    "autoLocation": "Detect Location",
+    "bioLabel": "Short Bio",
+    "bioPlaceholder": "Tell in 2 or 3 sentences about your journey and how you can add value...",
+    "continue": "Continue",
+    "back": "Back",
+    "finish": "Finish and Start"
   },
   "auth": {
     "confirmed": {

@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { useState, useEffect, Suspense } from "react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { ArrowRight, Loader2, AlertTriangle, Mail, Lock } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, Link } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"

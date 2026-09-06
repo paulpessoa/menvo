@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +12,7 @@ export default function EmailConfirmedPage() {
   const t = useTranslations("auth.confirmed")
   const tCommon = useTranslations("common")
   const router = useRouter()
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, getDefaultRedirectPath } = useAuth()
   const [countdown, setCountdown] = useState(5)
 
   useEffect(() => {
@@ -38,13 +38,7 @@ export default function EmailConfirmedPage() {
   }, [loading, user, profile, router])
 
   const handleRedirect = () => {
-    if (!profile) return
-
-    if (profile.verification_status === "pending") {
-      router.push("/profile?complete=true")
-    } else {
-      router.push("/dashboard")
-    }
+    router.push(getDefaultRedirectPath())
   }
 
   const getRedirectMessage = () => {

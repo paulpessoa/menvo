@@ -59,13 +59,15 @@ export async function GET(request: NextRequest) {
     if (user) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("*, user_roles!inner(roles(name))")
+        .select("*, user_roles(roles(name))")
         .eq("id", user.id)
         .maybeSingle()
 
       // Redirect based on roles
       if (profile) {
-        const roles = (profile.user_roles as any[])?.map((ur: any) => ur.roles?.name) || []
+        const roles = (profile.user_roles as any[])
+          ?.map((ur: any) => ur.roles?.name)
+          .filter(Boolean) || []
         
         if (roles.includes("admin")) {
           return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/admin" : next))
@@ -74,12 +76,16 @@ export async function GET(request: NextRequest) {
         if (roles.includes("mentor")) {
           return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentor" : next))
         }
+
+        if (roles.includes("mentee")) {
+          return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentee" : next))
+        }
         
-        // Default to mentee dashboard
-        return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentee" : next))
+        // No role assigned yet -> route to onboarding
+        return NextResponse.redirect(getTargetUrl("/onboarding"))
       } else {
-        // First time login or profile not setup - MANDAR PARA PERFIL CONFORME SOLICITADO
-        return NextResponse.redirect(getTargetUrl("/profile"))
+        // First time login or profile not setup -> send to onboarding
+        return NextResponse.redirect(getTargetUrl("/onboarding"))
       }
     }
   }

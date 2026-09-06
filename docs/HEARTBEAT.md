@@ -72,13 +72,33 @@
     - **OpenGraph & Twitter Cards**: Added full `openGraph` (title, description, url, siteName, locale, type) and `twitter:card` across `/about`, `/how-it-works`, `/community`, `/mentors`, `/faq`, `/doar`, and `/contact`.
     - **Absolute Canonical URLs & Multi-lang Alternates**: Enforced absolute canonical URLs (`https://www.menvo.com.br/...`) and `languages` alternates (`pt-BR`, `en`, `es`) on all public pages. 0 type errors.
 - [x] `test environment configuration & oauth validator suite` — Configured `jest.config.mjs` using `next/jest.js` and `jest.setup.js` with `@testing-library/jest-dom`. Fixed `isOAuthReadyForProduction` provider evaluation and localhost redirect checks in `lib/auth/oauth-config-validator.ts`. 22/22 unit tests passing, 0 TypeScript errors.
+- [x] `lcp & chunk optimization via code-splitting & dynamic imports` — Reduced bundle sizes and optimized Largest Contentful Paint:
+    - **Package Import Optimization**: Added `recharts` and `framer-motion` to `experimental.optimizePackageImports` in `next.config.mjs`.
+    - **Below-the-fold Carousel Code-Splitting**: Converted `TestimonialsCarousel` on the home page (`app/[locale]/page.tsx`) to Next.js `dynamic()` import with an accessible skeleton placeholder to protect CLS while cutting initial JS payload.
+    - **Heavy Modals Code-Splitting**: Converted `BookMentorshipModal` and `LoginRequiredModal` in `MentorProfileClient.tsx`, and `PdfViewerDialog` in `MenteeProfileClient.tsx`, to client dynamic imports loaded strictly on demand. 0 type errors.
+- [x] `automated test suites: debounce, form validation & booking api` — Expanded unit and integration test coverage (39/39 tests passing):
+    - **`hooks/useDebounce.test.ts`**: Tests debounce timer delays, rapid sequential query changes, and default fallback.
+    - **`hooks/useFormValidation.test.ts`**: Tests required field rules, min/max length, regex patterns, custom slug rules, dirty states, and utility class builders.
+    - **`app/api/appointments/schedule/route.test.ts`**: Integration test covering unauthenticated 401s, missing fields, self-booking 400 rejection, 404/403 mentor verifications, 409 conflict detection for concurrent slot collisions, and email notification dispatch.
+- [x] `seo & canonical coverage for quiz, privacy & terms` — Created dedicated layout files with `generateMetadata` for `app/[locale]/quiz/layout.tsx`, `app/[locale]/privacy/layout.tsx`, and `app/[locale]/terms/layout.tsx`, providing OpenGraph, Twitter cards, and canonical alternates (`pt-BR`, `en`, `es`).
+- [x] `infallible first-click logout and session termination` — Completely resolved the issue of logout not working on the first click:
+    - **Radix UI `onSelect` Event Binding**: Added `onSelect` to `UserNavDropdown.tsx` alongside `onClick`, preventing Radix focus/pointer events from swallowing dropdown menu click events.
+    - **Multi-Layer Cookie Wiping**: In `/api/auth/logout/route.ts`, explicitly iterated and deleted all `sb-` and session cookies on the server response via `cookieStore.delete({ path: '/' })`.
+    - **Client-Side Infallible Cookie & Storage Purge**: In `lib/auth/auth-context.tsx`, directly expired all `sb-*` cookies in `document.cookie` (`max-age=0`), purged `localStorage` and `sessionStorage`, cleared in-memory state, and triggered clean redirect to `'/'`.
+    - **Automated Route Test**: Added `app/api/auth/logout/route.test.ts` validating cookie deletion and signOut execution (41/41 tests passing).
+- [x] `mentor catalog unification, multi-role awareness and filter optimization` — Fixed mentors listing for both unauthenticated visitors and logged-in roles (mentor, mentee, admin):
+    - **Client Singleton Unification**: Connected `mentorService` to `createClient()` from `@/lib/utils/supabase/client` instead of isolated client.
+    - **SQL Query Fix**: Removed non-existent `active_roles` column from `getMentors`, `getMentorById`, and `getFilterOptions` which caused code 42703 crashes.
+    - **Multi-Tag Overlaps**: Changed `.contains()` to `.overlaps()` on `languages`, `mentorship_topics`, and `inclusive_tags`, allowing multi-select filters without returning 0 matches.
+    - **Profile Routing & UUID Support**: Switched `useRouter` in `MentorCard.tsx` to `@/i18n/routing` for locale preservation; added fallback in `getMentorData` to query by UUID `id` or `slug`.
+    - **Role Recognition**: Added "Você" badge on mentor's own card, hidden favorite button for self, and kept self-booking disabled on owner's profile. 0 type errors.
 
 ---
 
 ## 🚀 Next Steps (P2)
 
-1. **Automated End-to-End / Integration Testing** — Establish comprehensive tests for booking, authentication, and mentor search.
-2. **Observability & Analytics Dashboard** — Verify Sentry or error boundary telemetry and review core user journeys.
+1. **Observability & Analytics Dashboard** — Verify telemetry, Sentry/error boundary logging, and review core user journeys.
+2. **E2E Browser Validation with Playwright** — Run browser synthetic tests on production-like preview deployments.
 
 ---
 

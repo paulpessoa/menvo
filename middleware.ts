@@ -83,11 +83,18 @@ export async function middleware(request: NextRequest) {
     pathname
   ) || "/"
 
+  // Detect current locale
+  const currentLocale = locales.find(l => pathname.startsWith(`/${l}`)) || "pt-BR"
+
   // Auth Protection Logic
   const isProtectedRoute = protectedRoutes.some(route => pathnameWithoutLocale.startsWith(route))
 
   if (isProtectedRoute && !user) {
-    return NextResponse.redirect(new URL("/login", request.url))
+    const loginUrl = new URL(`/${currentLocale}/login`, request.url)
+    if (pathnameWithoutLocale !== "/") {
+      loginUrl.searchParams.set("next", pathname)
+    }
+    return NextResponse.redirect(loginUrl)
   }
 
   return response

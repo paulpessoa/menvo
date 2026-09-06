@@ -63,9 +63,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [cachedRoles, setCachedRoles] = useState<{admin: boolean, mentor: boolean, mentee: boolean, moderator: boolean, role: string | null, isVerified: boolean, roles: string[], isPending: boolean}>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('menvo_roles')
-            return saved ? JSON.parse(saved) : { admin: false, mentor: false, mentee: true, moderator: false, role: null, isVerified: false, roles: [], isPending: false }
+            return saved ? JSON.parse(saved) : { admin: false, mentor: false, mentee: false, moderator: false, role: null, isVerified: false, roles: [], isPending: false }
         }
-        return { admin: false, mentor: false, mentee: true, moderator: false, role: null, isVerified: false, roles: [], isPending: false }
+        return { admin: false, mentor: false, mentee: false, moderator: false, role: null, isVerified: false, roles: [], isPending: false }
     })
 
     const fetchProfile = useCallback(async (userId: string) => {
@@ -78,18 +78,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (error) throw error
 
-            const roleNames = (data as any)?.user_roles?.map((ur: any) => ur.roles?.name) || []
+            const roleNames = (data as any)?.user_roles?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
+            const profileRole = (data as any)?.user_role || null
             
-            // Prioridade absoluta: Admin > Mentor > Mentee
-            let primaryRole = 'mentee'
-            if (roleNames.includes('admin')) primaryRole = 'admin'
-            else if (roleNames.includes('mentor')) primaryRole = 'mentor'
-            else if (roleNames.includes('mentee')) primaryRole = 'mentee'
+            // Prioridade de resolução de role: Admin > Mentor > Mentee
+            let primaryRole: string | null = null
+            if (roleNames.includes('admin') || profileRole === 'admin') primaryRole = 'admin'
+            else if (roleNames.includes('mentor') || profileRole === 'mentor') primaryRole = 'mentor'
+            else if (roleNames.includes('mentee') || profileRole === 'mentee') primaryRole = 'mentee'
             
             const roles = {
-                admin: roleNames.includes('admin'),
-                mentor: roleNames.includes('mentor'),
-                mentee: roleNames.includes('mentee') || roleNames.length === 0,
+                admin: primaryRole === 'admin',
+                mentor: primaryRole === 'mentor',
+                mentee: primaryRole === 'mentee',
                 moderator: roleNames.includes('moderator'),
                 role: primaryRole,
                 isVerified: (data as any)?.is_verified || false,
@@ -260,13 +261,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getRoleDashboardPath = useCallback((roleName: string | null) => {
         if (roleName === 'admin') return '/dashboard/admin'
         if (roleName === 'mentor') return '/dashboard/mentor'
-        return '/dashboard/mentee'
+        if (roleName === 'mentee') return '/dashboard/mentee'
+        return '/onboarding'
     }, [])
 
     const getDefaultRedirectPath = useCallback(() => {
-        if (!cachedRoles.role) return '/profile'
+        if (!cachedRoles.role) return '/onboarding'
         return getRoleDashboardPath(cachedRoles.role)
     }, [cachedRoles.role, getRoleDashboardPath])
+
+    const needsRoleSelection = useCallback(() => {
+        if (!user) return false
+        return !cachedRoles.role || cachedRoles.roles.length === 0
+    }, [user, cachedRoles.role, cachedRoles.roles])
 
     const selectRole = useCallback(async (roleName: string) => {
         try {
@@ -277,10 +284,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role: roleName })
             })
-            if (!response.ok) throw new Error('Failed to set role')
-            await fetchProfile(user.id).then(setProfile)
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}))
+                throw new Error(errData.error || 'Failed to set role')
+            }
+            const updatedProfile = await fetchProfile(user.id)
+            setProfile(updatedProfile)
             return { success: true }
-        } catch (err: any) { return { success: false, error: err.message } } finally { setLoading(false) }
+        } catch (err: any) { 
+            return { success: false, error: err.message } 
+        } finally { 
+            setLoading(false) 
+        }
     }, [user, fetchProfile])
 
     useEffect(() => {
@@ -357,14 +372,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         hasAnyRole: (roles: string[]) => hasRole(roles),
         hasPermission,
         hasAnyPermission,
-        needsRoleSelection: () => false,
+        needsRoleSelection,
         refreshProfile: async () => {
             if (user) {
                 const newProfile = await fetchProfile(user.id)
                 setProfile(newProfile)
             }
         }
-    }), [user, session, profile, loading, isInitializing, cachedRoles, signIn, signUp, signInWithProvider, signOut, getDefaultRedirectPath, getRoleDashboardPath, selectRole, hasRole, hasPermission, hasAnyPermission, fetchProfile, supabase])
+    }), [user, session, profile, loading, isInitializing, cachedRoles, signIn, signUp, signInWithProvider, signOut, getDefaultRedirectPath, getRoleDashboardPath, selectRole, hasRole, hasPermission, hasAnyPermission, needsRoleSelection, fetchProfile, supabase])
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

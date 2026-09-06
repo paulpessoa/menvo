@@ -12,12 +12,12 @@ export async function GET(request: NextRequest) {
   const next = requestUrl.searchParams.get("next")
   const tokenHash = requestUrl.searchParams.get("token_hash")
   
-  const apiCallbackUrl = new URL("/api/auth/callback", request.url)
+  const centralCallbackUrl = new URL("/auth/callback", request.url)
   
-  if (code) apiCallbackUrl.searchParams.set("code", code)
-  if (type) apiCallbackUrl.searchParams.set("type", type)
-  if (next) apiCallbackUrl.searchParams.set("next", next)
-  if (tokenHash) apiCallbackUrl.searchParams.set("token_hash", tokenHash)
+  if (code) centralCallbackUrl.searchParams.set("code", code)
+  if (type) centralCallbackUrl.searchParams.set("type", type)
+  if (next) centralCallbackUrl.searchParams.set("next", next)
+  if (tokenHash) centralCallbackUrl.searchParams.set("token_hash", tokenHash)
 
-  return NextResponse.redirect(apiCallbackUrl)
+  return NextResponse.redirect(centralCallbackUrl)
 }

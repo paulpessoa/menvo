@@ -1382,7 +1382,24 @@
       "saveError": "Error al guardar el perfil. Revisa tu conexión.",
       "selectRequired": "Por favor, selecciona un perfil"
     },
-    "benefitsLabel": "Beneficios:"
+    "benefitsLabel": "Beneficios:",
+    "step1": "Paso 1 de 2",
+    "step2": "Paso 2 de 2",
+    "customizeTitle": "Personaliza tu experiencia",
+    "menteeSubtitle": "Cuéntanos qué deseas aprender para sugerirte los melhores mentores.",
+    "mentorSubtitle": "Comparte tu experiencia para conectarte con mentorados compatibles.",
+    "interestsLabel": "Áreas de Interés / Enfoque",
+    "goalLabel": "Objetivo Principal",
+    "jobTitleLabel": "Cargo / Puesto Actual",
+    "companyLabel": "Empresa u Organización",
+    "linkedinLabel": "Perfil de LinkedIn",
+    "locationLabel": "Ciudad y Estado",
+    "autoLocation": "Detectar Ubicación",
+    "bioLabel": "Breve Presentación",
+    "bioPlaceholder": "Cuenta en 2 o 3 oraciones sobre tu trayectoria y cómo puedes aportar...",
+    "continue": "Avanzar",
+    "back": "Volver",
+    "finish": "Completar y Empezar"
   },
   "auth": {
     "confirmed": {

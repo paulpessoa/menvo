@@ -1,8 +1,8 @@
 "use client"
 
-import Link from "next/link"
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
+import { useRouter, Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, ArrowRight, AlertTriangle } from "lucide-react"
@@ -28,8 +28,8 @@ export default function ConfirmationPage() {
   }, [searchParams])
 
   const handleContinue = () => {
-    // Redirecionar para o perfil para completar cadastro
-    router.push('/profile')
+    // Redirecionar para o onboarding para completar cadastro
+    router.push('/onboarding')
   }
 
   return (

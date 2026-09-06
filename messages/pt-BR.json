@@ -1376,7 +1376,24 @@
       "sessionExpired": "Sessão expirada. Faça login novamente.",
       "saveError": "Erro ao salvar perfil. Verifique sua conexão.",
       "selectRequired": "Por favor, selecione um perfil"
-    }
+    },
+    "step1": "Passo 1 de 2",
+    "step2": "Passo 2 de 2",
+    "customizeTitle": "Personalize sua jornada",
+    "menteeSubtitle": "Conte-nos o que você deseja aprender para sugerirmos os melhores mentores.",
+    "mentorSubtitle": "Compartilhe sua experiência para conectarmos você a mentorados compatíveis.",
+    "interestsLabel": "Áreas de Interesse / Foco",
+    "goalLabel": "Objetivo Principal",
+    "jobTitleLabel": "Cargo / Título Atual",
+    "companyLabel": "Empresa ou Organização",
+    "linkedinLabel": "Perfil no LinkedIn",
+    "locationLabel": "Cidade e Estado",
+    "autoLocation": "Detectar Localização",
+    "bioLabel": "Breve Apresentação",
+    "bioPlaceholder": "Conte em 2 ou 3 frases sobre sua trajetória e como você pode agregar...",
+    "continue": "Avançar",
+    "back": "Voltar",
+    "finish": "Concluir e Começar"
   },
   "auth": {
     "confirmed": {
