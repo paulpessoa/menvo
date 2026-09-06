@@ -11,7 +11,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { PdfViewerDialog } from "@/components/ui/pdf-viewer-dialog"
+import dynamic from "next/dynamic"
+
+const PdfViewerDialog = dynamic(
+  () => import("@/components/ui/pdf-viewer-dialog").then((mod) => mod.PdfViewerDialog),
+  { ssr: false }
+)
 import {
   MapPin,
   Mail,

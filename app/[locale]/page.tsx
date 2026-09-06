@@ -7,8 +7,19 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, MessageSquare, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
-import { TestimonialsCarousel } from "@/components/TestimonialsCarousel"
+import dynamic from "next/dynamic"
 import { QuizDiscoverySection } from "@/components/landing/QuizDiscoverySection"
+
+const TestimonialsCarousel = dynamic(
+  () => import("@/components/TestimonialsCarousel").then((mod) => mod.TestimonialsCarousel),
+  {
+    loading: () => (
+      <div className="w-full h-80 flex items-center justify-center animate-pulse">
+        <div className="h-64 w-full max-w-5xl bg-muted/40 rounded-3xl" />
+      </div>
+    ),
+  }
+)
 
 export default function Home() {
   const t = useTranslations("home")

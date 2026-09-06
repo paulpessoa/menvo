@@ -33,8 +33,16 @@ import {
 import { toast } from "sonner"
 import { Link, useRouter } from "@/i18n/routing"
 import { AvailabilityDisplay } from "@/components/mentorship/AvailabilityDisplay"
-import { BookMentorshipModal } from "@/components/mentorship/BookMentorshipModal"
-import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
+import dynamic from "next/dynamic"
+
+const BookMentorshipModal = dynamic(
+  () => import("@/components/mentorship/BookMentorshipModal").then((mod) => mod.BookMentorshipModal),
+  { ssr: false }
+)
+const LoginRequiredModal = dynamic(
+  () => import("@/components/auth/LoginRequiredModal").then((mod) => mod.LoginRequiredModal),
+  { ssr: false }
+)
 import { useTranslations } from "next-intl"
 import { MentorshipReviews } from "@/components/mentors/MentorshipReviews"
 import { useFavorites } from "@/hooks/useFavorites"
