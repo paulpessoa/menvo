@@ -171,8 +171,11 @@ export function MobileNavSheet({
         {isAuthenticated && (
           <div className="p-4 border-t bg-muted/10 mt-auto">
             <button
-              onClick={onSignOut}
-              className="flex items-center gap-4 w-full px-3 py-3 rounded-xl text-base font-bold text-red-600 hover:bg-red-50 transition-colors"
+              onClick={() => {
+                onOpenChange(false)
+                onSignOut()
+              }}
+              className="flex items-center gap-4 w-full px-3 py-3 rounded-xl text-base font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
             >
               <LogOut className="h-5 w-5" /> {t("header.userMenu.logout")}
             </button>

@@ -169,15 +169,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signOut = async () => {
         try {
             setLoading(true)
-            // 1. Invalida sessão no servidor e remove cookies HTTP
-            await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
 
-            // 2. Invalida sessão localmente no Supabase client
-            await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+            // 1. Invalida sessão no servidor e limpa cookies HTTP
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            }).catch(() => {})
+
+            // 2. Invalida sessão no cliente Supabase
+            await supabase.auth.signOut().catch(() => {})
         } catch (error) {
             console.error('[Auth] Logout warning:', error)
         } finally {
-            // 3. Limpeza infalível de estado e storage local
+            // 3. Limpeza direta e infalível de cookies no navegador
+            if (typeof document !== 'undefined') {
+                const cookies = document.cookie.split(';')
+                for (const rawCookie of cookies) {
+                    const cookie = rawCookie.trim()
+                    const eqPos = cookie.indexOf('=')
+                    const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie
+                    if (
+                        name.startsWith('sb-') ||
+                        name.includes('auth-token') ||
+                        name.includes('supabase') ||
+                        name.includes('menvo')
+                    ) {
+                        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`
+                        document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; SameSite=Lax`
+                    }
+                }
+            }
+
+            // 4. Limpeza de LocalStorage e SessionStorage
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('menvo_roles')
+                Object.keys(localStorage).forEach((key) => {
+                    if (key.startsWith('sb-') || key.includes('supabase') || key.includes('menvo')) {
+                        localStorage.removeItem(key)
+                    }
+                })
+                Object.keys(sessionStorage).forEach((key) => {
+                    if (key.startsWith('sb-') || key.includes('supabase') || key.includes('menvo')) {
+                        sessionStorage.removeItem(key)
+                    }
+                })
+            }
+
+            // 5. Limpeza de estado em memória
             setUser(null)
             setSession(null)
             setProfile(null)
@@ -191,9 +230,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 roles: [],
                 isPending: false
             })
+
+            // 6. Redirecionamento limpo para recarregar aplicação desautenticada de primeira
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('menvo_roles')
-                window.location.replace('/')
+                window.location.href = '/'
             }
             setLoading(false)
         }

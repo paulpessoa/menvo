@@ -94,6 +94,10 @@ export function UserNavDropdown({
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault()
+              onSignOut()
+            }}
             onClick={onSignOut}
             className="text-red-600 focus:text-red-600 cursor-pointer rounded-md"
           >
