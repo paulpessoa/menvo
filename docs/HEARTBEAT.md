@@ -1,12 +1,20 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
-## 📅 Last Updated: 2026-09-06
-**Current Status:** Auth loop fixed, waiting list disabled (open registration enabled), test users verified via Supabase Service Role, and 404 page implemented according to Menvo design tokens and i18n standards.
+## 📅 Last Updated: 2026-09-07
+**Current Status:** Availability management and scheduling flow fully operational end-to-end, loopback fetch eliminated from server components, string safeguards applied to all time formatting, minimum 45min session duration validation enforced, and technical documentation created at `docs/SCHEDULING_AND_AVAILABILITY.md`.
 
 ---
 
 ## 📍 Where We Left Off
 
+- [x] `availability & scheduling flow resolution (mentor & mentee)` — Diagnosed and solved critical end-to-end booking issues:
+    - **Loopback Fetch Eliminated**: Replaced internal `fetch('http://localhost:3000/api/mentors/.../availability')` in `app/[locale]/mentors/[slug]/page.tsx` with direct `createServiceRoleClient()` query, preventing connection drops on Vercel Edge/Serverless environments.
+    - **Premature Redirect Fixed**: In `app/[locale]/dashboard/mentor/availability/page.tsx`, guarded against session hydration race condition by checking `isInitializing` from `useAuth()`. Swapped `next/navigation` for `@/i18n/routing` `useRouter`.
+    - **Flexible Minute-Based Slot Generation**: In `/api/appointments/availability`, migrated from brittle hour-based loop to minute-based generator with 45-minute step calculation, correctly accommodating all sub-hour configurations.
+    - **Minimum Duration Enforcement**: Added frontend validation preventing mentors from saving slots < 45 min with localized feedback: `"O intervalo em {day} deve ser de no mínimo 45 minutos (tempo de uma sessão)"`.
+    - **Bulletproof String Safeguards**: Replaced all direct `.substring` calls across `BookMentorshipModal`, `AvailabilityDisplay`, `BookingForm`, `SessionDetailsModal`, and `SessionResponseModal` with safe string guards (`String(val || '').substring(0, 5)`).
+    - **System Documentation**: Authored `docs/SCHEDULING_AND_AVAILABILITY.md` detailing weekly recurring templates, 14-day rolling window projections, conflict resolution rules (internal appointments + Google Calendar freebusy), and full sequence diagram.
+    - **In-App Guidance**: Embedded an informational "Como funciona sua agenda" card directly in the mentor availability sidebar explaining the 4 core scheduling tenets.
 - [x] `activation funnel telemetry (ga4)` — Implemented lightweight GA4 event tracking in `lib/utils/google-analytics/events.ts`. Emits `quiz_completed` on quiz submission (`app/[locale]/quiz/page.tsx`) and `booking_confirmed` on mentorship scheduling (`components/mentorship/BookMentorshipModal.tsx`), establishing end-to-end activation tracking without external dependencies or overhead.
 - [x] `google calendar conflict detection` — Added `getCalendarBusyIntervals` to `lib/services/mentorship/google-calendar.service.ts` using native Google Calendar `freebusy.query`. Integrated conflict resolution into `/api/appointments/availability` to dynamically suppress slots colliding with existing calendar events, with non-blocking graceful fallback.
 - [x] `codebase anti-overengineering cleanup` — Audited and pruned orphaned legacy code: removed dead `lib/services/maps/` (2 files), dead AI resume analyzer `lib/cv-analysis.ts`, redundant upload hook `hooks/useFileUpload.ts`, and unused hooks (`useLoadingStates.ts`, `useUnsavedChanges.ts`, `useValidatedMentors.ts`). Cleaned over 1,200 lines of dead code while maintaining 100% test coverage (45/45 passing) and zero TypeScript errors.

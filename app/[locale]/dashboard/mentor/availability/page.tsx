@@ -28,7 +28,8 @@ import {
   Calendar,
   CheckCircle,
   AlertTriangle,
-  Loader2
+  Loader2,
+  Info
 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
@@ -475,6 +476,29 @@ export default function MentorAvailabilityPage() {
               <strong>{profile?.timezone || "America/Sao_Paulo"}</strong>.
             </AlertDescription>
           </Alert>
+
+          <Card className="border-muted bg-muted/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                <Info className="h-4 w-4 text-primary" />
+                Como funciona a sua agenda
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-2 pt-0">
+              <p>
+                • <strong>Padrão Semanal:</strong> Os horários salvos se repetem toda semana para sua conveniência.
+              </p>
+              <p>
+                • <strong>Janela de 14 Dias:</strong> Seus mentorados visualizam datas específicas projetadas nos próximos 14 dias.
+              </p>
+              <p>
+                • <strong>Duração:</strong> Mentorias duram <strong>45 minutos</strong>. Intervalos devem ter no mínimo 45 min.
+              </p>
+              <p>
+                • <strong>Conflitos Automáticos:</strong> Sessões já marcadas ou eventos no seu Google Calendar são bloqueados automaticamente.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -58,9 +58,8 @@ GEMINI.md
 AGENTS.md
 implementation-plan.html
 
-# Local scripts & internal documentation (kept locally, not tracked)
+# Local scripts (kept locally, not tracked)
 /scripts/
-/docs/
 
 # Supabase CLI
 .supabase/
