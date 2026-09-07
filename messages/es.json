@@ -1554,6 +1554,7 @@
     "noSchedule": "Sin horario configurado",
     "addScheduleToPreview": "Añade horarios para ver la vista previa",
     "success": "¡Disponibilidad guardada con éxito!",
+    "successSave": "¡Disponibilidad guardada con éxito!",
     "errorLoad": "Error al cargar la disponibilidad",
     "errorSave": "Error al guardar la disponibilidad",
     "invalidTime": "Hora inválida en {day}: el inicio debe ser antes del fin",

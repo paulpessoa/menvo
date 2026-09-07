@@ -1559,6 +1559,7 @@
     "noSchedule": "No schedule configured",
     "addScheduleToPreview": "Add time slots to see the preview",
     "success": "Availability saved successfully!",
+    "successSave": "Availability saved successfully!",
     "errorLoad": "Error loading availability",
     "errorSave": "Error saving availability",
     "invalidTime": "Invalid time on {day}: start must be before end",

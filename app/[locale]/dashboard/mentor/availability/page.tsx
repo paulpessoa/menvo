@@ -231,7 +231,7 @@ export default function MentorAvailabilityPage() {
         if (insertError) throw insertError
       }
 
-      setMessage({ type: "success", text: t("successSave") })
+      setMessage({ type: "success", text: t("success") })
       await fetchAvailability()
     } catch (error) {
       console.error("Error saving availability:", error)
