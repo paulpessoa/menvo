@@ -1,12 +1,18 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
 ## 📅 Last Updated: 2026-09-07
-**Current Status:** Availability management and scheduling flow fully operational end-to-end, loopback fetch eliminated from server components, string safeguards applied to all time formatting, minimum 45min session duration validation enforced, and technical documentation created at `docs/SCHEDULING_AND_AVAILABILITY.md`.
+**Current Status:** Auth Context and role management fully decoupled via `/api/auth/me` and `/api/profile`, fragile `localStorage` role caching eradicated, logout state reset bugs fixed, database portability architectural directive established, and scheduling flow operational end-to-end.
 
 ---
 
 ## 📍 Where We Left Off
 
+- [x] `auth context decoupling & database portability` — Executed Phase 1 of the pragmatic simplification plan:
+    - **API-Mediated Role & Profile Resolution**: Refactored `lib/auth/auth-context.tsx` to resolve roles and profile exclusively through `/api/auth/me` and `/api/profile` (cookie-authenticated API layer), eradicating direct database queries inside client components.
+    - **Elimination of `localStorage` Role Caching**: Removed `localStorage.getItem('menvo_roles')` and `localStorage.setItem('menvo_roles')`, terminating cross-session race conditions and stale role flash between different accounts.
+    - **Logout Bugfix**: Replaced hardcoded `mentee: true` state on `signOut` and `SIGNED_OUT` events with clean `EMPTY_ROLES` reset.
+    - **API Route Cookie + Bearer Support**: Enhanced `app/api/profile/route.ts` with `getAuthenticatedUser()` to seamlessly support both browser session cookies and Bearer tokens.
+    - **Quality Verification**: 45/45 unit tests passing (6 test suites in Jest) and 0 TypeScript errors (`tsc --noEmit`).
 - [x] `availability & scheduling flow resolution (mentor & mentee)` — Diagnosed and solved critical end-to-end booking issues:
     - **Loopback Fetch Eliminated**: Replaced internal `fetch('http://localhost:3000/api/mentors/.../availability')` in `app/[locale]/mentors/[slug]/page.tsx` with direct `createServiceRoleClient()` query, preventing connection drops on Vercel Edge/Serverless environments.
     - **Premature Redirect Fixed**: In `app/[locale]/dashboard/mentor/availability/page.tsx`, guarded against session hydration race condition by checking `isInitializing` from `useAuth()`. Swapped `next/navigation` for `@/i18n/routing` `useRouter`.
