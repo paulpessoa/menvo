@@ -27,20 +27,40 @@ export async function POST(request: NextRequest) {
       // snake_case (API-direct callers)
       mentor_id,
       scheduled_at,
+      requested_date,
+      requested_start_time,
+      requested_end_time,
       duration_minutes,
       mentorship_topics,
       notes_mentee,
       // camelCase (frontend BookMentorshipModal)
       mentorId,
       scheduledAt,
+      requestedDate,
+      requestedStartTime,
+      requestedEndTime,
       duration,
+      durationMinutes,
       message,
     } = body
 
     // Normalize: prefer snake_case if present, fall back to camelCase
     const resolvedMentorId = mentor_id ?? mentorId
-    const resolvedScheduledAt = scheduled_at ?? scheduledAt
-    const resolvedDuration = duration_minutes ?? duration ?? 45
+    let resolvedScheduledAt = scheduled_at ?? scheduledAt
+
+    const reqDate = requested_date ?? requestedDate
+    const reqTime = requested_start_time ?? requestedStartTime
+
+    if (!resolvedScheduledAt && reqDate && reqTime) {
+      try {
+        const timeFormatted = reqTime.length === 5 ? `${reqTime}:00` : reqTime
+        resolvedScheduledAt = new Date(`${reqDate}T${timeFormatted}-03:00`).toISOString()
+      } catch (err) {
+        resolvedScheduledAt = `${reqDate}T${reqTime}`
+      }
+    }
+
+    const resolvedDuration = duration_minutes ?? durationMinutes ?? duration ?? 45
     const resolvedNotes = notes_mentee ?? message ?? ""
     const resolvedTopics = mentorship_topics ?? []
 
@@ -56,7 +76,7 @@ export async function POST(request: NextRequest) {
     // 2. Verificar se o mentor existe, está verificado e buscar email para notificação
     const { data: mentor, error: mentorError } = await (supabase
       .from("profiles")
-      .select("id, verified, full_name, email")
+      .select("id, verified, verification_status, full_name, email")
       .eq("id", resolvedMentorId)
       .single() as any)
 
@@ -64,7 +84,8 @@ export async function POST(request: NextRequest) {
       return errorResponse("Mentor not found", "NOT_FOUND", 404)
     }
 
-    if (!mentor.verified) {
+    const isMentorVerified = mentor.verified === true || mentor.verification_status === "approved"
+    if (!isMentorVerified) {
       return errorResponse("Mentor is not verified", "FORBIDDEN", 403)
     }
 

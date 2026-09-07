@@ -237,4 +237,54 @@ describe('POST /api/appointments/schedule', () => {
       })
     )
   })
+
+  it('should successfully schedule when given requestedDate and requestedStartTime', async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'mentee-1', email: 'mentee@test.com' } },
+      error: null,
+    })
+
+    const mockCreatedAppt = {
+      id: 'new-appt-456',
+      mentor_id: 'mentor-1',
+      mentee_id: 'mentee-1',
+      scheduled_at: '2026-09-10T21:00:00-03:00',
+      status: 'pending',
+    }
+
+    mockSupabase.from.mockImplementation((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: { id: 'mentor-1', verified: true, full_name: 'Verified Mentor', email: 'mentor@test.com' },
+            error: null,
+          }),
+        }
+      }
+      if (table === 'appointments') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          in: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+          insert: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({ data: mockCreatedAppt, error: null }),
+        }
+      }
+      return {}
+    })
+
+    const req = createMockRequest({
+      mentorId: 'mentor-1',
+      requestedDate: '2026-09-10',
+      requestedStartTime: '21:00:00',
+      message: 'testando agendamento com requestedDate e requestedStartTime',
+    })
+    const response = await POST(req)
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.data.id).toBe('new-appt-456')
+  })
 })

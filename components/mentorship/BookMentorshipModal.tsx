@@ -150,10 +150,17 @@ export function BookMentorshipModal({
       const requestedDate = `${year}-${month}-${day}`
       const requestedStartTime = selectedSlot.start_time
       const requestedEndTime = selectedSlot.end_time
+      const scheduledAt =
+        (selectedSlot as any).datetime ||
+        new Date(
+          `${requestedDate}T${requestedStartTime.length === 5 ? requestedStartTime + ":00" : requestedStartTime}-03:00`
+        ).toISOString()
 
       const payload = {
         mentorId,
         mentor_id: mentorId,
+        scheduledAt,
+        scheduled_at: scheduledAt,
         requestedDate,
         requested_date: requestedDate,
         requestedStartTime,
