@@ -60,6 +60,7 @@ implementation-plan.html
 
 # Local scripts (kept locally, not tracked)
 /scripts/
+/scratch/
 
 # Supabase CLI
 .supabase/
