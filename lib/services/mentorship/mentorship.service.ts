@@ -503,6 +503,66 @@ export const mentorshipSessionsService = {
 
     const feedbackIds = new Set((feedbacks || []).map((f: any) => f.appointment_id))
     return completed.some((c: any) => !feedbackIds.has(c.id))
+  },
+
+  // Obter métricas consolidadas do dashboard do mentorado
+  getMenteeDashboardStats: async (userId: string) => {
+    const { data: appointments, error } = await (supabase
+      .from("appointments") as any)
+      .select("id, status, scheduled_at, duration_minutes, mentor_id")
+      .eq("mentee_id", userId)
+
+    if (error) throw error
+    const apts = (appointments as any[]) || []
+    const now = new Date()
+    const upcoming = apts.filter(a => new Date(a.scheduled_at) > now && a.status !== "cancelled").length
+    const completed = apts.filter(a => a.status === "completed").length
+    const totalMinutes = apts.filter(a => a.status === "completed").reduce((sum, a) => sum + (a.duration_minutes || 0), 0)
+    const totalHours = Math.round((totalMinutes / 60) * 10) / 10
+    const uniqueMentors = new Set(apts.map(a => a.mentor_id)).size
+
+    return {
+      totalAppointments: apts.length,
+      upcomingAppointments: upcoming,
+      completedSessions: completed,
+      totalMentors: uniqueMentors,
+      totalHours
+    }
+  },
+
+  // Obter próximos agendamentos do mentorado
+  getMenteeUpcomingAppointments: async (userId: string, limit = 3) => {
+    const { data, error } = await (supabase
+      .from("appointments") as any)
+      .select(`
+          id,
+          scheduled_at,
+          duration_minutes,
+          status,
+          mentor:profiles!mentor_id (
+              full_name,
+              avatar_url,
+              job_title
+          )
+      `)
+      .eq("mentee_id", userId)
+      .gte("scheduled_at", new Date().toISOString())
+      .neq("status", "cancelled")
+      .order("scheduled_at", { ascending: true })
+      .limit(limit)
+
+    if (error) throw error
+    return (data as any[])?.map((apt: any) => ({
+      id: apt.id,
+      scheduled_at: apt.scheduled_at,
+      duration_minutes: apt.duration_minutes,
+      status: apt.status,
+      mentor: {
+        full_name: apt.mentor?.full_name || "Mentor",
+        avatar_url: apt.mentor?.avatar_url || null,
+        job_title: apt.mentor?.job_title || null
+      }
+    })) || []
   }
 }
 

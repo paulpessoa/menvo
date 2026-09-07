@@ -520,6 +520,21 @@ class MentorService {
     if (error) throw error
     return (data as any) || []
   }
+
+  /**
+   * Busca os perfis de mentores favoritados pelo usuário.
+   */
+  async getFavoriteMentors(ids: string[]): Promise<any[]> {
+    if (!ids || ids.length === 0) return []
+    const { data, error } = await (this.supabase
+      .from("profiles") as any)
+      .select("id, full_name, avatar_url, job_title, company, average_rating, slug")
+      .in("id", ids)
+      .limit(4)
+
+    if (error) throw error
+    return data || []
+  }
 }
 
 export const mentorService = new MentorService()

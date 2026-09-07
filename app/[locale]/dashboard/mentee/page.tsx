@@ -21,18 +21,20 @@ import {
   Loader2,
   MessageSquare,
   TrendingUp,
-  LayoutDashboard
+  LayoutDashboard,
+  Star
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
-import { createClient } from "@/lib/utils/supabase/client"
 import { useLocale, useTranslations } from "next-intl"
 import { useFavorites } from "@/hooks/useFavorites"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/dashboard/FeedbackManagement"
 import { MenteeQuizCTA } from "@/components/dashboard/MenteeQuizCTA"
 import { quizService } from "@/lib/services/quiz/quiz.service"
+import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
+import { mentorService } from "@/lib/services/mentors/mentors.service"
 import type { QuizResponseSummary } from "@/lib/types/models/quiz"
 
 interface MenteeStats {
@@ -83,32 +85,18 @@ export default function MenteeDashboard() {
   const [quizSummary, setQuizSummary] = useState<QuizResponseSummary | null>(null)
   const [loadingQuiz, setLoadingQuiz] = useState(true)
 
-  const supabase = createClient()
+  const [hasPendingReview, setHasPendingReview] = useState(false)
   const { favorites } = useFavorites(user?.id)
 
   const fetchMenteeStats = async () => {
     if (!user?.id) return
     try {
-      const { data: appointments } = await supabase
-        .from("appointments")
-        .select("id, status, scheduled_at, duration_minutes, mentor_id")
-        .eq("mentee_id", user.id)
-      
-      const apts = (appointments as any[]) || []
-      const now = new Date()
-      const upcoming = apts.filter(a => new Date(a.scheduled_at) > now && a.status !== "cancelled").length
-      const completed = apts.filter(a => a.status === "completed").length
-      const totalMinutes = apts.filter(a => a.status === "completed").reduce((sum, a) => sum + (a.duration_minutes || 0), 0)
-      const totalHours = Math.round((totalMinutes / 60) * 10) / 10
-      const uniqueMentors = new Set(apts.map(a => a.mentor_id)).size
-
-      setStats({
-        totalAppointments: apts.length,
-        upcomingAppointments: upcoming,
-        completedSessions: completed,
-        totalMentors: uniqueMentors,
-        totalHours
-      })
+      const [statsData, pending] = await Promise.all([
+        mentorshipService.getMenteeDashboardStats(user.id),
+        mentorshipService.hasPendingEvaluations(user.id)
+      ])
+      setStats(statsData)
+      setHasPendingReview(pending)
     } catch (error) {
       console.error("Error fetching mentee stats:", error)
     } finally {
@@ -119,39 +107,7 @@ export default function MenteeDashboard() {
   const fetchUpcomingAppointments = async () => {
     if (!user?.id) return
     try {
-      const { data } = await supabase
-        .from("appointments")
-        .select(`
-            id,
-            scheduled_at,
-            duration_minutes,
-            status,
-            mentor:profiles!mentor_id (
-                full_name,
-                avatar_url,
-                job_title
-            )
-        `)
-        .eq("mentee_id", user.id)
-        .gte("scheduled_at", new Date().toISOString())
-        .neq("status", "cancelled")
-        .order("scheduled_at", { ascending: true })
-        .limit(3)
-
-      const formatted = (data as any[])?.map((apt: any) => {
-          return {
-            id: apt.id,
-            scheduled_at: apt.scheduled_at,
-            duration_minutes: apt.duration_minutes,
-            status: apt.status,
-            mentor: {
-              full_name: apt.mentor?.full_name || "Mentor",
-              avatar_url: apt.mentor?.avatar_url || null,
-              job_title: apt.mentor?.job_title || null
-            }
-          }
-      }) || []
-
+      const formatted = await mentorshipService.getMenteeUpcomingAppointments(user.id, 3)
       setUpcomingAppointments(formatted)
     } catch (error) {
       console.error("Error fetching upcoming appointments:", error)
@@ -162,13 +118,8 @@ export default function MenteeDashboard() {
     if (!favorites.length) return
     setLoadingFavorites(true)
     try {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, full_name, avatar_url, job_title, company, average_rating, slug")
-        .in("id", favorites)
-        .limit(4)
-
-      setFavoriteMentorsData((data as any[]) || [])
+      const data = await mentorService.getFavoriteMentors(favorites)
+      setFavoriteMentorsData(data)
     } catch (error) {
       console.error("Error fetching favorite mentors details:", error)
     } finally {
@@ -241,6 +192,30 @@ export default function MenteeDashboard() {
 
             {/* TAB: OVERVIEW */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
+              {/* Lembrete de Avaliação Pendente */}
+              {hasPendingReview && (
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center gap-3.5">
+                    <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
+                      <Star className="h-5 w-5 fill-current" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-foreground">
+                        Você tem mentoria aguardando sua avaliação!
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Sua opinião ajuda o mentor a evoluir e fortalece a comunidade voluntária da Menvo.
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild size="sm" className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold shrink-0 shadow-sm">
+                    <Link href="/mentorship/mentee">
+                      Avaliar Agora
+                    </Link>
+                  </Button>
+                </div>
+              )}
+
               {/* Quiz Onboarding & Activation CTA */}
               <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />
 
