@@ -173,7 +173,7 @@ export default function MenteeDashboard() {
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
               <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
             </div>
-            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
+            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all">
               <Link href="/mentors">
                 <Search className="h-4 w-4 mr-2" /> {t("mentee.actions.find")}
               </Link>
@@ -303,7 +303,7 @@ export default function MenteeDashboard() {
                         <p className="text-xs text-muted-foreground max-w-sm mb-5 leading-relaxed">
                           {t("mentee.sections.noAppointmentsDesc")}
                         </p>
-                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all px-5 h-10">
+                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all px-5 h-10">
                           <Link href="/mentors">{t("mentee.sections.bookNow")}</Link>
                         </Button>
                       </CardContent>

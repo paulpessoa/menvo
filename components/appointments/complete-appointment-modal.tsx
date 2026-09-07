@@ -181,7 +181,7 @@ export function CompleteAppointmentModal({
                     <Button
                         onClick={handleSubmit}
                         disabled={isSubmitting || rating === 0}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-primary hover:bg-primary/90 text-white font-medium shadow-sm"
                     >
                         {isSubmitting ? (
                             <>

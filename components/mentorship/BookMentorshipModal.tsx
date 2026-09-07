@@ -415,7 +415,7 @@ export function BookMentorshipModal({
                     type="button"
                     onClick={handleConfirmBooking}
                     disabled={isSubmitting || message.length < 20}
-                    className="flex-1 h-12 rounded-xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                    className="flex-1 h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>

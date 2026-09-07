@@ -73,9 +73,9 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
 
   // State B: New mentee has not taken the quiz yet (Primary Activation)
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-700 p-6 md:p-8 text-white shadow-lg transition-all hover:shadow-xl">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 p-6 md:p-8 text-white shadow-lg transition-all hover:shadow-xl">
       <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-0 right-1/4 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl pointer-events-none" />
 
       <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-3 max-w-2xl">
@@ -105,12 +105,12 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
           <Button
             asChild
             size="lg"
-            className="rounded-full bg-white text-teal-800 hover:bg-white/90 font-bold px-8 shadow-md hover:scale-105 transition-all text-base h-12"
+            className="rounded-full bg-white text-primary hover:bg-white/90 font-bold px-8 shadow-md hover:scale-105 transition-all text-base h-12"
           >
             <Link href="/quiz">
-              <Sparkles className="w-5 h-5 mr-2 text-teal-700" />
+              <Sparkles className="w-5 h-5 mr-2 text-primary" />
               {t("ctaButton")}
-              <ArrowRight className="w-5 h-5 ml-2 text-teal-700" />
+              <ArrowRight className="w-5 h-5 ml-2 text-primary" />
             </Link>
           </Button>
         </div>

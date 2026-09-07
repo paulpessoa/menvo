@@ -130,6 +130,7 @@ export function AppointmentCard({
   const canChat =
     appointment.status === "pending" || appointment.status === "confirmed"
   const canComplete =
+    !isMentor &&
     (appointment.status === "confirmed" || appointment.status === "completed") &&
     isPast &&
     !hasUserEvaluated
@@ -275,7 +276,7 @@ export function AppointmentCard({
           {canComplete && (
             <Button
               size="sm"
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary hover:bg-primary/90 text-white font-medium"
               onClick={() => setIsCompleteModalOpen(true)}
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />

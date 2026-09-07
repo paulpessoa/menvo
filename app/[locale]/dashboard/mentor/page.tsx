@@ -151,13 +151,13 @@ export default function MentorDashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
-                   <Card className="border-none shadow-sm bg-gradient-to-br from-teal-700 to-emerald-700 text-white overflow-hidden relative">
+                   <Card className="border-none shadow-sm bg-gradient-to-r from-primary-700 via-primary-600 to-primary text-white overflow-hidden relative">
                       <CardHeader className="relative z-10">
                         <CardTitle className="text-2xl">Gerencie sua Agenda</CardTitle>
-                        <CardDescription className="text-teal-100 text-base">Mantenha seus horários atualizados para receber novos agendamentos.</CardDescription>
+                        <CardDescription className="text-white/90 text-base">Mantenha seus horários atualizados para receber novos agendamentos.</CardDescription>
                       </CardHeader>
                       <CardContent className="relative z-10">
-                        <Button asChild size="lg" className="bg-white text-teal-800 hover:bg-white/90 font-bold shadow-md">
+                        <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 font-bold shadow-md">
                           <Link href="/dashboard/mentor/availability">Configurar Disponibilidade</Link>
                         </Button>
                       </CardContent>

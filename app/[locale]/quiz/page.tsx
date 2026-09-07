@@ -159,7 +159,7 @@ export default function QuizPage() {
             <CardContent className="space-y-6">
               <Button
                 size="lg"
-                className="w-full text-lg mt-8 h-14 font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md"
+                className="w-full text-lg mt-8 h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-md"
                 onClick={() => setShowQuiz(true)}
               >
                 {t('quiz_page.start_quiz')}
