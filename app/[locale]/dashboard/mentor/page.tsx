@@ -173,7 +173,7 @@ export default function MentorDashboard() {
                         title="Ver Mentorias" 
                         desc="Gerencie suas solicitações e sessões ativas." 
                         link="/mentorship/mentor" 
-                        icon={<Clock className="w-6 h-6 text-emerald-600" />}
+                        icon={<Clock className="w-6 h-6 text-primary" />}
                       />
                       <QuickActionCard 
                         title="Meu Perfil Público" 

@@ -179,7 +179,7 @@ export default function AdminVerificationsPage() {
                           </DialogContent>
                         </Dialog>
 
-                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApprove(verification.id)}>
+                        <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-medium" onClick={() => handleApprove(verification.id)}>
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Aprovar Mentor
                         </Button>

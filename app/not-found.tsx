@@ -34,7 +34,7 @@ export default function GlobalNotFound() {
           <div className="pt-2">
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm transition-colors shadow-md"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-medium text-sm transition-colors shadow-md"
             >
               <Home className="w-4 h-4" />
               Voltar ao Início

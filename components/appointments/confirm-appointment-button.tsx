@@ -113,7 +113,7 @@ export function ConfirmAppointmentButton({
                 <Button
                     variant="default"
                     size="sm"
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-primary hover:bg-primary/90 text-white font-medium"
                     onClick={() => setIsDialogOpen(true)}
                 >
                     <Calendar className="w-4 h-4 mr-2" />
@@ -199,7 +199,7 @@ export function ConfirmAppointmentButton({
                     <AlertDialogAction
                         onClick={handleConfirm}
                         disabled={isConfirming}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-primary hover:bg-primary/90 text-white font-medium"
                     >
                         {isConfirming ? 'Confirmando...' : 'Confirmar Mentoria'}
                     </AlertDialogAction>

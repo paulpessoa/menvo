@@ -29,7 +29,7 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
   // State A: Mentee has already completed the assessment
   if (quizResponse) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-teal-500/5 to-emerald-500/5 p-6 shadow-sm transition-all hover:shadow-md">
+      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent p-6 shadow-sm transition-all hover:shadow-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">

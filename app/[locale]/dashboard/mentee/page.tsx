@@ -233,7 +233,7 @@ export default function MenteeDashboard() {
                       title={t("mentee.actions.myMentorshipsAction")} 
                       desc={t("mentee.actions.myMentorshipsActionDesc")} 
                       link="/mentorship/mentee" 
-                      icon={<Calendar className="w-6 h-6 text-emerald-600" />}
+                      icon={<Calendar className="w-6 h-6 text-primary" />}
                     />
                     <QuickActionCard 
                       title={t("mentee.actions.exploreMentorsAction")} 

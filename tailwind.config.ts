@@ -34,7 +34,7 @@ const config = {
           300: "#93cbd3",
           400: "#5fa8b8",
           500: "#4191a2",
-          600: "#0f7185", // Brand Color
+          600: "#007585", // Official Menvo Brand Color
           700: "#006276", // Deep Brand Color
           800: "#004e5f",
           900: "#003a47",

@@ -275,7 +275,7 @@ export function MentorCard({
                     size="sm"
                     onClick={() => handleVerification(true)}
                     disabled={isVerifying || !isProfileComplete()}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-primary hover:bg-primary/90 text-white"
                     title={
                       !isProfileComplete()
                         ? "Perfil incompleto - não pode ser verificado"

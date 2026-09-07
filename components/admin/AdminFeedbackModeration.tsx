@@ -126,7 +126,7 @@ export function AdminFeedbackModeration() {
                   <div className="p-6 md:w-48 border-l border-gray-100 flex flex-col justify-center gap-3 bg-gray-50/20">
                     <Button 
                       onClick={() => handleModeration(fb.id, 'approved')} 
-                      className="w-full bg-green-600 hover:bg-green-700 font-bold"
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-bold"
                     >
                       <Check className="w-4 h-4 mr-2" /> Aprovar
                     </Button>

@@ -373,14 +373,14 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     variant="outline"
                     className={`font-semibold px-3 py-1 rounded-full text-xs flex items-center gap-1.5 ${
                       availability.length > 0 && mentor.availability_status === "available"
-                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        ? "bg-primary/10 text-primary border-primary/20"
                         : "bg-muted text-muted-foreground border-muted"
                     }`}
                   >
                     <span
                       className={`h-2 w-2 rounded-full ${
                         availability.length > 0 && mentor.availability_status === "available"
-                          ? "bg-emerald-500 animate-pulse"
+                          ? "bg-primary animate-pulse"
                           : "bg-muted-foreground"
                       }`}
                     />
@@ -413,9 +413,9 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                      <CheckCircle className="h-3.5 w-3.5 text-emerald-600" /> {t("costLabel")}
+                      <CheckCircle className="h-3.5 w-3.5 text-primary" /> {t("costLabel")}
                     </span>
-                    <p className="font-bold text-emerald-600">{t("costValue")}</p>
+                    <p className="font-bold text-primary">{t("costValue")}</p>
                   </div>
                   <div className="space-y-1">
                     <span className="text-muted-foreground flex items-center gap-1 font-medium">

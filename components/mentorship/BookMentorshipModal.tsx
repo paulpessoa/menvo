@@ -276,11 +276,11 @@ export function BookMentorshipModal({
               </div>
             ) : !selectedSlot ? (
               <div className="space-y-4">
-                <div className="bg-teal-50/80 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/50 rounded-2xl p-4 flex items-start gap-3">
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-start gap-3">
                   <div className="bg-primary text-white rounded-full p-1 mt-0.5 shadow-sm">
                     <Clock className="w-3.5 h-3.5" />
                   </div>
-                  <p className="text-sm text-teal-950 dark:text-teal-100 leading-relaxed">
+                  <p className="text-sm text-foreground leading-relaxed">
                     {t("standardDuration", { name: mentorName })}
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export function BookMentorshipModal({
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-gradient-to-r from-primary/10 via-teal-500/10 to-emerald-500/10 p-5 rounded-2xl border border-primary/20 relative overflow-hidden">
+                <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 rounded-2xl border border-primary/20 relative overflow-hidden">
                   <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">
                     {t("selectedSlot")}
                   </p>

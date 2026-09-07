@@ -301,7 +301,7 @@ export function AppointmentCard({
           {canJoinMeet && (
             <Button
               size="sm"
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-primary hover:bg-primary/90 text-white font-medium"
               asChild
             >
               <a
