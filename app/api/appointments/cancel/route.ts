@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/utils/supabase/server';
 
+import { cancelAppointmentSchema } from '@/lib/schemas/appointment';
+
 export async function POST(request: NextRequest) {
   try {
     // Buscar usuário atual
@@ -27,15 +29,17 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const body = await request.json();
-    const { appointmentId, reason } = body;
+    const body = await request.json().catch(() => ({}));
+    const parseResult = cancelAppointmentSchema.safeParse(body);
 
-    if (!appointmentId || !reason) {
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'appointmentId e reason são obrigatórios' },
+        { error: parseResult.error.errors[0]?.message || 'Dados inválidos para cancelamento' },
         { status: 400 }
       );
     }
+
+    const { appointmentId, reason } = parseResult.data;
 
     // Buscar appointment
     const { data: appointment, error: fetchError } = await supabase

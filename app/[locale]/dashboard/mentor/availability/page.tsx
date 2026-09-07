@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
-import { createClient } from "@/lib/utils/supabase/client"
+import { mentorAvailabilityService } from "@/lib/services/mentorship/mentorship.service"
+import { profileService } from "@/lib/services/auth/auth.service"
 import {
   Card,
   CardContent,
@@ -33,7 +34,6 @@ import {
 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
-import type { TablesInsert } from "@/lib/types/supabase"
 
 import {
   addMinutesToTime,
@@ -70,7 +70,6 @@ export default function MentorAvailabilityPage() {
     type: "success" | "error"
     text: string
   } | null>(null)
-  const supabase = createClient()
 
   const DAYS_OF_WEEK = [
     { value: 0, label: t("days.0") },
@@ -103,22 +102,13 @@ export default function MentorAvailabilityPage() {
 
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from("mentor_availability")
-        .select("*")
-        .eq("mentor_id", user.id)
-        .order("day_of_week")
-        .order("start_time")
+      const data = await mentorAvailabilityService.getMentorAvailability(user.id)
 
-      if (error) throw error
-
-      const normalized: AvailabilitySlot[] = ((data as any[]) || []).map(
-        (slot: any) => ({
-          ...slot,
-          start_time: normalizeTime(slot.start_time),
-          end_time: normalizeTime(slot.end_time)
-        })
-      )
+      const normalized: AvailabilitySlot[] = data.map((slot) => ({
+        ...slot,
+        start_time: normalizeTime(slot.start_time),
+        end_time: normalizeTime(slot.end_time)
+      }))
 
       setAvailability(normalized)
     } catch (error) {
@@ -221,38 +211,19 @@ export default function MentorAvailabilityPage() {
       setSaving(true)
       setMessage(null)
 
-      // Delete existing availability
-      const { error: deleteError } = await supabase
-        .from("mentor_availability")
-        .delete()
-        .eq("mentor_id", user.id)
+      const slotsToInsert = availability.map((slot) => ({
+        day_of_week: slot.day_of_week,
+        start_time: normalizeTime(slot.start_time),
+        end_time: normalizeTime(slot.end_time),
+        timezone: slot.timezone || effectiveTimezone,
+        is_active: true
+      }))
 
-      if (deleteError) throw deleteError
+      await mentorAvailabilityService.setMentorAvailability(user.id, slotsToInsert)
 
-      // Insert new availability
-      if (availability.length > 0) {
-        const slotsToInsert: TablesInsert<"mentor_availability">[] =
-          availability.map((slot) => ({
-            mentor_id: user.id,
-            day_of_week: slot.day_of_week,
-            start_time: normalizeTime(slot.start_time),
-            end_time: normalizeTime(slot.end_time),
-            timezone: slot.timezone || effectiveTimezone
-          }))
-
-        const { error: insertError } = await (supabase
-          .from("mentor_availability") as any)
-          .insert(slotsToInsert)
-
-        if (insertError) throw insertError
-
-        // Persist effective timezone to profile if missing or UTC
-        if (!profile?.timezone || profile.timezone === "UTC") {
-          await (supabase
-            .from("profiles") as any)
-            .update({ timezone: effectiveTimezone })
-            .eq("id", user.id)
-        }
+      // Persist effective timezone to profile if missing or UTC
+      if (!profile?.timezone || profile.timezone === "UTC") {
+        await profileService.updateProfile(user.id, { timezone: effectiveTimezone })
       }
 
       setMessage({ type: "success", text: t("success") })

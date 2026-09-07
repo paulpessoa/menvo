@@ -7,9 +7,22 @@ import {
   isGoogleCalendarConfigured,
   getMissingEnvVars
 } from "@/lib/services/mentorship/google-calendar.service"
+import { confirmAppointmentSchema } from "@/lib/schemas/appointment"
 
 export async function POST(request: NextRequest) {
   try {
+    // Parse e validação do body
+    const body = await request.json()
+    const validation = confirmAppointmentSchema.safeParse(body)
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Dados inválidos", details: validation.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+
+    const { appointmentId, token, mentorNotes } = validation.data
+
     // Usar Service Role para bypass RLS (chamada interna)
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,10 +34,6 @@ export async function POST(request: NextRequest) {
         }
       }
     )
-
-    // Parse do body
-    const body = await request.json()
-    const { appointmentId: rawAppointmentId, token, mentorNotes } = body
 
     // Suportar tanto token quanto appointmentId
     let appointment
@@ -46,10 +55,8 @@ export async function POST(request: NextRequest) {
 
       appointment = result.data
       fetchError = result.error
-    } else if (rawAppointmentId) {
+    } else if (appointmentId) {
       // Buscar por ID (UUID como string)
-      const appointmentId = rawAppointmentId
-
       const result = await supabase
         .from("appointments")
         .select(

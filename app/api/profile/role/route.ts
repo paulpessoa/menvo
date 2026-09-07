@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
+import { updateUserRoleSchema } from "@/lib/schemas/profile"
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,12 +14,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const body = await request.json().catch(() => ({}))
-    const { role, profileData } = body
+    const rawBody = await request.json().catch(() => ({}))
+    const validation = updateUserRoleSchema.safeParse(rawBody)
 
-    if (!role || !["mentor", "mentee"].includes(role)) {
-      return NextResponse.json({ error: "Role inválida" }, { status: 400 })
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.errors[0]?.message || "Dados inválidos" },
+        { status: 400 }
+      )
     }
+
+    const { role, profileData } = validation.data
 
     // 1. Atualizar o perfil do usuário
     const profileUpdates: Record<string, any> = {

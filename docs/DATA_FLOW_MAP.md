@@ -63,8 +63,7 @@ A aplicação opera sob três padrões bem delimitados:
 Para alcançar **100% de desacoplamento** (preparando o terreno para MCP Server e Agente sem dependência acoplada ao Supabase client), os seguintes pontos ainda realizam queries diretas no navegador:
 
 1. `app/[locale]/dashboard/mentor/availability/page.tsx`:
-   - Utiliza `createClient()` para salvar a matriz de horários.
-   - **Solução planejada:** Migrar para `mentorAvailabilityService.saveSlots(...)`.
+   - ✅ **Migrado:** Desacoplado do `createClient()`. Agora utiliza `mentorAvailabilityService.getMentorAvailability`, `mentorAvailabilityService.setMentorAvailability` e `profileService.updateProfile`.
 2. `app/[locale]/mentors/[slug]/page.tsx`:
    - Busca perfil individual por slug no client.
    - **Solução planejada:** Migrar para `mentorService.getMentorBySlug(slug)`.
@@ -81,9 +80,9 @@ Para alcançar **100% de desacoplamento** (preparando o terreno para MCP Server 
 
 - [x] `/api/feedback` (POST) — `feedbackSchema`
 - [x] `/api/profile` (PUT) — `profileSchema`
-- [x] `/api/appointments/create` (POST) — `appointmentSchema`
-- [ ] `/api/appointments/cancel` (POST) — `{ appointmentId: string, reason: string }`
-- [ ] `/api/appointments/confirm` (POST) — `{ appointmentId: string }`
-- [ ] `/api/appointments/schedule` (POST) — `{ mentorId, date, slot, topic, timezone }`
-- [ ] `/api/ai/match` (POST) — `{ query: string.min(5) }`
-- [ ] `/api/profile/role` (POST) — `{ role: enum(['mentor', 'mentee']) }`
+- [x] `/api/appointments/create` (POST) — `createAppointmentSchema`
+- [x] `/api/appointments/cancel` (POST) — `cancelAppointmentSchema`
+- [x] `/api/appointments/confirm` (POST) — `confirmAppointmentSchema`
+- [x] `/api/appointments/schedule` (POST) — Normalizador resiliente (camelCase/snake_case)
+- [x] `/api/ai/match` (POST) — `aiMatchQuerySchema`
+- [x] `/api/profile/role` (POST) — `updateUserRoleSchema`

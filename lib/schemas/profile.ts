@@ -27,3 +27,12 @@ export const updateProfileSchema = z.object({
 })
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
+
+export const updateUserRoleSchema = z.object({
+  role: z.enum(["mentor", "mentee"], {
+    errorMap: () => ({ message: "Role inválida" })
+  }),
+  profileData: z.record(z.any()).optional()
+})
+
+export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>

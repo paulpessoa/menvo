@@ -1,18 +1,21 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import { aiMatchService, type AIMatchResult } from "@/lib/services/ai/groq.service"
+import { aiMatchQuerySchema } from "@/lib/schemas/ai"
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { query, debug } = await request.json()
-
-    if (!query || query.trim().length < 5) {
+    const body = await request.json()
+    const validation = aiMatchQuerySchema.safeParse(body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Sua dúvida está muito curta. Descreva melhor o que você procura." },
+        { error: validation.error.errors[0]?.message || "Busca inválida" },
         { status: 400 }
       )
     }
+
+    const { query, debug } = validation.data
+    const supabase = await createClient()
 
     // 1. Contexto do usuário (opcional para tracking)
     const {
