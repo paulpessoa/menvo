@@ -99,7 +99,7 @@ export function SessionResponseModal({ isOpen, onClose, session }: SessionRespon
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4" />
                 <span>
-                  {session.requested_start_time.substring(0, 5)} - {session.requested_end_time.substring(0, 5)}
+                  {(session.requested_start_time || "").substring(0, 5)} - {(session.requested_end_time || "").substring(0, 5)}
                 </span>
               </div>
             </div>

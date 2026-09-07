@@ -87,7 +87,7 @@ export function AvailabilityDisplay({
               <div className="flex flex-wrap gap-2">
                 {slots
                   .sort((a: AvailabilitySlot, b: AvailabilitySlot) =>
-                    a.start_time.localeCompare(b.start_time)
+                    (a.start_time || "").localeCompare(b.start_time || "")
                   )
                   .map((slot, i) => (
                     <Badge
@@ -95,8 +95,8 @@ export function AvailabilityDisplay({
                       variant="outline"
                       className="font-medium bg-muted/30"
                     >
-                      {slot.start_time.substring(0, 5)} -{" "}
-                      {slot.end_time.substring(0, 5)}
+                      {(slot.start_time || "").substring(0, 5)} -{" "}
+                      {(slot.end_time || "").substring(0, 5)}
                     </Badge>
                   ))}
               </div>

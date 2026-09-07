@@ -101,11 +101,13 @@ export function BookMentorshipModal({
       const formattedSlots: TimeSlot[] = []
 
       data.availableSlots?.forEach((slot: any) => {
-        const [year, month, day] = slot.date.split("-").map(Number)
+        if (!slot?.date) return
+        const [year, month, day] = String(slot.date).split("-").map(Number)
+        if (!year || !month || !day) return
         const date = new Date(year, month - 1, day)
 
-        const startTime = slot.start_time || (slot.time ? `${slot.time}:00` : "00:00:00")
-        const endTime = slot.end_time || (slot.time ? `${slot.time}:45` : "00:45:00")
+        const startTime = String(slot.start_time || slot.time || "00:00")
+        const endTime = String(slot.end_time || (slot.time ? `${slot.time}:45` : "00:45"))
         const startShort = startTime.length >= 5 ? startTime.substring(0, 5) : startTime
         const endShort = endTime.length >= 5 ? endTime.substring(0, 5) : endTime
 

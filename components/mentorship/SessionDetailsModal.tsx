@@ -165,7 +165,7 @@ export function SessionDetailsModal({ isOpen, onClose, session, isMentor }: Sess
                   <span className="font-medium">Horário:</span>
                 </div>
                 <p className="text-sm ml-6">
-                  {session.requested_start_time.substring(0, 5)} - {session.requested_end_time.substring(0, 5)}
+                  {(session.requested_start_time || "").substring(0, 5)} - {(session.requested_end_time || "").substring(0, 5)}
                 </p>
               </div>
             </div>
