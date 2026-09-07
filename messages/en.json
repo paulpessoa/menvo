@@ -1562,6 +1562,7 @@
     "errorLoad": "Error loading availability",
     "errorSave": "Error saving availability",
     "invalidTime": "Invalid time on {day}: start must be before end",
+    "minDuration": "The slot on {day} must be at least 45 minutes (session duration)",
     "overlappingTime": "Overlapping times on {day}",
     "tips": {
       "title": "Tips",

@@ -1556,6 +1556,7 @@
     "errorLoad": "Erro ao carregar disponibilidade",
     "errorSave": "Erro ao salvar disponibilidade",
     "invalidTime": "Horário inválido no {day}: início deve ser antes do fim",
+    "minDuration": "O intervalo em {day} deve ser de no mínimo 45 minutos (tempo de uma sessão)",
     "overlappingTime": "Horários sobrepostos em {day}",
     "tips": {
       "title": "Dicas",

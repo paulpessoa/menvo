@@ -114,23 +114,36 @@ export async function GET(request: NextRequest) {
             .map(Number)
           const [endHour, endMinute] = avail.end_time.split(":").map(Number)
 
-          for (let hour = startHour; hour < endHour; hour++) {
-            const h = hour.toString().padStart(2, "0")
-            const m = startMinute.toString().padStart(2, "0")
-            
-            // Gerar ISO com offset explícito de Brasília (-03:00) para garantir 
+          const startTotalMinutes = startHour * 60 + startMinute
+          const endTotalMinutes = endHour * 60 + endMinute
+          const slotDuration = 45
+
+          let currentSlotStart = startTotalMinutes
+          while (currentSlotStart + slotDuration <= endTotalMinutes) {
+            const h = Math.floor(currentSlotStart / 60)
+              .toString()
+              .padStart(2, "0")
+            const m = (currentSlotStart % 60).toString().padStart(2, "0")
+
+            const slotEndMinutes = currentSlotStart + slotDuration
+            const endH = Math.floor(slotEndMinutes / 60)
+              .toString()
+              .padStart(2, "0")
+            const endM = (slotEndMinutes % 60).toString().padStart(2, "0")
+
+            // Gerar ISO com offset explícito de Brasília (-03:00) para garantir
             // que a conversão para UTC (Z) seja sempre correta (+3h)
             const slotIso = `${dateStr}T${h}:${m}:00-03:00`
             const utcDate = new Date(slotIso)
 
-            const endTotalMinutes = startMinute + 45
-            const endH = (hour + Math.floor(endTotalMinutes / 60)).toString().padStart(2, "0")
-            const endM = (endTotalMinutes % 60).toString().padStart(2, "0")
             const startTimeStr = `${h}:${m}:00`
             const endTimeStr = `${endH}:${endM}:00`
 
             if (utcDate > new Date()) {
-              if (!isSlotBooked(utcDate, 45) && !isSlotInCalendarConflict(utcDate, 45)) {
+              if (
+                !isSlotBooked(utcDate, slotDuration) &&
+                !isSlotInCalendarConflict(utcDate, slotDuration)
+              ) {
                 availableSlots.push({
                   date: dateStr,
                   time: `${h}:${m}`,
@@ -141,6 +154,14 @@ export async function GET(request: NextRequest) {
                 })
               }
             }
+
+            // Próximo slot: se o intervalo couber mais slots com passo de 60 min (15 min de intervalo),
+            // usa 60 min; caso contrário, avança a duração da mentoria (45 min)
+            const step =
+              currentSlotStart + 60 + slotDuration <= endTotalMinutes
+                ? 60
+                : slotDuration
+            currentSlotStart += step
           }
         }
       }

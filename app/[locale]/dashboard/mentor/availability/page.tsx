@@ -162,6 +162,15 @@ export default function MentorAvailabilityPage() {
         return t("invalidTime", { day: dayLabel })
       }
 
+      const [sh, sm] = slot.start_time.split(":").map(Number)
+      const [eh, em] = slot.end_time.split(":").map(Number)
+      const durationMinutes = (eh * 60 + em) - (sh * 60 + sm)
+      if (durationMinutes < 45) {
+        const dayLabel =
+          DAYS_OF_WEEK.find((d) => d.value === slot.day_of_week)?.label || ""
+        return t("minDuration", { day: dayLabel })
+      }
+
       for (let j = i + 1; j < availability.length; j++) {
         const otherSlot = availability[j]
         if (slot.day_of_week === otherSlot.day_of_week) {
