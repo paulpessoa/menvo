@@ -104,16 +104,21 @@ export function BookMentorshipModal({
         const [year, month, day] = slot.date.split("-").map(Number)
         const date = new Date(year, month - 1, day)
 
+        const startTime = slot.start_time || (slot.time ? `${slot.time}:00` : "00:00:00")
+        const endTime = slot.end_time || (slot.time ? `${slot.time}:45` : "00:45:00")
+        const startShort = startTime.length >= 5 ? startTime.substring(0, 5) : startTime
+        const endShort = endTime.length >= 5 ? endTime.substring(0, 5) : endTime
+
         formattedSlots.push({
-          day_of_week: slot.day_of_week,
-          start_time: slot.start_time,
-          end_time: slot.end_time,
+          day_of_week: slot.day_of_week ?? date.getDay(),
+          start_time: startTime,
+          end_time: endTime,
           date,
           formatted_date: date.toLocaleDateString(intlLocale, {
             day: "numeric",
             month: "short"
           }),
-          formatted_time: `${slot.start_time.substring(0, 5)} - ${slot.end_time.substring(0, 5)}`
+          formatted_time: `${startShort} - ${endShort}`
         })
       })
 

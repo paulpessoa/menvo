@@ -3,6 +3,8 @@ import { createClient } from "@/lib/utils/supabase/server"
 import { notFound } from "next/navigation"
 import MentorProfileClient, { type MentorProfile } from "./MentorProfileClient"
 
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+
 interface PageProps {
   params: Promise<{
     slug: string
@@ -29,18 +31,19 @@ async function getMentorData(slug: string) {
     return null
   }
 
-  // Buscar disponibilidade configurada via API (usa Service Role, bypass RLS)
-  let availability = []
+  // Buscar disponibilidade configurada diretamente (usa Service Role para leitura pública dos horários)
+  let availability: any[] = []
   try {
-    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/mentors/${mentor.id}/availability?format=config`
-    const response = await fetch(apiUrl, { cache: "no-store" })
-    if (response.ok) {
-      const data = await response.json()
-      // Se a API retornar o formato novo, extrair availableSlots
-      // Se retornar array direto, usar como está
-      availability = Array.isArray(data)
-        ? data
-        : data.weeklyConfig || data.availableSlots || []
+    const adminSupabase = createServiceRoleClient()
+    const { data: availData, error: availError } = await adminSupabase
+      .from("mentor_availability")
+      .select("*")
+      .eq("mentor_id", mentor.id)
+      .order("day_of_week")
+      .order("start_time")
+
+    if (!availError && availData) {
+      availability = availData
     }
   } catch (error) {
     console.error("Erro ao buscar disponibilidade:", error)

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/routing"
 import { createClient } from "@/lib/utils/supabase/client"
 import {
   Card,
@@ -42,6 +42,12 @@ interface AvailabilitySlot {
   timezone: string | null
 }
 
+const normalizeTime = (t: string | null | undefined): string => {
+  if (!t) return "09:00:00"
+  if (t.length === 5) return `${t}:00`
+  return t
+}
+
 const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   const hour = i.toString().padStart(2, "0")
   return [
@@ -49,11 +55,12 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
     { value: `${hour}:30:00`, label: `${hour}:30` }
   ]
 }).flat()
+
 export default function MentorAvailabilityPage() {
   const t = useTranslations("availability")
   const commonT = useTranslations("common")
   const router = useRouter()
-  const { user, profile, role, loading: authLoading } = useAuth()
+  const { user, profile, role, loading: authLoading, isInitializing } = useAuth()
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -74,7 +81,7 @@ export default function MentorAvailabilityPage() {
   ]
 
   useEffect(() => {
-    if (authLoading) return
+    if (authLoading || isInitializing) return
 
     if (!user) {
       router.push("/login")
@@ -87,7 +94,7 @@ export default function MentorAvailabilityPage() {
     }
 
     fetchAvailability()
-  }, [user, role, authLoading, router])
+  }, [user, role, authLoading, isInitializing, router])
 
   const fetchAvailability = async () => {
     if (!user?.id) return
@@ -103,7 +110,15 @@ export default function MentorAvailabilityPage() {
 
       if (error) throw error
 
-      setAvailability(data || [])
+      const normalized: AvailabilitySlot[] = ((data as any[]) || []).map(
+        (slot: any) => ({
+          ...slot,
+          start_time: normalizeTime(slot.start_time),
+          end_time: normalizeTime(slot.end_time)
+        })
+      )
+
+      setAvailability(normalized)
     } catch (error) {
       console.error("Error fetching availability:", error)
       setMessage({ type: "error", text: t("errorLoad") })
@@ -194,9 +209,9 @@ export default function MentorAvailabilityPage() {
           availability.map((slot) => ({
             mentor_id: user.id,
             day_of_week: slot.day_of_week,
-            start_time: slot.start_time,
-            end_time: slot.end_time,
-            timezone: slot.timezone || "America/Sao_Paulo"
+            start_time: normalizeTime(slot.start_time),
+            end_time: normalizeTime(slot.end_time),
+            timezone: slot.timezone || profile?.timezone || "America/Sao_Paulo"
           }))
 
         const { error: insertError } = await (supabase
@@ -248,6 +263,15 @@ export default function MentorAvailabilityPage() {
       ))
   }
 
+  if (authLoading || isInitializing) {
+    return (
+      <div className="container mx-auto py-24 px-4 flex flex-col items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">{commonT("loading")}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -291,7 +315,12 @@ export default function MentorAvailabilityPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4 pt-4">
-              {availability.length === 0 ? (
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">{commonT("loading")}</p>
+                </div>
+              ) : availability.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed rounded-xl bg-muted/30">
                   <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-20" />
                   <p className="text-muted-foreground">{t("noSlots")}</p>

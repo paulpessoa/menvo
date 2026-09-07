@@ -123,11 +123,20 @@ export async function GET(request: NextRequest) {
             const slotIso = `${dateStr}T${h}:${m}:00-03:00`
             const utcDate = new Date(slotIso)
 
+            const endTotalMinutes = startMinute + 45
+            const endH = (hour + Math.floor(endTotalMinutes / 60)).toString().padStart(2, "0")
+            const endM = (endTotalMinutes % 60).toString().padStart(2, "0")
+            const startTimeStr = `${h}:${m}:00`
+            const endTimeStr = `${endH}:${endM}:00`
+
             if (utcDate > new Date()) {
               if (!isSlotBooked(utcDate, 45) && !isSlotInCalendarConflict(utcDate, 45)) {
                 availableSlots.push({
                   date: dateStr,
                   time: `${h}:${m}`,
+                  start_time: startTimeStr,
+                  end_time: endTimeStr,
+                  day_of_week: dayOfWeek,
                   datetime: utcDate.toISOString()
                 })
               }
