@@ -12,6 +12,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
+  Clock,
+  Video,
+  CheckCircle,
   MapPin,
   Briefcase,
   Calendar,
@@ -32,7 +35,6 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { Link, useRouter } from "@/i18n/routing"
-import { AvailabilityDisplay } from "@/components/mentorship/AvailabilityDisplay"
 import dynamic from "next/dynamic"
 
 const BookMentorshipModal = dynamic(
@@ -365,21 +367,87 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             {/* Booking Card */}
             <Card className="border-none shadow-2xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white relative">
               <div className="h-3 bg-gradient-to-r from-blue-600 to-purple-600"></div>
-              <CardHeader className="pb-4 pt-8 px-8">
-                <CardTitle className="text-xl font-black uppercase tracking-tighter">{t("scheduleSession")}</CardTitle>
-                <CardDescription className="font-bold text-primary">{t("freeMentorships")}</CardDescription>
+              <CardHeader className="pb-3 pt-8 px-8">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <Badge
+                    variant="outline"
+                    className={`font-semibold px-3 py-1 rounded-full text-xs flex items-center gap-1.5 ${
+                      availability.length > 0 && mentor.availability_status === "available"
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-muted text-muted-foreground border-muted"
+                    }`}
+                  >
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        availability.length > 0 && mentor.availability_status === "available"
+                          ? "bg-emerald-500 animate-pulse"
+                          : "bg-muted-foreground"
+                      }`}
+                    />
+                    {availability.length > 0 && mentor.availability_status === "available"
+                      ? t("availableForBooking")
+                      : t("status.unavailable")}
+                  </Badge>
+                </div>
+                <CardTitle className="text-2xl font-black uppercase tracking-tighter">
+                  {t("scheduleSession")}
+                </CardTitle>
+                <CardDescription className="font-bold text-primary">
+                  {t("freeMentorships")}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="px-8 pb-10 space-y-6">
+              <CardContent className="px-8 pb-8 space-y-6">
+                {/* Meta details */}
+                <div className="grid grid-cols-2 gap-3 p-4 bg-muted/20 border rounded-2xl text-xs">
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
+                      <Clock className="h-3.5 w-3.5 text-primary" /> {t("durationLabel")}
+                    </span>
+                    <p className="font-bold text-foreground">{t("durationValue")}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
+                      <Video className="h-3.5 w-3.5 text-primary" /> {t("formatLabel")}
+                    </span>
+                    <p className="font-bold text-foreground">{t("formatValue")}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
+                      <CheckCircle className="h-3.5 w-3.5 text-emerald-600" /> {t("costLabel")}
+                    </span>
+                    <p className="font-bold text-emerald-600">{t("costValue")}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
+                      <Calendar className="h-3.5 w-3.5 text-primary" /> {t("windowLabel")}
+                    </span>
+                    <p className="font-bold text-foreground">{t("windowValue")}</p>
+                  </div>
+                </div>
+
                 {isOwner ? (
-                  <div className="bg-primary/5 rounded-2xl p-4 text-center border border-primary/10">
-                    <p className="text-sm font-bold text-primary/70 italic">
-                      {t("ownProfileMessage")}
-                    </p>
+                  <div className="space-y-3">
+                    <div className="bg-primary/5 rounded-2xl p-4 text-center border border-primary/10">
+                      <p className="text-sm font-bold text-primary/70 italic">
+                        {t("ownProfileMessage")}
+                      </p>
+                    </div>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full rounded-2xl h-12 font-bold hover:bg-primary/5 transition-all"
+                    >
+                      <Link href="/dashboard/mentor/availability">
+                        <Clock className="mr-2 h-4 w-4 text-primary" />
+                        {t("manageAvailability")}
+                      </Link>
+                    </Button>
                   </div>
                 ) : (
                   <Button
-                    className="w-full rounded-2xl h-14 font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-lg"
+                    className="w-full rounded-2xl h-14 font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
                     disabled={
+                      availability.length === 0 ||
                       mentor.availability_status === "busy" ||
                       mentor.availability_status === "unavailable"
                     }
@@ -391,27 +459,23 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                       }
                     }}
                   >
-                    <Calendar className="mr-2 h-6 w-6" />
+                    <Calendar className="mr-2 h-5 w-5" />
                     {mentor.availability_status === "busy" ||
-                    mentor.availability_status === "unavailable"
+                    mentor.availability_status === "unavailable" ||
+                    availability.length === 0
                       ? t("fullSchedule")
                       : t("bookMentorship")}
                   </Button>
                 )}
-                
-                <div className="flex items-start gap-3 p-4 bg-muted/30 rounded-2xl">
-                    <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                        {t("meetInfo")}
-                    </p>
+
+                <div className="flex items-start gap-3 p-3.5 bg-muted/30 rounded-2xl">
+                  <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {t("meetInfo")}
+                  </p>
                 </div>
               </CardContent>
             </Card>
-
-            <AvailabilityDisplay
-              availability={availability}
-              availability_status={mentor.availability_status}
-            />
 
             {/* Links Section */}
             {(mentor.linkedin_url ||
