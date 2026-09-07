@@ -56,7 +56,6 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
-    "@supabase/auth-helpers-nextjs": "latest",
     "@supabase/auth-helpers-react": "latest",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "^2.57.0",

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/utils/supabase/server'
 import { logAdminAction } from '@/lib/audit-logger'
 
 // POST - Ações especiais em usuários (reset senha, alterar status, etc.)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createClient()
     const body = await request.json()
     
     // Verificar se usuário é admin

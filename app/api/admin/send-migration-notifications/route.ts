@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/utils/supabase/server'
 import { sendBatchMigrationNotifications } from '@/lib/migration-notifications'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createClient()
     
     // Verificar se usuário é admin
     const { data: { user }, error: authError } = await supabase.auth.getUser()

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/lib/utils/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = await createClient()
     const { migrationId, action, notes } = await request.json()
     
     // Verificar se usuário é admin
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar dados da migração
-    const { data: migration, error: migrationError } = await supabase
+    const { data: migration, error: migrationError } = await (supabase as any)
       .from('user_migrations')
       .select('*')
       .eq('id', migrationId)
@@ -97,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Atualizar registro de migração
-    const { error: updateError } = await supabase
+    const { error: updateError } = await (supabase as any)
       .from('user_migrations')
       .update(updateData)
       .eq('id', migrationId)
