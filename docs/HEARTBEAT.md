@@ -56,6 +56,7 @@
 | File | Purpose |
 |---|---|
 | [`docs/BACKLOG.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/BACKLOG.md) | Prioritized product items (P0–P3) |
+| [`docs/V2_ARCHITECTURE_CLEANUP_MAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/V2_ARCHITECTURE_CLEANUP_MAP.md) | Roadmap de desacoplamento, Zod Schemas e preparação para Agente + MCP |
 | [`docs/JOURNAL.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/JOURNAL.md) | Historical log of architectural decisions & milestones |
 | [`docs/product/VISION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/product/VISION.md) | Product purpose, target audience, and north star |
 | [`docs/SCHEDULING_AND_AVAILABILITY.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/SCHEDULING_AND_AVAILABILITY.md) | Availability algorithm, 14-day projection, conflict detection |
