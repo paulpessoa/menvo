@@ -20,6 +20,7 @@ import { ChatButton } from "./chat-button"
 import { CompleteAppointmentModal } from "./complete-appointment-modal"
 import { useState } from "react"
 import { useTranslations, useFormatter } from "next-intl"
+import { useRouter } from "@/i18n/routing"
 
 interface AppointmentFeedbackItem {
   id: string | number
@@ -66,6 +67,7 @@ export function AppointmentCard({
   const t = useTranslations("appointments")
   const commonT = useTranslations("common")
   const format = useFormatter()
+  const router = useRouter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
 
   const mentor = Array.isArray(appointment.mentor)
@@ -128,8 +130,7 @@ export function AppointmentCard({
   const canChat =
     appointment.status === "pending" || appointment.status === "confirmed"
   const canComplete =
-    !isMentor &&
-    appointment.status === "confirmed" &&
+    (appointment.status === "confirmed" || appointment.status === "completed") &&
     isPast &&
     !hasUserEvaluated
 
@@ -140,12 +141,12 @@ export function AppointmentCard({
       if (response.ok) {
         const data = await response.json()
         const slug = data.slug || otherPerson.id
-        window.location.href = `/${rolePath}/${slug}`
+        router.push(`/${rolePath}/${slug}`)
       } else {
-        window.location.href = `/${rolePath}/${otherPerson.id}`
+        router.push(`/${rolePath}/${otherPerson.id}`)
       }
     } catch (error) {
-      window.location.href = `/${rolePath}/${otherPerson.id}`
+      router.push(`/${rolePath}/${otherPerson.id}`)
     }
   }
 
