@@ -15,7 +15,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog"
 import { UserTypeSelector } from "@/components/auth/UserTypeSelector"
-import type { UserType } from "@/hooks/useSignupForm"
+import type { UserType } from "@/lib/types/models/user"
 import { waitingListService } from "@/lib/services/waiting-list/waiting-list.service"
 import { toast } from "sonner"
 

@@ -535,6 +535,44 @@ class MentorService {
     if (error) throw error
     return data || []
   }
+
+  /**
+   * Busca os perfis completos de mentores recomendados pela IA por seus IDs.
+   */
+  async getMentorsByIds(ids: string[]): Promise<any[]> {
+    if (!ids || ids.length === 0) return []
+    const { data, error } = await (this.supabase
+      .from("mentors_view") as any)
+      .select(`
+        id,
+        full_name,
+        avatar_url,
+        bio,
+        job_title,
+        company,
+        city,
+        state,
+        country,
+        languages,
+        mentorship_topics,
+        inclusive_tags,
+        expertise_areas,
+        availability_status,
+        average_rating,
+        total_reviews,
+        total_sessions,
+        experience_years,
+        slug,
+        created_at
+      `)
+      .in("id", ids)
+
+    if (error) {
+      console.error("Error fetching mentors by IDs:", error)
+      return []
+    }
+    return data || []
+  }
 }
 
 export const mentorService = new MentorService()

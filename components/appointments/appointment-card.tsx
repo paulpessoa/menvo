@@ -135,19 +135,9 @@ export function AppointmentCard({
     isPast &&
     !hasUserEvaluated
 
-  const handleProfileClick = async () => {
-    const rolePath = isMentor ? "mentee" : "mentors"
-    try {
-      const response = await fetch(`/api/${rolePath}/${otherPerson.id}`)
-      if (response.ok) {
-        const data = await response.json()
-        const slug = data.slug || otherPerson.id
-        router.push(`/${rolePath}/${slug}`)
-      } else {
-        router.push(`/${rolePath}/${otherPerson.id}`)
-      }
-    } catch (error) {
-      router.push(`/${rolePath}/${otherPerson.id}`)
+  const handleProfileClick = () => {
+    if (!isMentor && otherPerson?.id) {
+      router.push(`/mentors/${(otherPerson as any).slug || otherPerson.id}`)
     }
   }
 

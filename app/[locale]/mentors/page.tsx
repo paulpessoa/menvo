@@ -112,6 +112,8 @@ export default function MentorsPage() {
     Record<string, string>
   >({})
   const [aiJustification, setAiJustification] = useState<string | null>(null)
+  const [aiQuery, setAiQuery] = useState<string | null>(null)
+  const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<MentorProfile[]>([])
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
@@ -264,26 +266,57 @@ export default function MentorsPage() {
     fetchMentors(false, nextPage)
   }
 
-  const handleAIMatch = (
+  const handleAIMatch = async (
     suggestions: Array<{ mentor_id: string; reason: string }>,
-    justification: string
+    justification: string,
+    searchQuery?: string
   ) => {
     const suggestionsMap: Record<string, string> = {}
+    const ids: string[] = []
     suggestions.forEach((s) => {
       suggestionsMap[s.mentor_id] = s.reason
+      ids.push(s.mentor_id)
     })
     setSuggestedMentors(suggestionsMap)
     setAiJustification(justification)
+    setAiQuery(searchQuery || null)
+
+    try {
+      const suggestedProfiles = await mentorService.getMentorsByIds(ids)
+      setAiRecommendedProfiles(suggestedProfiles)
+    } catch (err) {
+      console.error("Erro ao carregar mentores recomendados pela IA:", err)
+    }
 
     setTimeout(() => {
-      window.scrollTo({ top: 400, behavior: "smooth" })
+      window.scrollTo({ top: 350, behavior: "smooth" })
     }, 100)
   }
 
   const handleClearAI = () => {
     setSuggestedMentors({})
     setAiJustification(null)
+    setAiQuery(null)
+    setAiRecommendedProfiles([])
   }
+
+  // Combina mentores recomendados pela IA (seja da lista atual ou carregados sob demanda)
+  const displayedAIMentors = useMemo(() => {
+    if (!Object.keys(suggestedMentors).length) return []
+    const map = new Map<string, MentorProfile>()
+    aiRecommendedProfiles.forEach((m) => {
+      if (m.id) map.set(m.id, m)
+    })
+    mentors.forEach((m) => {
+      if (m.id && suggestedMentors[m.id]) map.set(m.id, m)
+    })
+    return Array.from(map.values())
+  }, [suggestedMentors, aiRecommendedProfiles, mentors])
+
+  const otherMentors = useMemo(() => {
+    const aiIds = new Set(displayedAIMentors.map((m) => m.id))
+    return mentors.filter((m) => !m.id || !aiIds.has(m.id))
+  }, [mentors, displayedAIMentors])
 
   // Timezone calculations
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -660,6 +693,41 @@ export default function MentorsPage() {
         )}
       </div>
 
+      {/* AI Recommendation Banner */}
+      {aiJustification && (
+        <div className="mb-8 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-2 border-primary/20 p-5 sm:p-6 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className="bg-primary text-white text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                  <Sparkles className="w-3.5 h-3.5" /> Recomendações da IA
+                </Badge>
+                {aiQuery && (
+                  <span className="text-xs font-semibold text-muted-foreground truncate">
+                    Para o seu objetivo: <strong className="text-foreground">"{aiQuery}"</strong>
+                  </span>
+                )}
+              </div>
+              <p className="text-sm font-medium text-foreground leading-relaxed pt-1">
+                {aiJustification}
+              </p>
+              <p className="text-xs text-primary font-semibold">
+                ✨ {displayedAIMentors.length} {displayedAIMentors.length === 1 ? "mentor selecionado com alta compatibilidade" : "mentores selecionados com alta compatibilidade"}:
+              </p>
+            </div>
+            <Button
+              onClick={handleClearAI}
+              variant="outline"
+              size="sm"
+              className="rounded-xl border-primary/30 hover:border-primary text-xs font-semibold shrink-0 gap-1.5 h-9"
+            >
+              <X className="w-3.5 h-3.5" />
+              Limpar busca com IA
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Results Count */}
       <div className="mb-6 flex justify-between items-center px-2">
         <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
@@ -674,7 +742,7 @@ export default function MentorsPage() {
             <MentorSkeletonCard key={i} />
           ))}
         </div>
-      ) : mentors.length === 0 ? (
+      ) : mentors.length === 0 && displayedAIMentors.length === 0 ? (
         <div className="relative text-center py-16 px-6 sm:px-12 bg-gradient-to-b from-primary/5 via-background to-muted/20 rounded-[2.5rem] border border-border/80 shadow-sm max-w-3xl mx-auto my-8 overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-2 bg-gradient-to-r from-transparent via-primary/50 to-transparent rounded-full" />
           
@@ -730,28 +798,20 @@ export default function MentorsPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Primeiro os sugeridos pela IA */}
-            {mentors
-              .filter(
-                (m) => m.id && Object.keys(suggestedMentors).includes(m.id)
-              )
-              .map((mentor) => (
-                <MentorCard
-                  key={`ai-${mentor.id}`}
-                  mentor={mentor}
-                  isAIHighlighted={true}
-                  aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
-                />
-              ))}
+            {/* Primeiro os recomendados pela IA */}
+            {displayedAIMentors.map((mentor) => (
+              <MentorCard
+                key={`ai-${mentor.id}`}
+                mentor={mentor}
+                isAIHighlighted={true}
+                aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
+              />
+            ))}
 
             {/* Depois os demais */}
-            {mentors
-              .filter(
-                (m) => !m.id || !Object.keys(suggestedMentors).includes(m.id)
-              )
-              .map((mentor) => (
-                <MentorCard key={mentor.id || "unknown"} mentor={mentor} />
-              ))}
+            {otherMentors.map((mentor) => (
+              <MentorCard key={mentor.id || "unknown"} mentor={mentor} />
+            ))}
           </div>
 
           {/* Load More */}

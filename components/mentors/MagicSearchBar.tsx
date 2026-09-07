@@ -12,7 +12,7 @@ import { useAuth } from "@/lib/auth"
 import { Link } from "@/i18n/routing"
 
 interface MagicSearchBarProps {
-  onMatch: (suggestions: Array<{mentor_id: string, reason: string}>, justification: string) => void
+  onMatch: (suggestions: Array<{mentor_id: string, reason: string}>, justification: string, query: string) => void
   onClear: () => void
 }
 
@@ -53,7 +53,7 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
         onClear()
         setHasResult(false)
       } else {
-        onMatch(result.suggestions, result.global_justification)
+        onMatch(result.suggestions, result.global_justification, query.trim())
         setHasResult(true)
         toast.success(t("success"))
       }

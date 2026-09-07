@@ -4,6 +4,7 @@
  */
 
 export type UserRole = "mentor" | "mentee" | "admin" | "volunteer" | "moderator"
+export type UserType = "mentee" | "mentor" | "company" | "recruiter"
 
 export interface UserProfile {
   id: string

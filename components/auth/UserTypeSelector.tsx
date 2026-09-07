@@ -1,12 +1,12 @@
 "use client"
+import { type Dispatch, type SetStateAction } from "react"
 
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useTranslations } from "next-intl"
 import { Card } from "@/components/ui/card"
 import { GraduationCap, Users } from "lucide-react"
-import { Dispatch, SetStateAction } from "react"
-import { UserType } from "@/hooks/useSignupForm"
+import type { UserType } from "@/lib/types/models/user"
 
 interface UserTypeSelectorProps {
   userType: UserType

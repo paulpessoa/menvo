@@ -1,7 +1,7 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
 ## 📅 Last Updated: 2026-09-07
-**Current Status:** Mentee and Mentor dashboards simplified around the core loop (1-click Google Meet access on upcoming session cards, pending requests alerts for mentors, decoupled DB queries into `mentorshipService`), dead routes deleted, and `@supabase/auth-helpers-nextjs` uninstalled.
+**Current Status:** Mentee and Mentor dashboards simplified around the core loop, AI search recommendations elevated with explanation banner & reason chips, cancellation modal redesigned with role-aware copy & quick chips, dead files (`useSignupForm`, `useFullUserProfile`, `oauth-diagnostics`) pruned.
 
 ---
 
