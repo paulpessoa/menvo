@@ -645,9 +645,14 @@
     "platform": "Platform",
     "findMentors": "Find Mentors",
     "howItWorks": "How it Works",
+    "mentors": "Mentors",
+    "mentees": "Mentees",
+    "ngos": "NGOs",
+    "companies": "Companies",
     "donate": "Donate",
     "company": "Institutional",
     "aboutUs": "About Us",
+    "faq": "Frequently Asked Questions (FAQ)",
     "team": "Team",
     "partners": "Partners",
     "contact": "Contact",
@@ -961,7 +966,7 @@
     },
     "contact": {
       "title": "Contact",
-      "text": "Questions? Contact us at contato@menvo.com."
+      "text": "Questions? Contact us at contato@menvo.com.br"
     },
     "links": {
       "privacy": "Privacy Policy",

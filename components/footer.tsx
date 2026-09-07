@@ -99,26 +99,34 @@ export default function Footer() {
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link
-                    href="/mentors"
+                    href="/how-it-works?tab=mentors"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {t("footer.findMentors")}
+                    {t("footer.mentors")}
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/how-it-works"
+                    href="/how-it-works?tab=mentees"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {t("footer.howItWorks")}
+                    {t("footer.mentees")}
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/doar"
-                    className="text-muted-foreground hover:text-foreground font-medium text-primary"
+                    href="/how-it-works?tab=ngos"
+                    className="text-muted-foreground hover:text-foreground"
                   >
-                    {t("footer.donate")}
+                    {t("footer.ngos")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/how-it-works?tab=companies"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    {t("footer.companies")}
                   </Link>
                 </li>
               </ul>
@@ -136,18 +144,18 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/about#team"
+                    href="/faq"
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    {t("footer.team")}
+                    {t("footer.faq")}
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/about#partners"
-                    className="text-muted-foreground hover:text-foreground"
+                    href="/doar"
+                    className="text-muted-foreground hover:text-foreground font-medium text-primary"
                   >
-                    {t("footer.partners")}
+                    {t("footer.donate")}
                   </Link>
                 </li>
                 <li>
