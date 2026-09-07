@@ -66,14 +66,12 @@ serve(async (req) => {
     }
 
     const analysis: AnalysisResult = quizResponse.ai_analysis
-    const hasGift = quizResponse.score >= 700
 
     // Generate email HTML
     const emailHtml = generateEmailTemplate(
       quizResponse.name,
       quizResponse.score,
       analysis,
-      hasGift,
       responseId
     )
 
@@ -152,7 +150,6 @@ function generateEmailTemplate(
   name: string,
   score: number,
   analysis: AnalysisResult,
-  hasGift: boolean,
   responseId: string
 ): string {
   const firstName = name.split(' ')[0]
@@ -170,28 +167,28 @@ function generateEmailTemplate(
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
           
           <!-- Header -->
           <tr>
             <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
-                🎯 Sua Análise Personalizada
+              <h1 style="color: #ffffff; margin: 0 0 10px 0; font-size: 28px; font-weight: bold;">
+                MENVO
               </h1>
-              <p style="margin: 10px 0 0 0; color: #e0e7ff; font-size: 16px;">
-                RecnPlay 2025 × MENVO
+              <p style="color: #e0e7ff; margin: 0; font-size: 16px;">
+                Sua Análise de Potencial está pronta!
               </p>
             </td>
           </tr>
 
           <!-- Greeting -->
           <tr>
-            <td style="padding: 30px;">
-              <p style="margin: 0 0 20px 0; font-size: 16px; color: #374151;">
-                Olá, <strong>${firstName}</strong>! 👋
-              </p>
-              <p style="margin: 0 0 20px 0; font-size: 16px; color: #374151; line-height: 1.6;">
-                Obrigado por participar do nosso questionário no RecnPlay! Aqui está sua análise personalizada gerada com inteligência artificial.
+            <td style="padding: 40px 30px 20px 30px;">
+              <h2 style="color: #1f2937; margin: 0 0 15px 0; font-size: 24px;">
+                Olá, ${firstName}! 👋
+              </h2>
+              <p style="color: #4b5563; margin: 0 0 20px 0; font-size: 16px; line-height: 1.6;">
+                Nossa Inteligência Artificial analisou suas respostas com cuidado. Aqui está um resumo do seu momento profissional:
               </p>
             </td>
           </tr>
@@ -199,46 +196,26 @@ function generateEmailTemplate(
           <!-- Score Card -->
           <tr>
             <td style="padding: 0 30px 30px 30px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border-radius: 12px; padding: 25px; border: 2px solid #e5e7eb;">
                 <tr>
                   <td align="center">
-                    <div style="background-color: #ffffff; width: 120px; height: 120px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
-                      <div style="text-align: center;">
-                        <div style="font-size: 48px; font-weight: bold; color: #667eea;">${score}</div>
-                        <div style="font-size: 12px; color: #6b7280;">de 1000</div>
-                      </div>
+                    <div style="font-size: 14px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px;">
+                      Índice de Prontidão
                     </div>
-                    <h2 style="margin: 20px 0 10px 0; color: #ffffff; font-size: 24px;">
+                    <div style="font-size: 48px; font-weight: bold; color: ${score >= 700 ? '#10b981' : score >= 400 ? '#f59e0b' : '#6b7280'}; margin-bottom: 10px;">
+                      ${score}
+                    </div>
+                    <div style="font-size: 18px; font-weight: 600; color: #1f2937; margin-bottom: 8px;">
                       ${analysis.titulo_personalizado}
-                    </h2>
-                    <p style="margin: 0; color: #e0e7ff; font-size: 16px; line-height: 1.6;">
+                    </div>
+                    <div style="font-size: 14px; color: #6b7280; max-width: 450px;">
                       ${analysis.resumo_motivador}
-                    </p>
+                    </div>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-
-          ${hasGift ? `
-          <!-- Gift Section -->
-          <tr>
-            <td style="padding: 0 30px 30px 30px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #d1fae5; border-radius: 12px; padding: 20px; border: 2px solid #10b981;">
-                <tr>
-                  <td>
-                    <h3 style="margin: 0 0 10px 0; color: #065f46; font-size: 20px;">
-                      🎉 Parabéns! Você ganhou um brinde!
-                    </h3>
-                    <p style="margin: 0; color: #047857; font-size: 14px;">
-                      Sua pontuação foi acima de 700! Escolha entre <strong>caneta</strong> ou <strong>botton</strong> e retire no estande do MENVO no RecnPlay.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          ` : ''}
 
           <!-- Mentors Section -->
           <tr>

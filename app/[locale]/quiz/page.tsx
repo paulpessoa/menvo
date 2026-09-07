@@ -10,8 +10,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { Gift, Sparkles, Users, Target, Compass } from "lucide-react"
-import { useSearchParams } from "next/navigation"
+import { Sparkles, Users, Target, Compass } from "lucide-react"
 import { QuizForm, QuizFormData } from "@/components/quiz/QuizForm"
 import { useToast } from "@/hooks/use-toast"
 import { AnimatedBackground } from "@/components/ui/animated-background"
@@ -26,8 +25,6 @@ export default function QuizPage() {
   const { toast } = useToast()
   const t = useTranslations('quiz')
   const { user, profile } = useAuth()
-  const searchParams = useSearchParams()
-  const event = searchParams.get("event") || searchParams.get("stand")
 
   const handleQuizSubmit = async (data: QuizFormData) => {
     try {
@@ -47,7 +44,7 @@ export default function QuizPage() {
       trackQuizCompleted({
         responseId: res.id,
         email: data.email,
-        hasEvent: !!event,
+        hasEvent: false,
       })
 
       toast({
@@ -55,9 +52,7 @@ export default function QuizPage() {
         description: t('quiz_form.submit_success_description')
       })
 
-      // Redirect to results page with response ID and preserve event context if present
-      const redirectUrl = event ? `/quiz/results/${res.id}?event=${encodeURIComponent(event)}` : `/quiz/results/${res.id}`
-      router.push(redirectUrl)
+      router.push(`/quiz/results/${res.id}`)
     } catch (error) {
       console.error("Error submitting quiz:", error)
       toast({
@@ -70,7 +65,9 @@ export default function QuizPage() {
 
   if (showQuiz) {
     const initialData: Partial<QuizFormData> = {
-      name: profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}`.trim() : '',
+      name: profile?.first_name
+        ? `${profile.first_name} ${profile.last_name || ''}`.trim()
+        : (user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''),
       email: user?.email || '',
       linkedinUrl: profile?.linkedin_url || ''
     }
@@ -80,6 +77,7 @@ export default function QuizPage() {
         onSubmit={handleQuizSubmit}
         onBack={() => setShowQuiz(false)}
         initialData={initialData}
+        isAuthenticated={!!user}
       />
     )
   }
@@ -127,31 +125,17 @@ export default function QuizPage() {
               </CardContent>
             </Card>
 
-            {event ? (
-              <Card className="border-2 hover:border-green-300 dark:hover:border-green-700 transition-colors">
-                <CardHeader>
-                  <Gift className="h-8 w-8 text-green-600 mb-2" />
-                  <CardTitle className="text-lg">{t('quiz_page.get_a_gift')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {t('quiz_page.get_a_gift_description')}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="border-2 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
-                <CardHeader>
-                  <Compass className="h-8 w-8 text-emerald-600 mb-2" />
-                  <CardTitle className="text-lg">{t('quiz_page.practical_steps')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {t('quiz_page.practical_steps_description')}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            <Card className="border-2 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
+              <CardHeader>
+                <Compass className="h-8 w-8 text-emerald-600 mb-2" />
+                <CardTitle className="text-lg">{t('quiz_page.practical_steps')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  {t('quiz_page.practical_steps_description')}
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Main CTA Card */}

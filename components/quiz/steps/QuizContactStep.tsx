@@ -70,8 +70,8 @@ export function QuizContactStep({
         />
       </div>
 
-      <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-        <p className="text-sm text-blue-900 dark:text-blue-100">
+      <div className="bg-primary/5 p-4 rounded-xl border border-primary/20">
+        <p className="text-sm text-foreground">
           {notificationText}
         </p>
       </div>

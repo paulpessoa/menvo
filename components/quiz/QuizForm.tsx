@@ -19,11 +19,10 @@ interface QuizFormProps {
   onSubmit: (data: QuizFormData) => Promise<void>
   onBack: () => void
   initialData?: Partial<QuizFormData>
+  isAuthenticated?: boolean
 }
 
-const TOTAL_STEPS = 8
-
-export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
+export function QuizForm({ onSubmit, onBack, initialData, isAuthenticated = false }: QuizFormProps) {
   const t = useTranslations('quiz')
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -32,7 +31,8 @@ export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
     ...initialData
   })
 
-  const progress = (currentStep / TOTAL_STEPS) * 100
+  const totalSteps = isAuthenticated ? 7 : 8
+  const progress = (currentStep / totalSteps) * 100
 
   const updateFormData = useCallback(<K extends keyof QuizFormData>(field: K, value: QuizFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -54,7 +54,7 @@ export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
   }, [currentStep, formData])
 
   const handleNext = () => {
-    if (canProceed() && currentStep < TOTAL_STEPS) {
+    if (canProceed() && currentStep < totalSteps) {
       setCurrentStep((prev) => prev + 1)
     }
   }
@@ -70,7 +70,19 @@ export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
 
     setIsSubmitting(true)
     try {
-      await onSubmit(formData as QuizFormData)
+      const finalData: QuizFormData = {
+        name: formData.name || initialData?.name || 'Mentorado',
+        email: formData.email || initialData?.email || '',
+        linkedinUrl: formData.linkedinUrl || initialData?.linkedinUrl || '',
+        careerMoment: formData.careerMoment!,
+        currentChallenge: formData.currentChallenge!,
+        mentorshipExperience: formData.mentorshipExperience!,
+        futureVision: formData.futureVision!,
+        developmentAreas: formData.developmentAreas || [],
+        personalLifeHelp: formData.personalLifeHelp!,
+        shareKnowledge: formData.shareKnowledge!,
+      }
+      await onSubmit(finalData)
     } catch (error) {
       console.error('Error submitting quiz:', error)
     } finally {
@@ -223,7 +235,7 @@ export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
                 {t('quiz_form.back')}
               </Button>
               <span className="text-sm font-medium text-muted-foreground">
-                {t('quiz_form.progress_header', { currentStep, totalSteps: TOTAL_STEPS })}
+                {t('quiz_form.progress_header', { currentStep, totalSteps })}
               </span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -245,33 +257,40 @@ export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
               </div>
 
               {/* Navigation Buttons */}
-              <div className="flex gap-3 pt-4">
-                {currentStep < TOTAL_STEPS ? (
-                  <Button
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    className="flex-1"
-                    size="lg"
-                  >
-                    {t('quiz_form.next')}
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={!canProceed() || isSubmitting}
-                    className="flex-1 font-bold bg-primary hover:bg-primary/90 text-white shadow-md"
-                    size="lg"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('quiz_form.processing')}
-                      </>
-                    ) : (
-                      t('quiz_form.submit')
-                    )}
-                  </Button>
+              <div className="space-y-3 pt-4">
+                <div className="flex gap-3">
+                  {currentStep < totalSteps ? (
+                    <Button
+                      onClick={handleNext}
+                      disabled={!canProceed()}
+                      className="flex-1"
+                      size="lg"
+                    >
+                      {t('quiz_form.next')}
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={!canProceed() || isSubmitting}
+                      className="flex-1 font-bold bg-primary hover:bg-primary/90 text-white shadow-md"
+                      size="lg"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {t('quiz_form.processing')}
+                        </>
+                      ) : (
+                        t('quiz_form.submit')
+                      )}
+                    </Button>
+                  )}
+                </div>
+                {isAuthenticated && currentStep === totalSteps && (
+                  <p className="text-xs text-center text-muted-foreground">
+                    {t('quiz_form.submit_auth_note')}
+                  </p>
                 )}
               </div>
             </CardContent>

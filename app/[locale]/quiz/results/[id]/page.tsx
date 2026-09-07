@@ -17,7 +17,6 @@ import {
     Users,
     Lightbulb,
     Target,
-    Gift,
     ArrowRight,
     Loader2,
     CheckCircle,
@@ -26,7 +25,6 @@ import {
     Mail,
     Share2
 } from "lucide-react"
-import Image from "next/image"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
@@ -67,9 +65,6 @@ export default function QuizResultsPage() {
     const t = useTranslations('quiz');
     const [loading, setLoading] = useState(true)
     const [response, setResponse] = useState<QuizResponse | null>(null)
-    const [selectedGift, setSelectedGift] = useState<"caneta" | "botton" | null>(
-        null
-    )
     const [sendingEmail, setSendingEmail] = useState(false)
 
     useEffect(() => {
@@ -175,8 +170,6 @@ export default function QuizResultsPage() {
     }
 
     const analysis = response.ai_analysis
-    const isEventMode = Boolean(searchParams.get("event") || searchParams.get("stand"))
-    const hasGift = isEventMode
 
     // Se precisa refazer, mostra interface especial
     if (analysis.precisa_refazer) {
@@ -267,82 +260,6 @@ export default function QuizResultsPage() {
                             {analysis.resumo_motivador}
                         </p>
                     </div>
-
-                    {/* Gift Selection (if score >= 700) */}
-                    {hasGift && (
-                        <Card className="border-2 border-green-300 dark:border-green-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30">
-                            <CardHeader>
-                                <div className="flex items-center gap-2">
-                                    <Gift className="h-6 w-6 text-green-600" />
-                                    <CardTitle className="text-green-900 dark:text-green-100">
-                                        {t('quiz_results.congratulations_gift')}
-                                    </CardTitle>
-                                </div>
-                                <CardDescription className="text-green-800 dark:text-green-200">
-                                    {t('quiz_results.choose_gift')}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <Button
-                                        variant={selectedGift === "caneta" ? "default" : "outline"}
-                                        className="h-32 text-lg flex-col p-4"
-                                        onClick={() => setSelectedGift("caneta")}
-                                    >
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="relative w-24 h-24">
-                                                <Image
-                                                    src="/images/menvo-caneta.jpeg"
-                                                    alt={t('quiz_results.pen')}
-                                                    fill
-                                                    className="object-cover rounded-lg"
-                                                />
-                                            </div>
-                                            <span className="font-semibold">{t('quiz_results.pen')}</span>
-                                            {selectedGift === "caneta" && (
-                                                <CheckCircle className="h-5 w-5 text-green-600" />
-                                            )}
-                                        </div>
-                                    </Button>
-                                    <Button
-                                        variant={selectedGift === "botton" ? "default" : "outline"}
-                                        className="h-32 text-lg flex-col p-4"
-                                        onClick={() => setSelectedGift("botton")}
-                                    >
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="relative w-24 h-24">
-                                                <Image
-                                                    src="/images/menvo-botton.jpeg"
-                                                    alt={t('quiz_results.button')}
-                                                    fill
-                                                    className="object-cover rounded-lg"
-                                                />
-                                            </div>
-                                            <span className="font-semibold">{t('quiz_results.button')}</span>
-                                            {selectedGift === "botton" && (
-                                                <CheckCircle className="h-5 w-5 text-green-600" />
-                                            )}
-                                        </div>
-                                    </Button>
-                                </div>
-                                <div className="mt-6 p-4 bg-green-100 dark:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-700">
-                                    <p className="text-sm text-center text-green-800 dark:text-green-200 font-medium">
-                                        {t('quiz_results.important_gift_choice')}
-                                    </p>
-                                    {selectedGift && (
-                                        <p className="text-sm text-center mt-2 text-green-800 dark:text-green-200">
-                                            {t('quiz_results.you_chose')}{" "}
-                                            <strong>
-                                                {selectedGift === "caneta" ? t('quiz_results.pen') : t('quiz_results.button')}
-                                            </strong>
-                                            <br />
-                                            {t('quiz_results.show_result_at_stand')}
-                                        </p>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
 
                     {/* Mentors Suggested */}
                     <Card>

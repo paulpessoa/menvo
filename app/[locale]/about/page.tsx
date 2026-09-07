@@ -180,7 +180,7 @@ export default function AboutPage() {
             asChild
             className="rounded-xl font-bold px-10 h-14 border-2"
           >
-            <a href="mailto:contato@menvo.com.br">{t("about.joinOurMission.contactUs")}</a>
+            <Link href="/contact">{t("about.joinOurMission.contactUs")}</Link>
           </Button>
         </div>
       </div>
