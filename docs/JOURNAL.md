@@ -4,6 +4,23 @@
 
 ---
 
+## 2026-09-07 — Brand Color Standardization, Scheduling Hardening & Core Loop Polish
+- **Official Brand Color (#007585):** Harmonized all buttons, cards, and interactive elements across the platform to Menvo's official deep teal (`#007585` / `--primary: 187 100% 26%`), eliminating arbitrary grass green (`emerald-600`) and legacy indigo/purple accents.
+- **Hero Banner Restoration:** Reinstated the top hero banner in `/mentorship/mentee` using the official brand gradient (`from-primary-700 via-primary-600 to-primary`) with functional 1-click CTAs ("Explorar Mentores" and "Explorar Comunidade").
+- **Asymmetric Evaluation Model Enforced:** Restricted public star rating and testimonial submission exclusively to mentees evaluating mentors; prevented mentors from receiving confusing review modals about themselves.
+- **Scheduling Flow Hardening:** Fixed timezone ISO normalization in `/api/appointments/schedule` (handling `requestedDate` + `requestedStartTime` with `-03:00` offset) and added mentor verification status guards.
+- **Auth Context API Decoupling:** Replaced direct database queries in `auth-context.tsx` with `/api/auth/me` and `/api/profile`, eradicated fragile `localStorage` role caching, and fixed logout state resets.
+
+---
+
+## 2026-09-06 — Auth Ecosystem Simplification, Availability Engine & Mobile UX
+- **Minute-Based Availability Engine:** Migrated from brittle hour loops to minute-based generator with 45-minute step calculation, minimum duration validation, and safe string guards across scheduling modals.
+- **Google Calendar Conflict Detection:** Integrated Google Calendar `freebusy.query` in `/api/appointments/availability` to dynamically suppress colliding slots.
+- **Auth Flow Restructuring:** Consolidated password update flows, fixed redirect ping-pong with `@/i18n/routing`, unified confirmation resend, and removed insecure dead endpoints in `/api/auth/`.
+- **Mobile Catalog Search:** Redesigned responsive filters sheet, balanced 50/50 action grid, and dismissible active filter chips bar for mobile viewports.
+
+---
+
 ## 2026-09-05 — Comprehensive Modernization, Decoupling & LLM SEO
 - **Architectural Decoupling:** Enforced strict separation of concerns per `AGENTS.md`. Eliminated all raw Supabase queries in components (`WaitingList`, `FeedbackManagement`, `mentors/page.tsx`), delegating all database interactions to dedicated services (`mentorService`, `mentorshipService`, `waitingListService`).
 - **Geo SEO & LLMs Indexing:** Standardized `public/llms.txt`, `public/llms-full.txt`, and AI crawler whitelisting in `robots.txt` for ChatGPT, Perplexity, Claude, Gemini, Kimi, and Manus.
