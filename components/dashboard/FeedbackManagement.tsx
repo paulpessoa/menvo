@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/utils/supabase/client"
+import { useState, useEffect, useCallback } from "react"
+import { useAuth } from "@/lib/auth"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -33,24 +33,26 @@ interface Feedback {
   } | null
   mentor?: {
     full_name: string | null
+    email: string | null
   } | null
 }
 
-export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
+interface FeedbackManagementProps {
+  type?: 'received' | 'sent'
+}
+
+export function FeedbackManagement({ type = 'received' }: FeedbackManagementProps) {
+  const { user } = useAuth()
   const [feedbacks, setFeedback] = useState<Feedback[]>([])
   const [loading, setLoading] = useState(true)
   const [editingFeedback, setEditingFeedback] = useState<Feedback | null>(null)
   const [newComment, setNewComment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
-  const supabase = createClient()
   const { toast } = useToast()
 
-  const fetchFeedbacks = async () => {
+  const fetchFeedbacks = useCallback(async () => {
+    if (!user?.id) return
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
     try {
       const data = await mentorshipService.getUserFeedbacks(user.id, type)
       setFeedback((data as unknown as Feedback[]) || [])
@@ -59,11 +61,11 @@ export function FeedbackManagement({ type }: { type: 'received' | 'sent' }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user?.id, type])
 
   useEffect(() => {
     fetchFeedbacks()
-  }, [type])
+  }, [fetchFeedbacks])
 
   const handleEdit = (fb: Feedback) => {
     setEditingFeedback(fb)

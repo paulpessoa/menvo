@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Link } from '@/i18n/routing';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/utils/supabase/client';
@@ -11,7 +11,7 @@ import { chatService } from '@/lib/services/chat/chat.service';
 export function MessagesBadge() {
     const { user, isAuthenticated } = useAuth();
     const [unreadCount, setUnreadCount] = useState(0);
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     const loadUnreadCount = useCallback(async () => {
         if (!user?.id) return;
