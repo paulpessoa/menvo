@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,22 +17,19 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Calendar, User, CheckCircle, XCircle, Eye } from "lucide-react"
+import { Calendar, User, CheckCircle, XCircle, Eye, Loader2, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { VerificationService } from "@/lib/services/verifications/verifications.service"
-import { Verification } from "@/lib/types/models/verification"
+import type { Verification } from "@/lib/types/models/verification"
+import { toast } from "sonner"
+import { Link } from "@/i18n/routing"
 
-export default function VerificationsPage() {
+export default function AdminVerificationsPage() {
   const { user } = useAuth()
   const [verifications, setVerifications] = useState<Verification[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedVerification, setSelectedVerification] = useState<Verification | null>(null)
 
-  useEffect(() => {
-    loadVerifications()
-  }, [user?.id])
-
-  const loadVerifications = async () => {
+  const loadVerifications = useCallback(async () => {
     try {
       if (user?.id) {
         const data = await VerificationService.getPendingVerifications(user.id)
@@ -40,10 +37,15 @@ export default function VerificationsPage() {
       }
     } catch (error) {
       console.error("Error loading verifications:", error)
+      toast.error("Erro ao carregar verificações pendentes")
     } finally {
       setLoading(false)
     }
-  }
+  }, [user?.id])
+
+  useEffect(() => {
+    loadVerifications()
+  }, [loadVerifications])
 
   const handleApprove = async (verificationId: string) => {
     try {
@@ -51,11 +53,13 @@ export default function VerificationsPage() {
         verificationId,
         adminId: user!.id,
         passed: true,
-        notes: "Verification completed successfully",
+        notes: "Verification completed successfully by admin",
       })
+      toast.success("Mentor aprovado com sucesso!")
       loadVerifications()
     } catch (error) {
       console.error("Error approving verification:", error)
+      toast.error("Erro ao aprovar mentor")
     }
   }
 
@@ -67,111 +71,130 @@ export default function VerificationsPage() {
         passed: false,
         notes: reason,
       })
+      toast.success("Aplicação rejeitada.")
       loadVerifications()
     } catch (error) {
       console.error("Error rejecting verification:", error)
+      toast.error("Erro ao rejeitar mentor")
     }
   }
 
   if (loading) {
-    return <div className="container py-8">Loading verifications...</div>
+    return (
+      <div className="container mx-auto py-12 flex flex-col items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+        <p className="text-muted-foreground">Carregando verificações de mentores...</p>
+      </div>
+    )
   }
 
   return (
-    <div className="container py-8 md:py-12">
+    <div className="container mx-auto py-8 px-4 md:py-12 max-w-6xl">
       <div className="flex flex-col space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mentor Verifications</h1>
-          <p className="text-muted-foreground">Review and approve mentor applications</p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Button variant="ghost" size="sm" asChild className="gap-1 text-muted-foreground">
+                <Link href="/dashboard/admin">
+                  <ArrowLeft className="h-4 w-4" />
+                  Painel Admin
+                </Link>
+              </Button>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight">Verificações de Mentores</h1>
+            <p className="text-muted-foreground">Analise, valide e aprove solicitações de credenciamento de mentores</p>
+          </div>
         </div>
 
         <Tabs defaultValue="pending" className="w-full">
-          <TabsList>
-            <TabsTrigger value="pending">Pending ({verifications.length})</TabsTrigger>
-            <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsList className="mb-4">
+            <TabsTrigger value="pending">Pendentes ({verifications.length})</TabsTrigger>
+            <TabsTrigger value="scheduled">Agendados</TabsTrigger>
+            <TabsTrigger value="completed">Concluídos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="space-y-4">
             {verifications.length === 0 ? (
               <Card>
-                <CardContent className="flex items-center justify-center h-48">
+                <CardContent className="flex items-center justify-center h-56">
                   <div className="text-center">
-                    <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No pending verifications</p>
+                    <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
+                    <p className="font-medium text-gray-700">Nenhuma verificação pendente</p>
+                    <p className="text-sm text-muted-foreground">Todas as solicitações de mentores estão em dia.</p>
                   </div>
                 </CardContent>
               </Card>
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {verifications.map((verification) => (
-                  <Card key={verification.id}>
+                  <Card key={verification.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                         <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
+                          <Avatar className="h-14 w-14">
                             <AvatarImage src="/placeholder.svg" />
-                            <AvatarFallback>
+                            <AvatarFallback className="bg-primary/10 text-primary font-bold">
                               {verification.mentor_name
                                 .split(" ")
                                 .map((n: string) => n[0])
+                                .slice(0, 2)
                                 .join("")}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <CardTitle className="text-xl">{verification.mentor_name}</CardTitle>
-                            <CardDescription>{verification.mentor_title}</CardDescription>
-                            <p className="text-sm text-muted-foreground">{verification.mentor_company}</p>
+                            <CardDescription className="font-medium text-gray-600">{verification.mentor_title}</CardDescription>
+                            <p className="text-sm text-muted-foreground">{verification.mentor_company || "Empresa não informada"}</p>
                           </div>
                         </div>
-                        <Badge variant="outline">{verification.verification_type}</Badge>
+                        <Badge variant="outline" className="w-fit">{verification.verification_type}</Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                        <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
+                        <div className="flex items-center gap-1.5">
                           <Calendar className="h-4 w-4" />
-                          <span>Applied {new Date(verification.created_at).toLocaleDateString()}</span>
+                          <span>Inscrito em {new Date(verification.created_at).toLocaleDateString("pt-BR")}</span>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
                           <User className="h-4 w-4" />
                           <span>{verification.mentor_email}</span>
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-3">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
                               <Eye className="h-4 w-4 mr-2" />
-                              Review Details
+                              Ver Detalhes
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent className="max-w-xl">
                             <DialogHeader>
-                              <DialogTitle>Verification Details</DialogTitle>
-                              <DialogDescription>Review mentor application and documents</DialogDescription>
+                              <DialogTitle>Detalhes da Verificação</DialogTitle>
+                              <DialogDescription>Dados cadastrais e documentos do mentor</DialogDescription>
                             </DialogHeader>
                             <VerificationDetails verification={verification} />
                           </DialogContent>
                         </Dialog>
 
-                        <Button size="sm" onClick={() => handleApprove(verification.id)}>
+                        <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => handleApprove(verification.id)}>
                           <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve
+                          Aprovar Mentor
                         </Button>
 
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="destructive" size="sm">
                               <XCircle className="h-4 w-4 mr-2" />
-                              Reject
+                              Rejeitar
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
-                              <DialogTitle>Reject Verification</DialogTitle>
-                              <DialogDescription>Please provide a reason for rejection</DialogDescription>
+                              <DialogTitle>Rejeitar Verificação</DialogTitle>
+                              <DialogDescription>Por favor, informe a justificativa da recusa</DialogDescription>
                             </DialogHeader>
                             <RejectForm onReject={(reason: string) => handleReject(verification.id, reason)} />
                           </DialogContent>
@@ -187,7 +210,7 @@ export default function VerificationsPage() {
           <TabsContent value="scheduled">
             <Card>
               <CardContent className="flex items-center justify-center h-48">
-                <p className="text-muted-foreground">Scheduled verifications will appear here</p>
+                <p className="text-muted-foreground">Verificações agendadas aparecerão aqui.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -195,7 +218,7 @@ export default function VerificationsPage() {
           <TabsContent value="completed">
             <Card>
               <CardContent className="flex items-center justify-center h-48">
-                <p className="text-muted-foreground">Completed verifications will appear here</p>
+                <p className="text-muted-foreground">Verificações concluídas aparecerão aqui.</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -207,45 +230,39 @@ export default function VerificationsPage() {
 
 function VerificationDetails({ verification }: { verification: Verification }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-2">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label className="text-sm font-medium">Name</Label>
-          <p className="text-sm">{verification.mentor_name}</p>
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Nome Completo</Label>
+          <p className="text-sm font-medium mt-0.5">{verification.mentor_name}</p>
         </div>
         <div>
-          <Label className="text-sm font-medium">Email</Label>
-          <p className="text-sm">{verification.mentor_email}</p>
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Email</Label>
+          <p className="text-sm font-medium mt-0.5">{verification.mentor_email}</p>
         </div>
         <div>
-          <Label className="text-sm font-medium">Title</Label>
-          <p className="text-sm">{verification.mentor_title}</p>
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Cargo / Título</Label>
+          <p className="text-sm font-medium mt-0.5">{verification.mentor_title}</p>
         </div>
         <div>
-          <Label className="text-sm font-medium">Company</Label>
-          <p className="text-sm">{verification.mentor_company}</p>
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Empresa / Organização</Label>
+          <p className="text-sm font-medium mt-0.5">{verification.mentor_company || "-"}</p>
         </div>
       </div>
 
-      <div>
-        <Label className="text-sm font-medium">Documents</Label>
-        <div className="mt-2 space-y-2">
+      <div className="border-t pt-4">
+        <Label className="text-xs text-muted-foreground uppercase font-semibold">Documentação & Redes</Label>
+        <div className="mt-3 space-y-2.5">
           <div className="flex items-center space-x-2">
-            <Checkbox id="resume" defaultChecked />
-            <Label htmlFor="resume" className="text-sm">
-              Resume/CV
+            <Checkbox id="resume" defaultChecked disabled />
+            <Label htmlFor="resume" className="text-sm cursor-pointer">
+              Currículo / Trajetória Profissional
             </Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="linkedin" defaultChecked />
-            <Label htmlFor="linkedin" className="text-sm">
-              LinkedIn Profile
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="portfolio" />
-            <Label htmlFor="portfolio" className="text-sm">
-              Portfolio (Optional)
+            <Checkbox id="linkedin" defaultChecked disabled />
+            <Label htmlFor="linkedin" className="text-sm cursor-pointer">
+              Perfil LinkedIn Validado
             </Label>
           </div>
         </div>
@@ -260,28 +277,26 @@ function RejectForm({ onReject }: { onReject: (reason: string) => void }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (reason.trim()) {
-      onReject(reason)
+      onReject(reason.trim())
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 pt-2">
       <div>
-        <Label htmlFor="reason">Reason for rejection</Label>
+        <Label htmlFor="reason">Motivo da recusa</Label>
         <Textarea
           id="reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="Please provide a detailed reason for rejection..."
+          placeholder="Explique o motivo para notificar o candidato (ex.: experiência insuficiente, perfil incompleto...)"
+          className="mt-1 min-h-[100px]"
           required
         />
       </div>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline">
-          Cancel
-        </Button>
         <Button type="submit" variant="destructive">
-          Reject Application
+          Confirmar Rejeição
         </Button>
       </div>
     </form>

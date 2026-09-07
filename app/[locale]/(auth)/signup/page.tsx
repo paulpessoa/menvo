@@ -106,8 +106,7 @@ function SignupForm() {
 
   if (success) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50/50 py-12 px-4">
-        <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
+      <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
           <CardHeader className="text-center pt-10">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
               <Mail className="h-8 w-8 text-primary" />
@@ -140,13 +139,11 @@ function SignupForm() {
             </Button>
           </CardFooter>
         </Card>
-      </div>
     )
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-secondary/50 via-background to-background py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md border-none shadow-2xl shadow-primary/5 rounded-[2.5rem] overflow-hidden">
+    <Card className="w-full max-w-md border-none shadow-2xl shadow-primary/5 rounded-[2.5rem] overflow-hidden">
         <CardHeader className="space-y-3 text-center pb-8 pt-10">
            <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-2 transform rotate-6">
             <Lock className="h-8 w-8 text-primary" />
@@ -302,7 +299,6 @@ function SignupForm() {
           </div>
         </CardFooter>
       </Card>
-    </div>
   )
 }
 

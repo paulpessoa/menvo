@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,7 +22,6 @@ import {
   UserPlus
 } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
-import Link from "next/link"
 import { useTranslations } from "next-intl"
 
 export default function SetPasswordPage() {
@@ -114,8 +113,7 @@ export default function SetPasswordPage() {
 
   if (!isValidSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-foreground">
-        <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-lg border-gray-200">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
               <AlertTriangle className="h-6 w-6 text-red-600" />
@@ -137,8 +135,7 @@ export default function SetPasswordPage() {
               <Link href="/login">{tCommon("login")}</Link>
             </Button>
           </CardFooter>
-        </Card>
-      </div>
+      </Card>
     )
   }
 
@@ -174,8 +171,7 @@ export default function SetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 text-foreground">
-      <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md shadow-lg border-gray-200">
         <CardHeader className="space-y-1">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <UserPlus className="h-6 w-6 text-blue-600" />
@@ -265,6 +261,5 @@ export default function SetPasswordPage() {
           </div>
         </CardFooter>
       </Card>
-    </div>
   )
 }

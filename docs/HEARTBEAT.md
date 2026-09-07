@@ -7,13 +7,30 @@
 
 ## 📍 Where We Left Off
 
-### Completed Refactoring (this session)
+- [x] `auth ecosystem restructuring & simplification` — Completed full audit and restructuring of all auth pages, components, and APIs:
+    - **Fix typo & domain in verifications**: Fixed `pages.tsx` typo (which broke the route with 404). Moved admin mentor verification panel to `app/[locale]/dashboard/admin/verifications/page.tsx`, and created canonical redirect in `app/[locale]/(auth)/verifications/page.tsx`. Deleted broken `pages.tsx`.
+    - **Unified resend-confirmation**: Merged `ResendForm.tsx` into a single, clean `app/[locale]/(auth)/resend-confirmation/page.tsx` and routed calls through `authService.resendConfirmationEmail` per `AGENTS.md`. Removed `ResendForm.tsx`.
+    - **Shared Auth Layout**: Created `app/[locale]/(auth)/layout.tsx` with light/dark Menvo branding, subtle gradient, responsive centering, and standardized footer, removing redundant `min-h-screen` wrappers across all 8 auth pages.
+    - **Password Flow Consolidation & i18n routing**: Consolidated `reset-password` into `update-password` as the Single Source of Truth. Replaced `next/navigation` with `@/i18n/routing` in `confirm-email`, `error`, `set-password`, and `forgot-password`, eliminating language prefix drop bugs (`/pt-BR`).
+    - **Cleaned orphaned files**: Removed dead components (`components/auth/login-form.tsx`, `register-form.tsx`, `ResendConfirmationEmail.tsx`, `LogoutButton.tsx`) and deleted dead REST API endpoints in `app/api/auth/*` (`login`, `register`, `forgot-password` which held insecure `service_role`, `reset-password`, `google`, `linkedin`). Preserved active `logout/route.ts` (100% passing tests) and `me/route.ts`.
 - [x] `test accounts & waiting list deactivation` — Disabled `waiting_list_flag` in Supabase `feature_flags` table and updated `.env.local` to allow immediate new user registrations. Created & verified 4 test accounts via Supabase Service Role API: `mentee@menvo.com.br` (role: mentee), `mentor@menvo.com.br` (role: mentor), `admin@menvo.com.br` (role: admin), and `demo@menvo.com.br` (role: mentee), all confirmed with password `Menvo@2026!`.
 - [x] `auth loop resolution` — Fixed infinite login loop and redirection storm:
     - `lib/auth/auth-guard.tsx`: Swapped `next/navigation` `useRouter` for `@/i18n/routing` `useRouter`, preserving `/pt-BR` and preventing middleware redirection ping-pong.
     - `app/[locale]/dashboard/page.tsx`: Replaced stuck `AuthGuard` with deterministic redirection logic based on user authentication and role, eliminating infinite loading spinners.
     - `app/[locale]/(auth)/login/page.tsx`: Added `Suspense` boundary, inspected `signIn` return value for errors, and sanitized redirect target to prevent self-referencing `/login` bounces.
 - [x] `404 not found page (ux/ui & i18n)` — Created localized `app/[locale]/not-found.tsx` and root `app/not-found.tsx` conforming to "Don't Make Me Think" UX principles and Menvo's design system tokens (ambient glow, gradient 404 number, i18n translations via `common.notFound`, "Página Inicial" primary action, "Encontrar Mentores" secondary action, and discovery cards for "Match com IA" and "Comunidade"). Tested and verified in browser.
+- [x] `mentors search & filters mobile optimization` — Redesigned catalog search experience on mobile viewports:
+    - **Busca Inteligente (`MagicSearchBar`)**: Responsive stacked layout on mobile with spacious input, clear placeholder visibility, and full-width thumb-friendly action button.
+    - **Barra de Busca Padrão & Controles**: Search input with clean border and elevated depth. Balanced 50/50 grid action bar for Sort and Filter buttons on mobile, eliminating awkward asymmetric layout.
+    - **Gaveta de Filtros (`Sheet`)**: Fixed horizontal screen overflow bug (`w-[400px]` -> `w-full sm:max-w-md`), structured with fixed header, smooth scrollable body with touch-friendly pills, and sticky bottom footer with "Limpar" and "Ver Mentores ({count})".
+    - **Chips de Filtros Ativos**: Added horizontal scrollable bar with dismissible badges below search controls for 1-click filter removal without needing to re-open the sheet.
+    - **Cards de Mentores (`MentorCard`)**: Refined mobile padding and eliminated text-button collision on narrow viewports. Tested and verified in mobile browser.
+- [x] `session feedback loop & mentee dashboard decoupling` — Enforced zero direct database queries in `dashboard/mentee`:
+    - Moved appointments and metrics queries into `mentorshipService.getMenteeDashboardStats` and `mentorshipService.getMenteeUpcomingAppointments`.
+    - Moved favorite mentors profile query into `mentorService.getFavoriteMentors`.
+    - Added high-visibility pending review reminder alert banner on the Mentee Dashboard when `mentorshipService.hasPendingEvaluations` is true, guiding mentees directly to evaluate finished sessions.
+    - Updated `AppointmentCard`: allowed both mentors and mentees to evaluate completed sessions (`status === "confirmed" || status === "completed"`), and replaced `window.location.href` with `@/i18n/routing` `useRouter().push` to preserve active locale.
+    - Decoupled `FeedbackManagement` to `useAuth()` and stabilized realtime channel in `MessagesBadge`. 100% clean TypeScript (`0 errors`) and 6/6 test suites passed.
 
 2. **Services (`lib/services/`)** — Enforced strict Supabase typing across `admin`, `verifications`, `mentors`, and `mentorship` services. Removed loose `as any` casts and typed all queries against the remote database schema.
 3. **API Routes (`app/api/`)** — Enforced Zod schemas on `POST /api/feedback`, `POST /api/appointments`, and user profile updates. Strict input validation across endpoints.

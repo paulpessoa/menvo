@@ -53,14 +53,12 @@ export default function EmailConfirmedPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="flex items-center justify-center p-6">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">{tCommon("loading")}</span>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardContent className="flex items-center justify-center p-6">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="ml-2">{tCommon("loading")}</span>
+        </CardContent>
+      </Card>
     )
   }
 
@@ -69,8 +67,7 @@ export default function EmailConfirmedPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4 text-foreground">
-      <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md shadow-lg border-gray-200 text-foreground">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <CheckCircle className="h-8 w-8 text-green-600" />
@@ -125,6 +122,5 @@ export default function EmailConfirmedPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
   )
 }

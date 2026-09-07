@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState, Suspense } from "react"
+import { useRouter } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle, RefreshCw } from "lucide-react"
+import { AlertCircle, RefreshCw, Loader2 } from "lucide-react"
 
 const errorMessages = {
   oauth_error: "Erro na autenticação com provedor externo. Tente novamente.",
@@ -21,6 +22,20 @@ const errorMessages = {
 }
 
 export default function AuthErrorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[300px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <AuthErrorContent />
+    </Suspense>
+  )
+}
+
+function AuthErrorContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string>("")
@@ -38,19 +53,18 @@ export default function AuthErrorPage() {
   }
 
   const handleResendEmail = () => {
-    // Redirect to appropriate page based on callback type
     switch (callbackType) {
       case 'signup':
-        router.push("/auth/confirm-email")
+        router.push("/resend-confirmation")
         break
       case 'recovery':
         router.push("/forgot-password")
         break
       case 'invite':
-        router.push("/login") // Admin needs to resend invite
+        router.push("/login")
         break
       default:
-        router.push("/auth/confirm-email")
+        router.push("/resend-confirmation")
     }
   }
 
@@ -68,60 +82,58 @@ export default function AuthErrorPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-            <AlertCircle className="h-8 w-8 text-red-600" />
-          </div>
-          <CardTitle className="text-2xl font-bold text-red-800">
-            Erro na Confirmação
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            {error}
-          </CardDescription>
-        </CardHeader>
+    <Card className="w-full max-w-md shadow-lg border-red-100">
+      <CardHeader className="text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 ring-8 ring-red-50">
+          <AlertCircle className="h-8 w-8 text-red-600" />
+        </div>
+        <CardTitle className="text-2xl font-bold text-red-800">
+          Erro na Autenticação
+        </CardTitle>
+        <CardDescription className="text-gray-600 mt-2">
+          {error}
+        </CardDescription>
+      </CardHeader>
 
-        <CardContent className="space-y-4">
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-4">
-              Não se preocupe, você pode tentar novamente.
-            </p>
-          </div>
+      <CardContent className="space-y-4">
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-4">
+            Não se preocupe, você pode tentar novamente ou solicitar um novo link.
+          </p>
+        </div>
 
-          <div className="flex flex-col gap-2">
-            <Button
-              onClick={handleRetry}
-              className="w-full"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Tentar Fazer Login
-            </Button>
+        <div className="flex flex-col gap-2.5">
+          <Button
+            onClick={handleRetry}
+            className="w-full h-11"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Tentar Fazer Login
+          </Button>
 
-            <Button
-              variant="outline"
-              onClick={handleResendEmail}
-              className="w-full"
-            >
-              {getResendButtonText()}
-            </Button>
+          <Button
+            variant="outline"
+            onClick={handleResendEmail}
+            className="w-full h-11"
+          >
+            {getResendButtonText()}
+          </Button>
 
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/")}
-              className="w-full"
-            >
-              Voltar ao Início
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="w-full h-11"
+          >
+            Voltar ao Início
+          </Button>
+        </div>
 
-          <div className="text-center">
-            <p className="text-xs text-gray-400">
-              Se o problema persistir, entre em contato com o suporte.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        <div className="text-center pt-2">
+          <p className="text-xs text-muted-foreground">
+            Se o problema persistir, entre em contato com o suporte.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

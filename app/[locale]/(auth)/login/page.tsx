@@ -102,8 +102,7 @@ function LoginFormContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md shadow-lg border-gray-200">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">{tc("welcome")}</CardTitle>
           <CardDescription>{t("description")}</CardDescription>
@@ -249,6 +248,5 @@ function LoginFormContent() {
           </div>
         </CardFooter>
       </Card>
-    </div>
   )
 }
