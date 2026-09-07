@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -83,11 +84,38 @@ function ChipInput({ value, onChange, placeholder }: ChipInputProps) {
 }
 
 export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <ProfilePageContent />
+    </Suspense>
+  )
+}
+
+function ProfilePageContent() {
   const t = useTranslations("profile")
   const commonT = useTranslations("common")
   const { user, refreshProfile, role, loading: authLoading } = useAuth()
   const { profile, loading: profileLoading, isUpdating, updateProfile } = useProfile()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get("tab")
+  const validTabs = ["basic", "career", "address", "interests", "mentorship"]
+  const [activeTab, setActiveTab] = useState(
+    tabParam && validTabs.includes(tabParam) ? tabParam : "basic"
+  )
+
+  useEffect(() => {
+    if (tabParam && validTabs.includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cvInputRef = useRef<HTMLInputElement>(null)
 
@@ -130,7 +158,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push("/login")
+      const fullPath = tabParam ? `/profile?tab=${tabParam}` : "/profile"
+      router.push(`/login?next=${encodeURIComponent(fullPath)}`)
       return
     }
 
@@ -295,7 +324,7 @@ export default function ProfilePage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="basic" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto">
               <TabsTrigger value="basic" className="py-2">Pessoal</TabsTrigger>
               <TabsTrigger value="career" className="py-2">Carreira</TabsTrigger>

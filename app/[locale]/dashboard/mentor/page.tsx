@@ -31,7 +31,7 @@ import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations, useLocale } from "next-intl"
 import { useFavorites } from "@/hooks/useFavorites"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FeedbackManagement } from "@/components/dashboard/FeedbackManagement"
+import { FeedbackManagement } from "@/components/FeedbackManagement"
 
 interface MentorStats {
   totalAppointments: number
@@ -113,7 +113,7 @@ export default function MentorDashboard() {
     <RequireRole roles={["mentor"]}>
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="space-y-8">
-          
+
           {/* Header e Boas-vindas */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -151,64 +151,64 @@ export default function MentorDashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
-                   <Card className="border-none shadow-sm bg-gradient-to-r from-primary-700 via-primary-600 to-primary text-white overflow-hidden relative">
-                      <CardHeader className="relative z-10">
-                        <CardTitle className="text-2xl">Gerencie sua Agenda</CardTitle>
-                        <CardDescription className="text-white/90 text-base">Mantenha seus horários atualizados para receber novos agendamentos.</CardDescription>
-                      </CardHeader>
-                      <CardContent className="relative z-10">
-                        <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 font-bold shadow-md">
-                          <Link href="/dashboard/mentor/availability">Configurar Disponibilidade</Link>
-                        </Button>
-                      </CardContent>
-                      <Calendar className="absolute -bottom-4 -right-4 h-32 w-32 text-white/10 rotate-12" />
-                   </Card>
+                  <Card className="border-none shadow-sm bg-gradient-to-r from-primary-700 via-primary-600 to-primary text-white overflow-hidden relative">
+                    <CardHeader className="relative z-10">
+                      <CardTitle className="text-2xl">Gerencie sua Agenda</CardTitle>
+                      <CardDescription className="text-white/90 text-base">Mantenha seus horários atualizados para receber novos agendamentos.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="relative z-10">
+                      <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 font-bold shadow-md">
+                        <Link href="/dashboard/mentor/availability">Configurar Disponibilidade</Link>
+                      </Button>
+                    </CardContent>
+                    <Calendar className="absolute -bottom-4 -right-4 h-32 w-32 text-white/10 rotate-12" />
+                  </Card>
 
-                   <div className="flex items-center justify-between">
-                     <h2 className="text-2xl font-bold">Próximos Passos</h2>
-                   </div>
-                   
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <QuickActionCard 
-                        title="Ver Mentorias" 
-                        desc="Gerencie suas solicitações e sessões ativas." 
-                        link="/mentorship/mentor" 
-                        icon={<Clock className="w-6 h-6 text-primary" />}
-                      />
-                      <QuickActionCard 
-                        title="Meu Perfil Público" 
-                        desc="Veja como os alunos enxergam você." 
-                        link={`/mentors/${profile?.slug || profile?.id}`} 
-                        icon={<Users className="w-6 h-6 text-primary" />}
-                      />
-                   </div>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold">Próximos Passos</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <QuickActionCard
+                      title="Ver Mentorias"
+                      desc="Gerencie suas solicitações e sessões ativas."
+                      link="/mentorship/mentor"
+                      icon={<Clock className="w-6 h-6 text-primary" />}
+                    />
+                    <QuickActionCard
+                      title="Meu Perfil Público"
+                      desc="Veja como os alunos enxergam você."
+                      link={`/mentors/${profile?.slug || profile?.id}`}
+                      icon={<Users className="w-6 h-6 text-primary" />}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-6">
-                   <h2 className="text-2xl font-bold">Resumo</h2>
-                   {profile && !profile.verified && (
-                      <Card className="bg-amber-50 border-amber-200">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-amber-800 text-base flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4" /> Perfil em Análise
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-amber-700">Sua conta de mentor está sendo revisada. Você poderá aceitar mentorias assim que for aprovado.</p>
-                        </CardContent>
-                      </Card>
-                   )}
-                   
-                   <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Dica do Staff</CardTitle>
+                  <h2 className="text-2xl font-bold">Resumo</h2>
+                  {profile && !profile.verified && (
+                    <Card className="bg-amber-50 border-amber-200">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-amber-800 text-base flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4" /> Perfil em Análise
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          Mentores que preenchem detalhadamente sua <strong>Abordagem de Mentoria</strong> recebem 3x mais solicitações.
-                        </p>
+                        <p className="text-sm text-amber-700">Sua conta de mentor está sendo revisada. Você poderá aceitar mentorias assim que for aprovado.</p>
                       </CardContent>
-                   </Card>
+                    </Card>
+                  )}
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Dica do Staff</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Mentores que preenchem detalhadamente sua <strong>Abordagem de Mentoria</strong> recebem 3x mais solicitações.
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </TabsContent>
@@ -226,15 +226,15 @@ export default function MentorDashboard() {
 
             {/* TAB: SETTINGS */}
             <TabsContent value="settings" className="animate-in fade-in slide-in-from-left-4 duration-500">
-               <Card>
-                 <CardHeader>
-                   <CardTitle>Configurações da Conta</CardTitle>
-                   <CardDescription>Gerencie suas preferências de notificação e privacidade.</CardDescription>
-                 </CardHeader>
-                 <CardContent className="h-40 flex items-center justify-center text-muted-foreground italic">
-                   Em breve: Mais controles para sua conta.
-                 </CardContent>
-               </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Configurações da Conta</CardTitle>
+                  <CardDescription>Gerencie suas preferências de notificação e privacidade.</CardDescription>
+                </CardHeader>
+                <CardContent className="h-40 flex items-center justify-center text-muted-foreground italic">
+                  Em breve: Mais controles para sua conta.
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

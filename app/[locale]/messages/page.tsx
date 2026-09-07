@@ -10,14 +10,14 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ChatInterface } from "@/components/chat/ChatInterface"
+import { ChatInterface } from "@/components/ChatInterface"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 interface Conversation {
@@ -36,11 +36,11 @@ interface Conversation {
 }
 
 interface RawConversation {
-    id: string
-    mentor_id: string
-    mentee_id: string
-    last_message_at: string | null
-    created_at: string
+  id: string
+  mentor_id: string
+  mentee_id: string
+  last_message_at: string | null
+  created_at: string
 }
 
 function MessagesContent() {
@@ -98,7 +98,7 @@ function MessagesContent() {
 
       if (convs) {
         const rawConvs = convs as RawConversation[]
-        
+
         const conversationsWithDetails = []
         for (const conv of rawConvs) {
           try {
@@ -178,17 +178,17 @@ function MessagesContent() {
 
   useEffect(() => {
     if (!user) return;
-    
+
     const channel = supabase
       .channel(`user-chats-${user.id}`)
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
         table: 'messages'
-      }, (payload: any) => { 
-          if (payload.new?.sender_id !== user.id) {
-            loadConversations(false) 
-          }
+      }, (payload: any) => {
+        if (payload.new?.sender_id !== user.id) {
+          loadConversations(false)
+        }
       })
       .subscribe();
 
@@ -232,27 +232,27 @@ function MessagesContent() {
         <div className={`w-full md:w-80 flex flex-col border-r bg-muted/5 ${selectedConversation ? 'hidden md:flex' : 'flex'}`}>
           <div className="p-6 border-b bg-white/50 backdrop-blur-sm">
             <h1 className="text-2xl font-bold mb-4 tracking-tight flex items-center gap-2">
-                {t("title")}
-                {archivedIds.size > 0 && (
-                    <Badge variant="outline" className="font-normal text-[10px] text-muted-foreground">
-                        {archivedIds.size} arquivados
-                    </Badge>
-                )}
+              {t("title")}
+              {archivedIds.size > 0 && (
+                <Badge variant="outline" className="font-normal text-[10px] text-muted-foreground">
+                  {archivedIds.size} arquivados
+                </Badge>
+              )}
             </h1>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder={t("searchPlaceholder")} 
-                value={searchTerm} 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-                className="pl-10 bg-white border-none shadow-sm focus-visible:ring-primary h-11 rounded-xl" 
+              <Input
+                placeholder={t("searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white border-none shadow-sm focus-visible:ring-primary h-11 rounded-xl"
               />
             </div>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {isLoading && conversations.length === 0 ? (
-                <div className="space-y-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
+              <div className="space-y-3">{[1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}</div>
             ) : filteredConversations.length === 0 ? (
               <div className="p-8 text-center flex flex-col items-center justify-center">
                 <div className="bg-primary/10 p-3.5 rounded-2xl w-fit mx-auto mb-3.5 border border-primary/20 shadow-xs">
@@ -265,9 +265,9 @@ function MessagesContent() {
                   {searchTerm ? "Tente outro nome ou limpe a busca." : t("emptyStateHelp")}
                 </p>
                 {searchTerm ? (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setSearchTerm("")}
                     className="rounded-xl text-xs font-semibold hover:bg-muted/80"
                   >
@@ -284,13 +284,12 @@ function MessagesContent() {
             ) : (
               <>
                 {filteredConversations.map((conversation) => (
-                  <div 
-                    key={conversation.id} 
-                    className={`group p-3 rounded-xl cursor-pointer transition-all flex items-center justify-between ${
-                        selectedConversation?.id === conversation.id 
-                        ? 'bg-white shadow-md ring-1 ring-black/5' 
+                  <div
+                    key={conversation.id}
+                    className={`group p-3 rounded-xl cursor-pointer transition-all flex items-center justify-between ${selectedConversation?.id === conversation.id
+                        ? 'bg-white shadow-md ring-1 ring-black/5'
                         : 'hover:bg-white/60'
-                    }`} 
+                      }`}
                     onClick={() => setSelectedConversation(conversation)}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -313,9 +312,9 @@ function MessagesContent() {
                           <span className="text-[10px] text-muted-foreground whitespace-nowrap">{formatTimestamp(conversation.last_message_at)}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                           <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 bg-muted/50 text-muted-foreground border-none">
-                              {getRoleLabel(conversation.other_user?.role_name)}
-                           </Badge>
+                          <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4 bg-muted/50 text-muted-foreground border-none">
+                            {getRoleLabel(conversation.other_user?.role_name)}
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -327,7 +326,7 @@ function MessagesContent() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="rounded-xl">
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => toggleArchive(conversation.id)}
                           className="flex items-center gap-2 cursor-pointer"
                         >
@@ -340,24 +339,24 @@ function MessagesContent() {
                 ))}
               </>
             )}
-            
+
             {/* Link para restaurar arquivados se houver algum */}
             {archivedIds.size > 0 && searchTerm === '' && (
-                <div className="mt-8 pt-4 border-t px-4 pb-4">
-                   <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-2">Opções</p>
-                   <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full justify-start text-xs text-muted-foreground hover:text-primary"
-                    onClick={() => {
-                        setArchivedIds(new Set())
-                        localStorage.removeItem('menvo_archived_chats')
-                    }}
-                   >
-                       <RotateCcw className="h-3 w-3 mr-2" />
-                       Restaurar todos os arquivados
-                   </Button>
-                </div>
+              <div className="mt-8 pt-4 border-t px-4 pb-4">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-2">Opções</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start text-xs text-muted-foreground hover:text-primary"
+                  onClick={() => {
+                    setArchivedIds(new Set())
+                    localStorage.removeItem('menvo_archived_chats')
+                  }}
+                >
+                  <RotateCcw className="h-3 w-3 mr-2" />
+                  Restaurar todos os arquivados
+                </Button>
+              </div>
             )}
           </div>
         </div>
@@ -365,19 +364,19 @@ function MessagesContent() {
         {/* Main Chat Area */}
         <div className="hidden md:flex flex-1 flex-col bg-white overflow-hidden">
           {selectedConversation ? (
-            <ChatInterface 
-              key={selectedConversation.id} 
-              mentorId={selectedConversation.other_user.id} 
-              currentUserId={user.id} 
-              mentorName={selectedConversation.other_user.full_name} 
-              mentorAvatar={selectedConversation.other_user.avatar_url || undefined} 
+            <ChatInterface
+              key={selectedConversation.id}
+              mentorId={selectedConversation.other_user.id}
+              currentUserId={user.id}
+              mentorName={selectedConversation.other_user.full_name}
+              mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
             />
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center max-w-lg mx-auto">
               <div className="relative mb-8">
                 <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full scale-150 animate-pulse" />
                 <div className="relative bg-white p-8 rounded-3xl shadow-xl ring-1 ring-black/5">
-                    <MessageCircle className="h-16 w-16 text-primary" />
+                  <MessageCircle className="h-16 w-16 text-primary" />
                 </div>
               </div>
               <h2 className="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">Suas Mensagens</h2>
@@ -385,20 +384,20 @@ function MessagesContent() {
                 Conecte-se com seus mentores e mentorados em tempo real. Selecione uma conversa ao lado para começar.
               </p>
               <div className="mt-10 grid grid-cols-2 gap-4 w-full">
-                  <div className="p-4 bg-muted/30 rounded-2xl text-left">
-                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm mb-3">
-                          <Archive className="w-4 h-4 text-primary" />
-                      </div>
-                      <p className="text-xs font-bold text-gray-900">Privacidade</p>
-                      <p className="text-[10px] text-muted-foreground">Arquive conversas antigas para manter seu foco.</p>
+                <div className="p-4 bg-muted/30 rounded-2xl text-left">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm mb-3">
+                    <Archive className="w-4 h-4 text-primary" />
                   </div>
-                  <div className="p-4 bg-muted/30 rounded-2xl text-left">
-                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm mb-3">
-                          <MessageCircle className="w-4 h-4 text-primary" />
-                      </div>
-                      <p className="text-xs font-bold text-gray-900">Realtime</p>
-                      <p className="text-[10px] text-muted-foreground">Mensagens instantâneas e notificações nativas.</p>
+                  <p className="text-xs font-bold text-gray-900">Privacidade</p>
+                  <p className="text-[10px] text-muted-foreground">Arquive conversas antigas para manter seu foco.</p>
+                </div>
+                <div className="p-4 bg-muted/30 rounded-2xl text-left">
+                  <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm mb-3">
+                    <MessageCircle className="w-4 h-4 text-primary" />
                   </div>
+                  <p className="text-xs font-bold text-gray-900">Realtime</p>
+                  <p className="text-[10px] text-muted-foreground">Mensagens instantâneas e notificações nativas.</p>
+                </div>
               </div>
             </div>
           )}
@@ -418,7 +417,7 @@ function MessagesContent() {
                 </Avatar>
                 <h2 className="font-bold text-sm truncate max-w-[150px]">{selectedConversation.other_user.full_name}</h2>
               </div>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5" /></Button>
@@ -431,12 +430,12 @@ function MessagesContent() {
               </DropdownMenu>
             </div>
             <div className="flex-1 overflow-hidden">
-              <ChatInterface 
-                key={`mobile-${selectedConversation.id}`} 
-                mentorId={selectedConversation.other_user.id} 
-                currentUserId={user.id} 
-                mentorName={selectedConversation.other_user.full_name} 
-                mentorAvatar={selectedConversation.other_user.avatar_url || undefined} 
+              <ChatInterface
+                key={`mobile-${selectedConversation.id}`}
+                mentorId={selectedConversation.other_user.id}
+                currentUserId={user.id}
+                mentorName={selectedConversation.other_user.full_name}
+                mentorAvatar={selectedConversation.other_user.avatar_url || undefined}
               />
             </div>
           </div>

@@ -1,5 +1,7 @@
 "use client"
-import Link from "next/link"
+import { useState, useEffect, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
+import { Link } from "@/i18n/routing"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,12 +22,41 @@ import {
   Users,
   Video,
   BarChart3,
-  Rocket
+  Rocket,
+  Loader2
 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { useAuth } from "@/lib/auth"
 
 export default function HowItWorksPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container max-w-7xl mx-auto px-4 py-12 flex justify-center min-h-[60vh] items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <HowItWorksContent />
+    </Suspense>
+  )
+}
+
+function HowItWorksContent() {
   const t = useTranslations()
+  const { isAuthenticated } = useAuth()
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get("tab")
+  const validTabs = ["mentees", "mentors", "ngos", "companies"]
+  const [activeTab, setActiveTab] = useState(
+    tabParam && validTabs.includes(tabParam) ? tabParam : "mentees"
+  )
+
+  useEffect(() => {
+    if (tabParam && validTabs.includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
 
   return (
     <div className="container max-w-7xl mx-auto px-4 py-12 md:py-20">
@@ -39,7 +70,7 @@ export default function HowItWorksPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="mentees" className="w-full max-w-5xl mx-auto">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
         <div className="flex justify-center mb-12">
           <TabsList className="grid w-full h-auto p-1 bg-muted/50 rounded-2xl grid-cols-2 md:grid-cols-4 gap-1">
             <TabsTrigger value="mentees" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
@@ -136,7 +167,7 @@ export default function HowItWorksPage() {
           ))}
           <div className="flex justify-center pt-8">
             <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href="/signup">{t("howItWorks.mentors.becomeMentor")}</Link>
+              <Link href={isAuthenticated ? "/profile?tab=mentorship" : "/signup"}>{t("howItWorks.mentors.becomeMentor")}</Link>
             </Button>
           </div>
         </TabsContent>

@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Instagram, Linkedin, Youtube, Github } from "lucide-react"
-import { NewsletterModal } from "@/components/newsletter/NewsletterModal"
+import { NewsletterModal } from "@/components/NewsletterModal"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 

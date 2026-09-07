@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogDescription
 } from '@/components/ui/dialog';
-import { ChatInterface } from '@/components/chat/ChatInterface';
+import { ChatInterface } from '@/components/ChatInterface';
 
 interface ChatButtonProps {
     appointment: {

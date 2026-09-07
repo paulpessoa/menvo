@@ -1,5 +1,5 @@
 "use client"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
@@ -8,7 +8,8 @@ import { Calendar, MessageSquare, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
-import { QuizDiscoverySection } from "@/components/landing/QuizDiscoverySection"
+import { QuizDiscoverySection } from "@/components/QuizDiscoverySection"
+import { useAuth } from "@/lib/auth"
 
 const TestimonialsCarousel = dynamic(
   () => import("@/components/TestimonialsCarousel").then((mod) => mod.TestimonialsCarousel),
@@ -24,6 +25,7 @@ const TestimonialsCarousel = dynamic(
 export default function Home() {
   const t = useTranslations("home")
   const tCommon = useTranslations("common")
+  const { isAuthenticated } = useAuth()
   const images = [
     "/images/e.jpg",
     "/images/d.jpg",
@@ -60,7 +62,9 @@ export default function Home() {
                 <Link href="/mentors">{t("hero.findMentor")}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="w-full lg:w-auto px-8 h-12 border-2 hover:bg-muted font-bold">
-                <Link href="/signup">{t("hero.becomeMentor")}</Link>
+                <Link href={isAuthenticated ? "/profile?tab=mentorship" : "/how-it-works?tab=mentors"}>
+                  {t("hero.becomeMentor")}
+                </Link>
               </Button>
             </div>
           </div>
@@ -77,9 +81,8 @@ export default function Home() {
                   alt={t("hero.title")}
                   priority={index === 0}
                   sizes="(max-width: 768px) 250px, (max-width: 1024px) 350px, 450px"
-                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${
-                    index === currentIndex ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
+                    }`}
                 />
               ))}
             </div>

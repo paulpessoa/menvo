@@ -264,7 +264,7 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
               className="sm:flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 rounded-xl"
               asChild
             >
-              <Link href="/profile">
+              <Link href="/profile?tab=mentorship">
                 {tCommunity("disclaimer.becomeMentor")}
               </Link>
             </Button>

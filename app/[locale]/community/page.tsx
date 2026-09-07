@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Search, Users, Loader2, Info, MessageCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { MenteeCard } from "@/components/community/MenteeCard"
+import { MenteeCard } from "@/components/MenteeCard"
 import { useAuth } from "@/lib/auth"
 import { useRouter } from "@/i18n/routing"
 import { useTranslations } from "next-intl"
@@ -16,7 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { ChatInterface } from "@/components/chat/ChatInterface"
+import { ChatInterface } from "@/components/ChatInterface"
 import {
   communityService,
   CommunityProfile,

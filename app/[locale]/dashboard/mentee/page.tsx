@@ -30,8 +30,8 @@ import { useAuth } from "@/lib/auth"
 import { useLocale, useTranslations } from "next-intl"
 import { useFavorites } from "@/hooks/useFavorites"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FeedbackManagement } from "@/components/dashboard/FeedbackManagement"
-import { MenteeQuizCTA } from "@/components/dashboard/MenteeQuizCTA"
+import { FeedbackManagement } from "@/components/FeedbackManagement"
+import { MenteeQuizCTA } from "@/components/MenteeQuizCTA"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
@@ -166,7 +166,7 @@ export default function MenteeDashboard() {
     <RequireRole roles={["mentee"]}>
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="space-y-8">
-          
+
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -229,16 +229,16 @@ export default function MenteeDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <QuickActionCard 
-                      title={t("mentee.actions.myMentorshipsAction")} 
-                      desc={t("mentee.actions.myMentorshipsActionDesc")} 
-                      link="/mentorship/mentee" 
+                    <QuickActionCard
+                      title={t("mentee.actions.myMentorshipsAction")}
+                      desc={t("mentee.actions.myMentorshipsActionDesc")}
+                      link="/mentorship/mentee"
                       icon={<Calendar className="w-6 h-6 text-primary" />}
                     />
-                    <QuickActionCard 
-                      title={t("mentee.actions.exploreMentorsAction")} 
-                      desc={t("mentee.actions.exploreMentorsActionDesc")} 
-                      link="/mentors" 
+                    <QuickActionCard
+                      title={t("mentee.actions.exploreMentorsAction")}
+                      desc={t("mentee.actions.exploreMentorsActionDesc")}
+                      link="/mentors"
                       icon={<Search className="w-6 h-6 text-primary" />}
                     />
                   </div>
