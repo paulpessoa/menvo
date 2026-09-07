@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useAuth } from "@/lib/auth"
-import { createClient } from "@/lib/utils/supabase/client"
 import { handleAsyncOperation } from "@/lib/error-handler"
 import { logger } from "@/lib/logger"
 import type { Database } from "@/lib/types/supabase"
@@ -25,30 +24,23 @@ export function useProfile() {
   const fetchProfile = useCallback(async () => {
     if (!user) return
 
-    const supabase = createClient()
-    
     const result = await handleAsyncOperation(
       async () => {
-        logger.debug('Fetching profile', 'useProfile', { userId: user.id });
+        logger.debug('Fetching profile via API', 'useProfile', { userId: user.id });
         
-        const { data, error: fetchError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single()
+        const response = await fetch('/api/profile', {
+          method: 'GET',
+          credentials: 'include',
+        })
 
-        if (fetchError) {
-          if (fetchError.code === "PGRST116") {
-            // Profile doesn't exist, create it
-            logger.info('Profile not found, creating new profile', 'useProfile', { userId: user.id });
-            return await createProfile()
-          } else {
-            throw fetchError
-          }
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || `HTTP ${response.status}`)
         }
 
-        logger.debug('Profile fetched successfully', 'useProfile', { userId: user.id });
-        return data as Profile;
+        const data = await response.json()
+        logger.debug('Profile fetched successfully via API', 'useProfile', { userId: user.id });
+        return data.profile as Profile;
       },
       'fetchProfile'
     );
@@ -72,37 +64,6 @@ export function useProfile() {
       setLoading(false)
     }
   }, [user, fetchProfile])
-
-  const createProfile = async (): Promise<Profile> => {
-    if (!user) throw new Error('No user found');
-
-    logger.info('Creating new profile via API', 'useProfile', { userId: user.id });
-
-    // Get session for API call
-    const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session?.access_token) {
-      throw new Error('No session found for profile creation')
-    }
-
-    // Use the profile API to create the profile (it handles creation automatically)
-    const response = await fetch('/api/profile', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Profile creation failed' }))
-      throw new Error(errorData.error || `HTTP ${response.status}`)
-    }
-
-    const result = await response.json()
-    logger.info('Profile created successfully via API', 'useProfile', { userId: user.id });
-    return result.profile;
-  }
 
   const updateProfile = async (updates: Partial<Profile>): Promise<ProfileUpdateResult> => {
     if (!user) {
@@ -143,21 +104,13 @@ export function useProfile() {
           fields: Object.keys(updates) 
         });
 
-        // Get session for API call
-        const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (!session?.access_token) {
-          throw new Error('Sessão expirada. Faça login novamente.')
-        }
-
         // Call the profile API endpoint
         const response = await fetch('/api/profile', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
           },
+          credentials: 'include',
           body: JSON.stringify(updates),
         })
 
@@ -165,7 +118,6 @@ export function useProfile() {
           const errorData = await response.json().catch(() => ({ error: 'Profile update failed' }))
           throw new Error(errorData.error || `HTTP ${response.status}`)
         }
-
         const result = await response.json()
         logger.profileUpdate(true, user.id, Object.keys(updates));
         return result.profile;

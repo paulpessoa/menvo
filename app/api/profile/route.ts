@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { createClient as createAdminClient } from "@supabase/supabase-js"
+import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { updateProfileSchema } from "@/lib/schemas/profile"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -9,33 +10,33 @@ if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error("Missing Supabase environment variables")
 }
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
   },
 })
 
+async function getAuthenticatedUser(request: NextRequest) {
+  const authHeader = request.headers.get("authorization")
+  if (authHeader) {
+    const token = authHeader.replace("Bearer ", "")
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
+    return { user, error }
+  }
+
+  const supabase = await createServerClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  return { user, error }
+}
+
 export async function PUT(request: NextRequest) {
   try {
-    // Check authentication
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader) {
-      return NextResponse.json({ 
-        error: "Token de autorização necessário" 
-      }, { status: 401 })
-    }
-
-    const token = authHeader.replace("Bearer ", "")
-    
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token)
+    const { user, error: authError } = await getAuthenticatedUser(request)
 
     if (authError || !user) {
       return NextResponse.json({ 
-        error: "Token inválido",
+        error: "Token ou sessão de autorização necessária",
         details: authError?.message 
       }, { status: 401 })
     }
@@ -87,24 +88,12 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const authHeader = request.headers.get("authorization")
-    if (!authHeader) {
-      return NextResponse.json({ 
-        error: "Token de autorização necessário" 
-      }, { status: 401 })
-    }
-
-    const token = authHeader.replace("Bearer ", "")
-    
-    const {
-      data: { user },
-      error: authError,
-    } = await supabaseAdmin.auth.getUser(token)
+    const { user, error: authError } = await getAuthenticatedUser(request)
 
     if (authError || !user) {
       return NextResponse.json({ 
-        error: "Token inválido" 
+        error: "Token ou sessão de autorização necessária",
+        details: authError?.message 
       }, { status: 401 })
     }
 

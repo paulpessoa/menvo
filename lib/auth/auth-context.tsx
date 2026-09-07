@@ -60,54 +60,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
 
-    const [cachedRoles, setCachedRoles] = useState<{admin: boolean, mentor: boolean, mentee: boolean, moderator: boolean, role: string | null, isVerified: boolean, roles: string[], isPending: boolean}>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('menvo_roles')
-            return saved ? JSON.parse(saved) : { admin: false, mentor: false, mentee: false, moderator: false, role: null, isVerified: false, roles: [], isPending: false }
-        }
-        return { admin: false, mentor: false, mentee: false, moderator: false, role: null, isVerified: false, roles: [], isPending: false }
-    })
+    const EMPTY_ROLES = {
+        admin: false,
+        mentor: false,
+        mentee: false,
+        moderator: false,
+        role: null as string | null,
+        isVerified: false,
+        roles: [] as string[],
+        isPending: false
+    }
 
-    const fetchProfile = useCallback(async (userId: string) => {
+    const [cachedRoles, setCachedRoles] = useState<{
+        admin: boolean
+        mentor: boolean
+        mentee: boolean
+        moderator: boolean
+        role: string | null
+        isVerified: boolean
+        roles: string[]
+        isPending: boolean
+    }>(EMPTY_ROLES)
+
+    const fetchProfile = useCallback(async (_userId?: string) => {
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*, user_roles(roles(name))')
-                .eq('id', userId)
-                .single()
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Cache-Control': 'no-cache' }
+            })
 
-            if (error) throw error
+            if (!response.ok) {
+                setCachedRoles(EMPTY_ROLES)
+                setProfile(null)
+                return null
+            }
 
-            const roleNames = (data as any)?.user_roles?.map((ur: any) => ur.roles?.name).filter(Boolean) || []
-            const profileRole = (data as any)?.user_role || null
-            
-            // Prioridade de resolução de role: Admin > Mentor > Mentee
-            let primaryRole: string | null = null
-            if (roleNames.includes('admin') || profileRole === 'admin') primaryRole = 'admin'
-            else if (roleNames.includes('mentor') || profileRole === 'mentor') primaryRole = 'mentor'
-            else if (roleNames.includes('mentee') || profileRole === 'mentee') primaryRole = 'mentee'
-            
+            const data = await response.json()
+            if (!data.authenticated || !data.user) {
+                setCachedRoles(EMPTY_ROLES)
+                setProfile(null)
+                return null
+            }
+
+            const roleNames: string[] = Array.isArray(data.roles) ? data.roles : []
+            const primaryRole: string | null = data.role || null
+
             const roles = {
-                admin: primaryRole === 'admin',
-                mentor: primaryRole === 'mentor',
-                mentee: primaryRole === 'mentee',
+                admin: primaryRole === 'admin' || roleNames.includes('admin'),
+                mentor: primaryRole === 'mentor' || roleNames.includes('mentor'),
+                mentee: primaryRole === 'mentee' || roleNames.includes('mentee'),
                 moderator: roleNames.includes('moderator'),
                 role: primaryRole,
-                isVerified: (data as any)?.is_verified || false,
-                isPending: (data as any)?.verification_status === 'pending',
+                isVerified: !!data.isVerified,
+                isPending: !!data.isPending,
                 roles: roleNames
             }
-            
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('menvo_roles', JSON.stringify(roles))
-            }
+
             setCachedRoles(roles)
-            return data
+            setProfile(data.profile)
+            return data.profile
         } catch (err) {
-            console.error('[Auth] Error fetching profile:', err)
+            console.error('[Auth] Error fetching profile via API:', err)
             return null
         }
-    }, [supabase])
+    }, [])
 
     const signIn = async (email: string, password: string) => {
         try {
@@ -221,16 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(null)
             setSession(null)
             setProfile(null)
-            setCachedRoles({
-                admin: false,
-                mentor: false,
-                mentee: true,
-                moderator: false,
-                role: null,
-                isVerified: false,
-                roles: [],
-                isPending: false
-            })
+            setCachedRoles(EMPTY_ROLES)
 
             // 6. Redirecionamento limpo para recarregar aplicação desautenticada de primeira
             if (typeof window !== 'undefined') {
@@ -282,13 +290,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const response = await fetch('/api/profile/role', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ role: roleName })
             })
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}))
                 throw new Error(errData.error || 'Failed to set role')
             }
-            const updatedProfile = await fetchProfile(user.id)
+            const updatedProfile = await fetchProfile()
             setProfile(updatedProfile)
             return { success: true }
         } catch (err: any) { 
@@ -304,7 +313,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const { data: { session: initialSession } } = await supabase.auth.getSession()
             if (initialSession && mounted) {
                 setSession(initialSession); setUser(initialSession.user)
-                const userProfile = await fetchProfile(initialSession.user.id)
+                const userProfile = await fetchProfile()
                 if (mounted) { setProfile(userProfile); setIsInitializing(false) }
             } else { if (mounted) setIsInitializing(false) }
         }
@@ -314,13 +323,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (event === 'SIGNED_OUT') {
                 if (mounted) {
                     setSession(null); setUser(null); setProfile(null)
-                    setCachedRoles({ admin: false, mentor: false, mentee: true, moderator: false, role: null, isVerified: false, roles: [], isPending: false })
+                    setCachedRoles(EMPTY_ROLES)
                     setIsInitializing(false)
                 }
             } else if (newSession) {
                 if (mounted) { setSession(newSession); setUser(newSession.user) }
                 const timeoutId = setTimeout(() => { if (mounted) setIsInitializing(false) }, 4000)
-                const userProfile = await fetchProfile(newSession.user.id)
+                const userProfile = await fetchProfile()
                 clearTimeout(timeoutId)
                 if (mounted) { setProfile(userProfile); setIsInitializing(false) }
             }
@@ -352,10 +361,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updateProfile: async (data: any) => {
             try {
                 if (!user) throw new Error('No user')
-                const { error } = await (supabase.from('profiles') as any).update(data).eq('id', user.id)
-                if (error) throw error
-                const newProfile = await fetchProfile(user.id)
-                setProfile(newProfile)
+                const res = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                })
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}))
+                    throw new Error(errData.error || 'Erro ao atualizar perfil')
+                }
+                const updatedProfile = await fetchProfile()
+                setProfile(updatedProfile)
                 return { success: true }
             } catch (err: any) { return { success: false, error: err.message } }
         },
@@ -375,7 +392,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         needsRoleSelection,
         refreshProfile: async () => {
             if (user) {
-                const newProfile = await fetchProfile(user.id)
+                const newProfile = await fetchProfile()
                 setProfile(newProfile)
             }
         }
