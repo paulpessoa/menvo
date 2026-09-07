@@ -209,7 +209,7 @@ function HowItWorksContent() {
           ))}
           <div className="flex justify-center pt-8">
             <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href="/signup">{t("howItWorks.ngos.getStarted")}</Link>
+              <Link href="/contact">{t("howItWorks.ngos.getStarted")}</Link>
             </Button>
           </div>
         </TabsContent>
@@ -251,7 +251,7 @@ function HowItWorksContent() {
           ))}
           <div className="flex justify-center pt-8">
             <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href="/signup">{t("howItWorks.companies.getStarted")}</Link>
+              <Link href="/contact">{t("howItWorks.companies.getStarted")}</Link>
             </Button>
           </div>
         </TabsContent>

@@ -35,6 +35,13 @@ import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import type { TablesInsert } from "@/lib/types/supabase"
 
+import {
+  addMinutesToTime,
+  formatTimezoneLabel,
+  getBrowserTimezone,
+  generateTimeOptions
+} from "@/lib/utils/timezone"
+
 interface AvailabilitySlot {
   id?: number | string
   day_of_week: number
@@ -49,13 +56,7 @@ const normalizeTime = (t: string | null | undefined): string => {
   return t
 }
 
-const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
-  const hour = i.toString().padStart(2, "0")
-  return [
-    { value: `${hour}:00:00`, label: `${hour}:00` },
-    { value: `${hour}:30:00`, label: `${hour}:30` }
-  ]
-}).flat()
+const TIME_OPTIONS = generateTimeOptions(6, 23)
 
 export default function MentorAvailabilityPage() {
   const t = useTranslations("availability")
@@ -128,12 +129,17 @@ export default function MentorAvailabilityPage() {
     }
   }
 
+  const effectiveTimezone =
+    profile?.timezone && profile.timezone !== "UTC"
+      ? profile.timezone
+      : getBrowserTimezone()
+
   const addAvailabilitySlot = () => {
     const newSlot: AvailabilitySlot = {
       day_of_week: 1,
       start_time: "09:00:00",
-      end_time: "17:00:00",
-      timezone: profile?.timezone || "America/Sao_Paulo"
+      end_time: "09:45:00", // Padrão automático de 45 minutos
+      timezone: effectiveTimezone
     }
     setAvailability([...availability, newSlot])
   }
@@ -144,7 +150,17 @@ export default function MentorAvailabilityPage() {
     value: string | number
   ) => {
     const updated = [...availability]
-    updated[index] = { ...updated[index], [field]: value }
+    if (field === "start_time" && typeof value === "string") {
+      // Ao alterar o início, calcula e preenche automaticamente o término com +45min
+      const autoEndTime = addMinutesToTime(value, 45)
+      updated[index] = {
+        ...updated[index],
+        start_time: value,
+        end_time: autoEndTime
+      }
+    } else {
+      updated[index] = { ...updated[index], [field]: value }
+    }
     setAvailability(updated)
   }
 
@@ -221,7 +237,7 @@ export default function MentorAvailabilityPage() {
             day_of_week: slot.day_of_week,
             start_time: normalizeTime(slot.start_time),
             end_time: normalizeTime(slot.end_time),
-            timezone: slot.timezone || profile?.timezone || "America/Sao_Paulo"
+            timezone: slot.timezone || effectiveTimezone
           }))
 
         const { error: insertError } = await (supabase
@@ -229,6 +245,14 @@ export default function MentorAvailabilityPage() {
           .insert(slotsToInsert)
 
         if (insertError) throw insertError
+
+        // Persist effective timezone to profile if missing or UTC
+        if (!profile?.timezone || profile.timezone === "UTC") {
+          await (supabase
+            .from("profiles") as any)
+            .update({ timezone: effectiveTimezone })
+            .eq("id", user.id)
+        }
       }
 
       setMessage({ type: "success", text: t("success") })
@@ -473,7 +497,7 @@ export default function MentorAvailabilityPage() {
             <AlertTriangle className="h-4 w-4 text-amber-600" />
             <AlertDescription className="text-amber-800 text-xs">
               {t("timezoneWarning")}{" "}
-              <strong>{profile?.timezone || "America/Sao_Paulo"}</strong>.
+              <strong>{formatTimezoneLabel(effectiveTimezone)}</strong>.
             </AlertDescription>
           </Alert>
 

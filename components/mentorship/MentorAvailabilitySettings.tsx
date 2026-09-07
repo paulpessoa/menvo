@@ -44,6 +44,14 @@ interface MentorAvailabilitySettingsProps {
   onClose: () => void
 }
 
+import {
+  addMinutesToTime,
+  formatTimeDisplay,
+  formatTimezoneLabel,
+  getBrowserTimezone,
+  generateTimeOptions
+} from "@/lib/utils/timezone"
+
 interface AvailabilitySlot {
   id?: string
   day_of_week: number
@@ -63,7 +71,7 @@ export function MentorAvailabilitySettings({
   const [newSlot, setNewSlot] = useState<AvailabilitySlot>({
     day_of_week: 1,
     start_time: "09:00",
-    end_time: "10:00",
+    end_time: "09:45",
     is_active: true
   })
 
@@ -100,11 +108,11 @@ export function MentorAvailabilitySettings({
         is_active: newSlot.is_active
       })
 
-      // Reset new slot
+      // Reset new slot with 45min default
       setNewSlot({
         day_of_week: 1,
         start_time: "09:00",
-        end_time: "10:00",
+        end_time: "09:45",
         is_active: true
       })
     } catch (error) {
@@ -145,13 +153,25 @@ export function MentorAvailabilitySettings({
     value: any
   ) => {
     const updatedSlots = [...slots]
-    updatedSlots[index] = { ...updatedSlots[index], [field]: value }
-    setSlots(updatedSlots)
-
-    // Auto-save if slot has ID
-    const slot = updatedSlots[index]
-    if (slot.id) {
-      handleUpdateSlot(slot.id, { [field]: value })
+    if (field === "start_time" && typeof value === "string") {
+      const autoEnd = formatTimeDisplay(addMinutesToTime(value, 45))
+      updatedSlots[index] = {
+        ...updatedSlots[index],
+        start_time: value,
+        end_time: autoEnd
+      }
+      setSlots(updatedSlots)
+      const slot = updatedSlots[index]
+      if (slot.id) {
+        handleUpdateSlot(slot.id, { start_time: value, end_time: autoEnd })
+      }
+    } else {
+      updatedSlots[index] = { ...updatedSlots[index], [field]: value }
+      setSlots(updatedSlots)
+      const slot = updatedSlots[index]
+      if (slot.id) {
+        handleUpdateSlot(slot.id, { [field]: value })
+      }
     }
   }
 
@@ -166,14 +186,7 @@ export function MentorAvailabilitySettings({
   ]
 
   const getTimeOptions = () => {
-    const times = []
-    for (let hour = 6; hour <= 22; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const timeString = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`
-        times.push(timeString)
-      }
-    }
-    return times
+    return generateTimeOptions(6, 23).map((t) => t.label)
   }
 
   const groupSlotsByDay = () => {
@@ -188,7 +201,11 @@ export function MentorAvailabilitySettings({
   }
 
   const isValidSlot = (slot: AvailabilitySlot) => {
-    return slot.start_time < slot.end_time
+    if (!slot.start_time || !slot.end_time) return false
+    const [sh, sm] = slot.start_time.split(":").map(Number)
+    const [eh, em] = slot.end_time.split(":").map(Number)
+    const duration = (eh * 60 + em) - (sh * 60 + sm)
+    return duration >= 45
   }
 
   return (
@@ -246,9 +263,14 @@ export function MentorAvailabilitySettings({
                   <Label>Início</Label>
                   <Select
                     value={newSlot.start_time}
-                    onValueChange={(value) =>
-                      setNewSlot({ ...newSlot, start_time: value })
-                    }
+                    onValueChange={(value) => {
+                      const autoEnd = formatTimeDisplay(addMinutesToTime(value, 45))
+                      setNewSlot({
+                        ...newSlot,
+                        start_time: value,
+                        end_time: autoEnd
+                      })
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />

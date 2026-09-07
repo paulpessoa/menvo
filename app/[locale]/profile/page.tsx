@@ -48,6 +48,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Switch } from "@/components/ui/switch"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { COMMON_TIMEZONES, getBrowserTimezone } from "@/lib/utils/timezone"
 
 interface ChipInputProps {
   value: string[]
@@ -154,6 +162,7 @@ function ProfilePageContent() {
     cv_url: "",
     is_public: false,
     learning_goals: "",
+    timezone: "America/Sao_Paulo",
   })
 
   useEffect(() => {
@@ -164,6 +173,10 @@ function ProfilePageContent() {
     }
 
     if (profile) {
+      const detectedTz = profile.timezone && profile.timezone !== "UTC" 
+        ? profile.timezone 
+        : getBrowserTimezone()
+
       setFormData({
         first_name: profile.first_name || "",
         last_name: profile.last_name || "",
@@ -193,6 +206,7 @@ function ProfilePageContent() {
         cv_url: profile.cv_url || "",
         is_public: profile.is_public || false,
         learning_goals: (profile as any).learning_goals || "",
+        timezone: detectedTz,
       })
     }
   }, [user, profile, authLoading, router])
@@ -457,6 +471,28 @@ function ProfilePageContent() {
                     />
                     <p className="text-xs text-muted-foreground">
                       Seu endereço exato nunca é compartilhado publicamente. Apenas sua cidade, estado e país aparecem nos perfis e nas buscas.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5 pt-2 border-t">
+                    <Label className="font-semibold">Fuso Horário de Atendimento / Agenda</Label>
+                    <Select
+                      value={formData.timezone}
+                      onValueChange={(val) => setFormData({ ...formData, timezone: val })}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione seu fuso horário" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COMMON_TIMEZONES.map((tz) => (
+                          <SelectItem key={tz.value} value={tz.value}>
+                            {tz.label} ({tz.value})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Os horários de agendamento e disponibilidade serão calculados com base neste fuso horário.
                     </p>
                   </div>
                 </CardContent>

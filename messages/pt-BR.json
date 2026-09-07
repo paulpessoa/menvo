@@ -322,7 +322,7 @@
         "feature2": "Dados estruturados",
         "feature3": "Cases de sucesso"
       },
-      "getStarted": "Começar como ONG"
+      "getStarted": "Falar com nossa equipe"
     },
     "companies": {
       "step1": {
@@ -353,7 +353,7 @@
         "feature2": "Relatórios anuais",
         "feature3": "Selo de Empresa Amiga"
       },
-      "getStarted": "Começar como Empresa"
+      "getStarted": "Falar com nossa equipe"
     },
     "faq": {
       "title": "Perguntas Frequentes",
@@ -471,7 +471,7 @@
     "signupTitle": "Criar Conta",
     "description": "Preencha seus dados para começar sua jornada",
     "firstName": "Nome",
-    "firstNamePlaceholder": "Digite seu promeiro nome",
+    "firstNamePlaceholder": "Digite seu primeiro nome",
     "lastName": "Sobrenome",
     "lastNamePlaceholder": "Digite seu sobrenome",
     "email": "E-mail",

@@ -308,7 +308,6 @@
         "feature2": "Sigue el progreso de las mentorías",
         "feature3": "Recibe informes de impacto social"
       },
-      "getStarted": "Registrar Mi ONG",
       "step3": {
         "title": "Seguimiento y Evolución",
         "description": "Monitorea el progreso de las mentorías y observa el impacto real en la vida de tus jóvenes.",
@@ -322,7 +321,8 @@
         "feature1": "Informes de impacto",
         "feature2": "Datos estructurados",
         "feature3": "Casos de éxito"
-      }
+      },
+      "getStarted": "Hablar con nuestro equipo"
     },
     "companies": {
       "step1": {
@@ -346,14 +346,14 @@
         "feature2": "Reconocimiento y gamificación interna",
         "feature3": "Desarrollo de habilidades blandas"
       },
-      "getStarted": "Conviértete en Socio Corporativo",
       "step4": {
         "title": "Impacto y Reconocimiento ESG",
         "description": "Fortalece las métricas de impacto social de tu empresa con datos reales y auditables.",
         "feature1": "Certificados ESG",
         "feature2": "Informes anuales",
         "feature3": "Sello de Empresa Amiga"
-      }
+      },
+      "getStarted": "Hablar con nuestro equipo"
     },
     "faq": {
       "title": "Preguntas Frecuentes",

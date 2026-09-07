@@ -322,7 +322,8 @@
         "feature1": "Impact reports",
         "feature2": "Structured data",
         "feature3": "Success stories"
-      }
+      },
+      "getStarted": "Talk to our team"
     },
     "companies": {
       "step1": {
@@ -346,14 +347,14 @@
         "feature2": "Recognition and internal gamification",
         "feature3": "Soft skills development"
       },
-      "getStarted": "Become a Corporate Partner",
       "step4": {
         "title": "ESG Impact and Recognition",
         "description": "Strengthen your company social impact metrics with real and auditable data.",
         "feature1": "ESG Certificates",
         "feature2": "Annual reports",
         "feature3": "Partner Company Seal"
-      }
+      },
+      "getStarted": "Talk to our team"
     },
     "faq": {
       "title": "Frequently Asked Questions",

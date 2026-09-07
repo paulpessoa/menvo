@@ -22,7 +22,8 @@ export const updateProfileSchema = z.object({
   inclusion_tags: z.array(z.string()).optional().nullable(),
   inclusive_tags: z.array(z.string()).optional().nullable(),
   availability_status: z.enum(["available", "busy", "unavailable"]).optional().nullable(),
-  chat_enabled: z.boolean().optional().nullable()
+  chat_enabled: z.boolean().optional().nullable(),
+  timezone: z.string().optional().nullable()
 })
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
