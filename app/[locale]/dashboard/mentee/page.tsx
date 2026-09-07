@@ -22,7 +22,9 @@ import {
   MessageSquare,
   TrendingUp,
   LayoutDashboard,
-  Star
+  Star,
+  Video,
+  ExternalLink
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -50,6 +52,7 @@ interface Appointment {
   scheduled_at: string
   duration_minutes: number
   status: string
+  google_meet_link?: string | null
   mentor: {
     full_name: string
     avatar_url: string | null
@@ -310,27 +313,63 @@ export default function MenteeDashboard() {
                     </Card>
                   ) : (
                     <div className="space-y-4">
-                      {upcomingAppointments.map((appt) => (
-                        <Card key={appt.id} className="border-l-4 border-l-primary overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-3 mb-3">
-                              <Avatar className="h-10 w-10 border">
-                                <AvatarImage src={appt.mentor.avatar_url || undefined} />
-                                <AvatarFallback>{appt.mentor.full_name[0]}</AvatarFallback>
-                              </Avatar>
-                              <div className="min-w-0">
-                                <p className="text-sm font-bold truncate">{appt.mentor.full_name}</p>
-                                <p className="text-[11px] text-muted-foreground">
-                                  {new Date(appt.scheduled_at).toLocaleString(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                                </p>
+                      {upcomingAppointments.map((appt) => {
+                        const dateObj = new Date(appt.scheduled_at)
+                        const isToday = dateObj.toDateString() === new Date().toDateString()
+                        const isConfirmed = appt.status === "confirmed"
+
+                        return (
+                          <Card key={appt.id} className="border-l-4 border-l-primary overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all">
+                            <CardContent className="p-4 space-y-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <Avatar className="h-10 w-10 border shrink-0">
+                                    <AvatarImage src={appt.mentor.avatar_url || undefined} />
+                                    <AvatarFallback>{appt.mentor.full_name[0]}</AvatarFallback>
+                                  </Avatar>
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-bold truncate">{appt.mentor.full_name}</p>
+                                    <p className="text-[11px] text-muted-foreground truncate">{appt.mentor.job_title || "Mentor"}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {isToday && (
+                                    <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold">
+                                      Hoje
+                                    </Badge>
+                                  )}
+                                  <Badge variant={isConfirmed ? "default" : "outline"} className={`text-[10px] font-semibold ${isConfirmed ? "bg-emerald-600 hover:bg-emerald-600 text-white" : ""}`}>
+                                    {isConfirmed ? "Confirmada" : "Pendente"}
+                                  </Badge>
+                                </div>
                               </div>
-                            </div>
-                            <Button asChild size="sm" variant="secondary" className="w-full font-bold rounded-xl h-9">
-                              <Link href="/mentorship/mentee">{t("mentee.sections.viewDetails")}</Link>
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))}
+
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
+                                <span className={isToday ? "font-bold text-foreground" : ""}>
+                                  {dateObj.toLocaleString(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                </span>
+                                <span>({appt.duration_minutes || 45} min)</span>
+                              </div>
+
+                              <div className="flex items-center gap-2 pt-1">
+                                {isConfirmed && appt.google_meet_link && (
+                                  <Button asChild size="sm" className="flex-1 font-bold rounded-xl h-9 bg-primary hover:bg-primary/90 text-white shadow-xs">
+                                    <a href={appt.google_meet_link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5">
+                                      <Video className="w-3.5 h-3.5" />
+                                      <span>Entrar no Meet</span>
+                                      <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
+                                    </a>
+                                  </Button>
+                                )}
+                                <Button asChild size="sm" variant={isConfirmed && appt.google_meet_link ? "outline" : "secondary"} className={`font-bold rounded-xl h-9 ${isConfirmed && appt.google_meet_link ? "px-3" : "w-full"}`}>
+                                  <Link href="/mentorship/mentee">{t("mentee.sections.viewDetails")}</Link>
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )
+                      })}
                     </div>
                   )}
                 </div>

@@ -1,7 +1,7 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
 ## 📅 Last Updated: 2026-09-07
-**Current Status:** All interactive buttons standardized to `#007585`, scheduling slots enhanced with smart timezone detection and 45-min auto-calculation, dead API routes deleted, residual admin routes migrated to `@/lib/utils/supabase/server`, and `@supabase/auth-helpers-nextjs` fully uninstalled.
+**Current Status:** Mentee and Mentor dashboards simplified around the core loop (1-click Google Meet access on upcoming session cards, pending requests alerts for mentors, decoupled DB queries into `mentorshipService`), dead routes deleted, and `@supabase/auth-helpers-nextjs` uninstalled.
 
 ---
 
@@ -44,7 +44,7 @@
 | Priority | Item | Status |
 |---|---|---|
 | **P0** | Google OAuth Verification submission in Google Cloud Console | Ready for submission |
-| **P1** | Dashboard Simplification (Anti-Overengineering — Core Loop focus) | In Queue |
+| **P1** | Dashboard Simplification (Anti-Overengineering — Core Loop focus) | Completed |
 | **P2** | Unified In-App Notifications Hub (Table `notifications` + Header Bell) | Planned |
 | **P2** | Database Portability (BFF layer audit for 100% API coverage) | Planned |
 | **P2** | Transactional Email Hardening (Brevo templates for booking & reminders) | Planned |
