@@ -29,7 +29,7 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
   // State A: Mentee has already completed the assessment
   if (quizResponse) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-purple-500/5 to-blue-500/5 p-6 shadow-sm transition-all hover:shadow-md">
+      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-teal-500/5 to-emerald-500/5 p-6 shadow-sm transition-all hover:shadow-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -73,9 +73,9 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
 
   // State B: New mentee has not taken the quiz yet (Primary Activation)
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 md:p-8 text-white shadow-lg transition-all hover:shadow-xl">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-800 via-teal-700 to-emerald-700 p-6 md:p-8 text-white shadow-lg transition-all hover:shadow-xl">
       <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-0 right-1/4 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl pointer-events-none" />
 
       <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="space-y-3 max-w-2xl">
@@ -105,12 +105,12 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
           <Button
             asChild
             size="lg"
-            className="rounded-full bg-white text-indigo-700 hover:bg-white/90 font-bold px-8 shadow-md hover:scale-105 transition-all text-base h-12"
+            className="rounded-full bg-white text-teal-800 hover:bg-white/90 font-bold px-8 shadow-md hover:scale-105 transition-all text-base h-12"
           >
             <Link href="/quiz">
-              <Sparkles className="w-5 h-5 mr-2 text-indigo-600" />
+              <Sparkles className="w-5 h-5 mr-2 text-teal-700" />
               {t("ctaButton")}
-              <ArrowRight className="w-5 h-5 ml-2 text-indigo-600" />
+              <ArrowRight className="w-5 h-5 ml-2 text-teal-700" />
             </Link>
           </Button>
         </div>

@@ -275,12 +275,12 @@ export function BookMentorshipModal({
                 </div>
               </div>
             ) : !selectedSlot ? (
-              <div className="space-y-6">
-                <div className="bg-blue-50/80 border border-blue-100 rounded-2xl p-4 flex items-start gap-3">
-                  <div className="bg-blue-500 text-white rounded-full p-1 mt-0.5 shadow-sm">
+              <div className="space-y-4">
+                <div className="bg-teal-50/80 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/50 rounded-2xl p-4 flex items-start gap-3">
+                  <div className="bg-primary text-white rounded-full p-1 mt-0.5 shadow-sm">
                     <Clock className="w-3.5 h-3.5" />
                   </div>
-                  <p className="text-sm text-blue-900 leading-relaxed">
+                  <p className="text-sm text-teal-950 dark:text-teal-100 leading-relaxed">
                     {t("standardDuration", { name: mentorName })}
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export function BookMentorshipModal({
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="bg-gradient-to-r from-primary/10 via-purple-500/10 to-blue-500/10 p-5 rounded-2xl border border-primary/20 relative overflow-hidden">
+                <div className="bg-gradient-to-r from-primary/10 via-teal-500/10 to-emerald-500/10 p-5 rounded-2xl border border-primary/20 relative overflow-hidden">
                   <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">
                     {t("selectedSlot")}
                   </p>
@@ -415,7 +415,7 @@ export function BookMentorshipModal({
                     type="button"
                     onClick={handleConfirmBooking}
                     disabled={isSubmitting || message.length < 20}
-                    className="flex-1 h-12 rounded-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                    className="flex-1 h-12 rounded-xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>

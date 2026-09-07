@@ -260,7 +260,7 @@ export function QuizForm({ onSubmit, onBack, initialData }: QuizFormProps) {
                   <Button
                     onClick={handleSubmit}
                     disabled={!canProceed() || isSubmitting}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="flex-1 font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md"
                     size="lg"
                   >
                     {isSubmitting ? (

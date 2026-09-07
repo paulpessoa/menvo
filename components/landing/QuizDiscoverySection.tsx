@@ -85,7 +85,7 @@ export function QuizDiscoverySection() {
 
             {/* Right Column: Visual Card Preview */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative w-full max-w-sm rounded-2xl bg-gradient-to-br from-primary/15 via-purple-500/10 to-blue-500/15 p-6 border border-border shadow-inner space-y-4">
+              <div className="relative w-full max-w-sm rounded-2xl bg-gradient-to-br from-primary/15 via-teal-500/10 to-emerald-500/15 p-6 border border-border shadow-inner space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-primary">Preview</span>
                   <Badge className="bg-primary/20 text-primary border-none text-[10px] font-bold">2 MIN</Badge>

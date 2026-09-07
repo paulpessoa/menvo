@@ -54,7 +54,7 @@ export function AuthGuard({
                     </p>
                     <button
                         onClick={() => router.back()}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                        className="bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-primary/90 transition-colors shadow-sm"
                     >
                         Voltar
                     </button>

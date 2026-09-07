@@ -173,7 +173,7 @@ export default function MenteeDashboard() {
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
               <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
             </div>
-            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all">
+            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all">
               <Link href="/mentors">
                 <Search className="h-4 w-4 mr-2" /> {t("mentee.actions.find")}
               </Link>
@@ -223,7 +223,7 @@ export default function MenteeDashboard() {
                 <StatCard title={t("mentee.stats.scheduled")} value={stats.upcomingAppointments} icon={<Calendar className="h-5 w-5" />} description={t("mentee.stats.scheduledDesc")} />
                 <StatCard title={t("mentee.stats.mentors")} value={stats.totalMentors} icon={<Users className="h-5 w-5" />} description={t("mentee.stats.mentorsDesc")} />
                 <StatCard title={t("mentee.stats.completed")} value={stats.completedSessions} icon={<CheckCircle className="h-5 w-5 text-green-500" />} description={t("mentee.stats.completedDesc")} />
-                <StatCard title={t("mentee.stats.hours")} value={`${stats.totalHours}h`} icon={<Clock className="h-5 w-5 text-blue-500" />} description={t("mentee.stats.hoursDesc")} />
+                <StatCard title={t("mentee.stats.hours")} value={`${stats.totalHours}h`} icon={<Clock className="h-5 w-5 text-primary" />} description={t("mentee.stats.hoursDesc")} />
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -233,13 +233,13 @@ export default function MenteeDashboard() {
                       title={t("mentee.actions.myMentorshipsAction")} 
                       desc={t("mentee.actions.myMentorshipsActionDesc")} 
                       link="/mentorship/mentee" 
-                      icon={<Calendar className="w-6 h-6 text-green-500" />}
+                      icon={<Calendar className="w-6 h-6 text-emerald-600" />}
                     />
                     <QuickActionCard 
                       title={t("mentee.actions.exploreMentorsAction")} 
                       desc={t("mentee.actions.exploreMentorsActionDesc")} 
                       link="/mentors" 
-                      icon={<Search className="w-6 h-6 text-blue-500" />}
+                      icon={<Search className="w-6 h-6 text-primary" />}
                     />
                   </div>
 
@@ -303,7 +303,7 @@ export default function MenteeDashboard() {
                         <p className="text-xs text-muted-foreground max-w-sm mb-5 leading-relaxed">
                           {t("mentee.sections.noAppointmentsDesc")}
                         </p>
-                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all px-5 h-10">
+                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all px-5 h-10">
                           <Link href="/mentors">{t("mentee.sections.bookNow")}</Link>
                         </Button>
                       </CardContent>

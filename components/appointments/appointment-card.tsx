@@ -182,7 +182,7 @@ export function AppointmentCard({
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span className={isToday ? "font-bold text-blue-600" : ""}>
+          <span className={isToday ? "font-bold text-primary" : ""}>
             {isToday ? t("today") : formattedDate}
           </span>
         </div>

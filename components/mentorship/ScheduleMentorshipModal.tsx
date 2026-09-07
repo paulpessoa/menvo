@@ -212,7 +212,7 @@ export function ScheduleMentorshipModal({
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-medium rounded-md transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? 'Enviando...' : 'Agendar'}
                         </button>

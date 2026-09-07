@@ -151,13 +151,13 @@ export default function MentorDashboard() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
-                   <Card className="border-none shadow-sm bg-gradient-to-br from-blue-500 to-indigo-600 text-white overflow-hidden relative">
+                   <Card className="border-none shadow-sm bg-gradient-to-br from-teal-700 to-emerald-700 text-white overflow-hidden relative">
                       <CardHeader className="relative z-10">
                         <CardTitle className="text-2xl">Gerencie sua Agenda</CardTitle>
-                        <CardDescription className="text-blue-100 text-base">Mantenha seus horários atualizados para receber novos agendamentos.</CardDescription>
+                        <CardDescription className="text-teal-100 text-base">Mantenha seus horários atualizados para receber novos agendamentos.</CardDescription>
                       </CardHeader>
                       <CardContent className="relative z-10">
-                        <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50 font-bold">
+                        <Button asChild size="lg" className="bg-white text-teal-800 hover:bg-white/90 font-bold shadow-md">
                           <Link href="/dashboard/mentor/availability">Configurar Disponibilidade</Link>
                         </Button>
                       </CardContent>
@@ -173,13 +173,13 @@ export default function MentorDashboard() {
                         title="Ver Mentorias" 
                         desc="Gerencie suas solicitações e sessões ativas." 
                         link="/mentorship/mentor" 
-                        icon={<Clock className="w-6 h-6 text-green-500" />}
+                        icon={<Clock className="w-6 h-6 text-emerald-600" />}
                       />
                       <QuickActionCard 
                         title="Meu Perfil Público" 
                         desc="Veja como os alunos enxergam você." 
                         link={`/mentors/${profile?.slug || profile?.id}`} 
-                        icon={<Users className="w-6 h-6 text-purple-500" />}
+                        icon={<Users className="w-6 h-6 text-primary" />}
                       />
                    </div>
                 </div>

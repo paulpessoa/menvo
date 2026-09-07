@@ -74,7 +74,7 @@ export function MagicSearchBar({ onMatch, onClear }: MagicSearchBarProps) {
   return (
     <div className="w-full max-w-4xl mx-auto mb-8 sm:mb-10">
       <form onSubmit={handleMagicSearch} className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-emerald-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
         <Card className="relative bg-card border-2 border-primary/15 shadow-xl overflow-hidden rounded-2xl">
           <CardContent className="p-3 sm:p-2.5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-2">
             {/* Input Row */}

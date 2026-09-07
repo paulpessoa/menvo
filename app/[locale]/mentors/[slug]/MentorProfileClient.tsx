@@ -366,7 +366,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
           <div className="space-y-8">
             {/* Booking Card */}
             <Card className="border-none shadow-2xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white relative">
-              <div className="h-3 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+              <div className="h-3 bg-gradient-to-r from-teal-600 to-emerald-600"></div>
               <CardHeader className="pb-3 pt-8 px-8">
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <Badge
@@ -445,7 +445,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   </div>
                 ) : (
                   <Button
-                    className="w-full rounded-2xl h-14 font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
+                    className="w-full rounded-2xl h-14 font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-xl shadow-teal-700/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
                     disabled={
                       availability.length === 0 ||
                       mentor.availability_status === "busy" ||

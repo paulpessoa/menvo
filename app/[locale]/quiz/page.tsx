@@ -155,11 +155,11 @@ export default function QuizPage() {
           </div>
 
           {/* Main CTA Card */}
-          <Card className="border-2 border-purple-200 dark:border-purple-800 shadow-lg">
+          <Card className="border-2 border-teal-200 dark:border-teal-800 shadow-lg">
             <CardContent className="space-y-6">
               <Button
                 size="lg"
-                className="w-full text-lg mt-8 h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full text-lg mt-8 h-14 font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white shadow-md"
                 onClick={() => setShowQuiz(true)}
               >
                 {t('quiz_page.start_quiz')}

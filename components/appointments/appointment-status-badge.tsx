@@ -33,7 +33,7 @@ export function AppointmentStatusBadge({ status, className }: AppointmentStatusB
             label: t('completed'),
             variant: 'outline' as const,
             icon: Calendar,
-            className: 'bg-blue-100 text-blue-800 border-blue-200',
+            className: 'bg-teal-50 text-teal-800 border-teal-200',
         },
     }
 
