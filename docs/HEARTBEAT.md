@@ -7,6 +7,9 @@
 
 ## 📍 Where We Left Off
 
+- [x] `activation funnel telemetry (ga4)` — Implemented lightweight GA4 event tracking in `lib/utils/google-analytics/events.ts`. Emits `quiz_completed` on quiz submission (`app/[locale]/quiz/page.tsx`) and `booking_confirmed` on mentorship scheduling (`components/mentorship/BookMentorshipModal.tsx`), establishing end-to-end activation tracking without external dependencies or overhead.
+- [x] `google calendar conflict detection` — Added `getCalendarBusyIntervals` to `lib/services/mentorship/google-calendar.service.ts` using native Google Calendar `freebusy.query`. Integrated conflict resolution into `/api/appointments/availability` to dynamically suppress slots colliding with existing calendar events, with non-blocking graceful fallback.
+- [x] `codebase anti-overengineering cleanup` — Audited and pruned orphaned legacy code: removed dead `lib/services/maps/` (2 files), dead AI resume analyzer `lib/cv-analysis.ts`, redundant upload hook `hooks/useFileUpload.ts`, and unused hooks (`useLoadingStates.ts`, `useUnsavedChanges.ts`, `useValidatedMentors.ts`). Cleaned over 1,200 lines of dead code while maintaining 100% test coverage (45/45 passing) and zero TypeScript errors.
 - [x] `auth ecosystem restructuring & simplification` — Completed full audit and restructuring of all auth pages, components, and APIs:
     - **Fix typo & domain in verifications**: Fixed `pages.tsx` typo (which broke the route with 404). Moved admin mentor verification panel to `app/[locale]/dashboard/admin/verifications/page.tsx`, and created canonical redirect in `app/[locale]/(auth)/verifications/page.tsx`. Deleted broken `pages.tsx`.
     - **Unified resend-confirmation**: Merged `ResendForm.tsx` into a single, clean `app/[locale]/(auth)/resend-confirmation/page.tsx` and routed calls through `authService.resendConfirmationEmail` per `AGENTS.md`. Removed `ResendForm.tsx`.

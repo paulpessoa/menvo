@@ -24,6 +24,7 @@ import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { useAuth } from "@/lib/auth"
 import { useLocale, useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
+import { trackBookingConfirmed } from "@/lib/utils/google-analytics/events"
 
 interface TimeSlot {
   day_of_week: number
@@ -173,6 +174,13 @@ export function BookMentorshipModal({
         }
         throw new Error(data.error || data.message || "Erro ao agendar mentoria")
       }
+
+      trackBookingConfirmed({
+        mentorId,
+        requestedDate,
+        requestedTime: requestedStartTime,
+        isFirstBooking: true,
+      })
 
       setSuccess(true)
       setTimeout(() => {

@@ -218,3 +218,50 @@ export async function deleteCalendarEvent(
     throw error;
   }
 }
+
+/**
+ * Intervalo ocupado retornado pelo Google Calendar
+ */
+export interface BusyInterval {
+  start: Date;
+  end: Date;
+}
+
+/**
+ * Consulta intervalos de horários ocupados no Google Calendar para detecção dinâmica
+ * de conflitos, bloqueando slots que colidem com eventos existentes.
+ */
+export async function getCalendarBusyIntervals(
+  timeMin: Date,
+  timeMax: Date
+): Promise<BusyInterval[]> {
+  if (!isGoogleCalendarConfigured()) {
+    return [];
+  }
+
+  try {
+    const oauth2Client = await createAuthenticatedClient();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    const calendarId = getCalendarId();
+
+    const response = await calendar.freebusy.query({
+      requestBody: {
+        timeMin: timeMin.toISOString(),
+        timeMax: timeMax.toISOString(),
+        items: [{ id: calendarId }],
+      },
+    });
+
+    const busyList = response.data.calendars?.[calendarId]?.busy || [];
+    return busyList
+      .filter((b) => b.start && b.end)
+      .map((b) => ({
+        start: new Date(b.start!),
+        end: new Date(b.end!),
+      }));
+  } catch (error: any) {
+    console.warn('[CALENDAR] Falha ao consultar freebusy do Google Calendar (seguindo com agenda local):', error.message || error);
+    return [];
+  }
+}
+

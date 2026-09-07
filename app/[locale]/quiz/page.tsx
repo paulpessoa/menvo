@@ -18,6 +18,7 @@ import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { quizService } from "@/lib/services/quiz/quiz.service"
+import { trackQuizCompleted } from "@/lib/utils/google-analytics/events"
 
 export default function QuizPage() {
   const [showQuiz, setShowQuiz] = useState(false)
@@ -41,6 +42,12 @@ export default function QuizPage() {
         future_vision: data.futureVision,
         share_knowledge: data.shareKnowledge,
         personal_life_help: data.personalLifeHelp
+      })
+
+      trackQuizCompleted({
+        responseId: res.id,
+        email: data.email,
+        hasEvent: !!event,
       })
 
       toast({
