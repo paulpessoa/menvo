@@ -47,13 +47,22 @@ export async function generateMetadata({
       url: "https://www.menvo.com.br",
       title: t("og.title") || t("title"),
       description: t("og.description") || t("description"),
-      siteName: t("og.siteName") || "MENVO"
+      siteName: t("og.siteName") || "MENVO",
+      images: [
+        {
+          url: "https://www.menvo.com.br/images/menvopeople.jpg",
+          width: 1200,
+          height: 630,
+          alt: "Menvo - Mentoria Voluntária Gratuita"
+        }
+      ]
     },
     twitter: {
       card: "summary_large_image",
       title: t("twitter.title") || t("title"),
       description: t("twitter.description") || t("description"),
-      creator: "@paulpessoa"
+      creator: "@paulpessoa",
+      images: ["https://www.menvo.com.br/images/menvopeople.jpg"]
     },
     robots: {
       index: true,

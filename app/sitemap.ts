@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/doar',
     '/privacy',
     '/terms',
+    '/cookies',
     '/login',
     '/signup'
   ]
