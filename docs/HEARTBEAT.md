@@ -61,7 +61,8 @@
 | [`docs/DATA_FLOW_MAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/DATA_FLOW_MAP.md) | Mapeamento de fluxo de dados, TanStack Query, Services e BFF |
 | [`docs/V2_ARCHITECTURE_CLEANUP_MAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/V2_ARCHITECTURE_CLEANUP_MAP.md) | Roadmap de desacoplamento, Zod Schemas e preparação para Agente + MCP |
 | [`docs/JOURNAL.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/JOURNAL.md) | Historical log of architectural decisions & milestones |
-| [`docs/product/VISION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/product/VISION.md) | Product purpose, target audience, and north star |
+| [`docs/VISION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/VISION.md) | Product purpose, target audience, and north star |
+| [`docs/GOOGLE_OAUTH_SUBMISSION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/GOOGLE_OAUTH_SUBMISSION.md) | Google Cloud Console OAuth verification kit & demo video script |
 | [`docs/SCHEDULING_AND_AVAILABILITY.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/SCHEDULING_AND_AVAILABILITY.md) | Availability algorithm, 14-day projection, conflict detection |
 | [`docs/EVALUATION_SYSTEM.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/EVALUATION_SYSTEM.md) | Asymmetric feedback model specification |
 | [`docs/GOOGLE_CALENDAR.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/GOOGLE_CALENDAR.md) | Google Calendar OAuth and Meet generation setup |
