@@ -9,7 +9,7 @@
 - **Personal Founder Signature (Paul Pessoa):** Implemented warm, clean email signature for community and relationship touchpoints (`sendVerificationNotification`, `sendAppointmentConfirmation`, `sendFeedbackRequest`). Includes circular portrait (`public/images/paul-pessoa.jpg`), official WhatsApp icon with direct chat link, and clean text links for LinkedIn/GitHub. Removed decorative emojis across all email templates and titles for a sober, professional tone.
 - **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal Menvo) across all Brevo email templates, eradicating rogue `#4F46E5` indigo buttons on Google Meet CTAs.
 - **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`, notifying the counterpart (mentor or mentee) with the session date, person who cancelled, and user-provided reason.
-- **Institutional Signature:** Retained clean, lightweight `Equipe Menvo` signature on operational notices (session reminders, cancellations, new mentor alerts).
+- **Streamlined Operational Emails (No Redundant Team Signature):** Eliminated the redundant `Equipe Menvo` signature block from transactional notices (reminders, cancellations). Operational emails now flow directly into the institutional Menvo footer without extra visual noise.
 
 ---
 

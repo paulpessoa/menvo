@@ -23,7 +23,8 @@ describe('GET /api/admin/emails/preview', () => {
     expect(res.status).toBe(200);
     const html = await res.text();
     expect(html).toContain('Mentoria Cancelada');
-    expect(html).toContain('Equipe Menvo');
+    expect(html).toContain('Motivo informado:');
+    expect(html).not.toContain('Equipe Menvo');
   });
 
   it('should return HTML preview for verification template', async () => {

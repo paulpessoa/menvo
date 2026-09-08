@@ -27,7 +27,7 @@ import {
 interface EmailTemplateMeta {
   key: string
   label: string
-  signature: "personal" | "team"
+  signature: "personal" | "none"
   icon: any
   description: string
 }
@@ -57,14 +57,14 @@ const TEMPLATES: EmailTemplateMeta[] = [
   {
     key: "cancellation",
     label: "Mentoria Cancelada",
-    signature: "team",
+    signature: "none",
     icon: CalendarX,
     description: "Notifica a contraparte com quem cancelou, motivo informado e horários alternativos."
   },
   {
     key: "reminder",
     label: "Lembrete do Dia",
-    signature: "team",
+    signature: "none",
     icon: Bell,
     description: "Lembrete com horário e link da sessão na manhã do dia do agendamento."
   }
@@ -158,8 +158,8 @@ export default function AdminEmailPreviewPage() {
                             Paul Pessoa
                           </Badge>
                         ) : (
-                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-gray-100 text-gray-700 border-gray-200">
-                            Equipe
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-slate-50 text-slate-600 border-slate-200">
+                            Direto
                           </Badge>
                         )}
                       </div>
@@ -193,10 +193,10 @@ export default function AdminEmailPreviewPage() {
               ) : (
                 <div>
                   <p className="font-medium text-foreground mb-1">
-                    🏢 Assinatura Institucional
+                    ⚡ Sem Assinatura Redundante
                   </p>
                   <p>
-                    Assinatura enxuta <strong>Equipe Menvo</strong> para comunicados operacionais de agendamento e cancelamento.
+                    Comunicação operacional e direta ao ponto, terminando imediatamente no conteúdo e aproveitando o rodapé institucional do Menvo.
                   </p>
                 </div>
               )}

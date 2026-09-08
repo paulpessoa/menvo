@@ -68,16 +68,6 @@ const getPersonalSignatureHtml = () => `
   </div>
 `;
 
-/**
- * Assinatura institucional para e-mails operacionais
- */
-const getTeamSignatureHtml = () => `
-  <div class="signature" style="margin-top: 30px; border-top: 1px solid ${COLORS.divider}; padding-top: 20px;">
-    <p style="font-weight: 600; color: #1f2937; margin: 0 0 2px 0; font-size: 14px;">Equipe Menvo</p>
-    <p style="color: #6b7280; font-size: 12px; margin: 0;">Mentoria voluntária gratuita · Conectando propósitos</p>
-  </div>
-`;
-
 // Layout Base (CSS e Container)
 const getEmailLayout = (
   title: string,
@@ -85,14 +75,7 @@ const getEmailLayout = (
   options: EmailLayoutOptions | string = {}
 ) => {
   const opts: EmailLayoutOptions = typeof options === 'string' ? { footerExtra: options } : options;
-  const signatureType = opts.signatureType || 'team';
-
-  let signatureHtml = '';
-  if (signatureType === 'personal') {
-    signatureHtml = getPersonalSignatureHtml();
-  } else if (signatureType === 'team') {
-    signatureHtml = getTeamSignatureHtml();
-  }
+  const signatureHtml = opts.signatureType === 'personal' ? getPersonalSignatureHtml() : '';
 
   return `
 <!DOCTYPE html>
