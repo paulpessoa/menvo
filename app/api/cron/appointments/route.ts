@@ -2,23 +2,46 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendAppointmentReminder, sendFeedbackRequest } from '@/lib/email/brevo';
 
-// Usar Service Role para bypass RLS nas consultas de admin
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+/**
+ * Retorna o cliente administrativo do Supabase com service_role para operações agendadas
+ */
+function getAdminClient() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+        throw new Error('Variáveis de ambiente do Supabase (URL / SERVICE_ROLE_KEY) não configuradas.');
+    }
+
+    return createClient(supabaseUrl, serviceRoleKey, {
+        auth: { persistSession: false }
+    });
+}
 
 export async function GET(request: Request) {
     try {
+        // Validação de segurança: Vercel Cron envia 'Authorization: Bearer <CRON_SECRET>'
+        const authHeader = request.headers.get('authorization');
+        const cronSecret = process.env.CRON_SECRET;
+
+        if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+            return NextResponse.json({ error: 'Unauthorized: CRON_SECRET mismatch' }, { status: 401 });
+        }
+
+        const supabase = getAdminClient();
         const now = new Date();
         const results = { reminders: 0, feedbacks: 0, errors: [] as string[] };
 
-        // --- 1. PROCESSAR LEMBRETES DO DIA ---
-        // Buscar mentorias CONFIRMADAS para hoje que ainda não enviaram lembrete
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        const todayEnd = new Date();
-        todayEnd.setHours(23, 59, 59, 999);
+        // --- 1. PROCESSAR LEMBRETES DO DIA (Fuso de Brasília / GMT-3) ---
+        const nowBR = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'America/Sao_Paulo',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).format(now);
+
+        const todayStart = new Date(`${nowBR}T00:00:00-03:00`);
+        const todayEnd = new Date(`${nowBR}T23:59:59.999-03:00`);
 
         const { data: toRemind, error: remindError } = await supabase
             .from('appointments')
@@ -32,33 +55,40 @@ export async function GET(request: Request) {
             .gte('scheduled_at', todayStart.toISOString())
             .lte('scheduled_at', todayEnd.toISOString());
 
-        if (toRemind) {
+        if (remindError) {
+            console.error('❌ [CRON] Erro ao buscar mentorias para lembrete:', remindError);
+            results.errors.push(`Erro busca lembretes: ${remindError.message}`);
+        } else if (toRemind && toRemind.length > 0) {
             for (const app of toRemind) {
                 try {
-                    // Enviar para o Mentee
-                    await sendAppointmentReminder({
-                        userEmail: app.mentee.email,
-                        userName: app.mentee.full_name,
-                        otherPersonName: app.mentor.full_name,
-                        scheduledAt: app.scheduled_at,
-                        meetLink: app.google_meet_link
-                    });
-                    
+                    // Enviar para o Mentorado
+                    if (app.mentee?.email) {
+                        await sendAppointmentReminder({
+                            userEmail: app.mentee.email,
+                            userName: app.mentee.full_name || 'Mentorado',
+                            otherPersonName: app.mentor?.full_name || 'Mentor',
+                            scheduledAt: app.scheduled_at,
+                            meetLink: app.google_meet_link
+                        });
+                    }
+
                     // Enviar para o Mentor
-                    await sendAppointmentReminder({
-                        userEmail: app.mentor.email,
-                        userName: app.mentor.full_name,
-                        otherPersonName: app.mentee.full_name,
-                        scheduledAt: app.scheduled_at,
-                        meetLink: app.google_meet_link
-                    });
+                    if (app.mentor?.email) {
+                        await sendAppointmentReminder({
+                            userEmail: app.mentor.email,
+                            userName: app.mentor.full_name || 'Mentor',
+                            otherPersonName: app.mentee?.full_name || 'Mentorado',
+                            scheduledAt: app.scheduled_at,
+                            meetLink: app.google_meet_link
+                        });
+                    }
 
                     // Marcar como lembrado
                     await supabase
                         .from('appointments')
                         .update({ reminded_at: new Date().toISOString() })
                         .eq('id', app.id);
-                    
+
                     results.reminders++;
                 } catch (e: any) {
                     results.errors.push(`Erro lembrete ${app.id}: ${e.message}`);
@@ -67,8 +97,7 @@ export async function GET(request: Request) {
         }
 
         // --- 2. PROCESSAR PEDIDOS DE FEEDBACK ---
-        // Buscar mentorias que terminaram há pelo menos 1 hora e ainda não pediram feedback
-        // Consideramos terminada se (scheduled_at + duration) < (agora - 1 hora)
+        // Buscar mentorias finalizadas há pelo menos 1 hora sem pedido de feedback enviado
         const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
         const { data: toFeedback, error: feedbackError } = await supabase
@@ -81,19 +110,24 @@ export async function GET(request: Request) {
             .eq('status', 'confirmed')
             .is('feedback_requested_at', null);
 
-        if (toFeedback) {
+        if (feedbackError) {
+            console.error('❌ [CRON] Erro ao buscar mentorias para feedback:', feedbackError);
+            results.errors.push(`Erro busca feedback: ${feedbackError.message}`);
+        } else if (toFeedback && toFeedback.length > 0) {
             for (const app of toFeedback) {
-                const endTime = new Date(new Date(app.scheduled_at).getTime() + (app.duration_minutes || 60) * 60000);
-                
-                // Se a mentoria já terminou há mais de 1 hora
+                const durationMinutes = app.duration_minutes || 45;
+                const endTime = new Date(new Date(app.scheduled_at).getTime() + durationMinutes * 60000);
+
                 if (endTime < oneHourAgo) {
                     try {
-                        await sendFeedbackRequest({
-                            userEmail: app.mentee.email,
-                            userName: app.mentee.full_name,
-                            mentorName: app.mentor.full_name,
-                            appointmentId: app.id
-                        });
+                        if (app.mentee?.email) {
+                            await sendFeedbackRequest({
+                                userEmail: app.mentee.email,
+                                userName: app.mentee.full_name || 'Mentorado',
+                                mentorName: app.mentor?.full_name || 'Mentor',
+                                appointmentId: app.id
+                            });
+                        }
 
                         // Marcar como solicitado
                         await supabase
@@ -109,10 +143,11 @@ export async function GET(request: Request) {
             }
         }
 
-        return NextResponse.json({ 
-            success: true, 
+        return NextResponse.json({
+            success: true,
             timestamp: now.toISOString(),
-            results 
+            dateBR: nowBR,
+            results
         });
 
     } catch (error: any) {

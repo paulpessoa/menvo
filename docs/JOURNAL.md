@@ -11,6 +11,7 @@
 - **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`, notifying the counterpart (mentor or mentee) with the session date, person who cancelled, and user-provided reason.
 - **Streamlined Operational Emails (No Redundant Team Signature):** Eliminated the redundant `Equipe Menvo` signature block from transactional notices (reminders, cancellations). Operational emails now flow directly into the institutional Menvo footer without extra visual noise.
 - **Live Email Test Dispatch Center (`/api/admin/emails/send-test`):** Added functional test email dispatching directly from `/dashboard/admin/emails`. Allows administrators to send real Brevo test emails of any template to any recipient with pre-fill of logged-in user email, loading feedback, and Sonner toast notifications.
+- **Cron Job Hardening (`/api/cron/appointments`):** Rescheduled from 04:00 UTC (01:00 AM) to 10:00 UTC (07:00 AM Brasília time) in `vercel.json` for morning delivery. Hardened endpoint with `CRON_SECRET` Bearer token authentication, precise Brasília calendar boundaries (`America/Sao_Paulo` ISO offsets), safe Supabase client initialization, and unit tests.
 
 ---
 
