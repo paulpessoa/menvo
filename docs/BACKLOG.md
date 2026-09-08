@@ -4,11 +4,6 @@
 
 ---
 
-## 🔴 P0 — Critical (Immediate)
-- [ ] **Google OAuth Verification Submission:** Complete demo recording showing the end-to-end booking flow and submit the verification request in Google Cloud Console.
-
----
-
 ## 🟠 P1 — High Priority
 - [x] **Mentor Search & Filtering Polish:** Redesigned responsive mobile layout for Magic Search, 50/50 action grid, sticky full-height filter drawer, and active chips bar.
 - [x] **Mentee Activation:** Track quiz completion to first booked session funnel in Google Analytics.
