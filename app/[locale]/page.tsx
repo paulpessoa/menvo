@@ -58,10 +58,10 @@ export default function Home() {
               {t("hero.description")}
             </p>
             <div className="flex flex-col gap-3 w-full max-w-sm mx-auto lg:flex-row lg:max-w-none lg:mx-0">
-              <Button size="lg" asChild className="w-full lg:w-auto px-8 h-12 shadow-lg shadow-primary/10 hover:scale-105 transition-transform font-bold">
+              <Button size="lg" asChild className="w-full lg:w-auto">
                 <Link href="/mentors">{t("hero.findMentor")}</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="w-full lg:w-auto px-8 h-12 border-2 hover:bg-muted font-bold">
+              <Button size="lg" variant="outline" asChild className="w-full lg:w-auto">
                 <Link href={isAuthenticated ? "/profile?tab=mentorship" : "/how-it-works?tab=mentors"}>
                   {t("hero.becomeMentor")}
                 </Link>
@@ -139,7 +139,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex justify-center mt-12">
-            <Button variant="outline" asChild className="rounded-full px-6">
+            <Button variant="outline" asChild>
               <Link href="/how-it-works">{t("howItWorks.learnMore")}</Link>
             </Button>
           </div>
@@ -180,7 +180,7 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-4 min-[400px]:flex-row">
-              <Button size="lg" variant="secondary" asChild className="px-10 h-14 text-lg shadow-xl hover:scale-105 transition-transform font-bold">
+              <Button size="xl" variant="secondary" asChild>
                 <Link href="/signup">{t("cta.signup")}</Link>
               </Button>
             </div>

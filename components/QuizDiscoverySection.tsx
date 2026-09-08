@@ -1,7 +1,7 @@
 "use client"
 
 import { Link } from "@/i18n/routing"
-import { Sparkles, ArrowRight, BrainCircuit, CheckCircle2, Compass } from "lucide-react"
+import { BrainCircuit, CheckCircle2, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
@@ -60,23 +60,18 @@ export function QuizDiscoverySection() {
                 <Button
                   size="lg"
                   asChild
-                  className="rounded-full h-12 px-8 font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all text-base"
                 >
                   <Link href="/quiz">
-                    <Sparkles className="w-4 h-4 mr-2" />
                     {t("ctaButton")}
-                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
 
                 <Button
                   size="lg"
-                  variant="ghost"
+                  variant="outline"
                   asChild
-                  className="rounded-full h-12 px-6 text-muted-foreground hover:text-foreground font-medium"
                 >
                   <Link href="/mentors">
-                    <Compass className="w-4 h-4 mr-2" />
                     {t("exploreLink")}
                   </Link>
                 </Button>
