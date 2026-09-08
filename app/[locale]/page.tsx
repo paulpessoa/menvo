@@ -51,7 +51,7 @@ export default function Home() {
             <Badge variant="secondary" className="w-fit mb-4 px-3 py-0.5 text-xs font-medium rounded-full bg-primary/10 text-primary border-none">
               {t("badge.freeMentorship")}
             </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-center lg:text-left leading-tight text-gray-900">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-center lg:text-left leading-tight text-foreground">
               {t("hero.title")}
             </h1>
             <p className="max-w-[540px] text-muted-foreground text-base md:text-lg mb-8 text-center lg:text-left leading-relaxed">
@@ -95,7 +95,7 @@ export default function Home() {
         <div className="container max-w-7xl px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-3">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-gray-900">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
                 {t("howItWorks.title")}
               </h2>
               <p className="max-w-[700px] text-muted-foreground text-base md:text-lg mx-auto">

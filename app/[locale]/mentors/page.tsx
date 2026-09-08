@@ -339,10 +339,10 @@ export default function MentorsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
           {t("title")}
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           {t("subtitle")}
         </p>
       </div>

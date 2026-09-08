@@ -54,8 +54,14 @@ export function MobileNavSheet({
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden h-10 w-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="lg:hidden h-10 w-10"
+          aria-label="Abrir menu de navegação"
+        >
           <Menu className="h-6 w-6" />
+          <span className="sr-only">Abrir menu de navegação</span>
         </Button>
       </SheetTrigger>
       <SheetContent

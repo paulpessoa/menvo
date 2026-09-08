@@ -32,7 +32,12 @@ export function LanguageSelector() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-full"
+          aria-label={t("language") || "Selecionar idioma"}
+        >
           <Globe className="h-4 w-4" />
           <span className="sr-only">{t("language")}</span>
         </Button>
