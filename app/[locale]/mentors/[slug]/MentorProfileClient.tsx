@@ -175,7 +175,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             className="hover:bg-transparent hover:text-primary p-0 font-bold text-muted-foreground transition-colors"
           >
             <Link href="/mentors">
-              <ArrowLeft className="h-4 w-4 mr-2" />
               {t("backToMentors")}
             </Link>
           </Button>
@@ -438,7 +437,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                       className="w-full rounded-2xl h-12 font-bold hover:bg-primary/5 transition-all"
                     >
                       <Link href="/dashboard/mentor/availability">
-                        <Clock className="mr-2 h-4 w-4 text-primary" />
                         {t("manageAvailability")}
                       </Link>
                     </Button>
@@ -459,7 +457,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                       }
                     }}
                   >
-                    <Calendar className="mr-2 h-5 w-5" />
                     {mentor.availability_status === "busy" ||
                     mentor.availability_status === "unavailable" ||
                     availability.length === 0
@@ -531,7 +528,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
               className="w-full rounded-2xl font-black shadow-2xl shadow-primary/40"
               disabled={mentor.availability_status === "busy" || mentor.availability_status === "unavailable"}
             >
-              <Calendar className="mr-2 h-6 w-6" />
               {mentor.availability_status === "busy" || mentor.availability_status === "unavailable"
                 ? t("fullSchedule")
                 : t("bookMentorship")}

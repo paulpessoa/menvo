@@ -406,9 +406,8 @@ export default function MentorsPage() {
               <SheetTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full sm:w-auto h-11 sm:h-12 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40"
+                  className="w-full sm:w-auto h-11 sm:h-12 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40"
                 >
-                  <Filter className="h-3.5 w-3.5 text-primary shrink-0" />
                   <span>{t("filters")}</span>
                   {activeFacetCount > 0 && (
                     <Badge className="ml-1 h-5 min-w-5 px-1.5 rounded-full text-[10px] flex items-center justify-center bg-primary text-primary-foreground">
@@ -719,9 +718,8 @@ export default function MentorsPage() {
               onClick={handleClearAI}
               variant="outline"
               size="sm"
-              className="rounded-xl border-primary/30 hover:border-primary text-xs font-semibold shrink-0 gap-1.5 h-9"
+              className="rounded-xl border-primary/30 hover:border-primary text-xs font-semibold shrink-0 h-9"
             >
-              <X className="w-3.5 h-3.5" />
               Limpar busca com IA
             </Button>
           </div>
@@ -789,7 +787,6 @@ export default function MentorsPage() {
               className="rounded-xl font-bold px-6 h-11 shadow-sm w-full sm:w-auto"
             >
               <Link href="/quiz">
-                <Sparkles className="h-4 w-4 mr-2" />
                 {t("takeQuizCTA")}
               </Link>
             </Button>
