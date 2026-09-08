@@ -73,5 +73,5 @@ Copie e cole este texto exato nos campos de justificativa da tela do Google:
 - [x] Política de privacidade com cláusula explícita do Google API Limited Use em `https://www.menvo.com.br/privacy` (Publicada e traduzida).
 - [x] Termos de uso em `https://www.menvo.com.br/terms` (Publicados e traduzidos).
 - [x] Domínio `menvo.com.br` verificado no Google Search Console sob a mesma conta Google.
-- [ ] Vídeo gravado e link adicionado na caixa de submissão do Google Cloud Console.
-- [ ] Clicar em **"Submit for Verification"**.
+- [x] Vídeo gravado e link adicionado na caixa de submissão do Google Cloud Console.
+- [x] Clicar em **"Submit for Verification"**.

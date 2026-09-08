@@ -44,7 +44,7 @@
 
 | Priority | Item | Status |
 |---|---|---|
-| **P0** | Google OAuth Verification submission in Google Cloud Console | Ready for submission |
+| **P0** | Google OAuth Verification submission in Google Cloud Console | Submitted (Under Review) |
 | **P1** | Dashboard Simplification (Anti-Overengineering — Core Loop focus) | Completed |
 | **P2** | Unified In-App Notifications Hub (Header NotificationBell + Hook) | Completed |
 | **P2** | Database Portability (100% decoupling to services/BFF layer) | Completed |
