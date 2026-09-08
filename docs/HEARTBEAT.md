@@ -7,7 +7,7 @@
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 53/53 passed across 7 test suites (`npm test`)
+- **Unit Tests:** 58/58 passed across 8 test suites (`npm test`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
 ---
@@ -19,6 +19,7 @@
 - **CSS Token:** `--primary: 187 100% 26%` in `app/[locale]/globals.css` (resolves to `#007585`).
 - **Tailwind Config:** `primary.600: "#007585"`, `primary.700: "#006276"`.
 - **Button Standard:** Use `variant="default"` (`bg-primary hover:bg-primary/90 text-white`) or brand gradient (`from-primary-700 via-primary-600 to-primary`).
+- **Email Design:** All Brevo transactional emails strictly use `#007585` for CTAs and buttons.
 - **Never** use arbitrary grass green (`emerald-600`, `green-600`) or legacy indigo/purple gradients for platform buttons.
 
 ### 2. Mentorship Evaluation Model
@@ -47,7 +48,7 @@
 | **P1** | Dashboard Simplification (Anti-Overengineering — Core Loop focus) | Completed |
 | **P2** | Unified In-App Notifications Hub (Header NotificationBell + Hook) | Completed |
 | **P2** | Database Portability (100% decoupling to services/BFF layer) | Completed |
-| **P2** | Transactional Email Hardening (Brevo templates for booking & reminders) | Planned |
+| **P2** | Transactional Email Hardening (Brevo templates, founder signature, Deep Teal CTAs) | Completed |
 
 ---
 

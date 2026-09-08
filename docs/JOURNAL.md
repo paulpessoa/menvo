@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-09-08 — Transactional Email Hardening & Founder Personalization
+- **Personal Founder Signature (Paul Pessoa):** Implemented warm, personalized email signature for community and relationship touchpoints (`sendVerificationNotification`, `sendAppointmentConfirmation`, `sendFeedbackRequest`). Includes circular portrait (`public/images/paul-pessoa.jpg`), Cora Coralina's quote (*"Feliz aquele que transfere o que sabe e aprende o que ensina."*), direct WhatsApp link, and LinkedIn/GitHub icons.
+- **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal Menvo) across all Brevo email templates, eradicating rogue `#4F46E5` indigo buttons on Google Meet CTAs.
+- **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`, notifying the counterpart (mentor or mentee) with the session date, person who cancelled, and user-provided reason.
+- **Institutional Signature:** Retained clean, lightweight `Equipe Menvo` signature on operational notices (session reminders, cancellations, new mentor alerts).
+
+---
+
 ## 2026-09-07 — Brand Color Standardization, Scheduling Hardening & Core Loop Polish
 - **Official Brand Color (#007585):** Harmonized all buttons, cards, and interactive elements across the platform to Menvo's official deep teal (`#007585` / `--primary: 187 100% 26%`), eliminating arbitrary grass green (`emerald-600`) and legacy indigo/purple accents.
 - **Hero Banner Restoration:** Reinstated the top hero banner in `/mentorship/mentee` using the official brand gradient (`from-primary-700 via-primary-600 to-primary`) with functional 1-click CTAs ("Explorar Mentores" and "Explorar Comunidade").

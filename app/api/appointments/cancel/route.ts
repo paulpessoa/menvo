@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/utils/supabase/server';
 
 import { cancelAppointmentSchema } from '@/lib/schemas/appointment';
+import { sendAppointmentCancellation } from '@/lib/email/brevo';
 
 export async function POST(request: NextRequest) {
   try {
@@ -91,7 +92,36 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: Remover evento do Google Calendar se existir
-    // TODO: Enviar email de notificação
+    
+    // Notificar a outra parte por e-mail com motivo do cancelamento
+    try {
+      type PersonInfo = { id?: string; full_name?: string | null; email?: string | null };
+      const mentor = (Array.isArray(appointment.mentor) ? appointment.mentor[0] : appointment.mentor) as PersonInfo | null;
+      const mentee = (Array.isArray(appointment.mentee) ? appointment.mentee[0] : appointment.mentee) as PersonInfo | null;
+
+      const isMentorCancelling = user.id === mentor?.id;
+      const recipient = isMentorCancelling ? mentee : mentor;
+      const cancelledByName = isMentorCancelling
+        ? (mentor?.full_name || 'Seu mentor')
+        : (mentee?.full_name || 'Seu mentorado');
+      const otherPersonName = isMentorCancelling
+        ? (mentor?.full_name || 'Mentor')
+        : (mentee?.full_name || 'Mentorado');
+
+      if (recipient?.email) {
+        await sendAppointmentCancellation({
+          recipientEmail: recipient.email,
+          recipientName: recipient.full_name || 'Usuário Menvo',
+          otherPersonName,
+          scheduledAt: appointment.scheduled_at,
+          reason,
+          cancelledByName,
+        });
+      }
+    } catch (emailError) {
+      console.error('[CANCEL] Erro ao enviar email de cancelamento:', emailError);
+      // Falhas de e-mail não impedem a conclusão do cancelamento no banco
+    }
 
     return NextResponse.json({
       success: true,
