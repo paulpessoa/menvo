@@ -44,10 +44,29 @@ export interface SessionResponse {
 // =============================================
 
 export const mentorAvailabilityService = {
-  // Obter disponibilidade de um mentor
+  // Obter disponibilidade de um mentor (BFF via /api/mentors/availability com fallback resiliente)
   getMentorAvailability: async (
     mentorId: string
   ): Promise<MentorAvailability[]> => {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch(`/api/mentors/availability?mentor_id=${encodeURIComponent(mentorId)}`)
+        if (res.ok) {
+          const json = await res.json()
+          if (json.success && Array.isArray(json.data)) {
+            return json.data.map((slot: any) => ({
+              ...slot,
+              id: slot.id as unknown as number,
+              is_active: true,
+              timezone: slot.timezone || "America/Sao_Paulo"
+            })) as MentorAvailability[]
+          }
+        }
+      } catch (fetchErr) {
+        console.warn("[mentorAvailabilityService] Erro na rota BFF, usando fallback direto:", fetchErr)
+      }
+    }
+
     const { data, error } = await supabase
       .from("mentor_availability")
       .select("*")
@@ -132,7 +151,7 @@ export const mentorAvailabilityService = {
     if (error) throw error
   },
 
-  // Definir disponibilidade completa do mentor (substitui todas)
+  // Definir disponibilidade completa do mentor (BFF via POST /api/mentors/availability com fallback)
   setMentorAvailability: async (
     mentorId: string,
     availabilities: Omit<
@@ -140,6 +159,29 @@ export const mentorAvailabilityService = {
       "id" | "mentor_id" | "created_at" | "updated_at"
     >[]
   ): Promise<MentorAvailability[]> => {
+    if (typeof window !== "undefined") {
+      try {
+        const res = await fetch("/api/mentors/availability", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slots: availabilities })
+        })
+        if (res.ok) {
+          const json = await res.json()
+          if (json.success && Array.isArray(json.data)) {
+            return json.data.map((item: any) => ({
+              ...item,
+              id: item.id as unknown as number,
+              is_active: true,
+              timezone: item.timezone || "America/Sao_Paulo"
+            })) as MentorAvailability[]
+          }
+        }
+      } catch (fetchErr) {
+        console.warn("[mentorAvailabilityService] Erro no POST BFF, usando fallback direto:", fetchErr)
+      }
+    }
+
     // 1. Remover disponibilidades antigas do mentor
     const { error: deleteError } = await supabase
       .from("mentor_availability")

@@ -4,7 +4,8 @@
 
 ---
 
-## 2026-09-08 — Transactional Email Hardening & Founder Personalization
+## 2026-09-08 — Mentor Availability BFF & Transactional Email Hardening
+- **Mentor Availability BFF Route (`/api/mentors/availability`):** Resolved availability slots not displaying on `/dashboard/mentor/availability` by introducing a dedicated BFF Route Handler (GET and POST) with Zod validation (`setAvailabilitySchema`). Replaced client-side anonymous RLS queries with server-authenticated session resolution, enabling robust slot listing, saving, and deletion.
 - **Personal Founder Signature (Paul Pessoa):** Implemented warm, personalized email signature for community and relationship touchpoints (`sendVerificationNotification`, `sendAppointmentConfirmation`, `sendFeedbackRequest`). Includes circular portrait (`public/images/paul-pessoa.jpg`), Cora Coralina's quote (*"Feliz aquele que transfere o que sabe e aprende o que ensina."*), direct WhatsApp link, and LinkedIn/GitHub icons.
 - **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal Menvo) across all Brevo email templates, eradicating rogue `#4F46E5` indigo buttons on Google Meet CTAs.
 - **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`, notifying the counterpart (mentor or mentee) with the session date, person who cancelled, and user-provided reason.
