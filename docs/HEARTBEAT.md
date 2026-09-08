@@ -1,7 +1,7 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
-## 📅 Last Updated: 2026-09-07
-**Current Status:** Mentee and Mentor dashboards simplified around the core loop, AI search recommendations elevated with explanation banner & reason chips, cancellation modal redesigned with role-aware copy & quick chips, dead files (`useSignupForm`, `useFullUserProfile`, `oauth-diagnostics`) pruned.
+## 📅 Last Updated: 2026-09-08
+**Current Status:** Google OAuth Verification submitted, transactional emails hardened with Brevo & founder signature, live test email center added, appointments cron job hardened (07:00 BRT schedule, CRON_SECRET auth, BRT timezone boundaries), complete legal policies (Privacy/Terms/Cookies) translated with Google Limited Use compliance, and SEO/Security headers strengthened.
 
 ---
 
