@@ -417,15 +417,29 @@ export async function sendMentorNewReviewNotification(data: {
 /**
  * Helper para envio via Brevo API
  */
-async function sendEmail(to: string | string[], subject: string, htmlContent: string) {
+async function sendEmail(
+  to: string | string[],
+  subject: string,
+  htmlContent: string
+): Promise<{ success: boolean; error?: string }> {
   const recipients = Array.isArray(to) ? to.map(email => ({ email })) : [{ email: to }];
+  const apiKey = process.env.BREVO_API_KEY;
+
+  if (!apiKey) {
+    console.warn("[EMAIL] BREVO_API_KEY não configurada.");
+    return {
+      success: false,
+      error: "BREVO_API_KEY não configurada no ambiente."
+    };
+  }
+
   try {
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY || ""
+        "api-key": apiKey
       },
       body: JSON.stringify({
         sender: {
@@ -437,13 +451,45 @@ async function sendEmail(to: string | string[], subject: string, htmlContent: st
         htmlContent
       })
     });
+
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       console.error("[EMAIL] Erro Brevo:", errorData);
+      return {
+        success: false,
+        error: errorData?.message || `Erro na API do Brevo (${response.status})`
+      };
     }
-  } catch (error) {
+
+    return { success: true };
+  } catch (error: any) {
     console.error("[EMAIL] Falha crítica:", error);
+    return {
+      success: false,
+      error: error?.message || "Falha de conexão com os servidores do Brevo."
+    };
   }
+}
+
+/**
+ * Envia um e-mail de teste real via Brevo baseado no template selecionado
+ */
+export async function sendTestEmail(params: {
+  to: string;
+  templateKey: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const html = getEmailTemplatePreviewHtml(params.templateKey);
+
+  const subjects: Record<string, string> = {
+    confirmation: "[TESTE] Sessão de Mentoria Confirmada",
+    verification: "[TESTE] Seu perfil de Mentor foi Aprovado",
+    feedback: "[TESTE] Como foi sua mentoria? Seu feedback faz a diferença",
+    cancellation: "[TESTE] Mentoria Cancelada",
+    reminder: "[TESTE] Lembrete: Sua mentoria é hoje"
+  };
+
+  const subject = subjects[params.templateKey] || `[TESTE] Template Menvo: ${params.templateKey}`;
+  return await sendEmail(params.to, subject, html);
 }
 
 /**
@@ -511,7 +557,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         </div>
         <p style="font-size: 13px; color: ${COLORS.muted};">Imprevistos acontecem. Você pode encontrar novos horários e outros mentores disponíveis quando desejar.</p>
       `;
-      return getEmailLayout("Mentoria Cancelada", content, { signatureType: "team" });
+      return getEmailLayout("Mentoria Cancelada", content, { signatureType: "none" });
     }
     case 'reminder': {
       const content = `
@@ -526,7 +572,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         </div>
         <p>Prepare suas dúvidas e aproveite ao máximo a troca de experiências.</p>
       `;
-      return getEmailLayout("Lembrete de Mentoria", content, { signatureType: "team" });
+      return getEmailLayout("Lembrete de Mentoria", content, { signatureType: "none" });
     }
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });

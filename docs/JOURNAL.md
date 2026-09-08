@@ -10,6 +10,7 @@
 - **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal Menvo) across all Brevo email templates, eradicating rogue `#4F46E5` indigo buttons on Google Meet CTAs.
 - **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`, notifying the counterpart (mentor or mentee) with the session date, person who cancelled, and user-provided reason.
 - **Streamlined Operational Emails (No Redundant Team Signature):** Eliminated the redundant `Equipe Menvo` signature block from transactional notices (reminders, cancellations). Operational emails now flow directly into the institutional Menvo footer without extra visual noise.
+- **Live Email Test Dispatch Center (`/api/admin/emails/send-test`):** Added functional test email dispatching directly from `/dashboard/admin/emails`. Allows administrators to send real Brevo test emails of any template to any recipient with pre-fill of logged-in user email, loading feedback, and Sonner toast notifications.
 
 ---
 

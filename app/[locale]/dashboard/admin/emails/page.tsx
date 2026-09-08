@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
+import { useAuth } from "@/lib/auth/auth-context"
+import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import {
   Mail,
   Smartphone,
@@ -21,7 +24,10 @@ import {
   UserCheck,
   Star,
   CalendarX,
-  Bell
+  Bell,
+  Send,
+  Loader2,
+  AlertCircle
 } from "lucide-react"
 
 interface EmailTemplateMeta {
@@ -72,11 +78,69 @@ const TEMPLATES: EmailTemplateMeta[] = [
 
 export default function AdminEmailPreviewPage() {
   const router = useRouter()
+  const { user } = useAuth()
   const [selectedTemplate, setSelectedTemplate] = useState<string>("confirmation")
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop")
 
+  // Estados de envio de teste real
+  const [testEmail, setTestEmail] = useState<string>("")
+  const [isSending, setIsSending] = useState<boolean>(false)
+  const [sendFeedback, setSendFeedback] = useState<{
+    type: "success" | "error"
+    message: string
+  } | null>(null)
+
+  // Pré-preenche com o e-mail do usuário logado se disponível
+  useEffect(() => {
+    if (user?.email && !testEmail) {
+      setTestEmail(user.email)
+    }
+  }, [user?.email])
+
   const currentTemplate = TEMPLATES.find((t) => t.key === selectedTemplate) || TEMPLATES[0]
   const previewUrl = `/api/admin/emails/preview?template=${selectedTemplate}`
+
+  const handleSendTest = async () => {
+    if (!testEmail.trim()) {
+      toast.error("Informe um e-mail válido para receber o teste.")
+      return
+    }
+
+    setIsSending(true)
+    setSendFeedback(null)
+
+    try {
+      const res = await fetch("/api/admin/emails/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: testEmail.trim(),
+          template: selectedTemplate
+        })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao disparar e-mail de teste.")
+      }
+
+      toast.success(`E-mail de teste (${currentTemplate.label}) enviado com sucesso!`)
+      setSendFeedback({
+        type: "success",
+        message: `E-mail enviado para ${testEmail.trim()}. Verifique sua caixa de entrada e spam.`
+      })
+    } catch (err: any) {
+      const errorMsg = err.message || "Falha ao conectar com o serviço Brevo."
+      toast.error(errorMsg)
+      setSendFeedback({
+        type: "error",
+        message: errorMsg
+      })
+    } finally {
+      setIsSending(false)
+    }
+  }
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
@@ -132,7 +196,10 @@ export default function AdminEmailPreviewPage() {
                 return (
                   <button
                     key={item.key}
-                    onClick={() => setSelectedTemplate(item.key)}
+                    onClick={() => {
+                      setSelectedTemplate(item.key)
+                      setSendFeedback(null)
+                    }}
                     className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-start gap-3 ${
                       isSelected
                         ? "bg-primary/10 border-primary shadow-sm ring-1 ring-primary/20"
@@ -149,12 +216,12 @@ export default function AdminEmailPreviewPage() {
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-1 mb-1">
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
                         <span className="font-semibold text-sm truncate text-foreground">
                           {item.label}
                         </span>
                         {item.signature === "personal" ? (
-                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-teal-50 text-teal-800 border-teal-200">
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-primary/10 text-primary border-primary/20">
                             Paul Pessoa
                           </Badge>
                         ) : (
@@ -170,6 +237,83 @@ export default function AdminEmailPreviewPage() {
                   </button>
                 )
               })}
+            </CardContent>
+          </Card>
+
+          {/* Painel de Disparo de Teste Real */}
+          <Card className="border-primary/30 shadow-sm bg-gradient-to-b from-primary/5 to-transparent">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2 text-foreground">
+                  <Send className="h-4 w-4 text-primary" /> Disparar Teste Real
+                </CardTitle>
+                <Badge variant="outline" className="text-[10px] bg-background text-primary border-primary/30">
+                  Brevo Live
+                </Badge>
+              </div>
+              <CardDescription className="text-xs">
+                Envie o template <strong>{currentTemplate.label}</strong> para uma caixa de entrada real.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-0">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <label htmlFor="test-email" className="font-medium text-foreground">
+                    E-mail de destino
+                  </label>
+                  {user?.email && testEmail !== user.email && (
+                    <button
+                      type="button"
+                      onClick={() => setTestEmail(user.email || "")}
+                      className="text-[11px] text-primary hover:underline font-medium"
+                    >
+                      Usar meu e-mail
+                    </button>
+                  )}
+                </div>
+                <Input
+                  id="test-email"
+                  type="email"
+                  placeholder="seu-email@exemplo.com"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  disabled={isSending}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <Button
+                onClick={handleSendTest}
+                disabled={isSending || !testEmail.trim()}
+                className="w-full gap-2 h-9 text-xs font-semibold bg-primary hover:bg-primary/90 text-white"
+              >
+                {isSending ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Disparando via Brevo...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-3.5 w-3.5" /> Enviar E-mail de Teste
+                  </>
+                )}
+              </Button>
+
+              {sendFeedback && (
+                <div
+                  className={`p-2.5 rounded-lg text-xs flex items-start gap-2 border ${
+                    sendFeedback.type === "success"
+                      ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+                      : "bg-red-50 text-red-800 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800"
+                  }`}
+                >
+                  {sendFeedback.type === "success" ? (
+                    <CheckCircle className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" />
+                  )}
+                  <span className="leading-tight">{sendFeedback.message}</span>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -241,25 +385,33 @@ export default function AdminEmailPreviewPage() {
             </span>
           </div>
 
-          {/* Device Frame */}
+          {/* Device Frame Simulator */}
           <div
-            className={`w-full transition-all duration-300 flex justify-center ${
-              deviceView === "mobile" ? "max-w-[420px]" : "max-w-[620px]"
+            className={`transition-all duration-300 w-full flex justify-center ${
+              deviceView === "mobile" ? "max-w-[420px]" : "max-w-full"
             }`}
           >
-            <div className="w-full bg-slate-100 p-4 rounded-2xl border shadow-inner">
-              <div className="bg-white rounded-xl shadow-lg border overflow-hidden">
-                <iframe
-                  key={`${selectedTemplate}-${deviceView}`}
-                  src={previewUrl}
-                  title="Email Preview"
-                  className="w-full border-0 transition-all"
-                  style={{
-                    height: "760px",
-                    width: "100%"
-                  }}
-                />
-              </div>
+            <div
+              className={`w-full bg-slate-900 rounded-2xl shadow-xl overflow-hidden border-4 border-slate-800 ${
+                deviceView === "mobile" ? "p-3 pt-6 rounded-[40px] shadow-2xl" : "p-2"
+              }`}
+            >
+              {/* Mobile Speaker / Notch Bar */}
+              {deviceView === "mobile" && (
+                <div className="w-24 h-4 bg-slate-800 mx-auto rounded-full mb-3 flex items-center justify-center">
+                  <div className="w-8 h-1 bg-slate-700 rounded-full" />
+                </div>
+              )}
+
+              {/* Iframe Viewport */}
+              <iframe
+                key={`${selectedTemplate}-${deviceView}`}
+                src={previewUrl}
+                title="Preview do E-mail"
+                className={`w-full bg-white rounded-lg transition-all duration-300 ${
+                  deviceView === "mobile" ? "h-[640px]" : "h-[740px]"
+                }`}
+              />
             </div>
           </div>
         </div>
