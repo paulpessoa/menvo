@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Mail, Lock } from "lucide-react"
+import { Loader2, Lock } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { Separator } from "@/components/ui/separator"
 import { useTranslations } from "next-intl"
@@ -102,20 +102,23 @@ function LoginFormContent() {
   }
 
   return (
-    <Card className="w-full max-w-md shadow-lg border-gray-200">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">{tc("welcome")}</CardTitle>
-          <CardDescription>{t("description")}</CardDescription>
+    <Card className="w-full max-w-md border-none shadow-2xl shadow-primary/5 rounded-[2.5rem] overflow-hidden">
+        <CardHeader className="space-y-3 text-center pb-8 pt-10">
+          <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-2 transform rotate-6">
+            <Lock className="h-8 w-8 text-primary" />
+          </div>
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-gray-900">{tc("welcome")}</CardTitle>
+          <CardDescription className="text-base">{t("description")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Layout Vertical (Stacked) conforme pedido */}
-          <div className="grid grid-cols-1 gap-2">
+        <CardContent className="space-y-6 px-8">
+          {/* Layout Vertical (Stacked) */}
+          <div className="grid grid-cols-1 gap-3">
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-3 py-2.5 bg-transparent"
+              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-gray-700"
               onClick={() => handleSocialLogin("google")}
-              disabled={isSocialLoading === "google"}
+              disabled={!!isSocialLoading || isLoading}
             >
               {isSocialLoading === "google" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -145,9 +148,9 @@ function LoginFormContent() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-3 py-2.5 bg-transparent"
+              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-gray-700"
               onClick={() => handleSocialLogin("linkedin")}
-              disabled={isSocialLoading === "linkedin"}
+              disabled={!!isSocialLoading || isLoading}
             >
               {isSocialLoading === "linkedin" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -164,62 +167,60 @@ function LoginFormContent() {
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">{t("orContinueWith")}</span>
+            <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
+              <span className="bg-white px-4 text-muted-foreground">{t("orContinueWith")}</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{tc("email")}</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder={t("emailPlaceholder")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-bold text-gray-700 ml-1">{tc("email")}</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={t("emailPlaceholder")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary text-sm"
+                required
+              />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">{tc("password")}</Label>
-                <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+                <Label htmlFor="password" title="Sua senha de acesso" className="text-xs font-bold text-gray-700 ml-1">{tc("password")}</Label>
+                <Link href="/forgot-password" className="text-xs font-bold text-primary hover:underline">
                   {t("forgotPassword")}
                 </Link>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t("passwordPlaceholder")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder={t("passwordPlaceholder")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary text-sm"
+                required
+              />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform mt-4"
+              disabled={isLoading || !!isSocialLoading}
+            >
               {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span className="flex items-center justify-center">
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   {t("loggingIn")}
-                </>
+                </span>
               ) : (
                 t("loginButton")
               )}
             </Button>
 
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="rounded-2xl">
                 <AlertDescription className="flex flex-col gap-2">
                   {error === "email_not_confirmed" ? (
                     <>
@@ -239,10 +240,10 @@ function LoginFormContent() {
             )}
           </form>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pb-10 pt-2">
           <div className="text-center text-sm text-muted-foreground w-full">
             {t("dontHaveAccount")}{" "}
-            <Link href="/signup" className="text-primary hover:underline font-medium">
+            <Link href="/signup" className="text-primary hover:underline font-bold">
               {tc("register")}
             </Link>
           </div>
