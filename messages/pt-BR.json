@@ -1956,5 +1956,128 @@
       "invalidLink": "Link inválido ou expirado"
     },
     "toastSuccess": "Senha atualizada com sucesso!"
+  },
+  "privacy": {
+    "badge": "Privacidade e Segurança",
+    "title": "Política de Privacidade",
+    "intro": "Na Menvo, a transparência e a proteção dos seus dados pessoais são princípios fundamentais da nossa comunidade voluntária.",
+    "dataCollection": {
+      "title": "Coleta de Informações",
+      "text": "Coletamos informações necessárias para conectar mentores e mentorados, como nome, e-mail, biografia profissional, áreas de atuação e disponibilidade de horários informados voluntariamente durante o cadastro."
+    },
+    "dataUsage": {
+      "title": "Uso dos Dados",
+      "text": "Os dados coletados são utilizados exclusivamente para viabilizar as sessões de mentoria, personalizar recomendações na plataforma, emitir comunicações transacionais e aprimorar a experiência da comunidade."
+    },
+    "dataSharing": {
+      "title": "Compartilhamento de Dados",
+      "text": "Não vendemos, alugamos ou comercializamos seus dados pessoais com terceiros. As informações de perfil público são visíveis apenas para outros usuários cadastrados na plataforma para fins de agendamento de mentorias."
+    },
+    "email": {
+      "title": "Comunicações por E-mail",
+      "text": "Enviamos e-mails transacionais relacionados a agendamentos, confirmações, cancelamentos, lembretes de sessão e solicitações de feedback através do serviço Brevo. Você pode gerenciar suas preferências a qualquer momento."
+    },
+    "photos": {
+      "title": "Fotos de Perfil",
+      "text": "Fotos enviadas para o perfil são armazenadas com segurança no Supabase Storage e usadas unicamente para identificação visual nas mentorias e no catálogo da plataforma."
+    },
+    "storage": {
+      "title": "Armazenamento e Segurança",
+      "text": "Adotamos práticas avançadas de segurança da informação, criptografia em trânsito e repouso, políticas estritas de Row Level Security (RLS) e infraestrutura em nuvem segura para proteger suas informações."
+    },
+    "googleCalendar": {
+      "title": "Integração com Google Calendar e Google Meet",
+      "text": "Ao conectar ou agendar uma mentoria com integração ao Google Calendar, a Menvo acessa a API do Google exclusivamente para criar eventos com links de videoconferência do Google Meet e verificar conflitos de agenda para os horários selecionados.\n\nO uso e transferência para qualquer outro aplicativo de informações recebidas das APIs do Google pela Menvo cumprirá a Política de Dados do Usuário dos Serviços de API do Google (Google API Services User Data Policy), incluindo os requisitos de Uso Limitado (Limited Use requirements). Não acessamos, armazenamos ou compartilhamos dados pessoais de calendários não relacionados às mentorias voluntárias da Menvo."
+    },
+    "mentorship": {
+      "title": "Privacidade nas Sessões",
+      "text": "O conteúdo conversado durante as sessões de mentoria é confidencial entre mentor e mentorado. A Menvo não grava as chamadas nem monitora o conteúdo das reuniões realizadas via Google Meet."
+    },
+    "thirdParty": {
+      "title": "Serviços de Terceiros",
+      "text": "Utilizamos serviços confiáveis de infraestrutura e autenticação, como Supabase, Vercel, Brevo e Google Cloud APIs, todos em conformidade com as normas internacionais de proteção de dados e LGPD."
+    },
+    "rights": {
+      "title": "Seus Direitos (LGPD)",
+      "text": "Você tem o direito de acessar, corrigir, atualizar ou solicitar a exclusão definitiva dos seus dados a qualquer momento através do seu painel de configurações ou entrando em contato conosco."
+    },
+    "contact": {
+      "title": "Contato com o Encarregado de Dados",
+      "text": "Para dúvidas, solicitações ou exercício de direitos de privacidade, entre em contato com nosso time pelo e-mail contato@menvo.com.br."
+    },
+    "links": {
+      "cookies": "Política de Cookies",
+      "terms": "Termos de Uso"
+    }
+  },
+  "terms": {
+    "badge": "Termos de Serviço",
+    "title": "Termos de Uso",
+    "intro": "Bem-vindo à Menvo. Ao utilizar nossa plataforma, você concorda com os termos e diretrizes que regem nossa comunidade de mentoria voluntária gratuita.",
+    "usage": {
+      "title": "Uso da Plataforma",
+      "text": "A Menvo é uma plataforma voluntária sem fins lucrativos criada para conectar profissionais dispostos a compartilhar conhecimento com pessoas em busca de orientação de carreira. Todas as mentorias são 100% gratuitas."
+    },
+    "account": {
+      "title": "Contas e Cadastro",
+      "text": "Você é responsável pela precisão das informações fornecidas no cadastro e pela segurança de suas credenciais de acesso. Cada usuário deve manter uma única conta individual."
+    },
+    "security": {
+      "title": "Conduta e Segurança",
+      "text": "É estritamente proibido qualquer tipo de assédio, discriminação, cobrança financeira por mentorias ou uso inadequado dos canais de comunicação da plataforma. Violações resultarão em cancelamento imediato da conta."
+    },
+    "content": {
+      "title": "Propriedade Intelectual",
+      "text": "Todo o conteúdo, marcas, código-fonte e design da Menvo são de propriedade exclusiva da plataforma. O conteúdo compartilhado pelos usuários durante as sessões permanece de propriedade de seus respectivos autores."
+    },
+    "communication": {
+      "title": "Comunicações",
+      "text": "Ao se cadastrar, você concorda em receber notificações essenciais da plataforma, tais como avisos de agendamento, mensagens de mentores/mentorados e lembretes de compromissos."
+    },
+    "storage": {
+      "title": "Disponibilidade do Serviço",
+      "text": "Trabalhamos para manter a plataforma sempre acessível e funcional, mas não podemos garantir disponibilidade ininterrupta. Reservamo-nos o direito de realizar manutenções e atualizações periódicas."
+    },
+    "rights": {
+      "title": "Limitação de Responsabilidade",
+      "text": "A Menvo conecta pessoas, mas não se responsabiliza pelas orientações, conselhos profissionais ou decisões tomadas em decorrência das sessões de mentoria voluntária realizadas entre os usuários."
+    },
+    "contact": {
+      "title": "Dúvidas e Suporte",
+      "text": "Em caso de dúvidas sobre estes termos ou para relatar qualquer incidente na plataforma, envie um e-mail para contato@menvo.com.br."
+    },
+    "links": {
+      "privacy": "Política de Privacidade",
+      "cookies": "Política de Cookies"
+    }
+  },
+  "cookies": {
+    "badge": "Transparência",
+    "title": "Política de Cookies",
+    "intro": "Explicamos como utilizamos cookies e tecnologias semelhantes para garantir o funcionamento seguro e eficiente da plataforma Menvo.",
+    "essential": {
+      "title": "Cookies Essenciais",
+      "text": "Estes cookies são estritamente necessários para o funcionamento da plataforma, mantendo sua sessão autenticada com segurança no Supabase e lembrando suas preferências de idioma e tema."
+    },
+    "social": {
+      "title": "Cookies de Autenticação Social",
+      "text": "Utilizados ao realizar login ou cadastro com provedores externos como Google e LinkedIn para validação de identidade e vinculação segura de perfil."
+    },
+    "preferences": {
+      "title": "Cookies de Preferências",
+      "text": "Permitem que a aplicação lembre suas configurações personalizadas, tais como visualização de catálogo e fuso horário detectado."
+    },
+    "analytics": {
+      "title": "Cookies de Análise e Métricas",
+      "text": "Ajudam a entender como a comunidade utiliza a plataforma através de métricas agregadas e anônimas (como Google Analytics), permitindo aprimorar continuamente a experiência de agendamento e navegação."
+    },
+    "clarity": {
+      "title": "Mapeamento de Experiência e Usabilidade",
+      "text": "Podemos utilizar ferramentas de telemetria agregada para identificar pontos de melhoria na usabilidade, garantindo sempre a anonimização de dados sensíveis."
+    },
+    "links": {
+      "privacy": "Política de Privacidade",
+      "terms": "Termos de Uso"
+    }
   }
 }

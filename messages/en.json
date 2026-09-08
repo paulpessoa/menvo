@@ -1963,5 +1963,128 @@
       "invalidLink": "Invalid or expired link"
     },
     "toastSuccess": "Password updated successfully!"
+  },
+  "privacy": {
+    "badge": "Privacy & Security",
+    "title": "Privacy Policy",
+    "intro": "At Menvo, transparency and personal data protection are core principles of our voluntary mentorship community.",
+    "dataCollection": {
+      "title": "Information Collection",
+      "text": "We collect information necessary to connect mentors and mentees, such as name, email, professional bio, fields of expertise, and scheduling availability voluntarily provided during registration."
+    },
+    "dataUsage": {
+      "title": "Use of Data",
+      "text": "Collected data is used exclusively to facilitate mentorship sessions, personalize recommendations, send transactional notices, and enhance community experience."
+    },
+    "dataSharing": {
+      "title": "Data Sharing",
+      "text": "We do not sell, rent, or trade your personal data with third parties. Public profile details are only visible to other registered users on the platform for mentorship booking purposes."
+    },
+    "email": {
+      "title": "Email Communications",
+      "text": "We send transactional emails related to appointments, confirmations, cancellations, reminders, and feedback requests via Brevo. You can manage your preferences at any time."
+    },
+    "photos": {
+      "title": "Profile Pictures",
+      "text": "Photos uploaded to profiles are securely stored in Supabase Storage and used strictly for visual identification in sessions and public catalog."
+    },
+    "storage": {
+      "title": "Storage & Security",
+      "text": "We apply industry-standard security practices, encryption in transit and at rest, strict Row Level Security (RLS) policies, and secure cloud infrastructure to protect your data."
+    },
+    "googleCalendar": {
+      "title": "Google Calendar and Google Meet Integration",
+      "text": "When connecting or booking a mentorship with Google Calendar integration, Menvo accesses Google APIs exclusively to create calendar events with Google Meet video links and verify schedule conflicts for selected time slots.\n\nMenvo's use and transfer of information received from Google APIs to any other app will adhere to the Google API Services User Data Policy, including the Limited Use requirements. We do not read, store, or share unrelated personal calendar entries."
+    },
+    "mentorship": {
+      "title": "Session Confidentiality",
+      "text": "Conversations during mentorship sessions remain strictly confidential between mentor and mentee. Menvo does not record calls or monitor the contents of video meetings."
+    },
+    "thirdParty": {
+      "title": "Third-Party Services",
+      "text": "We partner with trusted authentication and infrastructure providers including Supabase, Vercel, Brevo, and Google Cloud APIs, compliant with international data protection regulations and LGPD."
+    },
+    "rights": {
+      "title": "Your Privacy Rights",
+      "text": "You have the right to access, correct, update, or request permanent deletion of your personal data at any time via your account settings or by reaching out to our support team."
+    },
+    "contact": {
+      "title": "Data Protection Officer Contact",
+      "text": "For questions, requests, or exercising privacy rights, please contact our team at contato@menvo.com.br."
+    },
+    "links": {
+      "cookies": "Cookie Policy",
+      "terms": "Terms of Use"
+    }
+  },
+  "terms": {
+    "badge": "Terms of Service",
+    "title": "Terms of Use",
+    "intro": "Welcome to Menvo. By using our platform, you agree to the terms and guidelines governing our free voluntary mentorship community.",
+    "usage": {
+      "title": "Platform Use",
+      "text": "Menvo is a non-profit volunteer platform created to connect professionals willing to share knowledge with individuals seeking career guidance. All mentorships are 100% free."
+    },
+    "account": {
+      "title": "Accounts & Registration",
+      "text": "You are responsible for the accuracy of information provided during signup and for maintaining credential security. Each user must maintain a single personal account."
+    },
+    "security": {
+      "title": "Conduct & Safety",
+      "text": "Harassment, discrimination, charging fees for mentorships, or misuse of platform communication channels is strictly prohibited. Violations lead to immediate account termination."
+    },
+    "content": {
+      "title": "Intellectual Property",
+      "text": "All platform design, branding, code, and content belong exclusively to Menvo. Content shared by users during sessions remains the property of their respective creators."
+    },
+    "communication": {
+      "title": "Communications",
+      "text": "By signing up, you agree to receive essential platform notifications, including booking updates, messages between mentors and mentees, and session reminders."
+    },
+    "storage": {
+      "title": "Service Availability",
+      "text": "We strive to keep the platform reliable and available, though uninterrupted service cannot be guaranteed. We reserve the right to perform maintenance and updates."
+    },
+    "rights": {
+      "title": "Limitation of Liability",
+      "text": "Menvo connects people, but is not liable for guidance, professional advice, or decisions made as a result of voluntary mentorship sessions between users."
+    },
+    "contact": {
+      "title": "Questions & Support",
+      "text": "For inquiries regarding these terms or to report an issue, please contact contato@menvo.com.br."
+    },
+    "links": {
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy"
+    }
+  },
+  "cookies": {
+    "badge": "Transparency",
+    "title": "Cookie Policy",
+    "intro": "Learn how we use cookies and similar technologies to ensure a secure and efficient experience on Menvo.",
+    "essential": {
+      "title": "Essential Cookies",
+      "text": "These cookies are strictly necessary for platform functionality, maintaining secure authenticated sessions via Supabase, and preserving language and theme choices."
+    },
+    "social": {
+      "title": "Social Authentication Cookies",
+      "text": "Used when logging in or signing up via external providers like Google and LinkedIn for identity verification and secure profile linkage."
+    },
+    "preferences": {
+      "title": "Preference Cookies",
+      "text": "Enable the platform to remember your personalized settings, such as catalog view layout and detected timezone."
+    },
+    "analytics": {
+      "title": "Analytics Cookies",
+      "text": "Help us understand how the community navigates the platform through aggregated anonymous metrics, allowing continuous improvements to booking and search."
+    },
+    "clarity": {
+      "title": "User Experience Mapping",
+      "text": "We may use aggregate telemetry to diagnose usability issues while strictly masking sensitive user information."
+    },
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use"
+    }
   }
 }
