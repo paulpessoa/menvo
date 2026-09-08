@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
 import { LanguageSelector } from "./LanguageSelector"
 import { MessagesBadge } from "./MessagesBadge"
+import { NotificationBell } from "./header/NotificationBell"
 import { UserNavDropdown } from "./header/UserNavDropdown"
 import { MobileNavSheet } from "./header/MobileNavSheet"
 import { UserNavigationItem } from "./header/types"
@@ -160,6 +161,7 @@ export default function Header() {
           )}
 
           <MessagesBadge />
+          <NotificationBell />
 
           {loading ? (
             <div className="h-9 w-9 flex items-center justify-center">

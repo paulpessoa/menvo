@@ -45,8 +45,8 @@
 |---|---|---|
 | **P0** | Google OAuth Verification submission in Google Cloud Console | Ready for submission |
 | **P1** | Dashboard Simplification (Anti-Overengineering — Core Loop focus) | Completed |
-| **P2** | Unified In-App Notifications Hub (Table `notifications` + Header Bell) | Planned |
-| **P2** | Database Portability (BFF layer audit for 100% API coverage) | Planned |
+| **P2** | Unified In-App Notifications Hub (Header NotificationBell + Hook) | Completed |
+| **P2** | Database Portability (100% decoupling to services/BFF layer) | Completed |
 | **P2** | Transactional Email Hardening (Brevo templates for booking & reminders) | Planned |
 
 ---

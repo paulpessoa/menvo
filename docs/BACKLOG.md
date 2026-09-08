@@ -15,8 +15,8 @@
 
 ## 🟡 P2 — Medium Priority
 - [x] **Profile & Calendar Sync Polish:** Enhance Google Calendar conflict detection for mentors with fluctuating availability.
-- [ ] **Unified In-App Notifications Hub (Bell Icon):** Dedicated `notifications` table (`id`, `user_id`, `type`, `title`, `message`, `action_url`, `is_read`, `read_at`, `deleted_at`). Header bell icon with unread badge counter, dropdown drawer linking directly to actions needing attention (new booking requests, confirmed sessions, pending evaluations), with mark-as-read and soft-delete support.
-- [ ] **Database Portability & BFF Layer:** Audit all remaining frontend components to ensure 100% of data mutations flow through `/api/...` endpoints, preparing for future database migration away from Supabase.
+- [x] **Unified In-App Notifications Hub (Bell Icon):** Implemented in-app notification center via `NotificationBell`, `useNotifications`, and `notificationsService`. Displays real-time badge counter, popover with contextual icons (booking requests, confirmations, cancellations, pending evaluations), mark-as-read, and 1-click action navigation.
+- [x] **Database Portability & BFF Layer:** Audited and decoupled 100% of frontend components and hooks to flow through services/BFF endpoints.
 - [ ] **Transactional Email Hardening:** Ensure booking notifications and reminders arrive reliably via email (reducing MVP dependence on in-app real-time chat).
 - [x] **Brand Color & Hero Banner Harmonization:** Aligned buttons, cards, and hero banner on `/mentorship/mentee` with Menvo's official deep teal brand palette (`#006276` / `#0f7185` / `--primary`), eliminating off-brand grass green (`emerald-600`) and restoring functional hero actions.
 - [x] **Evaluation Flow Distinction (Mentee -> Mentor Only):** Restricted public session evaluation modals exclusively to mentees, preventing mentors from receiving confusing review modals about themselves.
