@@ -37,30 +37,28 @@ const getPersonalSignatureHtml = () => `
             style="border-radius: 50%; display: block; object-fit: cover; width: 64px; height: 64px; border: 2px solid ${COLORS.primary};"
           />
         </td>
-        <td style="vertical-align: top;">
-          <p style="font-style: italic; color: #4b5563; font-size: 13px; line-height: 1.4; margin: 0 0 8px 0;">
-            "Feliz aquele que transfere o que sabe e aprende o que ensina."
-            <span style="font-size: 11px; color: #9ca3af; font-style: normal;">— Cora Coralina</span>
-          </p>
+        <td style="vertical-align: middle;">
           <p style="font-weight: 700; color: #111827; font-size: 15px; margin: 0 0 2px 0;">Paul Pessoa</p>
-          <p style="font-size: 12px; color: ${COLORS.primary}; font-weight: 600; margin: 0 0 8px 0;">Idealizador & Software Engineer · Menvo</p>
+          <p style="font-size: 12px; color: ${COLORS.primary}; font-weight: 600; margin: 0 0 10px 0;">Idealizador & Software Engineer · Menvo</p>
           
           <table role="presentation" border="0" cellpadding="0" cellspacing="0">
             <tr>
               <td style="padding-right: 14px; vertical-align: middle;">
-                <a href="https://wa.me/5581995097377" target="_blank" style="color: #374151; font-size: 12px; text-decoration: none; font-weight: 500;">
-                  <span style="color: #10b981; font-size: 14px; vertical-align: middle; margin-right: 2px;">💬</span> +55 (81) 9 9509.7377
-                </a>
-              </td>
-              <td style="padding-right: 10px; vertical-align: middle;">
-                <a href="https://linkedin.com/in/paulpessoa" target="_blank" title="LinkedIn" style="text-decoration: none; display: inline-block;">
-                  <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="16" height="16" alt="LinkedIn" style="display: block; vertical-align: middle;" />
+                <a href="https://wa.me/5581995097377" target="_blank" style="color: #374151; font-size: 12px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center;">
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/733/733585.png"
+                    width="15"
+                    height="15"
+                    alt="WhatsApp"
+                    style="vertical-align: middle; margin-right: 6px; display: inline-block;"
+                  />
+                  +55 (81) 9 9509.7377
                 </a>
               </td>
               <td style="vertical-align: middle;">
-                <a href="https://github.com/paulpessoa" target="_blank" title="GitHub" style="text-decoration: none; display: inline-block;">
-                  <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" width="16" height="16" alt="GitHub" style="display: block; vertical-align: middle;" />
-                </a>
+                <a href="https://linkedin.com/in/paulpessoa" target="_blank" style="color: #6b7280; font-size: 12px; text-decoration: none; margin-right: 8px;">LinkedIn</a>
+                <span style="color: #d1d5db; font-size: 12px;">·</span>
+                <a href="https://github.com/paulpessoa" target="_blank" style="color: #6b7280; font-size: 12px; text-decoration: none; margin-left: 8px;">GitHub</a>
               </td>
             </tr>
           </table>
@@ -211,7 +209,7 @@ export async function sendAppointmentReminder(data: {
     minute: '2-digit'
   });
   const content = `
-    <h2>Lembrete: Sua mentoria é hoje! 📅</h2>
+    <h2>Lembrete: Sua mentoria é hoje</h2>
     <p>Olá, ${data.userName}. Passando para lembrar que sua sessão de mentoria com <strong>${data.otherPersonName}</strong> está agendada para hoje às <strong>${formattedTime}</strong>.</p>
     <div class="info-box">
         <p><strong>Evento:</strong> Mentoria MENVO</p>
@@ -221,11 +219,11 @@ export async function sendAppointmentReminder(data: {
     <div class="button-container">
         <a href="${data.meetLink}" class="button">Entrar no Google Meet</a>
     </div>` : ''}
-    <p>Prepare suas dúvidas e aproveite ao máximo a troca de experiências! 🚀</p>
+    <p>Prepare suas dúvidas e aproveite ao máximo a troca de experiências.</p>
   `;
   await sendEmail(
     data.userEmail,
-    "🔔 Lembrete: Sua mentoria é hoje!",
+    "Lembrete: Sua mentoria é hoje",
     getEmailLayout("Lembrete de Mentoria", content, { signatureType: "team" })
   );
 }
@@ -241,17 +239,17 @@ export async function sendFeedbackRequest(data: {
 }): Promise<void> {
   const feedbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/mentee?feedback=${data.appointmentId}`;
   const content = `
-    <h2>Como foi sua mentoria? ⭐</h2>
+    <h2>Como foi sua mentoria?</h2>
     <p>Olá, ${data.userName}! Sua sessão com <strong>${data.mentorName}</strong> terminou há pouco tempo.</p>
     <p>Sua avaliação é essencial para fortalecer a comunidade e reconhecer a dedicação voluntária do mentor na plataforma.</p>
     <div class="button-container">
         <a href="${feedbackUrl}" class="button">Avaliar Mentoria Agora</a>
     </div>
-    <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar!</p>
+    <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar.</p>
   `;
   await sendEmail(
     data.userEmail,
-    "⭐ Como foi sua mentoria? Deixe sua avaliação!",
+    "Como foi sua mentoria? Deixe sua avaliação",
     getEmailLayout("Avaliação de Mentoria", content, { signatureType: "personal" })
   );
 }
@@ -267,7 +265,7 @@ export async function sendVerificationNotification(data: VerificationData): Prom
     <h2>Olá, ${userName}!</h2>
     <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
     <div class="info-box" style="border-left: 4px solid ${isApproved ? '#007585' : '#F59E0B'}">
-        <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado ✅' : 'Ajustes Necessários 📢'}</p>
+        <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado' : 'Ajustes Necessários'}</p>
         ${notes ? `<p><strong>Observações:</strong> ${notes}</p>` : ''}
     </div>
     <div class="button-container">
@@ -277,7 +275,7 @@ export async function sendVerificationNotification(data: VerificationData): Prom
   `;
   await sendEmail(
     userEmail,
-    isApproved ? "🎉 Seu perfil no Menvo foi aprovado!" : "📢 Ajustes necessários no seu perfil Menvo",
+    isApproved ? "Seu perfil no Menvo foi aprovado" : "Ajustes necessários no seu perfil Menvo",
     getEmailLayout(isApproved ? "Perfil Aprovado" : "Ajustes no Perfil", content, { signatureType: "personal" })
   );
 }
@@ -321,7 +319,7 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
   });
 
   const content = `
-    <h2>Sua mentoria está confirmada! ✅</h2>
+    <h2>Sua mentoria está confirmada!</h2>
     <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
     <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
         <div class="info-item"><strong>Mentor(a):</strong> ${mentorName}</div>
@@ -334,11 +332,11 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
     </div>` : ''}
     ${calendarLink ? `<p style="text-align: center; margin-top: -10px; margin-bottom: 20px;"><a href="${calendarLink}" style="color: ${COLORS.primary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Adicionar ao Google Calendar</a></p>` : ''}
     <div class="divider"></div>
-    <p><strong>Dica:</strong> Recomendamos entrar com 5 minutos de antecedência e anotar suas dúvidas com antecedência. Tenham uma conversa inspiradora! 🚀</p>
+    <p><strong>Dica:</strong> Recomendamos entrar com 5 minutos de antecedência e anotar suas dúvidas com antecedência. Tenham uma conversa inspiradora.</p>
   `;
   await sendEmail(
     [mentorEmail, menteeEmail],
-    "Sessão de Mentoria Confirmada! ✅",
+    "Sessão de Mentoria Confirmada",
     getEmailLayout("Mentoria Confirmada", content, { signatureType: "personal" })
   );
 }
@@ -354,7 +352,7 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
     : `Informamos que <strong>${data.cancelledByName}</strong> precisou cancelar a mentoria agendada para <strong>${formattedDate}</strong>.`;
 
   const content = `
-    <h2>Mentoria Cancelada 📅</h2>
+    <h2>Mentoria Cancelada</h2>
     <p>Olá, ${data.recipientName}.</p>
     <p>${noticeText}</p>
     <div class="info-box" style="border-left: 4px solid #EF4444;">
@@ -365,7 +363,7 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
     <div class="button-container">
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors" class="button">Explorar outros mentores</a>
     </div>
-    <p style="font-size: 13px; color: ${COLORS.muted};">Imprevistos e conflitos de agenda acontecem! Você pode encontrar novos horários e outros mentores disponíveis quando desejar.</p>
+    <p style="font-size: 13px; color: ${COLORS.muted};">Imprevistos e conflitos de agenda acontecem. Você pode encontrar novos horários e outros mentores disponíveis quando desejar.</p>
   `;
   await sendEmail(
     data.recipientEmail,
@@ -383,7 +381,7 @@ export async function sendAdminNewMentorNotification(data: {
 }): Promise<void> {
   const adminEmail = process.env.ADMIN_EMAIL || "contato@menvo.com.br";
   const content = `
-    <h2>🎯 Nova Solicitação de Mentor!</h2>
+    <h2>Nova Solicitação de Mentor</h2>
     <p>Olá, Admin. Um usuário acaba de solicitar a validação de perfil como <strong>Mentor</strong> na plataforma.</p>
     <div class="info-box">
         <div class="info-item"><strong>Nome:</strong> ${data.userName}</div>
@@ -397,7 +395,7 @@ export async function sendAdminNewMentorNotification(data: {
   `;
   await sendEmail(
     adminEmail,
-    `🎯 Novo Mentor Pendente: ${data.userName}`,
+    `Novo Mentor Pendente: ${data.userName}`,
     getEmailLayout("Nova Solicitação de Mentor", content, { signatureType: "team" })
   );
 }
@@ -412,24 +410,23 @@ export async function sendMentorNewReviewNotification(data: {
   rating: number;
   comment: string | null;
 }): Promise<void> {
-  const stars = "⭐".repeat(data.rating);
   const content = `
-    <h2>Você recebeu uma nova avaliação! 🎉</h2>
+    <h2>Você recebeu uma nova avaliação</h2>
     <p>Olá, ${data.mentorName}! Um mentorado acaba de deixar um depoimento sobre a sua mentoria.</p>
     <div class="info-box" style="border-left: 4px solid #F59E0B">
         <p><strong>De:</strong> ${data.menteeName}</p>
-        <p><strong>Nota:</strong> ${stars} (${data.rating}/5)</p>
+        <p><strong>Nota:</strong> ${data.rating}/5</p>
         ${data.comment ? `<p style="margin-top: 10px; font-style: italic;">"${data.comment}"</p>` : ''}
     </div>
     <p>Esta avaliação já está visível no seu perfil público e ajuda a inspirar novos mentorados.</p>
     <div class="button-container">
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/mentor" class="button">Ver no meu Dashboard</a>
     </div>
-    <p>Muito obrigado por compartilhar seu conhecimento na Menvo! 🚀</p>
+    <p>Muito obrigado por compartilhar seu conhecimento na Menvo.</p>
   `;
   await sendEmail(
     data.mentorEmail,
-    `⭐ Nova avaliação de ${data.menteeName}: ${stars}`,
+    `Nova avaliação de ${data.menteeName} (${data.rating}/5)`,
     getEmailLayout("Nova Avaliação Recebida", content, { signatureType: "team" })
   );
 }
@@ -473,7 +470,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
   switch (templateKey) {
     case 'confirmation': {
       const content = `
-        <h2>Sua mentoria está confirmada! ✅</h2>
+        <h2>Sua mentoria está confirmada!</h2>
         <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
         <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
             <div class="info-item"><strong>Mentor(a):</strong> Dr. Carlos Mendes</div>
@@ -485,7 +482,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         </div>
         <p style="text-align: center; margin-top: -10px; margin-bottom: 20px;"><a href="#" style="color: ${COLORS.primary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Adicionar ao Google Calendar</a></p>
         <div class="divider"></div>
-        <p><strong>Dica:</strong> Recomendamos entrar com 5 minutos de antecedência e anotar suas dúvidas com antecedência. Tenham uma conversa inspiradora! 🚀</p>
+        <p><strong>Dica:</strong> Recomendamos entrar com 5 minutos de antecedência e anotar suas dúvidas com antecedência. Tenham uma conversa inspiradora.</p>
       `;
       return getEmailLayout("Mentoria Confirmada", content, { signatureType: "personal" });
     }
@@ -494,7 +491,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         <h2>Olá, Rodrigo!</h2>
         <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
         <div class="info-box" style="border-left: 4px solid #007585">
-            <p style="margin-bottom: 5px;"><strong>Status:</strong> Aprovado ✅</p>
+            <p style="margin-bottom: 5px;"><strong>Status:</strong> Aprovado</p>
             <p><strong>Observações:</strong> Perfil profissional verificado com sucesso. Experiência e formação alinhadas com o propósito da nossa comunidade.</p>
         </div>
         <div class="button-container">
@@ -506,36 +503,36 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
     }
     case 'feedback': {
       const content = `
-        <h2>Como foi sua mentoria? ⭐</h2>
+        <h2>Como foi sua mentoria?</h2>
         <p>Olá, Lucas! Sua sessão com <strong>Dra. Beatriz Santos</strong> terminou há pouco tempo.</p>
         <p>Sua avaliação é essencial para fortalecer a comunidade e reconhecer a dedicação voluntária do mentor na plataforma.</p>
         <div class="button-container">
             <a href="https://www.menvo.com.br/dashboard/mentee" class="button">Avaliar Mentoria Agora</a>
         </div>
-        <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar!</p>
+        <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar.</p>
       `;
       return getEmailLayout("Avaliação de Mentoria", content, { signatureType: "personal" });
     }
     case 'cancellation': {
       const content = `
-        <h2>Mentoria Cancelada 📅</h2>
+        <h2>Mentoria Cancelada</h2>
         <p>Olá, Gabriel.</p>
         <p>Informamos que <strong>Juliana Ramos</strong> precisou cancelar a mentoria agendada para <strong>12/09/2026 às 16:00</strong>.</p>
         <div class="info-box" style="border-left: 4px solid #EF4444;">
             <div class="info-item"><strong>Data e Hora Original:</strong> 12/09/2026 às 16:00</div>
             <div class="info-item"><strong>Cancelado por:</strong> Juliana Ramos</div>
-            <div class="info-item"><strong>Motivo informado:</strong><br/><em>"Conflito de agenda imprevisto no trabalho. Peço desculpas pelo transtorno!"</em></div>
+            <div class="info-item"><strong>Motivo informado:</strong><br/><em>"Conflito de agenda imprevisto no trabalho. Peço desculpas pelo transtorno."</em></div>
         </div>
         <div class="button-container">
             <a href="https://www.menvo.com.br/mentors" class="button">Explorar outros mentores</a>
         </div>
-        <p style="font-size: 13px; color: ${COLORS.muted};">Imprevistos acontecem! Você pode encontrar novos horários e outros mentores disponíveis quando desejar.</p>
+        <p style="font-size: 13px; color: ${COLORS.muted};">Imprevistos acontecem. Você pode encontrar novos horários e outros mentores disponíveis quando desejar.</p>
       `;
       return getEmailLayout("Mentoria Cancelada", content, { signatureType: "team" });
     }
     case 'reminder': {
       const content = `
-        <h2>Lembrete: Sua mentoria é hoje! 📅</h2>
+        <h2>Lembrete: Sua mentoria é hoje</h2>
         <p>Olá, Rafael. Passando para lembrar que sua sessão de mentoria com <strong>Camila Torres</strong> está agendada para hoje às <strong>19:00</strong>.</p>
         <div class="info-box">
             <p><strong>Evento:</strong> Mentoria MENVO</p>
@@ -544,7 +541,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         <div class="button-container">
             <a href="https://meet.google.com/xyz-uvwx-rst" class="button">Entrar no Google Meet</a>
         </div>
-        <p>Prepare suas dúvidas e aproveite ao máximo a troca de experiências! 🚀</p>
+        <p>Prepare suas dúvidas e aproveite ao máximo a troca de experiências.</p>
       `;
       return getEmailLayout("Lembrete de Mentoria", content, { signatureType: "team" });
     }

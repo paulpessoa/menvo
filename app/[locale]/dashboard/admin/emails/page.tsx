@@ -187,7 +187,7 @@ export default function AdminEmailPreviewPage() {
                     👤 Assinatura Pessoal do Idealizador
                   </p>
                   <p>
-                    Inclui a foto circular de Paul Pessoa, a citação de Cora Coralina (<em>"Feliz aquele que transfere o que sabe..."</em>), WhatsApp direto e links das redes sociais.
+                    Inclui a foto circular de Paul Pessoa, identificação como idealizador, ícone com link direto de WhatsApp e links para LinkedIn e GitHub.
                   </p>
                 </div>
               ) : (
