@@ -465,3 +465,90 @@ async function sendEmail(to: string | string[], subject: string, htmlContent: st
     console.error("[EMAIL] Falha crítica:", error);
   }
 }
+
+/**
+ * Retorna o HTML de preview de um template para o painel de visualização administrativa
+ */
+export function getEmailTemplatePreviewHtml(templateKey: string): string {
+  switch (templateKey) {
+    case 'confirmation': {
+      const content = `
+        <h2>Sua mentoria está confirmada! ✅</h2>
+        <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
+        <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
+            <div class="info-item"><strong>Mentor(a):</strong> Dr. Carlos Mendes</div>
+            <div class="info-item"><strong>Mentorado(a):</strong> Mariana Silva</div>
+            <div class="info-item"><strong>Data e Hora:</strong> Terça-feira, 15 de Setembro de 2026 às 14:00</div>
+        </div>
+        <div class="button-container">
+            <a href="https://meet.google.com/abc-defg-hij" class="button">Entrar no Google Meet</a>
+        </div>
+        <p style="text-align: center; margin-top: -10px; margin-bottom: 20px;"><a href="#" style="color: ${COLORS.primary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Adicionar ao Google Calendar</a></p>
+        <div class="divider"></div>
+        <p><strong>Dica:</strong> Recomendamos entrar com 5 minutos de antecedência e anotar suas dúvidas com antecedência. Tenham uma conversa inspiradora! 🚀</p>
+      `;
+      return getEmailLayout("Mentoria Confirmada", content, { signatureType: "personal" });
+    }
+    case 'verification': {
+      const content = `
+        <h2>Olá, Rodrigo!</h2>
+        <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
+        <div class="info-box" style="border-left: 4px solid #007585">
+            <p style="margin-bottom: 5px;"><strong>Status:</strong> Aprovado ✅</p>
+            <p><strong>Observações:</strong> Perfil profissional verificado com sucesso. Experiência e formação alinhadas com o propósito da nossa comunidade.</p>
+        </div>
+        <div class="button-container">
+            <a href="https://www.menvo.com.br/dashboard" class="button">Acessar meu Dashboard</a>
+        </div>
+        <p>Seja muito bem-vindo(a) à nossa rede de mentores voluntários. Sua experiência fará a diferença na carreira de muitos talentos!</p>
+      `;
+      return getEmailLayout("Perfil Aprovado", content, { signatureType: "personal" });
+    }
+    case 'feedback': {
+      const content = `
+        <h2>Como foi sua mentoria? ⭐</h2>
+        <p>Olá, Lucas! Sua sessão com <strong>Dra. Beatriz Santos</strong> terminou há pouco tempo.</p>
+        <p>Sua avaliação é essencial para fortalecer a comunidade e reconhecer a dedicação voluntária do mentor na plataforma.</p>
+        <div class="button-container">
+            <a href="https://www.menvo.com.br/dashboard/mentee" class="button">Avaliar Mentoria Agora</a>
+        </div>
+        <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar!</p>
+      `;
+      return getEmailLayout("Avaliação de Mentoria", content, { signatureType: "personal" });
+    }
+    case 'cancellation': {
+      const content = `
+        <h2>Mentoria Cancelada 📅</h2>
+        <p>Olá, Gabriel.</p>
+        <p>Informamos que <strong>Juliana Ramos</strong> precisou cancelar a mentoria agendada para <strong>12/09/2026 às 16:00</strong>.</p>
+        <div class="info-box" style="border-left: 4px solid #EF4444;">
+            <div class="info-item"><strong>Data e Hora Original:</strong> 12/09/2026 às 16:00</div>
+            <div class="info-item"><strong>Cancelado por:</strong> Juliana Ramos</div>
+            <div class="info-item"><strong>Motivo informado:</strong><br/><em>"Conflito de agenda imprevisto no trabalho. Peço desculpas pelo transtorno!"</em></div>
+        </div>
+        <div class="button-container">
+            <a href="https://www.menvo.com.br/mentors" class="button">Explorar outros mentores</a>
+        </div>
+        <p style="font-size: 13px; color: ${COLORS.muted};">Imprevistos acontecem! Você pode encontrar novos horários e outros mentores disponíveis quando desejar.</p>
+      `;
+      return getEmailLayout("Mentoria Cancelada", content, { signatureType: "team" });
+    }
+    case 'reminder': {
+      const content = `
+        <h2>Lembrete: Sua mentoria é hoje! 📅</h2>
+        <p>Olá, Rafael. Passando para lembrar que sua sessão de mentoria com <strong>Camila Torres</strong> está agendada para hoje às <strong>19:00</strong>.</p>
+        <div class="info-box">
+            <p><strong>Evento:</strong> Mentoria MENVO</p>
+            <p><strong>Horário:</strong> 19:00 (Horário de Brasília)</p>
+        </div>
+        <div class="button-container">
+            <a href="https://meet.google.com/xyz-uvwx-rst" class="button">Entrar no Google Meet</a>
+        </div>
+        <p>Prepare suas dúvidas e aproveite ao máximo a troca de experiências! 🚀</p>
+      `;
+      return getEmailLayout("Lembrete de Mentoria", content, { signatureType: "team" });
+    }
+    default:
+      return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
+  }
+}

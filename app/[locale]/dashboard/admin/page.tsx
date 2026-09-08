@@ -16,7 +16,8 @@ import {
   AlertCircle,
   CheckCircle,
   Building2,
-  TrendingUp
+  TrendingUp,
+  Mail
 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -145,6 +146,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/feature-flags",
       icon: Shield,
       color: "bg-purple-600"
+    },
+    {
+      title: "E-mails Transacionais",
+      description: "Visualizar templates Brevo, assinatura e botões Deep Teal",
+      href: "/dashboard/admin/emails",
+      icon: Mail,
+      color: "bg-teal-600"
     }
   ]
 
