@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/ChatInterface"
-import { createClient } from "@/lib/utils/supabase/client"
+import { chatService, type ChatConversationItem } from "@/lib/services/chat/chat.service"
 import { useTranslations } from "next-intl"
 import {
   DropdownMenu,
@@ -20,28 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-interface Conversation {
-  id: string
-  mentor_id: string
-  mentee_id: string
-  last_message_at: string | null
-  created_at: string
-  unread_count: number
-  other_user: {
-    id: string
-    full_name: string
-    avatar_url: string | null
-    role_name: string
-  }
-}
-
-interface RawConversation {
-  id: string
-  mentor_id: string
-  mentee_id: string
-  last_message_at: string | null
-  created_at: string
-}
+type Conversation = ChatConversationItem
 
 function MessagesContent() {
   const t = useTranslations("messages")
@@ -51,7 +30,6 @@ function MessagesContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set())
-  const supabase = createClient()
 
   // Gerenciamento de arquivamento via localStorage para simplicidade e utilidade imediata
   useEffect(() => {
@@ -82,91 +60,14 @@ function MessagesContent() {
 
     if (isInitial) setIsLoading(true)
     try {
-      const { data: convs, error } = await supabase
-        .from('conversations')
-        .select(`
-          id,
-          mentor_id,
-          mentee_id,
-          last_message_at,
-          created_at
-        `)
-        .or(`mentor_id.eq.${user.id},mentee_id.eq.${user.id}`)
-        .order('last_message_at', { ascending: false })
-
-      if (error) throw error
-
-      if (convs) {
-        const rawConvs = convs as RawConversation[]
-
-        const conversationsWithDetails = []
-        for (const conv of rawConvs) {
-          try {
-            const otherUserId = conv.mentor_id === user.id ? conv.mentee_id : conv.mentor_id
-            if (otherUserId === user.id) continue
-
-            const { data: otherUser } = await supabase
-              .from('profiles')
-              .select(`
-                id, 
-                full_name, 
-                avatar_url,
-                user_roles (
-                  roles (
-                    name
-                  )
-                )
-              `)
-              .eq('id', otherUserId)
-              .maybeSingle()
-
-            const { count: unreadCount } = await supabase
-              .from('messages')
-              .select('*', { count: 'exact', head: true })
-              .eq('conversation_id', conv.id)
-              .neq('sender_id', user.id)
-              .is('read_at', null)
-
-            interface OtherUserProfile {
-              id: string
-              full_name: string | null
-              avatar_url: string | null
-              user_roles?: Array<{ roles?: { name?: string } | null }> | null
-            }
-
-            const profileData = otherUser as unknown as OtherUserProfile | null
-            const roles = profileData?.user_roles || []
-            const roleNames = roles.map((ur) => ur.roles?.name).filter(Boolean)
-            let primaryRole = 'mentee'
-            if (roleNames.includes('admin')) primaryRole = 'admin'
-            else if (roleNames.includes('mentor')) primaryRole = 'mentor'
-
-            conversationsWithDetails.push({
-              id: conv.id,
-              mentor_id: conv.mentor_id,
-              mentee_id: conv.mentee_id,
-              last_message_at: conv.last_message_at,
-              created_at: conv.created_at,
-              unread_count: unreadCount || 0,
-              other_user: {
-                id: otherUserId,
-                full_name: profileData?.full_name || 'Usuário',
-                avatar_url: profileData?.avatar_url || null,
-                role_name: primaryRole
-              }
-            })
-          } catch (itemErr) {
-            console.warn(`[Messages] Erro ao carregar detalhes da conversa ${conv.id}`)
-          }
-        }
-
-        setConversations(conversationsWithDetails)
-      }
+      const items = await chatService.getConversations(user.id)
+      setConversations(items)
     } catch (error) {
+      console.error("[Messages] Erro ao carregar conversas:", error)
     } finally {
       if (isInitial) setIsLoading(false)
     }
-  }, [user, supabase])
+  }, [user])
 
   useEffect(() => {
     let mounted = true
@@ -177,23 +78,12 @@ function MessagesContent() {
   }, [user, loadConversations])
 
   useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel(`user-chats-${user.id}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'messages'
-      }, (payload: any) => {
-        if (payload.new?.sender_id !== user.id) {
-          loadConversations(false)
-        }
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel) };
-  }, [user, supabase, loadConversations])
+    if (!user) return
+    const unsubscribe = chatService.subscribeToUserChats(user.id, () => {
+      loadConversations(false)
+    })
+    return unsubscribe
+  }, [user, loadConversations])
 
   const filteredConversations = conversations
     .filter(conv => !archivedIds.has(conv.id))

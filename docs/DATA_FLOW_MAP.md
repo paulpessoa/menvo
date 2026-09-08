@@ -52,27 +52,24 @@ A aplicação opera sob três padrões bem delimitados:
 | `hooks/useMentors.ts` | `useQuery` | `mentorService.getMentors` | TanStack Query via Service |
 | `hooks/useMentorship.ts` | `useQuery` + `useMutation` | `mentorAvailabilityService`, `mentorshipSessionsService` | TanStack Query via Service |
 | `hooks/useNewsletter.ts` | `useQuery` + `useMutation` | `newsletterService` | TanStack Query via Service |
-| `hooks/useFavorites.ts` | `useQuery` + `useMutation` | Supabase Client direto | ⚠️ Próximo a migrar para `userService.favorites` |
+| `hooks/useFavorites.ts` | `useQuery` + `useMutation` | `favoritesService` | TanStack Query via Service |
 | `hooks/useProfile.ts` | Custom State | `/api/profile` | BFF |
 | `hooks/useDebounce.ts` | Utilitário puro | Em memória (Timer) | ✅ Utilitário |
 
 ---
 
-### 4. Telas com Consultas Residuais do Supabase (Alvos de Próxima Refatoração)
+### 4. Status de Desacoplamento da Interface (100% Concluído 🎉)
 
-Para alcançar **100% de desacoplamento** (preparando o terreno para MCP Server e Agente sem dependência acoplada ao Supabase client), os seguintes pontos ainda realizam queries diretas no navegador:
+Todas as queries diretas ao banco foram migradas para a camada de **Serviços** ou rotas **BFF**, cumprindo 100% a diretriz de arquitetura do `AGENTS.md`:
 
 1. `app/[locale]/dashboard/mentor/availability/page.tsx`:
-   - ✅ **Migrado:** Desacoplado do `createClient()`. Agora utiliza `mentorAvailabilityService.getMentorAvailability`, `mentorAvailabilityService.setMentorAvailability` e `profileService.updateProfile`.
+   - ✅ **Migrado:** Desacoplado do `createClient()`. Utiliza `mentorAvailabilityService` e `profileService`.
 2. `app/[locale]/mentors/[slug]/page.tsx`:
-   - Busca perfil individual por slug no client.
-   - **Solução planejada:** Migrar para `mentorService.getMentorBySlug(slug)`.
+   - ✅ **Migrado:** Desacoplado de queries diretas no RSC. Utiliza `mentorPublicService.getMentorBySlugOrId(slug)`.
 3. `app/[locale]/messages/page.tsx` & `components/ChatInterface.tsx`:
-   - Escuta mensagens em realtime do Supabase.
-   - **Solução planejada:** Centralizar em `chatService.subscribeToMessages(...)`.
+   - ✅ **Migrado:** Desacoplado de queries diretas e canais soltos. Utiliza `chatService.getConversations`, `chatService.subscribeToUserChats`, `chatService.subscribeToConversation` e `chatService.broadcastTyping`.
 4. `hooks/useFavorites.ts`:
-   - Lê e grava na tabela `user_favorites` diretamente.
-   - **Solução planejada:** Migrar para rota `/api/profile/favorites` ou `userService`.
+   - ✅ **Migrado:** Desacoplado de `createClient()`. Utiliza `favoritesService.getFavorites` e `favoritesService.toggleFavorite`.
 
 ---
 

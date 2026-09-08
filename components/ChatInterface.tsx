@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { createClient } from '@/lib/utils/supabase/client';
+import { chatService } from '@/lib/services/chat/chat.service';
 import { Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl';
@@ -39,7 +39,6 @@ export function ChatInterface({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const supabase = createClient();
 
     // Reset state and load messages when mentorId changes
     useEffect(() => {
@@ -135,56 +134,36 @@ export function ChatInterface({
     useEffect(() => {
         if (!conversationId) return;
 
-        let isSubscribed = true;
-
-        const channel = supabase
-            .channel(`conversation:${conversationId}`, {
-                config: {
-                    broadcast: { self: false },
-                    presence: { key: currentUserId },
-                },
-            })
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'messages',
-                    filter: `conversation_id=eq.${conversationId}`,
-                },
-                (payload: any) => {
-                    const msg = payload.new as Message;
-                    
+        const unsubscribe = chatService.subscribeToConversation(
+            conversationId,
+            currentUserId,
+            {
+                onMessage: (rawMsg) => {
+                    const msg = rawMsg as Message;
                     setMessages((prev) => {
                         if (prev.some(m => m.id === msg.id)) return prev;
-                        
                         if (msg.sender_id !== currentUserId) {
                             markAsRead(conversationId);
                         }
                         return [...prev, msg];
                     });
+                },
+                onTyping: () => {
+                    setIsTyping(true);
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                    typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+                },
+                onStatusChange: (status) => {
+                    setRealtimeStatus(status);
                 }
-            )
-            .on('broadcast', { event: 'typing' }, () => {
-                setIsTyping(true);
-                if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-                typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
-            })
-            .subscribe((status: string) => {
-                if (!isSubscribed) return;
-                if (status === 'SUBSCRIBED') {
-                    setRealtimeStatus('connected');
-                } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-                    setRealtimeStatus('disconnected');
-                }
-            });
+            }
+        );
 
         return () => {
-            isSubscribed = false;
             if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-            supabase.removeChannel(channel);
+            unsubscribe();
         };
-    }, [conversationId, currentUserId, supabase]);
+    }, [conversationId, currentUserId]);
 
     const markAsRead = async (convId: string) => {
         try {
@@ -200,11 +179,7 @@ export function ChatInterface({
 
     const handleTyping = () => {
         if (!conversationId) return;
-        supabase.channel(`conversation:${conversationId}`).send({
-            type: 'broadcast',
-            event: 'typing',
-            payload: { userId: currentUserId },
-        });
+        chatService.broadcastTyping(conversationId, currentUserId);
     };
 
     const scrollToBottom = () => {

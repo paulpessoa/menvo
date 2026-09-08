@@ -1,9 +1,7 @@
 import { Metadata } from "next"
-import { createClient } from "@/lib/utils/supabase/server"
 import { notFound } from "next/navigation"
 import MentorProfileClient, { type MentorProfile } from "./MentorProfileClient"
-
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { mentorPublicService } from "@/lib/services/mentors/mentor-public.service"
 
 interface PageProps {
   params: Promise<{
@@ -11,56 +9,12 @@ interface PageProps {
   }>
 }
 
-// Buscar dados do mentor e disponibilidade
-async function getMentorData(slug: string) {
-  const supabase = await createClient()
-
-  // Buscar mentor por slug ou ID (UUID)
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
-  const query = supabase
-    .from("mentors_view")
-    .select("*")
-    .eq("verified", true)
-
-  const { data: mentor, error } = await (isUuid
-    ? query.eq("id", slug)
-    : query.eq("slug", slug)
-  ).maybeSingle()
-
-  if (error || !mentor) {
-    return null
-  }
-
-  // Buscar disponibilidade configurada diretamente (usa Service Role para leitura pública dos horários)
-  let availability: any[] = []
-  try {
-    const adminSupabase = createServiceRoleClient()
-    const { data: availData, error: availError } = await adminSupabase
-      .from("mentor_availability")
-      .select("*")
-      .eq("mentor_id", mentor.id)
-      .order("day_of_week")
-      .order("start_time")
-
-    if (!availError && availData) {
-      availability = availData
-    }
-  } catch (error) {
-    console.error("Erro ao buscar disponibilidade:", error)
-  }
-
-  return {
-    mentor,
-    availability: availability || []
-  }
-}
-
 // Metadados dinâmicos para SEO e Open Graph
 export async function generateMetadata({
   params
 }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const data = await getMentorData(slug)
+  const data = await mentorPublicService.getMentorBySlugOrId(slug)
 
   if (!data) {
     return {
@@ -110,7 +64,7 @@ export const revalidate = 3600
 
 export default async function MentorProfilePage({ params }: PageProps) {
   const { slug } = await params
-  const data = await getMentorData(slug)
+  const data = await mentorPublicService.getMentorBySlugOrId(slug)
 
   if (!data) {
     notFound()

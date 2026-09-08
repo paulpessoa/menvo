@@ -1,24 +1,17 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/utils/supabase/client';
+import { favoritesService } from '@/lib/services/favorites/favorites.service';
 import { toast } from 'sonner';
 
 export function useFavorites(userId?: string) {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   const { data: favorites = [], isLoading: loading } = useQuery<string[]>({
     queryKey: ['favorites', userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
-        .from('user_favorites')
-        .select('mentor_id')
-        .eq('user_id', userId);
-
-      if (error) throw error;
-      return (data as { mentor_id: string }[])?.map(f => f.mentor_id) || [];
+      return favoritesService.getFavorites(userId);
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutos de cache fresco
@@ -27,20 +20,7 @@ export function useFavorites(userId?: string) {
   const mutation = useMutation({
     mutationFn: async ({ mentorId, isFavorite }: { mentorId: string; isFavorite: boolean }) => {
       if (!userId) throw new Error('Não autenticado');
-
-      if (isFavorite) {
-        const { error } = await supabase
-          .from('user_favorites')
-          .delete()
-          .eq('user_id', userId)
-          .eq('mentor_id', mentorId);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('user_favorites')
-          .insert({ user_id: userId, mentor_id: mentorId } as any);
-        if (error) throw error;
-      }
+      await favoritesService.toggleFavorite(userId, mentorId, isFavorite);
       return { mentorId, isFavorite };
     },
     onMutate: async ({ mentorId, isFavorite }) => {
