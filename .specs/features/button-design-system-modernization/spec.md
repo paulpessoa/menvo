@@ -52,9 +52,9 @@ As a user accessing the login screen, I want the card container, inputs, and but
 
 | Requirement ID | Description | Status |
 |---|---|---|
-| BTN-01 | Elevate `components/ui/button.tsx` variants to `rounded-xl`, tactile active scale, and brand glow | pending |
-| BTN-02 | Strip decorative icons from signup and login action buttons | pending |
-| BTN-03 | Redesign `/login` card, inputs, and button sizing to match `/signup` | pending |
-| BTN-04 | Audit and remove decorative icons from Home page hero, features, and CTA buttons | pending |
-| BTN-05 | Audit and remove decorative icons from Mentors catalog and booking dialogs | pending |
-| BTN-06 | Verify TypeScript compilation and unit test suite integrity | pending |
+| BTN-01 | Elevate `components/ui/button.tsx` variants to `rounded-xl`, tactile active scale, and brand glow | verified |
+| BTN-02 | Strip decorative icons from signup and login action buttons | verified |
+| BTN-03 | Redesign `/login` card, inputs, and button sizing to match `/signup` | verified |
+| BTN-04 | Audit and remove decorative icons from Home page hero, features, and CTA buttons | verified |
+| BTN-05 | Audit and remove decorative icons from Mentors catalog and booking dialogs | verified |
+| BTN-06 | Verify TypeScript compilation and unit test suite integrity | verified |
