@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRight, Loader2, AlertTriangle, Mail, Lock } from "lucide-react"
+import { Loader2, AlertTriangle, Mail, Lock } from "lucide-react"
 import { useRouter, Link } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
@@ -131,7 +131,6 @@ function SignupForm() {
             <Button asChild className="w-full h-12 rounded-xl font-bold shadow-lg shadow-primary/20">
               <Link href="/login">
                 {t("goToLogin")}
-                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" className="w-full h-12 rounded-xl border-2 font-bold">
@@ -282,10 +281,7 @@ function SignupForm() {
                   {t("creatingAccount")}
                 </span>
               ) : (
-                <>
-                  <span>{t("registerButton")}</span>
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
+                t("registerButton")
               )}
             </Button>
           </form>
