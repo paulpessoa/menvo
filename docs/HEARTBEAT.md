@@ -1,7 +1,7 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
 ## 📅 Last Updated: 2026-09-08
-**Current Status:** Google OAuth Verification submitted, transactional emails hardened with Brevo & founder signature, live test email center added, appointments cron job hardened (07:00 BRT schedule, CRON_SECRET auth, BRT timezone boundaries), complete legal policies (Privacy/Terms/Cookies) translated with Google Limited Use compliance, and SEO/Security headers strengthened.
+**Current Status:** Modernização global do Design System de botões concluída (tokens `rounded-xl`, elevação tátil `active:scale-[0.98]`, sombras da marca e remoção de ícones decorativos redundantes), tela de Login alinhada ao acabamento de alto nível da tela de Signup, Google OAuth Verification submetido e suíte de testes 100% íntegra.
 
 ---
 
@@ -14,13 +14,17 @@
 
 ## 📍 Architectural & Product Invariants
 
-### 1. Brand Identity & Color Tokens
+### 1. Brand Identity & Button Design System
 - **Official Brand Color:** `#007585` (Deep Teal / Verde Petróleo Menvo).
 - **CSS Token:** `--primary: 187 100% 26%` in `app/[locale]/globals.css` (resolves to `#007585`).
 - **Tailwind Config:** `primary.600: "#007585"`, `primary.700: "#006276"`.
-- **Button Standard:** Use `variant="default"` (`bg-primary hover:bg-primary/90 text-white`) or brand gradient (`from-primary-700 via-primary-600 to-primary`).
+- **Button Standards (`components/ui/button.tsx`):**
+  - **Border Radius:** `rounded-xl` por padrão em toda a aplicação.
+  - **Microinterações:** `active:scale-[0.98]` e hover com sombras de marca (`shadow-md shadow-primary/20`).
+  - **Variante Outline:** `border-2 border-border bg-background hover:bg-muted/60 active:scale-[0.98]`.
+  - **Minimalismo Text-Only:** Botões de ação devem exibir apenas texto puro legível. Proibido adicionar setinhas decorativas (`ArrowRight`) ou ícones redundantes.
+  - **Exceções Legítimas:** Spinners de loading (`Loader2`), logos oficiais de terceiros (Google/LinkedIn) e botões exclusivamente de ícone (`size="icon"`).
 - **Email Design:** All Brevo transactional emails strictly use `#007585` for CTAs and buttons.
-- **Never** use arbitrary grass green (`emerald-600`, `green-600`) or legacy indigo/purple gradients for platform buttons.
 
 ### 2. Mentorship Evaluation Model
 - **Asymmetric by Design:** Only mentees evaluate mentors (`!isMentor`).
@@ -45,6 +49,7 @@
 | Priority | Item | Status |
 |---|---|---|
 | **P0** | Google OAuth Verification submission in Google Cloud Console | Submitted (Under Review) |
+| **P1** | Button Design System Modernization (Signup standard + Text-Only buttons) | Completed |
 | **P1** | Dashboard Simplification (Anti-Overengineering — Core Loop focus) | Completed |
 | **P2** | Unified In-App Notifications Hub (Header NotificationBell + Hook) | Completed |
 | **P2** | Database Portability (100% decoupling to services/BFF layer) | Completed |
