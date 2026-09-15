@@ -28,11 +28,11 @@ A Menvo é uma iniciativa brasileira (Porto Digital, Recife / atuação nacional
 - **Sistema de Avaliações e Confiança:** Verificação rigorosa de perfis de mentores, avaliações mútuas e moderação de feedbacks para garantir a qualidade de cada sessão.
 
 ## Links e Recursos Essenciais
-- [Página Inicial Menvo](https://www.menvo.com.br/pt) — Apresentação da plataforma, depoimentos e estatísticas.
-- [Catálogo de Mentores](https://www.menvo.com.br/pt/mentors) — Busca e listagem completa de mentores disponíveis com filtros avançados.
-- [Quiz Diagnóstico de Carreira](https://www.menvo.com.br/pt/quiz) — Quiz gratuito de autoavaliação profissional com diagnóstico gerado por IA.
-- [Sobre a Menvo](https://www.menvo.com.br/pt/about) — Missão, visão, valores e equipe fundadora.
-- [Canal de Contato e Suporte](https://www.menvo.com.br/pt/contact) — Contato com o time da Menvo via e-mail e WhatsApp.
+- [Página Inicial Menvo](https://www.menvo.com.br) — Apresentação da plataforma, depoimentos e estatísticas.
+- [Catálogo de Mentores](https://www.menvo.com.br/mentors) — Busca e listagem completa de mentores disponíveis com filtros avançados.
+- [Quiz Diagnóstico de Carreira](https://www.menvo.com.br/quiz) — Quiz gratuito de autoavaliação profissional com diagnóstico gerado por IA.
+- [Sobre a Menvo](https://www.menvo.com.br/about) — Missão, visão, valores e equipe fundadora.
+- [Canal de Contato e Suporte](https://www.menvo.com.br/contact) — Contato com o time da Menvo via e-mail e WhatsApp.
 - [Documentação Completa para LLMs](https://www.menvo.com.br/llms-full.txt) — Arquivo completo para aprendizado e citação profunda por inteligências artificiais.
 
 ## Informações Geográficas e Contexto Local (GEO SEO)

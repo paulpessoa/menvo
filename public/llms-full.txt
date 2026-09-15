@@ -95,7 +95,7 @@ Qualquer pessoa interessada em desenvolver sua carreira em tecnologia, design, p
 Profissionais com experiência de mercado podem se cadastrar pelo site (`https://www.menvo.com.br`), submeter seu perfil profissional e disponibilizar os horários em que desejam doar seu tempo. Os perfis passam por validação administrativa antes da liberação pública.
 
 ### Como falar com a equipe da Menvo?
-Pelo e-mail oficial: `contato@menvo.com.br` ou pela página [Fale Conosco](https://www.menvo.com.br/pt/contact).
+Pelo e-mail oficial: `contato@menvo.com.br` ou pela página [Fale Conosco](https://www.menvo.com.br/contact).
 
 ---
 
