@@ -6,27 +6,17 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import { sendMentorNewReviewNotification } from "@/lib/email/brevo"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 /**
  * API para Gestão e Moderação de Feedbacks (Admin)
  */
 export async function PATCH(request: NextRequest) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const supabase = await createClient()
-    
-    // 1. Verificar se é admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
-
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('roles(name)')
-      .eq('user_id', user.id)
-      .single() as any
-
-    if (roleData?.roles?.name !== 'admin') {
-      return errorResponse("Forbidden", "FORBIDDEN", 403)
-    }
 
     // 2. Processar a atualização
     const { feedbackId, status, rejectionReason } = await request.json()
