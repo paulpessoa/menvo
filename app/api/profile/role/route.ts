@@ -27,8 +27,12 @@ export async function POST(request: NextRequest) {
     const { role, profileData } = validation.data
 
     // 1. Atualizar o perfil do usuário
+    // NÃO incluir "user_role" aqui: essa coluna não existe em `profiles`
+    // (a role real vive só em `user_roles`, atualizada mais abaixo). O
+    // PostgREST rejeita o payload inteiro se ele contiver uma coluna
+    // desconhecida, então isso fazia esse UPDATE falhar com 500 para
+    // QUALQUER usuário terminando o onboarding.
     const profileUpdates: Record<string, any> = {
-      user_role: role,
       verification_status: role === "mentor" ? "pending" : "approved",
       updated_at: new Date().toISOString(),
     }
