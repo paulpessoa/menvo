@@ -1,6 +1,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 // Admin client com service role para ignorar RLS
 const supabaseAdmin = createClient(
@@ -19,12 +20,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const { id } = await params
     const body = await request.json()
 
-    // 1. Validar se o solicitante é realmente um admin (segurança extra)
-    // Nota: O middleware já deve fazer isso, mas aqui reforçamos
-    
     const { updates, roles } = body
 
     // 2. Atualizar Perfil
@@ -81,7 +82,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const { id } = await params
+
+    if (id === guard.admin.userId) {
+      return NextResponse.json(
+        { error: "Você não pode remover a própria conta de administrador" },
+        { status: 400 }
+      )
+    }
 
     // No Supabase, deletar o perfil geralmente dispara o delete no Auth se o cascade estiver ON.
     // Se não, precisamos deletar explicitamente no auth.admin.

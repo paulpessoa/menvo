@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getEmailTemplatePreviewHtml } from "@/lib/email/brevo"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 export async function GET(request: NextRequest) {
+  const guard = await requireAdmin(["admin", "moderator"])
+  if (!guard.ok) return guard.response
+
   const { searchParams } = new URL(request.url)
   const template = searchParams.get("template") || "confirmation"
 
