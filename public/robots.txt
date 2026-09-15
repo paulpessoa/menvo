@@ -23,13 +23,39 @@ User-agent: Cohere-ai
 Allow: /
 
 # Disallow private and technical areas
+# Bare form blocks the default locale (pt-BR, no URL prefix); the /en/ and
+# /es/ forms are required too since a plain "Disallow: /dashboard/" only
+# matches paths that literally start with that string and would silently
+# leave the localized paths of every private area crawlable.
 Disallow: /api/
 Disallow: /admin/
 Disallow: /dashboard/
+Disallow: /en/dashboard/
+Disallow: /es/dashboard/
 Disallow: /settings/
+Disallow: /en/settings/
+Disallow: /es/settings/
 Disallow: /profile/
+Disallow: /en/profile/
+Disallow: /es/profile/
 Disallow: /messages/
+Disallow: /en/messages/
+Disallow: /es/messages/
 Disallow: /appointments/
+Disallow: /en/appointments/
+Disallow: /es/appointments/
+Disallow: /onboarding
+Disallow: /en/onboarding
+Disallow: /es/onboarding
+Disallow: /mentorship/
+Disallow: /en/mentorship/
+Disallow: /es/mentorship/
+Disallow: /setup/
+Disallow: /en/setup/
+Disallow: /es/setup/
+Disallow: /unauthorized
+Disallow: /en/unauthorized
+Disallow: /es/unauthorized
 Disallow: /_next/
 Disallow: /callback
 
