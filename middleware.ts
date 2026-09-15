@@ -3,7 +3,9 @@ import { createServerClient } from "@supabase/ssr"
 import createMiddleware from "next-intl/middleware"
 import { routing } from "./i18n/routing"
 import {
-  protectedRoutes
+  protectedRoutes,
+  adminRoutes,
+  onboardingRequiredRoutes
 } from "@/lib/config/routes"
 
 // Initialize next-intl middleware
@@ -95,6 +97,39 @@ export async function middleware(request: NextRequest) {
       loginUrl.searchParams.set("next", pathname)
     }
     return NextResponse.redirect(loginUrl)
+  }
+
+  // Role Protection Logic — client-side RequireRole/AuthGuard checks alone are
+  // not a security boundary (they run after the page's JS bundle loads and can
+  // be bypassed by calling the API directly or disabling JS). Resolve the
+  // role here only for routes that actually need it, to avoid a DB round trip
+  // on every request.
+  const isAdminRoute = adminRoutes.some(route => pathnameWithoutLocale.startsWith(route))
+  const isOnboardingRequiredRoute = onboardingRequiredRoutes.some(route =>
+    pathnameWithoutLocale.startsWith(route)
+  )
+
+  if (user && (isAdminRoute || isOnboardingRequiredRoute)) {
+    let roleNames: string[] = []
+    try {
+      const { data: roleRows } = await supabase
+        .from("user_roles")
+        .select("roles(name)")
+        .eq("user_id", user.id)
+        .returns<{ roles: { name: string } | null }[]>()
+
+      roleNames = (roleRows ?? [])
+        .map(row => row.roles?.name)
+        .filter((name): name is string => Boolean(name))
+    } catch (error) { }
+
+    if (isAdminRoute && !roleNames.includes("admin")) {
+      return NextResponse.redirect(new URL(`/${currentLocale}/unauthorized`, request.url))
+    }
+
+    if (isOnboardingRequiredRoute && roleNames.length === 0 && pathnameWithoutLocale !== "/onboarding") {
+      return NextResponse.redirect(new URL(`/${currentLocale}/onboarding`, request.url))
+    }
   }
 
   return response
