@@ -186,12 +186,12 @@ export function TestimonialsCarousel() {
                                             <h3 className="font-semibold text-sm truncate">{testimonial.name}</h3>
                                             <p className="text-xs text-muted-foreground truncate">{testimonial.role}</p>
                                             {testimonial.company && (
-                                                <p className="text-xs text-muted-foreground/70 truncate">{testimonial.company}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{testimonial.company}</p>
                                             )}
                                             {(testimonial.city || testimonial.country) && (
                                                 <div className="flex items-center gap-1 mt-1">
-                                                    <MapPin className="w-3 h-3 text-muted-foreground/50" />
-                                                    <p className="text-xs text-muted-foreground/70 truncate">
+                                                    <MapPin className="w-3 h-3 text-muted-foreground" />
+                                                    <p className="text-xs text-muted-foreground truncate">
                                                         {testimonial.city}{testimonial.city && testimonial.country && ', '}{testimonial.country}
                                                     </p>
                                                 </div>
@@ -237,8 +237,10 @@ export function TestimonialsCarousel() {
                     size="icon"
                     onClick={() => scroll('left')}
                     className="rounded-full"
+                    aria-label="Ver depoimentos anteriores"
                 >
                     <ChevronLeft className="w-5 h-5" />
+                    <span className="sr-only">Ver depoimentos anteriores</span>
                 </Button>
 
                 <Button
@@ -246,8 +248,10 @@ export function TestimonialsCarousel() {
                     size="icon"
                     onClick={() => scroll('right')}
                     className="rounded-full"
+                    aria-label="Ver próximos depoimentos"
                 >
                     <ChevronRight className="w-5 h-5" />
+                    <span className="sr-only">Ver próximos depoimentos</span>
                 </Button>
             </div>
 

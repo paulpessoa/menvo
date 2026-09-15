@@ -82,8 +82,10 @@ export function FeedbackBanner() {
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-primary hover:scale-110 transition-transform"
         size="icon"
+        aria-label="Enviar feedback sobre a Menvo"
       >
         <MessageSquare className="h-6 w-6" />
+        <span className="sr-only">Enviar feedback sobre a Menvo</span>
       </Button>
 
       {/* Modal de Feedback */}

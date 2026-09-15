@@ -40,7 +40,7 @@ export function UserNavDropdown({
   const t = useTranslations()
 
   return (
-    <div className="hidden md:block">
+    <div className="hidden lg:block">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

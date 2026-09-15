@@ -113,6 +113,7 @@ export function CookieConsentBanner() {
                 <Link
                   href="/cookies"
                   className="underline hover:text-foreground"
+                  aria-label={`${t("cookieConsent.learnMore")} — ${t("cookieConsent.title")}`}
                 >
                   {t("cookieConsent.learnMore")}
                 </Link>
@@ -139,8 +140,10 @@ export function CookieConsentBanner() {
               size="icon"
               onClick={acceptNecessary}
               className="flex-shrink-0"
+              aria-label={t("common.close") || "Fechar"}
             >
               <X className="h-4 w-4" />
+              <span className="sr-only">{t("common.close") || "Fechar"}</span>
             </Button>
           </div>
         </Card>

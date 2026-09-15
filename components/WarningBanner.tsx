@@ -48,8 +48,10 @@ export function WarningBanner() {
                 size="sm"
                 className="text-yellow-800 hover:bg-yellow-200"
                 onClick={handleDismiss}
+                aria-label={t('common.close') || 'Fechar aviso'}
               >
                 <X className="h-4 w-4" />
+                <span className="sr-only">{t('common.close') || 'Fechar aviso'}</span>
               </Button>
            </div>
         </div>

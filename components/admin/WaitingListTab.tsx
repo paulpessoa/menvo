@@ -3,8 +3,17 @@
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, UserPlus, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks, CheckCircle2 } from "lucide-react"
+import { Loader2, UserPlus, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks, CheckCircle2, MessageCircle, Copy } from "lucide-react"
 import { toast } from "sonner"
+
+function formatWhatsappDigits(raw: string): string | null {
+  const digits = raw.replace(/\D/g, "")
+  if (!digits) return null
+  // Assume BR numbers already missing the country code are 10-11 digits (DDD + number)
+  if (digits.length === 10 || digits.length === 11) return `55${digits}`
+  if (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) return digits
+  return digits
+}
 
 interface WaitingListEntry {
   id: string
@@ -162,7 +171,39 @@ export function WaitingListTab() {
                 </div>
                 <div className="text-xs text-muted-foreground mt-0.5">{entry.email}</div>
                 {entry.whatsapp && (
-                  <div className="text-xs text-muted-foreground">WhatsApp: {entry.whatsapp}</div>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-xs text-muted-foreground">WhatsApp: {entry.whatsapp}</span>
+                    {(() => {
+                      const waDigits = formatWhatsappDigits(entry.whatsapp!)
+                      if (!waDigits) return null
+                      const waMessage = `Olá ${entry.name.split(" ")[0]}! Aqui é da Menvo 🙂 Vi que você está na nossa lista de espera e gostaria de conversar sobre os próximos passos.`
+                      const waLink = `https://wa.me/${waDigits}?text=${encodeURIComponent(waMessage)}`
+                      return (
+                        <>
+                          <a
+                            href={waLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-green-700 hover:underline"
+                            title="Abrir conversa no WhatsApp"
+                          >
+                            <MessageCircle className="h-3 w-3" /> Abrir WhatsApp
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(waDigits)
+                              toast.success("Número copiado!")
+                            }}
+                            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                            title="Copiar número"
+                          >
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </>
+                      )
+                    })()}
+                  </div>
                 )}
                 {hasReason && (
                   <button

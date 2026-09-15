@@ -179,7 +179,7 @@ export default function Header() {
               onSignOut={handleSignOut}
             />
           ) : (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
               <Button asChild size="sm" className="shadow-md rounded-xl font-bold px-6">
                 <Link href="/login">{t("common.login")}</Link>
               </Button>
