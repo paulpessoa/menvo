@@ -25,6 +25,12 @@ class VerificationServiceClass {
       mentor_email: profile.email || "",
       mentor_title: profile.job_title || "Mentor",
       mentor_company: profile.company || "",
+      mentor_bio: profile.bio,
+      mentor_expertise_areas: profile.expertise_areas,
+      mentorship_approach: profile.mentorship_approach,
+      what_to_expect: profile.what_to_expect,
+      linkedin_url: profile.linkedin_url,
+      cv_url: profile.cv_url,
       verification_type: "Identity",
       status: "pending",
       created_at: profile.created_at || new Date().toISOString(),
@@ -32,6 +38,18 @@ class VerificationServiceClass {
     }))
   }
 
+  /**
+   * @deprecated Use POST /api/admin/verify instead. This ran the profile
+   * update AND (previously) would need to assign the "mentor" RBAC role
+   * client-side with the caller's own anon-key session — cross-user writes
+   * to user_roles have no confirmed RLS policy for that, unlike the admin
+   * policy that already covers `profiles`. The API route does this
+   * server-side with a service-role client, which is guaranteed to work
+   * regardless of RLS and matches how every other cross-user admin
+   * mutation in this codebase is done. Kept only so this class still
+   * compiles for any other lingering references; not called by the
+   * verifications page anymore.
+   */
   async completeVerification({
     verificationId,
     passed,

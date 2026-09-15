@@ -235,10 +235,20 @@ function ProfilePageContent() {
 
   const handleRequestMentor = async () => {
     try {
-        const response = await fetch('/api/profile/request-mentor', { method: 'POST' })
+        const response = await fetch('/api/profile/request-mentor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                mentorship_approach: formData.mentorship_approach,
+                what_to_expect: formData.what_to_expect
+            })
+        })
         if (response.ok) {
             toast.success("Solicitação enviada!")
             refreshProfile()
+        } else {
+            const data = await response.json().catch(() => ({}))
+            toast.error(data.error || "Erro ao solicitar")
         }
     } catch (err) { toast.error("Erro ao solicitar") }
   }
@@ -578,16 +588,39 @@ function ProfilePageContent() {
                                 <AlertDialogTrigger asChild>
                                     <Button size="sm" className="gap-2 shrink-0"><UserPlus className="h-4 w-4" /> {t("form.becomeMentorButton")}</Button>
                                 </AlertDialogTrigger>
-                                <AlertDialogContent>
+                                <AlertDialogContent className="max-w-lg">
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>{t("form.becomeMentorTitle")}</AlertDialogTitle>
                                         <AlertDialogDescription>
                                             <span className="block mb-2">{t("form.becomeMentorDescription")}</span>
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
+                                    <div className="space-y-4 py-2">
+                                        <div className="space-y-1">
+                                            <Label>{t("form.mentorshipApproachLabel")}</Label>
+                                            <Textarea
+                                                value={formData.mentorship_approach}
+                                                onChange={(e) => setFormData({...formData, mentorship_approach: e.target.value})}
+                                                placeholder={t("form.mentorshipApproachPlaceholder")}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label>{t("form.whatToExpectLabel")}</Label>
+                                            <Textarea
+                                                value={formData.what_to_expect}
+                                                onChange={(e) => setFormData({...formData, what_to_expect: e.target.value})}
+                                                placeholder={t("form.whatToExpectPlaceholder")}
+                                            />
+                                        </div>
+                                    </div>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>{t("form.becomeMentorCancel")}</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleRequestMentor}>{t("form.becomeMentorAction")}</AlertDialogAction>
+                                        <AlertDialogAction
+                                            onClick={handleRequestMentor}
+                                            disabled={!formData.mentorship_approach.trim()}
+                                        >
+                                            {t("form.becomeMentorAction")}
+                                        </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>

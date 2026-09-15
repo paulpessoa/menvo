@@ -14,6 +14,12 @@ export interface Verification {
   mentor_email: string;
   mentor_title: string;
   mentor_company: string;
+  mentor_bio?: string | null;
+  mentor_expertise_areas?: string[] | null;
+  mentorship_approach?: string | null;
+  what_to_expect?: string | null;
+  linkedin_url?: string | null;
+  cv_url?: string | null;
   submitted_at?: string;
   reviewed_at?: string;
   reviewed_by?: string;

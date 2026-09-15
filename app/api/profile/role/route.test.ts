@@ -62,7 +62,14 @@ describe('POST /api/profile/role', () => {
           })
           return {
             delete: jest.fn().mockReturnValue({ eq: deleteEq }),
-            upsert: jest.fn().mockResolvedValue({ error: null }),
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                eq: jest.fn().mockReturnValue({
+                  maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+                }),
+              }),
+            }),
+            insert: jest.fn().mockResolvedValue({ error: null }),
           }
         }
         return {}
@@ -162,7 +169,14 @@ describe('POST /api/profile/role', () => {
       if (table === 'user_roles') {
         return {
           delete: jest.fn().mockReturnValue({ eq: jest.fn().mockReturnValue({ in: jest.fn().mockResolvedValue({ error: null }) }) }),
-          upsert: jest.fn().mockResolvedValue({ error: null }),
+          select: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+              }),
+            }),
+          }),
+          insert: jest.fn().mockResolvedValue({ error: null }),
         }
       }
       return {}
@@ -186,7 +200,14 @@ describe('POST /api/profile/role', () => {
       in: jest.fn().mockResolvedValue({ error: null }),
     })
     const userRolesDelete = jest.fn().mockReturnValue({ eq: deleteEq })
-    const userRolesUpsert = jest.fn().mockResolvedValue({ error: null })
+    const userRolesInsert = jest.fn().mockResolvedValue({ error: null })
+    const userRolesSelect = jest.fn().mockReturnValue({
+      eq: jest.fn().mockReturnValue({
+        eq: jest.fn().mockReturnValue({
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+        }),
+      }),
+    })
 
     mockSupabase.from = jest.fn((table: string) => {
       if (table === 'profiles') {
@@ -206,7 +227,7 @@ describe('POST /api/profile/role', () => {
         }
       }
       if (table === 'user_roles') {
-        return { delete: userRolesDelete, upsert: userRolesUpsert }
+        return { delete: userRolesDelete, select: userRolesSelect, insert: userRolesInsert }
       }
       return {}
     })
@@ -217,9 +238,49 @@ describe('POST /api/profile/role', () => {
     expect(response.status).toBe(200)
     expect(userRolesDelete).toHaveBeenCalled()
     expect(deleteEq).toHaveBeenCalledWith('user_id', 'test-user-123')
-    expect(userRolesUpsert).toHaveBeenCalledWith(
-      { user_id: 'test-user-123', role_id: 1 },
-      { onConflict: 'user_id,role_id' }
-    )
+    expect(userRolesInsert).toHaveBeenCalledWith({ user_id: 'test-user-123', role_id: 1 })
+  })
+
+  it('does not insert a duplicate row when the role assignment already exists', async () => {
+    // Regression test: user_roles has no unique constraint on
+    // (user_id, role_id) (its primary key is a synthetic `id`), so
+    // `.upsert(..., { onConflict: "user_id,role_id" })` fails outright with
+    // Postgres error 42P10 ("no unique or exclusion constraint matching the
+    // ON CONFLICT specification") — confirmed directly against the live
+    // database. The fix checks for an existing row first and only inserts
+    // when one isn't found, so this must not insert when it already exists.
+    const userRolesInsert = jest.fn().mockResolvedValue({ error: null })
+    mockSupabase.from = jest.fn((table: string) => {
+      if (table === 'profiles') {
+        return { update: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }) }
+      }
+      if (table === 'roles') {
+        return {
+          select: jest.fn().mockReturnValue({
+            in: jest.fn().mockResolvedValue({ data: [{ id: 1, name: 'mentee' }], error: null }),
+          }),
+        }
+      }
+      if (table === 'user_roles') {
+        return {
+          delete: jest.fn().mockReturnValue({ eq: jest.fn().mockReturnValue({ in: jest.fn().mockResolvedValue({ error: null }) }) }),
+          select: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                maybeSingle: jest.fn().mockResolvedValue({ data: { id: 'existing-row' }, error: null }),
+              }),
+            }),
+          }),
+          insert: userRolesInsert,
+        }
+      }
+      return {}
+    })
+
+    const request = createMockRequest({ role: 'mentee' })
+    const response = await POST(request)
+
+    expect(response.status).toBe(200)
+    expect(userRolesInsert).not.toHaveBeenCalled()
   })
 })
