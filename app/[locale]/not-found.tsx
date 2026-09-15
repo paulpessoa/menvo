@@ -23,10 +23,18 @@ export default function NotFound() {
   }
 
   return (
-    <main
-      id="main-content"
-      className="relative min-h-[calc(100vh-14rem)] flex items-center justify-center px-4 py-16 overflow-hidden"
-    >
+    <>
+      {/* Client Components can't export `metadata`, and notFound() reached
+          via the i18n middleware's rewrite() keeps the HTTP status at 200
+          instead of 404 (a known Next.js/middleware interaction) — without
+          this, search engines would crawl and index 404 pages as real
+          content. Next.js hoists <meta> tags rendered anywhere in the tree
+          into <head>, so this works from a client component. */}
+      <meta name="robots" content="noindex" />
+      <main
+        id="main-content"
+        className="relative min-h-[calc(100vh-14rem)] flex items-center justify-center px-4 py-16 overflow-hidden"
+      >
       {/* Subtle decorative background ambient glow */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-teal-400/10 via-primary/10 to-cyan-400/10 rounded-full blur-3xl pointer-events-none -z-10"
@@ -142,5 +150,6 @@ export default function NotFound() {
         </div>
       </div>
     </main>
+    </>
   )
 }
