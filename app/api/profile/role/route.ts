@@ -73,18 +73,38 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Atribuir a role no sistema de RBAC
-    const { data: roleData } = await supabase
+    // "mentor" e "mentee" são mutuamente exclusivos: sem isso, um usuário que
+    // troca de role pelo onboarding (ex.: reenvia o POST) acumula as duas
+    // linhas em user_roles, o que quebra todo endpoint admin que faz
+    // `.select("roles(name)").single()` para esse usuário. Não tocamos em
+    // "admin"/"moderator", que são atribuídas por outro fluxo.
+    const { data: exclusiveRoles } = await supabase
       .from("roles")
-      .select("id")
-      .eq("name", role)
-      .single()
+      .select("id, name")
+      .in("name", ["mentor", "mentee"])
 
-    if (roleData) {
+    const roleIdByName = new Map(
+      (exclusiveRoles ?? []).map(r => [(r as any).name as string, (r as any).id as number])
+    )
+    const otherRoleIds = [...roleIdByName.entries()]
+      .filter(([name]) => name !== role)
+      .map(([, id]) => id)
+
+    if (otherRoleIds.length > 0) {
       await (supabase
         .from("user_roles") as any)
-        .upsert({ 
-          user_id: user.id, 
-          role_id: (roleData as any).id 
+        .delete()
+        .eq("user_id", user.id)
+        .in("role_id", otherRoleIds)
+    }
+
+    const roleId = roleIdByName.get(role)
+    if (roleId) {
+      await (supabase
+        .from("user_roles") as any)
+        .upsert({
+          user_id: user.id,
+          role_id: roleId
         }, { onConflict: "user_id,role_id" });
     }
 

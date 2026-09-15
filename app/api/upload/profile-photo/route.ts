@@ -56,15 +56,14 @@ export async function POST(request: NextRequest) {
     // Determine target user ID
     let finalUserId = user.id
     if (targetUserId && targetUserId !== user.id) {
-      const { data: roleData } = await supabaseAdmin
+      const { data: roleRows } = await supabaseAdmin
         .from('user_roles')
         .select('roles(name)')
         .eq('user_id', user.id)
-        .single()
-      
-      const isAdmin = (roleData?.roles as any)?.map?.((r: any) => r.roles?.name).includes('admin') || 
-                      (roleData?.roles as any)?.name === 'admin'
-      
+        .returns<{ roles: { name: string } | null }[]>()
+
+      const isAdmin = (roleRows ?? []).some(r => r.roles?.name === 'admin')
+
       if (!isAdmin) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
       }

@@ -18,14 +18,16 @@ export async function GET(request: NextRequest) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
-    // Check if user is admin
-    const { data: roleData } = await supabase
+    // Check if user is admin. Do not collapse with .single()/.maybeSingle():
+    // a user can hold more than one row in user_roles, which makes those
+    // throw instead of returning the row we actually want.
+    const { data: roleRows } = await supabase
       .from("user_roles")
       .select("roles(name)")
       .eq("user_id", user.id)
-      .single()
+      .returns<{ roles: { name: string } | null }[]>()
 
-    const isAdmin = (roleData as any)?.roles?.name === "admin"
+    const isAdmin = (roleRows ?? []).some(r => r.roles?.name === "admin")
 
     // Parse query parameters
     const page = Number.parseInt(searchParams.get("page") || "1")
