@@ -2,9 +2,35 @@
  * @jest-environment node
  */
 import { GET } from './route';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/auth/require-admin';
+
+jest.mock('@/lib/auth/require-admin', () => ({
+  requireAdmin: jest.fn()
+}));
+
+const mockRequireAdmin = requireAdmin as jest.MockedFunction<typeof requireAdmin>;
 
 describe('GET /api/admin/emails/preview', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRequireAdmin.mockResolvedValue({
+      ok: true,
+      admin: { userId: 'admin-uuid', role: 'admin' }
+    });
+  });
+
+  it('should return 403 when the caller is not an admin', async () => {
+    mockRequireAdmin.mockResolvedValue({
+      ok: false,
+      response: NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    });
+
+    const req = new NextRequest('http://localhost:3000/api/admin/emails/preview');
+    const res = await GET(req);
+
+    expect(res.status).toBe(403);
+  });
   it('should return HTML preview for confirmation template by default', async () => {
     const req = new NextRequest('http://localhost:3000/api/admin/emails/preview');
     const res = await GET(req);

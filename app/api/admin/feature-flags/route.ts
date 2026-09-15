@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { requireAdmin } from "@/lib/auth/require-admin"
 import type { Database, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
 
 // Constantes de tabela movidas para cá ou lidas do schema
@@ -15,6 +16,9 @@ const supabase = createClient<Database>(
 
 export async function GET() {
   try {
+    const guard = await requireAdmin(["admin", "moderator"])
+    if (!guard.ok) return guard.response
+
     const { data: flags, error: flagsError } = await supabase
       .from(FEATURE_FLAGS_TABLE)
       .select('*')
@@ -38,6 +42,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const body = await request.json()
     const { name, description, tags } = body
 
@@ -63,8 +70,11 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const body = await request.json()
-    const { id, enabled, name, performed_by } = body
+    const { id, enabled, name } = body
 
     const updatePayload: TablesUpdate<'feature_flags'> = {
       enabled,
@@ -83,7 +93,7 @@ export async function PUT(request: Request) {
     const logPayload: TablesInsert<'feature_flag_audit_logs'> = {
       flag_name: name,
       action: enabled ? 'Ativada' : 'Desativada',
-      performed_by: performed_by || 'Sistema'
+      performed_by: guard.admin.userId
     }
 
     await supabase.from(FEATURE_FLAGS_AUDIT_LOGS_TABLE).insert(logPayload)
@@ -96,6 +106,9 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     if (!id) throw new Error("ID is required")

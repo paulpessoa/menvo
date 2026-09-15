@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { sendTestEmail } from "@/lib/email/brevo"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 const sendTestSchema = z.object({
   email: z.string().email("Por favor, insira um e-mail válido."),
@@ -9,6 +10,9 @@ const sendTestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const body = await request.json().catch(() => null)
     const validation = sendTestSchema.safeParse(body)
 

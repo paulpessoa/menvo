@@ -1,6 +1,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 // Admin client com service role
 const supabaseAdmin = createClient(
@@ -16,6 +17,9 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const { userIds } = await request.json()
 
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {

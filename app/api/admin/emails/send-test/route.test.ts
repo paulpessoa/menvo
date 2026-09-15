@@ -2,17 +2,44 @@
  * @jest-environment node
  */
 import { POST } from './route';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import * as brevoModule from '@/lib/email/brevo';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 jest.mock('@/lib/email/brevo', () => ({
   sendTestEmail: jest.fn(),
   getEmailTemplatePreviewHtml: jest.fn().mockReturnValue('<p>Template Mock</p>')
 }));
 
+jest.mock('@/lib/auth/require-admin', () => ({
+  requireAdmin: jest.fn()
+}));
+
+const mockRequireAdmin = requireAdmin as jest.MockedFunction<typeof requireAdmin>;
+
 describe('POST /api/admin/emails/send-test', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRequireAdmin.mockResolvedValue({
+      ok: true,
+      admin: { userId: 'admin-uuid', role: 'admin' }
+    });
+  });
+
+  it('should return 403 when the caller is not an admin', async () => {
+    mockRequireAdmin.mockResolvedValue({
+      ok: false,
+      response: NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
+    });
+
+    const req = new NextRequest('http://localhost:3000/api/admin/emails/send-test', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'valid@menvo.com.br', template: 'confirmation' })
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(403);
+    expect(brevoModule.sendTestEmail).not.toHaveBeenCalled();
   });
 
   it('should return 400 for invalid email address', async () => {
