@@ -26,6 +26,31 @@ export interface MentorContextItem {
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.OPEN_AI_KEY
 const GROQ_API_KEY = process.env.GROQ_API_KEY
 
+/**
+ * O modelo às vezes "inventa" um mentor_id que não é o valor exato do campo
+ * `id` fornecido no contexto — por exemplo, uma versão simplificada do nome
+ * (`"nayane_prudencio"`) em vez do UUID real. Isso passaria despercebido até
+ * o front-end tentar buscar esse ID no banco: como o Postgres rejeita a
+ * cláusula `.in()` inteira quando um valor não é um UUID válido, um único
+ * ID alucinado derruba a exibição de TODOS os mentores sugeridos, mesmo os
+ * que vieram certos. Filtramos aqui, na fronteira do serviço de IA, pra
+ * nunca deixar um ID inventado sair — não importa qual provedor (OpenAI,
+ * Groq ou o fallback determinístico) gerou o resultado.
+ */
+function sanitizeResult(result: AIMatchResult, validIds: Set<string>): AIMatchResult {
+  const suggestions = (result.suggestions || []).filter((s) => validIds.has(s.mentor_id))
+  if (suggestions.length === 0 && (result.suggestions || []).length > 0) {
+    return {
+      ...result,
+      suggestions: [],
+      no_match: true,
+      global_justification:
+        "Não conseguimos confirmar um mentor específico para essa busca no momento, mas novas conexões são adicionadas semanalmente."
+    }
+  }
+  return { ...result, suggestions }
+}
+
 export const aiMatchService = {
   /**
    * Finds the best mentor matches for a given query against available mentors context.
@@ -34,6 +59,7 @@ export const aiMatchService = {
     userQuery: string,
     mentorsContext: MentorContextItem[]
   ): Promise<AIMatchResult> {
+    const validIds = new Set(mentorsContext.map((m) => m.id))
     const mentorsSummary = mentorsContext.map((m) => ({
       id: m.id,
       name: m.full_name,
@@ -55,6 +81,7 @@ REGRAS CRÍTICAS DE INTEGRIDADE:
 3. JUSTIFICATIVA HONESTA: Se "no_match" for true, em "global_justification", explique cordialmente que a rede Menvo ainda não possui especialistas específicos nessa área, mas que novas conexões são adicionadas semanalmente.
 4. FOCO DE NEGÓCIO: Dê prioridade a Carreira, Tecnologia, Programação, Produto, Design, Dados, Gestão e Educação.
 5. Retorne NO MÁXIMO 4 mentores recomendados.
+6. ID EXATO: o campo "mentor_id" de cada sugestão deve ser IDÊNTICO, caractere por caractere, ao valor do campo "id" do mentor correspondente na lista acima (um UUID, ex: "0737122a-0579-4981-9802-41883d6563a3"). NUNCA invente, abrevie ou crie uma versão do nome como id — copie o "id" exatamente como está na lista.
 
 FORMATO JSON OBRIGATÓRIO:
 {
@@ -92,8 +119,8 @@ FORMATO JSON OBRIGATÓRIO:
           const data = await response.json()
           const content = data?.choices?.[0]?.message?.content
           if (content) {
-            const result = JSON.parse(content)
-            return result as AIMatchResult
+            const result = JSON.parse(content) as AIMatchResult
+            return sanitizeResult(result, validIds)
           }
         } else {
           const errText = await response.text()
@@ -129,8 +156,8 @@ FORMATO JSON OBRIGATÓRIO:
           const data = await response.json()
           const content = data?.choices?.[0]?.message?.content
           if (content) {
-            const result = JSON.parse(content)
-            return result as AIMatchResult
+            const result = JSON.parse(content) as AIMatchResult
+            return sanitizeResult(result, validIds)
           }
         } else {
           const errText = await response.text()

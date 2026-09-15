@@ -60,6 +60,7 @@ interface UserStats {
   undefined: number
   menvoOrigin: number
   jotformOrigin: number
+  waitingList: number
 }
 
 export default function AdminUsersPage() {
@@ -74,7 +75,8 @@ export default function AdminUsersPage() {
     mentees: 0,
     undefined: 0,
     menvoOrigin: 0,
-    jotformOrigin: 0
+    jotformOrigin: 0,
+    waitingList: 0
   })
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -130,7 +132,9 @@ export default function AdminUsersPage() {
   }, [page, activeTab, searchTerm, originFilter])
 
   useEffect(() => {
-    if (activeTab === "waiting-list") return
+    // Sempre busca (mesmo na aba "waiting-list", que usa seu próprio
+    // componente pra listar) — é o que traz os `counts` usados nos badges
+    // de todas as abas, incluindo o da Waiting List.
     fetchData()
   }, [activeTab, originFilter]) // Recarregar ao mudar de aba ou origem
 
@@ -218,7 +222,7 @@ export default function AdminUsersPage() {
                         Não Definidos <Badge variant="destructive" className="ml-2">{stats.undefined}</Badge>
                     </TabsTrigger>
                     <TabsTrigger value="waiting-list" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
-                        Waiting List
+                        Waiting List <Badge variant="outline" className="ml-2 text-purple-700 border-purple-300 bg-purple-50">{stats.waitingList}</Badge>
                     </TabsTrigger>
                   </TabsList>
                 </div>

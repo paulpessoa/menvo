@@ -540,7 +540,15 @@ class MentorService {
    * Busca os perfis completos de mentores recomendados pela IA por seus IDs.
    */
   async getMentorsByIds(ids: string[]): Promise<any[]> {
-    if (!ids || ids.length === 0) return []
+    // A IA às vezes "inventa" um mentor_id que não é o UUID real (ex: uma
+    // versão do nome tipo "nayane_prudencio"). Um único valor inválido faz
+    // o Postgres rejeitar a cláusula `.in()` inteira ("invalid input syntax
+    // for type uuid"), zerando os resultados de TODOS os IDs — inclusive os
+    // válidos. Filtramos aqui pra garantir que um ID alucinado nunca derrube
+    // os demais.
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    const validIds = (ids || []).filter((id) => uuidPattern.test(id))
+    if (validIds.length === 0) return []
     const { data, error } = await (this.supabase
       .from("mentors_view") as any)
       .select(`
@@ -565,7 +573,7 @@ class MentorService {
         slug,
         created_at
       `)
-      .in("id", ids)
+      .in("id", validIds)
 
     if (error) {
       console.error("Error fetching mentors by IDs:", error)

@@ -1,11 +1,11 @@
 "use client"
 
-import { Sparkles, Loader2, Lock } from "lucide-react"
+import { Sparkles, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-import { Link } from "@/i18n/routing"
+import { useRouter } from "@/i18n/routing"
 
 interface AISearchButtonProps {
   query: string
@@ -19,29 +19,27 @@ interface AISearchButtonProps {
  * dispara neste clique explícito: é uma chamada de LLM com custo e latência
  * bem maiores que o filtro no banco, então nunca deve rodar sozinha a cada
  * tecla.
+ *
+ * O botão sempre tem a mesma aparência (não vira um botão diferente pra
+ * quem não está logado) — a exigência de login é comunicada num toast com
+ * um atalho pra ir ao /login, em vez de navegar pra lá sem avisar por quê.
  */
 export function AISearchButton({ query, loading, onSearch }: AISearchButtonProps) {
   const t = useTranslations("mentorsPage.magicSearch")
   const tCommon = useTranslations("common")
   const { isAuthenticated, loading: authLoading } = useAuth()
-
-  if (!authLoading && !isAuthenticated) {
-    return (
-      <Button
-        asChild
-        variant="outline"
-        title={t("loginRequired")}
-        className="h-11 sm:h-12 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40 shrink-0"
-      >
-        <Link href="/login" aria-label={`${tCommon("login")} — ${t("loginRequired")}`}>
-          <Lock className="h-3.5 w-3.5 shrink-0" />
-          <span className="hidden sm:inline">{tCommon("login")}</span>
-        </Link>
-      </Button>
-    )
-  }
+  const router = useRouter()
 
   const handleClick = () => {
+    if (!isAuthenticated) {
+      toast.error(t("loginRequired"), {
+        action: {
+          label: tCommon("login"),
+          onClick: () => router.push("/login")
+        }
+      })
+      return
+    }
     if (query.trim().length < 5) {
       toast.error(t("minChars"))
       return
@@ -53,7 +51,7 @@ export function AISearchButton({ query, loading, onSearch }: AISearchButtonProps
     <Button
       type="button"
       onClick={handleClick}
-      disabled={loading || authLoading || query.trim().length < 5}
+      disabled={loading || authLoading}
       aria-label={t("button")}
       className="h-11 sm:h-12 rounded-xl px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shrink-0"
     >

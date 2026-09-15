@@ -137,6 +137,10 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
       .eq("origin_platform", "jotform")
 
+    const { count: waitingListCount } = await supabase
+      .from("waiting_list")
+      .select("*", { count: "exact", head: true })
+
     return successResponse({
       users: profilesWithWaitingListFlag,
       pagination: {
@@ -152,7 +156,8 @@ export async function GET(request: NextRequest) {
         mentees: menteesCount || 0,
         undefined: undefinedCount || 0,
         menvoOrigin: menvoOriginCount || 0,
-        jotformOrigin: jotformOriginCount || 0
+        jotformOrigin: jotformOriginCount || 0,
+        waitingList: waitingListCount || 0
       }
     })
   } catch (error) {
