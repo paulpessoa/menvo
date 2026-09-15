@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/utils/supabase/server';
+import { createClient as createServerClient } from '@/lib/utils/supabase/server';
+import { createServiceRoleClient } from '@/lib/utils/supabase/service-role';
 
 export async function GET(request: NextRequest) {
     try {
-        const supabase = await createClient();
+        const serverSupabase = await createServerClient();
 
         // Verificar autenticação
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await serverSupabase.auth.getUser();
         if (authError || !user) {
             return NextResponse.json(
                 { error: 'Não autenticado' },
@@ -19,6 +20,17 @@ export async function GET(request: NextRequest) {
         const role = searchParams.get('role'); // 'mentor' ou 'mentee'
         const status = searchParams.get('status'); // 'pending', 'confirmed', 'cancelled', 'completed'
         const limit = parseInt(searchParams.get('limit') || '10');
+
+        // Usamos o client de service role só para esta leitura: a query abaixo
+        // sempre filtra por mentor_id = user.id OU mentee_id = user.id (nunca
+        // vaza agendamentos de terceiros), mas o embed profiles!mentor_id /
+        // profiles!mentee_id do PostgREST aplica a RLS de `profiles` na OUTRA
+        // ponta do agendamento. Se essa pessoa não tiver o perfil marcado como
+        // público, o embed silenciosamente vira `null` em vez de dar erro —
+        // e o ChatButton client-side quebra a página inteira lendo
+        // `otherPerson.full_name` de null. Ter marcado um horário juntos já
+        // autoriza cada lado a ver o nome/avatar básico do outro.
+        const supabase = createServiceRoleClient()
 
         // Construir query
         let query = supabase
