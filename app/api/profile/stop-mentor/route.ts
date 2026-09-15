@@ -43,9 +43,24 @@ export async function POST(request: NextRequest) {
         .single()
 
     if (menteeRole) {
-        await (supabase
-            .from('user_roles') as any)
-            .upsert({ user_id: user.id, role_id: (menteeRole as any).id })
+        // user_roles has no unique constraint on (user_id, role_id) — its
+        // primary key is a synthetic `id` column we never pass — so a bare
+        // `.upsert()` here never actually detects a conflict and behaves
+        // as a plain INSERT every call, silently creating a duplicate
+        // "mentee" row for a user who calls stop-mentor more than once.
+        // Check-then-insert instead.
+        const { data: existingRole } = await supabase
+            .from('user_roles')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('role_id', (menteeRole as any).id)
+            .maybeSingle()
+
+        if (!existingRole) {
+            await (supabase
+                .from('user_roles') as any)
+                .insert({ user_id: user.id, role_id: (menteeRole as any).id })
+        }
     }
 
     // 3. Resetar flags no perfil

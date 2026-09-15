@@ -104,12 +104,24 @@ export async function POST(request: NextRequest) {
 
     const roleId = roleIdByName.get(role)
     if (roleId) {
-      await (supabase
-        .from("user_roles") as any)
-        .upsert({
-          user_id: user.id,
-          role_id: roleId
-        }, { onConflict: "user_id,role_id" });
+      // user_roles has no unique constraint on (user_id, role_id) — its
+      // primary key is a synthetic `id` — so `.upsert(..., { onConflict:
+      // "user_id,role_id" })` fails outright with Postgres error 42P10
+      // ("no unique or exclusion constraint matching the ON CONFLICT
+      // specification"). Confirmed directly against the live database.
+      // Check-then-insert instead of relying on upsert.
+      const { data: existingRole } = await supabase
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("role_id", roleId)
+        .maybeSingle()
+
+      if (!existingRole) {
+        await (supabase
+          .from("user_roles") as any)
+          .insert({ user_id: user.id, role_id: roleId })
+      }
     }
 
     return NextResponse.json({

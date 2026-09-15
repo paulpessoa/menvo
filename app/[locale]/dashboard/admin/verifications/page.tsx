@@ -20,6 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar, User, CheckCircle, XCircle, Eye, Loader2, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { VerificationService } from "@/lib/services/verifications/verifications.service"
+import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
 import type { Verification } from "@/lib/types/models/verification"
 import { toast } from "sonner"
 import { Link } from "@/i18n/routing"
@@ -47,14 +48,26 @@ export default function AdminVerificationsPage() {
     loadVerifications()
   }, [loadVerifications])
 
+  const submitVerification = async (userId: string, status: VerificationStatus, notes: string) => {
+    const response = await fetch("/api/admin/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, status, notes })
+    })
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error(data.error || "Erro ao processar verificação")
+    }
+  }
+
   const handleApprove = async (verificationId: string) => {
     try {
-      await VerificationService.completeVerification({
-        verificationId,
-        adminId: user!.id,
-        passed: true,
-        notes: "Verification completed successfully by admin",
-      })
+      // Goes through /api/admin/verify (service-role, requireAdmin-guarded)
+      // rather than the client-side VerificationService: approving a
+      // mentor request also has to assign the "mentor" role in user_roles
+      // for a DIFFERENT user than the admin, which needs a service-role
+      // write — see processVerification in notification.service.ts.
+      await submitVerification(verificationId, "approved", "Verification completed successfully by admin")
       toast.success("Mentor aprovado com sucesso!")
       loadVerifications()
     } catch (error) {
@@ -65,12 +78,7 @@ export default function AdminVerificationsPage() {
 
   const handleReject = async (verificationId: string, reason: string) => {
     try {
-      await VerificationService.completeVerification({
-        verificationId,
-        adminId: user!.id,
-        passed: false,
-        notes: reason,
-      })
+      await submitVerification(verificationId, "rejected", reason)
       toast.success("Aplicação rejeitada.")
       loadVerifications()
     } catch (error) {
@@ -250,19 +258,69 @@ function VerificationDetails({ verification }: { verification: Verification }) {
         </div>
       </div>
 
+      {(verification.mentorship_approach || verification.what_to_expect) && (
+        <div className="border-t pt-4">
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Abordagem de Mentoria</Label>
+          <div className="mt-3 space-y-3">
+            {verification.mentorship_approach && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Como pretende conduzir as mentorias:</p>
+                <p className="text-sm whitespace-pre-wrap">{verification.mentorship_approach}</p>
+              </div>
+            )}
+            {verification.what_to_expect && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">O que espera do mentorado:</p>
+                <p className="text-sm whitespace-pre-wrap">{verification.what_to_expect}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {verification.mentor_bio && (
+        <div className="border-t pt-4">
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Bio</Label>
+          <p className="text-sm mt-1 whitespace-pre-wrap">{verification.mentor_bio}</p>
+        </div>
+      )}
+
+      {verification.mentor_expertise_areas && verification.mentor_expertise_areas.length > 0 && (
+        <div className="border-t pt-4">
+          <Label className="text-xs text-muted-foreground uppercase font-semibold">Especialidades</Label>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {verification.mentor_expertise_areas.map((area) => (
+              <Badge key={area} variant="secondary" className="font-normal">{area}</Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="border-t pt-4">
         <Label className="text-xs text-muted-foreground uppercase font-semibold">Documentação & Redes</Label>
         <div className="mt-3 space-y-2.5">
           <div className="flex items-center space-x-2">
-            <Checkbox id="resume" defaultChecked disabled />
+            <Checkbox id="resume" checked={Boolean(verification.cv_url)} disabled />
             <Label htmlFor="resume" className="text-sm cursor-pointer">
-              Currículo / Trajetória Profissional
+              {verification.cv_url ? (
+                <a href={verification.cv_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Currículo enviado — ver PDF
+                </a>
+              ) : (
+                "Currículo não enviado"
+              )}
             </Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Checkbox id="linkedin" defaultChecked disabled />
+            <Checkbox id="linkedin" checked={Boolean(verification.linkedin_url)} disabled />
             <Label htmlFor="linkedin" className="text-sm cursor-pointer">
-              Perfil LinkedIn Validado
+              {verification.linkedin_url ? (
+                <a href={verification.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Ver perfil no LinkedIn
+                </a>
+              ) : (
+                "LinkedIn não informado"
+              )}
             </Label>
           </div>
         </div>
