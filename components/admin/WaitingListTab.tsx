@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Mail, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks } from "lucide-react"
+import { Loader2, UserPlus, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface WaitingListEntry {
@@ -58,19 +58,24 @@ export function WaitingListTab() {
     fetchEntries()
   }, [fetchEntries])
 
-  const handleContact = async (id: string) => {
-    setPendingAction(`contact-${id}`)
+  const handleCreateAccount = async (id: string) => {
+    setPendingAction(`create-account-${id}`)
     try {
-      const response = await fetch("/api/admin/waiting-list/contact", {
+      const response = await fetch("/api/admin/waiting-list/create-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ waitingListId: id })
       })
       const data = await response.json()
-      if (!response.ok) throw new Error(data.error || "Falha ao enviar e-mail")
-      toast.success("E-mail de contato enviado!")
+      if (!response.ok) throw new Error(data.error || "Falha ao criar conta e enviar convite")
+      toast.success(
+        data.accountCreated
+          ? "Conta criada e convite enviado!"
+          : "Convite enviado para a conta já existente!"
+      )
+      setEntries(prev => prev.map(e => (e.id === id ? { ...e, status: "invited", has_profile: true } : e)))
     } catch (error: any) {
-      toast.error(error.message || "Erro ao enviar e-mail")
+      toast.error(error.message || "Erro ao criar conta e enviar convite")
     } finally {
       setPendingAction(null)
     }
@@ -172,20 +177,31 @@ export function WaitingListTab() {
               </div>
 
               <div className="flex flex-wrap gap-2 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleContact(entry.id)}
-                  disabled={pendingAction === `contact-${entry.id}`}
-                  className="gap-1.5"
-                >
-                  {pendingAction === `contact-${entry.id}` ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Mail className="h-3.5 w-3.5" />
-                  )}
-                  Pedir Contato
-                </Button>
+                {entry.status === "invited" ? (
+                  <Badge variant="outline" className="h-9 px-3 flex items-center gap-1.5 text-green-700 border-green-300 bg-green-50">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Convite enviado
+                  </Badge>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCreateAccount(entry.id)}
+                    disabled={pendingAction === `create-account-${entry.id}`}
+                    className="gap-1.5"
+                    title={
+                      entry.has_profile
+                        ? "Esta pessoa já tem conta — enviaremos um link para definir uma nova senha"
+                        : "Cria a conta como mentee e envia um e-mail com link para definir a senha"
+                    }
+                  >
+                    {pendingAction === `create-account-${entry.id}` ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <UserPlus className="h-3.5 w-3.5" />
+                    )}
+                    {entry.has_profile ? "Enviar Convite" : "Criar Conta e Convidar"}
+                  </Button>
+                )}
 
                 {hasReason ? (
                   <Button

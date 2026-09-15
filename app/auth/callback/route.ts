@@ -22,8 +22,22 @@ export async function GET(request: NextRequest) {
     return new URL(`/${locale}${cleanPath}`, origin)
   }
 
-  // Handle password recovery flow
-  if (type === "recovery") {
+  // Handle password recovery and first-time invite flows. This only works
+  // when `type` was baked into the redirect_to URL by whoever generated the
+  // link in the first place (e.g. resetPasswordForEmail's redirectTo:
+  // ".../auth/callback?type=recovery" in forgot-password/page.tsx and
+  // invite-batch/route.ts) — Supabase does NOT add `type` as a query
+  // param on its own. Its actual session payload (access_token,
+  // refresh_token, and its own `type`) arrives as a URL HASH FRAGMENT,
+  // which browsers never send to the server, so this route can only see
+  // `type` when a caller explicitly duplicates it into the query string
+  // like the two callers above do. Confirmed via a live invite link that
+  // Supabase's real redirect carries nothing here otherwise — callers that
+  // need this route to route correctly must follow the same convention.
+  // (The waiting-list invite flow sidesteps this entirely by pointing
+  // redirect_to straight at /update-password — see
+  // app/api/admin/waiting-list/create-account/route.ts.)
+  if (type === "recovery" || type === "invite") {
     return NextResponse.redirect(getTargetUrl("/update-password"))
   }
 
