@@ -1,11 +1,22 @@
 import Link from "next/link"
 import { Compass, Home } from "lucide-react"
+import type { Metadata } from "next"
 
 /**
  * Root 404 page fallback.
  * Next.js triggers this when a route is accessed outside of any localized sub-tree.
  * Since the root layout does not define <html>/<body> tags, this root not-found must provide them.
  */
+
+// notFound() thrown from a page reached via the i18n middleware's rewrite()
+// keeps the HTTP status at 200 instead of 404 (a known Next.js/middleware
+// interaction, not something fixable from route code at this Next version).
+// Without noindex, search engines can crawl and index this page as if it
+// were real content.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false }
+}
+
 export default function GlobalNotFound() {
   return (
     <html lang="pt-BR">
