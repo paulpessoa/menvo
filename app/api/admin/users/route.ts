@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10")
     const tab = searchParams.get("tab") || "all" // all, pending, mentors, mentees, undefined
     const search = searchParams.get("search") || ""
+    const origin = searchParams.get("origin") || "" // "menvo" | "jotform" | "" (all)
 
     const from = (page - 1) * limit
     const to = from + limit - 1
@@ -66,6 +67,11 @@ export async function GET(request: NextRequest) {
       query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
     }
 
+    // Filtro de origem (cadastro direto no site vs. base migrada do JotForm)
+    if (origin === "menvo" || origin === "jotform") {
+      query = query.eq("origin_platform", origin)
+    }
+
     const { data: profiles, error: profilesError, count } = await query
       .order("created_at", { ascending: false })
       .range(from, to)
@@ -98,6 +104,16 @@ export async function GET(request: NextRequest) {
       .select("user_roles", { count: "exact", head: true })
       .is("user_roles", null)
 
+    const { count: menvoOriginCount } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("origin_platform", "menvo")
+
+    const { count: jotformOriginCount } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("origin_platform", "jotform")
+
     return successResponse({
       users: profiles,
       pagination: {
@@ -111,7 +127,9 @@ export async function GET(request: NextRequest) {
         pending: pendingCount || 0,
         mentors: mentorsCount || 0,
         mentees: menteesCount || 0,
-        undefined: undefinedCount || 0
+        undefined: undefinedCount || 0,
+        menvoOrigin: menvoOriginCount || 0,
+        jotformOrigin: jotformOriginCount || 0
       }
     })
   } catch (error) {

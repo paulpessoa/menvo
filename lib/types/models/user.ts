@@ -50,6 +50,11 @@ export interface UserProfile {
   roles: UserRole[]
   is_public: boolean
   timezone?: string | null
+
+  // Provenance — "menvo" for organic signups, "jotform" for the historical
+  // JotForm base migrated into profiles (original_data holds the raw
+  // JotForm answer payload for that case)
+  origin_platform?: string | null
 }
 
 /**

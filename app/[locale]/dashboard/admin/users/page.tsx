@@ -5,6 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -50,6 +57,8 @@ interface UserStats {
   mentors: number
   mentees: number
   undefined: number
+  menvoOrigin: number
+  jotformOrigin: number
 }
 
 export default function AdminUsersPage() {
@@ -62,12 +71,15 @@ export default function AdminUsersPage() {
     pending: 0,
     mentors: 0,
     mentees: 0,
-    undefined: 0
+    undefined: 0,
+    menvoOrigin: 0,
+    jotformOrigin: 0
   })
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState(initialTab)
+  const [originFilter, setOriginFilter] = useState<"all" | "menvo" | "jotform">("all")
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
@@ -87,7 +99,8 @@ export default function AdminUsersPage() {
 
     try {
       const currentPage = isLoadMore ? page + 1 : 1
-      const response = await fetch(`/api/admin/users?page=${currentPage}&limit=${ITEMS_PER_PAGE}&tab=${activeTab}&search=${searchTerm}`)
+      const originParam = originFilter !== "all" ? `&origin=${originFilter}` : ""
+      const response = await fetch(`/api/admin/users?page=${currentPage}&limit=${ITEMS_PER_PAGE}&tab=${activeTab}&search=${searchTerm}${originParam}`)
       
       if (!response.ok) throw new Error("Erro na API")
       
@@ -113,11 +126,11 @@ export default function AdminUsersPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [page, activeTab, searchTerm])
+  }, [page, activeTab, searchTerm, originFilter])
 
   useEffect(() => {
     fetchData()
-  }, [activeTab]) // Recarregar ao mudar de aba
+  }, [activeTab, originFilter]) // Recarregar ao mudar de aba ou origem
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -170,6 +183,16 @@ export default function AdminUsersPage() {
                 className="pl-10"
               />
             </div>
+            <Select value={originFilter} onValueChange={(v) => setOriginFilter(v as typeof originFilter)}>
+              <SelectTrigger className="w-full md:w-[220px]">
+                <SelectValue placeholder="Origem do cadastro" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as origens</SelectItem>
+                <SelectItem value="menvo">Cadastro direto ({stats.menvoOrigin})</SelectItem>
+                <SelectItem value="jotform">Migrado do JotForm ({stats.jotformOrigin})</SelectItem>
+              </SelectContent>
+            </Select>
           </form>
 
           <Card>
@@ -244,6 +267,11 @@ export default function AdminUsersPage() {
                                 <Badge variant={user.verified ? "default" : "secondary"} className={user.verified ? "bg-green-600" : "bg-yellow-100 text-yellow-800 border-none"}>
                                     {user.verified ? "VERIFICADO" : "PENDENTE"}
                                 </Badge>
+                            )}
+                            {user.origin_platform === "jotform" && (
+                              <Badge variant="outline" className="text-[10px] uppercase text-amber-700 border-amber-300 bg-amber-50">
+                                JotForm
+                              </Badge>
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">{user.email}</div>
