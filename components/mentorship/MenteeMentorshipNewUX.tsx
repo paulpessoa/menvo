@@ -31,7 +31,7 @@ export function MenteeMentorshipNewUX() {
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                         </Button>
-                        <Button asChild variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm rounded-xl font-bold h-11 px-6">
+                        <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 backdrop-blur-sm rounded-xl font-bold h-11 px-6">
                             <Link href="/community">
                                 Explorar Comunidade
                             </Link>
