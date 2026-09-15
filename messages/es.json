@@ -1070,7 +1070,7 @@
   "mentorsPage": {
     "title": "Encuentra a tu Mentor Ideal",
     "subtitle": "Conéctate con mentores verificados y acelera tu carrera",
-    "searchPlaceholder": "Nombre, especialidad... o describe tu objetivo",
+    "searchPlaceholder": "Nombre, especialidad... o describe tu objetivo y busca con IA",
     "errorLoadingMentors": "Error al cargar los mentores. Por favor, inténtelo de nuevo.",
     "filters": "Filtros",
     "sheetTitle": "Filtros Avanzados",

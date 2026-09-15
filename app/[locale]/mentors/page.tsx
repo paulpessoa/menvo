@@ -823,24 +823,28 @@ export default function MentorsPage() {
             {t("noMentorsDescription")}
           </p>
 
-          {/* Sugestões de áreas populares */}
-          <div className="mb-8">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-              {t("popularSuggestions")}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
-              {["Frontend", "Backend", "UX / UI", "Carreira", "Produto", "Data Science"].map((topic) => (
-                <button
-                  key={topic}
-                  type="button"
-                  onClick={() => setFilters((prev) => ({ ...initialFilters, search: topic }))}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-white hover:border-primary hover:text-primary hover:bg-primary/5 transition-all shadow-2xs cursor-pointer"
-                >
-                  {topic}
-                </button>
-              ))}
+          {/* Sugestões de áreas populares — vêm dos temas que os próprios
+              mentores já cadastraram (carregados no load da página via
+              getCatalogFilterOptions), não uma lista fixa no código. */}
+          {availableFilters.topics.length > 0 && (
+            <div className="mb-8">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                {t("popularSuggestions")}
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto">
+                {availableFilters.topics.slice(0, 8).map((topic) => (
+                  <button
+                    key={topic}
+                    type="button"
+                    onClick={() => setFilters((prev) => ({ ...initialFilters, topics: [topic] }))}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-border bg-white hover:border-primary hover:text-primary hover:bg-primary/5 transition-all shadow-2xs cursor-pointer"
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button

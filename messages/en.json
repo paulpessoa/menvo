@@ -1071,7 +1071,7 @@
   "mentorsPage": {
     "title": "Find Your Ideal Mentor",
     "subtitle": "Connect with verified mentors and accelerate your career",
-    "searchPlaceholder": "Name, specialty... or describe your goal",
+    "searchPlaceholder": "Name, specialty... or describe your goal and search with AI",
     "errorLoadingMentors": "Error loading mentors. Please try again.",
     "filters": "Filters",
     "sheetTitle": "Advanced Filters",
