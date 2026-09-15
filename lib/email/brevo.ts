@@ -471,6 +471,35 @@ export async function sendWaitingListContactRequest(data: {
 }
 
 /**
+ * Avisa alguém da lista de espera que já criamos uma conta na Menvo para
+ * ela (como mentee, por padrão) e traz um link de convite com token —
+ * ao clicar, a pessoa já entra autenticada e só precisa definir uma senha.
+ */
+export async function sendWaitingListAccountInvite(data: {
+  name: string;
+  email: string;
+  inviteLink: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const content = `
+    <h2>Sua conta na Menvo já está pronta!</h2>
+    <p>Olá, ${firstName}! Vimos seu interesse na nossa lista de espera e já criamos uma conta para você começar — sem precisar preencher cadastro do zero.</p>
+    <p>Falta só um passo: defina sua senha de acesso clicando no botão abaixo.</p>
+    <div class="button-container">
+        <a href="${data.inviteLink}" class="button">Definir minha senha e entrar</a>
+    </div>
+    <p>Depois de entrar, complete seu perfil (ou faça nosso <a href="${appUrl}/quiz" style="color: ${COLORS.primary}; font-weight: 600;">Quiz de Carreira</a> de 2 minutos) para que possamos te ajudar a encontrar a mentoria certa — inclusive com sugestões feitas manualmente pela nossa equipe.</p>
+    <p style="font-size: 13px; color: ${COLORS.muted};">Por segurança, este link expira em algumas horas. Se ele não funcionar mais, é só solicitar um novo em "Esqueceu a senha?" na tela de login usando este mesmo e-mail.</p>
+  `;
+  return await sendEmail(
+    data.email,
+    "Sua conta na Menvo já está pronta — falta só a senha",
+    getEmailLayout("Bem-vindo(a) à Menvo!", content, { signatureType: "personal" })
+  );
+}
+
+/**
  * Pede que alguém complete o perfil (ou faça o quiz de carreira) porque
  * ainda não descrevemos o que essa pessoa busca — sem isso não dá para
  * sugerir ou fazer um match, manual ou automático.
