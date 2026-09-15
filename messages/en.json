@@ -1389,6 +1389,27 @@
       "step5Mentee": "Schedule your first session"
     }
   },
+  "tutorials": {
+    "title": "Mentor tutorials",
+    "subtitle": "Quick videos to help you get the most out of the platform",
+    "watchButton": "Watch",
+    "closeButton": "Got it",
+    "comingSoon": "Video coming soon",
+    "items": {
+      "profile": {
+        "title": "How to set up your profile",
+        "description": "Fill in your bio, expertise, availability schedule, and learn how to accept mentorship requests."
+      },
+      "sharing": {
+        "title": "Share that you're a mentor",
+        "description": "How to share on LinkedIn and social media that you're a Menvo volunteer mentor."
+      },
+      "firstSession": {
+        "title": "Your first mentoring session",
+        "description": "What to expect from the chat room, Google Meet, and best practices for running the session."
+      }
+    }
+  },
   "onboarding": {
     "title": "Choose your profile",
     "description": "Select how you would like to participate in our platform. You can change this later in settings.",

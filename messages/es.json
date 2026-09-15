@@ -1383,6 +1383,27 @@
       "step5Mentee": "Programa tu primera sesión"
     }
   },
+  "tutorials": {
+    "title": "Tutoriales para mentores",
+    "subtitle": "Videos rápidos para aprovechar mejor la plataforma",
+    "watchButton": "Ver",
+    "closeButton": "Entendido",
+    "comingSoon": "Video disponible pronto",
+    "items": {
+      "profile": {
+        "title": "Cómo configurar tu perfil",
+        "description": "Completa tu bio, especialidad, agenda de disponibilidad y aprende a aceptar solicitudes de mentoría."
+      },
+      "sharing": {
+        "title": "Comparte que eres mentor",
+        "description": "Cómo compartir en LinkedIn y redes sociales que eres mentor voluntario de Menvo."
+      },
+      "firstSession": {
+        "title": "Tu primera sesión de mentoría",
+        "description": "Qué esperar de la sala de chat, Google Meet y buenas prácticas para conducir la sesión."
+      }
+    }
+  },
   "onboarding": {
     "title": "Elige tu perfil",
     "description": "Selecciona cómo te gustaría participar en nuestra plataforma. Puedes cambiar esto más tarde en la configuración.",

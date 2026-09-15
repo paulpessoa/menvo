@@ -56,6 +56,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { COMMON_TIMEZONES, getBrowserTimezone } from "@/lib/utils/timezone"
+import { TutorialsSection } from "@/components/mentor/TutorialsSection"
 
 interface ChipInputProps {
   value: string[]
@@ -628,6 +629,8 @@ function ProfilePageContent() {
                     )}
                  </CardContent>
                </Card>
+
+               <TutorialsSection />
 
                {(isMentor || isPendingMentor) && (
                  <Card>
