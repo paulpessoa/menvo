@@ -1,34 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/utils/supabase/server'
 import { processVerification, VerificationStatus } from '@/lib/services/verifications/notification.service'
+import { requireAdmin } from '@/lib/auth/require-admin'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-
-    // 1. Check Auth & Admin Role
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
-    }
-
-    const { data: roleData } = await (supabase
-      .from('user_roles' as any)
-      .select('roles(name)')
-      .eq('user_id', user.id)
-      .single() as any)
-
-    const isAdmin = roleData?.roles?.name === 'admin'
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
-    }
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
 
     // 2. Parse Body
     const body = await request.json()
-    const { userId, status, notes } = body as { 
-      userId: string, 
-      status: VerificationStatus, 
-      notes?: string 
+    const { userId, status, notes } = body as {
+      userId: string,
+      status: VerificationStatus,
+      notes?: string
     }
 
     if (!userId || !status) {
@@ -38,7 +22,7 @@ export async function POST(request: NextRequest) {
     // 3. Process Verification
     const result = await processVerification({
       userId,
-      adminId: user.id,
+      adminId: guard.admin.userId,
       status,
       notes
     })

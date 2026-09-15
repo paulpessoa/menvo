@@ -6,6 +6,7 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import type { Database } from "@/lib/types/supabase"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,22 +45,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
     const supabase = await createClient()
-
-    // Verificar se é admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
-
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('roles(name)')
-      .eq('user_id', user.id)
-      .returns<any>()
-      .maybeSingle()
-
-    if ((roleData as any)?.roles?.name !== 'admin') {
-      return errorResponse("Forbidden", "FORBIDDEN", 403)
-    }
 
     const { data, error } = await supabase
       .from("waiting_list")

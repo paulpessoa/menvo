@@ -5,31 +5,14 @@ import {
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requireAdmin(["admin", "moderator"])
+    if (!guard.ok) return guard.response
+
     const supabase = await createClient()
-
-    // 1. Verificar autenticação e role admin
-    const {
-      data: { user },
-      error: authError
-    } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
-    }
-
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("roles(name)")
-      .eq("user_id", user.id)
-      .returns<{ roles: { name: string } | null }[]>()
-      .single()
-
-    const userRole = roleData?.roles?.name
-    if (userRole !== "admin" && userRole !== "moderator") {
-      return errorResponse("Forbidden", "FORBIDDEN", 403)
-    }
 
     // 2. Buscar parâmetros de paginação e filtro
     const { searchParams } = new URL(request.url)
