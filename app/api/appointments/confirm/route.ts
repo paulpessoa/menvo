@@ -89,6 +89,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // O caminho por token é auto-suficiente (link de e-mail com segredo
+    // aleatório). O caminho por appointmentId vem do botão "Confirmar" do
+    // dashboard do mentor e não carrega segredo nenhum, então exige sessão
+    // e confere que quem está confirmando é o próprio mentor do agendamento
+    // — sem isso, qualquer pessoa com o UUID confirmaria a sessão de outro
+    // mentor (evento no Google Calendar e e-mail incluídos).
+    if (!token && appointmentId) {
+      const sessionClient = await createServerClient()
+      const {
+        data: { user: sessionUser },
+        error: sessionError
+      } = await sessionClient.auth.getUser()
+
+      if (sessionError || !sessionUser || sessionUser.id !== appointment.mentor_id) {
+        return NextResponse.json(
+          { error: "Não autorizado a confirmar este agendamento" },
+          { status: 403 }
+        )
+      }
+    }
+
     // Verificar se já está confirmado
     if (appointment.status === "confirmed") {
       return NextResponse.json(
