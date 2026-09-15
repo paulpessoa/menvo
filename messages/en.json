@@ -1116,7 +1116,7 @@
     },
     "sortBy": {
       "label": "Sort",
-      "relevance": "Featured",
+      "relevance": "Relevance",
       "experience": "Experience",
       "newest": "Newest",
       "name": "Name (A-Z)"

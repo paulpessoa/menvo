@@ -137,7 +137,7 @@ export default function MentorsPage() {
   const debouncedSearch = useDebounce(filters.search, 350)
   const latestRequestIdRef = useRef(0)
 
-  const fetchMentors = useCallback(async (isInitial = false, overridePage?: number) => {
+  const fetchMentors = useCallback(async (isInitial = false, overridePage?: number, searchOverride?: string) => {
     const currentRequestId = ++latestRequestIdRef.current
     try {
       const currentPage = isInitial ? 0 : (overridePage ?? page)
@@ -150,7 +150,7 @@ export default function MentorsPage() {
 
       const { data, count } = await mentorService.searchCatalog({
         filters: {
-          search: debouncedSearch,
+          search: searchOverride ?? debouncedSearch,
           country: filters.country,
           state: filters.state,
           city: filters.city,
@@ -269,7 +269,8 @@ export default function MentorsPage() {
   const handleAIMatch = async (
     suggestions: Array<{ mentor_id: string; reason: string }>,
     justification: string,
-    searchQuery?: string
+    searchQuery?: string,
+    suggestedTopics: string[] = []
   ) => {
     const suggestionsMap: Record<string, string> = {}
     const ids: string[] = []
@@ -288,6 +289,21 @@ export default function MentorsPage() {
       console.error("Erro ao carregar mentores recomendados pela IA:", err)
     }
 
+    // Além dos 3-4 destaques da IA, aproveitamos os temas sugeridos por ela
+    // para ampliar a lista abaixo com outros mentores do mesmo assunto —
+    // só aplicamos os que realmente existem como tema cadastrado na
+    // plataforma, pra não zerar a lista com um tema livre que a IA inventou.
+    const matchedTopics = suggestedTopics.filter((topic) =>
+      availableFilters.topics.some(
+        (available) => available.toLowerCase() === topic.toLowerCase()
+      )
+    )
+    setFilters((prev) => ({
+      ...prev,
+      search: "",
+      topics: matchedTopics.length > 0 ? matchedTopics : prev.topics
+    }))
+
     setTimeout(() => {
       window.scrollTo({ top: 350, behavior: "smooth" })
     }, 100)
@@ -298,6 +314,7 @@ export default function MentorsPage() {
     setAiJustification(null)
     setAiQuery(null)
     setAiRecommendedProfiles([])
+    setFilters((prev) => ({ ...prev, topics: [] }))
   }
 
   // Combina mentores recomendados pela IA (seja da lista atual ou carregados sob demanda)
@@ -362,6 +379,12 @@ export default function MentorsPage() {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
               }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  fetchMentors(true, undefined, filters.search)
+                }
+              }}
               className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
                 filters.search ? "pr-10" : ""
               }`}

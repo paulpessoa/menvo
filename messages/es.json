@@ -1115,7 +1115,7 @@
     },
     "sortBy": {
       "label": "Ordenar",
-      "relevance": "Destacados",
+      "relevance": "Relevancia",
       "experience": "Experiencia",
       "newest": "Nuevos",
       "name": "Nombre (A-Z)"

@@ -1109,7 +1109,7 @@
     },
     "sortBy": {
       "label": "Ordenar",
-      "relevance": "Destaques",
+      "relevance": "Relevância",
       "experience": "Experiência",
       "newest": "Novos",
       "name": "Nome (A-Z)"
