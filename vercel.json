@@ -3,14 +3,6 @@
     {
       "path": "/api/cron/appointments",
       "schedule": "0 10 * * *"
-    },
-    {
-      "path": "/api/cron/expire-invitations",
-      "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/cron/expire-memberships",
-      "schedule": "0 3 * * *"
     }
   ]
 }
