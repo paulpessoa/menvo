@@ -39,7 +39,7 @@ import {
 import { useAuth } from "@/lib/auth"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
-import { MagicSearchBar } from "@/components/mentors/MagicSearchBar"
+import { AISearchButton } from "@/components/mentors/AISearchButton"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
@@ -114,6 +114,8 @@ export default function MentorsPage() {
   const [aiJustification, setAiJustification] = useState<string | null>(null)
   const [aiQuery, setAiQuery] = useState<string | null>(null)
   const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<MentorProfile[]>([])
+  const [isAIMode, setIsAIMode] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
@@ -150,7 +152,11 @@ export default function MentorsPage() {
 
       const { data, count } = await mentorService.searchCatalog({
         filters: {
-          search: searchOverride ?? debouncedSearch,
+          // Em modo IA, o texto digitado já foi consumido pelo endpoint
+          // de match — aqui filtramos por tema (filters.topics), não pelo
+          // texto literal, que quase nunca bate como ILIKE contra uma
+          // frase em linguagem natural.
+          search: isAIMode ? "" : (searchOverride ?? debouncedSearch),
           country: filters.country,
           state: filters.state,
           city: filters.city,
@@ -192,6 +198,7 @@ export default function MentorsPage() {
     }
   }, [
     debouncedSearch,
+    isAIMode,
     filters.country,
     filters.state,
     filters.city,
@@ -222,6 +229,7 @@ export default function MentorsPage() {
     fetchMentors(true)
   }, [
     debouncedSearch,
+    isAIMode,
     filters.country,
     filters.state,
     filters.city,
@@ -298,9 +306,9 @@ export default function MentorsPage() {
         (available) => available.toLowerCase() === topic.toLowerCase()
       )
     )
+    setIsAIMode(true)
     setFilters((prev) => ({
       ...prev,
-      search: "",
       topics: matchedTopics.length > 0 ? matchedTopics : prev.topics
     }))
 
@@ -314,7 +322,36 @@ export default function MentorsPage() {
     setAiJustification(null)
     setAiQuery(null)
     setAiRecommendedProfiles([])
-    setFilters((prev) => ({ ...prev, topics: [] }))
+    setIsAIMode(false)
+    setFilters((prev) => ({ ...prev, search: "", topics: [] }))
+  }
+
+  const handleAISearch = async () => {
+    const query = filters.search.trim()
+    setAiLoading(true)
+    try {
+      const response = await fetch("/api/ai/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      })
+      const result = await response.json()
+
+      if (!response.ok) throw new Error(result.error || t("magicSearch.error"))
+
+      if (result.no_match) {
+        toast.info(t("magicSearch.noMatch"))
+        handleClearAI()
+      } else {
+        await handleAIMatch(result.suggestions, result.global_justification, query, result.suggested_topics || [])
+        toast.success(t("magicSearch.success"))
+      }
+    } catch (error) {
+      console.error("Magic Search Error:", error)
+      toast.error(t("magicSearch.error"))
+    } finally {
+      setAiLoading(false)
+    }
   }
 
   // Combina mentores recomendados pela IA (seja da lista atual ou carregados sob demanda)
@@ -364,41 +401,49 @@ export default function MentorsPage() {
         </p>
       </div>
 
-      {/* Magic AI Search Bar */}
-      <MagicSearchBar onMatch={handleAIMatch} onClear={handleClearAI} />
-
       {/* Search and Filter Bar */}
-      <div className="mb-4 sm:mb-6 space-y-3">
+      <div className="mb-2 sm:mb-3 space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-          {/* Main Search Input */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
-            <Input
-              placeholder={t("searchPlaceholder")}
-              value={filters.search}
-              onChange={(e) =>
-                setFilters((prev) => ({ ...prev, search: e.target.value }))
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  fetchMentors(true, undefined, filters.search)
-                }
-              }}
-              className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
-                filters.search ? "pr-10" : ""
-              }`}
-            />
-            {filters.search && (
-              <button
-                type="button"
-                onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                aria-label="Limpar busca"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
+          {/* Search + AI Search (same field feeds both) */}
+          <div className="flex-1 flex gap-2 min-w-0">
+            <div className="flex-1 relative min-w-0">
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
+              <Input
+                placeholder={t("searchPlaceholder")}
+                value={filters.search}
+                onChange={(e) => {
+                  const value = e.target.value
+                  if (isAIMode) {
+                    // Editar o texto depois de um resultado de IA invalida
+                    // aquele resultado — volta pro fluxo normal de digitação.
+                    handleClearAI()
+                    setFilters((prev) => ({ ...prev, search: value }))
+                  } else {
+                    setFilters((prev) => ({ ...prev, search: value }))
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isAIMode) {
+                    e.preventDefault()
+                    fetchMentors(true, undefined, filters.search)
+                  }
+                }}
+                className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
+                  isAIMode ? "border-primary/40" : "border-border/80"
+                } ${filters.search ? "pr-10" : ""}`}
+              />
+              {filters.search && (
+                <button
+                  type="button"
+                  onClick={handleClearAI}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  aria-label="Limpar busca"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <AISearchButton query={filters.search} loading={aiLoading} onSearch={handleAISearch} />
           </div>
 
           {/* Sort & Filters Action Row (balanced 50-50 on mobile, compact on desktop) */}

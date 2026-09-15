@@ -17,10 +17,22 @@ export async function POST(request: NextRequest) {
     const { query, debug } = validation.data
     const supabase = await createClient()
 
-    // 1. Contexto do usuário (opcional para tracking)
+    // 1. Exige sessão autenticada — a busca com IA tem custo de LLM por
+    // chamada, então o mesmo requisito já aplicado na UI (botão só
+    // habilitado para usuários logados) precisa valer no endpoint também,
+    // senão qualquer chamada direta e não autenticada consegue gerar custo
+    // e (via `debug: true`) ver mentores não verificados.
     const {
-      data: { user }
+      data: { user },
+      error: authError
     } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "É necessário estar logado para usar a busca com IA." },
+        { status: 401 }
+      )
+    }
 
     // 2. Buscar mentores disponíveis
     let queryBuilder = supabase
