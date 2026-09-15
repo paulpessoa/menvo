@@ -46,17 +46,22 @@ describe('POST /api/profile/role', () => {
         if (table === 'roles') {
           return {
             select: jest.fn().mockReturnValue({
-              eq: jest.fn().mockReturnValue({
-                single: jest.fn().mockResolvedValue({
-                  data: { id: 2, name: 'mentor' },
-                  error: null,
-                }),
+              in: jest.fn().mockResolvedValue({
+                data: [
+                  { id: 1, name: 'mentee' },
+                  { id: 2, name: 'mentor' },
+                ],
+                error: null,
               }),
             }),
           }
         }
         if (table === 'user_roles') {
+          const deleteEq = jest.fn().mockReturnValue({
+            in: jest.fn().mockResolvedValue({ error: null }),
+          })
           return {
+            delete: jest.fn().mockReturnValue({ eq: deleteEq }),
             upsert: jest.fn().mockResolvedValue({ error: null }),
           }
         }
@@ -133,5 +138,51 @@ describe('POST /api/profile/role', () => {
 
     expect(mockSupabase.from).toHaveBeenCalledWith('validation_requests')
     expect(mockSupabase.from).toHaveBeenCalledWith('user_roles')
+  })
+
+  it('removes the previous mentor/mentee role before assigning the new one', async () => {
+    // Regression test: the route used to blindly upsert the new role without
+    // clearing the old one, so a user switching mentee <-> mentor ended up
+    // with both rows in user_roles. That breaks every admin endpoint that
+    // reads this table with .single()/.maybeSingle() for that user.
+    const deleteEq = jest.fn().mockReturnValue({
+      in: jest.fn().mockResolvedValue({ error: null }),
+    })
+    const userRolesDelete = jest.fn().mockReturnValue({ eq: deleteEq })
+    const userRolesUpsert = jest.fn().mockResolvedValue({ error: null })
+
+    mockSupabase.from = jest.fn((table: string) => {
+      if (table === 'profiles') {
+        return { update: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }) }
+      }
+      if (table === 'roles') {
+        return {
+          select: jest.fn().mockReturnValue({
+            in: jest.fn().mockResolvedValue({
+              data: [
+                { id: 1, name: 'mentee' },
+                { id: 2, name: 'mentor' },
+              ],
+              error: null,
+            }),
+          }),
+        }
+      }
+      if (table === 'user_roles') {
+        return { delete: userRolesDelete, upsert: userRolesUpsert }
+      }
+      return {}
+    })
+
+    const request = createMockRequest({ role: 'mentee' })
+    const response = await POST(request)
+
+    expect(response.status).toBe(200)
+    expect(userRolesDelete).toHaveBeenCalled()
+    expect(deleteEq).toHaveBeenCalledWith('user_id', 'test-user-123')
+    expect(userRolesUpsert).toHaveBeenCalledWith(
+      { user_id: 'test-user-123', role_id: 1 },
+      { onConflict: 'user_id,role_id' }
+    )
   })
 })
