@@ -440,6 +440,67 @@ export async function sendMentorNewReviewNotification(data: {
 }
 
 /**
+ * Pede que alguém da lista de espera entre em contato caso ainda tenha
+ * interesse em participar da Menvo como mentor ou mentorado.
+ */
+export async function sendWaitingListContactRequest(data: {
+  name: string;
+  email: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const content = `
+    <h2>Você ainda tem interesse na Menvo?</h2>
+    <p>Olá, ${firstName}! Vimos que você se cadastrou na nossa lista de espera há um tempo e queremos entender melhor como podemos te ajudar.</p>
+    <p>Você tem interesse em participar da Menvo como:</p>
+    <div class="info-box">
+        <div class="info-item">🎓 <strong>Mentorado(a):</strong> buscando orientação de carreira, técnica ou de negócios</div>
+        <div class="info-item">🤝 <strong>Mentor(a) voluntário(a):</strong> compartilhando sua experiência com quem está começando</div>
+    </div>
+    <p>Responda este e-mail nos contando qual dessas opções combina com você (ou as duas!) e o que você está buscando no momento. Assim conseguimos te ajudar a encontrar a pessoa certa o quanto antes.</p>
+    <div class="button-container">
+        <a href="${appUrl}/signup" class="button">Criar minha conta na Menvo</a>
+    </div>
+    <p>Ficamos no aguardo do seu retorno!</p>
+  `;
+  return await sendEmail(
+    data.email,
+    "Você ainda tem interesse na Menvo?",
+    getEmailLayout("Continua com a gente?", content, { signatureType: "personal" })
+  );
+}
+
+/**
+ * Pede que alguém complete o perfil (ou faça o quiz de carreira) porque
+ * ainda não descrevemos o que essa pessoa busca — sem isso não dá para
+ * sugerir ou fazer um match, manual ou automático.
+ */
+export async function sendWaitingListCompleteProfileRequest(data: {
+  name: string;
+  email: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const content = `
+    <h2>Nos conte o que você está buscando</h2>
+    <p>Olá, ${firstName}! Para te ajudarmos a encontrar a mentoria certa, precisamos entender melhor seus objetivos — e ainda não temos essa informação sobre você.</p>
+    <p>Escolha uma das opções abaixo (leva menos de 2 minutos):</p>
+    <div class="button-container">
+        <a href="${appUrl}/quiz" class="button">Fazer o Quiz de Carreira</a>
+    </div>
+    <p style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
+        <a href="${appUrl}/profile" style="color: ${COLORS.primary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Ou completar meu perfil diretamente</a>
+    </p>
+    <p>Com essa informação, nossa equipe consegue sugerir os mentores mais alinhados com o seu momento — e, se preferir, também podemos fazer essa conexão manualmente.</p>
+  `;
+  return await sendEmail(
+    data.email,
+    "Nos conte o que você busca na Menvo",
+    getEmailLayout("O que você está buscando?", content, { signatureType: "personal" })
+  );
+}
+
+/**
  * Helper para envio via Brevo API
  */
 async function sendEmail(

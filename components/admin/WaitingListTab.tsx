@@ -1,0 +1,263 @@
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Loader2, Mail, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks } from "lucide-react"
+import { toast } from "sonner"
+
+interface WaitingListEntry {
+  id: string
+  name: string
+  email: string
+  whatsapp: string | null
+  reason: string | null
+  status: string
+  created_at: string
+  has_profile: boolean
+}
+
+interface MatchSuggestion {
+  mentor_id: string
+  mentor_name: string
+  mentor_email: string | null
+  mentor_title: string | null
+  reason: string
+}
+
+interface MatchResult {
+  suggestions: MatchSuggestion[]
+  global_justification: string
+  no_match?: boolean
+  error?: string
+}
+
+export function WaitingListTab() {
+  const [entries, setEntries] = useState<WaitingListEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [pendingAction, setPendingAction] = useState<string | null>(null)
+  const [matchResults, setMatchResults] = useState<Record<string, MatchResult>>({})
+
+  const fetchEntries = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/waiting-list")
+      if (!response.ok) throw new Error("Erro ao carregar lista de espera")
+      const result = await response.json()
+      setEntries(result.data || [])
+    } catch (error) {
+      console.error("Error fetching waiting list:", error)
+      toast.error("Erro ao carregar lista de espera")
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchEntries()
+  }, [fetchEntries])
+
+  const handleContact = async (id: string) => {
+    setPendingAction(`contact-${id}`)
+    try {
+      const response = await fetch("/api/admin/waiting-list/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ waitingListId: id })
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Falha ao enviar e-mail")
+      toast.success("E-mail de contato enviado!")
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao enviar e-mail")
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  const handleRequestInfo = async (id: string) => {
+    setPendingAction(`request-info-${id}`)
+    try {
+      const response = await fetch("/api/admin/waiting-list/request-info", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ waitingListId: id })
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Falha ao enviar e-mail")
+      toast.success("E-mail solicitando perfil/quiz enviado!")
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao enviar e-mail")
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  const handleMatch = async (id: string) => {
+    setPendingAction(`match-${id}`)
+    try {
+      const response = await fetch("/api/admin/waiting-list/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ waitingListId: id })
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Falha ao gerar match")
+      setMatchResults(prev => ({ ...prev, [id]: data }))
+      setExpandedId(id)
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao gerar match")
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">Carregando lista de espera...</p>
+      </div>
+    )
+  }
+
+  if (entries.length === 0) {
+    return (
+      <div className="text-center py-20">
+        <ListChecks className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+        <h3 className="text-lg font-medium">Nenhum registro na lista de espera</h3>
+      </div>
+    )
+  }
+
+  return (
+    <div className="divide-y">
+      {entries.map((entry) => {
+        const hasReason = Boolean(entry.reason && entry.reason.trim())
+        const isExpanded = expandedId === entry.id
+        const match = matchResults[entry.id]
+
+        return (
+          <div key={entry.id} className="p-4">
+            <div className="flex flex-col md:flex-row md:items-start gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-sm">{entry.name}</span>
+                  {entry.has_profile && (
+                    <Badge variant="outline" className="text-[10px] uppercase text-green-700 border-green-300 bg-green-50">
+                      Já tem perfil no site
+                    </Badge>
+                  )}
+                  {!hasReason && (
+                    <Badge variant="outline" className="text-[10px] uppercase text-orange-700 border-orange-300 bg-orange-50">
+                      Sem motivação preenchida
+                    </Badge>
+                  )}
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">{entry.email}</div>
+                {entry.whatsapp && (
+                  <div className="text-xs text-muted-foreground">WhatsApp: {entry.whatsapp}</div>
+                )}
+                {hasReason && (
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isExpanded ? null : entry.id)}
+                    className="mt-2 text-xs text-primary flex items-center gap-1 hover:underline"
+                  >
+                    {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    {isExpanded ? "Ocultar motivação" : "Ver motivação"}
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleContact(entry.id)}
+                  disabled={pendingAction === `contact-${entry.id}`}
+                  className="gap-1.5"
+                >
+                  {pendingAction === `contact-${entry.id}` ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Mail className="h-3.5 w-3.5" />
+                  )}
+                  Pedir Contato
+                </Button>
+
+                {hasReason ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleMatch(entry.id)}
+                    disabled={pendingAction === `match-${entry.id}`}
+                    className="gap-1.5 text-primary border-primary/30 hover:bg-primary/5"
+                  >
+                    {pendingAction === `match-${entry.id}` ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Gerar Match
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRequestInfo(entry.id)}
+                    disabled={pendingAction === `request-info-${entry.id}`}
+                    className="gap-1.5"
+                  >
+                    {pendingAction === `request-info-${entry.id}` ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <FileQuestion className="h-3.5 w-3.5" />
+                    )}
+                    Pedir Perfil/Quiz
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {isExpanded && hasReason && (
+              <div className="mt-3 ml-0 md:ml-0 p-3 bg-muted/40 rounded-lg text-sm whitespace-pre-wrap">
+                {entry.reason}
+              </div>
+            )}
+
+            {match && (
+              <div className="mt-3 p-3 border border-primary/20 bg-primary/5 rounded-lg space-y-2">
+                <p className="text-xs font-semibold text-primary uppercase flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5" /> Sugestão de match (IA) — apenas sugestão, nenhum e-mail foi enviado
+                </p>
+                {match.no_match || match.suggestions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">{match.global_justification || "Nenhum mentor compatível encontrado no momento."}</p>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">{match.global_justification}</p>
+                    <div className="space-y-2">
+                      {match.suggestions.map((s) => (
+                        <div key={s.mentor_id} className="p-2 bg-background rounded border text-sm">
+                          <div className="font-medium">
+                            {s.mentor_name}
+                            {s.mentor_title && <span className="text-muted-foreground font-normal"> — {s.mentor_title}</span>}
+                          </div>
+                          {s.mentor_email && (
+                            <div className="text-xs text-muted-foreground">{s.mentor_email}</div>
+                          )}
+                          <p className="text-xs mt-1">{s.reason}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}

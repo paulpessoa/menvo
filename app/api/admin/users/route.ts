@@ -78,6 +78,29 @@ export async function GET(request: NextRequest) {
 
     if (profilesError) throw profilesError
 
+    // 3b. Sinalizar quem também está na lista de espera (waiting_list) —
+    // cruzamento por e-mail, só para os usuários desta página.
+    const emails = (profiles ?? [])
+      .map((p: any) => p.email)
+      .filter((email: unknown): email is string => typeof email === "string" && email.length > 0)
+
+    let waitingListEmails = new Set<string>()
+    if (emails.length > 0) {
+      const { data: waitingListRows } = await supabase
+        .from("waiting_list")
+        .select("email")
+        .in("email", emails)
+
+      waitingListEmails = new Set(
+        (waitingListRows ?? []).map((row: any) => (row.email as string).toLowerCase())
+      )
+    }
+
+    const profilesWithWaitingListFlag = (profiles ?? []).map((p: any) => ({
+      ...p,
+      in_waiting_list: typeof p.email === "string" && waitingListEmails.has(p.email.toLowerCase())
+    }))
+
     // 4. Buscar contagens para as abas de forma eficiente
     const { count: totalCount } = await supabase
       .from("profiles")
@@ -115,7 +138,7 @@ export async function GET(request: NextRequest) {
       .eq("origin_platform", "jotform")
 
     return successResponse({
-      users: profiles,
+      users: profilesWithWaitingListFlag,
       pagination: {
         page,
         limit,

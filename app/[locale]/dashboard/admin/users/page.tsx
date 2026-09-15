@@ -47,6 +47,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
 import { UserMetrics } from "@/components/admin/UserMetrics"
 import { EditUserModal } from "@/components/admin/EditUserModal"
+import { WaitingListTab } from "@/components/admin/WaitingListTab"
 import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import type { UserProfile } from "@/lib/types/models/user"
@@ -129,6 +130,7 @@ export default function AdminUsersPage() {
   }, [page, activeTab, searchTerm, originFilter])
 
   useEffect(() => {
+    if (activeTab === "waiting-list") return
     fetchData()
   }, [activeTab, originFilter]) // Recarregar ao mudar de aba ou origem
 
@@ -215,12 +217,19 @@ export default function AdminUsersPage() {
                     <TabsTrigger value="undefined" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
                         Não Definidos <Badge variant="destructive" className="ml-2">{stats.undefined}</Badge>
                     </TabsTrigger>
+                    <TabsTrigger value="waiting-list" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
+                        Waiting List
+                    </TabsTrigger>
                   </TabsList>
                 </div>
 
+                {activeTab === "waiting-list" ? (
+                  <WaitingListTab />
+                ) : (
+                <>
                 <div className="px-4 py-2 bg-muted/30 border-b flex items-center gap-4">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 cursor-pointer"
                       checked={selectedUserIds.length > 0 && selectedUserIds.length === users.length}
                       onChange={toggleSelectAll}
@@ -273,6 +282,11 @@ export default function AdminUsersPage() {
                                 JotForm
                               </Badge>
                             )}
+                            {user.in_waiting_list && (
+                              <Badge variant="outline" className="text-[10px] uppercase text-purple-700 border-purple-300 bg-purple-50">
+                                Waiting List
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-xs text-muted-foreground truncate">{user.email}</div>
                           {(user as any).institution && (
@@ -322,6 +336,8 @@ export default function AdminUsersPage() {
                             Carregar Mais Usuários
                         </Button>
                     </div>
+                )}
+                </>
                 )}
               </Tabs>
             </CardContent>

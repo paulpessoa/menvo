@@ -58,7 +58,31 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    return successResponse(data)
+    // Sinaliza quem da lista de espera já criou conta no site — ajuda o
+    // admin a saber se, além de pedir contato/motivação por e-mail, essa
+    // pessoa também pode ser encontrada e editada na aba de usuários.
+    const emails = (data ?? [])
+      .map(row => row.email)
+      .filter((email: unknown): email is string => typeof email === "string" && email.length > 0)
+
+    let profileEmails = new Set<string>()
+    if (emails.length > 0) {
+      const { data: profileRows } = await supabase
+        .from("profiles")
+        .select("email")
+        .in("email", emails)
+
+      profileEmails = new Set(
+        (profileRows ?? []).map((row: any) => (row.email as string).toLowerCase())
+      )
+    }
+
+    const dataWithProfileFlag = (data ?? []).map(row => ({
+      ...row,
+      has_profile: typeof row.email === "string" && profileEmails.has(row.email.toLowerCase())
+    }))
+
+    return successResponse(dataWithProfileFlag)
   } catch (error) {
     return handleApiError(error)
   }
