@@ -140,6 +140,43 @@ describe('POST /api/profile/role', () => {
     expect(mockSupabase.from).toHaveBeenCalledWith('user_roles')
   })
 
+  it('never writes a "user_role" column to profiles', async () => {
+    // Regression test: profiles has no `user_role` column (confirmed
+    // against the live schema — PostgREST returns PGRST204 "Could not find
+    // the 'user_role' column"). Including it in the update payload makes
+    // PostgREST reject the WHOLE update, which made this endpoint fail
+    // with 500 for every single user completing onboarding. The real role
+    // lives only in user_roles, written separately below.
+    const profilesUpdate = jest.fn().mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ error: null }),
+    })
+    mockSupabase.from = jest.fn((table: string) => {
+      if (table === 'profiles') return { update: profilesUpdate }
+      if (table === 'roles') {
+        return {
+          select: jest.fn().mockReturnValue({
+            in: jest.fn().mockResolvedValue({ data: [{ id: 1, name: 'mentee' }], error: null }),
+          }),
+        }
+      }
+      if (table === 'user_roles') {
+        return {
+          delete: jest.fn().mockReturnValue({ eq: jest.fn().mockReturnValue({ in: jest.fn().mockResolvedValue({ error: null }) }) }),
+          upsert: jest.fn().mockResolvedValue({ error: null }),
+        }
+      }
+      return {}
+    })
+
+    const request = createMockRequest({ role: 'mentee' })
+    const response = await POST(request)
+
+    expect(response.status).toBe(200)
+    expect(profilesUpdate).toHaveBeenCalledTimes(1)
+    const payload = profilesUpdate.mock.calls[0][0]
+    expect(payload).not.toHaveProperty('user_role')
+  })
+
   it('removes the previous mentor/mentee role before assigning the new one', async () => {
     // Regression test: the route used to blindly upsert the new role without
     // clearing the old one, so a user switching mentee <-> mentor ended up
