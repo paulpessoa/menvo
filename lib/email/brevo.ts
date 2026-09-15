@@ -14,6 +14,21 @@ const COLORS = {
   divider: '#e2e8f0'
 };
 
+/**
+ * Escapa texto livre fornecido pelo usuário antes de interpolar em HTML de
+ * e-mail. Necessário para qualquer campo de formulário longo (bio,
+ * abordagem de mentoria etc.) — ao contrário de nome/e-mail, esses campos
+ * são grandes o bastante para um usuário mal-intencionado esconder markup.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export type EmailSignatureType = 'personal' | 'team' | 'none';
 
 export interface EmailLayoutOptions {
@@ -361,8 +376,16 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
 export async function sendAdminNewMentorNotification(data: {
   userName: string;
   userEmail: string;
+  mentorshipApproach?: string;
+  whatToExpect?: string;
 }): Promise<void> {
   const adminEmail = process.env.ADMIN_EMAIL || "contato@menvo.com.br";
+  const approachSection = data.mentorshipApproach
+    ? `<div class="info-item" style="margin-top: 8px;"><strong>Como pretende conduzir as mentorias:</strong><br/>${escapeHtml(data.mentorshipApproach).replace(/\n/g, '<br/>')}</div>`
+    : '';
+  const expectSection = data.whatToExpect
+    ? `<div class="info-item" style="margin-top: 8px;"><strong>O que espera do mentorado:</strong><br/>${escapeHtml(data.whatToExpect).replace(/\n/g, '<br/>')}</div>`
+    : '';
   const content = `
     <h2>Nova Solicitação de Mentor</h2>
     <p>Olá, Admin. Um usuário acaba de solicitar a validação de perfil como <strong>Mentor</strong> na plataforma.</p>
@@ -370,9 +393,11 @@ export async function sendAdminNewMentorNotification(data: {
         <div class="info-item"><strong>Nome:</strong> ${data.userName}</div>
         <div class="info-item"><strong>E-mail:</strong> ${data.userEmail}</div>
         <div class="info-item"><strong>Data:</strong> ${new Date().toLocaleString("pt-BR")}</div>
+        ${approachSection}
+        ${expectSection}
     </div>
     <div class="button-container">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/admin/users" class="button">Verificar no Painel Admin</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/admin/verifications" class="button">Verificar no Painel Admin</a>
     </div>
     <p>Por favor, revise o perfil e os documentos para aprovação em até 48h.</p>
   `;

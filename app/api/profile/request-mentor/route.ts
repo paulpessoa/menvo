@@ -24,9 +24,25 @@ export async function POST(request: NextRequest) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
+    const body = await request.json().catch(() => ({}))
+    const mentorshipApproach =
+      typeof body?.mentorship_approach === "string" ? body.mentorship_approach.trim() : ""
+    const whatToExpect =
+      typeof body?.what_to_expect === "string" ? body.what_to_expect.trim() : ""
+
+    if (!mentorshipApproach) {
+      return errorResponse(
+        "Conte como você pretende conduzir suas mentorias antes de enviar a solicitação",
+        "VALIDATION_ERROR",
+        400
+      )
+    }
+
     const updateData: ProfileUpdate = {
       is_pending_mentor: true,
-      verification_status: 'pending'
+      verification_status: 'pending',
+      mentorship_approach: mentorshipApproach,
+      what_to_expect: whatToExpect || null
     }
 
     // Marcar perfil como solicitante de mentor
@@ -41,10 +57,12 @@ export async function POST(request: NextRequest) {
 
     // Notificar admin
     const userName = `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || user.email || 'Usuário'
-    
+
     sendAdminNewMentorNotification({
         userName: userName,
-        userEmail: user.email || ''
+        userEmail: user.email || '',
+        mentorshipApproach,
+        whatToExpect: whatToExpect || undefined
     }).catch(err => console.error('[API] Error sending admin notification:', err))
 
     return successResponse(data, "Solicitação enviada com sucesso")
