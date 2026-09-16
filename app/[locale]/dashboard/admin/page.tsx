@@ -25,6 +25,7 @@ import { useAuth } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
+import { PageContainer } from "@/components/layout/PageContainer"
 
 interface AdminStats {
   totalUsers: number
@@ -166,7 +167,7 @@ export default function AdminDashboard() {
 
   return (
     <RequireRole roles={["admin"]}>
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer>
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-bold">
@@ -302,7 +303,7 @@ export default function AdminDashboard() {
             </Card>
           )}
         </div>
-      </div>
+      </PageContainer>
     </RequireRole>
   )
 }

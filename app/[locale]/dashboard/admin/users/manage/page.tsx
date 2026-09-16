@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PageContainer } from "@/components/layout/PageContainer"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
@@ -359,10 +360,9 @@ export default function ManageUsersPage() {
     }, [page, searchTerm, roleFilter, statusFilter])
 
     return (
-        <div className="container mx-auto py-8 px-4">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-6">
+        <PageContainer>
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
                     <div>
                         <h1 className="text-2xl font-bold">Gerenciar Usuários</h1>
                         <p className="text-muted-foreground">
@@ -737,7 +737,6 @@ export default function ManageUsersPage() {
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-            </div>
-        </div>
+        </PageContainer>
     )
 }

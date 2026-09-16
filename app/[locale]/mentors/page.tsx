@@ -44,6 +44,7 @@ import { toast } from "sonner"
 import { useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { useDebounce } from "@/hooks/useDebounce"
+import { PageContainer } from "@/components/layout/PageContainer"
 
 interface MentorProfile {
   id: string | null
@@ -390,7 +391,7 @@ export default function MentorsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <PageContainer>
       {/* Header */}
       <div className="mb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
@@ -714,39 +715,71 @@ export default function MentorsPage() {
               Ativos:
             </span>
             {filters.state !== "all" && (
-              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+              <Badge
+                variant="secondary"
+                onClick={() => setFilters(p => ({ ...p, state: "all", city: "" }))}
+                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                title="Clique para remover este filtro"
+              >
                 <span>Estado: {filters.state}</span>
-                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, state: "all", city: "" }))} />
+                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             )}
             {filters.city && (
-              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+              <Badge
+                variant="secondary"
+                onClick={() => setFilters(p => ({ ...p, city: "" }))}
+                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                title="Clique para remover este filtro"
+              >
                 <span>Cidade: {filters.city}</span>
-                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, city: "" }))} />
+                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             )}
             {filters.topics.map((topic) => (
-              <Badge key={topic} variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+              <Badge
+                key={topic}
+                variant="secondary"
+                onClick={() => setFilters(p => ({ ...p, topics: p.topics.filter(t => t !== topic) }))}
+                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                title="Clique para remover este filtro"
+              >
                 <span>{topic}</span>
-                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, topics: p.topics.filter(t => t !== topic) }))} />
+                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             ))}
             {filters.inclusiveTags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+              <Badge
+                key={tag}
+                variant="secondary"
+                onClick={() => setFilters(p => ({ ...p, inclusiveTags: p.inclusiveTags.filter(t => t !== tag) }))}
+                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                title="Clique para remover este filtro"
+              >
                 <span>{tag}</span>
-                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, inclusiveTags: p.inclusiveTags.filter(t => t !== tag) }))} />
+                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             ))}
             {filters.availabilityStatus !== "all" && (
-              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+              <Badge
+                variant="secondary"
+                onClick={() => setFilters(p => ({ ...p, availabilityStatus: "all" }))}
+                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                title="Clique para remover este filtro"
+              >
                 <span>{filters.availabilityStatus === "available" ? t("status.available") : t("status.busy")}</span>
-                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, availabilityStatus: "all" }))} />
+                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             )}
             {filters.experienceYears !== "all" && (
-              <Badge variant="secondary" className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20">
+              <Badge
+                variant="secondary"
+                onClick={() => setFilters(p => ({ ...p, experienceYears: "all" }))}
+                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+                title="Clique para remover este filtro"
+              >
                 <span>{filters.experienceYears} anos</span>
-                <X className="h-3 w-3 cursor-pointer hover:opacity-75" onClick={() => setFilters(p => ({ ...p, experienceYears: "all" }))} />
+                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             )}
             <button
@@ -945,6 +978,6 @@ export default function MentorsPage() {
           </div>
         </>
       )}
-    </div>
+    </PageContainer>
   )
 }

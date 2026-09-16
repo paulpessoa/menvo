@@ -1,13 +1,13 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
 ## 📅 Last Updated: 2026-09-16
-**Current Status:** Admin breadcrumb unificado e roteado corretamente, bug de link `/mentors/undefined` corrigido, auditoria de consistência de largura/layout documentada, insights do Clarity (analytics) puxados e documentados, e roadmap de multi-tenant para organizações parceiras (Gira, Porto Social, etc.) rascunhado. **Comece por [`docs/NEXT_SESSION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/NEXT_SESSION.md) para retomar de onde parou.**
+**Current Status:** Componente compartilhado `PageContainer` introduzido e padronizado em todas as rotas do `/dashboard/admin/*` e `/mentors`, `AdminBreadcrumb` obsoleto removido, 123 dead clicks em `/mentors` corrigidos (card clicável por inteiro e chips de filtro responsivos), e feature flag legada de mentoria removida.
 
 ---
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 73/73 passed across 12 test suites (`npm test`)
+- **Unit Tests:** 120/120 passed across 25 test suites (`npm test`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
 ---

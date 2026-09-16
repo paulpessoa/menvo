@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { PageContainer } from "@/components/layout/PageContainer"
 import {
   Select,
   SelectContent,
@@ -162,7 +163,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <PageContainer>
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -353,6 +354,6 @@ export default function AdminUsersPage() {
         onClose={() => setIsEditModalOpen(false)}
         onSuccess={fetchData}
       />
-    </div>
+    </PageContainer>
   )
 }

@@ -25,5 +25,6 @@
 
 ## 🔵 P3 — Future / Strategic
 - [ ] **Multi-Tenant for Partner Organizations:** Offer Menvo as infrastructure for NGOs/institutions (Instituto Gira, Porto Social, hackathons, SEBRAE) to register their own beneficiaries and tap into the mentor pool. See [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) — blocked on a scoping call with a first pilot partner and a live DB check for leftover `organizations` schema from the previously-removed v1.
-- [ ] **UI Width/Container Standardization:** Introduce a shared `PageContainer` component and migrate the 5 divergent container conventions found across the app, starting with `/dashboard/admin/*`. See [`docs/UI_CONSISTENCY_AUDIT.md`](UI_CONSISTENCY_AUDIT.md) — needs a founder design call on which convention wins before a broad pass.
-- [ ] **`/mentors` Dead-Click Investigation:** 123 dead clicks in 3 months, by far the highest of any page — review Clarity session recordings to find the unresponsive element. See [`docs/CLARITY_INSIGHTS.md`](CLARITY_INSIGHTS.md).
+- [x] **UI Width/Container Standardization & Breadcrumb Removal:** Introduced shared `PageContainer` component (`components/layout/PageContainer.tsx`), standardized container widths/padding across all 8 `/dashboard/admin/*` routes and `/mentors`, and eliminated the obsolete/detached `AdminBreadcrumb`. See [`docs/UI_CONSISTENCY_AUDIT.md`](UI_CONSISTENCY_AUDIT.md).
+- [x] **`/mentors` Dead-Click Investigation & Fix:** Fixed the 123 dead clicks on `/mentors` by making the entire `MentorCard` interactive (`cursor-pointer`, `onClick`, keyboard support on photo, name, bio, and container) while isolating the favorite button, and made active filter chips dismissable on entire badge click. See [`docs/CLARITY_INSIGHTS.md`](CLARITY_INSIGHTS.md).
+

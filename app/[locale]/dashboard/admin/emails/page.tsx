@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { PageContainer } from "@/components/layout/PageContainer"
 import {
   Mail,
   Smartphone,
@@ -143,7 +144,7 @@ export default function AdminEmailPreviewPage() {
   }
 
   return (
-    <div className="container py-8">
+    <PageContainer>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -416,6 +417,6 @@ export default function AdminEmailPreviewPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

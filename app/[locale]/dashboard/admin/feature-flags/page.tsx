@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { PageContainer } from '@/components/layout/PageContainer';
 import { 
   Loader2, RefreshCw, Save, Plus, Trash2, History, Tag, 
   AlertTriangle, CheckCircle2, XCircle, Info, Shield
@@ -151,7 +152,7 @@ export default function AdminFeatureFlagsPage() {
   }, [fetchData]);
 
   return (
-    <div className="container py-8 space-y-8">
+    <PageContainer className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -286,6 +287,6 @@ export default function AdminFeatureFlagsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </PageContainer>
   );
 }

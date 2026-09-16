@@ -23,6 +23,7 @@ import { VerificationService } from "@/lib/services/verifications/verifications.
 import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
 import type { Verification } from "@/lib/types/models/verification"
 import { toast } from "sonner"
+import { PageContainer } from "@/components/layout/PageContainer"
 import { Link } from "@/i18n/routing"
 
 export default function AdminVerificationsPage() {
@@ -89,15 +90,15 @@ export default function AdminVerificationsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-12 flex flex-col items-center justify-center min-h-[400px]">
+      <PageContainer className="flex flex-col items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
         <p className="text-muted-foreground">Carregando verificações de mentores...</p>
-      </div>
+      </PageContainer>
     )
   }
 
   return (
-    <div className="container py-8 md:py-12">
+    <PageContainer>
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
@@ -232,7 +233,7 @@ export default function AdminVerificationsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </PageContainer>
   )
 }
 

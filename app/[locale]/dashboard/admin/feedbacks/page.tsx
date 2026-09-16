@@ -8,13 +8,14 @@ import { RequireRole } from "@/lib/auth/auth-guard"
 import { useTranslations } from "next-intl"
 import { AdminFeedbackModeration } from "@/components/admin/AdminFeedbackModeration"
 import { Badge } from "@/components/ui/badge"
+import { PageContainer } from "@/components/layout/PageContainer"
 
 export default function AdminFeedbacksPage() {
   const t = useTranslations("dashboard")
 
   return (
     <RequireRole roles={["admin"]}>
-      <div className="container mx-auto px-4 py-8 ">
+      <PageContainer>
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl font-black tracking-tight">Gestão de Feedbacks</h1>
@@ -63,7 +64,7 @@ export default function AdminFeedbacksPage() {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
+      </PageContainer>
     </RequireRole>
   )
 }

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { RequireRole } from "@/lib/auth/auth-guard"
+import { PageContainer } from "@/components/layout/PageContainer"
 import {
   adminReportsService,
   type TimeSeriesData,
@@ -99,7 +100,7 @@ export default function AdminReportsPage() {
 
   return (
     <RequireRole roles={["admin"]}>
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer>
         <div className="space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -167,7 +168,7 @@ export default function AdminReportsPage() {
             loading={loading}
           />
         </div>
-      </div>
+      </PageContainer>
     </RequireRole>
   )
 }

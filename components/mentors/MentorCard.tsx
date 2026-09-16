@@ -45,6 +45,11 @@ interface MentorCardProps {
   aiReason?: string | null
 }
 
+/**
+ * Card de mentor no catálogo de descoberta.
+ * Permite navegação clicando em qualquer área do card, na foto ou no botão,
+ * com isolamento para o botão de favoritos e suporte total a acessibilidade.
+ */
 export function MentorCard({
   mentor,
   isAIHighlighted,
@@ -92,9 +97,18 @@ export function MentorCard({
     }
   }
 
-  const handleProfileClick = (e: React.MouseEvent) => {
+  const handleProfileClick = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault()
-    router.push(`/mentors/${mentor.slug || mentor.id || ""}`)
+    const target = mentor.slug || mentor.id
+    if (target) {
+      router.push(`/mentors/${target}`)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      handleProfileClick(e)
+    }
   }
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -107,7 +121,12 @@ export function MentorCard({
 
   return (
     <Card
-      className={`hover:shadow-xl transition-all duration-300 flex flex-col h-full relative group border-none shadow-md rounded-[2rem] overflow-hidden bg-white ${
+      onClick={handleProfileClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`${t("viewProfile")} - ${mentor.full_name || "Mentor"}`}
+      className={`cursor-pointer hover:shadow-xl transition-all duration-300 flex flex-col h-full relative group border-none shadow-md rounded-[2rem] overflow-hidden bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary ${
         isAIHighlighted
           ? "ring-2 ring-primary/50 shadow-primary/10 scale-[1.02]"
           : ""
