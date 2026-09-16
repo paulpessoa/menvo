@@ -220,6 +220,16 @@ Contributions must adhere to the constraints defined in `AGENTS.md`:
 
 ---
 
+## 📚 Documentation
+
+Full engineering and product documentation lives in [`docs/`](docs/). Start
+at [`docs/HEARTBEAT.md`](docs/HEARTBEAT.md) — it's the living single source
+of truth for current system status, architectural invariants, and an index
+of every other doc (backlog, scheduling engine, evaluation model, SEO,
+deployment, Google Calendar setup, environment variables, and more).
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions of all kinds: bug fixes, new features, translation improvements, and documentation polish!

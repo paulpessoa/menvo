@@ -4,6 +4,15 @@
 
 ---
 
+## 2026-09-16 — Admin Breadcrumb Unification, Analytics-Driven Bug Fix & Multi-Tenant Planning
+- **Unified Admin Breadcrumb:** `AdminBreadcrumb` was only rendered on `/dashboard/admin/users` and its route map pointed at dead `/dashboard/admin/mentors*` routes plus a mismatched `/settings` entry. Moved it into the shared `dashboard/admin/layout.tsx` so every admin page gets a consistent, correctly-mapped breadcrumb.
+- **Fixed `/mentors/undefined` Bug (found via Clarity analytics):** Guarded two mentor-profile links (mentee's favorites list, mentor's "view public profile" quick action) that rendered without a slug/id fallback, producing broken links tracked in production traffic.
+- **Clarity MCP Server Connected:** Added `.mcp.json` (Microsoft Clarity Data Export MCP), enabling live analytics queries (sessions, traffic sources, dead/rage clicks, device mix) directly from an agent session. See `docs/CLARITY_INSIGHTS.md`.
+- **UI Consistency Audit:** Documented 5 divergent container/width conventions across the app (`docs/UI_CONSISTENCY_AUDIT.md`) — highest-impact area is `/dashboard/admin/*`, whose shared layout applies no width constraint, causing every child page to pick a different max-width.
+- **Multi-Tenant Roadmap (Proposal):** Drafted `docs/MULTI_TENANT_ROADMAP.md` for offering Menvo as infrastructure to partner organizations (Instituto Gira, Porto Social, hackathons, SEBRAE). Found that SQL functions referencing `organizations`/`organization_members` (e.g. `check_organization_quota`, `get_mentors_by_organization`) still exist in the DB function list even though those tables aren't in the current generated types — needs a live DB check before any schema work, since the prior organizations module was deliberately removed in favor of the lean mentor-mentee core loop (see "Earlier Milestones" below).
+
+---
+
 ## 2026-09-08 — Mentor Availability BFF & Transactional Email Hardening
 - **Mentor Availability BFF Route (`/api/mentors/availability`):** Resolved availability slots not displaying on `/dashboard/mentor/availability` by introducing a dedicated BFF Route Handler (GET and POST) with Zod validation (`setAvailabilitySchema`). Replaced client-side anonymous RLS queries with server-authenticated session resolution, enabling robust slot listing, saving, and deletion.
 - **Personal Founder Signature (Paul Pessoa):** Implemented warm, clean email signature for community and relationship touchpoints (`sendVerificationNotification`, `sendAppointmentConfirmation`, `sendFeedbackRequest`). Includes circular portrait (`public/images/paul-pessoa.jpg`), official WhatsApp icon with direct chat link, and clean text links for LinkedIn/GitHub. Removed decorative emojis across all email templates and titles for a sober, professional tone.

@@ -20,4 +20,10 @@
 - [x] **Transactional Email Hardening:** Ensure booking notifications, founder signatures, brand Deep Teal CTAs, and cancellation notices arrive reliably via Brevo SMTP API.
 - [x] **Brand Color & Hero Banner Harmonization:** Aligned buttons, cards, and hero banner on `/mentorship/mentee` with Menvo's official deep teal brand palette (`#006276` / `#0f7185` / `--primary`), eliminating off-brand grass green (`emerald-600`) and restoring functional hero actions.
 - [x] **Evaluation Flow Distinction (Mentee -> Mentor Only):** Restricted public session evaluation modals exclusively to mentees, preventing mentors from receiving confusing review modals about themselves.
+- [x] **Admin Breadcrumb Unification & `/mentors/undefined` Fix:** Unified `AdminBreadcrumb` across all `/dashboard/admin/*` pages with a corrected route map, and guarded two mentor-profile links against missing slug/id (found live via Clarity analytics).
 ---
+
+## 🔵 P3 — Future / Strategic
+- [ ] **Multi-Tenant for Partner Organizations:** Offer Menvo as infrastructure for NGOs/institutions (Instituto Gira, Porto Social, hackathons, SEBRAE) to register their own beneficiaries and tap into the mentor pool. See [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) — blocked on a scoping call with a first pilot partner and a live DB check for leftover `organizations` schema from the previously-removed v1.
+- [ ] **UI Width/Container Standardization:** Introduce a shared `PageContainer` component and migrate the 5 divergent container conventions found across the app, starting with `/dashboard/admin/*`. See [`docs/UI_CONSISTENCY_AUDIT.md`](UI_CONSISTENCY_AUDIT.md) — needs a founder design call on which convention wins before a broad pass.
+- [ ] **`/mentors` Dead-Click Investigation:** 123 dead clicks in 3 months, by far the highest of any page — review Clarity session recordings to find the unresponsive element. See [`docs/CLARITY_INSIGHTS.md`](CLARITY_INSIGHTS.md).

@@ -60,6 +60,11 @@ cp .env.example .env.local
 | `OPENAI_API_KEY` | Recommended | Server-only | OpenAI key for GPT-4o-mini matching |
 | `GROQ_API_KEY` | Optional | Server-only | Groq key for fallback inference |
 
+### Analytics (Microsoft Clarity MCP)
+| Variable | Required | Context | Description |
+|---|---|---|---|
+| `CLARITY_API_TOKEN` | Optional | Local dev tooling only | Used by `.mcp.json`'s `clarity` MCP server (`${CLARITY_API_TOKEN}`) to query session recordings and dashboard analytics from an agent session. Set via `.claude/settings.local.json` (`env` block) or a user-level OS env var — never committed. Not used by the running app itself. |
+
 ---
 
 ## 3. Security Guidelines

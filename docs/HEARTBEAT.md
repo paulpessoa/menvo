@@ -1,7 +1,7 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
-## 📅 Last Updated: 2026-09-08
-**Current Status:** Modernização global do Design System de botões concluída (tokens `rounded-xl`, elevação tátil `active:scale-[0.98]`, sombras da marca e remoção de ícones decorativos redundantes), tela de Login alinhada ao acabamento de alto nível da tela de Signup, Google OAuth Verification submetido e suíte de testes 100% íntegra.
+## 📅 Last Updated: 2026-09-16
+**Current Status:** Admin breadcrumb unificado e roteado corretamente, bug de link `/mentors/undefined` corrigido, auditoria de consistência de largura/layout documentada, insights do Clarity (analytics) puxados e documentados, e roadmap de multi-tenant para organizações parceiras (Gira, Porto Social, etc.) rascunhado. **Comece por [`docs/NEXT_SESSION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/NEXT_SESSION.md) para retomar de onde parou.**
 
 ---
 
@@ -62,6 +62,10 @@
 
 | File | Purpose |
 |---|---|
+| [`docs/NEXT_SESSION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/NEXT_SESSION.md) | **Start here** — what changed overnight and what's next |
+| [`docs/MULTI_TENANT_ROADMAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/MULTI_TENANT_ROADMAP.md) | Proposal: offering Menvo to partner orgs (Gira, Porto Social, etc.) |
+| [`docs/UI_CONSISTENCY_AUDIT.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/UI_CONSISTENCY_AUDIT.md) | Width/container and breadcrumb inconsistency findings |
+| [`docs/CLARITY_INSIGHTS.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/CLARITY_INSIGHTS.md) | Analytics snapshot: traffic, devices, friction points |
 | [`docs/BACKLOG.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/BACKLOG.md) | Prioritized product items (P0–P3) |
 | [`docs/DATA_FLOW_MAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/DATA_FLOW_MAP.md) | Mapeamento de fluxo de dados, TanStack Query, Services e BFF |
 | [`docs/V2_ARCHITECTURE_CLEANUP_MAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/V2_ARCHITECTURE_CLEANUP_MAP.md) | Roadmap de desacoplamento, Zod Schemas e preparação para Agente + MCP |
