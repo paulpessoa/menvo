@@ -48,37 +48,35 @@ sprawl until a real partner proves the need for it.
 
 ---
 
-## 1. Open questions only the founder can answer
+## 1. Decisions — answered 2026-09-16
 
-These block any real schema work — answer them before Phase 1 starts:
-
-1. **Does the live Supabase DB still have `organizations` /
-   `organization_members`?** Run `npm run db:types` with a valid
-   `SUPABASE_ACCESS_TOKEN` (tonight's attempt failed — token in `.env.local`
-   returned `Unauthorized`, needs refreshing at
-   [supabase.com/dashboard](https://supabase.com/dashboard/account/tokens))
-   or check the Supabase Table Editor directly.
-2. **What does "register beneficiaries" actually mean for a partner like
-   Gira?** Two very different data models depending on the answer:
-   - (a) Each beneficiary gets a real Menvo account (mentee role), tagged
-     with `organization_id` — they can log in, book sessions, see history.
-   - (b) Gira staff bulk-register names/contacts as *leads*, Menvo (or Gira)
-     matches them to a mentor, and the beneficiary experience is lighter
-     (maybe no login at all, just email/WhatsApp coordination).
-   These require a 30-minute scoping call with Gira before writing schema —
-   guessing wrong here means rebuilding twice.
-3. **Do partner orgs bring their own mentors, or draw from Menvo's existing
-   pool, or both?** Determines whether "org-exclusive mentors" (opt-in via
-   the existing `visible_to_organizations` column) is enough, or whether
-   orgs need their own mentor onboarding flow.
-4. **Free pilot or paid?** `check_organization_quota` already existing in
-   the DB functions suggests v1 had a quota/plan concept — decide if that's
-   relevant for a pilot with 1-2 partners or premature until there's demand.
-5. **URL/branding strategy**: subdomain (`gira.menvo.com.br`), path prefix
-   (`menvo.com.br/o/gira`), or no visible branding at all for the pilot
-   (just an admin dashboard, no distinct beneficiary-facing URL)? Path
-   prefix is the cheapest to ship and is recommended for a pilot — no DNS,
-   no wildcard SSL config on Vercel.
+1. **Live DB state (verified with `supabase gen types` against production):**
+   `organizations` and `organization_members` are **gone**. What survives:
+   - `mentor_visibility_settings` table (`visibility_scope`,
+     `visible_to_organizations text[]`) — reusable as-is.
+   - ~10 orphaned SQL functions referencing the dropped tables:
+     `check_organization_quota`, `get_organization_quota_usage`,
+     `expire_organization_memberships`, `expire_partner_invitations`,
+     `expire_user_partner_access`, `get_mentor_visible_organizations`,
+     `get_mentors_by_organization`, `get_user_organization_ids`,
+     `is_organization_admin`, `user_has_partner_access`. They will error if
+     called. **Phase 1 migration should `DROP FUNCTION` all of them** before
+     creating the new tables, so names don't collide with stale definitions.
+   - Conclusion: build from scratch, lean. No "trim v1" shortcut.
+2. **Beneficiaries get a real login** (founder's call). An org beneficiary is
+   a normal mentee account tagged with `organization_id`. Keep the org-facing
+   surface minimal; grow it only when a partner asks.
+3. **Orgs can bring their own mentors, and the mentor decides visibility**:
+   public to everyone, or only to members of their org. This maps 1:1 onto
+   the existing `mentor_visibility_settings.visibility_scope` +
+   `visible_to_organizations` — no new concept needed.
+4. **Free pilot.** No quotas, no billing. Dropping `check_organization_quota`
+   is fine.
+5. **URL: path prefix `/o/[slug]/...`** for the pilot. No subdomain, no
+   branding.
+6. **First pilot: Instituto Gira** — founder can talk to Leonildo (diretor
+   presidente) from the week of 2026-09-21. Schema below is designed so that
+   call can only *add* scope, not invalidate it.
 
 ---
 
@@ -149,10 +147,56 @@ import, multi-org membership per user.
 
 ---
 
-## 4. Immediate next step
+## 4. Phase 1 — concrete design (ready to implement)
 
-Before any code: **schedule the scoping call with Gira** (or whichever
-partner is closest to signing on) to answer questions 2-5 in Section 1. Also
-run `npm run db:types` with a fresh Supabase access token to settle question
-1 — that alone might save a full day of schema design if the old tables are
-still there and just need a Phase 1-sized trim.
+**Migration `supabase/migrations/<ts>_organizations_v2.sql`:**
+```sql
+-- 1. Drop orphaned v1 functions (see Section 1.1)
+-- 2. Tables
+create table organizations (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,             -- /o/[slug]
+  name text not null,
+  type text not null check (type in ('ngo','company','event','school','other')),
+  contact_name text, contact_email text,
+  status text not null default 'active' check (status in ('active','suspended')),
+  created_at timestamptz default now()
+);
+create table organization_members (
+  organization_id uuid references organizations(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  role text not null check (role in ('admin','member')),   -- member = beneficiary OR org mentor
+  created_at timestamptz default now(),
+  primary key (organization_id, user_id)
+);
+-- 3. RLS: members read their own org; org admins read members of their org;
+--    platform admins (user_roles.role = admin) read everything.
+```
+Mentor-side visibility: reuse `mentor_visibility_settings`. `/mentors`
+catalog query adds `where visibility_scope = 'public' or organization_id =
+any(visible_to_organizations)` for logged-in org members.
+
+**Routes (all reuse existing pages/components — no forks):**
+- `/o/[slug]` — public landing: org name + "Cadastre-se" CTA. Tiny.
+- `/o/[slug]/signup` — `signup/page.tsx` with `?org=slug` → after account
+  creation inserts `organization_members(role='member')`.
+- `/dashboard/org` — org admin view: members list (name, quiz done?, sessions
+  booked/completed), read-only. Guarded by `organization_members.role='admin'`.
+- `/dashboard/admin/organizations` — platform admin: create org, assign org
+  admin by email, suspend.
+- Mentor profile settings: existing visibility UI gets the org picker
+  (already backed by `/api/mentors/visibility`).
+
+**Out of scope until a partner asks:** invitations, activity log,
+membership expiry, CSV import, branding, multi-org per user, quotas.
+
+**Where it grows next (Phase 2+):** org-scoped reports/export, org admin
+inviting mentors by email, subdomain branding, per-org quiz variants.
+
+## 5. Immediate next step
+
+Founder: confirm the Phase 1 design above (or ask for changes), then it's a
+2-3 day build. Suggested order: migration → org signup tagging → org admin
+dashboard → catalog visibility filter → platform admin org CRUD. Run it as
+a feature branch + preview deploy; apply the migration to production only
+after review, ideally right before the Gira call so the demo is live.

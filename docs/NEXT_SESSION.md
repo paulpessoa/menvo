@@ -38,21 +38,12 @@ It's connected and working (`clarity` server in `.mcp.json` + token in
 `.claude/settings.local.json` / Windows user env var). You can just ask "puxa
 os dados do Clarity sobre X" in any session from now on.
 
-## 🤔 Decisions that need you specifically
-- **Multi-tenant**: who's the first real pilot partner (Gira)? A 30-min call
-  with them answers most of the open questions in the roadmap doc and
-  prevents building the wrong data model twice.
-- **UI width standard**: pick one container convention (recommendation in
-  the audit doc: introduce a shared `PageContainer` component) — this is a
-  visible, app-wide change I intentionally did not push through overnight
-  without your sign-off.
-- **`npm run db:types` failed** tonight (`SUPABASE_ACCESS_TOKEN` in
-  `.env.local` returned `Unauthorized`) — refresh it at
-  [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens)
-  when you get a chance; it blocks confirming whether the old `organizations`
-  tables still exist in the live DB, which the multi-tenant roadmap needs.
+## ✅ Resolved this morning (2026-09-16)
+- **Width standard shipped**: container capped at 1280px app-wide (root cause was a Tailwind config with no max-width below 1536px). See commit `eddd9f56`.
+- **Supabase token refreshed** and pushed to Doppler (`menvo/dev`).
+- **Live DB verified**: `organizations` tables are gone; only `mentor_visibility_settings` + orphaned functions remain. Multi-tenant is a clean rebuild.
+- **Multi-tenant decisions taken** (own login for beneficiaries, orgs bring mentors, mentor picks public vs org-only, free pilot, path-prefix URLs, pilot = Instituto Gira / Leonildo, week of 09-21). Phase 1 design is in [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §4 — awaiting a go to build.
 
 ## Not touched
-Nothing risky was pushed unsupervised — no schema changes, no multi-tenant
-code, no broad CSS pass. Everything here is either a verified small fix or a
-document waiting on your decision.
+No schema changes and no multi-tenant code yet — Phase 1 is designed and
+waiting for a go.
