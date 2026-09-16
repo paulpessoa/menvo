@@ -12,22 +12,14 @@ interface BreadcrumbItem {
 
 const routeMap: Record<string, BreadcrumbItem[]> = {
   "/dashboard/admin": [{ label: "Dashboard" }],
-  "/dashboard/admin/mentors": [
-    { label: "Dashboard", href: "/dashboard/admin" },
-    { label: "Mentores" }
-  ],
-  "/dashboard/admin/mentors/verify": [
-    { label: "Dashboard", href: "/dashboard/admin" },
-    { label: "Mentores", href: "/dashboard/admin/mentors" },
-    { label: "Verificar" }
-  ],
   "/dashboard/admin/users": [
     { label: "Dashboard", href: "/dashboard/admin" },
     { label: "Usuários" }
   ],
-  "/settings": [
+  "/dashboard/admin/users/manage": [
     { label: "Dashboard", href: "/dashboard/admin" },
-    { label: "Configurações" }
+    { label: "Usuários", href: "/dashboard/admin/users" },
+    { label: "Gerenciar" }
   ],
   "/dashboard/admin/reports": [
     { label: "Dashboard", href: "/dashboard/admin" },
@@ -36,6 +28,18 @@ const routeMap: Record<string, BreadcrumbItem[]> = {
   "/dashboard/admin/feedbacks": [
     { label: "Dashboard", href: "/dashboard/admin" },
     { label: "Feedbacks" }
+  ],
+  "/dashboard/admin/emails": [
+    { label: "Dashboard", href: "/dashboard/admin" },
+    { label: "E-mails" }
+  ],
+  "/dashboard/admin/feature-flags": [
+    { label: "Dashboard", href: "/dashboard/admin" },
+    { label: "Feature Flags" }
+  ],
+  "/dashboard/admin/verifications": [
+    { label: "Dashboard", href: "/dashboard/admin" },
+    { label: "Verificações" }
   ]
 }
 

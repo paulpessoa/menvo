@@ -16,6 +16,7 @@ import {
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
+import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -36,7 +37,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <RequireRole roles={["admin"]}>
       <div className="min-h-screen bg-gray-50">
-        <main className="min-h-screen">{children}</main>
+        <main className="min-h-screen">
+          <div className="container mx-auto px-4 pt-6">
+            <AdminBreadcrumb />
+          </div>
+          {children}
+        </main>
       </div>
     </RequireRole>
   )

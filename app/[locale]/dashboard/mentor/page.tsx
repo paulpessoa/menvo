@@ -213,12 +213,14 @@ export default function MentorDashboard() {
                       link="/mentorship/mentor"
                       icon={<Clock className="w-6 h-6 text-primary" />}
                     />
-                    <QuickActionCard
-                      title="Meu Perfil Público"
-                      desc="Veja sua página pública exatamente como os mentorados a veem."
-                      link={`/mentors/${profile?.slug || profile?.id}`}
-                      icon={<Users className="w-6 h-6 text-primary" />}
-                    />
+                    {(profile?.slug || profile?.id) && (
+                      <QuickActionCard
+                        title="Meu Perfil Público"
+                        desc="Veja sua página pública exatamente como os mentorados a veem."
+                        link={`/mentors/${profile.slug || profile.id}`}
+                        icon={<Users className="w-6 h-6 text-primary" />}
+                      />
+                    )}
                   </div>
                 </div>
 

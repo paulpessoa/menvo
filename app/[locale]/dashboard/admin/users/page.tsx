@@ -44,7 +44,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useRouter, useSearchParams } from "next/navigation"
-import { AdminBreadcrumb } from "@/components/admin/AdminBreadcrumb"
 import { UserMetrics } from "@/components/admin/UserMetrics"
 import { EditUserModal } from "@/components/admin/EditUserModal"
 import { WaitingListTab } from "@/components/admin/WaitingListTab"
@@ -164,7 +163,6 @@ export default function AdminUsersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <AdminBreadcrumb />
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>

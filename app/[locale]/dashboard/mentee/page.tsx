@@ -274,7 +274,7 @@ export default function MenteeDashboard() {
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {favoriteMentorsData.map((m) => (
+                          {favoriteMentorsData.filter((m) => m.slug || m.id).map((m) => (
                             <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
                               <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
                                 <Avatar className="h-12 w-12 border">
