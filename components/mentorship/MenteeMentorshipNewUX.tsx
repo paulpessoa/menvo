@@ -3,11 +3,15 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Clock, Video, ArrowRight, Calendar } from "lucide-react"
+import { Clock, Video, Calendar } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import AppointmentsList from "@/components/appointments/AppointmentsList"
 import { useTranslations } from "next-intl"
 
+/**
+ * Interface principal moderna de mentorias para mentorados (estilo ADPList).
+ * Exibe banner de boas-vindas com paleta oficial Menvo, timeline de status e orientações de sessão.
+ */
 export function MenteeMentorshipNewUX() {
     const t = useTranslations("mentorship.newUx")
 
@@ -28,7 +32,6 @@ export function MenteeMentorshipNewUX() {
                         <Button asChild className="bg-white text-primary hover:bg-white/95 font-bold shadow-md rounded-xl border-none h-11 px-6">
                             <Link href="/mentors">
                                 {t("exploreMentors")}
-                                <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                         </Button>
                         <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 backdrop-blur-sm rounded-xl font-bold h-11 px-6">
@@ -103,7 +106,6 @@ export function MenteeMentorshipNewUX() {
                     <Button asChild className="w-full h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all text-base">
                         <Link href="/mentors">
                             {t("exploreMentors")}
-                            <ArrowRight className="ml-2 h-5 w-5" />
                         </Link>
                     </Button>
                 </div>

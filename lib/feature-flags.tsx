@@ -13,7 +13,6 @@ import React, {
  */
 export interface FeatureFlags {
   waiting_list_flag: boolean
-  new_mentorship_flag: boolean
   feedback_app_flag: boolean
   maintenance_mode_flag: boolean
 }
@@ -23,7 +22,6 @@ export interface FeatureFlags {
  */
 export const DEFAULT_FLAGS: FeatureFlags = {
   waiting_list_flag: false,
-  new_mentorship_flag: false,
   feedback_app_flag: false,
   maintenance_mode_flag: false
 }
