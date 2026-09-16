@@ -53,7 +53,7 @@ export default async function ContactPage() {
   const t = await getTranslations("contact")
 
   return (
-    <div className="container max-w-5xl mx-auto px-4 py-12 md:py-20">
+    <div className="container mx-auto px-4 py-12 md:py-20">
       {/* Header */}
       <div className="text-center space-y-4 max-w-2xl mx-auto mb-14">
         <Badge variant="secondary" className="px-3 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary border-primary/20">

@@ -62,6 +62,9 @@ implementation-plan.html
 /scripts/
 /scratch/
 
+# MCP configs with API keys (workspace-scoped, local only)
+.vscode/mcp.json
+
 # Supabase CLI
 .supabase/
 .branches

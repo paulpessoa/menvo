@@ -167,7 +167,7 @@ export default function MenteeDashboard() {
 
   return (
     <RequireRole roles={["mentee"]}>
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 ">
         <div className="space-y-8">
 
           {/* Header */}

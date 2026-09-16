@@ -16,7 +16,7 @@ const TestimonialsCarousel = dynamic(
   {
     loading: () => (
       <div className="w-full h-80 flex items-center justify-center animate-pulse">
-        <div className="h-64 w-full max-w-5xl bg-muted/40 rounded-3xl" />
+        <div className="h-64 w-full  bg-muted/40 rounded-3xl" />
       </div>
     ),
   }
@@ -45,9 +45,9 @@ export default function Home() {
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="w-full py-12 md:py-24 bg-gradient-to-b from-secondary/50 to-background overflow-hidden">
-        <div className="container max-w-7xl px-4 md:px-6 flex flex-col lg:flex-row items-center justify-between min-h-[50vh] gap-10">
+        <div className="container  px-4 md:px-6 flex flex-col lg:flex-row items-center justify-between min-h-[50vh] gap-10">
           {/* Texto */}
-          <div className="flex-1 flex flex-col justify-center items-center lg:items-start max-w-2xl">
+          <div className="flex-1 flex flex-col justify-center items-center lg:items-start ">
             <Badge variant="secondary" className="w-fit mb-4 px-3 py-0.5 text-xs font-medium rounded-full bg-primary/10 text-primary border-none">
               {t("badge.freeMentorship")}
             </Badge>
@@ -92,7 +92,7 @@ export default function Home() {
 
       {/* How It Works Section */}
       <section className="w-full py-16 md:py-24">
-        <div className="container max-w-7xl px-4 md:px-6">
+        <div className="container  px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-3">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
@@ -103,7 +103,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3 lg:gap-12">
+          <div className="mx-auto grid  grid-cols-1 gap-6 md:grid-cols-3 lg:gap-12">
             <div className="flex flex-col items-center space-y-3 text-center p-6 rounded-2xl hover:bg-muted/30 transition-colors">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/10">
                 <Search className="h-8 w-8" />
@@ -153,7 +153,7 @@ export default function Home() {
 
       {/* Testimonials Section */}
       <section className="w-full py-16 md:py-24 bg-slate-50/50">
-        <div className="container max-w-7xl px-4 md:px-6">
+        <div className="container  px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-3">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-gray-900">
@@ -171,7 +171,7 @@ export default function Home() {
       {/* CTA Section */}
       <section className="w-full py-16 md:py-20 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-        <div className="container max-w-7xl px-4 md:px-6 relative z-10">
+        <div className="container  px-4 md:px-6 relative z-10">
           <div className="flex flex-col items-center justify-center space-y-6 text-center">
             <div className="space-y-3">
               <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">

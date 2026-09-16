@@ -107,7 +107,7 @@ function LoginFormContent() {
           <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-2 transform rotate-6">
             <Lock className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-gray-900">{tc("welcome")}</CardTitle>
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">{tc("welcome")}</CardTitle>
           <CardDescription className="text-base">{t("description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 px-8">
@@ -116,7 +116,7 @@ function LoginFormContent() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-gray-700"
+              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-foreground"
               onClick={() => handleSocialLogin("google")}
               disabled={!!isSocialLoading || isLoading}
             >
@@ -148,7 +148,7 @@ function LoginFormContent() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-gray-700"
+              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-foreground"
               onClick={() => handleSocialLogin("linkedin")}
               disabled={!!isSocialLoading || isLoading}
             >
@@ -168,13 +168,13 @@ function LoginFormContent() {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
-              <span className="bg-white px-4 text-muted-foreground">{t("orContinueWith")}</span>
+              <span className="bg-card px-4 text-muted-foreground">{t("orContinueWith")}</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-bold text-gray-700 ml-1">{tc("email")}</Label>
+              <Label htmlFor="email" className="text-xs font-bold text-muted-foreground ml-1">{tc("email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -188,7 +188,7 @@ function LoginFormContent() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" title="Sua senha de acesso" className="text-xs font-bold text-gray-700 ml-1">{tc("password")}</Label>
+                <Label htmlFor="password" title="Sua senha de acesso" className="text-xs font-bold text-muted-foreground ml-1">{tc("password")}</Label>
                 <Link href="/forgot-password" className="text-xs font-bold text-primary hover:underline">
                   {t("forgotPassword")}
                 </Link>

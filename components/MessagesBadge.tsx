@@ -90,8 +90,9 @@ export function MessagesBadge() {
 
     return (
         <Button variant="ghost" size="icon" className="relative" asChild title="Mensagens">
-            <Link href="/messages">
+            <Link href="/messages" aria-label="Mensagens">
                 <MessageSquare className="h-5 w-5" />
+                <span className="sr-only">Mensagens</span>
                 {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-sm ring-2 ring-background">
                         {unreadCount > 9 ? '9+' : unreadCount}

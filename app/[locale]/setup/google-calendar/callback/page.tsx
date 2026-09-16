@@ -37,7 +37,7 @@ export default function GoogleCalendarCallbackPage() {
 
     if (error) {
         return (
-            <div className="container max-w-2xl mx-auto py-10 px-4">
+            <div className="container mx-auto py-10 px-4">
                 <Card className="border-red-200">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-red-600">
@@ -65,7 +65,7 @@ export default function GoogleCalendarCallbackPage() {
 
     if (!code) {
         return (
-            <div className="container max-w-2xl mx-auto py-10 px-4">
+            <div className="container mx-auto py-10 px-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Carregando...</CardTitle>
@@ -76,7 +76,7 @@ export default function GoogleCalendarCallbackPage() {
     }
 
     return (
-        <div className="container max-w-2xl mx-auto py-10 px-4">
+        <div className="container mx-auto py-10 px-4">
             <Card className="border-green-200">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-green-600">

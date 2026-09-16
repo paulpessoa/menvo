@@ -98,7 +98,7 @@ function SignupForm() {
   // 🚀 Se a fila de espera estiver ativa, renderiza o componente de WaitingListForm
   if (waitingListEnabled) {
     return (
-      <div className="container max-w-5xl py-10 md:py-16 flex justify-center">
+      <div className="container py-10 md:py-16 flex justify-center">
         <WaitingListForm />
       </div>
     )
@@ -147,14 +147,14 @@ function SignupForm() {
            <div className="mx-auto bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-2 transform rotate-6">
             <Lock className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-extrabold tracking-tight text-gray-900">{t("signupTitle")}</CardTitle>
+          <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">{t("signupTitle")}</CardTitle>
           <CardDescription className="text-base">{t("description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 px-8">
           <div className="grid grid-cols-1 gap-3">
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-gray-700"
+              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-foreground"
               onClick={() => handleSocialLogin("google")}
               disabled={!!isSocialLoading || isLoading}
             >
@@ -174,7 +174,7 @@ function SignupForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-gray-700"
+              className="w-full flex items-center justify-center gap-3 h-12 rounded-xl border-2 hover:bg-muted transition-all font-semibold text-foreground"
               onClick={() => handleSocialLogin("linkedin")}
               disabled={!!isSocialLoading || isLoading}
             >
@@ -194,7 +194,7 @@ function SignupForm() {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
-              <span className="bg-white px-4 text-muted-foreground">
+              <span className="bg-card px-4 text-muted-foreground">
                 {t("orContinueWith")}
               </span>
             </div>
@@ -202,15 +202,15 @@ function SignupForm() {
 
           <form onSubmit={handleSignup} className="space-y-4">
             {error && (
-              <div className="rounded-2xl bg-red-50 p-3 border-none flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-600 shrink-0" />
-                <p className="text-xs font-bold text-red-900 leading-tight">{error}</p>
+              <div className="rounded-2xl bg-destructive/10 p-3 border-none flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                <p className="text-xs font-bold text-destructive leading-tight">{error}</p>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="firstName" className="text-xs font-bold text-gray-700 ml-1">{t("firstName")}</Label>
+                <Label htmlFor="firstName" className="text-xs font-bold text-muted-foreground ml-1">{t("firstName")}</Label>
                 <Input
                   id="firstName"
                   type="text"
@@ -222,7 +222,7 @@ function SignupForm() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="lastName" className="text-xs font-bold text-gray-700 ml-1">{t("lastName")}</Label>
+                <Label htmlFor="lastName" className="text-xs font-bold text-muted-foreground ml-1">{t("lastName")}</Label>
                 <Input
                   id="lastName"
                   type="text"
@@ -236,7 +236,7 @@ function SignupForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-bold text-gray-700 ml-1">{tc("email")}</Label>
+              <Label htmlFor="email" className="text-xs font-bold text-muted-foreground ml-1">{tc("email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -249,7 +249,7 @@ function SignupForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" title="Crie uma senha segura" className="text-xs font-bold text-gray-700 ml-1">{tc("password")}</Label>
+              <Label htmlFor="password" title="Crie uma senha segura" className="text-xs font-bold text-muted-foreground ml-1">{tc("password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -262,7 +262,7 @@ function SignupForm() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" title="Repita a mesma senha" className="text-xs font-bold text-gray-700 ml-1">{t("confirmPassword")}</Label>
+              <Label htmlFor="confirmPassword" title="Repita a mesma senha" className="text-xs font-bold text-muted-foreground ml-1">{t("confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"

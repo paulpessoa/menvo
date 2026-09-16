@@ -12,7 +12,7 @@ export default function AboutPage() {
   const t = useTranslations()
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-12 md:py-20">
+    <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="flex flex-col items-center text-center space-y-6 mb-16">
         <Badge
           variant="secondary"

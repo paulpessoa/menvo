@@ -59,7 +59,7 @@ function HowItWorksContent() {
   }, [tabParam])
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 py-12 md:py-20">
+    <div className="container mx-auto px-4 py-12 md:py-20">
       {/* Header */}
       <div className="flex flex-col items-center text-center space-y-4 mb-16">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">

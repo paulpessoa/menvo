@@ -2,21 +2,40 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Mail, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect } from "react"
+import { useEffect, useState, useMemo } from "react"
 
 export default function FAQPage() {
     const t = useTranslations()
+    const [searchQuery, setSearchQuery] = useState("")
+
+    const faqItems = useMemo(() => {
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => ({
+            id: i,
+            question: t(`faq.q${i}.question`),
+            answer: t(`faq.q${i}.answer`)
+        }))
+    }, [t])
+
+    const filteredFaqs = useMemo(() => {
+        if (!searchQuery.trim()) return faqItems
+        const query = searchQuery.toLowerCase()
+        return faqItems.filter(item =>
+            item.question.toLowerCase().includes(query) ||
+            item.answer.toLowerCase().includes(query)
+        )
+    }, [searchQuery, faqItems])
 
     // Add structured data for SEO
     useEffect(() => {
-        const faqs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => ({
+        const faqs = faqItems.map(item => ({
             "@type": "Question",
-            "name": t(`faq.q${i}.question`),
+            "name": item.question,
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": t(`faq.q${i}.answer`)
+                "text": item.answer
             }
         }))
 
@@ -31,7 +50,7 @@ export default function FAQPage() {
         return () => {
             document.head.removeChild(script)
         }
-    }, [t])
+    }, [faqItems])
 
     return (
         <div className="container py-8 md:py-12">
@@ -42,117 +61,43 @@ export default function FAQPage() {
                 </p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q1.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q1.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
+            <div className="max-w-3xl mx-auto">
+                <div className="mb-8">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                            placeholder={t("faq.search") || "Buscar..."}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-10 h-12 text-base"
+                        />
+                    </div>
+                    {searchQuery && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                            {filteredFaqs.length} {filteredFaqs.length === 1 ? "resultado" : "resultados"}
+                        </p>
+                    )}
+                </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q2.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q2.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q3.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q3.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q4.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q4.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q5.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q5.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q6.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q6.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q7.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q7.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q8.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q8.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q9.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q9.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("faq.q10.question")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">
-                                {t("faq.q10.answer")}
-                            </p>
-                        </CardContent>
-                    </Card>
+                <div className="grid grid-cols-1 gap-6">
+                    {filteredFaqs.length > 0 ? (
+                        filteredFaqs.map(faq => (
+                            <Card key={faq.id}>
+                                <CardHeader>
+                                    <CardTitle>{faq.question}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-muted-foreground">
+                                        {faq.answer}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        ))
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-muted-foreground text-lg">{t("faq.noResults") || "Nenhum resultado encontrado"}</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-12 text-center">
