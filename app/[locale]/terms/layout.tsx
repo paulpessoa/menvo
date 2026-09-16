@@ -1,5 +1,4 @@
-import { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
+import type { Metadata } from "next"
 
 export async function generateMetadata({
   params
@@ -7,18 +6,14 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: "terms" })
-
-  const title = t("title") || "Termos de Serviço"
-  const description = t("intro") || "Confira os termos e condições de uso da plataforma comunitária de mentoria gratuita Menvo."
   const path = locale === "pt-BR" ? "/terms" : `/${locale}/terms`
-  const url = `https://www.menvo.com.br${path}`
 
   return {
-    title,
-    description,
+    title: "Termos de Uso | Menvo",
+    description:
+      "Termos e condições de uso da plataforma de mentoria voluntária Menvo.",
     alternates: {
-      canonical: url,
+      canonical: path,
       languages: {
         "pt-BR": "/terms",
         en: "/en/terms",
@@ -26,21 +21,20 @@ export async function generateMetadata({
       }
     },
     openGraph: {
-      title: `${title} | Menvo`,
-      description,
-      url,
+      title: "Termos de Uso | Menvo",
+      description:
+        "Termos e condições de uso da plataforma de mentoria voluntária Menvo.",
+      url: `https://www.menvo.com.br${path}`,
       siteName: "Menvo",
-      locale,
-      type: "website"
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${title} | Menvo`,
-      description
+      locale
     }
   }
 }
 
-export default function TermsLayout({ children }: { children: React.ReactNode }) {
+export default function TermsLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return children
 }

@@ -1,4 +1,4 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 
 export async function generateMetadata({
@@ -7,18 +7,18 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: "howItWorks" })
+  const t = await getTranslations({ locale, namespace: "common" })
 
-  const title = t("title") || "Como Funciona"
-  const description = t("description") || "Conectamos mentores e pessoas em busca de orientação profissional em mentorias voluntárias e 100% gratuitas."
   const path = locale === "pt-BR" ? "/how-it-works" : `/${locale}/how-it-works`
-  const url = `https://www.menvo.com.br${path}`
+  const title = `${t("howItWorks") || "Como Funciona"} | Menvo`
+  const description =
+    "Entenda como funciona a plataforma Menvo para mentores e mentorados. Conexões gratuitas de desenvolvimento profissional."
 
   return {
     title,
     description,
     alternates: {
-      canonical: url,
+      canonical: path,
       languages: {
         "pt-BR": "/how-it-works",
         en: "/en/how-it-works",
@@ -26,21 +26,19 @@ export async function generateMetadata({
       }
     },
     openGraph: {
-      title: `${title} | Menvo`,
+      title,
       description,
-      url,
+      url: `https://www.menvo.com.br${path}`,
       siteName: "Menvo",
-      locale,
-      type: "website"
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${title} | Menvo`,
-      description
+      locale
     }
   }
 }
 
-export default function HowItWorksLayout({ children }: { children: React.ReactNode }) {
+export default function HowItWorksLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return children
 }

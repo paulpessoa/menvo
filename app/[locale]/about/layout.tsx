@@ -1,4 +1,4 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 
 export async function generateMetadata({
@@ -9,16 +9,17 @@ export async function generateMetadata({
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "about" })
 
-  const title = `${t("badge")} — ${t("ourMission.title")}`
-  const description = t("ourMission.description")
   const path = locale === "pt-BR" ? "/about" : `/${locale}/about`
-  const url = `https://www.menvo.com.br${path}`
+  const title = "Sobre Nós | Menvo"
+  const description =
+    t("ourMission.description") ||
+    "Conheça a missão da Menvo de democratizar o acesso à mentoria voluntária e gratuita de carreira."
 
   return {
     title,
     description,
     alternates: {
-      canonical: url,
+      canonical: path,
       languages: {
         "pt-BR": "/about",
         en: "/en/about",
@@ -26,21 +27,19 @@ export async function generateMetadata({
       }
     },
     openGraph: {
-      title: `${title} | Menvo`,
+      title,
       description,
-      url,
+      url: `https://www.menvo.com.br${path}`,
       siteName: "Menvo",
-      locale,
-      type: "website"
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${title} | Menvo`,
-      description
+      locale
     }
   }
 }
 
-export default function AboutLayout({ children }: { children: React.ReactNode }) {
+export default function AboutLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return children
 }

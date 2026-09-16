@@ -1,13 +1,14 @@
 # 💓 HEARTBEAT — Single Source of Truth
 
 ## 📅 Last Updated: 2026-09-16
-**Current Status:** Componente compartilhado `PageContainer` introduzido e padronizado em todas as rotas do `/dashboard/admin/*` e `/mentors`, `AdminBreadcrumb` obsoleto removido, 123 dead clicks em `/mentors` corrigidos (card clicável por inteiro e chips de filtro responsivos), e feature flag legada de mentoria removida.
+**Current Status:** Resolução completa dos problemas do Google Search Console (robots.txt, error boundaries, canonicals, 301 redirects, sitemap) e ocultação do mentor de teste na listagem pública via status público (`is_public = false`, `profile_visibility = 'private'`) com preservação total dos dados no banco.
 
 ---
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 120/120 passed across 25 test suites (`npm test`)
+- **Unit Tests:** 124/124 passed across 25 test suites (`npm test`)
+- **Production Build:** 55/55 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
 ---

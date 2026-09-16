@@ -22,7 +22,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: {
-      canonical: url,
+      canonical: path,
       languages: {
         "pt-BR": "/contact",
         en: "/en/contact",

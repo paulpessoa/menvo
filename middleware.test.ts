@@ -94,3 +94,37 @@ describe('middleware role protection', () => {
     expect(res.status).not.toBe(307)
   })
 })
+
+describe('middleware 301 SEO redirects', () => {
+  it('redirects /register and /auth/register to /signup with 301', async () => {
+    const res1 = await middleware(makeRequest('/register'))
+    expect(res1.status).toBe(301)
+    expect(res1.headers.get('location')).toContain('/signup')
+
+    const res2 = await middleware(makeRequest('/auth/register'))
+    expect(res2.status).toBe(301)
+    expect(res2.headers.get('location')).toContain('/signup')
+  })
+
+  it('redirects legacy /mentors/id and /organizations to /mentors with 301', async () => {
+    const res1 = await middleware(makeRequest('/mentors/id'))
+    expect(res1.status).toBe(301)
+    expect(res1.headers.get('location')).toContain('/mentors')
+
+    const res2 = await middleware(makeRequest('/organizations'))
+    expect(res2.status).toBe(301)
+    expect(res2.headers.get('location')).toContain('/mentors')
+  })
+
+  it('redirects obsolete test locales like /sv/how-it-works to clean path with 301', async () => {
+    const res = await middleware(makeRequest('/sv/how-it-works'))
+    expect(res.status).toBe(301)
+    expect(res.headers.get('location')).toContain('/how-it-works')
+  })
+
+  it('redirects broken path /$ to / with 301', async () => {
+    const res = await middleware(makeRequest('/$'))
+    expect(res.status).toBe(301)
+    expect(res.headers.get('location')).toBe('http://localhost:3000/')
+  })
+})

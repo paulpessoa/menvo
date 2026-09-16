@@ -3,30 +3,12 @@
 
 User-agent: *
 Allow: /
+Allow: /_next/static/
+Allow: /_next/image/
 Allow: /llms.txt
 Allow: /llms-full.txt
 
-# AI Search & LLM Crawlers (Allowed)
-User-agent: GPTBot
-User-agent: ChatGPT-User
-User-agent: ClaudeBot
-User-agent: Claude-Web
-User-agent: PerplexityBot
-User-agent: Google-Extended
-User-agent: GoogleOther
-User-agent: Applebot-Extended
-User-agent: meta-externalagent
-User-agent: Bytespider
-User-agent: CCBot
-User-agent: Diffbot
-User-agent: Cohere-ai
-Allow: /
-
-# Disallow private and technical areas
-# Bare form blocks the default locale (pt-BR, no URL prefix); the /en/ and
-# /es/ forms are required too since a plain "Disallow: /dashboard/" only
-# matches paths that literally start with that string and would silently
-# leave the localized paths of every private area crawlable.
+# Disallow private, administrative and user-specific paths across locales
 Disallow: /api/
 Disallow: /admin/
 Disallow: /dashboard/
@@ -44,20 +26,63 @@ Disallow: /es/messages/
 Disallow: /appointments/
 Disallow: /en/appointments/
 Disallow: /es/appointments/
-Disallow: /onboarding
-Disallow: /en/onboarding
-Disallow: /es/onboarding
+Disallow: /mentee/
+Disallow: /en/mentee/
+Disallow: /es/mentee/
 Disallow: /mentorship/
 Disallow: /en/mentorship/
 Disallow: /es/mentorship/
+Disallow: /onboarding
+Disallow: /en/onboarding
+Disallow: /es/onboarding
 Disallow: /setup/
 Disallow: /en/setup/
 Disallow: /es/setup/
 Disallow: /unauthorized
 Disallow: /en/unauthorized
 Disallow: /es/unauthorized
-Disallow: /_next/
+Disallow: /confirmation
+Disallow: /en/confirmation
+Disallow: /es/confirmation
+Disallow: /feedback
+Disallow: /en/feedback
+Disallow: /es/feedback
+Disallow: /quiz/results/
+Disallow: /en/quiz/results/
+Disallow: /es/quiz/results/
+Disallow: /auth/
+Disallow: /pt-BR/auth/
+Disallow: /en/auth/
+Disallow: /es/auth/
 Disallow: /callback
+
+# AI Search & LLM Crawlers (Allowed for public content, restricted on private data)
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: GoogleOther
+User-agent: Applebot-Extended
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: CCBot
+User-agent: Diffbot
+User-agent: Cohere-ai
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /settings/
+Disallow: /profile/
+Disallow: /messages/
+Disallow: /appointments/
+Disallow: /mentee/
+Disallow: /onboarding
+Disallow: /quiz/results/
 
 # Sitemap & LLM Knowledge
 Sitemap: https://www.menvo.com.br/sitemap.xml

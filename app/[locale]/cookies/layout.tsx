@@ -6,24 +6,24 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  const path = locale === "pt-BR" ? "/doar" : `/${locale}/doar`
+  const path = locale === "pt-BR" ? "/cookies" : `/${locale}/cookies`
 
   return {
-    title: "Apoie a Menvo | Doações",
+    title: "Política de Cookies | Menvo",
     description:
-      "Apoie a plataforma Menvo a continuar oferecendo mentorias voluntárias e gratuitas para milhares de pessoas em todo o Brasil.",
+      "Informações sobre a utilização de cookies e tecnologias de rastreamento na plataforma Menvo.",
     alternates: {
       canonical: path,
       languages: {
-        "pt-BR": "/doar",
-        en: "/en/doar",
-        es: "/es/doar"
+        "pt-BR": "/cookies",
+        en: "/en/cookies",
+        es: "/es/cookies"
       }
     },
     openGraph: {
-      title: "Apoie a Menvo | Doações",
+      title: "Política de Cookies | Menvo",
       description:
-        "Apoie a plataforma Menvo a continuar oferecendo mentorias voluntárias e gratuitas.",
+        "Informações sobre a utilização de cookies e tecnologias de rastreamento na plataforma Menvo.",
       url: `https://www.menvo.com.br${path}`,
       siteName: "Menvo",
       locale
@@ -31,7 +31,7 @@ export async function generateMetadata({
   }
 }
 
-export default function DoarLayout({
+export default function CookiesLayout({
   children
 }: {
   children: React.ReactNode

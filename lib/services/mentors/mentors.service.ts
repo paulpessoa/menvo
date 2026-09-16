@@ -64,6 +64,7 @@ class MentorService {
       `,
         { count: "exact" }
       )
+      .eq("is_public", true)
       .not("mentor_skills", "is", null)
 
     // Filtro de busca genérica
@@ -375,7 +376,7 @@ class MentorService {
         created_at
       `,
       { count: "exact" }
-    )
+    ).eq("is_public", true)
 
     if (filters.search && filters.search.trim() !== "") {
       const sanitized = filters.search.trim().replace(/[,()]/g, " ")
@@ -458,9 +459,11 @@ class MentorService {
     topics: string[]
     inclusiveTags: string[]
   }> {
-    const { data, error } = await (this.supabase.from("mentors_view") as any).select(
-      "country, state, city, languages, mentorship_topics, inclusive_tags"
-    )
+    const { data, error } = await (this.supabase.from("mentors_view") as any)
+      .select(
+        "country, state, city, languages, mentorship_topics, inclusive_tags"
+      )
+      .eq("is_public", true)
 
     if (error) throw error
 

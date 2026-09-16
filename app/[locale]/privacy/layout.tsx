@@ -1,5 +1,4 @@
-import { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
+import type { Metadata } from "next"
 
 export async function generateMetadata({
   params
@@ -7,18 +6,14 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>
 }): Promise<Metadata> {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: "privacy" })
-
-  const title = t("title") || "Política de Privacidade"
-  const description = t("intro") || "Saiba como o Menvo protege suas informações pessoais e assegura a privacidade em todas as interações."
   const path = locale === "pt-BR" ? "/privacy" : `/${locale}/privacy`
-  const url = `https://www.menvo.com.br${path}`
 
   return {
-    title,
-    description,
+    title: "Política de Privacidade | Menvo",
+    description:
+      "Política de privacidade e proteção de dados da plataforma Menvo em conformidade com a LGPD.",
     alternates: {
-      canonical: url,
+      canonical: path,
       languages: {
         "pt-BR": "/privacy",
         en: "/en/privacy",
@@ -26,21 +21,20 @@ export async function generateMetadata({
       }
     },
     openGraph: {
-      title: `${title} | Menvo`,
-      description,
-      url,
+      title: "Política de Privacidade | Menvo",
+      description:
+        "Política de privacidade e proteção de dados da plataforma Menvo em conformidade com a LGPD.",
+      url: `https://www.menvo.com.br${path}`,
       siteName: "Menvo",
-      locale,
-      type: "website"
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${title} | Menvo`,
-      description
+      locale
     }
   }
 }
 
-export default function PrivacyLayout({ children }: { children: React.ReactNode }) {
+export default function PrivacyLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
   return children
 }

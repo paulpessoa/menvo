@@ -15,16 +15,45 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = request.headers.get("host") || ""
 
-  // 0. Enforce www domain
-  if (process.env.NODE_ENV === "production" && !hostname.startsWith("www.")) {
+  // 0. Enforce www domain in production
+  if (process.env.NODE_ENV === "production" && hostname === "menvo.com.br") {
     const newUrl = new URL(request.url)
-    newUrl.hostname = `www.${hostname}`
+    newUrl.hostname = "www.menvo.com.br"
     return NextResponse.redirect(newUrl, 301)
   }
 
-  // 1. Handle obsolete routes
-  if (pathname.includes("/organizations")) {
+  // 1. Broken / test paths cleanup
+  if (pathname === "/$") {
+    return NextResponse.redirect(new URL("/", request.url), 301)
+  }
+
+  // 2. Handle obsolete test locales (e.g. /sv, /da, /fr from old experiments)
+  const obsoleteLocales = ["sv", "da", "fr"]
+  for (const obs of obsoleteLocales) {
+    if (pathname === `/${obs}` || pathname.startsWith(`/${obs}/`)) {
+      const remainder = pathname.replace(new RegExp(`^/${obs}`), "") || "/"
+      if (remainder.includes("maps") || remainder.includes("organizations")) {
+        return NextResponse.redirect(new URL("/mentors", request.url), 301)
+      }
+      if (remainder.includes("register")) {
+        return NextResponse.redirect(new URL("/signup", request.url), 301)
+      }
+      return NextResponse.redirect(new URL(remainder, request.url), 301)
+    }
+  }
+
+  // 3. Handle obsolete routes (organizations, legacy mentors/id, undefined params)
+  if (
+    pathname.includes("/organizations") ||
+    pathname.includes("/mentors/id") ||
+    pathname.includes("/undefined")
+  ) {
     return NextResponse.redirect(new URL("/mentors", request.url), 301)
+  }
+
+  // 4. Handle /register and /auth/register -> /signup
+  if (pathname === "/register" || pathname.endsWith("/register")) {
+    return NextResponse.redirect(new URL("/signup", request.url), 301)
   }
 
   // --- FIX 20-04-26 PRIORITÁRIO ---
@@ -34,7 +63,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // 1. Detect and redirect legacy /auth/* paths to clean paths
+  // 5. Detect and redirect legacy /auth/* paths to clean paths
   const locales = routing.locales
   for (const locale of locales) {
     if (pathname.startsWith(`/${locale}/auth/`)) {

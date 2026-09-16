@@ -1,5 +1,13 @@
 import { Link } from "@/i18n/routing"
 import Image from "next/image"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true
+  }
+}
 
 interface AuthLayoutProps {
   children: React.ReactNode

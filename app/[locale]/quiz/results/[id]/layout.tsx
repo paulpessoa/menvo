@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   }
 }
 
-export default function OnboardingLayout({
+export default function QuizResultsLayout({
   children
 }: {
   children: React.ReactNode

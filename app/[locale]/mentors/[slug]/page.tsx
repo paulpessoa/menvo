@@ -13,48 +13,68 @@ interface PageProps {
 export async function generateMetadata({
   params
 }: PageProps): Promise<Metadata> {
-  const { slug } = await params
-  const data = await mentorPublicService.getMentorBySlugOrId(slug)
+  try {
+    const { slug } = await params
+    const data = await mentorPublicService.getMentorBySlugOrId(slug)
 
-  if (!data) {
+    if (!data) {
+      return {
+        title: "Mentor não encontrado | Menvo",
+        description: "O mentor que você procura não está disponível.",
+        robots: {
+          index: false,
+          follow: false
+        }
+      }
+    }
+
+    const { mentor } = data
+    const title = `${mentor.full_name} - ${mentor.job_title || "Mentor"} | Menvo`
+    const description =
+      mentor.bio?.substring(0, 160) ||
+      `Conecte-se com ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 3).join(", ") || "diversas áreas"}. Mentorias 100% gratuitas.`
+
+    const imageUrl =
+      mentor.avatar_url || "https://www.menvo.com.br/images/menvopeople.jpg"
+    const canonicalPath = `/mentors/${slug}`
+
+    return {
+      title,
+      description,
+      openGraph: {
+        type: "profile",
+        url: `https://www.menvo.com.br${canonicalPath}`,
+        title,
+        description,
+        images: [
+          { url: imageUrl, width: 1200, height: 630, alt: mentor.full_name || title }
+        ],
+        siteName: "Menvo",
+        locale: "pt_BR"
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [imageUrl]
+      },
+      alternates: {
+        canonical: canonicalPath,
+        languages: {
+          "pt-BR": `/mentors/${slug}`,
+          en: `/en/mentors/${slug}`,
+          es: `/es/mentors/${slug}`
+        }
+      }
+    }
+  } catch (error) {
+    console.error("[mentors/[slug]] Erro em generateMetadata:", error)
     return {
       title: "Mentor não encontrado | Menvo",
-      description: "O mentor que você procura não está disponível."
-    }
-  }
-
-  const { mentor } = data
-  const title = `${mentor.full_name} - ${mentor.job_title || "Mentor"} | Menvo`
-  const description =
-    mentor.bio?.substring(0, 160) ||
-    `Conecte-se com ${mentor.full_name}, mentor especializado em ${mentor.mentorship_topics?.slice(0, 3).join(", ") || "diversas áreas"}. Mentorias 100% gratuitas.`
-
-  const imageUrl =
-    mentor.avatar_url || `${process.env.NEXT_PUBLIC_SITE_URL}/og-default.png`
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/mentors/${slug}`
-
-  return {
-    title,
-    description,
-    openGraph: {
-      type: "profile",
-      url,
-      title,
-      description,
-      images: [
-        { url: imageUrl, width: 1200, height: 630, alt: mentor.full_name || title }
-      ],
-      siteName: "Menvo",
-      locale: "pt_BR"
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [imageUrl]
-    },
-    alternates: {
-      canonical: url
+      robots: {
+        index: false,
+        follow: false
+      }
     }
   }
 }
@@ -63,8 +83,14 @@ export async function generateMetadata({
 export const revalidate = 3600
 
 export default async function MentorProfilePage({ params }: PageProps) {
-  const { slug } = await params
-  const data = await mentorPublicService.getMentorBySlugOrId(slug)
+  let data = null
+  try {
+    const { slug } = await params
+    data = await mentorPublicService.getMentorBySlugOrId(slug)
+  } catch (error) {
+    console.error("[mentors/[slug]] Erro ao carregar página do mentor:", error)
+    notFound()
+  }
 
   if (!data) {
     notFound()

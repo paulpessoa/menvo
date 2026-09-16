@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   }
 }
 
-export default function OnboardingLayout({
+export default function FeedbackLayout({
   children
 }: {
   children: React.ReactNode
