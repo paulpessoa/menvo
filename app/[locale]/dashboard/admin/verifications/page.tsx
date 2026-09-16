@@ -97,7 +97,7 @@ export default function AdminVerificationsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 md:py-12 max-w-6xl">
+    <div className="container py-8 md:py-12">
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
