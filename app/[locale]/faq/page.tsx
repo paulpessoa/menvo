@@ -66,7 +66,7 @@ export default function FAQPage() {
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
-                            placeholder={t("faq.search") || "Buscar..."}
+                            placeholder={t("faq.search")}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10 h-12 text-base"
@@ -74,7 +74,7 @@ export default function FAQPage() {
                     </div>
                     {searchQuery && (
                         <p className="text-sm text-muted-foreground mt-2">
-                            {filteredFaqs.length} {filteredFaqs.length === 1 ? "resultado" : "resultados"}
+                            {filteredFaqs.length} {filteredFaqs.length === 1 ? t("faq.resultSingular") : t("faq.resultPlural")}
                         </p>
                     )}
                 </div>
@@ -95,7 +95,7 @@ export default function FAQPage() {
                         ))
                     ) : (
                         <div className="text-center py-12">
-                            <p className="text-muted-foreground text-lg">{t("faq.noResults") || "Nenhum resultado encontrado"}</p>
+                            <p className="text-muted-foreground text-lg">{t("faq.noResults")}</p>
                         </div>
                     )}
                 </div>

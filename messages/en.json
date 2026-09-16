@@ -432,6 +432,10 @@
       "question": "Can I be both a mentor and mentee?",
       "answer": "Yes! You can have both profiles on the platform. Many professionals seek mentorship in specific areas while mentoring in their areas of expertise."
     },
+    "search": "Search questions...",
+    "noResults": "No results found",
+    "resultSingular": "result",
+    "resultPlural": "results",
     "stillHaveQuestions": "Still have questions?",
     "supportDescription": "Our support team is here to help you with any questions you may have.",
     "contactSupport": "Contact Support"

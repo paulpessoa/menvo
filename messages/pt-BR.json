@@ -431,6 +431,10 @@
       "question": "Posso ser mentor e mentorado ao mesmo tempo?",
       "answer": "Sim! Você pode ter ambos os perfis na plataforma. Muitos profissionais buscam mentoria em áreas específicas enquanto mentoram em suas áreas de expertise."
     },
+    "search": "Buscar perguntas...",
+    "noResults": "Nenhum resultado encontrado",
+    "resultSingular": "resultado",
+    "resultPlural": "resultados",
     "stillHaveQuestions": "Ainda tem dúvidas?",
     "supportDescription": "Nossa equipe de suporte está aqui para ajudar com qualquer pergunta que você tenha.",
     "contactSupport": "Fale com o Suporte"

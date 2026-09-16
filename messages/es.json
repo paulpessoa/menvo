@@ -431,6 +431,10 @@
       "question": "¿Puedo ser mentor y mentee al mismo tiempo?",
       "answer": "¡Sí! Puedes tener ambos perfiles en la plataforma. Muchos profesionales buscan mentoría en áreas específicas mientras mentorizan en sus áreas de especialización."
     },
+    "search": "Buscar preguntas...",
+    "noResults": "No se encontraron resultados",
+    "resultSingular": "resultado",
+    "resultPlural": "resultados",
     "stillHaveQuestions": "¿Todavía tienes preguntas?",
     "supportDescription": "Nuestro equipo de soporte está aquí para ayudarte con cualquier pregunta que puedas tener.",
     "contactSupport": "Contactar Soporte"
