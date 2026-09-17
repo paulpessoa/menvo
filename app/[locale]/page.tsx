@@ -8,8 +8,14 @@ import { Calendar, MessageSquare, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
-import { QuizDiscoverySection } from "@/components/QuizDiscoverySection"
 import { useAuth } from "@/lib/auth"
+
+const QuizDiscoverySection = dynamic(
+  () => import("@/components/QuizDiscoverySection").then((mod) => mod.QuizDiscoverySection),
+  {
+    loading: () => <div className="w-full h-48 animate-pulse bg-muted/20" />,
+  }
+)
 
 const TestimonialsCarousel = dynamic(
   () => import("@/components/TestimonialsCarousel").then((mod) => mod.TestimonialsCarousel),
