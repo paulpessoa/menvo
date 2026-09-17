@@ -227,3 +227,106 @@ on `feat/multi-tenant-phase1` (PR #45):
   Fine for the pilot; fix if Gira's beneficiaries trip on it.
 - Org affiliation isn't shown on public mentor cards yet.
 - Test org "Org Teste Claude" (suspended) can be deleted from the SQL editor.
+
+---
+
+## 6. Phase 1.5 — plan (2026-09-17, agreed with founder, not started)
+
+Triggered by review of the merged Phase 1 (#45). Three founder questions
+and the answers we're building to:
+
+**Q1. Can an org add mentors *and* admins, or one or the other?**
+Both, and it needs no new membership role. A member is whatever they already
+are on the platform (`user_roles`: mentor or mentee). So:
+`organization_members.role` stays `admin | member`, and the org dashboard
+*derives* "beneficiary" vs "org mentor" from the person's platform role.
+An org admin can also be a mentor or mentee themselves. Reports split by
+that derived kind.
+
+**Q2. Should the org choose whether `/o/[slug]` is public?**
+Yes — `organizations.join_policy`: `open` (default; anyone logged in can
+request) | `invite_only` (page still resolves for people who hold an invite
+link, but shows "participação por convite" and no request button; excluded
+from sitemap, `noindex`). Requesting always requires login (that's already
+the case); the policy only controls whether strangers can *ask*.
+
+**Q3. Emails must be coherent with the above.** Yes — copy is picked by the
+recipient's platform role (mentor vs mentee), and the sentence "acompanha
+sua jornada ... mentores dedicados a ela" goes away. See 6.3.
+
+### 6.1 Data
+- Migration `20260921000003_org_join_policy.sql`:
+  `alter table organizations add column join_policy text not null
+  default 'open' check (join_policy in ('open','invite_only'))`.
+  Update `organization_members_self_request` policy to also require
+  `o.join_policy = 'open'` in its `exists(...)` subquery.
+- Regenerate `lib/types/supabase.ts` (`npm run db:types`) after push.
+
+### 6.2 API
+- `GET /api/org/[id]` (`app/api/org/[id]/route.ts`): for each member also
+  return `platformRole: 'mentor' | 'mentee' | null` (join `user_roles ->
+  roles(name)`; pick mentor if present, else mentee). Add `summary`:
+  `{ beneficiaries, mentors, pendingRequests, pendingInvites,
+  sessionsBookedByBeneficiaries, sessionsGivenByOrgMentors }`.
+  `sessionsGivenByOrgMentors` = appointments where `mentor_id` in org
+  mentor ids.
+- `PATCH /api/org/[id]` (new): org admin updates `join_policy` (zod enum).
+- `POST /api/me/organizations`: return 403 with a clear message when
+  `join_policy = 'invite_only'` and no invite row exists.
+- `POST /api/org/[id]/members` (invite): pass the invitee's platform role
+  to the email so the copy matches.
+
+### 6.3 Emails (`lib/email/brevo.ts`)
+Rewrite the three org templates with role-aware copy:
+- `sendOrgInvite({ ..., recipientRole })`:
+  - mentee: "A {org} quer acompanhar sua jornada de mentoria na Menvo.
+    Ao aceitar, a organização passa a ver seu progresso (sessões, quiz)
+    para te apoiar melhor."
+  - mentor: "A {org} quer contar com você como mentor(a) do grupo dela na
+    Menvo. Ao aceitar, você aparece como mentor da organização e pode
+    receber pedidos dos beneficiários dela."
+- `sendOrgMembershipApproved({ ..., recipientRole })`: same split; the
+  CTA is "Encontrar um mentor" for mentees and "Ver minha agenda" for
+  mentors. Drop "Tudo continua gratuito" (true, but reads as a disclaimer).
+- `sendOrgJoinRequestToAdmin`: include "(mentor)"/"(mentorado)" after the
+  requester's name.
+- Update the three `case 'org_*'` previews accordingly; add a mentor
+  variant preview key (`org_invite_mentor`) so the admin can see both.
+
+### 6.4 UI
+- `/dashboard/org` (`app/[locale]/dashboard/org/page.tsx`):
+  - Header cards: Beneficiários / Mentores / Sessões (from `summary`).
+  - Split the members table into two: "Beneficiários" and "Mentores da
+    organização" (by `platformRole`). Keep invite + pending panels.
+  - Settings card: "Página pública" toggle → `join_policy`, with helper
+    text: "Aberta: qualquer pessoa logada pode solicitar. Somente por
+    convite: só quem você convidar entra."
+- `/o/[slug]` + `JoinOrganizationButton`: when `invite_only` and viewer
+  has no invite row, render "Esta organização entra por convite" (no
+  request button). When invited, keep "Aceitar convite".
+- `OrganizationsTab` (profile): show "Mentor da organização" vs
+  "Beneficiário" badge next to each active membership, from the viewer's
+  own platform role.
+- `MentorCard`/mentor profile: small "Mentor da {org}" chip for active
+  org mentors — **only if** the org is `open` (an invite-only org is not
+  advertised on public cards). Skip if it complicates the card; note it in
+  §7 instead.
+
+### 6.5 SEO / sitemap
+- `app/sitemap.ts`: add `/o/[slug]` for every org with `status='active'
+  and join_policy='open'`, all locales, priority 0.6, weekly.
+- `app/[locale]/o/[slug]/page.tsx`: `generateMetadata` with title
+  "{org.name} na Menvo", description, OG image (site default), canonical;
+  `robots: { index: false }` when `invite_only`.
+- `public/robots.txt`: nothing to add (`/o/` is public by design).
+- `llms.txt` / `llms-full.txt`: one line describing partner org pages.
+
+### 6.6 Cleanup / docs
+- `docs/MULTI_TENANT_ROADMAP.md`: fold this section into §5 once shipped.
+- Delete test org "Org Teste Claude" via SQL editor once done.
+
+### 6.7 Verification
+- `tsc --noEmit`, jest, then in preview: toggle `join_policy`, confirm the
+  landing hides the request button and sitemap.xml drops the org; invite a
+  mentor and a mentee and check both email previews; org dashboard shows
+  the two tables and correct counts.
