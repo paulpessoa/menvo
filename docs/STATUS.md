@@ -193,5 +193,12 @@ mentor has connected Calendar yet), `feedback` (the `/feedback` page form),
 far), `validation_requests` (mentor verification workflow,
 `/api/profile/role`).
 
-**Not done yet:** migration squash (90 empty `*_remote_baseline.sql`
-placeholders → 1 real baseline). Next step when picked back up.
+**Skipped: migration squash** (90 empty `*_remote_baseline.sql`
+placeholders → 1 real baseline). Both `supabase migration squash` and
+`supabase db dump` need Docker/Podman locally (`LegacyImagePrepullError`
+without it) to spin up a shadow database for the diff — founder declined
+to install Docker. No functional impact: the placeholders are empty files
+that only exist so `db push` doesn't see remote-only history and refuse to
+run; they don't affect the app or the real schema. Purely cosmetic clutter
+in `supabase/migrations/`. Revisit if Podman (lighter, same CLI interface)
+becomes acceptable, or from a machine that already has a container runtime.
