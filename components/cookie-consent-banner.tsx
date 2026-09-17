@@ -113,7 +113,6 @@ export function CookieConsentBanner() {
                 <Link
                   href="/cookies"
                   className="underline hover:text-foreground"
-                  aria-label={`${t("cookieConsent.learnMore")} — ${t("cookieConsent.title")}`}
                 >
                   {t("cookieConsent.learnMore")}
                 </Link>

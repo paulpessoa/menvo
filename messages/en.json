@@ -114,7 +114,7 @@
         "title": "Connect & Grow",
         "description": "Meet virtually, share experiences, and develop your skills with personalized guidance."
       },
-      "learnMore": "Learn More"
+      "learnMore": "Learn how Menvo works"
     },
     "featuredMentors": {
       "title": "Featured Mentors",
@@ -913,7 +913,7 @@
   "cookieConsent": {
     "title": "We use cookies",
     "description": "We use essential cookies for site functionality and analytics cookies to improve your experience. You can choose which cookies to accept.",
-    "learnMore": "Learn more",
+    "learnMore": "Learn more about our Cookie Policy",
     "acceptAll": "Accept All",
     "acceptNecessary": "Necessary Only",
     "customize": "Customize",

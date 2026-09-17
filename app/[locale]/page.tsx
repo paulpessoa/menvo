@@ -140,7 +140,7 @@ export default function Home() {
           </div>
           <div className="flex justify-center mt-12">
             <Button variant="outline" asChild>
-              <Link href="/how-it-works" aria-label={`${t("howItWorks.learnMore")} — ${t("howItWorks.title")}`}>
+              <Link href="/how-it-works">
                 {t("howItWorks.learnMore")}
               </Link>
             </Button>
