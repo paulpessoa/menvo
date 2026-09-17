@@ -202,3 +202,14 @@ that only exist so `db push` doesn't see remote-only history and refuse to
 run; they don't affect the app or the real schema. Purely cosmetic clutter
 in `supabase/migrations/`. Revisit if Podman (lighter, same CLI interface)
 becomes acceptable, or from a machine that already has a container runtime.
+
+---
+
+## 🧪 Evals — 2026-09-17
+
+Added `evals/` (`npm run eval:match`): 20 real-model test cases for
+`lib/services/ai/groq.service.ts`, the AI mentor-matching prompt. Not part
+of `npm test` — makes real LLM calls (cost, non-deterministic), so it's a
+manual gate before changing the prompt/model, not a CI check. Baseline:
+**20/20 (100%), ~2.5s avg latency** against `gpt-4o-mini`. See
+`evals/README.md`.
