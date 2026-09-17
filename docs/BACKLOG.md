@@ -25,6 +25,6 @@
 
 ## 🔵 P3 — Future / Strategic
 - [ ] **Multi-Tenant for Partner Organizations:** Offer Menvo as infrastructure for NGOs/institutions (Instituto Gira, Porto Social, hackathons, SEBRAE) to register their own beneficiaries and tap into the mentor pool. See [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) — blocked on a scoping call with a first pilot partner and a live DB check for leftover `organizations` schema from the previously-removed v1.
-- [x] **UI Width/Container Standardization & Breadcrumb Removal:** Introduced shared `PageContainer` component (`components/layout/PageContainer.tsx`), standardized container widths/padding across all 8 `/dashboard/admin/*` routes and `/mentors`, and eliminated the obsolete/detached `AdminBreadcrumb`. See [`docs/UI_CONSISTENCY_AUDIT.md`](UI_CONSISTENCY_AUDIT.md).
+- [x] **UI Width/Container Standardization & Breadcrumb Removal:** Introduced shared `PageContainer` component (`components/layout/PageContainer.tsx`), standardized container widths/padding across all 8 `/dashboard/admin/*` routes, `/mentors`, and all remaining public/dashboard pages (1280px cap app-wide), and eliminated the obsolete/detached `AdminBreadcrumb`.
 - [x] **`/mentors` Dead-Click Investigation & Fix:** Fixed the 123 dead clicks on `/mentors` by making the entire `MentorCard` interactive (`cursor-pointer`, `onClick`, keyboard support on photo, name, bio, and container) while isolating the favorite button, and made active filter chips dismissable on entire badge click. See [`docs/CLARITY_INSIGHTS.md`](CLARITY_INSIGHTS.md).
 

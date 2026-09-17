@@ -63,9 +63,7 @@
 
 | File | Purpose |
 |---|---|
-| [`docs/NEXT_SESSION.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/NEXT_SESSION.md) | **Start here** — what changed overnight and what's next |
-| [`docs/MULTI_TENANT_ROADMAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/MULTI_TENANT_ROADMAP.md) | Proposal: offering Menvo to partner orgs (Gira, Porto Social, etc.) |
-| [`docs/UI_CONSISTENCY_AUDIT.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/UI_CONSISTENCY_AUDIT.md) | Width/container and breadcrumb inconsistency findings |
+| [`docs/MULTI_TENANT_ROADMAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/MULTI_TENANT_ROADMAP.md) | Proposal: offering Menvo to partner orgs (Gira, Porto Social, etc.) — decisions taken, Phase 1 design ready, awaiting go to build |
 | [`docs/CLARITY_INSIGHTS.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/CLARITY_INSIGHTS.md) | Analytics snapshot: traffic, devices, friction points |
 | [`docs/BACKLOG.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/BACKLOG.md) | Prioritized product items (P0–P3) |
 | [`docs/DATA_FLOW_MAP.md`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/docs/DATA_FLOW_MAP.md) | Mapeamento de fluxo de dados, TanStack Query, Services e BFF |
