@@ -142,3 +142,56 @@ started.
 | [`docs/SCHEDULING_AND_AVAILABILITY.md`](SCHEDULING_AND_AVAILABILITY.md) | Availability algorithm, 14-day projection, conflict detection |
 | [`docs/ENVIRONMENT_VARIABLES.md`](ENVIRONMENT_VARIABLES.md) | Active environment variables reference across environments |
 | [`docs/SEO_GUIDE.md`](SEO_GUIDE.md) | Search engine, LLMs/Geo SEO, and image guidelines |
+
+---
+
+## 🗄️ DB audit — 2026-09-17
+
+Triggered by the founder's questions about vector search, an agent, messy
+migrations, and Supabase coupling. Full plan and reasoning:
+[`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) is org-specific;
+the broader architecture plan lives in this session's approved plan
+(vectors: not yet, pgvector when there's a real trigger; chat agent:
+LangChain.js + Groq/Gemini behind a flag, later; Supabase: keep for now,
+extract service layers incrementally — see journal entry below).
+
+**Row counts at audit time** (`count(*)` via service-role client, all
+public tables): `profiles` 684, `user_roles` 617, `waiting_list` 43,
+`user_favorites` 5, `feature_flag_audit_logs` 4, `mentor_availability` 4,
+`quiz_responses` 4, `feature_flags` 3, `roles` 3, `appointments` 1,
+`conversations` 1, `messages` 1, `organization_members` 1,
+`mentor_visibility_settings` 2, `newsletter_subscriptions` 2,
+`organizations` 2 — everything else (`admin_actions`, `admin_audit_logs`,
+`ai_missing_demands`, `appointment_feedbacks`, `feedback`,
+`google_calendar_tokens`, `mentor_suggestions`, `mentor_verification`,
+`quiz_mentors`, `validation_requests`, `verification_logs`) was 0.
+
+**Dropped** (migration `20260921000003_drop_dead_objects.sql`) — zero rows
+*and* zero references anywhere in `app`/`lib`, confirmed with `git grep`
+before touching anything:
+- `admin_actions`, `quiz_mentors`, `verification_logs`, `mentor_verification`
+- `mentor_suggestions` + its view (`mentor_suggestions_view`) + the 6
+  functions that only existed to read/write it
+  (`get_mentor_suggestions_stats`, `get_most_active_suggesters`,
+  `get_most_suggested_free_topics`, `get_most_suggested_inclusion_tags`,
+  `get_most_suggested_knowledge_topics`, `mark_old_suggestions_as_expired`)
+- The 8 orphaned v1 organizations functions (`check_organization_quota`,
+  `get_mentors_by_organization`, `is_organization_admin`,
+  `user_has_partner_access`, `get_expiring_memberships`,
+  `expire_pending_invitations`, `get_visible_mentor_ids`,
+  `is_mentor_visible_to_user`) — **these had already failed to drop once**:
+  migration `20260921000000` guessed a `(uuid)` parameter signature that
+  didn't match the real one, so `drop function if exists x(uuid);` silently
+  no-op'd. Fixed by using the bare name (`drop function if exists x;`),
+  which Postgres resolves without a signature when it's unambiguous.
+
+**Kept despite 0 rows** — real, wired-up features that just haven't been
+used yet, not dead code: `ai_missing_demands` (logged by `/api/ai/match`
+when no mentor matches), `google_calendar_tokens` (per-mentor OAuth, no
+mentor has connected Calendar yet), `feedback` (the `/feedback` page form),
+`appointment_feedbacks` (session ratings — only 1 appointment exists so
+far), `validation_requests` (mentor verification workflow,
+`/api/profile/role`).
+
+**Not done yet:** migration squash (90 empty `*_remote_baseline.sql`
+placeholders → 1 real baseline). Next step when picked back up.

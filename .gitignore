@@ -69,3 +69,4 @@ implementation-plan.html
 .supabase/
 .branches
 supabase/.temp/
+supabase/backup_*.sql

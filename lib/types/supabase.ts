@@ -14,54 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_actions: {
-        Row: {
-          action_type: string
-          admin_id: string | null
-          created_at: string
-          details: Json | null
-          id: number
-          reason: string | null
-          target_id: string
-          target_type: string
-        }
-        Insert: {
-          action_type: string
-          admin_id?: string | null
-          created_at?: string
-          details?: Json | null
-          id?: number
-          reason?: string | null
-          target_id: string
-          target_type: string
-        }
-        Update: {
-          action_type?: string
-          admin_id?: string | null
-          created_at?: string
-          details?: Json | null
-          id?: number
-          reason?: string | null
-          target_id?: string
-          target_type?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "admin_actions_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "mentors_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "admin_actions_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -558,119 +510,6 @@ export type Database = {
           },
         ]
       }
-      mentor_suggestions: {
-        Row: {
-          admin_notes: string | null
-          created_at: string | null
-          free_topics: string[] | null
-          id: string
-          inclusion_tags: string[] | null
-          knowledge_topics: string[] | null
-          linkedin_url: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          status: string | null
-          suggestion_text: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          created_at?: string | null
-          free_topics?: string[] | null
-          id?: string
-          inclusion_tags?: string[] | null
-          knowledge_topics?: string[] | null
-          linkedin_url?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string | null
-          suggestion_text: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          admin_notes?: string | null
-          created_at?: string | null
-          free_topics?: string[] | null
-          id?: string
-          inclusion_tags?: string[] | null
-          knowledge_topics?: string[] | null
-          linkedin_url?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          status?: string | null
-          suggestion_text?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      mentor_verification: {
-        Row: {
-          documents_url: string[] | null
-          id: number
-          mentor_id: string
-          rejection_reason: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          reviewer_notes: string | null
-          status: string
-          submitted_at: string
-        }
-        Insert: {
-          documents_url?: string[] | null
-          id?: number
-          mentor_id: string
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          reviewer_notes?: string | null
-          status?: string
-          submitted_at?: string
-        }
-        Update: {
-          documents_url?: string[] | null
-          id?: number
-          mentor_id?: string
-          rejection_reason?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          reviewer_notes?: string | null
-          status?: string
-          submitted_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mentor_verification_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "mentors_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mentor_verification_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mentor_verification_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "mentors_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mentor_verification_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       mentor_visibility_settings: {
         Row: {
           created_at: string
@@ -1078,45 +917,6 @@ export type Database = {
         }
         Relationships: []
       }
-      quiz_mentors: {
-        Row: {
-          areas: string[]
-          bio: string | null
-          created_at: string | null
-          current_mentees: number | null
-          id: string
-          is_available: boolean | null
-          max_mentees: number | null
-          name: string
-          specialties: string[]
-          updated_at: string | null
-        }
-        Insert: {
-          areas: string[]
-          bio?: string | null
-          created_at?: string | null
-          current_mentees?: number | null
-          id?: string
-          is_available?: boolean | null
-          max_mentees?: number | null
-          name: string
-          specialties: string[]
-          updated_at?: string | null
-        }
-        Update: {
-          areas?: string[]
-          bio?: string | null
-          created_at?: string | null
-          current_mentees?: number | null
-          id?: string
-          is_available?: boolean | null
-          max_mentees?: number | null
-          name?: string
-          specialties?: string[]
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       quiz_responses: {
         Row: {
           ai_analysis: Json | null
@@ -1315,62 +1115,6 @@ export type Database = {
         }
         Relationships: []
       }
-      verification_logs: {
-        Row: {
-          action: string
-          admin_id: string | null
-          id: number
-          mentor_id: string
-          notes: string | null
-          timestamp: string
-        }
-        Insert: {
-          action: string
-          admin_id?: string | null
-          id?: number
-          mentor_id: string
-          notes?: string | null
-          timestamp?: string
-        }
-        Update: {
-          action?: string
-          admin_id?: string | null
-          id?: number
-          mentor_id?: string
-          notes?: string | null
-          timestamp?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "verification_logs_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "mentors_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "verification_logs_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "verification_logs_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "mentors_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "verification_logs_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       waiting_list: {
         Row: {
           approved_at: string | null
@@ -1412,30 +1156,6 @@ export type Database = {
       }
     }
     Views: {
-      mentor_suggestions_view: {
-        Row: {
-          admin_notes: string | null
-          avatar_url: string | null
-          created_at: string | null
-          email: string | null
-          first_name: string | null
-          free_topics: string[] | null
-          id: string | null
-          inclusion_tags: string[] | null
-          knowledge_topics: string[] | null
-          last_name: string | null
-          linkedin_url: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          reviewer_first_name: string | null
-          reviewer_last_name: string | null
-          status: string | null
-          suggestion_text: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
       mentors_view: {
         Row: {
           academic_level: string | null
@@ -1613,34 +1333,9 @@ export type Database = {
         Args: { role_name: string; user_id: string }
         Returns: boolean
       }
-      check_organization_quota: {
-        Args: { org_id: string; quota_type: string }
-        Returns: boolean
-      }
       check_user_role: { Args: { target_role: string }; Returns: boolean }
-      expire_pending_invitations: {
-        Args: never
-        Returns: {
-          expired_count: number
-          expired_invitation_ids: string[]
-        }[]
-      }
       generate_secure_token: { Args: { length?: number }; Returns: string }
       generate_unique_slug: { Args: { base_name: string }; Returns: string }
-      get_expiring_memberships: {
-        Args: { days_ahead?: number }
-        Returns: {
-          days_until_expiration: number
-          expires_at: string
-          id: string
-          organization_id: string
-          organization_name: string
-          role: string
-          user_email: string
-          user_id: string
-          user_name: string
-        }[]
-      }
       get_google_calendar_tokens: {
         Args: { p_user_id: string }
         Returns: {
@@ -1657,77 +1352,9 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      get_mentor_suggestions_stats: {
-        Args: never
-        Returns: {
-          approved_count: number
-          avg_response_time_hours: number
-          contacted_count: number
-          pending_count: number
-          rejected_count: number
-          reviewing_count: number
-          total_suggestions: number
-        }[]
-      }
-      get_mentors_by_organization: {
-        Args: { p_organization_id: string; p_user_id?: string }
-        Returns: {
-          mentor_id: string
-        }[]
-      }
-      get_most_active_suggesters: {
-        Args: { limit_count?: number }
-        Returns: {
-          approved_count: number
-          email: string
-          first_name: string
-          last_name: string
-          suggestion_count: number
-          user_id: string
-        }[]
-      }
-      get_most_suggested_free_topics: {
-        Args: { limit_count?: number }
-        Returns: {
-          suggestion_count: number
-          topic: string
-        }[]
-      }
-      get_most_suggested_inclusion_tags: {
-        Args: { limit_count?: number }
-        Returns: {
-          suggestion_count: number
-          tag: string
-        }[]
-      }
-      get_most_suggested_knowledge_topics: {
-        Args: { limit_count?: number }
-        Returns: {
-          suggestion_count: number
-          topic: string
-        }[]
-      }
       get_user_role: { Args: { user_id: string }; Returns: string }
-      get_visible_mentor_ids: {
-        Args: { p_user_id: string }
-        Returns: {
-          mentor_id: string
-        }[]
-      }
       is_admin: { Args: never; Returns: boolean }
-      is_mentor_visible_to_user: {
-        Args: { p_mentor_id: string; p_user_id: string }
-        Returns: boolean
-      }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
-      is_organization_admin: {
-        Args: { org_id: string; user_id: string }
-        Returns: boolean
-      }
-      mark_old_suggestions_as_expired: {
-        Args: { days_old?: number }
-        Returns: number
-      }
       save_google_calendar_tokens: {
         Args: {
           p_access_token: string
@@ -1737,10 +1364,6 @@ export type Database = {
           p_user_id: string
         }
         Returns: undefined
-      }
-      user_has_partner_access: {
-        Args: { p_partner_id: string; p_user_id: string }
-        Returns: boolean
       }
     }
     Enums: {
