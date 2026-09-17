@@ -12,6 +12,17 @@ const ConsoleEasterEgg = dynamic(
   () => import("@/components/ConsoleEasterEgg").then((m) => m.ConsoleEasterEgg),
   { ssr: false }
 )
+/**
+ * Deferred wrapper for FounderPitchWidget.
+ * The widget is entirely client-side (localStorage, timers, iframe) and must
+ * never be server-rendered. Loading it lazily after idle keeps it completely
+ * off the critical render path.
+ */
+const FounderPitchWidget = dynamic(
+  () =>
+    import("@/components/FounderPitchWidget").then((m) => m.FounderPitchWidget),
+  { ssr: false }
+)
 
 export function DeferredConsoleEasterEgg() {
   return <ConsoleEasterEgg />
@@ -19,4 +30,8 @@ export function DeferredConsoleEasterEgg() {
 
 export function DeferredFeedbackBanner() {
   return <FeedbackBanner />
+}
+
+export function DeferredFounderPitchWidget() {
+  return <FounderPitchWidget />
 }

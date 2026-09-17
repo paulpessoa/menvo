@@ -14,7 +14,7 @@ import { routing } from "@/i18n/routing"
 import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
-import { DeferredConsoleEasterEgg, DeferredFeedbackBanner } from "@/components/DeferredClientWidgets"
+import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -167,6 +167,7 @@ export default async function RootLayout({
               </main>
               <Footer />
               <DeferredFeedbackBanner />
+              <DeferredFounderPitchWidget />
               <CookieConsentBanner />
               <Script
                 id="google-tag-manager"
