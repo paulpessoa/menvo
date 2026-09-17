@@ -26,6 +26,7 @@ A Menvo é uma iniciativa brasileira (Porto Digital, Recife / atuação nacional
 - **Agendamento Inteligente e Calendário:** Seleção direta de slots de disponibilidade do mentor com sincronização automática com Google Calendar e Google Meet.
 - **Salas de Mentoria e Chat Privado:** Comunicação em tempo real entre mentor e mentorado antes e depois das sessões.
 - **Sistema de Avaliações e Confiança:** Verificação rigorosa de perfis de mentores, avaliações mútuas e moderação de feedbacks para garantir a qualidade de cada sessão.
+- **Organizações Parceiras (`/o/[slug]`):** ONGs, empresas e instituições parceiras têm uma página própria onde seus beneficiários e mentores vinculados se conectam à rede de mentoria gratuita da Menvo.
 
 ## Links e Recursos Essenciais
 - [Página Inicial Menvo](https://www.menvo.com.br) — Apresentação da plataforma, depoimentos e estatísticas.

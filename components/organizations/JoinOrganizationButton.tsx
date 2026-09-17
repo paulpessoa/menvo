@@ -12,9 +12,10 @@ type MembershipStatus = "none" | "requested" | "invited" | "active"
 interface Props {
   slug: string
   orgName: string
+  joinPolicy: "open" | "invite_only"
 }
 
-export function JoinOrganizationButton({ slug, orgName }: Props) {
+export function JoinOrganizationButton({ slug, orgName, joinPolicy }: Props) {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [status, setStatus] = useState<MembershipStatus | null>(null)
@@ -97,6 +98,14 @@ export function JoinOrganizationButton({ slug, orgName }: Props) {
     return (
       <p className="flex items-center gap-2 text-muted-foreground mt-2">
         <Clock className="h-5 w-5" /> Solicitação enviada — aguardando aprovação da organização
+      </p>
+    )
+  }
+
+  if (status !== "invited" && joinPolicy === "invite_only") {
+    return (
+      <p className="text-muted-foreground mt-2 text-center max-w-[400px]">
+        Esta organização entra apenas por convite. Peça a um administrador dela pra te convidar.
       </p>
     )
   }

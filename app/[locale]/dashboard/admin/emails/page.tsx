@@ -80,10 +80,17 @@ const TEMPLATES: EmailTemplateMeta[] = [
   },
   {
     key: "org_invite",
-    label: "Convite de Organização",
+    label: "Convite de Organização (mentorado)",
     signature: "none",
     icon: Building2,
-    description: "Admin de uma organização parceira convida alguém que já tem conta na Menvo."
+    description: "Admin de uma organização parceira convida um mentorado que já tem conta na Menvo."
+  },
+  {
+    key: "org_invite_mentor",
+    label: "Convite de Organização (mentor)",
+    signature: "none",
+    icon: Building2,
+    description: "Admin de uma organização parceira convida um mentor que já tem conta na Menvo."
   },
   {
     key: "org_join_request",
@@ -94,10 +101,17 @@ const TEMPLATES: EmailTemplateMeta[] = [
   },
   {
     key: "org_membership_approved",
-    label: "Participação Aprovada (Org)",
+    label: "Participação Aprovada (mentorado)",
     signature: "personal",
     icon: BadgeCheck,
-    description: "Confirma à pessoa que ela agora faz parte da organização."
+    description: "Confirma ao mentorado que ele agora faz parte da organização."
+  },
+  {
+    key: "org_membership_approved_mentor",
+    label: "Participação Aprovada (mentor)",
+    signature: "personal",
+    icon: BadgeCheck,
+    description: "Confirma ao mentor que ele agora faz parte da organização."
   }
 ]
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Building2, Check, Loader2, LogOut, X } from "lucide-react"
 import { toast } from "sonner"
+import { useAuth } from "@/lib/auth"
 
 interface Membership {
   organization_id: string
@@ -16,6 +17,8 @@ interface Membership {
 }
 
 export function OrganizationsTab() {
+  const { cachedRoles } = useAuth()
+  const isMentor = cachedRoles?.mentor === true
   const [memberships, setMemberships] = useState<Membership[]>([])
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
@@ -147,6 +150,9 @@ export function OrganizationsTab() {
                   {m.role === "admin" && (
                     <Badge variant="default" className="ml-2">Admin</Badge>
                   )}
+                  <Badge variant="secondary" className="ml-2">
+                    {isMentor ? "Mentor da organização" : "Beneficiário"}
+                  </Badge>
                 </div>
               </div>
               <div className="flex gap-2">

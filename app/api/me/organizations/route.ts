@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { getPlatformRole } from "@/lib/services/organizations/org-dashboard.service"
 import { sendOrgJoinRequestToAdmin } from "@/lib/email/brevo"
 import { errorResponse, handleApiError, successResponse } from "@/lib/api/error-handler"
 
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     const { data: organization } = await supabase
       .from("organizations")
-      .select("id, name")
+      .select("id, name, join_policy")
       .eq("slug", validation.data.slug)
       .eq("status", "active")
       .maybeSingle()
@@ -79,6 +80,14 @@ export async function POST(request: NextRequest) {
       return successResponse({ status: "active" }, `Você agora faz parte da ${organization.name}`)
     }
 
+    if ((organization as any).join_policy === "invite_only") {
+      return errorResponse(
+        "Esta organização entra apenas por convite. Peça a um administrador dela pra te convidar.",
+        "FORBIDDEN",
+        403
+      )
+    }
+
     const { error: insertError } = await supabase
       .from("organization_members")
       .insert({ organization_id: organization.id, user_id: user.id, role: "member", status: "requested" })
@@ -99,12 +108,13 @@ export async function POST(request: NextRequest) {
 
     const requesterName = (requester as any)?.full_name || (requester as any)?.email || "Alguém"
     const requesterEmail = (requester as any)?.email || user.email || ""
+    const requesterRole = await getPlatformRole(supabase, user.id)
     await Promise.all(
       ((admins ?? []) as any[])
         .map(a => a.profiles?.email)
         .filter(Boolean)
         .map(adminEmail =>
-          sendOrgJoinRequestToAdmin({ adminEmail, requesterName, requesterEmail, orgName: organization.name }).catch(() => null)
+          sendOrgJoinRequestToAdmin({ adminEmail, requesterName, requesterEmail, orgName: organization.name, requesterRole }).catch(() => null)
         )
     )
 

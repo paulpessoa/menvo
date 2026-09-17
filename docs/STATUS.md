@@ -213,3 +213,27 @@ of `npm test` — makes real LLM calls (cost, non-deterministic), so it's a
 manual gate before changing the prompt/model, not a CI check. Baseline:
 **20/20 (100%), ~2.5s avg latency** against `gpt-4o-mini`. See
 `evals/README.md`.
+
+---
+
+## 🏢 Multi-Tenant Phase 1.5 — shipped 2026-09-17
+
+Founder review of Phase 1 caught a real coherence bug before it mattered:
+the org-invite/approval emails said "acompanha sua jornada... mentores
+dedicados a ela" to *everyone*, including mentors being invited to be an
+org's own mentor pool — backwards for that audience. Fixed by deriving a
+member's kind (beneficiary vs org mentor) from their existing platform role
+(`user_roles`, never a new field) and writing role-aware copy for all three
+org emails. Also added `organizations.join_policy` (`open`/`invite_only`,
+migration `20260921000004`) so an org can choose whether strangers can
+request to join or only accept invites — invite-only orgs get `noindex`
+and drop out of `sitemap.xml`.
+
+Extracted the first per-domain service pulled out of a route handler:
+`lib/services/organizations/org-dashboard.service.ts` — `/api/org/[id]`
+went from inline PostgREST calls to a single `getOrgDashboard()` call.
+Small, but it's the pattern the roadmap's item 3 (architecture plan,
+2026-09-17) calls for: extract incrementally as each domain gets touched,
+rather than a big-bang rewrite.
+
+Full detail: [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6.

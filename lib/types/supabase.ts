@@ -701,6 +701,7 @@ export type Database = {
           contact_name: string | null
           created_at: string
           id: string
+          join_policy: string
           name: string
           slug: string
           status: string
@@ -711,6 +712,7 @@ export type Database = {
           contact_name?: string | null
           created_at?: string
           id?: string
+          join_policy?: string
           name: string
           slug: string
           status?: string
@@ -721,6 +723,7 @@ export type Database = {
           contact_name?: string | null
           created_at?: string
           id?: string
+          join_policy?: string
           name?: string
           slug?: string
           status?: string

@@ -89,5 +89,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[sitemap] Failed to load mentor profiles:', error)
   }
 
+  // Partner organization landing pages (/o/[slug]) — only ones that opted
+  // into being discoverable (roadmap §6.5). Invite-only orgs are excluded:
+  // their page still resolves for someone holding the direct link, but
+  // isn't meant to be found by strangers via search.
+  try {
+    if (
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      const supabase = createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      )
+
+      const { data: organizations } = await supabase
+        .from('organizations')
+        .select('slug')
+        .eq('status', 'active')
+        .eq('join_policy', 'open')
+
+      for (const org of organizations ?? []) {
+        routing.locales.forEach((locale) => {
+          const isDefault = locale === routing.defaultLocale
+          const path = isDefault ? `/o/${org.slug}` : `/${locale}/o/${org.slug}`
+
+          sitemapEntries.push({
+            url: `${BASE_URL}${path}`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.6
+          })
+        })
+      }
+    }
+  } catch (error) {
+    console.error('[sitemap] Failed to load organizations:', error)
+  }
+
   return sitemapEntries
 }

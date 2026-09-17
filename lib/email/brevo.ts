@@ -533,11 +533,18 @@ export async function sendWaitingListCompleteProfileRequest(data: {
 // Organizações parceiras (multi-tenant)
 // ---------------------------------------------------------------------------
 
-function orgInviteContent(firstName: string, orgName: string, appUrl: string) {
+type OrgRecipientRole = "mentor" | "mentee";
+
+function orgInviteContent(firstName: string, orgName: string, appUrl: string, role: OrgRecipientRole) {
+  const body = role === "mentor"
+    ? `<p>A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer contar com você como mentor(a) do grupo dela na plataforma.</p>
+       <p>Ao aceitar, você aparece como mentor da ${orgName} e pode receber pedidos de mentoria vindos dos beneficiários dela — sua agenda e seu processo de aceite continuam exatamente os mesmos.</p>`
+    : `<p>A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer acompanhar sua jornada de mentoria na plataforma.</p>
+       <p>Ao aceitar, a organização passa a ver seu progresso (sessões agendadas, quiz de carreira) para te apoiar melhor — sua conta continua exatamente a mesma.</p>`;
   return `
     <h2>Você foi convidado(a) para a ${orgName}</h2>
-    <p>Olá, ${firstName}! A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer você como parte do grupo dela na plataforma.</p>
-    <p>Ao aceitar, você continua com a mesma conta de sempre — a diferença é que a organização passa a acompanhar sua jornada e pode te conectar a mentores dedicados a ela.</p>
+    <p>Olá, ${firstName}!</p>
+    ${body}
     <div class="button-container">
         <a href="${appUrl}/profile?tab=organizations" class="button">Ver e aceitar o convite</a>
     </div>
@@ -549,6 +556,7 @@ export async function sendOrgInvite(data: {
   name: string;
   email: string;
   orgName: string;
+  recipientRole: OrgRecipientRole;
 }): Promise<{ success: boolean; error?: string }> {
   const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
   const orgName = escapeHtml(data.orgName);
@@ -556,14 +564,15 @@ export async function sendOrgInvite(data: {
   return await sendEmail(
     data.email,
     `Convite: participe da ${data.orgName} na Menvo`,
-    getEmailLayout("Convite de organização", orgInviteContent(firstName, orgName, appUrl), { signatureType: "none" })
+    getEmailLayout("Convite de organização", orgInviteContent(firstName, orgName, appUrl, data.recipientRole), { signatureType: "none" })
   );
 }
 
-function orgJoinRequestContent(requesterName: string, requesterEmail: string, orgName: string, appUrl: string) {
+function orgJoinRequestContent(requesterName: string, requesterEmail: string, orgName: string, appUrl: string, requesterRole: OrgRecipientRole | null) {
+  const roleLabel = requesterRole === "mentor" ? " (mentor)" : requesterRole === "mentee" ? " (mentorado)" : "";
   return `
     <h2>Nova solicitação para entrar na ${orgName}</h2>
-    <p><strong>${requesterName}</strong> (${requesterEmail}) pediu para participar da <strong>${orgName}</strong> na Menvo.</p>
+    <p><strong>${requesterName}${roleLabel}</strong> (${requesterEmail}) pediu para participar da <strong>${orgName}</strong> na Menvo.</p>
     <div class="button-container">
         <a href="${appUrl}/dashboard/org" class="button">Revisar solicitação</a>
     </div>
@@ -576,6 +585,7 @@ export async function sendOrgJoinRequestToAdmin(data: {
   requesterName: string;
   requesterEmail: string;
   orgName: string;
+  requesterRole?: OrgRecipientRole | null;
 }): Promise<{ success: boolean; error?: string }> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
   return await sendEmail(
@@ -583,20 +593,26 @@ export async function sendOrgJoinRequestToAdmin(data: {
     `Solicitação para entrar na ${data.orgName}`,
     getEmailLayout(
       "Nova solicitação",
-      orgJoinRequestContent(escapeHtml(data.requesterName), escapeHtml(data.requesterEmail), escapeHtml(data.orgName), appUrl),
+      orgJoinRequestContent(escapeHtml(data.requesterName), escapeHtml(data.requesterEmail), escapeHtml(data.orgName), appUrl, data.requesterRole ?? null),
       { signatureType: "none" }
     )
   );
 }
 
-function orgMembershipApprovedContent(firstName: string, orgName: string, appUrl: string) {
+function orgMembershipApprovedContent(firstName: string, orgName: string, appUrl: string, role: OrgRecipientRole) {
+  const cta = role === "mentor"
+    ? { href: `${appUrl}/dashboard/mentor/availability`, label: "Ver minha agenda" }
+    : { href: `${appUrl}/mentors`, label: "Encontrar um mentor" };
+  const body = role === "mentor"
+    ? `Você agora aparece como mentor(a) da ${orgName} e pode receber pedidos de mentoria vindos dos beneficiários dela.`
+    : `A organização agora acompanha sua jornada na Menvo e pode te conectar a mentores dedicados a ela.`;
   return `
     <h2>Você agora faz parte da ${orgName}</h2>
     <p>Olá, ${firstName}! Sua participação na <strong>${orgName}</strong> foi aprovada.</p>
     <div class="button-container">
-        <a href="${appUrl}/mentors" class="button">Encontrar um mentor</a>
+        <a href="${cta.href}" class="button">${cta.label}</a>
     </div>
-    <p>A partir de agora a organização acompanha sua jornada na Menvo e pode te conectar a mentores dedicados a ela. Tudo continua gratuito.</p>
+    <p>${body}</p>
   `;
 }
 
@@ -604,13 +620,14 @@ export async function sendOrgMembershipApproved(data: {
   name: string;
   email: string;
   orgName: string;
+  recipientRole: OrgRecipientRole;
 }): Promise<{ success: boolean; error?: string }> {
   const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
   return await sendEmail(
     data.email,
     `Bem-vindo(a) à ${data.orgName} na Menvo`,
-    getEmailLayout("Participação aprovada", orgMembershipApprovedContent(firstName, escapeHtml(data.orgName), appUrl), { signatureType: "personal" })
+    getEmailLayout("Participação aprovada", orgMembershipApprovedContent(firstName, escapeHtml(data.orgName), appUrl, data.recipientRole), { signatureType: "personal" })
   );
 }
 
@@ -775,11 +792,15 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       return getEmailLayout("Lembrete de Mentoria", content, { signatureType: "none" });
     }
     case 'org_invite':
-      return getEmailLayout("Convite de organização", orgInviteContent("Mariana", "Instituto Gira", "https://www.menvo.com.br"), { signatureType: "none" });
+      return getEmailLayout("Convite de organização", orgInviteContent("Mariana", "Instituto Gira", "https://www.menvo.com.br", "mentee"), { signatureType: "none" });
+    case 'org_invite_mentor':
+      return getEmailLayout("Convite de organização (mentor)", orgInviteContent("Rodrigo", "Instituto Gira", "https://www.menvo.com.br", "mentor"), { signatureType: "none" });
     case 'org_join_request':
-      return getEmailLayout("Nova solicitação", orgJoinRequestContent("Mariana Silva", "mariana@example.com", "Instituto Gira", "https://www.menvo.com.br"), { signatureType: "none" });
+      return getEmailLayout("Nova solicitação", orgJoinRequestContent("Mariana Silva", "mariana@example.com", "Instituto Gira", "https://www.menvo.com.br", "mentee"), { signatureType: "none" });
     case 'org_membership_approved':
-      return getEmailLayout("Participação aprovada", orgMembershipApprovedContent("Mariana", "Instituto Gira", "https://www.menvo.com.br"), { signatureType: "personal" });
+      return getEmailLayout("Participação aprovada", orgMembershipApprovedContent("Mariana", "Instituto Gira", "https://www.menvo.com.br", "mentee"), { signatureType: "personal" });
+    case 'org_membership_approved_mentor':
+      return getEmailLayout("Participação aprovada (mentor)", orgMembershipApprovedContent("Rodrigo", "Instituto Gira", "https://www.menvo.com.br", "mentor"), { signatureType: "personal" });
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }

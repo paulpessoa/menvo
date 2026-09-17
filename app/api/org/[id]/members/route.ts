@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { requireOrgAdmin } from "@/lib/auth/require-org-admin"
+import { getPlatformRole } from "@/lib/services/organizations/org-dashboard.service"
 import { sendOrgInvite, sendOrgMembershipApproved } from "@/lib/email/brevo"
 import { errorResponse, handleApiError, successResponse } from "@/lib/api/error-handler"
 
@@ -57,13 +58,14 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     const orgName = await getOrgName(organizationId)
     const personName = (profile as any).full_name || (profile as any).email
+    const recipientRole = (await getPlatformRole(supabase, profile.id)) ?? "mentee"
 
     if (existing?.status === "active") {
       return successResponse({ status: "active" }, "Essa pessoa já faz parte da organização")
     }
 
     if (existing?.status === "invited") {
-      await sendOrgInvite({ name: personName, email: (profile as any).email, orgName }).catch(() => null)
+      await sendOrgInvite({ name: personName, email: (profile as any).email, orgName, recipientRole }).catch(() => null)
       return successResponse({ status: "invited" }, "Convite reenviado")
     }
 
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         .eq("organization_id", organizationId)
         .eq("user_id", profile.id)
       if (error) throw error
-      await sendOrgMembershipApproved({ name: personName, email: (profile as any).email, orgName }).catch(() => null)
+      await sendOrgMembershipApproved({ name: personName, email: (profile as any).email, orgName, recipientRole }).catch(() => null)
       return successResponse({ status: "active" }, "Solicitação pendente aprovada")
     }
 
@@ -83,7 +85,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       .insert({ organization_id: organizationId, user_id: profile.id, role: "member", status: "invited" })
     if (insertError) throw insertError
 
-    await sendOrgInvite({ name: personName, email: (profile as any).email, orgName }).catch(() => null)
+    await sendOrgInvite({ name: personName, email: (profile as any).email, orgName, recipientRole }).catch(() => null)
 
     return successResponse({ status: "invited" }, "Convite enviado")
   } catch (error) {
@@ -116,7 +118,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const person = (updated as any).profiles
     if (person?.email) {
       const orgName = await getOrgName(organizationId)
-      await sendOrgMembershipApproved({ name: person.full_name || person.email, email: person.email, orgName }).catch(() => null)
+      const recipientRole = (await getPlatformRole(supabase, validation.data.userId)) ?? "mentee"
+      await sendOrgMembershipApproved({ name: person.full_name || person.email, email: person.email, orgName, recipientRole }).catch(() => null)
     }
 
     return successResponse({ status: "active" }, "Participação aprovada")

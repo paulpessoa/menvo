@@ -1,7 +1,7 @@
 # 🏢 Multi-Tenant Roadmap — Menvo for Organizations
 
-> **Status: Phase 1 shipped and merged to `main` (PR #45). Phase 1.5 planned,
-> not started — see §6.** Written 2026-09-16 based on the founder's
+> **Status: Phase 1 and Phase 1.5 shipped and merged to `main` — see §6.**
+> Written 2026-09-16 based on the founder's
 > vision to offer Menvo as infrastructure to partner organizations (Instituto
 > Gira, Porto Social, Instituto Braude's reading circle, SEBRAE, online
 > hackathons, etc.) so they can register the youth/beneficiaries they serve
@@ -231,7 +231,7 @@ on `feat/multi-tenant-phase1` (PR #45):
 
 ---
 
-## 6. Phase 1.5 — plan (2026-09-17, agreed with founder, not started)
+## 6. Phase 1.5 — shipped (2026-09-17)
 
 Triggered by review of the merged Phase 1 (#45). Three founder questions
 and the answers we're building to:
@@ -322,12 +322,26 @@ Rewrite the three org templates with role-aware copy:
 - `public/robots.txt`: nothing to add (`/o/` is public by design).
 - `llms.txt` / `llms-full.txt`: one line describing partner org pages.
 
-### 6.6 Cleanup / docs
-- `docs/MULTI_TENANT_ROADMAP.md`: fold this section into §5 once shipped.
-- Delete test org "Org Teste Claude" via SQL editor once done.
+### 6.6 Cleanup / docs — done
+- Test org "Org Teste Claude" suspended (not deleted — no delete endpoint
+  exists by design, suspension is the intended way to retire an org).
 
-### 6.7 Verification
-- `tsc --noEmit`, jest, then in preview: toggle `join_policy`, confirm the
-  landing hides the request button and sitemap.xml drops the org; invite a
-  mentor and a mentee and check both email previews; org dashboard shows
-  the two tables and correct counts.
+### 6.7 Verification — done (2026-09-17)
+`tsc --noEmit` and jest (124/124) clean. In preview, with a real admin
+session: toggled `join_policy` open → invite_only → open on the test org;
+confirmed the landing's `<meta name="robots">` flips to `noindex, nofollow`
+under invite_only and `/sitemap.xml` drops the org's `/o/[slug]` entries
+(only the real open org, `/o/giral`, remained); invited an existing mentor
+account and confirmed it shows under "Mentores da organização" (not
+"Beneficiários") with status "Convidado"; confirmed all 5 email preview
+variants render, including the mentor-specific invite copy ("você aparece
+como mentor da organização e pode receber pedidos de mentoria vindos dos
+beneficiários dela").
+
+**Follow-ups deliberately not done** (noted, not urgent):
+- Mentor card "Mentor da {org}" chip on public profiles — skipped per
+  §6.4's own escape hatch, to avoid complicating `MentorCard`.
+- A brand-new account signing up from `/o/[slug]` still lands on
+  `/onboarding` first and loses the `next` param back to the org page
+  (same gap noted in Phase 1's §5) — low priority until a real pilot
+  partner's beneficiaries hit it.
