@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       admin_actions: {
@@ -835,6 +810,85 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_members: {
+        Row: {
+          created_at: string
+          organization_id: string
+          role: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          organization_id: string
+          role: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          organization_id?: string
+          role?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          contact_email: string | null
+          contact_name: string | null
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          status: string
+          type: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          status?: string
+          type: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           academic_level: string | null
@@ -1564,14 +1618,6 @@ export type Database = {
         Returns: boolean
       }
       check_user_role: { Args: { target_role: string }; Returns: boolean }
-      expire_organization_memberships: {
-        Args: never
-        Returns: {
-          expired_count: number
-          expired_member_ids: string[]
-        }[]
-      }
-      expire_partner_invitations: { Args: never; Returns: undefined }
       expire_pending_invitations: {
         Args: never
         Returns: {
@@ -1579,7 +1625,6 @@ export type Database = {
           expired_invitation_ids: string[]
         }[]
       }
-      expire_user_partner_access: { Args: never; Returns: undefined }
       generate_secure_token: { Args: { length?: number }; Returns: string }
       generate_unique_slug: { Args: { base_name: string }; Returns: string }
       get_expiring_memberships: {
@@ -1624,14 +1669,6 @@ export type Database = {
           total_suggestions: number
         }[]
       }
-      get_mentor_visible_organizations: {
-        Args: { p_mentor_id: string }
-        Returns: {
-          organization_id: string
-          organization_name: string
-          organization_type: string
-        }[]
-      }
       get_mentors_by_organization: {
         Args: { p_organization_id: string; p_user_id?: string }
         Returns: {
@@ -1670,20 +1707,6 @@ export type Database = {
           topic: string
         }[]
       }
-      get_organization_quota_usage: {
-        Args: { org_id: string }
-        Returns: {
-          current_usage: number
-          is_unlimited: boolean
-          max_limit: number
-          percentage_used: number
-          quota_type: string
-        }[]
-      }
-      get_user_organization_ids: {
-        Args: { user_uuid: string }
-        Returns: string[]
-      }
       get_user_role: { Args: { user_id: string }; Returns: string }
       get_visible_mentor_ids: {
         Args: { p_user_id: string }
@@ -1696,6 +1719,7 @@ export type Database = {
         Args: { p_mentor_id: string; p_user_id: string }
         Returns: boolean
       }
+      is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
       is_organization_admin: {
         Args: { org_id: string; user_id: string }
         Returns: boolean
@@ -1737,12 +1761,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1766,11 +1790,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1791,11 +1815,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1816,11 +1840,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1833,11 +1857,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1847,9 +1871,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       hub_resource_status: ["pending", "published", "rejected", "archived"],

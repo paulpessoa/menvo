@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, AlertTriangle, Mail, Lock } from "lucide-react"
 import { useRouter, Link } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
@@ -29,6 +30,8 @@ function SignupForm() {
   const { user, loading, signUp, signInWithProvider, getDefaultRedirectPath } =
     useAuth()
   const waitingListEnabled = useFeatureFlag("waiting_list_flag")
+  const nextParam = useSearchParams().get("next")
+  const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : undefined
 
   const isAuthenticated = !!user && !loading
   const [email, setEmail] = useState("")
@@ -70,7 +73,7 @@ function SignupForm() {
     setIsLoading(true)
 
     try {
-      await signUp(email, password, firstName.trim(), lastName.trim())
+      await signUp(email, password, firstName.trim(), lastName.trim(), safeNext)
       setSuccess(true)
       toast.success(t("success"))
     } catch (err: any) {
@@ -148,7 +151,9 @@ function SignupForm() {
             <Lock className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">{t("signupTitle")}</CardTitle>
-          <CardDescription className="text-base">{t("description")}</CardDescription>
+          <CardDescription className="text-base">
+            {t("description")}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 px-8">
           <div className="grid grid-cols-1 gap-3">

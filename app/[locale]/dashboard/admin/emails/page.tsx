@@ -28,7 +28,10 @@ import {
   Bell,
   Send,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Building2,
+  UserPlus,
+  BadgeCheck
 } from "lucide-react"
 
 interface EmailTemplateMeta {
@@ -74,6 +77,27 @@ const TEMPLATES: EmailTemplateMeta[] = [
     signature: "none",
     icon: Bell,
     description: "Lembrete com horário e link da sessão na manhã do dia do agendamento."
+  },
+  {
+    key: "org_invite",
+    label: "Convite de Organização",
+    signature: "none",
+    icon: Building2,
+    description: "Admin de uma organização parceira convida alguém que já tem conta na Menvo."
+  },
+  {
+    key: "org_join_request",
+    label: "Solicitação de Entrada (Org)",
+    signature: "none",
+    icon: UserPlus,
+    description: "Avisa o admin da organização que alguém pediu para participar."
+  },
+  {
+    key: "org_membership_approved",
+    label: "Participação Aprovada (Org)",
+    signature: "personal",
+    icon: BadgeCheck,
+    description: "Confirma à pessoa que ela agora faz parte da organização."
   }
 ]
 

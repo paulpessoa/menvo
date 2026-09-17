@@ -1,6 +1,7 @@
 # 🏢 Multi-Tenant Roadmap — Menvo for Organizations
 
-> **Status: proposal, not started.** Written 2026-09-16 based on the founder's
+> **Status: Phase 1 built on `feat/multi-tenant-phase1`, migration not yet
+> applied to production — see §5.** Written 2026-09-16 based on the founder's
 > vision to offer Menvo as infrastructure to partner organizations (Instituto
 > Gira, Porto Social, Instituto Braude's reading circle, SEBRAE, online
 > hackathons, etc.) so they can register the youth/beneficiaries they serve
@@ -193,10 +194,36 @@ membership expiry, CSV import, branding, multi-org per user, quotas.
 **Where it grows next (Phase 2+):** org-scoped reports/export, org admin
 inviting mentors by email, subdomain branding, per-org quiz variants.
 
-## 5. Immediate next step
+## 5. Status — Phase 1 built and applied (2026-09-17)
 
-Founder: confirm the Phase 1 design above (or ask for changes), then it's a
-2-3 day build. Suggested order: migration → org signup tagging → org admin
-dashboard → catalog visibility filter → platform admin org CRUD. Run it as
-a feature branch + preview deploy; apply the migration to production only
-after review, ideally right before the Gira call so the demo is live.
+Migrations `20260921000000..000002` are applied to production. What's live
+on `feat/multi-tenant-phase1` (PR #45):
+
+**Membership is a stateful relation the person controls from their profile**
+(`organization_members.status`: `invited` | `requested` | `active`):
+
+| Who starts it | Where | Result |
+|---|---|---|
+| Org admin invites by e-mail | `/dashboard/org` → Convidar | `invited` + e-mail `sendOrgInvite` |
+| Person asks to join | `/o/[slug]` → Solicitar participação | `requested` + e-mail to org admins |
+| Org admin approves | `/dashboard/org` → ✓ | `active` + e-mail `sendOrgMembershipApproved` |
+| Person accepts invite | `/profile?tab=organizations` → Aceitar | `active` |
+| Person leaves / declines / withdraws | `/profile?tab=organizations` | row deleted |
+
+- Invites require an existing Menvo account (the org admin gets a clear
+  message otherwise: share the `/o/[slug]` link). No org-specific signup
+  page — `/signup?next=/o/[slug]` brings a new account back to the org page.
+- `/dashboard/admin/organizations` — platform admin: create org, suspend/
+  reactivate, assign an org admin by e-mail.
+- RLS: self read/request/accept/leave; org admins (`is_org_admin()`,
+  security definer to avoid policy recursion) manage their org's rows;
+  platform admins see everything. `/o/*` pages filter `status = 'active'`
+  explicitly because platform admins can read suspended orgs via RLS.
+- Mentor-side catalog visibility filter: **not built** (Phase 2, §3).
+
+**Known gaps / next:**
+- A brand-new account that signs up from `/o/[slug]` is sent to `/onboarding`
+  first (role picker) and loses `next`; they have to reopen the org link.
+  Fine for the pilot; fix if Gira's beneficiaries trip on it.
+- Org affiliation isn't shown on public mentor cards yet.
+- Test org "Org Teste Claude" (suspended) can be deleted from the SQL editor.
