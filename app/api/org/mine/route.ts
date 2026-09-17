@@ -21,6 +21,7 @@ export async function GET() {
       .select("organization_id, organizations(id, slug, name)")
       .eq("user_id", user.id)
       .eq("role", "admin")
+      .eq("status", "active")
 
     if (error) throw error
 

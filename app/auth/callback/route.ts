@@ -69,63 +69,8 @@ export async function GET(request: NextRequest) {
 
     // 4. Fetch Profile & Roles for smart redirection
     const { data: { user } } = await supabase.auth.getUser()
-
+    
     if (user) {
-      // Multi-tenant Phase 1: tag the account with the org it signed up
-      // through (see /o/[slug]/signup + docs/MULTI_TENANT_ROADMAP.md §4).
-      // Metadata survives the confirm-email gap; the actual insert has to
-      // wait until here, once we have a confirmed, authenticated session.
-      const pendingOrgSlug = (user.user_metadata as any)?.pending_organization_slug as
-        | string
-        | undefined
-
-      if (pendingOrgSlug) {
-        const { data: organization } = await supabase
-          .from("organizations" as any)
-          .select("id")
-          .eq("slug", pendingOrgSlug)
-          .eq("status", "active")
-          .maybeSingle()
-
-        if (organization) {
-          const orgId = (organization as any).id as string
-
-          const { data: existingMembership } = await supabase
-            .from("organization_members" as any)
-            .select("organization_id")
-            .eq("organization_id", orgId)
-            .eq("user_id", user.id)
-            .maybeSingle()
-
-          if (!existingMembership) {
-            await supabase
-              .from("organization_members" as any)
-              .insert({ organization_id: orgId, user_id: user.id, role: "member" } as any)
-          }
-
-          // Org beneficiaries are plain mentee accounts (founder's call,
-          // roadmap §1.2) — skip onboarding's role picker for them.
-          const { data: existingRoles } = await supabase
-            .from("user_roles")
-            .select("id")
-            .eq("user_id", user.id)
-
-          if (!existingRoles || existingRoles.length === 0) {
-            const { data: menteeRole } = await supabase
-              .from("roles")
-              .select("id")
-              .eq("name", "mentee")
-              .maybeSingle()
-
-            if (menteeRole) {
-              await supabase
-                .from("user_roles")
-                .insert({ user_id: user.id, role_id: (menteeRole as any).id } as any)
-            }
-          }
-        }
-      }
-
       const { data: profile } = await supabase
         .from("profiles")
         .select("*, user_roles(roles(name))")

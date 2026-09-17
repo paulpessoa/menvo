@@ -16,26 +16,22 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, AlertTriangle, Mail, Lock } from "lucide-react"
 import { useRouter, Link } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { WaitingListForm } from "@/components/WaitingListForm"
 import { useFeatureFlag } from "@/lib/feature-flags"
 
-export interface SignupFormProps {
-  /** When set, this signup is scoped to an organization (`/o/[slug]/signup`):
-   * the waiting list gate is skipped and the account is tagged on confirmation. */
-  orgSlug?: string
-  orgName?: string
-}
-
-export function SignupForm({ orgSlug, orgName }: SignupFormProps = {}) {
+function SignupForm() {
   const t = useTranslations("register")
   const tl = useTranslations("login")
   const tc = useTranslations("common")
   const { user, loading, signUp, signInWithProvider, getDefaultRedirectPath } =
     useAuth()
-  const waitingListEnabled = useFeatureFlag("waiting_list_flag") && !orgSlug
+  const waitingListEnabled = useFeatureFlag("waiting_list_flag")
+  const nextParam = useSearchParams().get("next")
+  const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : undefined
 
   const isAuthenticated = !!user && !loading
   const [email, setEmail] = useState("")
@@ -77,7 +73,7 @@ export function SignupForm({ orgSlug, orgName }: SignupFormProps = {}) {
     setIsLoading(true)
 
     try {
-      await signUp(email, password, firstName.trim(), lastName.trim(), orgSlug)
+      await signUp(email, password, firstName.trim(), lastName.trim(), safeNext)
       setSuccess(true)
       toast.success(t("success"))
     } catch (err: any) {
@@ -156,7 +152,7 @@ export function SignupForm({ orgSlug, orgName }: SignupFormProps = {}) {
           </div>
           <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">{t("signupTitle")}</CardTitle>
           <CardDescription className="text-base">
-            {orgName ? `${orgName} · ${t("description")}` : t("description")}
+            {t("description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 px-8">

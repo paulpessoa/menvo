@@ -529,6 +529,91 @@ export async function sendWaitingListCompleteProfileRequest(data: {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Organizações parceiras (multi-tenant)
+// ---------------------------------------------------------------------------
+
+function orgInviteContent(firstName: string, orgName: string, appUrl: string) {
+  return `
+    <h2>Você foi convidado(a) para a ${orgName}</h2>
+    <p>Olá, ${firstName}! A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer você como parte do grupo dela na plataforma.</p>
+    <p>Ao aceitar, você continua com a mesma conta de sempre — a diferença é que a organização passa a acompanhar sua jornada e pode te conectar a mentores dedicados a ela.</p>
+    <div class="button-container">
+        <a href="${appUrl}/profile?tab=organizations" class="button">Ver e aceitar o convite</a>
+    </div>
+    <p style="font-size: 13px; color: ${COLORS.muted};">Você pode recusar ou sair da organização a qualquer momento na aba "Organizações" do seu perfil.</p>
+  `;
+}
+
+export async function sendOrgInvite(data: {
+  name: string;
+  email: string;
+  orgName: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const orgName = escapeHtml(data.orgName);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  return await sendEmail(
+    data.email,
+    `Convite: participe da ${data.orgName} na Menvo`,
+    getEmailLayout("Convite de organização", orgInviteContent(firstName, orgName, appUrl), { signatureType: "none" })
+  );
+}
+
+function orgJoinRequestContent(requesterName: string, requesterEmail: string, orgName: string, appUrl: string) {
+  return `
+    <h2>Nova solicitação para entrar na ${orgName}</h2>
+    <p><strong>${requesterName}</strong> (${requesterEmail}) pediu para participar da <strong>${orgName}</strong> na Menvo.</p>
+    <div class="button-container">
+        <a href="${appUrl}/dashboard/org" class="button">Revisar solicitação</a>
+    </div>
+    <p style="font-size: 13px; color: ${COLORS.muted};">Você pode aprovar ou recusar no painel da organização. A pessoa só passa a fazer parte do grupo depois da sua aprovação.</p>
+  `;
+}
+
+export async function sendOrgJoinRequestToAdmin(data: {
+  adminEmail: string;
+  requesterName: string;
+  requesterEmail: string;
+  orgName: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  return await sendEmail(
+    data.adminEmail,
+    `Solicitação para entrar na ${data.orgName}`,
+    getEmailLayout(
+      "Nova solicitação",
+      orgJoinRequestContent(escapeHtml(data.requesterName), escapeHtml(data.requesterEmail), escapeHtml(data.orgName), appUrl),
+      { signatureType: "none" }
+    )
+  );
+}
+
+function orgMembershipApprovedContent(firstName: string, orgName: string, appUrl: string) {
+  return `
+    <h2>Você agora faz parte da ${orgName}</h2>
+    <p>Olá, ${firstName}! Sua participação na <strong>${orgName}</strong> foi aprovada.</p>
+    <div class="button-container">
+        <a href="${appUrl}/mentors" class="button">Encontrar um mentor</a>
+    </div>
+    <p>A partir de agora a organização acompanha sua jornada na Menvo e pode te conectar a mentores dedicados a ela. Tudo continua gratuito.</p>
+  `;
+}
+
+export async function sendOrgMembershipApproved(data: {
+  name: string;
+  email: string;
+  orgName: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  return await sendEmail(
+    data.email,
+    `Bem-vindo(a) à ${data.orgName} na Menvo`,
+    getEmailLayout("Participação aprovada", orgMembershipApprovedContent(firstName, escapeHtml(data.orgName), appUrl), { signatureType: "personal" })
+  );
+}
+
 /**
  * Helper para envio via Brevo API
  */
@@ -689,6 +774,12 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       `;
       return getEmailLayout("Lembrete de Mentoria", content, { signatureType: "none" });
     }
+    case 'org_invite':
+      return getEmailLayout("Convite de organização", orgInviteContent("Mariana", "Instituto Gira", "https://www.menvo.com.br"), { signatureType: "none" });
+    case 'org_join_request':
+      return getEmailLayout("Nova solicitação", orgJoinRequestContent("Mariana Silva", "mariana@example.com", "Instituto Gira", "https://www.menvo.com.br"), { signatureType: "none" });
+    case 'org_membership_approved':
+      return getEmailLayout("Participação aprovada", orgMembershipApprovedContent("Mariana", "Instituto Gira", "https://www.menvo.com.br"), { signatureType: "personal" });
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }

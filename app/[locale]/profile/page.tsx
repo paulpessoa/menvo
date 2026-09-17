@@ -57,6 +57,7 @@ import {
 } from "@/components/ui/select"
 import { COMMON_TIMEZONES, getBrowserTimezone } from "@/lib/utils/timezone"
 import { TutorialsSection } from "@/components/mentor/TutorialsSection"
+import { OrganizationsTab } from "@/components/profile/OrganizationsTab"
 
 interface ChipInputProps {
   value: string[]
@@ -114,7 +115,7 @@ function ProfilePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get("tab")
-  const validTabs = ["basic", "career", "address", "interests", "mentorship"]
+  const validTabs = ["basic", "career", "address", "interests", "mentorship", "organizations"]
   const [activeTab, setActiveTab] = useState(
     tabParam && validTabs.includes(tabParam) ? tabParam : "basic"
   )
@@ -350,12 +351,13 @@ function ProfilePageContent() {
 
         <form onSubmit={handleSubmit}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-muted/50 p-1 h-auto">
               <TabsTrigger value="basic" className="py-2">Pessoal</TabsTrigger>
               <TabsTrigger value="career" className="py-2">Carreira</TabsTrigger>
               <TabsTrigger value="address" className="py-2">Localização</TabsTrigger>
               <TabsTrigger value="interests" className="py-2">Interesses</TabsTrigger>
               <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
+              <TabsTrigger value="organizations" className="py-2">Organizações</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">
@@ -658,6 +660,10 @@ function ProfilePageContent() {
                     </CardContent>
                  </Card>
                )}
+            </TabsContent>
+
+            <TabsContent value="organizations" className="space-y-6">
+              <OrganizationsTab />
             </TabsContent>
 
             <div className="flex justify-end gap-4 pt-6 border-t">

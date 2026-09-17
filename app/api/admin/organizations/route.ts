@@ -16,7 +16,7 @@ export async function GET() {
     // so embed the member ids and count client-side.
     const { data: organizations, error } = await supabase
       .from("organizations" as any)
-      .select("*, organization_members(user_id)")
+      .select("*, organization_members(user_id, status)")
       .order("created_at", { ascending: false })
 
     if (error) throw error
@@ -24,7 +24,7 @@ export async function GET() {
     const withCounts = ((organizations ?? []) as any[]).map(
       ({ organization_members, ...org }) => ({
         ...org,
-        member_count: organization_members?.length ?? 0
+        member_count: (organization_members ?? []).filter((m: any) => m.status === "active").length
       })
     )
 

@@ -48,13 +48,13 @@ export async function requireOrgAdmin(organizationId: string): Promise<GuardResu
   }
 
   const { data: membership } = await supabase
-    .from("organization_members" as any)
-    .select("role")
+    .from("organization_members")
+    .select("role, status")
     .eq("organization_id", organizationId)
     .eq("user_id", user.id)
     .maybeSingle()
 
-  if ((membership as any)?.role !== "admin") {
+  if ((membership as any)?.role !== "admin" || (membership as any)?.status !== "active") {
     return {
       ok: false,
       response: NextResponse.json(

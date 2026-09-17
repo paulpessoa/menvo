@@ -28,7 +28,7 @@ export async function GET(
 
     const { data: members, error: membersError } = await supabase
       .from("organization_members" as any)
-      .select("user_id, role, created_at, profiles(id, full_name, email)")
+      .select("user_id, role, status, created_at, profiles(id, full_name, email)")
       .eq("organization_id", organizationId)
       .order("created_at", { ascending: false })
 
@@ -67,6 +67,7 @@ export async function GET(
     const beneficiaries = memberRows.map(m => ({
       userId: m.user_id,
       role: m.role,
+      status: m.status,
       joinedAt: m.created_at,
       fullName: m.profiles?.full_name ?? null,
       email: m.profiles?.email ?? null,

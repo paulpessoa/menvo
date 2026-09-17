@@ -194,32 +194,36 @@ membership expiry, CSV import, branding, multi-org per user, quotas.
 **Where it grows next (Phase 2+):** org-scoped reports/export, org admin
 inviting mentors by email, subdomain branding, per-org quiz variants.
 
-## 5. Status — Phase 1 built, migration not yet applied (2026-09-16)
+## 5. Status — Phase 1 built and applied (2026-09-17)
 
-Code for the plan above is on `feat/multi-tenant-phase1`:
-- `supabase/migrations/20260921000000_organizations_v2.sql` — drops the
-  orphaned v1 functions, creates `organizations` + `organization_members`
-  with RLS (self-read, org-admin read, platform-admin full access, and a
-  self-join policy so a new signup can tag its own `member` row).
-- `/o/[slug]` public landing + `/o/[slug]/signup` (reuses the real
-  `SignupForm`, bypassing the waiting-list gate — org partners get real
-  accounts immediately).
-- `app/auth/callback/route.ts` tags the account with its org and
-  auto-assigns the `mentee` role on email confirmation, reading
-  `pending_organization_slug` off signup metadata.
+Migrations `20260921000000..000002` are applied to production. What's live
+on `feat/multi-tenant-phase1` (PR #45):
+
+**Membership is a stateful relation the person controls from their profile**
+(`organization_members.status`: `invited` | `requested` | `active`):
+
+| Who starts it | Where | Result |
+|---|---|---|
+| Org admin invites by e-mail | `/dashboard/org` → Convidar | `invited` + e-mail `sendOrgInvite` |
+| Person asks to join | `/o/[slug]` → Solicitar participação | `requested` + e-mail to org admins |
+| Org admin approves | `/dashboard/org` → ✓ | `active` + e-mail `sendOrgMembershipApproved` |
+| Person accepts invite | `/profile?tab=organizations` → Aceitar | `active` |
+| Person leaves / declines / withdraws | `/profile?tab=organizations` | row deleted |
+
+- Invites require an existing Menvo account (the org admin gets a clear
+  message otherwise: share the `/o/[slug]` link). No org-specific signup
+  page — `/signup?next=/o/[slug]` brings a new account back to the org page.
 - `/dashboard/admin/organizations` — platform admin: create org, suspend/
-  reactivate, assign an org admin by email.
-- `/dashboard/org` — org admin's own scoped dashboard: beneficiary list
-  with quiz-done / sessions-booked stats.
-- Mentor-side catalog visibility filter was **not** built — confirmed
-  correctly out of scope for Phase 1 (§3).
+  reactivate, assign an org admin by e-mail.
+- RLS: self read/request/accept/leave; org admins (`is_org_admin()`,
+  security definer to avoid policy recursion) manage their org's rows;
+  platform admins see everything. `/o/*` pages filter `status = 'active'`
+  explicitly because platform admins can read suspended orgs via RLS.
+- Mentor-side catalog visibility filter: **not built** (Phase 2, §3).
 
-**Not yet done, and needs the founder either way:**
-1. **Apply the migration to production** (`supabase db push` or paste the
-   SQL into the Supabase SQL editor) — nothing above works until the tables
-   exist. Do this deliberately, ideally right before the Gira call so the
-   demo is live, not blind before a review.
-2. Open/merge the PR for `feat/multi-tenant-phase1`.
-3. After merge + migration, create the Instituto Gira org via
-   `/dashboard/admin/organizations` and hand Leonildo the `/o/instituto-gira`
-   link.
+**Known gaps / next:**
+- A brand-new account that signs up from `/o/[slug]` is sent to `/onboarding`
+  first (role picker) and loses `next`; they have to reopen the org link.
+  Fine for the pilot; fix if Gira's beneficiaries trip on it.
+- Org affiliation isn't shown on public mentor cards yet.
+- Test org "Org Teste Claude" (suspended) can be deleted from the SQL editor.

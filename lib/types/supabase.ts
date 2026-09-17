@@ -815,18 +815,21 @@ export type Database = {
           created_at: string
           organization_id: string
           role: string
+          status: string
           user_id: string
         }
         Insert: {
           created_at?: string
           organization_id: string
           role: string
+          status?: string
           user_id: string
         }
         Update: {
           created_at?: string
           organization_id?: string
           role?: string
+          status?: string
           user_id?: string
         }
         Relationships: [
@@ -1716,6 +1719,7 @@ export type Database = {
         Args: { p_mentor_id: string; p_user_id: string }
         Returns: boolean
       }
+      is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
       is_organization_admin: {
         Args: { org_id: string; user_id: string }
         Returns: boolean
