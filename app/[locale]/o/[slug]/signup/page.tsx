@@ -13,6 +13,7 @@ async function getOrganization(slug: string) {
     .from("organizations" as any)
     .select("slug, name")
     .eq("slug", slug)
+    .eq("status", "active")
     .maybeSingle()
   return data as { slug: string; name: string } | null
 }

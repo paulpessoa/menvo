@@ -12,14 +12,23 @@ export async function GET() {
 
     const supabase = await createClient()
 
+    // Aggregates (count) are disabled on Supabase's PostgREST by default,
+    // so embed the member ids and count client-side.
     const { data: organizations, error } = await supabase
       .from("organizations" as any)
-      .select("*, organization_members(count)")
+      .select("*, organization_members(user_id)")
       .order("created_at", { ascending: false })
 
     if (error) throw error
 
-    return successResponse(organizations)
+    const withCounts = ((organizations ?? []) as any[]).map(
+      ({ organization_members, ...org }) => ({
+        ...org,
+        member_count: organization_members?.length ?? 0
+      })
+    )
+
+    return successResponse(withCounts)
   } catch (error) {
     return handleApiError(error)
   }

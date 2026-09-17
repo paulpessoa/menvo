@@ -41,7 +41,7 @@ interface Organization {
   contact_name: string | null
   contact_email: string | null
   created_at: string
-  organization_members: { count: number }[]
+  member_count: number
 }
 
 const ORG_TYPES = [
@@ -270,7 +270,7 @@ export default function AdminOrganizationsPage() {
                     <TableCell>
                       {ORG_TYPES.find(t => t.value === org.type)?.label || org.type}
                     </TableCell>
-                    <TableCell>{org.organization_members?.[0]?.count ?? 0}</TableCell>
+                    <TableCell>{org.member_count}</TableCell>
                     <TableCell>
                       <Badge variant={org.status === "active" ? "default" : "secondary"}>
                         {org.status === "active" ? "Ativa" : "Suspensa"}
