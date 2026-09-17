@@ -1,0 +1,2 @@
+-- Already applied on remote before this repo tracked migrations locally.
+-- Placeholder so the CLI's history check passes; the real SQL lives only in the database.
