@@ -5,18 +5,16 @@ import { Providers } from "./providers"
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer"
-import { FeedbackBanner } from "@/components/FeedbackBanner"
 import { CookieConsentBanner } from "@/components/cookie-consent-banner"
-import { GoogleAnalytics } from "@next/third-parties/google"
 import Script from "next/script"
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { notFound } from "next/navigation"
 import { routing } from "@/i18n/routing"
-import { ConsoleEasterEgg } from "@/components/ConsoleEasterEgg"
 import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
+import { DeferredConsoleEasterEgg, DeferredFeedbackBanner } from "@/components/DeferredClientWidgets"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -133,7 +131,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <Script
           id="clarity-script"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `(function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -160,7 +158,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <div className="flex min-h-screen flex-col">
-              <ConsoleEasterEgg />
+              <DeferredConsoleEasterEgg />
               <Header />
               <main id="main-content" className="flex-1">
                 <MaintenanceGuard>
@@ -168,9 +166,23 @@ export default async function RootLayout({
                 </MaintenanceGuard>
               </main>
               <Footer />
-              <FeedbackBanner />
+              <DeferredFeedbackBanner />
               <CookieConsentBanner />
-              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+              <Script
+                id="google-tag-manager"
+                strategy="lazyOnload"
+                src="https://www.googletagmanager.com/gtag/js?id=G-Y2ETF2ENBD"
+              />
+              <Script id="google-analytics" strategy="lazyOnload">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', 'G-Y2ETF2ENBD', {
+                    page_path: window.location.pathname,
+                  });
+                `}
+              </Script>
             </div>
             <Toaster />
           </Providers>
