@@ -5,7 +5,6 @@ import { Providers } from "./providers"
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer"
-import dynamic from "next/dynamic"
 import { CookieConsentBanner } from "@/components/cookie-consent-banner"
 import Script from "next/script"
 import { NextIntlClientProvider } from "next-intl"
@@ -15,15 +14,7 @@ import { routing } from "@/i18n/routing"
 import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
-
-const FeedbackBanner = dynamic(
-  () => import("@/components/FeedbackBanner").then((m) => m.FeedbackBanner),
-  { ssr: false }
-)
-const ConsoleEasterEgg = dynamic(
-  () => import("@/components/ConsoleEasterEgg").then((m) => m.ConsoleEasterEgg),
-  { ssr: false }
-)
+import { DeferredConsoleEasterEgg, DeferredFeedbackBanner } from "@/components/DeferredClientWidgets"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -167,7 +158,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <div className="flex min-h-screen flex-col">
-              <ConsoleEasterEgg />
+              <DeferredConsoleEasterEgg />
               <Header />
               <main id="main-content" className="flex-1">
                 <MaintenanceGuard>
@@ -175,7 +166,7 @@ export default async function RootLayout({
                 </MaintenanceGuard>
               </main>
               <Footer />
-              <FeedbackBanner />
+              <DeferredFeedbackBanner />
               <CookieConsentBanner />
               <Script
                 id="google-tag-manager"
