@@ -42,9 +42,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Handle obsolete routes (organizations, legacy mentors/id, undefined params)
+  // 3. Handle obsolete routes (v1 organizations, legacy mentors/id, undefined
+  // params). Scoped to avoid catching the new, intentional
+  // /dashboard/admin/organizations (multi-tenant Phase 1) and /o/[slug].
   if (
-    pathname.includes("/organizations") ||
+    (pathname.includes("/organizations") && !pathname.includes("/dashboard/admin/organizations")) ||
     pathname.includes("/mentors/id") ||
     pathname.includes("/undefined")
   ) {

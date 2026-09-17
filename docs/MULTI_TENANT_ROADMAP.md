@@ -1,6 +1,7 @@
 # 🏢 Multi-Tenant Roadmap — Menvo for Organizations
 
-> **Status: proposal, not started.** Written 2026-09-16 based on the founder's
+> **Status: Phase 1 built on `feat/multi-tenant-phase1`, migration not yet
+> applied to production — see §5.** Written 2026-09-16 based on the founder's
 > vision to offer Menvo as infrastructure to partner organizations (Instituto
 > Gira, Porto Social, Instituto Braude's reading circle, SEBRAE, online
 > hackathons, etc.) so they can register the youth/beneficiaries they serve
@@ -193,10 +194,32 @@ membership expiry, CSV import, branding, multi-org per user, quotas.
 **Where it grows next (Phase 2+):** org-scoped reports/export, org admin
 inviting mentors by email, subdomain branding, per-org quiz variants.
 
-## 5. Immediate next step
+## 5. Status — Phase 1 built, migration not yet applied (2026-09-16)
 
-Founder: confirm the Phase 1 design above (or ask for changes), then it's a
-2-3 day build. Suggested order: migration → org signup tagging → org admin
-dashboard → catalog visibility filter → platform admin org CRUD. Run it as
-a feature branch + preview deploy; apply the migration to production only
-after review, ideally right before the Gira call so the demo is live.
+Code for the plan above is on `feat/multi-tenant-phase1`:
+- `supabase/migrations/20260921000000_organizations_v2.sql` — drops the
+  orphaned v1 functions, creates `organizations` + `organization_members`
+  with RLS (self-read, org-admin read, platform-admin full access, and a
+  self-join policy so a new signup can tag its own `member` row).
+- `/o/[slug]` public landing + `/o/[slug]/signup` (reuses the real
+  `SignupForm`, bypassing the waiting-list gate — org partners get real
+  accounts immediately).
+- `app/auth/callback/route.ts` tags the account with its org and
+  auto-assigns the `mentee` role on email confirmation, reading
+  `pending_organization_slug` off signup metadata.
+- `/dashboard/admin/organizations` — platform admin: create org, suspend/
+  reactivate, assign an org admin by email.
+- `/dashboard/org` — org admin's own scoped dashboard: beneficiary list
+  with quiz-done / sessions-booked stats.
+- Mentor-side catalog visibility filter was **not** built — confirmed
+  correctly out of scope for Phase 1 (§3).
+
+**Not yet done, and needs the founder either way:**
+1. **Apply the migration to production** (`supabase db push` or paste the
+   SQL into the Supabase SQL editor) — nothing above works until the tables
+   exist. Do this deliberately, ideally right before the Gira call so the
+   demo is live, not blind before a review.
+2. Open/merge the PR for `feat/multi-tenant-phase1`.
+3. After merge + migration, create the Instituto Gira org via
+   `/dashboard/admin/organizations` and hand Leonildo the `/o/instituto-gira`
+   link.

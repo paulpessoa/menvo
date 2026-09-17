@@ -23,6 +23,7 @@ export const protectedRoutes = [
   "/messages",
   "/calendar",
   "/dashboard/admin",
+  "/dashboard/org",
   "/mentorship",
   "/volunteer-activities",
   "/onboarding",

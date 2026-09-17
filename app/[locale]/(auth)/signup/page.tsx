@@ -22,13 +22,20 @@ import { toast } from "sonner"
 import { WaitingListForm } from "@/components/WaitingListForm"
 import { useFeatureFlag } from "@/lib/feature-flags"
 
-function SignupForm() {
+export interface SignupFormProps {
+  /** When set, this signup is scoped to an organization (`/o/[slug]/signup`):
+   * the waiting list gate is skipped and the account is tagged on confirmation. */
+  orgSlug?: string
+  orgName?: string
+}
+
+export function SignupForm({ orgSlug, orgName }: SignupFormProps = {}) {
   const t = useTranslations("register")
   const tl = useTranslations("login")
   const tc = useTranslations("common")
   const { user, loading, signUp, signInWithProvider, getDefaultRedirectPath } =
     useAuth()
-  const waitingListEnabled = useFeatureFlag("waiting_list_flag")
+  const waitingListEnabled = useFeatureFlag("waiting_list_flag") && !orgSlug
 
   const isAuthenticated = !!user && !loading
   const [email, setEmail] = useState("")
@@ -70,7 +77,7 @@ function SignupForm() {
     setIsLoading(true)
 
     try {
-      await signUp(email, password, firstName.trim(), lastName.trim())
+      await signUp(email, password, firstName.trim(), lastName.trim(), orgSlug)
       setSuccess(true)
       toast.success(t("success"))
     } catch (err: any) {
@@ -148,7 +155,9 @@ function SignupForm() {
             <Lock className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-3xl font-extrabold tracking-tight text-foreground">{t("signupTitle")}</CardTitle>
-          <CardDescription className="text-base">{t("description")}</CardDescription>
+          <CardDescription className="text-base">
+            {orgName ? `${orgName} · ${t("description")}` : t("description")}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 px-8">
           <div className="grid grid-cols-1 gap-3">

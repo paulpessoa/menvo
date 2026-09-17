@@ -34,7 +34,7 @@ export interface AuthContextType {
         isPending: boolean
     }
     signIn: (email: string, password: string) => Promise<{ success: boolean, error?: any }>
-    signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ success: boolean, error?: any }>
+    signUp: (email: string, password: string, firstName: string, lastName: string, orgSlug?: string) => Promise<{ success: boolean, error?: any }>
     signInWithProvider: (provider: Provider) => Promise<{ success: boolean, error?: any }>
     signOut: () => Promise<void>
     refreshProfile: () => Promise<void>
@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) { return { success: false, error } } finally { setLoading(false) }
     }
 
-    const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+    const signUp = async (email: string, password: string, firstName: string, lastName: string, orgSlug?: string) => {
         try {
             setLoading(true)
             const { error } = await supabase.auth.signUp({
@@ -146,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         first_name: firstName,
                         last_name: lastName,
                         full_name: `${firstName} ${lastName}`,
+                        ...(orgSlug ? { pending_organization_slug: orgSlug } : {}),
                     },
                     emailRedirectTo: `${window.location.origin}/auth/callback`,
                 }
