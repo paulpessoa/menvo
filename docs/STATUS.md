@@ -1,0 +1,144 @@
+# 💓 STATUS — Single Source of Truth
+
+> Merges what used to be three overlapping files (`HEARTBEAT.md`, `BACKLOG.md`,
+> `JOURNAL.md`) into one: current health, standing product/architecture
+> invariants, the active backlog, and a chronological engineering log.
+
+## 📅 Last Updated: 2026-09-17
+**Current status:** Multi-tenant Phase 1 shipped and merged (organizations,
+invite/request/approve membership, org admin dashboard). Phase 1.5
+(role-aware reporting, public/invite-only orgs, coherent emails, SEO) is
+planned in [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6, not
+started.
+
+---
+
+## 🚦 System Health
+- **TypeScript:** 0 errors (`npx tsc --noEmit`)
+- **Unit Tests:** 124/124 passed across 25 test suites (`npm test`)
+- **Production Build:** 55/55 pages generated successfully (`npm run build`)
+- **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
+
+---
+
+## 📍 Architectural & Product Invariants
+
+### 1. Brand Identity & Button Design System
+- **Official Brand Color:** `#007585` (Deep Teal / Verde Petróleo Menvo).
+- **CSS Token:** `--primary: 187 100% 26%` in `app/[locale]/globals.css` (resolves to `#007585`).
+- **Tailwind Config:** `primary.600: "#007585"`, `primary.700: "#006276"`.
+- **Button Standards (`components/ui/button.tsx`):**
+  - **Border Radius:** `rounded-xl` por padrão em toda a aplicação.
+  - **Microinterações:** `active:scale-[0.98]` e hover com sombras de marca (`shadow-md shadow-primary/20`).
+  - **Variante Outline:** `border-2 border-border bg-background hover:bg-muted/60 active:scale-[0.98]`.
+  - **Minimalismo Text-Only:** Botões de ação devem exibir apenas texto puro legível. Proibido adicionar setinhas decorativas (`ArrowRight`) ou ícones redundantes.
+  - **Exceções Legítimas:** Spinners de loading (`Loader2`), logos oficiais de terceiros (Google/LinkedIn) e botões exclusivamente de ícone (`size="icon"`).
+- **Email Design:** All Brevo transactional emails strictly use `#007585` for CTAs and buttons.
+
+### 2. Mentorship Evaluation Model
+- **Asymmetric by Design:** Only mentees evaluate mentors (`!isMentor`).
+- **Purpose:** Testimonials and 1-to-5 star ratings construct the mentor's public profile credibility. Mentees do not have public catalog ratings.
+- **Card Action:** The "Avaliar Mentoria" button is strictly hidden from mentors and only revealed to mentees on past, confirmed/completed sessions.
+
+### 3. Scheduling & Availability Engine
+- **Weekly Recurring Slots:** Mentors configure weekday recurring availability (minimum interval: 45 minutes).
+- **14-Day Rolling Window:** Slots are projected dynamically up to 14 days in advance.
+- **Conflict Filtering:** Suppresses colliding slots against both internal appointments and Google Calendar `freebusy.query`.
+- **Reference:** See [`docs/SCHEDULING_AND_AVAILABILITY.md`](SCHEDULING_AND_AVAILABILITY.md).
+
+### 4. Database Portability (BFF Architecture)
+- **Rule:** UI components must never query Supabase directly.
+- **Direction:** All client mutations and queries must flow through internal Next.js API routes (`/api/...`) to ensure zero-downtime database migration away from Supabase in the future.
+- **Auth Session:** Managed via `lib/auth/auth-context.tsx` reading `/api/auth/me` and `/api/profile` (cookie-authenticated).
+
+### 5. Multi-Tenant Organizations (added 2026-09-17)
+- **Membership is stateful, not binary:** `organization_members.status`
+  is `invited | requested | active`. The person controls it from
+  `/profile?tab=organizations`; the org admin controls it from
+  `/dashboard/org`. Nobody is auto-tagged into an org at signup.
+- **A member's "kind" (beneficiary vs org mentor) is derived**, never a
+  separate field — it's whatever `user_roles` already says the person is
+  (mentor or mentee). See roadmap §6 for the reporting split this enables.
+- **RLS org-admin checks go through `is_org_admin()`** (security definer),
+  never a policy that selects from its own table — Postgres rejects direct
+  self-referential `USING` clauses as recursion.
+- **Reference:** [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md).
+
+---
+
+## 🎯 Active Backlog
+
+### 🟠 P1 — High Priority
+- [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification — all completed pre-2026-09-16, see journal below for detail.
+
+### 🟡 P2 — Medium Priority
+- [x] Profile & Calendar Sync Polish, In-App Notifications Hub, Database Portability/BFF audit, Transactional Email Hardening, Brand Color Harmonization, Evaluation Flow Distinction, Admin Breadcrumb Unification.
+
+### 🔵 P3 — Future / Strategic
+- [x] **UI Width/Container Standardization:** Shared `PageContainer` component, 1280px cap app-wide, obsolete `AdminBreadcrumb` removed.
+- [x] **`/mentors` Dead-Click Fix:** Whole `MentorCard` interactive, dismissable filter chips (found via Clarity).
+- [x] **Multi-Tenant Phase 1:** Organizations, invite/request/approve membership, org admin dashboard, platform admin org CRUD. Shipped in PR #45.
+- [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Plan: [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6.
+
+---
+
+## 📓 Engineering Journal
+
+### 2026-09-17 — Multi-Tenant Phase 1 Shipped, Membership Model Redesigned
+- **Phase 1 built and merged (PR #45):** `organizations` + `organization_members` tables, `/o/[slug]` landing, `/dashboard/admin/organizations` (platform admin CRUD), `/dashboard/org` (org admin dashboard).
+- **Founder feedback caught a real design flaw before it shipped wider:** the original "signup tags you into an org" flow had no path for someone who already had an account, and was confusing UX. Replaced with a stateful membership (`invited/requested/active`) controlled from `/profile` and `/dashboard/org`, with three coherent transactional emails.
+- **Three production bugs found only by testing against the real DB** (not catchable by `tsc`/jest): infinite RLS recursion on a self-referential policy (fixed with a `security definer` function), Supabase disabling PostgREST aggregates by default (`organization_members(count)` → counted in JS instead), and a suspended org still being readable by platform admins on its public landing page (added an explicit `status = 'active'` filter).
+- **Phase 1.5 planned, not started:** role-aware reporting, public vs invite-only org pages, per-role email copy, SEO. See roadmap §6.
+- **Unrelated production outage found and fixed mid-session:** `main` was unbuildable since an earlier commit (`a5e4a74c`) put `dynamic(..., { ssr: false })` directly in the Server Component root layout — Next 15 rejects that. Fixed by moving the two deferred client widgets into a small `"use client"` wrapper (`components/DeferredClientWidgets.tsx`).
+- **Docs pruned:** removed 11 stale/obsolete docs (v1 organizations deployment guide, superseded architecture maps, dated planning/analytics snapshots); merged `HEARTBEAT.md` + `BACKLOG.md` + `JOURNAL.md` into this file.
+
+### 2026-09-16 — Admin Breadcrumb Unification, Analytics-Driven Bug Fix & Multi-Tenant Planning
+- **Unified Admin Breadcrumb:** `AdminBreadcrumb` was only rendered on `/dashboard/admin/users` and its route map pointed at dead `/dashboard/admin/mentors*` routes plus a mismatched `/settings` entry. Moved it into the shared `dashboard/admin/layout.tsx` so every admin page gets a consistent, correctly-mapped breadcrumb (later removed entirely in favor of `PageContainer`-only pages).
+- **Fixed `/mentors/undefined` Bug (found via Clarity analytics):** Guarded two mentor-profile links (mentee's favorites list, mentor's "view public profile" quick action) that rendered without a slug/id fallback, producing broken links tracked in production traffic.
+- **Clarity MCP Server Connected:** Added `.mcp.json` (Microsoft Clarity Data Export MCP), enabling live analytics queries (sessions, traffic sources, dead/rage clicks, device mix) directly from an agent session.
+- **Multi-Tenant Roadmap drafted:** Found that SQL functions referencing `organizations`/`organization_members` still existed in the DB function list even though those tables weren't in the generated types — required a live DB check before any schema work, since the prior organizations module was deliberately removed in favor of the lean mentor-mentee core loop (see "Earlier Milestones" below).
+
+### 2026-09-08 — Mentor Availability BFF & Transactional Email Hardening
+- **Mentor Availability BFF Route (`/api/mentors/availability`):** Resolved availability slots not displaying on `/dashboard/mentor/availability` by introducing a dedicated BFF Route Handler (GET and POST) with Zod validation. Replaced client-side anonymous RLS queries with server-authenticated session resolution.
+- **Personal Founder Signature (Paul Pessoa):** Implemented email signature for community/relationship touchpoints, with circular portrait, WhatsApp link, LinkedIn/GitHub. Removed decorative emojis across all email templates.
+- **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal) across all Brevo templates.
+- **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`.
+- **Live Email Test Dispatch Center (`/api/admin/emails/send-test`):** Send real Brevo test emails of any template from `/dashboard/admin/emails`.
+- **Cron Job Hardening (`/api/cron/appointments`):** Rescheduled to 10:00 UTC (07:00 Brasília) with `CRON_SECRET` auth and precise `America/Sao_Paulo` boundaries.
+
+### 2026-09-07 — Brand Color Standardization, Scheduling Hardening & Core Loop Polish
+- **Official Brand Color (#007585):** Harmonized all buttons, cards, and interactive elements, eliminating arbitrary `emerald-600` and legacy indigo/purple accents.
+- **Hero Banner Restoration:** Reinstated the `/mentorship/mentee` hero banner with the official brand gradient and functional CTAs.
+- **Asymmetric Evaluation Model Enforced:** Restricted public star ratings/testimonials to mentees evaluating mentors.
+- **Scheduling Flow Hardening:** Fixed timezone ISO normalization in `/api/appointments/schedule`, added mentor verification status guards.
+- **Auth Context API Decoupling:** Replaced direct database queries in `auth-context.tsx` with `/api/auth/me` and `/api/profile`.
+
+### 2026-09-06 — Auth Ecosystem Simplification, Availability Engine & Mobile UX
+- **Minute-Based Availability Engine:** Migrated from hour loops to minute-based generator (45-minute step, min duration validation).
+- **Google Calendar Conflict Detection:** Integrated `freebusy.query` in `/api/appointments/availability`.
+- **Auth Flow Restructuring:** Consolidated password update flows, fixed redirect ping-pong, unified confirmation resend.
+- **Mobile Catalog Search:** Redesigned responsive filters sheet, 50/50 action grid, dismissible filter chips.
+
+### 2026-09-05 — Comprehensive Modernization, Decoupling & LLM SEO
+- **Architectural Decoupling:** Enforced strict separation of concerns per `AGENTS.md`. Eliminated raw Supabase queries in components, delegating to dedicated services.
+- **Geo SEO & LLMs Indexing:** Standardized `public/llms.txt`, `public/llms-full.txt`, AI crawler whitelisting in `robots.txt`.
+- **Web Quality & Accessibility:** Font display swap, Schema.org JSON-LD graph, skip-to-content links, Hero image LCP preloading.
+- **Strict Typing:** 100% clean `tsc --noEmit` (0 errors across the codebase).
+
+### Earlier Milestones
+- **Organization Module Deprecation:** Removed multi-tenant organizations v1 in favor of a lean, direct mentor-to-mentee relationship (later rebuilt leaner — see 2026-09-17 above).
+- **Unified Internationalization:** Integrated quiz translations into standard Next-intl `messages/{locale}.json` dictionaries.
+- **AI Mentorship Matching:** Implemented GPT-4o-mini powered mentor recommendation engine with deterministic fallback in `/api/ai/match`.
+
+---
+
+## 📚 Documentation Index
+
+| File | Purpose |
+|---|---|
+| [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) | Multi-tenant organizations: decisions, Phase 1 (shipped), Phase 1.5 plan |
+| [`docs/VISION.md`](VISION.md) | Product purpose, target audience, and north star |
+| [`docs/GOOGLE_OAUTH_SUBMISSION.md`](GOOGLE_OAUTH_SUBMISSION.md) | Google Cloud Console OAuth verification kit & demo video script |
+| [`docs/SCHEDULING_AND_AVAILABILITY.md`](SCHEDULING_AND_AVAILABILITY.md) | Availability algorithm, 14-day projection, conflict detection |
+| [`docs/ENVIRONMENT_VARIABLES.md`](ENVIRONMENT_VARIABLES.md) | Active environment variables reference across environments |
+| [`docs/SEO_GUIDE.md`](SEO_GUIDE.md) | Search engine, LLMs/Geo SEO, and image guidelines |

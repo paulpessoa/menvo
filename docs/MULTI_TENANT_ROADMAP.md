@@ -1,27 +1,28 @@
 # 🏢 Multi-Tenant Roadmap — Menvo for Organizations
 
-> **Status: Phase 1 built on `feat/multi-tenant-phase1`, migration not yet
-> applied to production — see §5.** Written 2026-09-16 based on the founder's
+> **Status: Phase 1 shipped and merged to `main` (PR #45). Phase 1.5 planned,
+> not started — see §6.** Written 2026-09-16 based on the founder's
 > vision to offer Menvo as infrastructure to partner organizations (Instituto
 > Gira, Porto Social, Instituto Braude's reading circle, SEBRAE, online
 > hackathons, etc.) so they can register the youth/beneficiaries they serve
 > and tap into (or bring) mentors — while keeping the free public
-> mentor-mentee core loop as the backbone. This is a planning document; no
-> schema or code changes were made tonight. Read [`docs/JOURNAL.md`](JOURNAL.md)
-> and [`docs/BACKLOG.md`](BACKLOG.md) for why this direction was previously
-> reversed — that history matters for how this should be rebuilt.
+> mentor-mentee core loop as the backbone. Read
+> [`docs/STATUS.md`](STATUS.md) (Engineering Journal, "Earlier Milestones")
+> for why this direction was previously reversed — that history matters for
+> how this got rebuilt.
 
 ---
 
 ## 0. Important context: this was already tried and removed once
 
-`docs/JOURNAL.md` → "Earlier Milestones": **"Organization Module
-Deprecation: Removed multi-tenant organizations in favor of a lean, direct
-mentor-to-mentee relationship."** `docs/BACKLOG.md` also lists "Dashboard
+`docs/STATUS.md` → Engineering Journal, "Earlier Milestones": **"Organization
+Module Deprecation: Removed multi-tenant organizations in favor of a lean,
+direct mentor-to-mentee relationship."** The same journal lists "Dashboard
 Simplification (Anti-Overengineering)" as a completed P1 item. The old
-implementation left real fossils behind:
+implementation left real fossils behind (its deployment guide has since been
+deleted as obsolete — this is what it covered):
 
-- `docs/archive/ORGANIZATIONS_V1_DEPLOYMENT_GUIDE.md` — a full deployment
+- A full deployment
   guide for `organizations`, `organization_members`,
   `mentor_visibility_settings`, `organization_activity_log` tables, invitation
   flows, and expiration cron jobs.
