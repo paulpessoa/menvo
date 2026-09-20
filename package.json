@@ -29,7 +29,6 @@
     "@google-cloud/local-auth": "^3.0.1",
     "@googlemaps/js-api-loader": "latest",
     "@hookform/resolvers": "latest",
-    "@next/third-parties": "latest",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",

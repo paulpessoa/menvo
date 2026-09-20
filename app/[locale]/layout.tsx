@@ -6,7 +6,6 @@ import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
 import Footer from "@/components/footer"
 import { CookieConsentBanner } from "@/components/cookie-consent-banner"
-import Script from "next/script"
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -15,7 +14,7 @@ import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
-import { GoogleAnalytics } from "@next/third-parties/google"
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -170,7 +169,21 @@ export default async function RootLayout({
               <DeferredFeedbackBanner />
               <DeferredFounderPitchWidget />
               <CookieConsentBanner />
-              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+              <Script
+                id="google-tag-manager"
+                strategy="lazyOnload"
+                src="https://www.googletagmanager.com/gtag/js?id=G-Y2ETF2ENBD"
+              />
+              <Script id="google-analytics" strategy="lazyOnload">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', 'G-Y2ETF2ENBD', {
+                    page_path: window.location.pathname,
+                  });
+                `}
+              </Script>
             </div>
             <Toaster />
           </Providers>
