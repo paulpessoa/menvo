@@ -24,6 +24,11 @@ const FounderPitchWidget = dynamic(
   { ssr: false }
 )
 
+const CookieConsentBanner = dynamic(
+  () => import("@/components/cookie-consent-banner").then((m) => m.CookieConsentBanner),
+  { ssr: false }
+)
+
 export function DeferredConsoleEasterEgg() {
   return <ConsoleEasterEgg />
 }
@@ -34,4 +39,8 @@ export function DeferredFeedbackBanner() {
 
 export function DeferredFounderPitchWidget() {
   return <FounderPitchWidget />
+}
+
+export function DeferredCookieConsentBanner() {
+  return <CookieConsentBanner />
 }

@@ -9,10 +9,6 @@ import dynamic from "next/dynamic"
 const Footer = dynamic(() => import("@/components/footer"), {
   ssr: true,
 })
-const CookieConsentBanner = dynamic(
-  () => import("@/components/cookie-consent-banner").then((mod) => mod.CookieConsentBanner),
-  { ssr: false }
-)
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -20,7 +16,7 @@ import { routing } from "@/i18n/routing"
 import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
-import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
+import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget, DeferredCookieConsentBanner } from "@/components/DeferredClientWidgets"
 import { AnalyticsWrapper } from "@/components/AnalyticsWrapper"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
@@ -164,7 +160,7 @@ export default async function RootLayout({
               <Footer />
               <DeferredFeedbackBanner />
               <DeferredFounderPitchWidget />
-              <CookieConsentBanner />
+              <DeferredCookieConsentBanner />
               <AnalyticsWrapper />
             </div>
             <Toaster />

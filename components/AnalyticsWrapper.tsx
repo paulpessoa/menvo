@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 
 declare global {
   interface Window {
-    dataLayer: any[];
+    dataLayer?: Object[];
     gtag: (...args: any[]) => void;
     gtag_initialized?: boolean;
   }
