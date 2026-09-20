@@ -16,7 +16,7 @@ import { routing } from "@/i18n/routing"
 import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
-import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget, DeferredCookieConsentBanner } from "@/components/DeferredClientWidgets"
+import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredCookieConsentBanner } from "@/components/DeferredClientWidgets"
 import { AnalyticsWrapper } from "@/components/AnalyticsWrapper"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
@@ -159,7 +159,7 @@ export default async function RootLayout({
               </main>
               <Footer />
               <DeferredFeedbackBanner />
-              <DeferredFounderPitchWidget />
+
               <DeferredCookieConsentBanner />
               <AnalyticsWrapper />
             </div>
