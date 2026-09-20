@@ -33,8 +33,9 @@ export function getAssistantAgent(supabase: SupabaseClient) {
     temperature: 0.3
   })
 
-  // O withFallbacks nativo do LangChain resolve automaticamente
-  const modelWithFallback = groqModel.withFallbacks({ fallbacks: [geminiModel] })
+  // O withFallbacks nativo não suporta bindTools diretamente no createReactAgent
+  // Portanto, usaremos o modelo primário diretamente.
+  const primaryModel = groqModel
 
   // 2. Configurar Tools
   const searchMentorsTool = tool(
@@ -68,7 +69,7 @@ export function getAssistantAgent(supabase: SupabaseClient) {
 
   // 3. Criar e retornar Agent
   return createReactAgent({
-    llm: modelWithFallback,
+    llm: primaryModel,
     tools,
     messageModifier: new SystemMessage(SYSTEM_PROMPT)
   })

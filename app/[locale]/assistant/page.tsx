@@ -111,6 +111,13 @@ export default function AssistantPage() {
                   ))
                 } else if (data.type === "tool_start") {
                   setToolActivity(`Acessando: ${data.name}...`)
+                } else if (data.type === "error") {
+                  setToolActivity(null)
+                  setMessages(prev => prev.map(msg => 
+                    msg.id === assistantMessageId 
+                      ? { ...msg, text: msg.text + "\n❌ Erro: " + data.message } 
+                      : msg
+                  ))
                 }
               } catch (e) {
                 // Ignore parse errors on incomplete chunks
