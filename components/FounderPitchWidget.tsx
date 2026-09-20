@@ -184,6 +184,7 @@ export function FounderPitchWidget() {
     <aside
       role="complementary"
       aria-label="Vídeo de boas-vindas do fundador da Menvo"
+      inert={!isVisible}
       className={[
         // Posicionamento confortável: afastado da barra de scroll e da borda inferior
         "fixed z-50",
