@@ -112,13 +112,13 @@ async function main() {
   })
 
   const geminiModel = new ChatGoogleGenerativeAI({
-    model: "gemini-4.5-flash",
+    model: "gemini-3.5-flash-lite",
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     temperature: 0
   })
 
   await runEval("Qwen 3.8 27b (Groq)", groqModel)
-  await runEval("Gemini 4.5 Flash (Google)", geminiModel)
+  await runEval("Gemini 3.5 Flash-Lite (Google)", geminiModel)
 }
 
 main().catch(console.error)

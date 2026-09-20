@@ -220,7 +220,7 @@ Sequência:
    `qwen/qwen3.8-27b`, `temperature: 0.3`). Envolva a chamada
    inteira em try/catch; em erro **e** se `GOOGLE_GENERATIVE_AI_API_KEY`
    existir, refaça com `ChatGoogleGenerativeAI` (`@langchain/google-genai`,
-   modelo `gemini-4.5-flash`). Se ambos falharem → 502 com
+   modelo `gemini-3.5-flash-lite`). Se ambos falharem → 502 com
    `{ error: "Assistente indisponível no momento" }`.
 5. **Agente**: as 3 tools da §3 viram tools LangChain (use `tool()` de
    `@langchain/core/tools` com os schemas Zod — não reescreva os schemas).
