@@ -20,6 +20,16 @@ const SUGGESTIONS = [
   "Quero aprender a investir"
 ]
 
+const LOADING_MESSAGES = [
+  "Deixa eu pensar um pouco...",
+  "Menvozando...",
+  "Consultando as estrelas da mentoria...",
+  "Uau, muita gente me perguntando isso hoje...",
+  "Processando sua resposta...",
+  "Procurando nas melhores conexões...",
+  "Pera aí, consultando o oráculo..."
+]
+
 export default function AssistantPage() {
   const isEnabled = useFeatureFlag("ai_assistant_flag")
   const t = useTranslations("Navigation")
@@ -36,7 +46,7 @@ export default function AssistantPage() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages, toolActivity])
+  }, [messages.length, toolActivity])
 
   if (!isEnabled) {
     return (
@@ -76,7 +86,7 @@ export default function AssistantPage() {
       const res = await fetch("/api/assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ message: text, history: messages })
       })
 
       if (!res.ok) {
@@ -110,7 +120,8 @@ export default function AssistantPage() {
                       : msg
                   ))
                 } else if (data.type === "tool_start") {
-                  setToolActivity(`Acessando: ${data.name}...`)
+                  const randomMsg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+                  setToolActivity(randomMsg)
                 } else if (data.type === "error") {
                   setToolActivity(null)
                   setMessages(prev => prev.map(msg => 
