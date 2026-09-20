@@ -10,7 +10,8 @@ import {
   Shield,
   LayoutDashboard,
   Loader2,
-  Heart
+  Heart,
+  Bot
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -21,12 +22,14 @@ import { NotificationBell } from "./header/NotificationBell"
 import { UserNavDropdown } from "./header/UserNavDropdown"
 import { MobileNavSheet } from "./header/MobileNavSheet"
 import { UserNavigationItem } from "./header/types"
+import { useFeatureFlag } from "@/lib/feature-flags"
 
 export default function Header() {
   const { user, profile, isAuthenticated, loading, role, isAdmin, signOut } = useAuth()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
+  const isAssistantEnabled = useFeatureFlag("ai_assistant_flag")
 
   const navigation = [
     { name: t("common.home"), href: "/" },
@@ -62,6 +65,15 @@ export default function Header() {
       icon: Settings,
       color: "text-gray-700"
     })
+
+    if (isAssistantEnabled) {
+      userNavigation.push({
+        name: "Assistente (AI)",
+        href: "/assistant",
+        icon: Bot,
+        color: "text-purple-600"
+      })
+    }
 
     if (isAdmin) {
       userNavigation.push({ type: "separator" })

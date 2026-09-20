@@ -15,6 +15,7 @@ export interface FeatureFlags {
   waiting_list_flag: boolean
   feedback_app_flag: boolean
   maintenance_mode_flag: boolean
+  ai_assistant_flag: boolean
 }
 
 /**
@@ -23,7 +24,8 @@ export interface FeatureFlags {
 export const DEFAULT_FLAGS: FeatureFlags = {
   waiting_list_flag: false,
   feedback_app_flag: false,
-  maintenance_mode_flag: false
+  maintenance_mode_flag: false,
+  ai_assistant_flag: false
 }
 
 interface FeatureFlagsContextType {

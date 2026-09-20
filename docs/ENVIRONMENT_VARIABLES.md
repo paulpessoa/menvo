@@ -58,7 +58,8 @@ cp .env.example .env.local
 | Variable | Required | Context | Description |
 |---|---|---|---|
 | `OPENAI_API_KEY` | Recommended | Server-only | OpenAI key for GPT-4o-mini matching |
-| `GROQ_API_KEY` | Optional | Server-only | Groq key for fallback inference |
+| `GROQ_API_KEY` | Optional | Server-only | Groq key for fallback inference and Assistant |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Optional | Server-only | Google AI key for Gemini 2.5 Flash-Lite fallback in the Assistant |
 
 ### Analytics (Microsoft Clarity MCP)
 | Variable | Required | Context | Description |

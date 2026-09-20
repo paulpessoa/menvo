@@ -45,6 +45,7 @@ class MentorService {
       .select(
         `
         id,
+        slug,
         first_name,
         last_name,
         avatar_url,

@@ -21,6 +21,7 @@ export const protectedRoutes = [
   "/profile",
   "/mentors/id/schedule",
   "/messages",
+  "/assistant",
   "/calendar",
   "/dashboard/admin",
   "/dashboard/org",
