@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import { useState, useEffect } from "react"
 
 // `ssr: false` is only allowed inside a Client Component, so the root layout
 // (a Server Component) renders this wrapper instead of calling dynamic() itself.
@@ -42,5 +43,17 @@ export function DeferredFounderPitchWidget() {
 }
 
 export function DeferredCookieConsentBanner() {
+  const [shouldRender, setShouldRender] = useState(false)
+
+  useEffect(() => {
+    // Atrasa a renderização do banner em 3.5 segundos para não competir com a hidratação inicial
+    const timer = setTimeout(() => {
+      setShouldRender(true)
+    }, 3500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!shouldRender) return null
+
   return <CookieConsentBanner />
 }
