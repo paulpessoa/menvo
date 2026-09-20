@@ -14,7 +14,6 @@ import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
-import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
