@@ -22,6 +22,7 @@ const mcpHandler = createMcpHandler((server) => {
     {
       title: "Buscar Mentores",
       description: "Busca mentores no catálogo usando filtro por relevância e pesquisa (IA/semântico)",
+      // @ts-ignore: Zod and StandardSchema conflict
       inputSchema: searchMentorsInput
     },
     async (input: any) => {
@@ -35,6 +36,7 @@ const mcpHandler = createMcpHandler((server) => {
     {
       title: "Ver Disponibilidade do Mentor",
       description: "Retorna a agenda do mentor nos próximos dias usando o seu slug público",
+      // @ts-ignore: Zod and StandardSchema conflict
       inputSchema: getMentorAvailabilityInput
     },
     async (input: any) => {
@@ -48,6 +50,7 @@ const mcpHandler = createMcpHandler((server) => {
     {
       title: "Explicar como funciona a Menvo",
       description: "Responde dúvidas sobre o funcionamento da plataforma Menvo",
+      // @ts-ignore: Zod and StandardSchema conflict
       inputSchema: explainHowItWorksInput
     },
     async (input: any) => {

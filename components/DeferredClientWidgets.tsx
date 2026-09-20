@@ -46,10 +46,10 @@ export function DeferredCookieConsentBanner() {
   const [shouldRender, setShouldRender] = useState(false)
 
   useEffect(() => {
-    // Atrasa a renderização do banner em 3.5 segundos para não competir com a hidratação inicial
+    // Atrasa a renderização do banner em 6 segundos para não competir com a hidratação inicial e as imagens da Home
     const timer = setTimeout(() => {
       setShouldRender(true)
-    }, 3500)
+    }, 6000)
     return () => clearTimeout(timer)
   }, [])
 
