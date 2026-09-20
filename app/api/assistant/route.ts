@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { getFeatureFlags } from "@/lib/feature-flags-server"
 import { checkRateLimit } from "@/lib/rate-limit"
-import { HumanMessage } from "@langchain/core/messages"
+import { HumanMessage, AIMessage } from "@langchain/core/messages"
 import { getAssistantAgent } from "@/lib/services/assistant/agent"
 
 export const maxDuration = 60
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 })
     }
 
-    const { message: userMessage } = await req.json()
+    const { message: userMessage, history = [] } = await req.json()
     if (!userMessage) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
@@ -40,9 +40,15 @@ export async function POST(req: NextRequest) {
       async start(controller) {
         let fullAiResponse = ""
         try {
+          const pastMessages = history
+            .filter((msg: any) => !msg.isStreaming && msg.text && msg.text.trim().length > 0)
+            .map((msg: any) => 
+              msg.role === "user" ? new HumanMessage(msg.text) : new AIMessage(msg.text)
+            )
+
           const events = await agent.streamEvents(
-            { messages: [new HumanMessage(userMessage)] },
-            { version: "v2" }
+            { messages: [...pastMessages, new HumanMessage(userMessage)] },
+            { version: "v2", recursionLimit: 5 }
           )
 
           for await (const event of events) {
