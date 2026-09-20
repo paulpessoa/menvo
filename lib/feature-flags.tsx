@@ -8,25 +8,9 @@ import React, {
   useCallback
 } from "react"
 
-/**
- * Interface de Feature Flags (Padrão Sincronizado com o Banco).
- */
-export interface FeatureFlags {
-  waiting_list_flag: boolean
-  feedback_app_flag: boolean
-  maintenance_mode_flag: boolean
-  ai_assistant_flag: boolean
-}
-
-/**
- * Defaults seguros.
- */
-export const DEFAULT_FLAGS: FeatureFlags = {
-  waiting_list_flag: false,
-  feedback_app_flag: false,
-  maintenance_mode_flag: false,
-  ai_assistant_flag: false
-}
+import { FeatureFlags, DEFAULT_FLAGS } from "./feature-flags-server"
+export type { FeatureFlags }
+export { DEFAULT_FLAGS }
 
 interface FeatureFlagsContextType {
   flags: FeatureFlags
@@ -96,29 +80,3 @@ export function useFeatureFlag(flagName: keyof FeatureFlags): boolean {
   return flags[flagName] ?? DEFAULT_FLAGS[flagName]
 }
 
-/**
- * getFeatureFlags (Servidor)
- * Chamada direta ao banco para Server Components, garantindo tempo real.
- */
-export async function getFeatureFlags(): Promise<FeatureFlags> {
-  try {
-    const { createClient } = await import('@supabase/supabase-js')
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    
-    const { data } = await supabase
-      .from('feature_flags')
-      .select('name, enabled')
-
-    const flagsFromDB: any = {}
-    data?.forEach(f => {
-      flagsFromDB[f.name] = f.enabled
-    })
-
-    return { ...DEFAULT_FLAGS, ...flagsFromDB }
-  } catch {
-    return DEFAULT_FLAGS
-  }
-}

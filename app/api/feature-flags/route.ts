@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { DEFAULT_FLAGS } from "@/lib/feature-flags"
+import { DEFAULT_FLAGS } from "@/lib/feature-flags-server"
 import type { Database } from "@/lib/types/supabase"
 
 // Força a rota a ser dinâmica e não cacheada
