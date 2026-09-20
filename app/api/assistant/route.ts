@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         try {
           const events = await agent.streamEvents(
             { messages: [new HumanMessage(userMessage)] },
-            { version: "v2" }
+            { version: "v2", recursionLimit: 5 }
           )
 
           for await (const event of events) {
