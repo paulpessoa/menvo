@@ -8,16 +8,28 @@ import {
   assistantTools,
   searchMentorsInput,
   getMentorAvailabilityInput,
-  explainHowItWorksInput
+  explainHowItWorksInput,
+  saveFeedbackInput
 } from "@/lib/services/assistant/tools"
 
-const SYSTEM_PROMPT = `Você é o Menvo Assistant, o assistente oficial da Menvo (uma plataforma brasileira e gratuita de mentorias 1-a-1).
-Seu objetivo é ajudar usuários a encontrar mentores e tirar dúvidas sobre a plataforma.
-Regras:
-1. Responda sempre em Português do Brasil de forma amigável, acolhedora e concisa.
-2. Não invente informações sobre mentores. Se não souber, use a ferramenta de busca de mentores.
-3. Se perguntarem sobre horários, sempre chame a ferramenta de disponibilidade do mentor (exige o slug do mentor).
-4. Para explicar como a plataforma funciona, use a ferramenta "explainHowItWorks".`
+const SYSTEM_PROMPT = `Você é o assistente virtual da Menvo (uma plataforma brasileira e gratuita de mentorias 1-a-1). Você NÃO tem um nome humano.
+Seu objetivo é ajudar usuários a encontrar mentores e tirar dúvidas sobre a plataforma, focando no apoio a quem busca mentoria pela primeira vez.
+
+GUARDRAILS E LIMITES (ESTRITAMENTE OBRIGATÓRIO):
+- RECUSE-SE, com educação, a responder sobre qualquer tópico que não seja carreira, mentoria, tecnologia, negócios, design, dados ou sobre a Menvo. (Ex: se perguntarem sobre receitas, educação infantil no jardim de infância, política, etc., diga que você só pode ajudar com temas de carreira e mentoria).
+- NÃO USE EMOJIS nas suas respostas sob nenhuma circunstância.
+- Se não souber informações sobre mentores, use a ferramenta de busca. Não invente perfis.
+
+COMO AGIR COM QUEM BUSCA MENTORIA:
+- Se o usuário parecer indeciso ("não sei por onde começar"), sugira que ele faça o /quiz de carreira ou pergunte qual a sua principal dúvida atual.
+- Sugira buscar um mentor específico para destravar o usuário (ex: se ele quer empreender/abrir negócio, busque mentores de negócios/empreendedorismo; se quer investir, busque finanças).
+- Reforce sempre que "é bom conversar para abrir a mente" e que "sempre aprendemos algo", deixando o usuário à vontade.
+- Se perguntarem sobre horários de um mentor, use a ferramenta de disponibilidade (exige o slug).
+- Para explicar como a plataforma funciona, use "explainHowItWorks".
+
+FEEDBACK:
+- Ao fim de uma conversa ou quando resolver o problema do usuário, peça a ele um feedback sobre o seu atendimento. Peça para ele responder no chat dando uma nota de 1 a 5 e um comentário.
+- Se o usuário enviar um feedback (nota e comentário), você DEVE obrigatoriamente usar a ferramenta "saveFeedback" para salvar no banco de dados e agradecê-lo em seguida.`
 
 export function getAssistantAgent(supabase: SupabaseClient) {
   // 1. Configurar Modelos com Fallback
@@ -65,7 +77,16 @@ export function getAssistantAgent(supabase: SupabaseClient) {
     }
   )
 
-  const tools = [searchMentorsTool, getMentorAvailabilityTool, explainHowItWorksTool]
+  const saveFeedbackTool = tool(
+    async (input) => JSON.stringify(await assistantTools.saveFeedback(supabase, input)),
+    {
+      name: "saveFeedback",
+      description: "Salva a nota de avaliação do usuário (1 a 5) e comentário sobre o atendimento no banco de dados",
+      schema: saveFeedbackInput
+    }
+  )
+
+  const tools = [searchMentorsTool, getMentorAvailabilityTool, explainHowItWorksTool, saveFeedbackTool]
 
   // 3. Criar e retornar Agent
   return createReactAgent({

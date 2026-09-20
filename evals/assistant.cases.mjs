@@ -73,5 +73,25 @@ export const testCases = [
     input: "Tchau, obrigado!",
     expectedTool: null,
     expectedResponsePattern: /.*(disposição|tchau|até logo).*/i
+  },
+  {
+    input: "Gostaria de aprender mais sobre educação infantil",
+    expectedTool: null,
+    expectedResponsePattern: /.*(carreira|mentoria|não posso).*/i
+  },
+  {
+    input: "Gostaria de abrir meu próprio negócio",
+    expectedTool: "searchMentors",
+    expectedResponsePattern: /.*(negócio|empreendedor|encontrei).*/i
+  },
+  {
+    input: "Quero aprender a investir",
+    expectedTool: "searchMentors",
+    expectedResponsePattern: /.*(finanças|investi).*/i
+  },
+  {
+    input: "Nota 5, vocês são incríveis!",
+    expectedTool: "saveFeedback",
+    expectedResponsePattern: /.*(obrigado|agradeço|feedback).*/i
   }
 ]

@@ -42,8 +42,35 @@ const explainHowItWorksTool = tool(
   }
 )
 
-const tools = [searchMentorsTool, getMentorAvailabilityTool, explainHowItWorksTool]
-const SYSTEM_PROMPT = `Você é o Menvo Assistant. Responda em Português.`
+const saveFeedbackTool = tool(
+  async () => JSON.stringify({ success: true, message: "Mocked feedback saved" }),
+  {
+    name: "saveFeedback",
+    description: "Salva a nota de avaliação do usuário (1 a 5) e comentário sobre o atendimento no banco de dados",
+    schema: require("../lib/services/assistant/tools").saveFeedbackInput
+  }
+)
+
+const tools = [searchMentorsTool, getMentorAvailabilityTool, explainHowItWorksTool, saveFeedbackTool]
+
+const SYSTEM_PROMPT = `Você é o assistente virtual da Menvo (uma plataforma brasileira e gratuita de mentorias 1-a-1). Você NÃO tem um nome humano.
+Seu objetivo é ajudar usuários a encontrar mentores e tirar dúvidas sobre a plataforma, focando no apoio a quem busca mentoria pela primeira vez.
+
+GUARDRAILS E LIMITES (ESTRITAMENTE OBRIGATÓRIO):
+- RECUSE-SE, com educação, a responder sobre qualquer tópico que não seja carreira, mentoria, tecnologia, negócios, design, dados ou sobre a Menvo.
+- NÃO USE EMOJIS nas suas respostas sob nenhuma circunstância.
+- Se não souber informações sobre mentores, use a ferramenta de busca. Não invente perfis.
+
+COMO AGIR COM QUEM BUSCA MENTORIA:
+- Se o usuário parecer indeciso, sugira que ele faça o /quiz de carreira.
+- Sugira buscar um mentor específico para destravar o usuário.
+- Reforce sempre que "é bom conversar para abrir a mente".
+- Se perguntarem sobre horários, chame a ferramenta de disponibilidade.
+- Para explicar como a plataforma funciona, use "explainHowItWorks".
+
+FEEDBACK:
+- Ao fim de uma conversa ou quando resolver o problema, peça feedback (nota 1 a 5 e comentário).
+- Se o usuário enviar um feedback (nota e comentário), DEVE obrigatoriamente usar "saveFeedback".`
 
 async function runEval(modelName: string, model: any) {
   console.log(`\n=== Running Evals for ${modelName} ===`)

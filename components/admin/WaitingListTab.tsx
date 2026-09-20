@@ -151,6 +151,10 @@ export function WaitingListTab() {
         const hasReason = Boolean(entry.reason && entry.reason.trim())
         const isExpanded = expandedId === entry.id
         const match = matchResults[entry.id]
+        
+        const createdDate = new Date(entry.created_at)
+        const daysWaiting = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+        const formattedDate = createdDate.toLocaleDateString('pt-BR')
 
         return (
           <div key={entry.id} className="p-4">
@@ -169,7 +173,11 @@ export function WaitingListTab() {
                     </Badge>
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground mt-0.5">{entry.email}</div>
+                <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 flex-wrap">
+                  <span>{entry.email}</span>
+                  <span className="opacity-50">•</span>
+                  <span>Cadastrado em: {formattedDate} ({daysWaiting} {daysWaiting === 1 ? 'dia' : 'dias'} aguardando)</span>
+                </div>
                 {entry.whatsapp && (
                   <div className="flex items-center gap-1.5 mt-1">
                     <span className="text-xs text-muted-foreground">WhatsApp: {entry.whatsapp}</span>

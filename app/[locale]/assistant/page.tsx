@@ -15,9 +15,9 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "Quero um mentor de dados",
-  "Como a Menvo funciona?",
-  "Minha agenda"
+  "Não sei por onde começar na minha carreira",
+  "Quero um mentor para abrir meu próprio negócio",
+  "Quero aprender a investir"
 ]
 
 export default function AssistantPage() {

@@ -154,5 +154,35 @@ export function explainHowItWorks(input: z.infer<typeof explainHowItWorksInput>)
   }
 }
 
+// --- 4. saveFeedback ---
+
+export const saveFeedbackInput = z.object({
+  rating: z.number().int().min(1).max(5).describe("Avaliação de 1 a 5"),
+  comment: z.string().describe("Comentário ou feedback em texto sobre a experiência ou resposta")
+})
+
+export async function saveFeedback(
+  supabase: SupabaseClient,
+  input: z.infer<typeof saveFeedbackInput>
+): Promise<{ success: boolean; message: string }> {
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  const insertData = {
+    user_id: user?.id || null,
+    rating: input.rating,
+    comment: input.comment,
+    page_url: "/assistant"
+  }
+
+  const { error } = await supabase.from("feedback").insert(insertData)
+  
+  if (error) {
+    console.error("Erro ao salvar feedback via assistente:", error)
+    return { success: false, message: "Não foi possível salvar o feedback no momento." }
+  }
+
+  return { success: true, message: "Feedback salvo com sucesso." }
+}
+
 // --- Registro único ---
-export const assistantTools = { searchMentors, getMentorAvailability, explainHowItWorks }
+export const assistantTools = { searchMentors, getMentorAvailability, explainHowItWorks, saveFeedback }
