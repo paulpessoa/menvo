@@ -4,8 +4,15 @@ import "./globals.css"
 import { Providers } from "./providers"
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
-import Footer from "@/components/footer"
-import { CookieConsentBanner } from "@/components/cookie-consent-banner"
+import dynamic from "next/dynamic"
+
+const Footer = dynamic(() => import("@/components/footer"), {
+  ssr: true,
+})
+const CookieConsentBanner = dynamic(
+  () => import("@/components/cookie-consent-banner").then((mod) => mod.CookieConsentBanner),
+  { ssr: false }
+)
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -14,7 +21,7 @@ import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
-import Script from "next/script"
+import { AnalyticsWrapper } from "@/components/AnalyticsWrapper"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -129,17 +136,6 @@ export default async function RootLayout({
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="preconnect" href="https://www.clarity.ms" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <Script
-          id="clarity-script"
-          strategy="lazyOnload"
-          dangerouslySetInnerHTML={{
-            __html: `(function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "rz28fusa38");`
-          }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -169,21 +165,7 @@ export default async function RootLayout({
               <DeferredFeedbackBanner />
               <DeferredFounderPitchWidget />
               <CookieConsentBanner />
-              <Script
-                id="google-tag-manager"
-                strategy="lazyOnload"
-                src="https://www.googletagmanager.com/gtag/js?id=G-Y2ETF2ENBD"
-              />
-              <Script id="google-analytics" strategy="lazyOnload">
-                {`
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', 'G-Y2ETF2ENBD', {
-                    page_path: window.location.pathname,
-                  });
-                `}
-              </Script>
+              <AnalyticsWrapper />
             </div>
             <Toaster />
           </Providers>
