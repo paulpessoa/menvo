@@ -15,6 +15,8 @@ import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { GoogleAnalytics } from "@next/third-parties/google"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -169,21 +171,8 @@ export default async function RootLayout({
               <DeferredFeedbackBanner />
               <DeferredFounderPitchWidget />
               <CookieConsentBanner />
-              <Script
-                id="google-tag-manager"
-                strategy="lazyOnload"
-                src="https://www.googletagmanager.com/gtag/js?id=G-Y2ETF2ENBD"
-              />
-              <Script id="google-analytics" strategy="lazyOnload">
-                {`
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', 'G-Y2ETF2ENBD', {
-                    page_path: window.location.pathname,
-                  });
-                `}
-              </Script>
+              <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
+              <SpeedInsights />
             </div>
             <Toaster />
           </Providers>

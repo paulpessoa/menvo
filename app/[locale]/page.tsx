@@ -39,10 +39,19 @@ export default function Home() {
     "/images/b.jpg"
   ]
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [loadedImages, setLoadedImages] = useState<number[]>([0, 1])
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length)
+      setCurrentIndex((prevIndex) => {
+        const next = (prevIndex + 1) % images.length
+        const nextNext = (next + 1) % images.length
+        setLoadedImages((prev) => {
+          if (prev.includes(next) && prev.includes(nextNext)) return prev
+          return Array.from(new Set([...prev, next, nextNext]))
+        })
+        return next
+      })
     }, 4000)
     return () => clearInterval(interval)
   }, [images.length])
@@ -79,17 +88,20 @@ export default function Home() {
             <div className="absolute -inset-4 bg-primary/5 rounded-full blur-3xl" />
             <div className="relative h-[250px] w-[250px] md:h-[350px] md:w-[350px] lg:h-[450px] lg:w-[450px] flex items-center shadow-xl rounded-3xl overflow-hidden ring-4 ring-white">
               {images.map((src, index) => (
-                <Image
-                  key={index}
-                  src={src}
-                  width={500}
-                  height={500}
-                  alt={t("hero.title")}
-                  priority={index === 0}
-                  sizes="(max-width: 768px) 250px, (max-width: 1024px) 350px, 450px"
-                  className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
-                    }`}
-                />
+                loadedImages.includes(index) && (
+                  <Image
+                    key={index}
+                    src={src}
+                    width={500}
+                    height={500}
+                    alt={t("hero.title")}
+                    priority={index === 0}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    sizes="(max-width: 768px) 250px, (max-width: 1024px) 350px, 450px"
+                    className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
+                      }`}
+                  />
+                )
               ))}
             </div>
           </div>
