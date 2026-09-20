@@ -217,7 +217,7 @@ Sequência:
    windowMs: 24 * 60 * 60 * 1000 })` → 429 com mensagem amigável usando
    `formatResetTime`.
 4. **Modelo**: instancie `ChatGroq` (`@langchain/groq`, modelo
-   `llama-3.3-70b-versatile`, `temperature: 0.3`). Envolva a chamada
+   `qwen/qwen3.8-27b`, `temperature: 0.3`). Envolva a chamada
    inteira em try/catch; em erro **e** se `GOOGLE_GENERATIVE_AI_API_KEY`
    existir, refaça com `ChatGoogleGenerativeAI` (`@langchain/google-genai`,
    modelo `gemini-2.5-flash-lite`). Se ambos falharem → 502 com

@@ -47,7 +47,7 @@ const SYSTEM_PROMPT = `Você é o Menvo Assistant. Responda em Português.`
 
 async function runEval(modelName: string, model: any) {
   console.log(`\n=== Running Evals for ${modelName} ===`)
-  
+
   const agent = createReactAgent({
     llm: model,
     tools,
@@ -60,19 +60,19 @@ async function runEval(modelName: string, model: any) {
   for (let i = 0; i < testCases.length; i++) {
     const testCase = testCases[i]
     const start = Date.now()
-    
+
     try {
       const response = await agent.invoke({
         messages: [new HumanMessage(testCase.input)]
       })
-      
+
       const end = Date.now()
       const latency = end - start
       totalLatency += latency
-      
+
       const messages = response.messages
       const aiMessage: any = messages[messages.length - 1].content
-      
+
       let calledTool = null
       for (const msg of messages as any[]) {
         if (msg.tool_calls && msg.tool_calls.length > 0) {
@@ -84,7 +84,7 @@ async function runEval(modelName: string, model: any) {
       const toolMatch = testCase.expectedTool === calledTool
       // Se não tem padrão, consideramos como sucesso o toolMatch, caso contrario os dois.
       const patternMatch = testCase.expectedResponsePattern ? testCase.expectedResponsePattern.test(aiMessage) : true
-      
+
       const passed = toolMatch && patternMatch
       if (passed) successCount++
 
@@ -100,13 +100,13 @@ async function runEval(modelName: string, model: any) {
 
   const avgLatency = (totalLatency / testCases.length).toFixed(2)
   console.log(`\nResults for ${modelName}:`)
-  console.log(`Success Rate: ${successCount}/${testCases.length} (${((successCount/testCases.length)*100).toFixed(1)}%)`)
+  console.log(`Success Rate: ${successCount}/${testCases.length} (${((successCount / testCases.length) * 100).toFixed(1)}%)`)
   console.log(`Average Latency: ${avgLatency}ms`)
 }
 
 async function main() {
   const groqModel = new ChatGroq({
-    model: "llama-3.3-70b-versatile",
+    model: "qwen/qwen3.8-27b",
     apiKey: process.env.GROQ_API_KEY,
     temperature: 0
   })
@@ -117,7 +117,7 @@ async function main() {
     temperature: 0
   })
 
-  await runEval("Llama 3.3 70B (Groq)", groqModel)
+  await runEval("Qwen 3.8 27b (Groq)", groqModel)
   await runEval("Gemini 2.5 Flash-Lite (Google)", geminiModel)
 }
 

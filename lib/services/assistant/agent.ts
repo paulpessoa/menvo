@@ -4,11 +4,11 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt"
 import { tool } from "@langchain/core/tools"
 import { HumanMessage, SystemMessage } from "@langchain/core/messages"
 import { SupabaseClient } from "@supabase/supabase-js"
-import { 
-  assistantTools, 
-  searchMentorsInput, 
-  getMentorAvailabilityInput, 
-  explainHowItWorksInput 
+import {
+  assistantTools,
+  searchMentorsInput,
+  getMentorAvailabilityInput,
+  explainHowItWorksInput
 } from "@/lib/services/assistant/tools"
 
 const SYSTEM_PROMPT = `Você é o Menvo Assistant, o assistente oficial da Menvo (uma plataforma brasileira e gratuita de mentorias 1-a-1).
@@ -22,7 +22,7 @@ Regras:
 export function getAssistantAgent(supabase: SupabaseClient) {
   // 1. Configurar Modelos com Fallback
   const groqModel = new ChatGroq({
-    model: "llama3-70b-8192",
+    model: "qwen/qwen3.8-27b",
     apiKey: process.env.GROQ_API_KEY,
     temperature: 0.3
   })
