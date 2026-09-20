@@ -15,7 +15,6 @@ import { DebugUrlCapturer } from "@/components/DebugUrlCapturer"
 import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredFounderPitchWidget } from "@/components/DeferredClientWidgets"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import { GoogleAnalytics } from "@next/third-parties/google"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
@@ -172,7 +171,6 @@ export default async function RootLayout({
               <DeferredFounderPitchWidget />
               <CookieConsentBanner />
               <GoogleAnalytics gaId="G-Y2ETF2ENBD" />
-              <SpeedInsights />
             </div>
             <Toaster />
           </Providers>
