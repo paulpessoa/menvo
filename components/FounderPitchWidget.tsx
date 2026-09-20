@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Pause, Play, Volume2, VolumeX, X } from "lucide-react"
+import { YouTubeEmbed } from "@next/third-parties/google"
 
 const STORAGE_KEY = "pitch_shown_count"
 const MAX_SHOWS = 2
@@ -183,7 +184,6 @@ export function FounderPitchWidget() {
     <aside
       role="complementary"
       aria-label="Vídeo de boas-vindas do fundador da Menvo"
-      aria-hidden={!isVisible}
       className={[
         // Posicionamento confortável: afastado da barra de scroll e da borda inferior
         "fixed z-50",
@@ -231,36 +231,23 @@ export function FounderPitchWidget() {
           className="relative bg-black w-full overflow-hidden"
           style={{ aspectRatio: "9/16" }}
         >
-          {/* Skeleton enquanto o YouTube buferiza */}
-          {!isVideoReady && (
-            <div className="absolute inset-0 bg-neutral-900 flex flex-col items-center justify-center gap-2 text-white/40 z-10">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-[10px]">Carregando...</span>
-            </div>
-          )}
-
-          {src && (
-            <iframe
-              ref={iframeRef}
-              src={src}
-              onLoad={handleIframeLoad}
+          {/* Skeleton enquanto o YouTube buferiza (O YouTubeEmbed já gerencia a thumbnail e poster, então não precisamos do iframe puro) */}
+          {shouldRender && (
+            <div
               style={{
                 position: "absolute",
-                // Shift up 90px para clipar a chrome superior do Shorts
                 top: "-90px",
                 left: "-2px",
-                // +160px = 90px (topo) + 70px (rodapé) para compensar o shift
                 width: "calc(100% + 4px)",
                 height: "calc(100% + 160px)",
-                border: "none",
-                opacity: isVideoReady ? 1 : 0,
-                transition: "opacity 0.5s ease",
               }}
-              allow="autoplay; encrypted-media"
-              loading="lazy"
-              title="Vídeo de boas-vindas — Paul Pessoa, fundador Menvo"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+            >
+              <YouTubeEmbed
+                videoid={VIDEO_ID}
+                params="autoplay=1&mute=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&controls=0&cc_load_policy=0&iv_load_policy=3&fs=0&showinfo=0"
+                playlabel="Reproduzir vídeo de boas-vindas"
+              />
+            </div>
           )}
 
           {/* Overlay pointer-events:none — impede acesso à chrome do YouTube que sobrou */}
