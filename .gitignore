@@ -57,6 +57,8 @@ yarn-error.log*
 GEMINI.md
 AGENTS.md
 implementation-plan.html
+lighthouse-report.json
+*.report.html
 
 # Local scripts (kept locally, not tracked)
 /scripts/
