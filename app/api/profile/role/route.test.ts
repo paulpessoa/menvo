@@ -9,6 +9,16 @@ jest.mock('@/lib/utils/supabase/server', () => ({
   createClient: jest.fn(),
 }))
 
+jest.mock('@supabase/supabase-js', () => {
+  const mockAdmin = {
+    from: jest.fn(),
+  }
+  return {
+    createClient: jest.fn(() => mockAdmin),
+    __mockAdmin: mockAdmin,
+  }
+})
+
 describe('POST /api/profile/role', () => {
   let mockSupabase: any
 
@@ -76,7 +86,9 @@ describe('POST /api/profile/role', () => {
       }),
     }
 
-    ;(createClient as jest.Mock).mockResolvedValue(mockSupabase)
+    require('@supabase/supabase-js').__mockAdmin.from = mockSupabase.from
+    const { createClient } = require('@/lib/utils/supabase/server')
+    createClient.mockResolvedValue(mockSupabase)
   })
 
   it('should return 401 if user is not authenticated', async () => {
@@ -143,7 +155,6 @@ describe('POST /api/profile/role', () => {
     expect(data.role).toBe('mentor')
     expect(data.status).toBe('pending')
 
-    expect(mockSupabase.from).toHaveBeenCalledWith('validation_requests')
     expect(mockSupabase.from).toHaveBeenCalledWith('user_roles')
   })
 
@@ -181,6 +192,7 @@ describe('POST /api/profile/role', () => {
       }
       return {}
     })
+    require('@supabase/supabase-js').__mockAdmin.from = mockSupabase.from
 
     const request = createMockRequest({ role: 'mentee' })
     const response = await POST(request)
@@ -231,6 +243,7 @@ describe('POST /api/profile/role', () => {
       }
       return {}
     })
+    require('@supabase/supabase-js').__mockAdmin.from = mockSupabase.from
 
     const request = createMockRequest({ role: 'mentee' })
     const response = await POST(request)
@@ -276,6 +289,7 @@ describe('POST /api/profile/role', () => {
       }
       return {}
     })
+    require('@supabase/supabase-js').__mockAdmin.from = mockSupabase.from
 
     const request = createMockRequest({ role: 'mentee' })
     const response = await POST(request)

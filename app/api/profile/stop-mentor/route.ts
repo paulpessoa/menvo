@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/utils/supabase/server"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import {
   errorResponse,
@@ -8,6 +9,11 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
     const supabase = await createClient()
 
     const {
@@ -27,9 +33,9 @@ export async function POST(request: NextRequest) {
         .single()
 
     if (mentorRole) {
-        // Remover a role de mentor do usuário
-        await (supabase
-            .from('user_roles') as any)
+        // Remover a role de mentor do usuário usando admin
+        await supabaseAdmin
+            .from('user_roles')
             .delete()
             .eq('user_id', user.id)
             .eq('role_id', (mentorRole as any).id)
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest) {
         // as a plain INSERT every call, silently creating a duplicate
         // "mentee" row for a user who calls stop-mentor more than once.
         // Check-then-insert instead.
-        const { data: existingRole } = await supabase
+        const { data: existingRole } = await supabaseAdmin
             .from('user_roles')
             .select('id')
             .eq('user_id', user.id)
@@ -57,8 +63,8 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         if (!existingRole) {
-            await (supabase
-                .from('user_roles') as any)
+            await supabaseAdmin
+                .from('user_roles')
                 .insert({ user_id: user.id, role_id: (menteeRole as any).id })
         }
     }
@@ -69,7 +75,8 @@ export async function POST(request: NextRequest) {
       .update({ 
           is_pending_mentor: false,
           verified: false,
-          is_public: false 
+          is_public: false,
+          verification_status: null
       })
       .eq("id", user.id)
       .select()

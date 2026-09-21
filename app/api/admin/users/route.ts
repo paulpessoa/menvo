@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     if (profilesError) throw profilesError
 
     if (tab === "undefined" && profiles) {
-      profiles = profiles.filter(p => !p.user_roles || p.user_roles.length === 0)
+      profiles = profiles.filter((p: any) => !p.user_roles || p.user_roles.length === 0)
       count = profiles.length
       profiles = profiles.slice(from, to + 1)
     }

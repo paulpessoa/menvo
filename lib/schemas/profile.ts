@@ -23,9 +23,25 @@ export const updateProfileSchema = z.object({
   inclusive_tags: z.array(z.string()).optional().nullable(),
   availability_status: z.enum(["available", "busy", "unavailable"]).optional().nullable(),
   chat_enabled: z.boolean().optional().nullable(),
-  timezone: z.string().optional().nullable()
+  timezone: z.string().optional().nullable(),
+  slug: z.string().trim().toLowerCase()
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Use apenas letras minúsculas, números e hífen")
+    .min(3).max(60).optional().nullable(),
+  state: z.string().max(100).optional().nullable(),
+  address: z.string().max(255).optional().nullable(),
+  portfolio_url: z.string().url("URL do portfólio inválida").or(z.literal("")).optional().nullable(),
+  institution: z.string().max(150).optional().nullable(),
+  course: z.string().max(150).optional().nullable(),
+  expected_graduation: z.string().max(20).optional().nullable(),
+  expertise_areas: z.array(z.string()).optional().nullable(),
+  mentorship_topics: z.array(z.string()).optional().nullable(),
+  mentorship_approach: z.string().max(2000).optional().nullable(),
+  what_to_expect: z.string().max(2000).optional().nullable(),
+  ideal_mentee: z.string().max(2000).optional().nullable(),
+  cv_url: z.string().url().or(z.literal("")).optional().nullable(),
+  is_public: z.boolean().optional(),
+  learning_goals: z.string().max(2000).optional().nullable(),
 })
-
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
 
 export const updateUserRoleSchema = z.object({

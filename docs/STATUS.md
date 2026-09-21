@@ -191,8 +191,8 @@ used yet, not dead code: `ai_missing_demands` (logged by `/api/ai/match`
 when no mentor matches), `google_calendar_tokens` (per-mentor OAuth, no
 mentor has connected Calendar yet), `feedback` (the `/feedback` page form),
 `appointment_feedbacks` (session ratings — only 1 appointment exists so
-far), `validation_requests` (mentor verification workflow,
-`/api/profile/role`).
+far).
+*(Note: `validation_requests` was kept previously, but as of the Sparkling Hummingbird fix, it is no longer written to during onboarding and is now considered obsolete/dead code, candidate for removal in a future migration).*
 
 **Skipped: migration squash** (90 empty `*_remote_baseline.sql`
 placeholders → 1 real baseline). Both `supabase migration squash` and

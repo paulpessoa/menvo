@@ -3,14 +3,13 @@ import { createClient } from "@/lib/utils/supabase/server"
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { updateUserRoleSchema } from "@/lib/schemas/profile"
 
-const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-)
-
 export async function POST(request: NextRequest) {
   try {
+    const supabaseAdmin = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
     const supabase = await createClient()
     const {
       data: { user },
@@ -41,6 +40,7 @@ export async function POST(request: NextRequest) {
     // QUALQUER usuário terminando o onboarding.
     const profileUpdates: Record<string, any> = {
       verification_status: role === "mentor" ? "pending" : "approved",
+      is_pending_mentor: role === "mentor",
       updated_at: new Date().toISOString(),
     }
 
@@ -68,20 +68,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
     }
 
-    if (role === "mentor") {
-      const { error: validationError } = await (supabase
-        .from("validation_requests") as any)
-        .insert({
-          user_id: user.id,
-          request_type: "mentor_verification",
-          status: "pending",
-          created_at: new Date().toISOString(),
-        });
-
-      if (validationError) {
-        console.error("Erro ao criar solicitação de validação:", validationError)
-      }
-    }
+    // Removemos a escrita na tabela `validation_requests` aqui (Opção A)
+    // pois ela é write-only neste fluxo e o admin aprova com base em `profiles.verification_status`.
 
     // 2. Atribuir a role no sistema de RBAC
     // "mentor" e "mentee" são mutuamente exclusivos: sem isso, um usuário que
@@ -97,8 +85,11 @@ export async function POST(request: NextRequest) {
     const roleIdByName = new Map(
       (exclusiveRoles ?? []).map(r => [(r as any).name as string, (r as any).id as number])
     )
+    // Se a role solicitada for "mentor", ele entra como "mentee" até ser aprovado pelo admin
+    const roleToAssign = role === "mentor" ? "mentee" : role
+
     const otherRoleIds = [...roleIdByName.entries()]
-      .filter(([name]) => name !== role)
+      .filter(([name]) => name !== roleToAssign)
       .map(([, id]) => id)
 
     if (otherRoleIds.length > 0) {
@@ -109,7 +100,7 @@ export async function POST(request: NextRequest) {
         .in("role_id", otherRoleIds)
     }
 
-    const roleId = roleIdByName.get(role)
+    const roleId = roleIdByName.get(roleToAssign)
     if (roleId) {
       const { data: existingRole } = await supabaseAdmin
         .from("user_roles")
@@ -131,7 +122,7 @@ export async function POST(request: NextRequest) {
       role,
       status: role === "mentor" ? "pending" : "approved",
     })
-  } catch (error) {
+  } catch (error) { console.error('TEST ERROR:', error);
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
