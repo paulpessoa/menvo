@@ -42,7 +42,7 @@ export function getAssistantAgent(supabase: SupabaseClient) {
   })
 
   const geminiModel = new ChatGoogleGenerativeAI({
-    model: "gemini-1.5-flash-8b",
+    model: "gemini-1.5-flash",
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     temperature: 0.3
   })

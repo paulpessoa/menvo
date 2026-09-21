@@ -79,6 +79,7 @@ started.
 - [x] **`/mentors` Dead-Click Fix:** Whole `MentorCard` interactive, dismissable filter chips (found via Clarity).
 - [x] **Multi-Tenant Phase 1:** Organizations, invite/request/approve membership, org admin dashboard, platform admin org CRUD. Shipped in PR #45.
 - [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Plan: [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6.
+- [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
