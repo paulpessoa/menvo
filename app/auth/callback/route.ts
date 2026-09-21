@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const type = searchParams.get("type")
   const next = searchParams.get("next") || "/dashboard"
+  const error = searchParams.get("error")
+  const errorDescription = searchParams.get("error_description")
+  const errorCode = searchParams.get("error_code")
 
   // 1. Detect Locale (Priority: Cookie -> Default)
   const cookieStore = await cookies()
@@ -20,6 +23,11 @@ export async function GET(request: NextRequest) {
   const getTargetUrl = (path: string) => {
     const cleanPath = path.startsWith("/") ? path : `/${path}`
     return new URL(`/${locale}${cleanPath}`, origin)
+  }
+
+  if (error || errorCode) {
+    console.error("Auth callback error:", error || errorCode, errorDescription)
+    return NextResponse.redirect(getTargetUrl(`/login?error=${encodeURIComponent(errorDescription || error || errorCode || "auth_failed")}`))
   }
 
   // Handle password recovery and first-time invite flows. This only works
