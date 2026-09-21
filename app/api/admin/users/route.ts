@@ -58,9 +58,8 @@ export async function GET(request: NextRequest) {
       query = query.eq("user_roles.roles.name", "mentor")
     } else if (tab === "mentees") {
       query = query.eq("user_roles.roles.name", "mentee")
-    } else if (tab === "undefined") {
-      query = query.is("user_roles", null)
     }
+    // Para tab === "undefined", filtramos em memória depois, pois PostgREST não suporta is.null em relacionamentos.
 
     // Filtro de busca
     if (search) {
@@ -72,11 +71,23 @@ export async function GET(request: NextRequest) {
       query = query.eq("origin_platform", origin)
     }
 
-    const { data: profiles, error: profilesError, count } = await query
-      .order("created_at", { ascending: false })
-      .range(from, to)
+    let paginatedQuery = query.order("created_at", { ascending: false })
+    
+    // If we are filtering undefined in JS, we shouldn't paginate the SQL query for this tab
+    // Otherwise, we paginate normally
+    if (tab !== "undefined") {
+      paginatedQuery = paginatedQuery.range(from, to)
+    }
+
+    let { data: profiles, error: profilesError, count } = await paginatedQuery
 
     if (profilesError) throw profilesError
+
+    if (tab === "undefined" && profiles) {
+      profiles = profiles.filter(p => !p.user_roles || p.user_roles.length === 0)
+      count = profiles.length
+      profiles = profiles.slice(from, to + 1)
+    }
 
     // 3b. Sinalizar quem também está na lista de espera (waiting_list) —
     // cruzamento por e-mail, só para os usuários desta página.
@@ -122,10 +133,12 @@ export async function GET(request: NextRequest) {
       .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
       .eq("user_roles.roles.name", "mentee")
 
-    const { count: undefinedCount } = await supabase
+    const { count: adminsCount } = await supabase
       .from("profiles")
-      .select("user_roles", { count: "exact", head: true })
-      .is("user_roles", null)
+      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
+      .eq("user_roles.roles.name", "admin")
+
+    const undefinedCount = Math.max(0, (totalCount || 0) - (mentorsCount || 0) - (menteesCount || 0) - (adminsCount || 0))
 
     const { count: menvoOriginCount } = await supabase
       .from("profiles")
