@@ -1,6 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { updateUserRoleSchema } from "@/lib/schemas/profile"
+
+const supabaseAdmin = createSupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false } }
+)
 
 export async function POST(request: NextRequest) {
   try {
@@ -95,8 +102,8 @@ export async function POST(request: NextRequest) {
       .map(([, id]) => id)
 
     if (otherRoleIds.length > 0) {
-      await (supabase
-        .from("user_roles") as any)
+      await supabaseAdmin
+        .from("user_roles")
         .delete()
         .eq("user_id", user.id)
         .in("role_id", otherRoleIds)
@@ -104,13 +111,7 @@ export async function POST(request: NextRequest) {
 
     const roleId = roleIdByName.get(role)
     if (roleId) {
-      // user_roles has no unique constraint on (user_id, role_id) — its
-      // primary key is a synthetic `id` — so `.upsert(..., { onConflict:
-      // "user_id,role_id" })` fails outright with Postgres error 42P10
-      // ("no unique or exclusion constraint matching the ON CONFLICT
-      // specification"). Confirmed directly against the live database.
-      // Check-then-insert instead of relying on upsert.
-      const { data: existingRole } = await supabase
+      const { data: existingRole } = await supabaseAdmin
         .from("user_roles")
         .select("id")
         .eq("user_id", user.id)
@@ -118,8 +119,8 @@ export async function POST(request: NextRequest) {
         .maybeSingle()
 
       if (!existingRole) {
-        await (supabase
-          .from("user_roles") as any)
+        await supabaseAdmin
+          .from("user_roles")
           .insert({ user_id: user.id, role_id: roleId })
       }
     }
