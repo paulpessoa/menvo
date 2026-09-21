@@ -42,14 +42,15 @@ export function getAssistantAgent(supabase: SupabaseClient) {
   })
 
   const geminiModel = new ChatGoogleGenerativeAI({
-    model: "gemini-3.5-flash-lite",
+    model: "gemini-1.5-flash-8b",
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     temperature: 0.3
   })
 
   // O withFallbacks nativo não suporta bindTools diretamente no createReactAgent
-  // Portanto, usaremos o modelo primário diretamente.
-  const primaryModel = groqModel
+  // Portanto, vamos usar o Gemini (que respeita os tool limits e stop words) como primário
+  // para evitar o loop infinito (Recursion limit) que o modelo Qwen no Groq está causando.
+  const primaryModel = geminiModel
 
   // 2. Configurar Tools
   const searchMentorsTool = tool(
