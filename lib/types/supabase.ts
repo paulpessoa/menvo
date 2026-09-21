@@ -1368,6 +1368,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      sync_waiting_list_status: { Args: never; Returns: undefined }
     }
     Enums: {
       hub_resource_status: "pending" | "published" | "rejected" | "archived"

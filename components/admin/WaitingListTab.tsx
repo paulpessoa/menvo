@@ -162,9 +162,12 @@ export function WaitingListTab() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-sm">{entry.name}</span>
-                  {entry.has_profile && (
-                    <Badge variant="outline" className="text-[10px] uppercase text-green-700 border-green-300 bg-green-50">
-                      Já tem perfil no site
+                  {/* Quem já entrou de fato nem aparece aqui (vira 'registered'),
+                      então ter perfil sem convite significa conta criada mas
+                      nunca acessada — vale um lembrete em vez de um novo cadastro. */}
+                  {entry.has_profile && entry.status !== "invited" && (
+                    <Badge variant="outline" className="text-[10px] uppercase text-amber-700 border-amber-300 bg-amber-50">
+                      Tem conta, nunca entrou
                     </Badge>
                   )}
                   {!hasReason && (
@@ -226,31 +229,39 @@ export function WaitingListTab() {
               </div>
 
               <div className="flex flex-wrap gap-2 shrink-0">
-                {entry.status === "invited" ? (
+                {entry.status === "invited" && (
                   <Badge variant="outline" className="h-9 px-3 flex items-center gap-1.5 text-green-700 border-green-300 bg-green-50">
                     <CheckCircle2 className="h-3.5 w-3.5" /> Convite enviado
                   </Badge>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleCreateAccount(entry.id)}
-                    disabled={pendingAction === `create-account-${entry.id}`}
-                    className="gap-1.5"
-                    title={
-                      entry.has_profile
+                )}
+                {/* Quem já foi convidado continua podendo receber um novo link:
+                    o link do Supabase é de uso único e expira em horas, então
+                    é comum a pessoa abrir, não salvar a senha e precisar de outro. */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleCreateAccount(entry.id)}
+                  disabled={pendingAction === `create-account-${entry.id}`}
+                  className="gap-1.5"
+                  title={
+                    entry.status === "invited"
+                      ? "Gera um novo link de definição de senha e reenvia o e-mail de convite"
+                      : entry.has_profile
                         ? "Esta pessoa já tem conta — enviaremos um link para definir uma nova senha"
                         : "Cria a conta como mentee e envia um e-mail com link para definir a senha"
-                    }
-                  >
-                    {pendingAction === `create-account-${entry.id}` ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <UserPlus className="h-3.5 w-3.5" />
-                    )}
-                    {entry.has_profile ? "Enviar Convite" : "Criar Conta e Convidar"}
-                  </Button>
-                )}
+                  }
+                >
+                  {pendingAction === `create-account-${entry.id}` ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <UserPlus className="h-3.5 w-3.5" />
+                  )}
+                  {entry.status === "invited"
+                    ? "Reenviar Convite"
+                    : entry.has_profile
+                      ? "Enviar Convite"
+                      : "Criar Conta e Convidar"}
+                </Button>
 
                 {hasReason ? (
                   <Button

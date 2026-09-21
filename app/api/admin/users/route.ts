@@ -137,9 +137,12 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
       .eq("origin_platform", "jotform")
 
+    // Mesmo filtro da aba: quem já entrou na plataforma não conta como
+    // "esperando" (ver sync_waiting_list_status).
     const { count: waitingListCount } = await supabase
       .from("waiting_list")
       .select("*", { count: "exact", head: true })
+      .neq("status", "registered")
 
     return successResponse({
       users: profilesWithWaitingListFlag,

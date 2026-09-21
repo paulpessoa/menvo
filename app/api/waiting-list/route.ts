@@ -50,17 +50,27 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient()
 
+    // Alinha o status com auth.users antes de listar: quem já entrou na
+    // plataforma (Google, LinkedIn ou pelo link de convite) vira
+    // 'registered' e some da lista; quem foi convidado mas ainda não
+    // entrou vira 'invited'. Sem isso, quem se cadastrou pelo Google logo
+    // depois de entrar na fila ficaria aqui para sempre como 'pending'.
+    const { error: syncError } = await supabase.rpc("sync_waiting_list_status")
+    if (syncError) throw syncError
+
     const { data, error } = await supabase
       .from("waiting_list")
       .select("*")
+      .neq("status", "registered")
       .order("created_at", { ascending: false })
       .returns<any[]>()
 
     if (error) throw error
 
-    // Sinaliza quem da lista de espera já criou conta no site — ajuda o
-    // admin a saber se, além de pedir contato/motivação por e-mail, essa
-    // pessoa também pode ser encontrada e editada na aba de usuários.
+    // Sinaliza quem da lista de espera já tem conta (criada pelo convite ou
+    // por cadastro antigo sem login) — ajuda o admin a saber se, além de
+    // pedir contato/motivação por e-mail, essa pessoa também pode ser
+    // encontrada e editada na aba de usuários.
     const emails = (data ?? [])
       .map(row => row.email)
       .filter((email: unknown): email is string => typeof email === "string" && email.length > 0)
