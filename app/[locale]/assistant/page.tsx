@@ -6,12 +6,14 @@ import { useTranslations } from "next-intl"
 import { Send, Bot, User, Sparkles, Loader2, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { MentorCard } from "@/components/mentors/MentorCard"
 
 interface Message {
   id: string
   role: "user" | "assistant"
   text: string
   isStreaming?: boolean
+  mentors?: any[]
 }
 
 const SUGGESTIONS = [
@@ -122,6 +124,13 @@ export default function AssistantPage() {
                 } else if (data.type === "tool_start") {
                   const randomMsg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
                   setToolActivity(randomMsg)
+                } else if (data.type === "mentors_found") {
+                  setToolActivity(null)
+                  setMessages(prev => prev.map(msg => 
+                    msg.id === assistantMessageId 
+                      ? { ...msg, mentors: data.mentors } 
+                      : msg
+                  ))
                 } else if (data.type === "error") {
                   setToolActivity(null)
                   setMessages(prev => prev.map(msg => 
@@ -180,16 +189,30 @@ export default function AssistantPage() {
                 <Bot className="w-5 h-5 text-primary" />
               </div>
             )}
-            <div 
-              className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-                msg.role === "user" 
-                  ? "bg-primary text-primary-foreground rounded-tr-sm" 
-                  : "bg-muted rounded-tl-sm"
-              }`}
-            >
-              <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
-              {msg.isStreaming && !msg.text && (
-                <Loader2 className="w-4 h-4 animate-spin opacity-50" />
+            <div className="flex flex-col gap-3 w-full max-w-[90%]">
+              <div 
+                className={`w-fit px-4 py-3 rounded-2xl ${
+                  msg.role === "user" 
+                    ? "bg-primary text-primary-foreground rounded-tr-sm self-end" 
+                    : "bg-muted rounded-tl-sm self-start"
+                }`}
+              >
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                {msg.isStreaming && !msg.text && (
+                  <Loader2 className="w-4 h-4 animate-spin opacity-50" />
+                )}
+              </div>
+              
+              {msg.mentors && msg.mentors.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-2">
+                  {msg.mentors.map((mentor: any) => (
+                    <MentorCard 
+                      key={mentor.id} 
+                      mentor={mentor} 
+                      isAIHighlighted={true} 
+                    />
+                  ))}
+                </div>
               )}
             </div>
             {msg.role === "user" && (

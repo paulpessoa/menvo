@@ -9,22 +9,13 @@ import { computeAvailableSlots } from "@/lib/services/appointments/availability.
 export const searchMentorsInput = z.object({
   query: z.string().trim().min(2).max(200)
     .describe("Tema, habilidade ou objetivo em linguagem natural, ex.: 'transição de carreira para dados'"),
-  limit: z.number().int().min(1).max(10).default(5)
+  limit: z.number().int().min(1).max(5).default(3)
 })
-
-export interface MentorSummary {
-  slug: string
-  fullName: string
-  jobTitle: string | null
-  skills: string[]
-  bioExcerpt: string
-  profileUrl: string
-}
 
 export async function searchMentors(
   supabase: SupabaseClient,
   input: z.infer<typeof searchMentorsInput>
-): Promise<MentorSummary[]> {
+): Promise<any[]> {
   const result = await mentorService.searchCatalog({
     filters: { search: input.query, sortBy: "relevance" },
     page: 1,
@@ -33,14 +24,9 @@ export async function searchMentors(
 
   const mentors = result.data || []
 
-  return mentors.map((m: any) => ({
-    slug: m.slug || m.id,
-    fullName: `${m.first_name} ${m.last_name}`.trim(),
-    jobTitle: m.job_title || null,
-    skills: m.mentor_skills || m.inclusive_tags || [],
-    bioExcerpt: m.bio ? (m.bio.length > 200 ? m.bio.substring(0, 197) + "..." : m.bio) : "",
-    profileUrl: `${process.env.NEXT_PUBLIC_APP_URL}/mentors/${m.slug || m.id}`
-  }))
+  // Retornamos os dados completos para que o frontend possa renderizar os MentorCards
+  // O LLM receberá esses dados e usará o 'full_name' e 'bio' para formular a resposta.
+  return mentors
 }
 
 

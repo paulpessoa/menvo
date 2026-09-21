@@ -66,6 +66,14 @@ export async function POST(req: NextRequest) {
             if (event.event === "on_tool_start") {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "tool_start", name: event.name })}\n\n`))
             }
+
+            // Envia o payload completo dos mentores encontrados para renderizar o UI Card
+            if (event.event === "on_tool_end" && event.name === "searchMentors") {
+              const mentorsData = event.data.output
+              if (mentorsData && Array.isArray(mentorsData)) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "mentors_found", mentors: mentorsData })}\n\n`))
+              }
+            }
           }
 
           // Salvar LOG no banco em background (Auditoria)
