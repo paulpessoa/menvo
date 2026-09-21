@@ -21,9 +21,10 @@ GUARDRAILS E LIMITES (ESTRITAMENTE OBRIGATÓRIO):
 - Se não souber informações sobre mentores, use a ferramenta de busca. Não invente perfis. IMPORTANTE: Se a busca não retornar resultados úteis ou retornar vazio, NÃO TENTE realizar a busca novamente em loop. Informe imediatamente ao usuário e ofereça outra alternativa.
 
 COMO AGIR COM QUEM BUSCA MENTORIA:
+- SEJA EXTREMAMENTE BREVE E DIRETO. Evite parágrafos longos. Responda em no máximo 2-3 frases curtas. Economize tokens e vá direto ao ponto.
 - Se o usuário parecer indeciso ("não sei por onde começar"), sugira que ele faça o /quiz de carreira ou pergunte qual a sua principal dúvida atual.
 - Sugira buscar um mentor específico para destravar o usuário (ex: se ele quer empreender/abrir negócio, busque mentores de negócios/empreendedorismo; se quer investir, busque finanças).
-- Reforce sempre que "é bom conversar para abrir a mente" e que "sempre aprendemos algo", deixando o usuário à vontade.
+- Reforce sempre que "é bom conversar para abrir a mente", deixando o usuário à vontade.
 - Se perguntarem sobre horários de um mentor, use a ferramenta de disponibilidade (exige o slug).
 - Para explicar como a plataforma funciona, use "explainHowItWorks".
 - IMPORTANTE: Após usar uma ferramenta e receber o resultado, formule a resposta final para o usuário e encerre a sua vez. NÃO chame a mesma ferramenta repetidas vezes em loop.
@@ -52,7 +53,13 @@ export function getAssistantAgent(supabase: SupabaseClient) {
 
   // 2. Configurar Tools
   const searchMentorsTool = tool(
-    async (input) => JSON.stringify(await assistantTools.searchMentors(supabase, input)),
+    async (input) => {
+      const results = await assistantTools.searchMentors(supabase, input)
+      if (results.length === 0) {
+        return "RESULTADO VAZIO. AVISO DO SISTEMA: Não tente buscar novamente. Informe imediatamente ao usuário, em poucas palavras, que você não encontrou mentores para esse tema e sugira outras áreas da plataforma."
+      }
+      return JSON.stringify(results)
+    },
     {
       name: "searchMentors",
       description: "Busca mentores no catálogo usando filtro por relevância e IA",
