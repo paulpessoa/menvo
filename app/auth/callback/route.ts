@@ -30,25 +30,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(getTargetUrl(`/login?error=${encodeURIComponent(errorDescription || error || errorCode || "auth_failed")}`))
   }
 
-  // Handle password recovery and first-time invite flows. This only works
-  // when `type` was baked into the redirect_to URL by whoever generated the
-  // link in the first place (e.g. resetPasswordForEmail's redirectTo:
-  // ".../auth/callback?type=recovery" in forgot-password/page.tsx and
-  // invite-batch/route.ts) — Supabase does NOT add `type` as a query
-  // param on its own. Its actual session payload (access_token,
-  // refresh_token, and its own `type`) arrives as a URL HASH FRAGMENT,
-  // which browsers never send to the server, so this route can only see
-  // `type` when a caller explicitly duplicates it into the query string
-  // like the two callers above do. Confirmed via a live invite link that
-  // Supabase's real redirect carries nothing here otherwise — callers that
-  // need this route to route correctly must follow the same convention.
-  // (The waiting-list invite flow sidesteps this entirely by pointing
-  // redirect_to straight at /update-password — see
-  // app/api/admin/waiting-list/create-account/route.ts.)
-  if (type === "recovery" || type === "invite") {
-    return NextResponse.redirect(getTargetUrl("/update-password"))
-  }
-
   if (code) {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,15 +48,20 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    // 3. Exchange code for session
+    // Exchange code for session
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
     
     if (exchangeError) {
       console.error("Auth exchange error:", exchangeError)
-      return NextResponse.redirect(getTargetUrl(`/login?error=auth_failed`))
+      return NextResponse.redirect(getTargetUrl(`/login?error=${encodeURIComponent(exchangeError.message || "auth_failed")}`))
     }
 
-    // 4. Fetch Profile & Roles for smart redirection
+    // If it's a recovery or invite flow, send them to update-password now that they are authenticated
+    if (type === "recovery" || type === "invite") {
+      return NextResponse.redirect(getTargetUrl("/update-password"))
+    }
+
+    // Fetch Profile & Roles for smart redirection
     const { data: { user } } = await supabase.auth.getUser()
     
     if (user) {
@@ -110,6 +96,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(getTargetUrl("/onboarding"))
       }
     }
+  } else if (type === "recovery" || type === "invite") {
+    // Fallback for Implicit Flow where the session is in the URL hash fragment.
+    // We just redirect to the page and let the browser's supabase client pick up the hash.
+    return NextResponse.redirect(getTargetUrl("/update-password"))
   }
 
   // Final fallback
