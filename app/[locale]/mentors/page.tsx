@@ -45,7 +45,7 @@ import { useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { useDebounce } from "@/hooks/useDebounce"
 import { PageContainer } from "@/components/layout/PageContainer"
-
+import { SuggestMentorModal } from "@/components/mentors/SuggestMentorModal"
 interface MentorProfile {
   id: string | null
   full_name: string | null
@@ -128,6 +128,8 @@ export default function MentorsPage() {
     topics: [] as string[],
     inclusiveTags: [] as string[]
   })
+
+  const [isSuggestModalOpen, setSuggestModalOpen] = useState(false)
 
   const { user } = useAuth()
 
@@ -882,6 +884,13 @@ export default function MentorsPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
               variant="outline"
+              onClick={() => setSuggestModalOpen(true)}
+              className="rounded-xl border-2 font-bold px-6 h-11 w-full sm:w-auto text-primary border-primary/20 hover:bg-primary/5"
+            >
+              Sugira um tema
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => setFilters(initialFilters)}
               className="rounded-xl border-2 font-bold px-6 h-11 w-full sm:w-auto"
             >
@@ -978,6 +987,12 @@ export default function MentorsPage() {
           </div>
         </>
       )}
+
+      <SuggestMentorModal 
+        isOpen={isSuggestModalOpen} 
+        onClose={() => setSuggestModalOpen(false)} 
+        initialTopic={filters.search || filters.topics[0] || ""}
+      />
     </PageContainer>
   )
 }
