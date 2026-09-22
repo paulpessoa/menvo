@@ -26,7 +26,8 @@ import {
   GraduationCap,
   ExternalLink,
   MailCheck,
-  Trash2
+  Trash2,
+  Info
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
@@ -455,6 +456,108 @@ export function EditUserModal({
               <Shield className="h-3 w-3" /> Alterar papéis concede ou remove
               acesso a áreas privadas instantaneamente.
             </p>
+          </div>
+
+          {/* Visualização Detalhada (Apenas Leitura) */}
+          <div className="space-y-4 p-5 border rounded-xl bg-gray-50/50">
+            <Label className="text-base font-bold flex items-center gap-2 text-gray-700">
+              <Info className="h-5 w-5" /> Informações Complementares (Apenas Leitura)
+            </Label>
+            
+            <details className="w-full bg-white rounded-md border px-4 py-2 group">
+              <summary className="text-sm font-semibold text-gray-600 cursor-pointer list-none flex justify-between items-center group-open:mb-4">
+                Ver todos os detalhes preenchidos pelo usuário
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="16" width="16" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+              </summary>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 py-2 text-sm border-t pt-4">
+                {user.email && (
+                  <div className="space-y-1">
+                    <p className="font-semibold text-gray-500">Email</p>
+                    <p className="text-gray-900 break-words">{user.email}</p>
+                  </div>
+                )}
+                {(user.city || user.state || user.country) && (
+                  <div className="space-y-1">
+                    <p className="font-semibold text-gray-500">Localização</p>
+                    <p className="text-gray-900">
+                      {[user.city, user.state, user.country].filter(Boolean).join(", ")}
+                    </p>
+                  </div>
+                )}
+                {user.linkedin_url && (
+                  <div className="space-y-1">
+                    <p className="font-semibold text-gray-500">LinkedIn</p>
+                    <a href={user.linkedin_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline break-all">
+                      {user.linkedin_url}
+                    </a>
+                  </div>
+                )}
+                {user.portfolio_url && (
+                  <div className="space-y-1">
+                    <p className="font-semibold text-gray-500">Portfólio / Site</p>
+                    <a href={user.portfolio_url} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline break-all">
+                      {user.portfolio_url}
+                    </a>
+                  </div>
+                )}
+                {user.learning_goals && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">Objetivos (Mentee)</p>
+                    <p className="text-gray-900 whitespace-pre-wrap">{user.learning_goals}</p>
+                  </div>
+                )}
+                {user.expertise_areas && user.expertise_areas.length > 0 && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">Áreas de Expertise</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {user.expertise_areas.map((area: string, i: number) => (
+                        <Badge key={i} variant="secondary" className="text-xs">{area}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {user.mentorship_topics && user.mentorship_topics.length > 0 && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">Tópicos de Mentoria</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {user.mentorship_topics.map((topic: string, i: number) => (
+                        <Badge key={i} variant="outline" className="text-xs">{topic}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {user.mentorship_approach && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">Abordagem (Mentor)</p>
+                    <p className="text-gray-900 whitespace-pre-wrap">{user.mentorship_approach}</p>
+                  </div>
+                )}
+                {user.what_to_expect && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">O que esperar</p>
+                    <p className="text-gray-900 whitespace-pre-wrap">{user.what_to_expect}</p>
+                  </div>
+                )}
+                {user.ideal_mentee && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">Mentee Ideal</p>
+                    <p className="text-gray-900 whitespace-pre-wrap">{user.ideal_mentee}</p>
+                  </div>
+                )}
+                {user.inclusive_tags && user.inclusive_tags.length > 0 && (
+                  <div className="space-y-1 sm:col-span-2">
+                    <p className="font-semibold text-gray-500">Tags Inclusivas</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {user.inclusive_tags.map((tag: string, i: number) => (
+                        <Badge key={i} className="text-xs bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200">{tag}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </details>
           </div>
 
           {/* Verificação */}
