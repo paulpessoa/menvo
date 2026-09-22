@@ -32,11 +32,9 @@ export async function POST(request: Request) {
       user_id: user?.id || null
     };
 
-    const { data: suggestion, error } = await (supabase as any)
+    const { error } = await (supabase as any)
       .from("mentor_suggestions")
-      .insert(insertData)
-      .select()
-      .single();
+      .insert(insertData);
 
     if (error) {
       // MOCK: If the user hasn't run the migration or has an invalid API key, return success to not block the UI

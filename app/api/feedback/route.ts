@@ -98,11 +98,9 @@ export async function POST(request: NextRequest) {
       user_agent: user_agent || null
     };
 
-    const { data: feedback, error } = await supabase
+    const { error } = await supabase
       .from("feedback")
-      .insert(insertData as any)
-      .select()
-      .single();
+      .insert(insertData as any);
 
     if (error) {
       // MOCK: If there is an invalid API key, return success to not block the UI locally
@@ -114,11 +112,11 @@ export async function POST(request: NextRequest) {
         }
         return successResponse(mockFeedback, "Feedback submitted successfully (MOCKED)")
       }
-      throw error;
+      return NextResponse.json({ error: "Supabase error", details: error }, { status: 500 });
     }
 
-    return successResponse(feedback, "Feedback submitted successfully")
-  } catch (error) {
-    return handleApiError(error)
+    return successResponse({ success: true }, "Feedback submitted successfully")
+  } catch (error: any) {
+    return NextResponse.json({ error: "Unexpected error", details: error?.message || error }, { status: 500 });
   }
 }
