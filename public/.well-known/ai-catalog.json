@@ -1,0 +1,20 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Menvo",
+    "identifier": "did:web:menvo.com.br"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:menvo:docs:llms",
+      "displayName": "Menvo LLMs Documentation",
+      "type": "text/plain",
+      "url": "https://www.menvo.com.br/llms.txt",
+      "description": "Informações e contexto sobre a Menvo para modelos de linguagem e agentes de IA.",
+      "representativeQueries": [
+        "O que é a Menvo?",
+        "Informações sobre a Menvo"
+      ]
+    }
+  ]
+}
