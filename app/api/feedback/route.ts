@@ -86,9 +86,7 @@ export async function POST(request: NextRequest) {
 
     const { rating, comment, email, page_url, user_agent } = parsed.data
 
-    if (!user && !email) {
-      return errorResponse("Email is required for anonymous feedback", "VALIDATION_ERROR", 400)
-    }
+    // Email is no longer required for anonymous feedback
 
     // Create feedback
     const insertData: Record<string, any> = {
