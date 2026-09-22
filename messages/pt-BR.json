@@ -622,7 +622,12 @@
       "busy": "Ocupado",
       "specialties": "Especialidades:",
       "viewProfile": "Ver Perfil",
-      "scheduleSession": "Agendar"
+      "scheduleSession": "Agendar",
+      "mentor": "Mentor",
+      "yearsExp": "anos de exp.",
+      "aiRecommended": "Recomendado pela IA",
+      "addFavorite": "Adicionar aos favoritos",
+      "removeFavorite": "Remover dos favoritos"
     },
     "loginRequired": {
       "title": "Login Necessário",

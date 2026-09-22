@@ -1,22 +1,19 @@
-"use client"
+'use client'
 
-import { useTranslations } from "next-intl"
-import { useRouter } from "@/i18n/routing"
-import { MapPin, Briefcase, Calendar, Sparkles, Heart } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { useFavorites } from "@/hooks/useFavorites"
-import { useAuth } from "@/lib/auth"
+import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { Link } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
+import { Heart, MapPin, Briefcase, ChevronRight, Award, Sparkles, Star, User } from 'lucide-react'
+import { useAuth } from '@/lib/auth'
+import { useFavorites } from '@/hooks/useFavorites'
 
-interface MentorProfile {
+/**
+ * Shape produced by the `mentors_view` and consumed by `/mentors` and `/assistant`.
+ * Kept local because the view's projection is page-specific — the canonical
+ * DB-side type lives in `lib/types/models/mentor.ts` as `MentorProfile`.
+ */
+interface MentorCardMentor {
   id: string | null
   full_name: string | null
   avatar_url: string | null
@@ -36,226 +33,249 @@ interface MentorProfile {
   total_sessions: number | null
   experience_years: number | null
   slug: string | null
-  created_at?: string | null
+  /** Legacy field — some callers may still provide photo_url instead of avatar_url */
+  photo_url?: string | null
 }
 
 interface MentorCardProps {
-  mentor: MentorProfile
+  mentor: MentorCardMentor
+  /** Highlights the card as an AI-recommended match */
   isAIHighlighted?: boolean
-  aiReason?: string | null
+  /** Short AI-generated reason for the recommendation */
+  aiReason?: string
 }
 
 /**
- * Card de mentor no catálogo de descoberta.
- * Permite navegação clicando em qualquer área do card, na foto ou no botão,
- * com isolamento para o botão de favoritos e suporte total a acessibilidade.
+ * Card de exibição de mentor no catálogo público e no assistente de IA.
+ * Usa os design tokens da marca (`primary`) e as chaves de tradução
+ * `mentors.mentorCard.*`.
  */
-export function MentorCard({
+export const MentorCard: React.FC<MentorCardProps> = ({
   mentor,
-  isAIHighlighted,
-  aiReason
-}: MentorCardProps) {
-  const t = useTranslations("mentorsPage")
-  const router = useRouter()
+  isAIHighlighted = false,
+  aiReason,
+}) => {
+  const t = useTranslations('mentors')
   const { user } = useAuth()
+  const [imageError, setImageError] = useState(false)
+
+  // Foto real do mentor — aceita avatar_url ou photo_url (retrocompatibilidade)
+  const rawPhoto = mentor.avatar_url || mentor.photo_url
+
+  useEffect(() => {
+    setImageError(false)
+  }, [rawPhoto])
+
+  const hasPhoto = Boolean(rawPhoto) && !imageError
+
+  // Iniciais do mentor para avatar fallback neutro
+  const initials = mentor.full_name
+    ? mentor.full_name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((n) => n[0]?.toUpperCase())
+        .join('')
+    : ''
+
+  // Favoritos — requer userId para funcionar
   const { favorites, toggleFavorite } = useFavorites(user?.id)
-
-  const isFavorite = !!(mentor.id && favorites.includes(mentor.id))
-  const isOwnCard = !!(user?.id && mentor.id && user.id === mentor.id)
-
-  const formatDate = (dateString?: string | null) => {
-    if (!dateString) return ""
-    return new Date(dateString).toLocaleDateString("pt-BR", {
-      month: "short",
-      year: "numeric"
-    })
-  }
-
-  const getAvailabilityColor = (status: string | null) => {
-    switch (status) {
-      case "available":
-        return "bg-green-100 text-green-800"
-      case "busy":
-        return "bg-yellow-100 text-yellow-800"
-      case "unavailable":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getAvailabilityText = (status: string | null) => {
-    switch (status) {
-      case "available":
-        return t("status.available")
-      case "busy":
-        return t("status.busy")
-      case "unavailable":
-        return t("status.unavailable")
-      default:
-        return t("status.unknown")
-    }
-  }
-
-  const handleProfileClick = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.preventDefault()
-    const target = mentor.slug || mentor.id
-    if (target) {
-      router.push(`/mentors/${target}`)
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      handleProfileClick(e)
-    }
-  }
+  const isFavorite = mentor.id ? favorites.includes(mentor.id) : false
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (mentor.id) {
-        toggleFavorite(mentor.id)
-    }
+    if (mentor.id) toggleFavorite(mentor.id)
   }
 
+  const isAvailable = mentor.availability_status
+    ? mentor.availability_status === 'available'
+    : true
+
+  // Combina expertise_areas + mentorship_topics como "skills" visíveis
+  const skills: string[] = [
+    ...(mentor.expertise_areas ?? []),
+    ...(mentor.mentorship_topics ?? []),
+  ].filter((v, i, a) => a.indexOf(v) === i) // deduplica
+
+  // Localização formatada (cidade, estado)
+  const locationParts = [mentor.city, mentor.state].filter(Boolean)
+  const locationLabel = locationParts.length > 0
+    ? locationParts.join(', ')
+    : null
+
   return (
-    <Card
-      onClick={handleProfileClick}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      role="button"
-      aria-label={`${t("viewProfile")} - ${mentor.full_name || "Mentor"}`}
-      className={`cursor-pointer hover:shadow-xl transition-all duration-300 flex flex-col h-full relative group border-none shadow-md rounded-[2rem] overflow-hidden bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary ${
+    <div
+      className={`group relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
         isAIHighlighted
-          ? "ring-2 ring-primary/50 shadow-primary/10 scale-[1.02]"
-          : ""
+          ? 'border-primary/40 dark:border-primary-400/40 ring-1 ring-primary/20'
+          : 'border-slate-200/80 dark:border-slate-800'
       }`}
     >
-      {isAIHighlighted && (
-        <div className="absolute -top-3 -right-3 z-20 bg-primary text-white p-2 rounded-full shadow-lg animate-bounce">
-          <Sparkles className="h-5 w-5" />
-        </div>
-      )}
 
-      {/* Botão de Favorito - Restaurado */}
-      {!isOwnCard && (
-        <button
-          onClick={handleFavoriteClick}
-          className={`absolute top-4 right-4 p-2.5 rounded-full shadow-sm transition-all z-10 ${
-            isFavorite
-              ? "bg-red-50 text-red-500 scale-110"
-              : "bg-white/80 text-gray-400 hover:text-red-400 hover:bg-white"
-          }`}
-          aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-        >
-          <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
-        </button>
-      )}
-
-      <CardHeader className="pb-3 px-5 sm:px-6 pt-5 sm:pt-7">
-        <div className="flex items-start justify-between pr-8">
-          <div className="flex items-center space-x-3.5 sm:space-x-4">
-            <Avatar className="h-12 w-12 sm:h-14 sm:w-14 border-2 border-white shadow-md group-hover:scale-105 transition-transform duration-300 shrink-0">
-              <AvatarImage
-                src={mentor.avatar_url || undefined}
-                alt={mentor.full_name || undefined}
-              />
-              <AvatarFallback className="bg-primary/5 text-primary font-bold">
-                {mentor.full_name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("") || "M"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="space-y-0.5 sm:space-y-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <CardTitle className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-primary transition-colors truncate">
-                  {mentor.full_name}
-                </CardTitle>
-                {isOwnCard && (
-                  <Badge className="bg-amber-100 text-amber-800 text-[9px] uppercase font-bold tracking-wider border-none h-4">
-                    Você
-                  </Badge>
-                )}
-                {isAIHighlighted && (
-                  <Badge className="bg-primary/10 text-primary hover:bg-primary/20 text-[9px] uppercase font-black tracking-widest border-none h-4">
-                    IA Match
-                  </Badge>
-                )}
-              </div>
-              <CardDescription className="text-xs sm:text-sm font-semibold text-primary/70 line-clamp-1">
-                {mentor.job_title}
-                {mentor.company && <span className="text-muted-foreground font-medium italic"> @ {mentor.company}</span>}
-              </CardDescription>
+      {/* ================================================================
+          1. RETRATO HERO: Imagem real do mentor ou fallback neutro com iniciais
+          ================================================================ */}
+      <div className="relative w-full aspect-[4/4.2] overflow-hidden bg-slate-100 dark:bg-slate-800">
+        {hasPhoto ? (
+          <Image
+            src={rawPhoto!}
+            alt={mentor.full_name || 'Mentor'}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+            onError={() => setImageError(true)}
+            priority={false}
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 via-primary-50/20 to-slate-200 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 select-none">
+            <div className="w-24 h-24 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-primary-700 dark:text-primary-300">
+              {initials ? (
+                <span className="text-2xl font-bold tracking-wider">{initials}</span>
+              ) : (
+                <User className="w-10 h-10 text-primary-600/70" />
+              )}
             </div>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-3.5 sm:space-y-4 flex-1 flex flex-col px-5 sm:px-7 pb-5 sm:pb-7">
-        {isAIHighlighted && aiReason && (
-          <div className="p-3 bg-primary/5 rounded-2xl border border-primary/10 text-xs text-primary font-medium italic leading-relaxed">
-            "{aiReason}"
           </div>
         )}
 
-        <div className="flex justify-between items-center">
-          <Badge
-            variant="secondary"
-            className={`${getAvailabilityColor(mentor.availability_status)} border-none text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full`}
-          >
-            {getAvailabilityText(mentor.availability_status)}
-          </Badge>
-          
-          {mentor.experience_years && (
-            <div className="flex items-center gap-1.5 text-xs font-bold text-gray-600">
-               <Briefcase className="h-3.5 w-3.5 text-primary/60" />
-               {mentor.experience_years} {t("years")}
-            </div>
-          )}
-        </div>
+        {/* Badge de recomendação IA */}
+        {isAIHighlighted && (
+          <div className="absolute top-3 left-3 z-[2] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-600/90 text-white backdrop-blur-md shadow-sm">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{t('mentorCard.aiRecommended')}</span>
+          </div>
+        )}
 
-        {mentor.bio && (
-          <p className="text-sm text-gray-600 line-clamp-3 min-h-[3rem] leading-relaxed italic">
-            "{mentor.bio}"
+        {/* Badge de disponibilidade (abaixo do badge AI se ambos) */}
+        {!isAIHighlighted && (
+          <div className="absolute top-3 left-3">
+            {isAvailable ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/90 text-white backdrop-blur-md shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                {t('mentorCard.available')}
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800/80 text-slate-200 backdrop-blur-md">
+                {t('mentorCard.busy')}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Botão de Favorito */}
+        <button
+          type="button"
+          onClick={handleFavoriteClick}
+          aria-label={isFavorite ? t('mentorCard.removeFavorite') : t('mentorCard.addFavorite')}
+          className={`absolute top-3 right-3 z-20 p-2 rounded-full backdrop-blur-md transition-all duration-200 ${isFavorite
+              ? 'bg-rose-500 text-white shadow-md scale-110'
+              : 'bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 hover:text-rose-500 hover:bg-white'
+            }`}
+        >
+          <Heart
+            className={`w-4 h-4 transition-transform duration-200 ${isFavorite ? 'fill-current' : ''}`}
+          />
+        </button>
+
+        {/* Anos de experiência */}
+        {mentor.experience_years != null && mentor.experience_years > 0 && (
+          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900/80 text-white backdrop-blur-md shadow-sm">
+            <Award className="w-3.5 h-3.5 text-amber-400" />
+            <span>+{mentor.experience_years} {t('mentorCard.yearsExp')}</span>
+          </div>
+        )}
+
+        {/* Rating (canto inferior direito da foto) */}
+        {mentor.average_rating != null && mentor.average_rating > 0 && (
+          <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold bg-slate-900/80 text-white backdrop-blur-md shadow-sm">
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+            <span>{mentor.average_rating.toFixed(1)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ================================================================
+          2. CONTEÚDO
+          ================================================================ */}
+      <div className="flex flex-col flex-1 p-5">
+
+        {/* Nome */}
+        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
+          {mentor.full_name}
+        </h3>
+
+        {/* Cargo */}
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400 line-clamp-1 mt-0.5 flex items-center gap-1.5">
+          <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span>{mentor.job_title || t('mentorCard.mentor')}</span>
+        </p>
+
+        {/* Motivo da IA */}
+        {aiReason && (
+          <p className="text-xs text-primary-700 dark:text-primary-300 italic line-clamp-2 mt-3 leading-relaxed border-l-2 border-primary/40 pl-2.5 bg-primary-50/50 dark:bg-primary-950/20 py-1.5 rounded-r-md">
+            <Sparkles className="w-3 h-3 inline-block mr-1 -mt-0.5" />
+            {aiReason}
           </p>
         )}
 
-        {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pt-2">
-            {mentor.mentorship_topics.slice(0, 3).map((topic, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="text-[9px] font-bold uppercase tracking-wider bg-gray-100/80 text-gray-600 border-none"
+        {/* Bio */}
+        {!aiReason && mentor.bio && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2 mt-3 leading-relaxed border-l-2 border-primary/30 pl-2.5">
+            &ldquo;{mentor.bio}&rdquo;
+          </p>
+        )}
+
+        {/* Skills / Áreas de Especialidade */}
+        {skills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3.5">
+            {skills.slice(0, 3).map((skill, idx) => (
+              <span
+                key={idx}
+                className="inline-block px-2.5 py-0.5 text-[11px] font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60"
               >
-                {topic}
-              </Badge>
+                {skill}
+              </span>
             ))}
+            {skills.length > 3 && (
+              <span className="inline-block px-2 py-0.5 text-[11px] font-medium rounded-md bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400">
+                +{skills.length - 3}
+              </span>
+            )}
           </div>
         )}
 
-        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 mt-auto pt-6 border-t border-gray-50">
-          <div className="flex items-center gap-1.5">
-            <Calendar className="h-3 w-3" />
-            <span>Desde {formatDate(mentor.created_at)}</span>
-          </div>
-          
-          {(mentor.city || mentor.country) && (
+        {/* ================================================================
+            3. RODAPÉ: Localização & Link
+            ================================================================ */}
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-500 dark:text-slate-400">
+          {locationLabel ? (
             <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span className="max-w-[80px] truncate">{mentor.city || mentor.country}</span>
+              <MapPin className="w-3.5 h-3.5 text-slate-400" />
+              <span>{locationLabel}</span>
             </div>
+          ) : (
+            <span />
           )}
+
+          <div className="inline-flex items-center gap-1 font-semibold text-primary-700 dark:text-primary-400 group-hover:translate-x-0.5 transition-transform">
+            <span>{t('mentorCard.viewProfile')}</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </div>
         </div>
 
-        <div className="pt-2">
-          <Button onClick={handleProfileClick} className="w-full rounded-2xl h-11 font-bold shadow-lg shadow-primary/10">
-            {t("viewProfile")}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Link overlay de cobertura */}
+      <Link
+        href={`/mentors/${mentor.slug || mentor.id}`}
+        className="absolute inset-0 z-10"
+        aria-label={`${t('mentorCard.viewProfile')} — ${mentor.full_name}`}
+      >
+        <span className="sr-only">{mentor.full_name}</span>
+      </Link>
+    </div>
   )
 }
+
+export default MentorCard

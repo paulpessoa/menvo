@@ -622,7 +622,12 @@
       "busy": "Ocupado",
       "specialties": "Especialidades:",
       "viewProfile": "Ver Perfil",
-      "scheduleSession": "Programar"
+      "scheduleSession": "Programar",
+      "mentor": "Mentor",
+      "yearsExp": "años de exp.",
+      "aiRecommended": "Recomendado por IA",
+      "addFavorite": "Añadir a favoritos",
+      "removeFavorite": "Eliminar de favoritos"
     },
     "loginRequired": {
       "title": "Inicio de Sesión Requerido",

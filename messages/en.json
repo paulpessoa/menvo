@@ -623,7 +623,12 @@
       "busy": "Busy",
       "specialties": "Specialties:",
       "viewProfile": "View Profile",
-      "scheduleSession": "Schedule"
+      "scheduleSession": "Schedule",
+      "mentor": "Mentor",
+      "yearsExp": "yrs exp.",
+      "aiRecommended": "AI Recommended",
+      "addFavorite": "Add to favorites",
+      "removeFavorite": "Remove from favorites"
     },
     "loginRequired": {
       "title": "Login Required",
