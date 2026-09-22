@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    return successResponse(suggestion, "Sugestão recebida com sucesso")
+    return successResponse({ success: true }, "Sugestão recebida com sucesso")
   } catch (error) {
     return handleApiError(error)
   }
