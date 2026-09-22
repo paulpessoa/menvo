@@ -84,18 +84,14 @@ export async function POST(request: NextRequest) {
       return errorResponse(errorMessage, "VALIDATION_ERROR", 400)
     }
 
-    const { rating, comment, email, page_url, user_agent } = parsed.data
-
-    // Email is no longer required for anonymous feedback
+    const { rating, comment, email } = parsed.data
 
     // Create feedback
     const insertData: Record<string, any> = {
       user_id: user?.id || null,
       rating,
       comment: comment || null,
-      email: user ? null : email,
-      page_url: page_url || null,
-      user_agent: user_agent || null
+      email: user ? null : email
     };
 
     const { error } = await supabase
