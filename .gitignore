@@ -52,6 +52,7 @@ yarn-error.log*
 
 # AI & Local Development Tooling
 .gemini/
+.claude/worktrees/
 .geminirc
 .geminiignore
 GEMINI.md
