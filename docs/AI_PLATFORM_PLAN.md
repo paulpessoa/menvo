@@ -1,14 +1,17 @@
 # Plano — Menvo AI-First: Diagnóstico Agêntico, Copiloto, Medição de Uso e Base de Conhecimento
 
 > **Status:** proposta aprovada, 2026-09-23. **Já implementado (Fase 0,
-> parcial):** §5 `ai_usage_events`, `ai_model_pricing`, `ai_entitlements`,
+> quase completa):** §5 `ai_usage_events`, `ai_model_pricing`, `ai_entitlements`,
 > `ai_quota_ledger`, `ai_budget` (corte duro em 100%, sem degradação a 80%),
 > RPCs `consume_ai_quota`/`get_ai_quota`/`record_ai_usage`, ligados em
 > `/api/ai/match`, `/api/assistant` e no match da lista de espera, e o painel
 > `/dashboard/admin/ai-usage`. Migração `20260923000002` aplicada em 2026-09-23.
-> Diferença do desenho: a medição do LangChain lê `streamEvents`
-> (`lib/ai/langchain-metering.ts`) em vez de um callback handler. Ver o diário
-> do `STATUS.md`.
+> RLS de `quiz_responses` corrigida e aplicada (`…000005`). Registro de
+> modelos por capacidade (`lib/ai/models`, [ADR 0004](governance/adr/0004-model-registry-by-capability.md))
+> implementado em código — a medição do LangChain agora é um callback por
+> modelo (`lib/ai/metering/callback.ts`), não mais `streamEvents`
+> (`lib/ai/langchain-metering.ts`, removido). Migrações `…000004` e `…000006`
+> escritas, aguardando o fundador aplicá-las. Ver o diário do `STATUS.md`.
 > **Para quem executa:** leia §0 (estado atual) e §1 (princípios) antes de
 > qualquer fase. As decisões do fundador estão em §9, os preços dos modelos
 > em §11 e privacidade/retenção em §12.
@@ -495,10 +498,13 @@ diário do `STATUS.md`.
 7. Esqueleto de `docs/` e `kb/` + ADRs 0001–0004 + `docs/governance/ai-policy.md`.
 8. Seed de `ai_model_pricing` e `ai_model_config` com a §11; `ai_budget` com US$ 10.
 9. Auditar a RLS real de `quiz_responses` (§0, item 8) e registrar o resultado no diário.
-   **Auditado em 2026-09-23: vazamento confirmado** (leitura pública de todas
-   as linhas). Correção aprovada: `20260923000005_quiz_responses_privacy.sql`
-   (escrita, não aplicada; vai junto com a mudança de código).
+   **Feito (2026-09-23):** vazamento confirmado, corrigido e **aplicado**
+   (`20260923000005_quiz_responses_privacy.sql`); código (`quiz.service.ts`,
+   `org-dashboard.service.ts`, `/quiz/results/[id]`) atualizado no mesmo dia.
 10. Aposentar `qwen/qwen3.8-27b` e `gpt-3.5-turbo` em favor do registro (§11.2).
+    **Feito em código (2026-09-23):** nenhuma referência a `qwen/qwen3.8-27b`
+    ou `gpt-3.5-turbo` resta em `lib/`, `app/` ou `supabase/functions/`; ver
+    ADR 0004 §7. Falta aplicar as migrações `…000004`/`…000006`.
 
 ### Fase 1: Diagnóstico agêntico
 1. Migração: `diagnostic_sessions`, `ai_threads`, `ai_messages`, `quiz_responses.user_id`.

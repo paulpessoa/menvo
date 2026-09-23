@@ -1,18 +1,20 @@
 ---
 title: "ADR 0004 — Registro de modelos por capacidade (lib/ai/models + ai_model_config)"
 owner: paul
-status: draft
+status: current
 last_reviewed: 2026-09-23
-source_of_truth: [supabase/migrations/20260923000004_ai_model_config.sql, lib/ai/metering.ts, lib/ai/langchain-metering.ts, lib/services/assistant/agent.ts, lib/services/ai/groq.service.ts, supabase/functions/analyze-quiz/index.ts]
+source_of_truth: [supabase/migrations/20260923000004_ai_model_config.sql, supabase/migrations/20260923000006_quiz_analyze_registry.sql, lib/ai/models, lib/ai/metering/callback.ts, lib/services/assistant/agent.ts, lib/services/ai/match.service.ts, lib/ai-menvo/diagnostic/analyze.ts, app/api/quiz/[id]/analyze/route.ts]
 ---
 
 # ADR 0004 — Registro de modelos por capacidade
 
-- **Status:** proposto (2026-09-23). Migração escrita, **não aplicada**.
+- **Status:** implementado (2026-09-23). Código em produção assim que
+  publicado; migrações `20260923000004` (registro) e `20260923000006`
+  (análise do quiz no registro) **escritas, não aplicadas** — aguardando o
+  fundador aplicá-las (a `20260923000005`, correção da RLS do quiz, já foi
+  aplicada e é pré-requisito da `000006`). Até lá, tudo funciona com os
+  defaults embutidos no código (`source: "default"`, §5).
 - **Plano:** `AI_PLATFORM_PLAN.md` §1 princípio 3, §8 Fase 0 itens 2, 8 e 10, §11.2.
-- **Para quem implementa (Sonnet):** as §3 a §7 são a especificação. As
-  §8 e §9 trazem os critérios de aceite e os testes. Não aplique a migração
-  sem o OK do fundador.
 
 ## 1. Contexto
 
