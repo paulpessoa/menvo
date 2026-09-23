@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -132,190 +131,173 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold">{t("title")}</h1>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="general" className="flex items-center gap-2">
-            <Globe className="h-4 w-4" />
-            {t("tabs.general")}
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            {t("tabs.security")}
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              {t("language.title")}
+            </CardTitle>
+            <CardDescription>{t("language.description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+              <Button
+                variant={currentLanguage === "pt-BR" ? "default" : "outline"}
+                onClick={() => changeLanguage("pt-BR")}
+                className="w-full justify-start md:justify-center"
+              >
+                🇧🇷 {commonT("portuguese")}
+              </Button>
+              <Button
+                variant={currentLanguage === "en" ? "default" : "outline"}
+                onClick={() => changeLanguage("en")}
+                className="w-full justify-start md:justify-center"
+              >
+                🇺🇸 {commonT("english")}
+              </Button>
+              <Button
+                variant={currentLanguage === "es" ? "default" : "outline"}
+                onClick={() => changeLanguage("es")}
+                className="w-full justify-start md:justify-center"
+              >
+                🇪🇸 {commonT("spanish")}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* General Tab */}
-        <TabsContent value="general" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                {t("language.title")}
-              </CardTitle>
-              <CardDescription>{t("language.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-                <Button
-                  variant={currentLanguage === "pt-BR" ? "default" : "outline"}
-                  onClick={() => changeLanguage("pt-BR")}
-                  className="w-full justify-start md:justify-center"
-                >
-                  🇧🇷 {commonT("portuguese")}
-                </Button>
-                <Button
-                  variant={currentLanguage === "en" ? "default" : "outline"}
-                  onClick={() => changeLanguage("en")}
-                  className="w-full justify-start md:justify-center"
-                >
-                  🇺🇸 {commonT("english")}
-                </Button>
-                <Button
-                  variant={currentLanguage === "es" ? "default" : "outline"}
-                  onClick={() => changeLanguage("es")}
-                  className="w-full justify-start md:justify-center"
-                >
-                  🇪🇸 {commonT("spanish")}
-                </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("account.title")}</CardTitle>
+            <CardDescription>{t("account.description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <p className="font-medium">{t("account.email")}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {user?.email}
+                  </p>
+                </div>
+                <Badge variant="default">{t("account.verified")}</Badge>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("account.title")}</CardTitle>
-              <CardDescription>{t("account.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              {t("security.title")}
+            </CardTitle>
+            <CardDescription>{t("security.description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleChangePassword} className="space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{t("account.email")}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                  <Badge variant="default">{t("account.verified")}</Badge>
-                </div>
+                <Label htmlFor="current-password">
+                  {t("security.currentPassword")}
+                </Label>
+                <Input
+                  id="current-password"
+                  name="current-password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder={t("security.currentPasswordPlaceholder")}
+                />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <div className="space-y-2">
+                <Label htmlFor="new-password">
+                  {t("security.newPassword")}
+                </Label>
+                <Input
+                  id="new-password"
+                  name="new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={t("security.newPasswordPlaceholder")}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">
+                  {t("security.confirmPassword")}
+                </Label>
+                <Input
+                  id="confirm-password"
+                  name="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={t("security.confirmPasswordPlaceholder")}
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={
+                  isChangingPassword ||
+                  !currentPassword ||
+                  !newPassword ||
+                  !confirmPassword
+                }
+                className="w-full"
+              >
+                {isChangingPassword
+                  ? t("security.changing")
+                  : t("security.title")}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
-        {/* Security Tab */}
-        <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                {t("security.title")}
-              </CardTitle>
-              <CardDescription>{t("security.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">
-                    {t("security.currentPassword")}
-                  </Label>
-                  <Input
-                    id="current-password"
-                    name="current-password"
-                    type="password"
-                    autoComplete="current-password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder={t("security.currentPasswordPlaceholder")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">
-                    {t("security.newPassword")}
-                  </Label>
-                  <Input
-                    id="new-password"
-                    name="new-password"
-                    type="password"
-                    autoComplete="new-password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={t("security.newPasswordPlaceholder")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">
-                    {t("security.confirmPassword")}
-                  </Label>
-                  <Input
-                    id="confirm-password"
-                    name="confirm-password"
-                    type="password"
-                    autoComplete="new-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder={t("security.confirmPasswordPlaceholder")}
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={
-                    isChangingPassword ||
-                    !currentPassword ||
-                    !newPassword ||
-                    !confirmPassword
-                  }
-                  className="w-full"
-                >
-                  {isChangingPassword
-                    ? t("security.changing")
-                    : t("security.title")}
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              {t("dangerZone.title")}
+            </CardTitle>
+            <CardDescription>{t("dangerZone.description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t("dangerZone.deleteButton")}
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card className="border-destructive">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-5 w-5" />
-                {t("dangerZone.title")}
-              </CardTitle>
-              <CardDescription>{t("dangerZone.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    {t("dangerZone.deleteButton")}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      {t("dangerZone.confirmTitle")}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {t("dangerZone.confirmDesc")}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>
-                      {t("dangerZone.cancel")}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDeleteAccount}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {t("dangerZone.confirmAction")}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("dangerZone.confirmTitle")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("dangerZone.confirmDesc")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {t("dangerZone.cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {t("dangerZone.confirmAction")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
