@@ -1627,15 +1627,15 @@ export type Database = {
       claim_quiz_analysis: {
         Args: { p_id: string; p_server_key: string }
         Returns: {
-          career_moment: string | null
+          career_moment: string
           claimed: boolean
-          current_challenge: string | null
-          development_areas: string[] | null
-          future_vision: string | null
-          mentorship_experience: string | null
-          name: string | null
-          personal_life_help: string | null
-          share_knowledge: string | null
+          current_challenge: string
+          development_areas: string[]
+          future_vision: string
+          mentorship_experience: string
+          name: string
+          personal_life_help: string
+          share_knowledge: string
         }[]
       }
       consume_ai_quota: {
@@ -1678,14 +1678,20 @@ export type Database = {
       }
       get_quiz_result: {
         Args: { p_id: string }
-        Returns: { ai_analysis: Json | null; id: string; processed_at: string | null }[]
+        Returns: {
+          ai_analysis: Json
+          id: string
+          processed_at: string
+        }[]
       }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
       org_members_quiz_done: {
         Args: { p_org: string }
-        Returns: { email: string }[]
+        Returns: {
+          email: string
+        }[]
       }
       record_ai_usage: {
         Args: {
@@ -1714,7 +1720,12 @@ export type Database = {
         Returns: undefined
       }
       save_quiz_analysis: {
-        Args: { p_analysis: Json; p_id: string; p_score?: number | null; p_server_key: string }
+        Args: {
+          p_analysis: Json
+          p_id: string
+          p_score?: number
+          p_server_key: string
+        }
         Returns: undefined
       }
       sync_waiting_list_status: { Args: never; Returns: undefined }

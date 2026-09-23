@@ -294,20 +294,21 @@ export default function QuizResultsPage() {
                                                 </p>
                                             )}
                                         </div>
-                                        <Badge
-                                            variant={mentor.disponivel ? "default" : "secondary"}
-                                            className={
-                                                mentor.disponivel
-                                                    ? "bg-green-600 hover:bg-green-700"
-                                                    : "bg-orange-500 text-white"
-                                            }
-                                        >
-                                            <CheckCircle
-                                                className={`h-3 w-3 mr-1 ${mentor.disponivel ? "text-white" : "text-white"
-                                                    }`}
-                                            />
-                                            {mentor.disponivel ? t('quiz_results.available') : t('quiz_results.full_schedule')}
-                                        </Badge>
+                                        {mentor.mentor_nome && (
+                                            <Badge
+                                                variant={mentor.disponivel ? "default" : "secondary"}
+                                                className={
+                                                    mentor.disponivel
+                                                        ? "bg-green-600 hover:bg-green-700"
+                                                        : "bg-orange-500 text-white"
+                                                }
+                                            >
+                                                <CheckCircle
+                                                    className="h-3 w-3 mr-1 text-white"
+                                                />
+                                                {mentor.disponivel ? t('quiz_results.available') : t('quiz_results.full_schedule')}
+                                            </Badge>
+                                        )}
                                     </div>
                                     <p className="text-sm text-muted-foreground">
                                         {mentor.razao}

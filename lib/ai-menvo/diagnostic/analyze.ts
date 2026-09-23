@@ -65,13 +65,25 @@ export interface AnalysisMentor {
   mentor_skills: string[] | null
   mentorship_topics: string[] | null
   availability_status: string | null
-  is_available: boolean | null
   average_rating: number | null
   total_reviews: number | null
   total_sessions: number | null
 }
 
 function buildPrompt(answers: QuizAnswers, mentors: AnalysisMentor[]): string {
+  const mentorsSection =
+    mentors.length > 0
+      ? mentors
+          .map(
+            (m) => `- ${m.full_name} (${m.job_title} na ${m.company}):
+  Expertise: ${m.expertise_areas?.join(", ") || "N/A"}
+  Tópicos de Mentoria: ${m.mentorship_topics?.join(", ") || "N/A"}
+  Rating: ${m.average_rating ?? "N/A"}/5 (${m.total_reviews ?? 0} avaliações, ${m.total_sessions ?? 0} sessões)
+  Status: ${m.availability_status}`
+          )
+          .join("\n\n")
+      : "Nenhum mentor cadastrado no momento."
+
   return `Analise as respostas do questionário abaixo e crie uma análise personalizada, criativa e motivadora.
 
 RESPOSTAS DO PARTICIPANTE:
@@ -85,15 +97,7 @@ RESPOSTAS DO PARTICIPANTE:
 - Desafios na vida pessoal: ${answers.personal_life_help}
 
 MENTORES DISPONÍVEIS NA PLATAFORMA:
-${mentors
-  .map(
-    (m) => `- ${m.full_name} (${m.job_title} na ${m.company}):
-  Expertise: ${m.expertise_areas?.join(", ") || "N/A"}
-  Tópicos de Mentoria: ${m.mentorship_topics?.join(", ") || "N/A"}
-  Rating: ${m.average_rating ?? "N/A"}/5 (${m.total_reviews ?? 0} avaliações, ${m.total_sessions ?? 0} sessões)
-  Status: ${m.availability_status}`
-  )
-  .join("\n\n")}
+${mentorsSection}
 
 INSTRUÇÕES:
 1. PRIMEIRO: Avalie a qualidade e coerência das respostas
@@ -102,10 +106,10 @@ INSTRUÇÕES:
    - Use o campo "precisa_refazer" como true nestes casos
 
 2. Se as respostas forem adequadas, crie uma análise calorosa, profissional e motivadora
-3. Sugira 2-3 tipos de mentores baseados nas áreas de interesse
-   - Se houver mentores disponíveis que combinam, mencione-os especificamente
-   - Se não houver mentores para certas áreas, indique disponivel: false
-   - Em "mentor_nome", use o nome de um mentor real da lista, ou "" (texto vazio) se não houver
+3. Sugira 2-3 tipos de mentores baseados nas áreas de interesse:
+   - REGRA CRÍTICA: NUNCA invente nomes de mentores fictícios.
+   - Em "mentor_nome", use ESTRITAMENTE o nome de um mentor real presente na lista "MENTORES DISPONÍVEIS NA PLATAFORMA" acima, caso haja sinergia com a área.
+   - Se não houver nenhum mentor na lista acima compatível com aquela área (ou se a lista estiver vazia), use obrigatoriamente "mentor_nome": "" (texto vazio) e "disponivel": false.
 4. Dê 2-3 conselhos práticos e acionáveis
 5. Identifique se a pessoa tem potencial para ser mentora (baseado na resposta sobre compartilhar conhecimento)
 6. Sugira áreas de desenvolvimento na vida pessoal baseado nos desafios mencionados
@@ -227,6 +231,63 @@ export function fallbackAnalysis(answers: QuizAnswers, mentors: AnalysisMentor[]
   }
 }
 
+/**
+ * Sanitizes suggested mentors against real platform mentors.
+ *
+ * Why: LLMs frequently hallucinate fictitious names (e.g. "Ana Santos", "Pedro Oliveira")
+ * when attempting to match user needs, even with explicit negative prompt constraints.
+ * This function guarantees that any suggested mentor whose name does not exactly match
+ * an active platform mentor has their name cleared to "" and their availability set to false.
+ * For genuine mentors, it reflects their true availability status.
+ *
+ * @param analysis - The raw analysis result produced by the model or fallback
+ * @param realMentors - The list of actual platform mentors provided as context
+ * @returns The sanitized analysis result free of hallucinated mentor names
+ */
+export function sanitizeAnalysisMentors(
+  analysis: QuizAnalysisResult,
+  realMentors: AnalysisMentor[]
+): QuizAnalysisResult {
+  const mentorMap = new Map<string, AnalysisMentor>()
+  for (const m of realMentors) {
+    if (m.full_name) {
+      mentorMap.set(m.full_name.trim().toLowerCase(), m)
+    }
+  }
+
+  const sanitizedMentores = (analysis.mentores_sugeridos || []).map((item) => {
+    const rawName = item.mentor_nome?.trim()
+    if (!rawName) {
+      return {
+        ...item,
+        mentor_nome: "",
+        disponivel: false
+      }
+    }
+
+    const matched = mentorMap.get(rawName.toLowerCase())
+    if (!matched) {
+      // Hallucinated mentor name — purge to avoid showing non-existent users
+      return {
+        ...item,
+        mentor_nome: "",
+        disponivel: false
+      }
+    }
+
+    return {
+      ...item,
+      mentor_nome: matched.full_name || rawName,
+      disponivel: matched.availability_status === "available"
+    }
+  })
+
+  return {
+    ...analysis,
+    mentores_sugeridos: sanitizedMentores
+  }
+}
+
 export interface AnalyzeQuizOptions {
   onCall: (record: AiCallRecord) => void
 }
@@ -253,12 +314,14 @@ export async function analyzeQuiz(
     const model = await getStructuredModel<QuizAnalysisResult>(supabase, "analyze", quizAnalysisSchema, {
       onCall: opts.onCall
     })
-    const analysis = await model.invoke(buildPrompt(answers, mentors))
+    const rawAnalysis = await model.invoke(buildPrompt(answers, mentors))
+    const analysis = sanitizeAnalysisMentors(rawAnalysis, mentors)
     return { analysis, usedFallback: false }
   } catch (err) {
     if (!(err instanceof AiModelUnavailableError)) {
       console.warn("[analyzeQuiz] model attempts failed, using deterministic fallback:", err instanceof Error ? err.message : err)
     }
-    return { analysis: fallbackAnalysis(answers, mentors), usedFallback: true }
+    const fallback = sanitizeAnalysisMentors(fallbackAnalysis(answers, mentors), mentors)
+    return { analysis: fallback, usedFallback: true }
   }
 }

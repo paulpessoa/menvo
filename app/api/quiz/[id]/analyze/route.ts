@@ -63,12 +63,24 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
     personal_life_help: claim.personal_life_help ?? ""
   }
 
-  const { data: mentorRows } = await supabase
+  let { data: mentorRows } = await supabase
     .from("mentors_view")
     .select(
-      "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, is_available, average_rating, total_reviews, total_sessions"
+      "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions"
     )
-    .eq("is_available", true)
+    .eq("verified", true)
+    .eq("is_public", true)
+    .limit(50)
+
+  if (!mentorRows || mentorRows.length === 0) {
+    const { data: allMentors } = await supabase
+      .from("mentors_view")
+      .select(
+        "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions"
+      )
+      .limit(50)
+    mentorRows = allMentors
+  }
 
   const mentors = (mentorRows ?? []) as unknown as AnalysisMentor[]
 
@@ -80,8 +92,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
   const { error: saveError } = await supabase.rpc("save_quiz_analysis", {
     p_server_key: serverKey,
     p_id: id,
-    p_analysis: analysis,
-    p_score: null
+    p_analysis: analysis
   })
 
   if (saveError) {
