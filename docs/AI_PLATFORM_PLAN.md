@@ -485,6 +485,8 @@ diário do `STATUS.md`.
 ### Fase 0: Fundação (pré-requisito de tudo)
 1. Declarar `@langchain/langgraph` no `package.json` com versão fixada.
 2. `lib/ai/models`: registro por capacidade + `withFallbacks` + `ai_model_config`.
+   Especificado em [ADR 0004](governance/adr/0004-model-registry-by-capability.md)
+   (inclui itens 8 e 10; migração `20260923000004` escrita, não aplicada).
 3. `lib/ai/metering`: callback + `ai_usage_events` + `ai_model_pricing` + RPC `record_ai_usage`.
 4. `ai_entitlements` + `ai_quota_ledger` + RPC `consume_ai_quota`; trocar o
    rate limit em memória do `/api/assistant` pelo gate no banco.
@@ -493,6 +495,9 @@ diário do `STATUS.md`.
 7. Esqueleto de `docs/` e `kb/` + ADRs 0001–0004 + `docs/governance/ai-policy.md`.
 8. Seed de `ai_model_pricing` e `ai_model_config` com a §11; `ai_budget` com US$ 10.
 9. Auditar a RLS real de `quiz_responses` (§0, item 8) e registrar o resultado no diário.
+   **Auditado em 2026-09-23: vazamento confirmado** (leitura pública de todas
+   as linhas). Correção aprovada: `20260923000005_quiz_responses_privacy.sql`
+   (escrita, não aplicada; vai junto com a mudança de código).
 10. Aposentar `qwen/qwen3.8-27b` e `gpt-3.5-turbo` em favor do registro (§11.2).
 
 ### Fase 1: Diagnóstico agêntico
@@ -542,6 +547,7 @@ exportação do núcleo `lib/ai/` como pacote/template para clientes.
 | D4 | Quem faz diagnóstico | **Qualquer usuário logado** (a base de todo usuário é mentorado). |
 | D5 | Modelos padrão | Ver §11.2 (preços pesquisados em 2026-09-23). |
 | D6 | Retenção | Ver §12.1 (sugestão do Claude, fundador delegou). |
+| D8 | Aposentar `gpt-3.5-turbo` do `analyze-quiz` | **Opção A** (2026-09-23): a análise vai para uma rota Next.js no registro de modelos, medida e dentro do teto. Ver ADR 0004 §7.3. |
 | D7 | Privacidade do diagnóstico | **Privado por padrão.** O usuário pode compartilhar com um mentor, que passa a ver os insights para trabalhar na mentoria. Revogável. Ver §12.2. |
 
 ---
