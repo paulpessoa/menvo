@@ -30,6 +30,7 @@ interface ProfileMentorshipSectionProps {
  */
 export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMentor, onStatusChange }: ProfileMentorshipSectionProps) {
   const t = useTranslations("profile")
+  const tCommon = useTranslations("common")
 
   const post = async (path: string, body: object | undefined, successMessage: string) => {
     try {
@@ -83,7 +84,7 @@ export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMe
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                    <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
                     <AlertDialogAction onClick={() => post("/api/profile/stop-mentor", undefined, "Você agora é apenas mentorado.")} className="bg-red-600">{t("form.stopMentorConfirm")}</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
