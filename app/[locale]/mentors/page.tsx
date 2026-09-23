@@ -30,7 +30,6 @@ import {
   Heart,
   Loader2,
   ArrowDownUp,
-  Globe,
   SearchX,
   Sparkles,
   X
@@ -107,7 +106,6 @@ export default function MentorsPage() {
   const [page, setPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
 
   const [suggestedMentors, setSuggestedMentors] = useState<
     Record<string, string>
@@ -132,12 +130,6 @@ export default function MentorsPage() {
   const [isSuggestModalOpen, setSuggestModalOpen] = useState(false)
 
   const { user } = useAuth()
-
-  // Update clock every minute
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
-    return () => clearInterval(timer)
-  }, [])
 
   const debouncedSearch = useDebounce(filters.search, 350)
   const latestRequestIdRef = useRef(0)
@@ -374,23 +366,6 @@ export default function MentorsPage() {
     const aiIds = new Set(displayedAIMentors.map((m) => m.id))
     return mentors.filter((m) => !m.id || !aiIds.has(m.id))
   }, [mentors, displayedAIMentors])
-
-  // Timezone calculations
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const brtTime = currentTime.toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    hour: "2-digit",
-    minute: "2-digit"
-  })
-  const localTime = currentTime.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit"
-  })
-  const brtGmt = "GMT-3"
-  const localGmt = (date: Date) => {
-    const offset = -date.getTimezoneOffset() / 60
-    return `GMT${offset >= 0 ? "+" : ""}${offset}:00`
-  }
 
   return (
     <PageContainer>
@@ -946,45 +921,6 @@ export default function MentorsPage() {
               </Button>
             </div>
           )}
-
-          {/* Timezone Info Banner - Transparente e Preciso (Mover para o fim) */}
-          <div className="mt-20 mb-10 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10 rounded-2xl p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-white p-3 rounded-xl shadow-sm">
-                  <Globe className="h-6 w-6 text-primary" />
-                </div>
-                <div className="space-y-1 text-center md:text-left">
-                  <p className="text-sm font-bold text-gray-900 leading-none">
-                    {t("timezoneBanner.title")}
-                  </p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {t("timezoneBanner.description")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                <div className="flex-1 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/50 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">
-                    {t("timezoneBanner.referenceLabel")} ({brtGmt})
-                  </p>
-                  <p className="text-lg font-bold text-gray-800 tabular-nums">
-                    {brtTime}
-                  </p>
-                </div>
-                <div className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-center shadow-lg shadow-primary/20">
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-0.5">
-                    {t("timezoneBanner.localLabel")} ({localGmt(currentTime)})
-                  </p>
-                  <p className="text-lg font-bold tabular-nums">{localTime}</p>
-                  <p className="text-[9px] font-medium opacity-80 truncate max-w-[120px] mx-auto">
-                    {userTimezone}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </>
       )}
 

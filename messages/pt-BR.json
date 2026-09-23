@@ -95,10 +95,6 @@
       "ctaButton": "Fazer Quiz de Carreira",
       "exploreLink": "Ou explore todos os mentores"
     },
-    "testimonials": {
-      "title": "Histórias que Inspiram",
-      "description": "Vidas transformadas através da mentoria"
-    },
     "howItWorks": {
       "title": "Como Funciona",
       "description": "Nossa plataforma facilita a conexão com mentores e o agendamento de sessões",
@@ -1109,12 +1105,6 @@
       "busy": "Ocupado",
       "unavailable": "Indisponível",
       "unknown": "Status desconhecido"
-    },
-    "timezoneBanner": {
-      "title": "Ajuste de Horário Global",
-      "description": "Sua agenda é automaticamente convertida para o seu fuso local para evitar erros de agendamento.",
-      "referenceLabel": "Brasil",
-      "localLabel": "Seu Horário"
     },
     "sortBy": {
       "label": "Ordenar",
