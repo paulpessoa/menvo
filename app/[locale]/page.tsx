@@ -17,17 +17,6 @@ const QuizDiscoverySection = dynamic(
   }
 )
 
-const TestimonialsCarousel = dynamic(
-  () => import("@/components/TestimonialsCarousel").then((mod) => mod.TestimonialsCarousel),
-  {
-    loading: () => (
-      <div className="w-full h-80 flex items-center justify-center animate-pulse">
-        <div className="h-64 w-full  bg-muted/40 rounded-3xl" />
-      </div>
-    ),
-  }
-)
-
 export default function Home() {
   const t = useTranslations("home")
   const tCommon = useTranslations("common")
@@ -168,23 +157,6 @@ export default function Home() {
 
       {/* AI Quiz Discovery Section */}
       <QuizDiscoverySection />
-
-      {/* Testimonials Section */}
-      <section className="w-full py-16 md:py-24 bg-slate-50/50">
-        <div className="container  px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-gray-900">
-                {t("testimonials.title")}
-              </h2>
-              <p className="max-w-[800px] text-muted-foreground text-base md:text-lg mx-auto">
-                {t("testimonials.description")}
-              </p>
-            </div>
-          </div>
-          <TestimonialsCarousel />
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="w-full py-16 md:py-20 bg-primary text-primary-foreground relative overflow-hidden">
