@@ -43,6 +43,7 @@ import { toast } from "sonner"
 import { useLocale, useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { useDebounce } from "@/hooks/useDebounce"
+import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useAiQuota } from "@/hooks/useAiQuota"
 import { AIQuotaHint } from "@/components/mentors/AIQuotaHint"
 import { PageContainer } from "@/components/layout/PageContainer"
@@ -135,6 +136,7 @@ export default function MentorsPage() {
   const [isSuggestModalOpen, setSuggestModalOpen] = useState(false)
 
   const { user } = useAuth()
+  const diagnosticHref = useDiagnosticHref()
 
   const debouncedSearch = useDebounce(filters.search, 350)
   const latestRequestIdRef = useRef(0)
@@ -909,7 +911,7 @@ export default function MentorsPage() {
               asChild
               className="rounded-xl font-bold px-6 h-11 shadow-sm w-full sm:w-auto"
             >
-              <Link href="/quiz">
+              <Link href={diagnosticHref}>
                 {t("takeQuizCTA")}
               </Link>
             </Button>

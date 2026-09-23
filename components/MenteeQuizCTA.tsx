@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
 import type { QuizResponseSummary } from "@/lib/types/models/quiz"
+import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 
 interface MenteeQuizCTAProps {
   quizResponse: QuizResponseSummary | null
@@ -19,6 +20,7 @@ interface MenteeQuizCTAProps {
  */
 export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
   const t = useTranslations("dashboard.mentee.quiz")
+  const diagnosticHref = useDiagnosticHref()
 
   if (loading) {
     return (
@@ -60,7 +62,7 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
               </Link>
             </Button>
             <Button asChild variant="outline" size="sm" className="rounded-full text-muted-foreground hover:text-foreground">
-              <Link href="/quiz">
+              <Link href={diagnosticHref}>
                 <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
                 {t("retakeQuiz")}
               </Link>
@@ -107,7 +109,7 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
             size="lg"
             className="rounded-full bg-white text-primary hover:bg-white/90 font-bold px-8 shadow-md hover:scale-105 transition-all text-base h-12"
           >
-            <Link href="/quiz">
+            <Link href={diagnosticHref}>
               <Sparkles className="w-5 h-5 mr-2 text-primary" />
               {t("ctaButton")}
               <ArrowRight className="w-5 h-5 ml-2 text-primary" />

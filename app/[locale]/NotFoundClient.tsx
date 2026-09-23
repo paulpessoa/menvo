@@ -4,12 +4,14 @@ import { Link, useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Home, Compass, ArrowLeft, Sparkles, Users } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 
 /**
  * Componente cliente interativo para a página 404 localizada.
  */
 export default function NotFoundClient() {
   const t = useTranslations("common")
+  const diagnosticHref = useDiagnosticHref()
   const router = useRouter()
 
   const handleGoBack = () => {
@@ -100,7 +102,7 @@ export default function NotFoundClient() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
             <Link
-              href="/quiz"
+              href={diagnosticHref}
               className="group p-4 rounded-xl border border-border/60 hover:border-primary/40 bg-card hover:bg-accent/40 transition-all duration-200"
             >
               <div className="flex items-center gap-3">
