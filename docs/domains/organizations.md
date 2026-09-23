@@ -1,3 +1,11 @@
+---
+title: Organizations (multi-tenant)
+owner: paul
+status: current
+last_reviewed: 2026-09-23
+source_of_truth: [supabase/migrations/20260921000000_organizations_v2.sql, supabase/migrations/20260921000004_org_join_policy.sql, lib/services/organizations/org-dashboard.service.ts, app/api/org/[id]/route.ts]
+---
+
 # 🏢 Multi-Tenant Roadmap — Menvo for Organizations
 
 > **Status: Phase 1 and Phase 1.5 shipped and merged to `main` — see §6.**
@@ -7,7 +15,7 @@
 > hackathons, etc.) so they can register the youth/beneficiaries they serve
 > and tap into (or bring) mentors — while keeping the free public
 > mentor-mentee core loop as the backbone. Read
-> [`docs/STATUS.md`](STATUS.md) (Engineering Journal, "Earlier Milestones")
+> [`docs/STATUS.md`](../STATUS.md) (Engineering Journal, "Earlier Milestones")
 > for why this direction was previously reversed — that history matters for
 > how this got rebuilt.
 

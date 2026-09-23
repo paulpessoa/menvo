@@ -1,7 +1,7 @@
 # 🔐 Environment Variables Guide — Menvo
 
 > **Single Source of Truth** for Menvo environment variables across Local Development, Preview, and Production (Vercel).
-> All template keys are defined in [`.env.example`](file:///c:/Users/paulm/OneDrive/Ambiente%20de%20Trabalho/PROJETOS/menvo/.env.example).
+> All template keys are defined in [`.env.example`](../../.env.example).
 
 ---
 

@@ -8,14 +8,14 @@
 **Current status:** Multi-tenant Phase 1 shipped and merged (organizations,
 invite/request/approve membership, org admin dashboard). Phase 1.5
 (role-aware reporting, public/invite-only orgs, coherent emails, SEO) is
-planned in [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6, not
+planned in [`domains/organizations.md`](domains/organizations.md) §6, not
 started.
 
 ---
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 134/134 passed across 27 test suites (`npm test`)
+- **Unit Tests:** 145/145 passed across 30 test suites (`npm test`)
 - **Production Build:** 55/55 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -44,7 +44,7 @@ started.
 - **Weekly Recurring Slots:** Mentors configure weekday recurring availability (minimum interval: 45 minutes).
 - **14-Day Rolling Window:** Slots are projected dynamically up to 14 days in advance.
 - **Conflict Filtering:** Suppresses colliding slots against both internal appointments and Google Calendar `freebusy.query`.
-- **Reference:** See [`docs/SCHEDULING_AND_AVAILABILITY.md`](SCHEDULING_AND_AVAILABILITY.md).
+- **Reference:** See [`docs/domains/scheduling.md`](domains/scheduling.md).
 
 ### 4. Database Portability (BFF Architecture)
 - **Rule:** UI components must never query Supabase directly.
@@ -62,7 +62,7 @@ started.
 - **RLS org-admin checks go through `is_org_admin()`** (security definer),
   never a policy that selects from its own table — Postgres rejects direct
   self-referential `USING` clauses as recursion.
-- **Reference:** [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md).
+- **Reference:** [`docs/domains/organizations.md`](domains/organizations.md).
 
 ---
 
@@ -78,14 +78,24 @@ started.
 - [x] **UI Width/Container Standardization:** Shared `PageContainer` component, 1280px cap app-wide, obsolete `AdminBreadcrumb` removed.
 - [x] **`/mentors` Dead-Click Fix:** Whole `MentorCard` interactive, dismissable filter chips (found via Clarity).
 - [x] **Multi-Tenant Phase 1:** Organizations, invite/request/approve membership, org admin dashboard, platform admin org CRUD. Shipped in PR #45.
-- [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Plan: [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6.
-- [ ] **AI-First Platform (diagnóstico agêntico, copiloto por papel, medição de uso, KB):** Plan: [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md). Fase 0: cota mensal + medição de custo no Postgres **feitas** (2026-09-23, migração aplicada); teto global de US$ 10/mês (`ai_budget`) também feito; faltam registro de modelos por capacidade, degradação para modelo barato a 80% do orçamento, medir `analyze-quiz`. Decisões D1–D7 resolvidas em 2026-09-23 (plano §9); preços em §11, privacidade/retenção em §12.
+- [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Plan: [`domains/organizations.md`](domains/organizations.md) §6.
+- [ ] **AI-First Platform (diagnóstico agêntico, copiloto por papel, medição de uso, KB):** Plan: [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md). Fase 0: cota mensal + medição de custo no Postgres **feitas** (2026-09-23, migração aplicada); teto global de US$ 10/mês (`ai_budget`) também feito; `searchMentors` DTOs, `@langchain/langgraph` declarado, links de diagnóstico e esqueleto de `docs/`+`kb/` **feitos** (2026-09-23, ver diário); faltam registro de modelos por capacidade, degradação para modelo barato a 80% do orçamento, medir `analyze-quiz`, protocolo SSE tipado com Zod, ADRs 0001–0004, `docs/governance/ai-policy.md`, seed de `ai_model_pricing`/`ai_model_config`, auditar RLS de `quiz_responses`, aposentar `qwen/qwen3.8-27b`/`gpt-3.5-turbo`. Decisões D1–D7 resolvidas em 2026-09-23 (plano §9); preços em §11, privacidade/retenção em §12.
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-23 — AI Plan Fase 0: Lean Mentor DTO, `langgraph` Dependency, Diagnostic Links, Docs/KB Skeleton
+- **`searchMentors` no longer sends full mentor rows to the LLM** (`lib/services/assistant/tools.ts`): added two Zod DTOs — `mentorLlmDto` (slug, name, role, up to 5 skills, bio cut to 200 chars, profileUrl; no email/phone/any other field) and `mentorCardDto` (the full card shape `MentorCard` renders). The tool (`lib/services/assistant/agent.ts`) now uses LangChain's `responseFormat: "content_and_artifact"`: `content` (the lean DTO, stringified) is what the model reads and pays tokens for; `artifact` (the card DTO) rides along on the `ToolMessage` without ever reaching the model. `app/api/assistant/route.ts`'s `mentors_found` SSE event now reads `event.data.output.artifact` instead of the raw tool output, so the UI still gets full cards.
+- **`@langchain/langgraph` declared explicitly** in `package.json` (exact `1.4.16`, the version already resolved as a transitive dep of `langchain`; `package-lock.json` synced so `npm ci` doesn't fail) — it was imported directly in `agent.ts` without ever being a first-class dependency.
+- **Internal diagnostic links point at the chat, not the anonymous quiz** (plan §9 D1): `MenteeQuizCTA` (both the "take the quiz" and "retake" buttons), `/mentors`' empty-state CTA, and `NotFoundClient`'s discovery link go to `/assistant?mode=diagnostic` (conditionally, see below). The mentee dashboard needed no separate change — it already renders `MenteeQuizCTA`. `/assistant` doesn't read `mode` yet (ignored, as planned); wiring the actual diagnostic subgraph is Fase 1. The anonymous `/quiz` flow (event lead capture) and `/quiz/results/[id]` were left untouched, per D1.
+- **`docs/` and `kb/` skeleton created** (plan §6.1): new `docs/README.md` explains the two-tree split and the mandatory frontmatter for `kb/` and `docs/domains/`. Moved the four existing docs into their planned homes and updated every internal link: `SCHEDULING_AND_AVAILABILITY.md` → `domains/scheduling.md`, `MULTI_TENANT_ROADMAP.md` → `domains/organizations.md`, `ENVIRONMENT_VARIABLES.md` → `operations/environment-variables.md`, `SEO_GUIDE.md` → `product/seo.md`. Created the empty target folders (`governance/adr`, `architecture`, `operations/runbooks`, `product`, and all of `kb/`'s subfolders) with `.gitkeep` placeholders — no `kb/` articles written yet, no ADRs, no `ai-policy.md`, per scope.
+- **Opus review before commit caught and fixed:** (a) `package-lock.json` didn't list the new direct dependency, which would have broken `npm ci` on Vercel; (b) the assistant asked `searchCatalog` for `page: 1`, but that API is 0-indexed, so it **always skipped the top-rated mentors** (bug existed before this change); (c) the DTO mapping used `any[]` and a strict `.parse` that would crash the whole search on one malformed row, so it now uses `safeParse` and drops bad rows; (d) `organizations.md`'s relative link to `STATUS.md` broke with the move, and `environment-variables.md` had a `file:///c:/Users/...` link. Both are now relative; (e) `domains/scheduling.md` and `domains/organizations.md` got the frontmatter the new README requires. Added `lib/services/assistant/tools.test.ts` (lean DTO keys, bio 200, skills ≤ 5, no email/phone, malformed row dropped, page 0).
+- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (30 suites, 145 tests, all passing).
+- **Links resolved (founder accepted the recommendation):** `/assistant` needs login + `ai_assistant_flag` and has no diagnostic mode yet, so a hard link would dead-end anonymous visitors and everyone while the flag is off. New `hooks/useDiagnosticHref.ts` returns `/assistant?mode=diagnostic` only when logged in **and** the flag is on, else `/quiz`; used by `MenteeQuizCTA`, `/mentors` and `NotFoundClient`. `QuizDiscoverySection` (home page, mostly anonymous traffic) stays on `/quiz`.
+- **Not done, explicitly out of scope for this pass:** model registry (`lib/ai/models`), SSE protocol typed with Zod, `ai_model_pricing`/`ai_model_config` seed, `quiz_responses` RLS audit, retiring `qwen/qwen3.8-27b`/`gpt-3.5-turbo`, ADRs, `ai-policy.md`, any DB migration or RLS change (none needed).
 
 ### 2026-09-23 — AI Monthly Quota + Cost Metering (AI Plan Fase 0, partial)
 - **Why:** the platform is non-profit but must pay for itself, so every AI feature needs a hard per-user limit and a known cost before it scales. Limits and costs now live in Postgres (the old 30/day assistant limit was in-memory, i.e. per serverless instance, i.e. not a limit).
@@ -172,13 +182,13 @@ started.
 
 | File | Purpose |
 |---|---|
-| [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) | Multi-tenant organizations: decisions, Phase 1 (shipped), Phase 1.5 plan |
+| [`docs/domains/organizations.md`](domains/organizations.md) | Multi-tenant organizations: decisions, Phase 1 (shipped), Phase 1.5 plan |
 | [`docs/AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md) | AI-first plan: agentic diagnostic, role-based copilot, AI usage metering, knowledge base & docs governance |
 | [`docs/VISION.md`](VISION.md) | Product purpose, target audience, and north star |
 | [`docs/GOOGLE_OAUTH_SUBMISSION.md`](GOOGLE_OAUTH_SUBMISSION.md) | Google Cloud Console OAuth verification kit & demo video script |
-| [`docs/SCHEDULING_AND_AVAILABILITY.md`](SCHEDULING_AND_AVAILABILITY.md) | Availability algorithm, 14-day projection, conflict detection |
-| [`docs/ENVIRONMENT_VARIABLES.md`](ENVIRONMENT_VARIABLES.md) | Active environment variables reference across environments |
-| [`docs/SEO_GUIDE.md`](SEO_GUIDE.md) | Search engine, LLMs/Geo SEO, and image guidelines |
+| [`docs/domains/scheduling.md`](domains/scheduling.md) | Availability algorithm, 14-day projection, conflict detection |
+| [`docs/operations/environment-variables.md`](operations/environment-variables.md) | Active environment variables reference across environments |
+| [`docs/product/seo.md`](product/seo.md) | Search engine, LLMs/Geo SEO, and image guidelines |
 
 ---
 
@@ -186,7 +196,7 @@ started.
 
 Triggered by the founder's questions about vector search, an agent, messy
 migrations, and Supabase coupling. Full plan and reasoning:
-[`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) is org-specific;
+[`docs/domains/organizations.md`](domains/organizations.md) is org-specific;
 the broader architecture plan lives in this session's approved plan
 (vectors: not yet, pgvector when there's a real trigger; chat agent:
 LangChain.js + Groq/Gemini behind a flag, later; Supabase: keep for now,
@@ -273,4 +283,4 @@ Small, but it's the pattern the roadmap's item 3 (architecture plan,
 2026-09-17) calls for: extract incrementally as each domain gets touched,
 rather than a big-bang rewrite.
 
-Full detail: [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6.
+Full detail: [`domains/organizations.md`](domains/organizations.md) §6.

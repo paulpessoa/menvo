@@ -1,3 +1,11 @@
+---
+title: Scheduling and availability
+owner: paul
+status: current
+last_reviewed: 2026-09-23
+source_of_truth: [lib/services/appointments/availability.service.ts, app/api/appointments/availability/route.ts, app/api/mentors/availability/route.ts]
+---
+
 # Sistema de Agenda e Disponibilidade de Mentorias — Menvo
 
 Este documento consolida as **regras de negócio, arquitetura e fluxo de dados** do sistema de agendamento e disponibilidade entre mentores e mentorados na Menvo.

@@ -79,7 +79,7 @@ valores):
   segue sozinho.
 - `NEXT_PUBLIC_APP_URL` — já existe, usado nas respostas das tools.
 
-Documente as duas novas em `docs/ENVIRONMENT_VARIABLES.md` (tabela
+Documente as duas novas em `docs/operations/environment-variables.md` (tabela
 existente; adicione linhas).
 
 ---
