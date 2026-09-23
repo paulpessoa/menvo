@@ -661,8 +661,6 @@
     "team": "Equipe",
     "partners": "Parceiros",
     "contact": "Contato",
-    "subscribe": "Inscreva-se",
-    "newsletter": "Receba novidades e atualizações da Menvo.",
     "privacyPolicy": "Privacidade",
     "termsOfService": "Termos",
     "cookiePolicy": "Cookies",
@@ -795,37 +793,6 @@
       "button": "Cancelar inscrição",
       "cancelling": "Cancelando...",
       "backToSite": "Voltar ao site"
-    },
-    "modal": {
-      "success": {
-        "title": "Obrigado por se juntar à nossa newsletter!",
-        "receive": "O que você receberá:",
-        "news": "✨ Novidades sobre mentorias e oportunidades",
-        "tips": "💡 Dicas exclusivas de desenvolvimento profissional",
-        "features": "🚀 Primeiras informações sobre novos recursos",
-        "whatsapp": "📱 Atualizações importantes via WhatsApp",
-        "madeWithLove": "Feito com carinho pela equipe Menvo",
-        "continue": "Continuar Explorando"
-      },
-      "form": {
-        "title": "Newsletter Menvo",
-        "emailLabel": "Email *",
-        "emailPlaceholder": "seu@email.com",
-        "nameLabel": "Nome (opcional)",
-        "namePlaceholder": "Seu nome",
-        "whatsappLabel": "WhatsApp (opcional)",
-        "whatsappPlaceholder": "+55 11 99999-9999",
-        "whatsappInfo": "Receba atualizações via WhatsApp",
-        "consentLabel": "Consentimento obrigatório *",
-        "consentInfo": "Concordo em receber emails da Menvo com novidades, atualizações e conteúdo relevante.",
-        "marketingLabel": "Marketing personalizado (opcional)",
-        "marketingInfo": "Concordo em receber ofertas e promoções personalizadas baseadas no meu perfil e interesses.",
-        "dataProtectionTitle": "Proteção de Dados",
-        "dataProtectionInfo": "Seus dados são protegidos conforme a LGPD. Não compartilhamos suas informações com terceiros.",
-        "cancel": "Cancelar",
-        "subscribing": "Inscrevendo...",
-        "subscribe": "Inscrever-se"
-      }
     }
   },
   "privacy": {

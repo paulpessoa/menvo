@@ -661,8 +661,6 @@
     "team": "Equipo",
     "partners": "Socios",
     "contact": "Contacto",
-    "subscribe": "Suscríbete",
-    "newsletter": "Recibe noticias y actualizaciones de Menvo.",
     "allRightsReserved": "Todos los direitos reservados.",
     "privacyPolicy": "Privacidad",
     "termsOfService": "Términos",
@@ -795,37 +793,6 @@
       "button": "Darse de baja",
       "cancelling": "Dando de baja...",
       "backToSite": "Volver al sitio"
-    },
-    "modal": {
-      "success": {
-        "title": "¡Gracias por unirte a nuestro boletín!",
-        "receive": "Lo que recibirás:",
-        "news": "✨ Noticias sobre mentorías y oportunidades",
-        "tips": "💡 Consejos exclusivos de desarrollo profesional",
-        "features": "🚀 Primera información sobre nuevas funciones",
-        "whatsapp": "📱 Actualizaciones importantes vía WhatsApp",
-        "madeWithLove": "Hecho con amor por el equipo de Menvo",
-        "continue": "Continuar Explorando"
-      },
-      "form": {
-        "title": "Boletín Menvo",
-        "emailLabel": "Correo electrónico *",
-        "emailPlaceholder": "tu@correo.com",
-        "nameLabel": "Nombre (opcional)",
-        "namePlaceholder": "Tu nombre",
-        "whatsappLabel": "WhatsApp (opcional)",
-        "whatsappPlaceholder": "+55 11 99999-9999",
-        "whatsappInfo": "Recibir actualizaciones vía WhatsApp",
-        "consentLabel": "Consentimiento obligatorio *",
-        "consentInfo": "Acepto recibir correos electrónicos de Menvo con noticias, actualizaciones y contenido relevante.",
-        "marketingLabel": "Marketing personalizado (opcional)",
-        "marketingInfo": "Acepto recibir ofertas y promociones personalizadas basadas en mi perfil e intereses.",
-        "dataProtectionTitle": "Protección de Datos",
-        "dataProtectionInfo": "Tus datos están protegidos según las leyes de privacidad. No compartimos tu información con terceros.",
-        "cancel": "Cancelar",
-        "subscribing": "Suscribiendo...",
-        "subscribe": "Suscribirse"
-      }
     }
   },
   "privacy": {
