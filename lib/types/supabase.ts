@@ -116,6 +116,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_model_config: {
+        Row: {
+          active: boolean
+          capability: string
+          fallback: Json
+          model: string
+          notes: string | null
+          params: Json
+          provider: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          capability: string
+          fallback?: Json
+          model: string
+          notes?: string | null
+          params?: Json
+          provider: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          capability?: string
+          fallback?: Json
+          model?: string
+          notes?: string | null
+          params?: Json
+          provider?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       ai_model_pricing: {
         Row: {
           cached_input_per_mtok: number | null
@@ -1133,6 +1169,7 @@ export type Database = {
       quiz_responses: {
         Row: {
           ai_analysis: Json | null
+          analysis_claimed_at: string | null
           career_moment: string
           created_at: string | null
           current_challenge: string | null
@@ -1152,6 +1189,7 @@ export type Database = {
         }
         Insert: {
           ai_analysis?: Json | null
+          analysis_claimed_at?: string | null
           career_moment: string
           created_at?: string | null
           current_challenge?: string | null
@@ -1171,6 +1209,7 @@ export type Database = {
         }
         Update: {
           ai_analysis?: Json | null
+          analysis_claimed_at?: string | null
           career_moment?: string
           created_at?: string | null
           current_challenge?: string | null
@@ -1585,6 +1624,20 @@ export type Database = {
         Returns: boolean
       }
       check_user_role: { Args: { target_role: string }; Returns: boolean }
+      claim_quiz_analysis: {
+        Args: { p_id: string; p_server_key: string }
+        Returns: {
+          career_moment: string | null
+          claimed: boolean
+          current_challenge: string | null
+          development_areas: string[] | null
+          future_vision: string | null
+          mentorship_experience: string | null
+          name: string | null
+          personal_life_help: string | null
+          share_knowledge: string | null
+        }[]
+      }
       consume_ai_quota: {
         Args: { p_feature: string }
         Returns: {
@@ -1623,9 +1676,17 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_quiz_result: {
+        Args: { p_id: string }
+        Returns: { ai_analysis: Json | null; id: string; processed_at: string | null }[]
+      }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
+      org_members_quiz_done: {
+        Args: { p_org: string }
+        Returns: { email: string }[]
+      }
       record_ai_usage: {
         Args: {
           p_cached_input_tokens?: number
@@ -1650,6 +1711,10 @@ export type Database = {
           p_scope?: string
           p_user_id: string
         }
+        Returns: undefined
+      }
+      save_quiz_analysis: {
+        Args: { p_analysis: Json; p_id: string; p_score?: number | null; p_server_key: string }
         Returns: undefined
       }
       sync_waiting_list_status: { Args: never; Returns: undefined }

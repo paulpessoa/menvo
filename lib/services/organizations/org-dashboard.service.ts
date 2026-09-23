@@ -72,11 +72,12 @@ export async function getOrgDashboard(
     memberIds.length
       ? supabase.from("appointments").select("mentor_id").in("mentor_id", memberIds)
       : Promise.resolve({ data: [] as { mentor_id: string }[] }),
+    // quiz_responses has no direct-select policy any more (RLS audit,
+    // STATUS.md 2026-09-23) — org admins see "did the quiz?" only through
+    // this security-definer RPC, which checks is_org_admin() itself and
+    // never exposes another member's raw quiz answers.
     memberEmails.length
-      ? supabase
-          .from("quiz_responses" as any)
-          .select("email")
-          .in("email", memberEmails)
+      ? supabase.rpc("org_members_quiz_done", { p_org: organizationId })
       : Promise.resolve({ data: [] as { email: string }[] }),
     memberIds.length
       ? supabase

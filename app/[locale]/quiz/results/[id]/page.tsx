@@ -50,9 +50,6 @@ interface AnalysisResult {
 
 interface QuizResponse {
     id: string
-    name: string
-    email: string
-    score: number
     ai_analysis: AnalysisResult
     processed_at: string
 }

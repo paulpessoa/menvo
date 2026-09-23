@@ -1,13 +1,22 @@
 import { createClient } from "@/lib/utils/supabase/client"
 import type {
-  QuizResponseRow,
   QuizResponseInsert,
   QuizResponseSummary,
+  QuizResultView,
   QuizAnalysisResult
 } from "@/lib/types/models/quiz"
 
 /**
  * Service to manage quiz responses, AI analysis trigger, and user diagnostic queries.
+ *
+ * `quiz_responses` RLS (migration `20260923000005_quiz_responses_privacy.sql`,
+ * audit in STATUS.md 2026-09-23) no longer allows an anonymous or
+ * cross-account read of the table: a logged-in user reads only rows
+ * matching their own e-mail, and there is no `anon` SELECT at all. The
+ * anonymous quiz still needs to read back its own just-submitted row by
+ * `id` (the results page, shared on LinkedIn/WhatsApp by design) — that
+ * goes through `get_quiz_result`, a `security definer` RPC that returns
+ * only `id`, `processed_at` and `ai_analysis`, never name/e-mail/answers.
  */
 class QuizService {
   private supabase = createClient()
@@ -15,6 +24,10 @@ class QuizService {
   /**
    * Retrieves the most recent quiz response for a given email address.
    * Useful for determining if a logged-in mentee has already completed the assessment.
+   *
+   * Only works for the caller's own e-mail — RLS enforces this even though
+   * the query itself doesn't filter by session, since the caller is
+   * expected to pass their own logged-in e-mail (dashboard/mentee/page.tsx).
    *
    * @param email - User's email address
    * @returns QuizResponseSummary or null if none found
@@ -58,27 +71,33 @@ class QuizService {
   }
 
   /**
-   * Retrieves a full quiz response record by its unique ID.
+   * Retrieves the public result view for a quiz response by its UUID — the
+   * only three fields `/quiz/results/[id]` renders. Works for anonymous
+   * visitors (the results link is shared) through the `get_quiz_result` RPC,
+   * never a direct `.select()` on `quiz_responses`.
    *
    * @param id - UUID of the quiz response
-   * @returns QuizResponseRow or null if not found
+   * @returns QuizResultView or null if not found
    */
-  async getQuizResponseById(id: string): Promise<QuizResponseRow | null> {
+  async getQuizResponseById(id: string): Promise<QuizResultView | null> {
     if (!id) return null
 
     try {
-      const { data, error } = await (this.supabase
-        .from("quiz_responses") as any)
-        .select("*")
-        .eq("id", id)
-        .single()
+      const { data, error } = await (this.supabase.rpc as any)("get_quiz_result", { p_id: id })
 
       if (error) {
         console.error("[QuizService] Error loading quiz results by ID:", error)
         return null
       }
 
-      return data
+      const row = Array.isArray(data) ? data[0] : data
+      if (!row) return null
+
+      return {
+        id: row.id,
+        processed_at: row.processed_at,
+        ai_analysis: (row.ai_analysis as unknown as QuizAnalysisResult) || null
+      }
     } catch (err) {
       console.error("[QuizService] Unexpected error loading quiz results:", err)
       return null
@@ -88,33 +107,37 @@ class QuizService {
   /**
    * Submits a new quiz response and triggers the background AI analysis.
    *
+   * The id is generated on the client because the insert can no longer be
+   * followed by a `.select()`: PostgREST does a SELECT to return the
+   * inserted row, and an anonymous submitter has no SELECT policy on
+   * `quiz_responses` any more (only their own row, once logged in, does).
+   *
    * @param payload - Quiz response data matching table insert schema
-   * @returns Created QuizResponseRow
+   * @returns The generated id, to route to `/quiz/results/[id]`
    */
-  async submitQuiz(payload: QuizResponseInsert): Promise<QuizResponseRow> {
-    const { data: response, error } = await (this.supabase
-      .from("quiz_responses") as any)
-      .insert({
-        ...payload,
-        email: payload.email.trim().toLowerCase()
-      })
-      .select()
-      .single()
+  async submitQuiz(payload: QuizResponseInsert): Promise<{ id: string }> {
+    const id = crypto.randomUUID()
 
-    if (error || !response) {
-      throw error || new Error("Failed to create quiz response")
+    const { error } = await (this.supabase.from("quiz_responses") as any).insert({
+      ...payload,
+      id,
+      email: payload.email.trim().toLowerCase()
+    })
+
+    if (error) {
+      throw error
     }
 
-    // Trigger AI analysis Edge Function asynchronously
+    // Trigger AI analysis asynchronously (POST /api/quiz/[id]/analyze — a
+    // Next.js route on the model registry, metered and inside the AI
+    // budget; ADR 0004 §7.3, replaces the old analyze-quiz Edge Function).
     try {
-      await this.supabase.functions.invoke("analyze-quiz", {
-        body: { responseId: response.id }
-      })
+      await fetch(`/api/quiz/${id}/analyze`, { method: "POST" })
     } catch (analysisError) {
       console.warn("[QuizService] Asynchronous AI trigger warning:", analysisError)
     }
 
-    return response
+    return { id }
   }
 
   /**
