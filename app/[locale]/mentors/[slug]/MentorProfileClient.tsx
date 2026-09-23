@@ -130,31 +130,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
     toast.success(t("share.copySuccess"))
   }
 
-  const getAvailabilityColor = (status: string) => {
-    switch (status) {
-      case "available":
-        return "bg-green-100 text-green-800 border-none"
-      case "busy":
-        return "bg-yellow-100 text-yellow-800 border-none"
-      case "unavailable":
-        return "bg-red-100 text-red-800 border-none"
-      default:
-        return "bg-gray-100 text-gray-800 border-none"
-    }
-  }
 
-  const getAvailabilityText = (status: string) => {
-    switch (status) {
-      case "available":
-        return t("status.available")
-      case "busy":
-        return t("status.busy")
-      case "unavailable":
-        return t("status.unavailable")
-      default:
-        return t("status.unknown")
-    }
-  }
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Abril 2024"
@@ -254,11 +230,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center md:justify-start pt-2">
-                        <Badge className={`${getAvailabilityColor(mentor.availability_status)} font-black uppercase tracking-widest text-[10px] px-3 py-1`}>
-                            {getAvailabilityText(mentor.availability_status)}
-                        </Badge>
-                    </div>
+
                   </div>
                 </div>
               </CardHeader>
@@ -367,27 +339,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             <Card className="border-none shadow-2xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white relative">
               <div className="h-3 bg-gradient-to-r from-primary-700 via-primary-600 to-primary"></div>
               <CardHeader className="pb-3 pt-8 px-8">
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <Badge
-                    variant="outline"
-                    className={`font-semibold px-3 py-1 rounded-full text-xs flex items-center gap-1.5 ${
-                      availability.length > 0 && mentor.availability_status === "available"
-                        ? "bg-primary/10 text-primary border-primary/20"
-                        : "bg-muted text-muted-foreground border-muted"
-                    }`}
-                  >
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        availability.length > 0 && mentor.availability_status === "available"
-                          ? "bg-primary animate-pulse"
-                          : "bg-muted-foreground"
-                      }`}
-                    />
-                    {availability.length > 0 && mentor.availability_status === "available"
-                      ? t("availableForBooking")
-                      : t("status.unavailable")}
-                  </Badge>
-                </div>
                 <CardTitle className="text-2xl font-black uppercase tracking-tighter">
                   {t("scheduleSession")}
                 </CardTitle>

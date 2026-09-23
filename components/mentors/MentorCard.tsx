@@ -151,30 +151,16 @@ export const MentorCard: React.FC<MentorCardProps> = ({
           </div>
         )}
 
-        {/* Badge de disponibilidade (abaixo do badge AI se ambos) */}
-        {!isAIHighlighted && (
-          <div className="absolute top-3 left-3">
-            {isAvailable ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/90 text-white backdrop-blur-md shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                {t('mentorCard.available')}
-              </span>
-            ) : (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800/80 text-slate-200 backdrop-blur-md">
-                {t('mentorCard.busy')}
-              </span>
-            )}
-          </div>
-        )}
 
-        {/* Botão de Favorito */}
+
+        {/* Botão de Favorito — visível apenas no hover (ou se já favoritado) */}
         <button
           type="button"
           onClick={handleFavoriteClick}
           aria-label={isFavorite ? t('mentorCard.removeFavorite') : t('mentorCard.addFavorite')}
           className={`absolute top-3 right-3 z-20 p-2 rounded-full backdrop-blur-md transition-all duration-200 ${isFavorite
-              ? 'bg-rose-500 text-white shadow-md scale-110'
-              : 'bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 hover:text-rose-500 hover:bg-white'
+              ? 'bg-rose-500 text-white shadow-md scale-110 opacity-100'
+              : 'opacity-0 group-hover:opacity-100 bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 hover:text-rose-500 hover:bg-white'
             }`}
         >
           <Heart
