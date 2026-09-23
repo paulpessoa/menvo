@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/lib/types/supabase"
-import type { MentorContextItem } from "./groq.service"
+import type { MentorContextItem } from "./match.service"
 
 /** Upper bound on mentors sent to the LLM — this is what drives prompt cost. */
 export const MAX_CANDIDATES = 100

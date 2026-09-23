@@ -6,7 +6,7 @@ import { z } from "zod"
  * (`ai_usage_events.feature`). Adding a new AI feature = add it here + seed an
  * entitlement row; without the row the quota gate denies it (limit 0).
  */
-export const AI_FEATURES = ["match", "assistant", "admin_waitlist_match"] as const
+export const AI_FEATURES = ["match", "assistant", "admin_waitlist_match", "quiz_analysis"] as const
 
 export const aiFeatureSchema = z.enum(AI_FEATURES)
 

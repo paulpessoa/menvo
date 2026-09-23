@@ -1,9 +1,9 @@
-import { ChatGroq } from "@langchain/groq"
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
-import { createReactAgent } from "@langchain/langgraph/prebuilt"
+import { createAgent, modelFallbackMiddleware } from "langchain"
 import { tool } from "@langchain/core/tools"
-import { HumanMessage, SystemMessage } from "@langchain/core/messages"
+import { SystemMessage } from "@langchain/core/messages"
 import { SupabaseClient } from "@supabase/supabase-js"
+import { getAgentModels } from "@/lib/ai/models"
+import type { AiCallRecord } from "@/lib/ai/metering"
 import {
   assistantTools,
   searchMentorsInput,
@@ -35,26 +35,27 @@ FEEDBACK:
 - Ao fim de uma conversa ou quando resolver o problema do usuário, peça a ele um feedback sobre o seu atendimento. Peça para ele responder no chat dando uma nota de 1 a 5 e um comentário.
 - Se o usuário enviar um feedback (nota e comentário), você DEVE obrigatoriamente usar a ferramenta "saveFeedback" para salvar no banco de dados e agradecê-lo em seguida.`
 
-export function getAssistantAgent(supabase: SupabaseClient) {
-  // 1. Configurar Modelos com Fallback
-  const groqModel = new ChatGroq({
-    model: "qwen/qwen3.8-27b",
-    apiKey: process.env.GROQ_API_KEY,
-    temperature: 0.3
-  })
+export interface GetAssistantAgentOptions {
+  /** Receives one AiCallRecord per model attempt (primary + every fallback
+   * try), success or failure — ADR 0004 §6. */
+  onCall: (record: AiCallRecord) => void
+}
 
-  const geminiModel = new ChatGoogleGenerativeAI({
-    model: "gemini-3.5-flash-lite",
-    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-    temperature: 0.3
-  })
+/**
+ * Builds the assistant agent for one request, resolving the `converse`
+ * capability through the model registry (`lib/ai/models`) instead of
+ * instantiating a fixed model. Async because the registry reads
+ * `ai_model_config` (cached 60s — see `lib/ai/models/load.ts`).
+ *
+ * Uses `createAgent` (from `langchain`) + `modelFallbackMiddleware`, not the
+ * deprecated `createReactAgent`: `withFallbacks` cannot bind tools onto a
+ * `RunnableWithFallbacks` (ADR 0004 §1), but `modelFallbackMiddleware` swaps
+ * `request.model` and re-runs the same tool-bound request, so every fallback
+ * model gets the same 4 tools as the primary.
+ */
+export async function getAssistantAgent(supabase: SupabaseClient, opts: GetAssistantAgentOptions) {
+  const { primary, fallbacks } = await getAgentModels(supabase, "converse", { onCall: opts.onCall })
 
-  // O withFallbacks nativo não suporta bindTools diretamente no createReactAgent
-  // Portanto, vamos usar o Gemini (que respeita os tool limits e stop words) como primário
-  // para evitar o loop infinito (Recursion limit) que o modelo Qwen no Groq está causando.
-  const primaryModel = geminiModel
-
-  // 2. Configurar Tools
   const searchMentorsTool = tool(
     async (input) => {
       const results = await assistantTools.searchMentors(supabase, input)
@@ -104,10 +105,10 @@ export function getAssistantAgent(supabase: SupabaseClient) {
 
   const tools = [searchMentorsTool, getMentorAvailabilityTool, explainHowItWorksTool, saveFeedbackTool]
 
-  // 3. Criar e retornar Agent
-  return createReactAgent({
-    llm: primaryModel,
+  return createAgent({
+    model: primary,
     tools,
-    messageModifier: new SystemMessage(SYSTEM_PROMPT)
+    systemPrompt: new SystemMessage(SYSTEM_PROMPT),
+    middleware: fallbacks.length > 0 ? [modelFallbackMiddleware(...fallbacks)] : []
   })
 }

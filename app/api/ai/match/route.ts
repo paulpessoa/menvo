@@ -1,6 +1,6 @@
 import { after, NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { aiMatchService } from "@/lib/services/ai/groq.service"
+import { aiMatchService } from "@/lib/services/ai/match.service"
 import { getMentorCandidates } from "@/lib/services/ai/mentor-candidates.service"
 import { aiMatchQuerySchema } from "@/lib/schemas/ai"
 import { consumeAiQuota } from "@/lib/ai/quota"
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { result, calls } = await aiMatchService.findOptimalMentors(query, mentors)
+    const { result, calls } = await aiMatchService.findOptimalMentors(supabase, query, mentors)
 
     after(async () => {
       await recordAiCalls(supabase, "match", calls)

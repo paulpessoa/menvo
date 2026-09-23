@@ -1,7 +1,7 @@
 import { after, NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import { aiMatchService } from "@/lib/services/ai/groq.service"
+import { aiMatchService } from "@/lib/services/ai/match.service"
 import { consumeAiQuota } from "@/lib/ai/quota"
 import { recordAiCalls } from "@/lib/ai/metering"
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Limite mensal de IA atingido", quota }, { status: 429 })
     }
 
-    const { result: matchResult, calls } = await aiMatchService.findOptimalMentors(reason.trim(), mentors as any[])
+    const { result: matchResult, calls } = await aiMatchService.findOptimalMentors(supabase, reason.trim(), mentors as any[])
     after(() => recordAiCalls(supabase, "admin_waitlist_match", calls))
 
     // Anexa nome/e-mail do mentor a cada sugestão para exibir na tela do

@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { getFeatureFlags } from "@/lib/feature-flags-server"
 import { consumeAiQuota } from "@/lib/ai/quota"
-import { recordAiCalls } from "@/lib/ai/metering"
-import { createLangChainUsageCollector } from "@/lib/ai/langchain-metering"
+import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
 import { HumanMessage, AIMessage } from "@langchain/core/messages"
 import { getAssistantAgent } from "@/lib/services/assistant/agent"
 
@@ -44,10 +43,11 @@ export async function POST(req: NextRequest) {
         { status: 429 }
       )
     }
-    const usage = createLangChainUsageCollector()
+    const calls: AiCallRecord[] = []
 
-    // Instanciar agent via service
-    const agent = getAssistantAgent(supabase)
+    // Instanciar agent via service — async: resolve a capacidade "converse"
+    // no registro de modelos (lib/ai/models), com fallback (ADR 0004).
+    const agent = await getAssistantAgent(supabase, { onCall: (record) => calls.push(record) })
 
     // Configurar Stream SSE Nativo do Next.js
     const encoder = new TextEncoder()
@@ -67,8 +67,6 @@ export async function POST(req: NextRequest) {
           )
 
           for await (const event of events) {
-            usage.handle(event)
-
             // Emite o conteúdo gerado pelo modelo ao vivo (stream)
             if (event.event === "on_chat_model_stream") {
               const chunk = event.data.chunk
@@ -108,7 +106,7 @@ export async function POST(req: NextRequest) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", message: err.message })}\n\n`))
         } finally {
           // Before close(): the serverless function lives while the stream is open.
-          await recordAiCalls(supabase, "assistant", usage.calls)
+          await recordAiCalls(supabase, "assistant", calls)
           controller.close()
         }
       }

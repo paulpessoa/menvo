@@ -1,8 +1,9 @@
 /**
- * Eval for lib/services/ai/groq.service.ts — the real network calls, not a
- * mock. Run manually (costs a handful of real LLM calls); never wired into
- * `npm test`. Answers the question the codebase had no way to answer
- * before: "did this prompt/model change make the match better or worse?"
+ * Eval for lib/services/ai/match.service.ts (capability "rank" in the model
+ * registry, ADR 0004) — the real network calls, not a mock. Run manually
+ * (costs a handful of real LLM calls); never wired into `npm test`. Answers
+ * the question the codebase had no way to answer before: "did this
+ * prompt/model change make the match better or worse?"
  *
  * Usage:
  *   npm run eval:match
@@ -10,6 +11,7 @@
 import { readFileSync } from "fs"
 import { resolve, dirname } from "path"
 import { fileURLToPath } from "url"
+import { createClient } from "@supabase/supabase-js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -29,7 +31,7 @@ try {
 }
 
 async function main() {
-  const { aiMatchService } = await import("../lib/services/ai/groq.service")
+  const { aiMatchService } = await import("../lib/services/ai/match.service")
   const { mentors } = await import("./ai-match.fixtures.mjs")
   const { cases } = await import("./ai-match.cases.mjs")
 
@@ -37,6 +39,11 @@ async function main() {
     console.error("[eval] No OPENAI_API_KEY/OPEN_AI_KEY or GROQ_API_KEY set — nothing to eval against a real model.")
     process.exit(1)
   }
+
+  // Anonymous client: ai_model_config is unreadable without a session (RLS),
+  // so this resolves to the same DEFAULT_MODEL_CONFIG production falls back
+  // to when the table is empty — exactly what an eval should measure.
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
   type Row = {
     query: string
@@ -52,7 +59,7 @@ async function main() {
 
   for (const c of cases as any[]) {
     const start = Date.now()
-    const { result, calls } = await aiMatchService.findOptimalMentors(c.query, mentors as any)
+    const { result, calls } = await aiMatchService.findOptimalMentors(supabase, c.query, mentors as any)
     const latencyMs = Date.now() - start
 
     const tier = calls.map((call) => `${call.provider}:${call.status}`).join(" → ")

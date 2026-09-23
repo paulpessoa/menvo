@@ -5,11 +5,11 @@ import { POST } from './route'
 import { NextRequest } from 'next/server'
 import { requireAdmin } from '@/lib/auth/require-admin'
 import { createClient } from '@/lib/utils/supabase/server'
-import { aiMatchService } from '@/lib/services/ai/groq.service'
+import { aiMatchService } from '@/lib/services/ai/match.service'
 
 jest.mock('@/lib/auth/require-admin', () => ({ requireAdmin: jest.fn() }))
 jest.mock('@/lib/utils/supabase/server', () => ({ createClient: jest.fn() }))
-jest.mock('@/lib/services/ai/groq.service', () => ({
+jest.mock('@/lib/services/ai/match.service', () => ({
   aiMatchService: { findOptimalMentors: jest.fn() }
 }))
 jest.mock('@/lib/ai/quota', () => ({
@@ -128,6 +128,7 @@ describe('POST /api/admin/waiting-list/match', () => {
       mentor_email: 'marcia@example.com'
     })
     expect(aiMatchService.findOptimalMentors).toHaveBeenCalledWith(
+      mockSupabase,
       'Quero migrar para RH e Departamento Pessoal',
       expect.any(Array)
     )

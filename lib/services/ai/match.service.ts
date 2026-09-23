@@ -1,13 +1,16 @@
 /**
  * AI Match Service
  * Handles intelligent matching of mentors based on user search queries,
- * utilizing OpenAI (gpt-4o-mini) as primary provider with fallback to Groq
- * and deterministic keyword matching. Uses native fetch for zero-dependency portability.
+ * resolved through the model registry (`lib/ai/models`, capability `rank`)
+ * with fallback and metering built in, and a deterministic keyword match as
+ * the last resort when no provider is available or every attempt fails.
  *
- * Returns, next to the result, one `AiCallRecord` per attempt so the caller can
- * meter cost — including attempts that failed and the keyword fallback.
+ * Returns, next to the result, one `AiCallRecord` per attempt so the caller
+ * can meter cost — including attempts that failed and the keyword fallback.
  */
 import { z } from "zod"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import { getStructuredModel, AiModelUnavailableError } from "@/lib/ai/models"
 import type { AiCallRecord } from "@/lib/ai/metering"
 
 const aiMatchResultSchema = z.object({
@@ -36,42 +39,13 @@ export interface MentorContextItem {
   bio?: string | null
 }
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.OPEN_AI_KEY
-const GROQ_API_KEY = process.env.GROQ_API_KEY
-
-interface ChatProvider {
-  provider: "openai" | "groq"
-  model: string
-  url: string
-  apiKey: string | undefined
+interface MentorSummary {
+  id: string
+  name: string
+  title: string
+  skills: string[]
+  bio: string
 }
-
-const PROVIDERS: ChatProvider[] = [
-  {
-    provider: "openai",
-    model: "gpt-4o-mini",
-    url: "https://api.openai.com/v1/chat/completions",
-    apiKey: OPENAI_API_KEY
-  },
-  {
-    provider: "groq",
-    model: "openai/gpt-oss-20b",
-    url: "https://api.groq.com/openai/v1/chat/completions",
-    apiKey: GROQ_API_KEY
-  }
-]
-
-// Both providers speak the OpenAI chat-completions format.
-const chatCompletionSchema = z.object({
-  choices: z.array(z.object({ message: z.object({ content: z.string().nullable() }) })).min(1),
-  usage: z
-    .object({
-      prompt_tokens: z.number().default(0),
-      completion_tokens: z.number().default(0),
-      prompt_tokens_details: z.object({ cached_tokens: z.number().default(0) }).nullish()
-    })
-    .nullish()
-})
 
 /**
  * O modelo às vezes "inventa" um mentor_id que não é o valor exato do campo
@@ -98,80 +72,7 @@ function sanitizeResult(result: AIMatchResult, validIds: Set<string>): AIMatchRe
   return { ...result, suggestions }
 }
 
-function safeJsonParse(text: string): unknown {
-  try {
-    return JSON.parse(text)
-  } catch {
-    return null
-  }
-}
-
-async function callProvider(
-  p: ChatProvider,
-  prompt: string
-): Promise<{ result: AIMatchResult | null; call: AiCallRecord }> {
-  const started = Date.now()
-  const call: AiCallRecord = {
-    provider: p.provider,
-    model: p.model,
-    inputTokens: 0,
-    outputTokens: 0,
-    cachedInputTokens: 0,
-    latencyMs: 0,
-    status: "error"
-  }
-
-  try {
-    const response = await fetch(p.url, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${p.apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: p.model,
-        messages: [
-          { role: "system", content: "Você é um assistente técnico que retorna estritamente JSON válido." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.2,
-        response_format: { type: "json_object" }
-      }),
-      signal: AbortSignal.timeout(10000)
-    })
-    call.latencyMs = Date.now() - started
-
-    if (!response.ok) {
-      call.errorCode = `http_${response.status}`
-      console.warn(`[AIMatchService] ${p.provider} non-200:`, response.status, await response.text())
-      return { result: null, call }
-    }
-
-    const completion = chatCompletionSchema.parse(await response.json())
-    call.inputTokens = completion.usage?.prompt_tokens ?? 0
-    call.outputTokens = completion.usage?.completion_tokens ?? 0
-    call.cachedInputTokens = completion.usage?.prompt_tokens_details?.cached_tokens ?? 0
-
-    // Tokens were billed even if the content turns out unusable, so the call
-    // is recorded with its real usage either way.
-    const content = completion.choices[0].message.content
-    const parsed = content ? aiMatchResultSchema.safeParse(safeJsonParse(content)) : null
-    if (!parsed?.success) {
-      call.errorCode = "invalid_output"
-      return { result: null, call }
-    }
-
-    call.status = "ok"
-    return { result: parsed.data, call }
-  } catch (err) {
-    call.latencyMs = Date.now() - started
-    call.errorCode = err instanceof Error && err.name === "TimeoutError" ? "timeout" : "exception"
-    console.warn(`[AIMatchService] ${p.provider} request failed:`, err instanceof Error ? err.message : err)
-    return { result: null, call }
-  }
-}
-
-function keywordMatch(
-  userQuery: string,
-  mentors: Array<{ id: string; title: string; skills: string[]; bio: string }>
-): AIMatchResult {
+function keywordMatch(userQuery: string, mentors: MentorSummary[]): AIMatchResult {
   const queryTokens = userQuery.toLowerCase().split(/\s+/).filter((t) => t.length > 2)
   const matches: Array<{ mentor_id: string; reason: string; score: number }> = []
 
@@ -220,21 +121,8 @@ function keywordMatch(
   }
 }
 
-export const aiMatchService = {
-  /**
-   * Finds the best mentor matches for a given query against available mentors context.
-   */
-  async findOptimalMentors(userQuery: string, mentorsContext: MentorContextItem[]): Promise<AIMatchRun> {
-    const validIds = new Set(mentorsContext.map((m) => m.id))
-    const mentorsSummary = mentorsContext.map((m) => ({
-      id: m.id,
-      name: m.full_name,
-      title: m.job_title || "Mentor",
-      skills: [...new Set([...(m.mentor_skills ?? []), ...(m.expertise_areas ?? []), ...(m.mentorship_topics ?? [])])],
-      bio: m.bio?.substring(0, 160) || ""
-    }))
-
-    const prompt = `
+function buildPrompt(userQuery: string, mentorsSummary: MentorSummary[]): string {
+  return `
 Você é o Especialista em Conexões Ético da plataforma MENVO.
 Sua missão é analisar os mentores disponíveis e sugerir os mais indicados para a dúvida do usuário: "${userQuery}"
 
@@ -259,25 +147,52 @@ FORMATO JSON OBRIGATÓRIO:
   "no_match": false
 }
 `
+}
+
+export const aiMatchService = {
+  /**
+   * Finds the best mentor matches for a given query against available mentors
+   * context. `supabase` is the caller's session client, used only to resolve
+   * the `rank` capability's model chain (`ai_model_config`, RLS applies) —
+   * no domain query happens here.
+   */
+  async findOptimalMentors(
+    supabase: SupabaseClient,
+    userQuery: string,
+    mentorsContext: MentorContextItem[]
+  ): Promise<AIMatchRun> {
+    const validIds = new Set(mentorsContext.map((m) => m.id))
+    const mentorsSummary: MentorSummary[] = mentorsContext.map((m) => ({
+      id: m.id,
+      name: m.full_name,
+      title: m.job_title || "Mentor",
+      skills: [...new Set([...(m.mentor_skills ?? []), ...(m.expertise_areas ?? []), ...(m.mentorship_topics ?? [])])],
+      bio: m.bio?.substring(0, 160) || ""
+    }))
 
     const calls: AiCallRecord[] = []
-    for (const provider of PROVIDERS) {
-      if (!provider.apiKey) continue
-      const { result, call } = await callProvider(provider, prompt)
-      calls.push(call)
-      if (result) return { result: sanitizeResult(result, validIds), calls }
-    }
 
-    console.info("[AIMatchService] Using deterministic keyword matching fallback")
-    calls.push({
-      provider: "local",
-      model: "keyword",
-      inputTokens: 0,
-      outputTokens: 0,
-      cachedInputTokens: 0,
-      latencyMs: 0,
-      status: "fallback"
-    })
-    return { result: keywordMatch(userQuery, mentorsSummary), calls }
+    try {
+      const model = await getStructuredModel<AIMatchResult>(supabase, "rank", aiMatchResultSchema, {
+        onCall: (record) => calls.push(record)
+      })
+      const result = await model.invoke(buildPrompt(userQuery, mentorsSummary))
+      return { result: sanitizeResult(result, validIds), calls }
+    } catch (err) {
+      if (!(err instanceof AiModelUnavailableError)) {
+        console.warn("[MatchService] all model attempts failed, using keyword fallback:", err instanceof Error ? err.message : err)
+      }
+      console.info("[MatchService] Using deterministic keyword matching fallback")
+      calls.push({
+        provider: "local",
+        model: "keyword",
+        inputTokens: 0,
+        outputTokens: 0,
+        cachedInputTokens: 0,
+        latencyMs: 0,
+        status: "fallback"
+      })
+      return { result: keywordMatch(userQuery, mentorsSummary), calls }
+    }
   }
 }

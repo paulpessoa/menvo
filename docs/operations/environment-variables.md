@@ -61,6 +61,7 @@ cp .env.example .env.local
 | `GROQ_API_KEY` | Optional | Server-only | Groq key for fallback inference and Assistant |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Optional | Server-only | Google AI key for Gemini 2.5 Flash-Lite fallback in the Assistant |
 | `AI_METERING_KEY` | **Required for AI cost metering** | Server-only | Proves AI usage rows come from the server (`record_ai_usage` rejects calls without it). Its SHA-256 must be stored in `private.ai_settings` — see migration `20260923000003`. Missing = usage not recorded, so the monthly budget can't see the spend |
+| `AI_FORCE_FALLBACK` | Optional, evals-only | Local, never set in Production/Preview | Set to a capability name (e.g. `converse`) to make `lib/ai/models` drop the primary model for that one capability, so `npm run test:evals`/`npm run eval:match` can exercise the fallback model deliberately (ADR 0004 §7.1). |
 
 ### Analytics (Microsoft Clarity MCP)
 | Variable | Required | Context | Description |
