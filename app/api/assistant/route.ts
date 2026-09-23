@@ -84,10 +84,10 @@ export async function POST(req: NextRequest) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "tool_start", name: event.name })}\n\n`))
             }
 
-            // Envia o payload completo dos mentores encontrados para renderizar o UI Card
+            // Envia o payload de card (artifact da tool, nunca visto pelo LLM) para renderizar o UI Card
             if (event.event === "on_tool_end" && event.name === "searchMentors") {
-              const mentorsData = event.data.output
-              if (mentorsData && Array.isArray(mentorsData)) {
+              const mentorsData = event.data.output?.artifact
+              if (mentorsData && Array.isArray(mentorsData) && mentorsData.length > 0) {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "mentors_found", mentors: mentorsData })}\n\n`))
               }
             }

@@ -58,15 +58,20 @@ export function getAssistantAgent(supabase: SupabaseClient) {
   const searchMentorsTool = tool(
     async (input) => {
       const results = await assistantTools.searchMentors(supabase, input)
-      if (results.length === 0) {
-        return "RESULTADO VAZIO. AVISO DO SISTEMA: Não tente buscar novamente. Informe imediatamente ao usuário, em poucas palavras, que você não encontrou mentores para esse tema e sugira outras áreas da plataforma."
+      if (results.forLlm.length === 0) {
+        return [
+          "RESULTADO VAZIO. AVISO DO SISTEMA: Não tente buscar novamente. Informe imediatamente ao usuário, em poucas palavras, que você não encontrou mentores para esse tema e sugira outras áreas da plataforma.",
+          []
+        ]
       }
-      return JSON.stringify(results)
+      // content (enxuto) vai para o LLM; artifact (card) vai só para a UI via SSE.
+      return [JSON.stringify(results.forLlm), results.forCard]
     },
     {
       name: "searchMentors",
       description: "Busca mentores no catálogo usando filtro por relevância e IA",
-      schema: searchMentorsInput
+      schema: searchMentorsInput,
+      responseFormat: "content_and_artifact"
     }
   )
 

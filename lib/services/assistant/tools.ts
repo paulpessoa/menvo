@@ -12,21 +12,81 @@ export const searchMentorsInput = z.object({
   limit: z.number().int().min(1).max(5).default(3)
 })
 
+/** Enxuto: o único formato que chega ao LLM (economiza tokens, sem PII de contato). */
+export const mentorLlmDto = z.object({
+  slug: z.string(),
+  name: z.string(),
+  role: z.string(),
+  skills: z.array(z.string()).max(5),
+  bio: z.string().max(200),
+  profileUrl: z.string()
+})
+export type MentorLlmDto = z.infer<typeof mentorLlmDto>
+
+/** Card: o que o `mentors_found` (SSE) manda para renderizar `MentorCard` na UI. */
+export const mentorCardDto = z.object({
+  id: z.string().nullable(),
+  full_name: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+  bio: z.string().nullable(),
+  job_title: z.string().nullable(),
+  company: z.string().nullable(),
+  city: z.string().nullable(),
+  state: z.string().nullable(),
+  country: z.string().nullable(),
+  languages: z.array(z.string()).nullable(),
+  mentorship_topics: z.array(z.string()).nullable(),
+  inclusive_tags: z.array(z.string()).nullable(),
+  expertise_areas: z.array(z.string()).nullable(),
+  availability_status: z.string().nullable(),
+  average_rating: z.number().nullable(),
+  total_reviews: z.number().nullable(),
+  total_sessions: z.number().nullable(),
+  experience_years: z.number().nullable(),
+  slug: z.string().nullable()
+})
+export type MentorCardDto = z.infer<typeof mentorCardDto>
+
+export interface SearchMentorsResult {
+  /** Vai para o LLM (conteúdo da tool). */
+  forLlm: MentorLlmDto[]
+  /** Vai para o evento SSE `mentors_found` (artifact da tool, não visto pelo modelo). */
+  forCard: MentorCardDto[]
+}
+
 export async function searchMentors(
   supabase: SupabaseClient,
   input: z.infer<typeof searchMentorsInput>
-): Promise<any[]> {
+): Promise<SearchMentorsResult> {
+  // searchCatalog pages are 0-indexed; page 1 would skip the best-rated mentors.
   const result = await mentorService.searchCatalog({
     filters: { search: input.query, sortBy: "relevance" },
-    page: 1,
+    page: 0,
     limit: input.limit
   })
 
-  const mentors = result.data || []
+  // safeParse strips every column outside the DTO and drops a malformed row
+  // instead of failing the whole search.
+  const forCard: MentorCardDto[] = (result.data ?? []).flatMap((row: unknown) => {
+    const parsed = mentorCardDto.safeParse(row)
+    return parsed.success && (parsed.data.slug || parsed.data.id) ? [parsed.data] : []
+  })
 
-  // Retornamos os dados completos para que o frontend possa renderizar os MentorCards
-  // O LLM receberá esses dados e usará o 'full_name' e 'bio' para formular a resposta.
-  return mentors
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"
+  const forLlm: MentorLlmDto[] = forCard.map((m) => {
+    const slug = (m.slug || m.id) as string
+    const skills = [...new Set([...(m.expertise_areas ?? []), ...(m.mentorship_topics ?? [])])].slice(0, 5)
+    return {
+      slug,
+      name: m.full_name || "Mentor",
+      role: m.job_title || "Mentor",
+      skills,
+      bio: (m.bio || "").slice(0, 200),
+      profileUrl: `${baseUrl}/mentors/${slug}`
+    }
+  })
+
+  return { forLlm, forCard }
 }
 
 
