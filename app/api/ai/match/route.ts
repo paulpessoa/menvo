@@ -1,12 +1,19 @@
+import { after, NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
-import { aiMatchService, type AIMatchResult } from "@/lib/services/ai/groq.service"
+import { aiMatchService } from "@/lib/services/ai/groq.service"
+import { getMentorCandidates } from "@/lib/services/ai/mentor-candidates.service"
 import { aiMatchQuerySchema } from "@/lib/schemas/ai"
+import { consumeAiQuota } from "@/lib/ai/quota"
+import { recordAiCalls } from "@/lib/ai/metering"
 
+/**
+ * AI mentor search. Order matters for cost control:
+ * auth → candidates (free) → quota credit → LLM → metering (after response).
+ * The credit is taken right before the only step that spends money.
+ */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const validation = aiMatchQuerySchema.safeParse(body)
+    const validation = aiMatchQuerySchema.safeParse(await request.json())
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.errors[0]?.message || "Busca inválida" },
@@ -17,11 +24,6 @@ export async function POST(request: NextRequest) {
     const { query, debug } = validation.data
     const supabase = await createClient()
 
-    // 1. Exige sessão autenticada — a busca com IA tem custo de LLM por
-    // chamada, então o mesmo requisito já aplicado na UI (botão só
-    // habilitado para usuários logados) precisa valer no endpoint também,
-    // senão qualquer chamada direta e não autenticada consegue gerar custo
-    // e (via `debug: true`) ver mentores não verificados.
     const {
       data: { user },
       error: authError
@@ -34,29 +36,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 2. Buscar mentores disponíveis
-    let queryBuilder = supabase
-      .from("mentors_view")
-      .select("id, full_name, job_title, mentor_skills, bio")
-      .order("created_at", { ascending: false })
-      .limit(100)
+    const mentors = await getMentorCandidates(supabase, { includeUnverified: debug })
 
-    if (!debug) {
-      queryBuilder = queryBuilder.eq("verified", true)
-    }
-
-    let { data: mentors } = await queryBuilder
-
-    // Fallback: se nenhum mentor verificado for retornado, consulta mentores gerais ativos
-    if (!mentors || mentors.length === 0) {
-      const fallbackQuery = await supabase
-        .from("mentors_view")
-        .select("id, full_name, job_title, mentor_skills, bio")
-        .limit(100)
-      mentors = fallbackQuery.data || []
-    }
-
-    if (!mentors || mentors.length === 0) {
+    if (mentors.length === 0) {
       return NextResponse.json({
         no_match: true,
         global_justification: "Ainda não temos mentores cadastrados disponíveis na plataforma.",
@@ -65,36 +47,41 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // 3. Processar match com IA (OpenAI gpt-4o-mini com fallback resiliente)
-    const matchResult: AIMatchResult = await aiMatchService.findOptimalMentors(
-      query.trim(),
-      mentors as any[]
-    )
+    const quota = await consumeAiQuota(supabase, "match")
+    if (!quota.allowed) {
+      return NextResponse.json(
+        {
+          error:
+            quota.reason === "budget"
+              ? "A busca com IA atingiu o limite de uso da plataforma neste mês."
+              : "Você atingiu o limite mensal de buscas com IA.",
+          code: quota.reason === "budget" ? "budget_exceeded" : "quota_exceeded",
+          quota
+        },
+        { status: 429 }
+      )
+    }
 
-    // 4. Preparar resposta
-    const finalResponse = {
-      ...matchResult,
+    const { result, calls } = await aiMatchService.findOptimalMentors(query, mentors)
+
+    after(async () => {
+      await recordAiCalls(supabase, "match", calls)
+      const { error } = await supabase.from("ai_missing_demands").insert({
+        user_id: user.id,
+        query_text: query,
+        suggested_topics: result.suggested_topics,
+        matched_count: result.suggestions.length
+      })
+      if (error) console.warn("[AIMatchRoute] demand tracking failed:", error.message)
+    })
+
+    return NextResponse.json({
+      ...result,
+      quota,
       ...(debug ? { debug_context: mentors } : {})
-    }
-
-    // 5. Trackear demanda de busca de forma assíncrona (não bloqueante)
-    try {
-      await supabase.from("ai_missing_demands").insert({
-        user_id: user?.id || null,
-        query_text: query.trim(),
-        suggested_topics: matchResult.suggested_topics || [],
-        matched_count: matchResult.suggestions?.length || 0
-      } as any)
-    } catch (trackError) {
-      console.warn("[AIMatchRoute] Non-blocking tracking error:", trackError)
-    }
-
-    return NextResponse.json(finalResponse)
-  } catch (error: any) {
-    console.error("💥 Erro na API de AI Match:", error)
-    return NextResponse.json(
-      { error: "Erro interno no processamento de IA." },
-      { status: 500 }
-    )
+    })
+  } catch (error) {
+    console.error("[AIMatchRoute] error:", error)
+    return NextResponse.json({ error: "Erro interno no processamento de IA." }, { status: 500 })
   }
 }

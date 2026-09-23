@@ -91,6 +91,16 @@ export default function AssistantPage() {
         body: JSON.stringify({ message: text, history: messages })
       })
 
+      if (res.status === 429) {
+        const body = await res.json().catch(() => null)
+        setMessages(prev => prev.map(msg =>
+          msg.id === assistantMessageId
+            ? { ...msg, text: body?.error ?? "Você atingiu o limite mensal do assistente." }
+            : msg
+        ))
+        return
+      }
+
       if (!res.ok) {
         throw new Error(await res.text())
       }

@@ -1170,7 +1170,10 @@
       "minChars": "Please describe your challenge with a bit more detail.",
       "disclaimer": "Our AI analyzes bios and skills of all mentors for you.",
       "loginRequired": "AI Magic Search is exclusive to logged-in users.",
-      "loginLink": "Login or sign up to use it"
+      "loginLink": "Login or sign up to use it",
+      "quotaRemaining": "You have {remaining} of {limit} AI searches left this month.",
+      "quotaExhausted": "You've used all your AI searches for this month. They renew on {date}. Regular search is still available.",
+      "budgetExhausted": "AI search reached the platform's usage limit for this month and returns on {date}. Regular search is still available."
     },
     "popularSuggestions": "Or explore these trending fields:",
     "takeQuizCTA": "Find Your Mentor via Quiz",

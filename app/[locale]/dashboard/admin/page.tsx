@@ -142,6 +142,13 @@ export default function AdminDashboard() {
       color: "bg-green-600"
     },
     {
+      title: "Custos de IA",
+      description: "Custo por funcionalidade, modelo e usuário no mês",
+      href: "/dashboard/admin/ai-usage",
+      icon: TrendingUp,
+      color: "bg-amber-600"
+    },
+    {
       title: "Feature Flags",
       description: "Ligar/Desligar funcionalidades em tempo real (Governança)",
       href: "/dashboard/admin/feature-flags",

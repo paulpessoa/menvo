@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { getFeatureFlags } from "@/lib/feature-flags-server"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { consumeAiQuota } from "@/lib/ai/quota"
+import { recordAiCalls } from "@/lib/ai/metering"
+import { createLangChainUsageCollector } from "@/lib/ai/langchain-metering"
 import { HumanMessage, AIMessage } from "@langchain/core/messages"
 import { getAssistantAgent } from "@/lib/services/assistant/agent"
 
@@ -21,15 +23,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Assistant is not enabled" }, { status: 403 })
     }
 
-    const rateLimit = checkRateLimit(`assistant:${user.id}`, { maxRequests: 30, windowMs: 86400_000 })
-    if (!rateLimit.allowed) {
-      return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 })
-    }
-
     const { message: userMessage, history = [] } = await req.json()
     if (!userMessage) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
+
+    // One credit per user message (a turn), however many model calls the
+    // agent makes inside it — those are metered individually below.
+    const quota = await consumeAiQuota(supabase, "assistant")
+    if (!quota.allowed) {
+      return NextResponse.json(
+        {
+          error:
+            quota.reason === "budget"
+              ? "O assistente atingiu o limite de uso da plataforma neste mês. Ele volta no início do próximo mês."
+              : "Você atingiu o limite mensal de mensagens com o assistente.",
+          code: quota.reason === "budget" ? "budget_exceeded" : "quota_exceeded",
+          quota
+        },
+        { status: 429 }
+      )
+    }
+    const usage = createLangChainUsageCollector()
 
     // Instanciar agent via service
     const agent = getAssistantAgent(supabase)
@@ -52,6 +67,8 @@ export async function POST(req: NextRequest) {
           )
 
           for await (const event of events) {
+            usage.handle(event)
+
             // Emite o conteúdo gerado pelo modelo ao vivo (stream)
             if (event.event === "on_chat_model_stream") {
               const chunk = event.data.chunk
@@ -86,10 +103,12 @@ export async function POST(req: NextRequest) {
           })
 
           controller.enqueue(encoder.encode("data: [DONE]\n\n"))
-          controller.close()
         } catch (err: any) {
           console.error("Erro no stream do assistente:", err)
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", message: err.message })}\n\n`))
+        } finally {
+          // Before close(): the serverless function lives while the stream is open.
+          await recordAiCalls(supabase, "assistant", usage.calls)
           controller.close()
         }
       }

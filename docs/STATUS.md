@@ -79,11 +79,24 @@ started.
 - [x] **`/mentors` Dead-Click Fix:** Whole `MentorCard` interactive, dismissable filter chips (found via Clarity).
 - [x] **Multi-Tenant Phase 1:** Organizations, invite/request/approve membership, org admin dashboard, platform admin org CRUD. Shipped in PR #45.
 - [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Plan: [`MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) §6.
+- [ ] **AI-First Platform (diagnóstico agêntico, copiloto por papel, medição de uso, KB):** Plan: [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md). Fase 0: cota mensal + medição de custo no Postgres **feitas** (2026-09-23, migração aplicada); teto global de US$ 10/mês (`ai_budget`) também feito; faltam registro de modelos por capacidade, degradação para modelo barato a 80% do orçamento, medir `analyze-quiz`. Decisões D1–D7 resolvidas em 2026-09-23 (plano §9); preços em §11, privacidade/retenção em §12.
+- [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-23 — AI Monthly Quota + Cost Metering (AI Plan Fase 0, partial)
+- **Why:** the platform is non-profit but must pay for itself, so every AI feature needs a hard per-user limit and a known cost before it scales. Limits and costs now live in Postgres (the old 30/day assistant limit was in-memory, i.e. per serverless instance, i.e. not a limit).
+- **Migration `20260923000002_ai_usage_and_quota.sql` (applied to the DB on 2026-09-23; the AI routes fail closed without it):** `ai_model_pricing` (USD/1M tokens, new row per price change), `ai_entitlements` (monthly limit per role × feature, `NULL` = unlimited, no row = disabled), `ai_quota_ledger`, `ai_usage_events` (one row per model call incl. failures and keyword fallback, no content). RPCs `consume_ai_quota` (atomic, race-free), `get_ai_quota`, `record_ai_usage` (cost computed in SQL) — all `security definer` reading `auth.uid()`, no insert policies for users, no `service_role`. Views `ai_usage_monthly`, `ai_usage_by_user_monthly` (`security_invoker`).
+- **Global ceiling:** `ai_budget` (US$ 10/month, decision D3). When the platform's spend this month reaches it, `consume_ai_quota` denies every non-admin with `reason = 'budget'` (UI says the AI is back next month; regular search keeps working). Hard stop only — no 80% downgrade yet.
+- **Initial limits (edit rows in `ai_entitlements`, no deploy):** AI search `match` 10/month for mentee/mentor, 5 default; assistant 60 mentee / 30 default; admin unlimited but still counted. Month = calendar month in America/Sao_Paulo.
+- **Wired:** `/api/ai/match` (credit taken right before the LLM call, metering + demand log in `after()`), `/api/admin/waiting-list/match`, `/api/assistant` (1 credit per message; every model call inside the agent turn metered via `streamEvents` → `lib/ai/langchain-metering.ts`). `/mentors` shows "X de Y buscas com IA este mês" and a clear message at the limit. New admin page `/dashboard/admin/ai-usage` (cost by feature × model, error/fallback counts, unpriced calls, top 20 users by cost).
+- **Reusable core:** `lib/ai/{features,quota,metering,langchain-metering}.ts` — no Menvo domain imports. New AI feature = add to `AI_FEATURES` + seed an entitlement row.
+- **Scaling seam:** `lib/services/ai/mentor-candidates.service.ts` is the only place that decides which mentors reach the LLM. When the catalog passes ~100 verified mentors, swap its query for Postgres FTS or pgvector top-K; route/quota/metering don't change.
+- **Fixed:** `ai_missing_demands` never received a row — the route inserted `matched_count`, a column that didn't exist (added). Match context now also sends `expertise_areas`/`mentorship_topics`, not only `mentor_skills`.
+- **Known, not done:** `supabase/functions/analyze-quiz` (OpenAI, `service_role`, anonymous) is neither limited nor metered. Could not verify `ai_missing_demands` RLS allows insert by `authenticated` (table predates migrations) — the route logs a warning if not.
 
 ### 2026-09-23 — "Minhas Mentorias" Redesigned Around Next Action
 - **8 tabs → 1 switch + 3 sections.** `/mentorship/mentor` had two 4-tab blocks (Recebidas/Solicitadas × Pendentes/Agendadas/Avaliadas/Canceladas), mostly empty. Now: a two-option switch (Recebidas · você como mentor / Solicitadas · você como mentorado, persisted in `?view=requested`, each with its pending-action count), then **Requer sua ação → Próximas sessões → Histórico** (history collapses after 5). `/mentorship/mentee` uses the same board.
@@ -159,6 +172,7 @@ started.
 | File | Purpose |
 |---|---|
 | [`docs/MULTI_TENANT_ROADMAP.md`](MULTI_TENANT_ROADMAP.md) | Multi-tenant organizations: decisions, Phase 1 (shipped), Phase 1.5 plan |
+| [`docs/AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md) | AI-first plan: agentic diagnostic, role-based copilot, AI usage metering, knowledge base & docs governance |
 | [`docs/VISION.md`](VISION.md) | Product purpose, target audience, and north star |
 | [`docs/GOOGLE_OAUTH_SUBMISSION.md`](GOOGLE_OAUTH_SUBMISSION.md) | Google Cloud Console OAuth verification kit & demo video script |
 | [`docs/SCHEDULING_AND_AVAILABILITY.md`](SCHEDULING_AND_AVAILABILITY.md) | Availability algorithm, 14-day projection, conflict detection |

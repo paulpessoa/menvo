@@ -1163,7 +1163,10 @@
       "minChars": "Por favor, descreva seu desafio com um pouco mais de detalhes.",
       "disclaimer": "Nossa IA analisa as bios e habilidades de todos os mentores para você.",
       "loginRequired": "A busca mágica com IA é exclusiva para usuários logados.",
-      "loginLink": "Entre ou cadastre-se para usar"
+      "loginLink": "Entre ou cadastre-se para usar",
+      "quotaRemaining": "Você tem {remaining} de {limit} buscas com IA este mês.",
+      "quotaExhausted": "Você usou todas as buscas com IA deste mês. Elas renovam em {date}. A busca normal continua liberada.",
+      "budgetExhausted": "A busca com IA atingiu o limite de uso da plataforma neste mês e volta em {date}. A busca normal continua liberada."
     },
     "popularSuggestions": "Ou explore estas áreas em alta:",
     "takeQuizCTA": "Descobrir Mentor via Quiz",

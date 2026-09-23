@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+import { after, NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { aiMatchService } from "@/lib/services/ai/groq.service"
+import { consumeAiQuota } from "@/lib/ai/quota"
+import { recordAiCalls } from "@/lib/ai/metering"
 
 /**
  * Sugestão de match para uma pessoa da lista de espera, a partir do texto
@@ -57,7 +59,14 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const matchResult = await aiMatchService.findOptimalMentors(reason.trim(), mentors as any[])
+    // Admins are unlimited, but the credit still counts usage per admin.
+    const quota = await consumeAiQuota(supabase, "admin_waitlist_match")
+    if (!quota.allowed) {
+      return NextResponse.json({ error: "Limite mensal de IA atingido", quota }, { status: 429 })
+    }
+
+    const { result: matchResult, calls } = await aiMatchService.findOptimalMentors(reason.trim(), mentors as any[])
+    after(() => recordAiCalls(supabase, "admin_waitlist_match", calls))
 
     // Anexa nome/e-mail do mentor a cada sugestão para exibir na tela do
     // admin sem uma segunda ida ao banco no front-end.

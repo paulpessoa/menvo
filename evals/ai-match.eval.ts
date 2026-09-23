@@ -47,29 +47,17 @@ async function main() {
     pass: boolean
   }
   const rows: Row[] = []
+  let totalInputTokens = 0
+  let totalOutputTokens = 0
 
   for (const c of cases as any[]) {
-    const tiers: string[] = []
-    const originalWarn = console.warn
-    const originalInfo = console.info
-    console.warn = (...args: any[]) => tiers.push(String(args[0]))
-    console.info = (...args: any[]) => tiers.push(String(args[0]))
-
     const start = Date.now()
-    let result: any
-    try {
-      result = await aiMatchService.findOptimalMentors(c.query, mentors as any)
-    } finally {
-      console.warn = originalWarn
-      console.info = originalInfo
-    }
+    const { result, calls } = await aiMatchService.findOptimalMentors(c.query, mentors as any)
     const latencyMs = Date.now() - start
 
-    const tier = tiers.some(t => t.includes("deterministic keyword"))
-      ? "fallback"
-      : tiers.some(t => t.includes("Groq request failed") || t.includes("OpenAI request"))
-        ? (process.env.OPENAI_API_KEY || process.env.OPEN_AI_KEY ? "openai-or-groq" : "groq")
-        : (process.env.OPENAI_API_KEY || process.env.OPEN_AI_KEY ? "openai" : "groq")
+    const tier = calls.map((call) => `${call.provider}:${call.status}`).join(" → ")
+    totalInputTokens += calls.reduce((sum, call) => sum + call.inputTokens, 0)
+    totalOutputTokens += calls.reduce((sum, call) => sum + call.outputTokens, 0)
 
     let pass: boolean
     let got: string
@@ -101,7 +89,10 @@ async function main() {
     console.log(`${mark} [${r.tier}, ${r.latencyMs}ms] "${r.query}"`)
     if (!r.pass) console.log(`    expected: ${r.expected}  |  got: ${r.got}`)
   }
-  console.log(`\n${passed}/${rows.length} passed (${Math.round((passed / rows.length) * 100)}%)  ·  avg latency ${avgLatency}ms\n`)
+  console.log(`\n${passed}/${rows.length} passed (${Math.round((passed / rows.length) * 100)}%)  ·  avg latency ${avgLatency}ms`)
+  console.log(
+    `avg tokens/search: ${Math.round(totalInputTokens / rows.length)} in · ${Math.round(totalOutputTokens / rows.length)} out\n`
+  )
 
   if (passed < rows.length) process.exitCode = 1
 }

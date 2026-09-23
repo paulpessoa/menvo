@@ -50,10 +50,50 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_budget: {
+        Row: {
+          limit_usd: number
+          month: string
+          updated_at: string
+        }
+        Insert: {
+          limit_usd: number
+          month: string
+          updated_at?: string
+        }
+        Update: {
+          limit_usd?: number
+          month?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ai_entitlements: {
+        Row: {
+          feature: string
+          monthly_limit: number | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          feature: string
+          monthly_limit?: number | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          feature?: string
+          monthly_limit?: number | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_missing_demands: {
         Row: {
           created_at: string | null
           id: string
+          matched_count: number | null
           query_text: string
           suggested_topics: string[] | null
           user_id: string | null
@@ -61,6 +101,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          matched_count?: number | null
           query_text: string
           suggested_topics?: string[] | null
           user_id?: string | null
@@ -68,8 +109,117 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          matched_count?: number | null
           query_text?: string
           suggested_topics?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      ai_model_pricing: {
+        Row: {
+          cached_input_per_mtok: number | null
+          effective_from: string
+          input_per_mtok: number
+          model: string
+          notes: string | null
+          output_per_mtok: number
+          provider: string
+        }
+        Insert: {
+          cached_input_per_mtok?: number | null
+          effective_from?: string
+          input_per_mtok: number
+          model: string
+          notes?: string | null
+          output_per_mtok: number
+          provider: string
+        }
+        Update: {
+          cached_input_per_mtok?: number | null
+          effective_from?: string
+          input_per_mtok?: number
+          model?: string
+          notes?: string | null
+          output_per_mtok?: number
+          provider?: string
+        }
+        Relationships: []
+      }
+      ai_quota_ledger: {
+        Row: {
+          feature: string
+          period_start: string
+          updated_at: string
+          used_count: number
+          user_id: string
+        }
+        Insert: {
+          feature: string
+          period_start: string
+          updated_at?: string
+          used_count?: number
+          user_id: string
+        }
+        Update: {
+          feature?: string
+          period_start?: string
+          updated_at?: string
+          used_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_usage_events: {
+        Row: {
+          cached_input_tokens: number
+          cost_usd: number | null
+          created_at: string
+          error_code: string | null
+          feature: string
+          id: string
+          input_tokens: number
+          latency_ms: number | null
+          model: string
+          output_tokens: number
+          provider: string
+          roles: string[]
+          run_id: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          cached_input_tokens?: number
+          cost_usd?: number | null
+          created_at?: string
+          error_code?: string | null
+          feature: string
+          id?: string
+          input_tokens?: number
+          latency_ms?: number | null
+          model: string
+          output_tokens?: number
+          provider: string
+          roles?: string[]
+          run_id?: string | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          cached_input_tokens?: number
+          cost_usd?: number | null
+          created_at?: string
+          error_code?: string | null
+          feature?: string
+          id?: string
+          input_tokens?: number
+          latency_ms?: number | null
+          model?: string
+          output_tokens?: number
+          provider?: string
+          roles?: string[]
+          run_id?: string | null
+          status?: string
           user_id?: string | null
         }
         Relationships: []
@@ -1162,6 +1312,34 @@ export type Database = {
       }
     }
     Views: {
+      ai_usage_by_user_monthly: {
+        Row: {
+          calls: number | null
+          cost_usd: number | null
+          full_name: string | null
+          month: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      ai_usage_monthly: {
+        Row: {
+          calls: number | null
+          cost_usd: number | null
+          errors: number | null
+          fallbacks: number | null
+          feature: string | null
+          input_tokens: number | null
+          model: string | null
+          month: string | null
+          output_tokens: number | null
+          p50_latency_ms: number | null
+          provider: string | null
+          unpriced_calls: number | null
+          users: number | null
+        }
+        Relationships: []
+      }
       mentors_view: {
         Row: {
           academic_level: string | null
@@ -1335,11 +1513,22 @@ export type Database = {
       }
     }
     Functions: {
+      ai_current_period: { Args: never; Returns: string }
       assign_user_role: {
         Args: { role_name: string; user_id: string }
         Returns: boolean
       }
       check_user_role: { Args: { target_role: string }; Returns: boolean }
+      consume_ai_quota: {
+        Args: { p_feature: string }
+        Returns: {
+          allowed: boolean
+          quota_limit: number
+          reason: string
+          resets_at: string
+          used: number
+        }[]
+      }
       generate_secure_token: { Args: { length?: number }; Returns: string }
       generate_unique_slug: { Args: { base_name: string }; Returns: string }
       get_google_calendar_tokens: {
@@ -1358,9 +1547,34 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_ai_quota: {
+        Args: { p_feature: string }
+        Returns: {
+          allowed: boolean
+          quota_limit: number
+          reason: string
+          resets_at: string
+          used: number
+        }[]
+      }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
+      record_ai_usage: {
+        Args: {
+          p_cached_input_tokens?: number
+          p_error_code?: string
+          p_feature: string
+          p_input_tokens?: number
+          p_latency_ms?: number
+          p_model: string
+          p_output_tokens?: number
+          p_provider: string
+          p_run_id?: string
+          p_status?: string
+        }
+        Returns: string
+      }
       save_google_calendar_tokens: {
         Args: {
           p_access_token: string

@@ -12,6 +12,11 @@ jest.mock('@/lib/utils/supabase/server', () => ({ createClient: jest.fn() }))
 jest.mock('@/lib/services/ai/groq.service', () => ({
   aiMatchService: { findOptimalMentors: jest.fn() }
 }))
+jest.mock('@/lib/ai/quota', () => ({
+  consumeAiQuota: jest.fn().mockResolvedValue({ allowed: true, used: 1, limit: null, remaining: null, resetsAt: '2026-10-01T03:00:00Z', reason: 'ok' })
+}))
+jest.mock('@/lib/ai/metering', () => ({ recordAiCalls: jest.fn() }))
+jest.mock('next/server', () => ({ ...jest.requireActual('next/server'), after: jest.fn() }))
 
 const mockRequireAdmin = requireAdmin as jest.MockedFunction<typeof requireAdmin>
 
@@ -104,10 +109,13 @@ describe('POST /api/admin/waiting-list/match', () => {
     // This route is a pure suggestion surface for the admin — it must never
     // email the waiting-list person or the suggested mentor on its own.
     ;(aiMatchService.findOptimalMentors as jest.Mock).mockResolvedValue({
-      suggestions: [{ mentor_id: 'mentor-1', reason: 'Especialista em RH e DP, alinhado ao objetivo dela.' }],
-      global_justification: 'Márcia atua diretamente na área que Amanda busca.',
-      suggested_topics: ['RH', 'Departamento Pessoal'],
-      no_match: false
+      result: {
+        suggestions: [{ mentor_id: 'mentor-1', reason: 'Especialista em RH e DP, alinhado ao objetivo dela.' }],
+        global_justification: 'Márcia atua diretamente na área que Amanda busca.',
+        suggested_topics: ['RH', 'Departamento Pessoal'],
+        no_match: false
+      },
+      calls: []
     })
 
     const res = await POST(makeRequest({ waitingListId: 'wl-1' }))
