@@ -116,20 +116,24 @@ export const MentorCard: React.FC<MentorCardProps> = ({
       {/* ================================================================
           1. RETRATO HERO: Imagem real do mentor ou fallback neutro com iniciais
           ================================================================ */}
-      <div className="relative w-full aspect-[4/4.2] overflow-hidden bg-slate-100 dark:bg-slate-800">
+      <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
         {hasPhoto ? (
+          // `unoptimized`: avatares vêm de hosts arbitrários (LinkedIn, Google,
+          // storage externo…). Sem ele, o loader do Next rejeita qualquer host
+          // fora de `images.remotePatterns` e a foto some para esses mentores.
           <Image
             src={rawPhoto!}
             alt={mentor.full_name || 'Mentor'}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            unoptimized
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
             onError={() => setImageError(true)}
             priority={false}
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 via-primary-50/20 to-slate-200 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 select-none">
-            <div className="w-24 h-24 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-primary-700 dark:text-primary-300">
+            <div className="w-20 h-20 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-primary-700 dark:text-primary-300">
               {initials ? (
                 <span className="text-2xl font-bold tracking-wider">{initials}</span>
               ) : (
@@ -198,10 +202,10 @@ export const MentorCard: React.FC<MentorCardProps> = ({
       {/* ================================================================
           2. CONTEÚDO
           ================================================================ */}
-      <div className="flex flex-col flex-1 p-5">
+      <div className="flex flex-col flex-1 p-4">
 
         {/* Nome */}
-        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
+        <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
           {mentor.full_name}
         </h3>
 
