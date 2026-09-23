@@ -41,13 +41,15 @@ export async function GET(request: NextRequest) {
                     id,
                     full_name,
                     email,
-                    avatar_url
+                    avatar_url,
+                    linkedin_url
                 ),
                 mentee:profiles!mentee_id(
                     id,
                     full_name,
                     email,
-                    avatar_url
+                    avatar_url,
+                    linkedin_url
                 ),
                 feedbacks:appointment_feedbacks(
                     id,

@@ -17,6 +17,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { ChatInterface } from "@/components/ChatInterface"
+import { useFeatureFlag } from "@/lib/feature-flags"
 import {
   communityService,
   CommunityProfile,
@@ -40,6 +41,7 @@ export default function CommunityPage() {
 
   const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
+  const isChatEnabled = useFeatureFlag("chat_flag")
 
   const isMentor =
     authIsMentor ||
@@ -117,10 +119,20 @@ export default function CommunityPage() {
     }
 
     const targetProfile = profiles.find((p) => p.id === targetUserId)
-    if (targetProfile) {
-      setSelectedUser(targetProfile)
-      setIsChatOpen(true)
+    if (!targetProfile) return
+
+    // Chat desligado: a troca acontece no LinkedIn (ou no perfil, se não houver LinkedIn)
+    if (!isChatEnabled) {
+      if (targetProfile.linkedin_url) {
+        window.open(targetProfile.linkedin_url, "_blank", "noopener,noreferrer")
+      } else if (targetProfile.slug) {
+        router.push(`/mentee/${targetProfile.slug}`)
+      }
+      return
     }
+
+    setSelectedUser(targetProfile)
+    setIsChatOpen(true)
   }
 
   return (
@@ -211,6 +223,7 @@ export default function CommunityPage() {
       )}
 
       {/* Inline Chat Drawer */}
+      {isChatEnabled && (
       <Sheet open={isChatOpen} onOpenChange={setIsChatOpen}>
         <SheetContent className="sm:max-w-md p-0 flex flex-col h-full border-l shadow-2xl">
           <SheetHeader className="p-4 border-b bg-white">
@@ -235,6 +248,7 @@ export default function CommunityPage() {
           )}
         </SheetContent>
       </Sheet>
+      )}
     </div>
   )
 }

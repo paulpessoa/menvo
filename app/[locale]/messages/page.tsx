@@ -13,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/ChatInterface"
 import { chatService, type ChatConversationItem } from "@/lib/services/chat/chat.service"
 import { useTranslations } from "next-intl"
+import { useFeatureFlags } from "@/lib/feature-flags"
+import { useRouter } from "@/i18n/routing"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -335,6 +337,19 @@ function MessagesContent() {
   )
 }
 
+/**
+ * Messages inbox. Gated by `chat_flag`: while the in-app chat is off, contact
+ * happens on LinkedIn, so direct visits (old links, bookmarks) go to the dashboard.
+ */
 export default function MessagesPage() {
+  const { flags, isLoading } = useFeatureFlags()
+  const router = useRouter()
+  const chatEnabled = flags.chat_flag
+
+  useEffect(() => {
+    if (!isLoading && !chatEnabled) router.replace("/dashboard")
+  }, [isLoading, chatEnabled, router])
+
+  if (!chatEnabled) return null
   return <MessagesContent />
 }

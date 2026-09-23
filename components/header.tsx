@@ -30,6 +30,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
   const isAssistantEnabled = useFeatureFlag("ai_assistant_flag")
+  const isChatEnabled = useFeatureFlag("chat_flag")
 
   const navigation = [
     { name: t("common.home"), href: "/" },
@@ -53,12 +54,14 @@ export default function Header() {
       icon: User,
       color: "text-gray-700"
     })
-    userNavigation.push({
-      name: t("header.userMenu.messages"),
-      href: "/messages",
-      icon: MessageSquare,
-      color: "text-gray-700"
-    })
+    if (isChatEnabled) {
+      userNavigation.push({
+        name: t("header.userMenu.messages"),
+        href: "/messages",
+        icon: MessageSquare,
+        color: "text-gray-700"
+      })
+    }
     userNavigation.push({
       name: t("header.userMenu.settings"),
       href: "/settings",
@@ -172,7 +175,7 @@ export default function Header() {
             </Button>
           )}
 
-          <MessagesBadge />
+          {isChatEnabled && <MessagesBadge />}
           <NotificationBell />
 
           {loading ? (

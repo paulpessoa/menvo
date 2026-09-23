@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useFeatureFlag } from "@/lib/feature-flags"
 import {
   Card,
   CardContent,
@@ -90,7 +91,18 @@ export default function MenteeProfileClient({ mentee }: Props) {
     })
   }
 
+  const isChatEnabled = useFeatureFlag("chat_flag")
+  // Chat desligado: o contato acontece no LinkedIn; sem LinkedIn, não há CTA
+  const canContact = isChatEnabled || !!mentee.linkedin_url
+  const contactLabel = isChatEnabled
+    ? isMentor ? "Oferecer Ajuda Agora" : "Iniciar Conversa"
+    : "Conversar no LinkedIn"
+
   const handleChat = () => {
+    if (!isChatEnabled) {
+      window.open(mentee.linkedin_url, "_blank", "noopener,noreferrer")
+      return
+    }
     router.push(`/messages?userId=${mentee.id}`)
   }
 
@@ -178,7 +190,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
                     </div>
 
                     {/* Chat CTA Desktop */}
-                    {!isOwner && (
+                    {!isOwner && canContact && (
                       <div className="hidden md:flex pt-4">
                         <Button
                           size="xl"
@@ -186,7 +198,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
                           className="rounded-2xl px-12 font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
                         >
                           <MessageCircle className="mr-2 h-6 w-6" />
-                          {isMentor ? "Oferecer Ajuda Agora" : "Iniciar Conversa"}
+                          {contactLabel}
                         </Button>
                       </div>
                     )}
@@ -408,7 +420,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
         </div>
 
         {/* Mobile Sticky Action Bar */}
-        {!isOwner && (
+        {!isOwner && canContact && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
             <Button
               size="xl"
@@ -416,7 +428,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
               className="w-full rounded-2xl font-black shadow-2xl shadow-primary/40"
             >
               <MessageCircle className="mr-2 h-6 w-6" />
-              {isMentor ? "Oferecer Ajuda Agora" : "Iniciar Conversa"}
+              {contactLabel}
             </Button>
           </div>
         )}

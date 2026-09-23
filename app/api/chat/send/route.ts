@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
 import { getOrCreateConversation, sendMessage } from '@/lib/chat/chat-service';
+import { getFeatureFlags } from '@/lib/feature-flags-server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Chat interno desligado por feature flag: contato acontece no LinkedIn
+    const flags = await getFeatureFlags();
+    if (!flags.chat_flag) {
+      return NextResponse.json({ error: 'Chat desabilitado' }, { status: 403 });
+    }
+
     const supabase = await createClient();
 
     // Verificar autenticação

@@ -11,7 +11,8 @@ import {
   MessageSquare,
   ExternalLink,
   XCircle,
-  CheckCircle2
+  CheckCircle2,
+  Linkedin
 } from "lucide-react"
 import { AppointmentStatusBadge } from "./appointment-status-badge"
 import { ConfirmAppointmentButton } from "./confirm-appointment-button"
@@ -21,6 +22,7 @@ import { CompleteAppointmentModal } from "./complete-appointment-modal"
 import { useState } from "react"
 import { useTranslations, useFormatter } from "next-intl"
 import { useRouter } from "@/i18n/routing"
+import { useFeatureFlag } from "@/lib/feature-flags"
 
 interface AppointmentFeedbackItem {
   id: string | number
@@ -44,12 +46,14 @@ interface Appointment {
     full_name: string
     email: string
     avatar_url?: string
+    linkedin_url?: string | null
   }
   mentee: {
     id: string
     full_name: string
     email: string
     avatar_url?: string
+    linkedin_url?: string | null
   }
 }
 
@@ -69,6 +73,7 @@ export function AppointmentCard({
   const format = useFormatter()
   const router = useRouter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
+  const isChatEnabled = useFeatureFlag("chat_flag")
 
   const mentor = Array.isArray(appointment.mentor)
     ? appointment.mentor[0]
@@ -78,7 +83,7 @@ export function AppointmentCard({
     : appointment.mentee
 
   const isMentor = mentor?.id === currentUserId
-  const otherPerson = (isMentor ? mentee : mentor) || { id: "", full_name: "Usuário", avatar_url: null }
+  const otherPerson = (isMentor ? mentee : mentor) || { id: "", full_name: "Usuário", avatar_url: null, linkedin_url: null }
   const userRole = isMentor ? "mentor" : "mentee"
 
   // Avaliação calculada diretamente dos dados da consulta mãe, sem query N+1
@@ -253,12 +258,21 @@ export function AppointmentCard({
 
       <CardFooter className="pt-3 flex-col sm:flex-row gap-3">
         <div className="flex gap-2 flex-wrap">
-          {(canChat || canConfirm) && (
+          {isChatEnabled && (canChat || canConfirm) && (
             <ChatButton
               appointment={appointment}
               currentUserId={currentUserId}
               isMentor={isMentor}
             />
+          )}
+          {/* Chat desligado: a conversa acontece no LinkedIn da outra pessoa */}
+          {!isChatEnabled && (canChat || canConfirm) && otherPerson?.linkedin_url && (
+            <Button variant="outline" size="sm" asChild>
+              <a href={otherPerson.linkedin_url} target="_blank" rel="noopener noreferrer">
+                <Linkedin className="w-4 h-4 mr-2" />
+                LinkedIn
+              </a>
+            </Button>
           )}
         </div>
 

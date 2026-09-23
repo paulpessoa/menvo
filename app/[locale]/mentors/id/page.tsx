@@ -35,6 +35,7 @@ import {
 } from "lucide-react"
 import { useMentor } from "@/hooks/useMentors"
 import { useAuth } from "@/lib/auth"
+import { useFeatureFlag } from "@/lib/feature-flags"
 import { LoginRequiredModal } from "@/components/auth/LoginRequiredModal"
 import { useState } from "react"
 import { useTranslations } from "next-intl"
@@ -47,6 +48,7 @@ interface MentorProfilePageProps {
 export default function MentorProfilePage({ params }: MentorProfilePageProps) {
   const t = useTranslations()
   const { user } = useAuth()
+  const isChatEnabled = useFeatureFlag("chat_flag")
   const { data: mentor, isLoading, error } = useMentor(params.id)
   const [showLoginModal, setShowLoginModal] = useState(false)
 
@@ -227,13 +229,15 @@ export default function MentorProfilePage({ params }: MentorProfilePageProps) {
             <Button onClick={handleScheduleSession} className="gap-2">
               <Calendar className="h-4 w-4" /> Agendar Sessão
             </Button>
-            <Button
-              variant="outline"
-              onClick={handleSendMessage}
-              className="gap-2"
-            >
-              <MessageSquare className="h-4 w-4" /> Enviar Mensagem
-            </Button>
+            {isChatEnabled && (
+              <Button
+                variant="outline"
+                onClick={handleSendMessage}
+                className="gap-2"
+              >
+                <MessageSquare className="h-4 w-4" /> Enviar Mensagem
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={handleSaveToFavorites}>
               <Heart className="h-5 w-5" />
             </Button>

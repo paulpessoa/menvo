@@ -85,6 +85,11 @@ started.
 
 ## 📓 Engineering Journal
 
+### 2026-09-23 — In-App Chat Hidden Behind `chat_flag`
+- **Decision:** No in-app chat for now. Mentor↔mentee contact happens on LinkedIn, which pushes the relationship outside the platform. Re-enable when users start asking for a built-in channel.
+- **Flag:** `chat_flag` (default `false`, seeded by `20260923000000_chat_feature_flag.sql`, toggled at `/dashboard/admin/feature-flags`).
+- **Gated surfaces:** header "Mensagens" menu item + `MessagesBadge`, `/messages` (redirects to `/dashboard`), appointment card Chat button (replaced by the other person's LinkedIn; `linkedin_url` added to `/api/appointments/list`), community "Oferecer ajuda" (opens LinkedIn or profile), mentee profile CTA ("Conversar no LinkedIn"), legacy `mentors/id` "Enviar Mensagem", and `POST /api/chat/send` (403).
+
 ### 2026-09-17 — Multi-Tenant Phase 1 Shipped, Membership Model Redesigned
 - **Phase 1 built and merged (PR #45):** `organizations` + `organization_members` tables, `/o/[slug]` landing, `/dashboard/admin/organizations` (platform admin CRUD), `/dashboard/org` (org admin dashboard).
 - **Founder feedback caught a real design flaw before it shipped wider:** the original "signup tags you into an org" flow had no path for someone who already had an account, and was confusing UX. Replaced with a stateful membership (`invited/requested/active`) controlled from `/profile` and `/dashboard/org`, with three coherent transactional emails.
