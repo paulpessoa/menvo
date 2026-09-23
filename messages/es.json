@@ -1172,7 +1172,36 @@
       "loginLink": "Entra o regístrate para usarla"
     },
     "popularSuggestions": "O explora estas áreas destacadas:",
-    "takeQuizCTA": "Encuentra tu Mentor vía Quiz"
+    "takeQuizCTA": "Encuentra tu Mentor vía Quiz",
+    "suggestModal": {
+      "cta": "Sugiere un tema",
+      "title": "Sugerir un tema o mentor",
+      "description": "¿No encontraste lo que buscabas? Cuéntanos — cada sugerencia nos ayuda a decidir qué mentores invitar a la plataforma.",
+      "contextLabel": "Enviaremos junto los filtros de tu búsqueda:",
+      "topicLabel": "¿Qué estabas buscando?",
+      "topicPlaceholder": "Ej: Producto, Carrera en TI, Diseño de Servicios...",
+      "descriptionLabel": "Más detalles (opcional)",
+      "descriptionPlaceholder": "Ej: alguien que ya haya hecho una transición de carrera hacia producto...",
+      "emailLabel": "Tu correo (opcional)",
+      "emailPlaceholder": "tu@correo.com",
+      "emailHint": "Solo lo usamos para contactarte sobre esta sugerencia.",
+      "cancel": "Cancelar",
+      "submit": "Enviar sugerencia",
+      "submitting": "Enviando...",
+      "successTitle": "¡Sugerencia enviada!",
+      "successDescription": "¡Gracias! Nuestro equipo la revisará y buscará mentores con este perfil.",
+      "error": "No pudimos enviar tu sugerencia. Inténtalo de nuevo en unos instantes.",
+      "experienceYears": "{value} años de experiencia",
+      "availability": {
+        "available": "Disponible",
+        "busy": "Ocupado"
+      },
+      "errors": {
+        "topic": "Describe el tema con 3 a 100 caracteres.",
+        "description": "Los detalles pueden tener como máximo 500 caracteres.",
+        "email": "Ingresa un correo válido."
+      }
+    }
   },
   "profile": {
     "title": "Mi Perfil",

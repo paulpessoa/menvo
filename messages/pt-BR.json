@@ -1166,7 +1166,36 @@
       "loginLink": "Entre ou cadastre-se para usar"
     },
     "popularSuggestions": "Ou explore estas áreas em alta:",
-    "takeQuizCTA": "Descobrir Mentor via Quiz"
+    "takeQuizCTA": "Descobrir Mentor via Quiz",
+    "suggestModal": {
+      "cta": "Sugira um tema",
+      "title": "Sugerir um tema ou mentor",
+      "description": "Não encontrou o que buscava? Conte pra gente — cada sugestão ajuda a decidir quais mentores convidar para a plataforma.",
+      "contextLabel": "Vamos enviar junto os filtros da sua busca:",
+      "topicLabel": "O que você estava buscando?",
+      "topicPlaceholder": "Ex: Produto, Carreira em TI, Design de Serviços...",
+      "descriptionLabel": "Mais detalhes (opcional)",
+      "descriptionPlaceholder": "Ex: quero alguém que já tenha feito transição de carreira para produto...",
+      "emailLabel": "Seu e-mail (opcional)",
+      "emailPlaceholder": "voce@email.com",
+      "emailHint": "Usamos só para falar com você sobre esta sugestão.",
+      "cancel": "Cancelar",
+      "submit": "Enviar sugestão",
+      "submitting": "Enviando...",
+      "successTitle": "Sugestão enviada!",
+      "successDescription": "Obrigado! Nosso time vai avaliar e buscar mentores com esse perfil.",
+      "error": "Não foi possível enviar sua sugestão. Tente novamente em instantes.",
+      "experienceYears": "{value} anos de experiência",
+      "availability": {
+        "available": "Disponível",
+        "busy": "Ocupado"
+      },
+      "errors": {
+        "topic": "Descreva o tema com 3 a 100 caracteres.",
+        "description": "Os detalhes podem ter no máximo 500 caracteres.",
+        "email": "Digite um e-mail válido."
+      }
+    }
   },
   "profile": {
     "title": "Meu Perfil",

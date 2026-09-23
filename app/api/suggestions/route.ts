@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { mentorSuggestionSchema } from "@/lib/schemas/suggestions"
+import { mentorSuggestionSchema, hasSuggestionContext } from "@/lib/schemas/suggestions"
 import { handleApiError, successResponse } from "@/lib/api/error-handler"
 
 export async function POST(request: Request) {
@@ -22,14 +22,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const { topic, description, email } = parsed.data
+    const { topic, description, email, context } = parsed.data
 
     // Create suggestion
     const insertData = {
       topic,
       description: description || null,
       email: user ? null : (email || null),
-      user_id: user?.id || null
+      user_id: user?.id || null,
+      context: hasSuggestionContext(context) ? context : null
     };
 
     const { error } = await (supabase as any)

@@ -1173,7 +1173,36 @@
       "loginLink": "Login or sign up to use it"
     },
     "popularSuggestions": "Or explore these trending fields:",
-    "takeQuizCTA": "Find Your Mentor via Quiz"
+    "takeQuizCTA": "Find Your Mentor via Quiz",
+    "suggestModal": {
+      "cta": "Suggest a topic",
+      "title": "Suggest a topic or mentor",
+      "description": "Couldn't find what you were looking for? Tell us — every suggestion helps us decide which mentors to invite to the platform.",
+      "contextLabel": "We'll send your search filters along with it:",
+      "topicLabel": "What were you looking for?",
+      "topicPlaceholder": "E.g. Product, Tech Careers, Service Design...",
+      "descriptionLabel": "More details (optional)",
+      "descriptionPlaceholder": "E.g. someone who has already made a career switch into product...",
+      "emailLabel": "Your email (optional)",
+      "emailPlaceholder": "you@email.com",
+      "emailHint": "We only use it to reach you about this suggestion.",
+      "cancel": "Cancel",
+      "submit": "Send suggestion",
+      "submitting": "Sending...",
+      "successTitle": "Suggestion sent!",
+      "successDescription": "Thank you! Our team will review it and look for mentors with this profile.",
+      "error": "We couldn't send your suggestion. Please try again shortly.",
+      "experienceYears": "{value} years of experience",
+      "availability": {
+        "available": "Available",
+        "busy": "Busy"
+      },
+      "errors": {
+        "topic": "Describe the topic in 3 to 100 characters.",
+        "description": "Details can be at most 500 characters.",
+        "email": "Enter a valid email."
+      }
+    }
   },
   "profile": {
     "title": "My Profile",

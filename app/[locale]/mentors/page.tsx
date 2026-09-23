@@ -40,11 +40,14 @@ import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
 import { AISearchButton } from "@/components/mentors/AISearchButton"
 import { toast } from "sonner"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { useDebounce } from "@/hooks/useDebounce"
+import { useAiQuota } from "@/hooks/useAiQuota"
+import { AIQuotaHint } from "@/components/mentors/AIQuotaHint"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { SuggestMentorModal } from "@/components/mentors/SuggestMentorModal"
+import type { SuggestionContext } from "@/lib/schemas/suggestions"
 interface MentorProfile {
   id: string | null
   full_name: string | null
@@ -100,6 +103,7 @@ const ITEMS_PER_PAGE = 12
 
 export default function MentorsPage() {
   const t = useTranslations("mentorsPage")
+  const locale = useLocale()
   const [mentors, setMentors] = useState<MentorProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -115,6 +119,7 @@ export default function MentorsPage() {
   const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<MentorProfile[]>([])
   const [isAIMode, setIsAIMode] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
+  const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
@@ -263,6 +268,20 @@ export default function MentorsPage() {
     return count
   }, [filters])
 
+  const suggestionContext = useMemo<SuggestionContext>(() => ({
+    topics: filters.topics,
+    languages: filters.languages,
+    inclusiveTags: filters.inclusiveTags,
+    country: filters.country !== "all" ? filters.country : undefined,
+    state: filters.state !== "all" ? filters.state : undefined,
+    city: filters.city || undefined,
+    availabilityStatus:
+      filters.availabilityStatus === "available" || filters.availabilityStatus === "busy"
+        ? filters.availabilityStatus
+        : undefined,
+    experienceYears: filters.experienceYears !== "all" ? filters.experienceYears : undefined,
+  }), [filters])
+
   const handleLoadMore = () => {
     const nextPage = page + 1
     setPage(nextPage)
@@ -331,6 +350,19 @@ export default function MentorsPage() {
         body: JSON.stringify({ query })
       })
       const result = await response.json()
+      setAiQuota(result.quota)
+
+      if (response.status === 429) {
+        const resetDate = result.quota?.resetsAt
+          ? new Date(result.quota.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+          : ""
+        toast.error(
+          t(result.quota?.reason === "budget" ? "magicSearch.budgetExhausted" : "magicSearch.quotaExhausted", {
+            date: resetDate
+          })
+        )
+        return
+      }
 
       if (!response.ok) throw new Error(result.error || t("magicSearch.error"))
 
@@ -685,6 +717,8 @@ export default function MentorsPage() {
           </div>
         </div>
 
+        <AIQuotaHint quota={aiQuota} />
+
         {/* Active Filter Badges Bar */}
         {activeFacetCount > 0 && (
           <div className="flex items-center gap-1.5 overflow-x-auto py-1 text-xs scrollbar-none">
@@ -862,7 +896,7 @@ export default function MentorsPage() {
               onClick={() => setSuggestModalOpen(true)}
               className="rounded-xl border-2 font-bold px-6 h-11 w-full sm:w-auto text-primary border-primary/20 hover:bg-primary/5"
             >
-              Sugira um tema
+              {t("suggestModal.cta")}
             </Button>
             <Button
               variant="outline"
@@ -928,6 +962,7 @@ export default function MentorsPage() {
         isOpen={isSuggestModalOpen} 
         onClose={() => setSuggestModalOpen(false)} 
         initialTopic={filters.search || filters.topics[0] || ""}
+        context={suggestionContext}
       />
     </PageContainer>
   )
