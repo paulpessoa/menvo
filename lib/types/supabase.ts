@@ -451,6 +451,30 @@ export type Database = {
           },
         ]
       }
+      assistant_conversations: {
+        Row: {
+          ai_response: string
+          created_at: string
+          id: string
+          user_id: string
+          user_message: string
+        }
+        Insert: {
+          ai_response: string
+          created_at?: string
+          id?: string
+          user_id: string
+          user_message: string
+        }
+        Update: {
+          ai_response?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          user_message?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -659,6 +683,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mentor_suggestions: {
+        Row: {
+          context: Json | null
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          status: string
+          topic: string
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          status?: string
+          topic: string
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          status?: string
+          topic?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       mentor_visibility_settings: {
         Row: {
@@ -1513,7 +1570,16 @@ export type Database = {
       }
     }
     Functions: {
+      ai_budget_exhausted: { Args: never; Returns: boolean }
       ai_current_period: { Args: never; Returns: string }
+      ai_monthly_limit: {
+        Args: { p_feature: string; p_user_id: string }
+        Returns: {
+          monthly_limit: number
+          unlimited: boolean
+        }[]
+      }
+      ai_user_roles: { Args: { p_user_id: string }; Returns: string[] }
       assign_user_role: {
         Args: { role_name: string; user_id: string }
         Returns: boolean
@@ -1531,6 +1597,16 @@ export type Database = {
       }
       generate_secure_token: { Args: { length?: number }; Returns: string }
       generate_unique_slug: { Args: { base_name: string }; Returns: string }
+      get_ai_quota: {
+        Args: { p_feature: string }
+        Returns: {
+          allowed: boolean
+          quota_limit: number
+          reason: string
+          resets_at: string
+          used: number
+        }[]
+      }
       get_google_calendar_tokens: {
         Args: { p_user_id: string }
         Returns: {
@@ -1547,16 +1623,6 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      get_ai_quota: {
-        Args: { p_feature: string }
-        Returns: {
-          allowed: boolean
-          quota_limit: number
-          reason: string
-          resets_at: string
-          used: number
-        }[]
-      }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
@@ -1571,6 +1637,7 @@ export type Database = {
           p_output_tokens?: number
           p_provider: string
           p_run_id?: string
+          p_server_key: string
           p_status?: string
         }
         Returns: string

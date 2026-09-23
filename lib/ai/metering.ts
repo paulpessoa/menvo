@@ -24,6 +24,10 @@ export interface AiCallRecord {
  * Persists AI calls as `ai_usage_events`; cost is computed in the database
  * from `ai_model_pricing`, so a price change never requires a deploy.
  *
+ * Sends `AI_METERING_KEY` because usage numbers must come from the server:
+ * if users could call `record_ai_usage` themselves, one forged row would
+ * exhaust the global `ai_budget` and block AI for everyone.
+ *
  * Never throws: losing a metering row must not break the user's request.
  * Run it inside `after()` (or at the end of a stream) so it adds no latency.
  */
@@ -33,9 +37,16 @@ export async function recordAiCalls(
   calls: AiCallRecord[],
   runId: string = crypto.randomUUID()
 ): Promise<void> {
+  const serverKey = process.env.AI_METERING_KEY
+  if (!serverKey) {
+    console.warn(`[ai-metering] AI_METERING_KEY is not set; ${calls.length} ${feature} call(s) not recorded`)
+    return
+  }
+
   const results = await Promise.allSettled(
     calls.map((call) =>
       supabase.rpc("record_ai_usage", {
+        p_server_key: serverKey,
         p_feature: feature,
         p_provider: call.provider,
         p_model: call.model,

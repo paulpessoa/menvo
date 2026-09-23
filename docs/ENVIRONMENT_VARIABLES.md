@@ -60,6 +60,7 @@ cp .env.example .env.local
 | `OPENAI_API_KEY` | Recommended | Server-only | OpenAI key for GPT-4o-mini matching |
 | `GROQ_API_KEY` | Optional | Server-only | Groq key for fallback inference and Assistant |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Optional | Server-only | Google AI key for Gemini 2.5 Flash-Lite fallback in the Assistant |
+| `AI_METERING_KEY` | **Required for AI cost metering** | Server-only | Proves AI usage rows come from the server (`record_ai_usage` rejects calls without it). Its SHA-256 must be stored in `private.ai_settings` — see migration `20260923000003`. Missing = usage not recorded, so the monthly budget can't see the spend |
 
 ### Analytics (Microsoft Clarity MCP)
 | Variable | Required | Context | Description |
