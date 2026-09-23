@@ -115,7 +115,7 @@ export default function QuizResultsPage() {
         window.open(linkedinUrl, "_blank")
     }
 
-    const loadResults = async () => {
+    const loadResults = async (attempt = 0) => {
         if (!params.id) return
         try {
             const data = await quizService.getQuizResponseById(params.id as string)
@@ -125,7 +125,17 @@ export default function QuizResultsPage() {
 
             // Wait for processing if not done yet
             if (!res.processed_at) {
-                setTimeout(loadResults, 2000) // Retry after 2 seconds
+                // ~4 min without a result: stop spinning and show the error
+                // toast (e.g. the monthly AI budget is exhausted).
+                if (attempt >= 120) throw new Error("Quiz analysis timed out")
+                // Every ~70s, ask for the analysis again: covers a request
+                // that died mid-analysis (its 2-min claim expires) or a tab
+                // closed right after submitting. The server-side claim makes
+                // a duplicate request a no-op.
+                if (attempt > 0 && attempt % 35 === 0) {
+                    quizService.requestAnalysis(res.id)
+                }
+                setTimeout(() => loadResults(attempt + 1), 2000) // Retry after 2 seconds
                 return
             }
 

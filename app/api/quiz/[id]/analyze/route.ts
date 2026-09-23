@@ -3,6 +3,11 @@ import { createClient } from "@/lib/utils/supabase/server"
 import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
 import { analyzeQuiz, type AnalysisMentor, type QuizAnswers } from "@/lib/ai-menvo/diagnostic/analyze"
 
+// gemini-2.5-flash took ~10s for one analysis in a real run (2026-09-23);
+// the platform default could kill the function after claiming the row but
+// before saving, leaving the results page waiting. Same cap as /api/assistant.
+export const maxDuration = 60
+
 /**
  * Replaces `supabase/functions/analyze-quiz` (ADR 0004 §7.3, decision D8 =
  * option A): runs the quiz analysis through the model registry, metered and

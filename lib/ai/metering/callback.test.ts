@@ -35,6 +35,32 @@ describe("createMeteringCallback", () => {
     expect(onCall.mock.calls[0][0].latencyMs).toBeGreaterThanOrEqual(0)
   })
 
+  it("reads Groq streaming usage from response_metadata.usage when usage_metadata is empty", async () => {
+    // Real shape from ChatGroq.stream(), 2026-09-23: no usage_metadata at all.
+    const onCall = jest.fn()
+    const cb = createMeteringCallback({ provider: "groq", model: "openai/gpt-oss-120b", isFallback: true, onCall })
+
+    await cb.handleLLMEnd?.(
+      {
+        generations: [
+          [
+            {
+              text: "",
+              message: {
+                response_metadata: {
+                  usage: { input_tokens: 74, output_tokens: 47, prompt_tokens: 74, completion_tokens: 47 }
+                }
+              }
+            } as never
+          ]
+        ]
+      },
+      "run-groq"
+    )
+
+    expect(onCall).toHaveBeenCalledWith(expect.objectContaining({ inputTokens: 74, outputTokens: 47, status: "fallback" }))
+  })
+
   it("records zero tokens when usage_metadata is missing, without throwing", async () => {
     const onCall = jest.fn()
     const cb = createMeteringCallback({ provider: "groq", model: "openai/gpt-oss-20b", isFallback: false, onCall })

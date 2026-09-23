@@ -128,16 +128,26 @@ class QuizService {
       throw error
     }
 
-    // Trigger AI analysis asynchronously (POST /api/quiz/[id]/analyze — a
-    // Next.js route on the model registry, metered and inside the AI
-    // budget; ADR 0004 §7.3, replaces the old analyze-quiz Edge Function).
+    await this.requestAnalysis(id)
+
+    return { id }
+  }
+
+  /**
+   * Asks the server to analyze a quiz response (POST /api/quiz/[id]/analyze
+   * — model registry, metered, inside the AI budget; ADR 0004 §7.3, replaces
+   * the old analyze-quiz Edge Function). Safe to call more than once: the
+   * server claims the row atomically, so a duplicate request does nothing.
+   * Never throws — the results page polls for the outcome either way.
+   *
+   * @param id - UUID of the quiz response
+   */
+  async requestAnalysis(id: string): Promise<void> {
     try {
       await fetch(`/api/quiz/${id}/analyze`, { method: "POST" })
     } catch (analysisError) {
       console.warn("[QuizService] Asynchronous AI trigger warning:", analysisError)
     }
-
-    return { id }
   }
 
   /**

@@ -14,26 +14,30 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import { getStructuredModel, AiModelUnavailableError } from "@/lib/ai/models"
 import type { AiCallRecord } from "@/lib/ai/metering"
 
+// Every field required and non-nullable, because both models in the
+// `analyze` chain reject the alternatives (verified with real calls,
+// 2026-09-23): OpenAI's strict Structured Outputs (gpt-5-mini) refuses
+// `ZodDefault` before sending the request, and Gemini refuses `.nullable()`
+// (`type: ["string","null"]` → 400). "Absent" is an empty string
+// (mentor_nome) or an empty array; the results page treats "" as no name.
 export const quizAnalysisSchema = z.object({
-  precisa_refazer: z.boolean().optional(),
+  precisa_refazer: z.boolean(),
   titulo_personalizado: z.string(),
   resumo_motivador: z.string(),
-  mentores_sugeridos: z
-    .array(
-      z.object({
-        tipo: z.string(),
-        razao: z.string(),
-        disponivel: z.boolean(),
-        mentor_nome: z.string().optional()
-      })
-    )
-    .default([]),
-  conselhos_praticos: z.array(z.string()).default([]),
-  proximos_passos: z.array(z.string()).default([]),
-  areas_desenvolvimento: z.array(z.string()).default([]),
+  mentores_sugeridos: z.array(
+    z.object({
+      tipo: z.string(),
+      razao: z.string(),
+      disponivel: z.boolean(),
+      mentor_nome: z.string()
+    })
+  ),
+  conselhos_praticos: z.array(z.string()),
+  proximos_passos: z.array(z.string()),
+  areas_desenvolvimento: z.array(z.string()),
   mensagem_final: z.string(),
-  potencial_mentor: z.boolean().optional(),
-  areas_vida_pessoal: z.array(z.string()).optional()
+  potencial_mentor: z.boolean(),
+  areas_vida_pessoal: z.array(z.string())
 })
 
 export type QuizAnalysisResult = z.infer<typeof quizAnalysisSchema>
@@ -101,6 +105,7 @@ INSTRUÇÕES:
 3. Sugira 2-3 tipos de mentores baseados nas áreas de interesse
    - Se houver mentores disponíveis que combinam, mencione-os especificamente
    - Se não houver mentores para certas áreas, indique disponivel: false
+   - Em "mentor_nome", use o nome de um mentor real da lista, ou "" (texto vazio) se não houver
 4. Dê 2-3 conselhos práticos e acionáveis
 5. Identifique se a pessoa tem potencial para ser mentora (baseado na resposta sobre compartilhar conhecimento)
 6. Sugira áreas de desenvolvimento na vida pessoal baseado nos desafios mencionados
@@ -173,23 +178,26 @@ export function fallbackAnalysis(answers: QuizAnswers, mentors: AnalysisMentor[]
           tipo: `${mentor.full_name} - ${mentor.job_title}`,
           razao: `${mentor.bio?.substring(0, 100)}... | Expertise: ${mentor.expertise_areas?.slice(0, 2).join(", ")} | Rating: ${mentor.average_rating ?? "N/A"}/5`,
           disponivel: mentor.availability_status === "available",
-          mentor_nome: mentor.full_name ?? undefined
+          mentor_nome: mentor.full_name ?? ""
         }))
       : [
           {
             tipo: "Mentor de Carreira",
             razao: "Para te ajudar a planejar seus próximos passos profissionais e definir objetivos claros",
-            disponivel: false
+            disponivel: false,
+            mentor_nome: ""
           },
           {
             tipo: "Mentor de Desenvolvimento Técnico",
             razao: "Para desenvolver suas habilidades técnicas e se manter atualizado no mercado",
-            disponivel: false
+            disponivel: false,
+            mentor_nome: ""
           },
           {
             tipo: "Mentor de Liderança",
             razao: "Para desenvolver suas soft skills e capacidades de liderança",
-            disponivel: false
+            disponivel: false,
+            mentor_nome: ""
           }
         ]
 
