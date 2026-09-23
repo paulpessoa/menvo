@@ -3,7 +3,6 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import {
   Calendar,
   Clock,
@@ -33,7 +32,7 @@ interface Appointment {
   id: string | number
   scheduled_at: string
   duration_minutes: number
-  status: "pending" | "confirmed" | "cancelled" | "completed"
+  status: "pending" | "confirmed" | "cancelled" | "completed" | "rejected"
   notes_mentee?: string
   notes_mentor?: string
   google_meet_link?: string
@@ -56,6 +55,9 @@ interface Appointment {
     linkedin_url?: string | null
   }
 }
+
+/** Shape returned by `/api/appointments/list`, as consumed by the card. */
+export type AppointmentCardData = Appointment
 
 interface AppointmentCardProps {
   appointment: Appointment
@@ -124,7 +126,17 @@ export function AppointmentCard({
       .slice(0, 2)
   }
 
-  const canConfirm = isMentor && appointment.status === "pending"
+  // O status do banco não sabe que o tempo passou: um pedido nunca respondido
+  // continua "pending" e uma sessão realizada continua "confirmed" até a
+  // avaliação. O badge mostra o estado real para quem está olhando.
+  const badgeStatus =
+    isPast && appointment.status === "pending"
+      ? "expired"
+      : isPast && appointment.status === "confirmed"
+        ? "completed"
+        : appointment.status
+
+  const canConfirm = isMentor && appointment.status === "pending" && !isPast
   const canCancel =
     (appointment.status === "pending" || appointment.status === "confirmed") &&
     !isPast
@@ -139,6 +151,10 @@ export function AppointmentCard({
     (appointment.status === "confirmed" || appointment.status === "completed") &&
     isPast &&
     !hasUserEvaluated
+
+  const showLinkedin = !isChatEnabled && (canChat || canConfirm) && !!otherPerson?.linkedin_url
+  const hasActions =
+    (isChatEnabled && (canChat || canConfirm)) || showLinkedin || canComplete || canConfirm || canCancel || canJoinMeet
 
   const handleProfileClick = () => {
     if (!isMentor && otherPerson?.id) {
@@ -171,7 +187,7 @@ export function AppointmentCard({
               </p>
             </div>
           </div>
-          <AppointmentStatusBadge status={appointment.status} />
+          <AppointmentStatusBadge status={badgeStatus} />
         </div>
       </CardHeader>
 
@@ -189,11 +205,6 @@ export function AppointmentCard({
           <span className="text-muted-foreground">
             ({appointment.duration_minutes} {t("minutes")})
           </span>
-          {isPast && appointment.status !== "completed" && (
-            <Badge variant="outline" className="text-xs text-orange-600">
-              {t("expired")}
-            </Badge>
-          )}
         </div>
 
         {appointment.notes_mentee && (
@@ -256,6 +267,7 @@ export function AppointmentCard({
           )}
       </CardContent>
 
+      {hasActions && (
       <CardFooter className="pt-3 flex-col sm:flex-row gap-3">
         <div className="flex gap-2 flex-wrap">
           {isChatEnabled && (canChat || canConfirm) && (
@@ -266,9 +278,9 @@ export function AppointmentCard({
             />
           )}
           {/* Chat desligado: a conversa acontece no LinkedIn da outra pessoa */}
-          {!isChatEnabled && (canChat || canConfirm) && otherPerson?.linkedin_url && (
+          {showLinkedin && (
             <Button variant="outline" size="sm" asChild>
-              <a href={otherPerson.linkedin_url} target="_blank" rel="noopener noreferrer">
+              <a href={otherPerson.linkedin_url ?? undefined} target="_blank" rel="noopener noreferrer">
                 <Linkedin className="w-4 h-4 mr-2" />
                 LinkedIn
               </a>
@@ -321,6 +333,7 @@ export function AppointmentCard({
           )}
         </div>
       </CardFooter>
+      )}
 
       <CompleteAppointmentModal
         open={isCompleteModalOpen}

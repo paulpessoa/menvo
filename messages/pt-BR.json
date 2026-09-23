@@ -1621,66 +1621,52 @@
   },
   "mentorship": {
     "title": "Minhas Mentorias",
-    "description": "Gerencie todas as suas mentorias - recebidas e solicitadas",
+    "description": "Pedidos que você recebe como mentor e mentorias que você solicita",
+    "hub": {
+      "loading": "Carregando mentorias...",
+      "error": "Não foi possível carregar suas mentorias.",
+      "retry": "Tentar novamente",
+      "switchLabel": "Tipo de mentoria",
+      "actionCount": "{count, plural, one {# item requer sua ação} other {# itens requerem sua ação}}",
+      "upcomingTitle": "Próximas sessões",
+      "historyTitle": "Histórico",
+      "showMore": "Ver mais ({count})",
+      "showLess": "Ver menos",
+      "nextSession": "Sua próxima sessão",
+      "nextSessionToday": "Sua sessão é hoje",
+      "withPerson": "com {name}",
+      "joinMeet": "Entrar no Meet",
+      "meetPending": "O link do Google Meet aparece aqui assim que for gerado.",
+      "howItWorksTitle": "Como funciona sua sessão",
+      "howItWorksMeet": "As mentorias confirmadas acontecem 100% online via Google Meet. O link é gerado automaticamente e aparece no card da sessão.",
+      "howItWorksTip": "Entre com 5 minutos de antecedência e leve seus principais objetivos. Depois da sessão, avalie seu mentor — isso ajuda a comunidade.",
+      "exploreMentors": "Explorar mentores",
+      "asMentor": {
+        "tab": "Recebidas",
+        "tabSub": "Você como mentor",
+        "actionTitle": "Aguardando sua resposta",
+        "actionHint": "Confirme ou recuse antes da data — pedidos sem resposta expiram.",
+        "upcomingEmpty": "Nenhuma sessão confirmada por enquanto.",
+        "emptyTitle": "Você ainda não recebeu pedidos de mentoria",
+        "emptyDesc": "Mantenha sua disponibilidade atualizada para aparecer com horários livres para os mentorados.",
+        "emptyCta": "Configurar disponibilidade"
+      },
+      "asMentee": {
+        "tab": "Solicitadas",
+        "tabSub": "Você como mentorado",
+        "actionTitle": "Avalie suas sessões",
+        "actionHint": "Sua avaliação libera novos agendamentos e ajuda outros mentorados a escolher.",
+        "upcomingHint": "Inclui pedidos aguardando a confirmação do mentor.",
+        "upcomingEmpty": "Nenhuma sessão agendada. Que tal encontrar um mentor?",
+        "emptyTitle": "Você ainda não solicitou nenhuma mentoria",
+        "emptyDesc": "Encontre um mentor com a experiência que você procura e escolha um horário livre na agenda dele.",
+        "emptyCta": "Encontrar mentores"
+      }
+    },
     "menteePage": {
       "backToDashboard": "Voltar ao Dashboard",
       "title": "Minhas Mentorias",
       "description": "Acompanhe suas solicitações e sessões de mentoria agendadas"
-    },
-    "newUx": {
-      "nextMeeting": "Próximo Encontro",
-      "heroTitle": "Prepare-se para crescer!",
-      "heroDesc": "Você tem uma sessão agendada em breve. Revise suas perguntas e aproveite cada minuto.",
-      "viewDetails": "Ver Detalhes",
-      "myGoals": "Meus Objetivos",
-      "timelineTitle": "Cronograma de Mentorias",
-      "awaitingConfirmation": "Aguardando Confirmação",
-      "confirmed": "Confirmadas",
-      "recentHistory": "Histórico Recente",
-      "eliteTitle": "Seja um Mentee Elite",
-      "eliteDesc": "Complete suas avaliações para ganhar selos de pontualidade e dedicação.",
-      "viewBadges": "Ver minhas medalhas",
-      "usefulResources": "Recursos Úteis",
-      "howToLeverage": "Como aproveitar a mentoria",
-      "networkingTips": "Dicas de Networking",
-      "careerTrack": "Trilha de Carreira",
-      "exploreMentors": "Explorar Novos Mentores"
-    },
-    "received": {
-      "title": "Mentorias Recebidas",
-      "asMentor": "(você como mentor)",
-      "pending": "Pedidos Recebidos",
-      "pendingDesc": "Solicitações de mentoria aguardando sua confirmação",
-      "confirmed": "Mentorias Agendadas",
-      "confirmedDesc": "Sessões confirmadas e agendadas. Após a mentoria, clique em \"Avaliar\" para deixar seu feedback.",
-      "completed": "Mentorias Avaliadas",
-      "completedDesc": "Sessões finalizadas com feedback registrado",
-      "cancelled": "Sessões Canceladas",
-      "cancelledDesc": "Mentorias que foram canceladas"
-    },
-    "requested": {
-      "title": "Mentorias Solicitadas",
-      "asMentee": "(você como mentee)",
-      "pending": "Aguardando Confirmação",
-      "pendingDesc": "Solicitações pendentes de confirmação dos mentores",
-      "confirmed": "Mentorias Agendadas",
-      "confirmedDesc": "Sessões confirmadas pelos mentores",
-      "completed": "Mentorias Avaliadas",
-      "completedDesc": "Sessões finalizadas com seu feedback",
-      "cancelled": "Sessões Canceladas",
-      "cancelledDesc": "Mentorias que foram canceladas"
-    },
-    "tabs": {
-      "pending": "Pendentes",
-      "confirmed": "Agendadas",
-      "completed": "Avaliadas",
-      "cancelled": "Canceladas"
-    },
-    "resources": {
-      "title": "Biblioteca de Recursos",
-      "description": "Compartilhe materiais e recursos com seus mentees",
-      "inDevelopment": "Em desenvolvimento",
-      "comingSoon": "Em breve: biblioteca de materiais, templates e recursos para compartilhar com mentees"
     },
     "booking": {
       "modalTitle": "Agendar Mentoria",
@@ -1715,7 +1701,9 @@
       "pending": "Pendente",
       "confirmed": "Confirmado",
       "cancelled": "Cancelado",
-      "completed": "Concluído"
+      "completed": "Concluído",
+      "rejected": "Recusado",
+      "expired": "Expirado"
     },
     "today": "Hoje",
     "expired": "Expirado",

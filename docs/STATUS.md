@@ -4,7 +4,7 @@
 > `JOURNAL.md`) into one: current health, standing product/architecture
 > invariants, the active backlog, and a chronological engineering log.
 
-## 📅 Last Updated: 2026-09-17
+## 📅 Last Updated: 2026-09-23
 **Current status:** Multi-tenant Phase 1 shipped and merged (organizations,
 invite/request/approve membership, org admin dashboard). Phase 1.5
 (role-aware reporting, public/invite-only orgs, coherent emails, SEO) is
@@ -15,7 +15,7 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 124/124 passed across 25 test suites (`npm test`)
+- **Unit Tests:** 134/134 passed across 27 test suites (`npm test`)
 - **Production Build:** 55/55 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -84,6 +84,15 @@ started.
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-23 — "Minhas Mentorias" Redesigned Around Next Action
+- **8 tabs → 1 switch + 3 sections.** `/mentorship/mentor` had two 4-tab blocks (Recebidas/Solicitadas × Pendentes/Agendadas/Avaliadas/Canceladas), mostly empty. Now: a two-option switch (Recebidas · você como mentor / Solicitadas · você como mentorado, persisted in `?view=requested`, each with its pending-action count), then **Requer sua ação → Próximas sessões → Histórico** (history collapses after 5). `/mentorship/mentee` uses the same board.
+- **Grouping is by derived lifecycle, not DB status** (`lib/mentorship/group-appointments.ts`, unit-tested): `confirmed` stays `confirmed` after the session until the mentee evaluates, and unanswered `pending` never expires in the DB — the old tabs kept past sessions under "Agendadas" forever. Card badges now show "Concluído"/"Expirado" for those.
+- **One request per perspective** (`hooks/useMyAppointments.ts`, TanStack Query + Zod) instead of up to 8 `AppointmentsList` fetches; confirm/cancel/evaluate invalidate both perspectives.
+- **Fixed:** mentor could "Confirmar" an already-expired request; the mentee hero claimed "você tem uma sessão agendada" with zero sessions (replaced by a real `NextSessionCard`); removed the "Biblioteca de Recursos — em desenvolvimento" placeholder; empty card footers.
+- **Verified E2E** with Playwright against the real pages using a stateful mock of `/api/*` (no DB access): 32/32 checks incl. confirm, evaluate, perspective switch, reload, mobile 390px.
+- **Follow-up: closed the direct-Supabase gap this same session.** Evaluation, feedback editing and both dashboards' stats/upcoming-appointments reads were going straight from client components to Supabase (`mentorshipService.submitFeedbackAndComplete`/`updateFeedback`/`getUserFeedbacks`/`hasPendingEvaluations`/`getMenteeDashboardStats`/`getMenteeUpcomingAppointments`/`getMentorDashboardStats`/`getMentorUpcomingAppointments`), violating invariant #4. Added `POST /api/appointments/complete`, `GET+PATCH /api/appointments/feedback`, `GET /api/dashboard/mentee`, `GET /api/dashboard/mentor` (all service-role, session-authenticated, ownership-checked) and pointed the service functions at them, keeping every call site's signature unchanged. Also fixed two real gaps found while doing this: the evaluate endpoint now rejects a non-mentee reviewer and a duplicate evaluation (server previously trusted the client-side `!isMentor` gate only), and the feedback-edit endpoint now checks `reviewer_id === user.id` (previously anyone with a feedback id could edit anyone's comment). Removed the old `mentorship.received/requested/tabs/resources/newUx` i18n keys (unused after the redesign) from all three locales.
+- **Known, not fixed (pre-existing, out of scope today):** `mentorAvailabilityService.addAvailability/updateAvailability/removeAvailability` (used by `/dashboard/mentor/availability`) still write to Supabase directly — `getMentorAvailability`/`setMentorAvailability` already go through `/api/mentors/availability`. `mentorshipSessionsService.requestSession/respondToSession/getMentorSessions/getMenteeSessions/completeSession/cancelSession/getSession/getMentorStats` also call Supabase directly, but are dead code — not imported by any live component (only by unused hooks in `useMentorship.ts`, used only by the unreferenced `ScheduleSessionModal`/`SessionResponseModal`).
 
 ### 2026-09-23 — Profile & Onboarding Save Flow Fixed, /profile Tabs Consolidated
 - **Every `/profile` save and every mentee onboarding returned 500:** both payloads carry `learning_goals`, a column that never existed in `profiles` (PostgREST rejects the whole UPDATE). Added migration `20260923000001_profiles_learning_goals.sql` (applied to the DB on 2026-09-23).

@@ -1628,66 +1628,52 @@
   },
   "mentorship": {
     "title": "My Mentorships",
-    "description": "Manage all your mentorships - received and requested",
+    "description": "Requests you receive as a mentor and mentorships you request",
+    "hub": {
+      "loading": "Loading mentorships...",
+      "error": "We couldn't load your mentorships.",
+      "retry": "Try again",
+      "switchLabel": "Mentorship type",
+      "actionCount": "{count, plural, one {# item needs your action} other {# items need your action}}",
+      "upcomingTitle": "Upcoming sessions",
+      "historyTitle": "History",
+      "showMore": "Show more ({count})",
+      "showLess": "Show less",
+      "nextSession": "Your next session",
+      "nextSessionToday": "Your session is today",
+      "withPerson": "with {name}",
+      "joinMeet": "Join Meet",
+      "meetPending": "The Google Meet link shows up here as soon as it's generated.",
+      "howItWorksTitle": "How your session works",
+      "howItWorksMeet": "Confirmed mentorships happen 100% online via Google Meet. The link is generated automatically and shows on the session card.",
+      "howItWorksTip": "Join 5 minutes early and bring your main goals. After the session, rate your mentor — it helps the community.",
+      "exploreMentors": "Explore mentors",
+      "asMentor": {
+        "tab": "Received",
+        "tabSub": "You as mentor",
+        "actionTitle": "Awaiting your answer",
+        "actionHint": "Confirm or decline before the date — unanswered requests expire.",
+        "upcomingEmpty": "No confirmed sessions yet.",
+        "emptyTitle": "You haven't received any mentorship requests yet",
+        "emptyDesc": "Keep your availability up to date so mentees see open slots.",
+        "emptyCta": "Set availability"
+      },
+      "asMentee": {
+        "tab": "Requested",
+        "tabSub": "You as mentee",
+        "actionTitle": "Rate your sessions",
+        "actionHint": "Your rating unlocks new bookings and helps other mentees choose.",
+        "upcomingHint": "Includes requests awaiting the mentor's confirmation.",
+        "upcomingEmpty": "No sessions scheduled. How about finding a mentor?",
+        "emptyTitle": "You haven't requested any mentorship yet",
+        "emptyDesc": "Find a mentor with the experience you're looking for and pick an open slot.",
+        "emptyCta": "Find mentors"
+      }
+    },
     "menteePage": {
       "backToDashboard": "Back to Dashboard",
       "title": "My Mentorships",
       "description": "Track your requests and scheduled mentorship sessions"
-    },
-    "newUx": {
-      "nextMeeting": "Next Meeting",
-      "heroTitle": "Get ready to grow!",
-      "heroDesc": "You have a session scheduled soon. Review your questions and make the most of every minute.",
-      "viewDetails": "View Details",
-      "myGoals": "My Goals",
-      "timelineTitle": "Mentorship Timeline",
-      "awaitingConfirmation": "Awaiting Confirmation",
-      "confirmed": "Confirmed",
-      "recentHistory": "Recent History",
-      "eliteTitle": "Become an Elite Mentee",
-      "eliteDesc": "Complete your evaluations to earn punctuality and dedication badges.",
-      "viewBadges": "View my badges",
-      "usefulResources": "Useful Resources",
-      "howToLeverage": "How to get the most out of mentorship",
-      "networkingTips": "Networking Tips",
-      "careerTrack": "Career Track",
-      "exploreMentors": "Explore New Mentors"
-    },
-    "received": {
-      "title": "Mentorships Received",
-      "asMentor": "(you as mentor)",
-      "pending": "Requests Received",
-      "pendingDesc": "Mentorship requests awaiting your confirmation",
-      "confirmed": "Scheduled Mentorships",
-      "confirmedDesc": "Confirmed and scheduled sessions. After the mentorship, click \"Evaluate\" to leave your feedback.",
-      "completed": "Evaluated Mentorships",
-      "completedDesc": "Finished sessions with registered feedback",
-      "cancelled": "Cancelled Sessions",
-      "cancelledDesc": "Mentorships that were cancelled"
-    },
-    "requested": {
-      "title": "Mentorships Requested",
-      "asMentee": "(you as mentee)",
-      "pending": "Awaiting Confirmation",
-      "pendingDesc": "Pending confirmation requests from mentors",
-      "confirmed": "Scheduled Mentorships",
-      "confirmedDesc": "Sessions confirmed by mentors",
-      "completed": "Evaluated Mentorships",
-      "completedDesc": "Finished sessions with your feedback",
-      "cancelled": "Cancelled Sessions",
-      "cancelledDesc": "Mentorships that were cancelled"
-    },
-    "tabs": {
-      "pending": "Pending",
-      "confirmed": "Scheduled",
-      "completed": "Evaluated",
-      "cancelled": "Cancelled"
-    },
-    "resources": {
-      "title": "Resource Library",
-      "description": "Share materials and resources with your mentees",
-      "inDevelopment": "In development",
-      "comingSoon": "Coming soon: library of materials, templates and resources to share with mentees"
     },
     "booking": {
       "modalTitle": "Book Mentorship",
@@ -1722,7 +1708,9 @@
       "pending": "Pending",
       "confirmed": "Confirmed",
       "cancelled": "Cancelled",
-      "completed": "Completed"
+      "completed": "Completed",
+      "rejected": "Declined",
+      "expired": "Expired"
     },
     "today": "Today",
     "expired": "Expired",

@@ -447,11 +447,9 @@ export const mentorshipSessionsService = {
     }
   },
 
-  // Enviar feedback e completar agendamento
+  // Enviar feedback do mentorado e concluir o agendamento (BFF: POST /api/appointments/complete)
   submitFeedbackAndComplete: async ({
     appointmentId,
-    reviewerId,
-    reviewedId,
     rating,
     privateNotes,
     publicFeedback
@@ -463,214 +461,80 @@ export const mentorshipSessionsService = {
     privateNotes?: string | null
     publicFeedback?: string | null
   }): Promise<void> => {
-    const feedbackPayload: Database["public"]["Tables"]["appointment_feedbacks"]["Insert"] = {
-      appointment_id: appointmentId,
-      reviewer_id: reviewerId,
-      reviewed_id: reviewedId,
-      rating,
-      private_notes: privateNotes || null,
-      public_feedback: publicFeedback || null
+    const res = await fetch("/api/appointments/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId, rating, privateNotes, publicFeedback })
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || "Erro ao registrar avaliação")
     }
-
-    const { error: feedbackError } = await (supabase
-      .from("appointment_feedbacks") as any)
-      .insert(feedbackPayload)
-
-    if (feedbackError) throw feedbackError
-
-    const appointmentPayload: Database["public"]["Tables"]["appointments"]["Update"] = {
-      status: "completed",
-      updated_at: new Date().toISOString()
-    }
-
-    const { error: updateError } = await (supabase
-      .from("appointments") as any)
-      .update(appointmentPayload)
-      .eq("id", appointmentId)
-
-    if (updateError) throw updateError
   },
 
-  // Atualizar feedback público de agendamento
+  // Atualizar feedback público de agendamento (BFF: PATCH /api/feedback)
   updateFeedback: async (feedbackId: string, publicFeedback: string): Promise<void> => {
-    const { error } = await (supabase
-      .from("appointment_feedbacks") as any)
-      .update({
-        public_feedback: publicFeedback,
-        status: "pending",
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", feedbackId)
-
-    if (error) throw error
+    const res = await fetch("/api/appointments/feedback", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ feedbackId, publicFeedback })
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || "Erro ao atualizar avaliação")
+    }
   },
 
   /**
-   * Obtém lista de feedbacks recebidos ou enviados por um usuário.
-   * @param userId - ID do usuário
-   * @param type - 'received' ou 'sent'
+   * Obtém lista de feedbacks recebidos ou enviados pelo usuário logado
+   * (BFF: GET /api/feedback). O userId permanece no parâmetro por
+   * compatibilidade de assinatura; a API usa a sessão autenticada.
    */
-  getUserFeedbacks: async (userId: string, type: "received" | "sent"): Promise<any[]> => {
-    let query = (supabase.from("appointment_feedbacks") as any).select(`
-      id, rating, public_feedback, status, created_at, rejection_reason,
-      mentee:profiles!reviewer_id(full_name, email),
-      mentor:profiles!reviewed_id(full_name)
-    `)
-
-    if (type === "received") {
-      query = query.eq("reviewed_id", userId)
-    } else {
-      query = query.eq("reviewer_id", userId)
-    }
-
-    const { data, error } = await query.order("created_at", { ascending: false })
-    if (error) throw error
-    return data || []
+  getUserFeedbacks: async (_userId: string, type: "received" | "sent"): Promise<any[]> => {
+    const res = await fetch(`/api/appointments/feedback?type=${type}`)
+    if (!res.ok) throw new Error("Erro ao buscar avaliações")
+    const data = await res.json()
+    return data.feedbacks || []
   },
 
-  // Verificar se o usuário tem mentorias concluídas sem avaliação
-  hasPendingEvaluations: async (userId: string): Promise<boolean> => {
-    const { data: completed } = await (supabase
-      .from("appointments") as any)
-      .select("id")
-      .eq("mentee_id", userId)
-      .eq("status", "completed")
-
-    if (!completed || completed.length === 0) return false
-
-    const { data: feedbacks } = await (supabase
-      .from("appointment_feedbacks") as any)
-      .select("appointment_id")
-      .eq("reviewer_id", userId)
-
-    const feedbackIds = new Set((feedbacks || []).map((f: any) => f.appointment_id))
-    return completed.some((c: any) => !feedbackIds.has(c.id))
+  // Verificar se o usuário tem mentorias concluídas sem avaliação (BFF: GET /api/dashboard/mentee)
+  hasPendingEvaluations: async (_userId: string): Promise<boolean> => {
+    const res = await fetch("/api/dashboard/mentee")
+    if (!res.ok) throw new Error("Erro ao verificar avaliações pendentes")
+    const data = await res.json()
+    return !!data.hasPendingEvaluations
   },
 
-  // Obter métricas consolidadas do dashboard do mentorado
-  getMenteeDashboardStats: async (userId: string) => {
-    const { data: appointments, error } = await (supabase
-      .from("appointments") as any)
-      .select("id, status, scheduled_at, duration_minutes, mentor_id")
-      .eq("mentee_id", userId)
-
-    if (error) throw error
-    const apts = (appointments as any[]) || []
-    const now = new Date()
-    const upcoming = apts.filter(a => new Date(a.scheduled_at) > now && a.status !== "cancelled").length
-    const completed = apts.filter(a => a.status === "completed").length
-    const totalMinutes = apts.filter(a => a.status === "completed").reduce((sum, a) => sum + (a.duration_minutes || 0), 0)
-    const totalHours = Math.round((totalMinutes / 60) * 10) / 10
-    const uniqueMentors = new Set(apts.map(a => a.mentor_id)).size
-
-    return {
-      totalAppointments: apts.length,
-      upcomingAppointments: upcoming,
-      completedSessions: completed,
-      totalMentors: uniqueMentors,
-      totalHours
-    }
+  // Obter métricas consolidadas do dashboard do mentorado (BFF: GET /api/dashboard/mentee)
+  getMenteeDashboardStats: async (_userId: string) => {
+    const res = await fetch("/api/dashboard/mentee")
+    if (!res.ok) throw new Error("Erro ao buscar métricas do dashboard")
+    const data = await res.json()
+    return data.stats
   },
 
-  // Obter próximos agendamentos do mentorado
-  getMenteeUpcomingAppointments: async (userId: string, limit = 3) => {
-    const { data, error } = await (supabase
-      .from("appointments") as any)
-      .select(`
-          id,
-          scheduled_at,
-          duration_minutes,
-          status,
-          google_meet_link,
-          mentor:profiles!mentor_id (
-              full_name,
-              avatar_url,
-              job_title
-          )
-      `)
-      .eq("mentee_id", userId)
-      .gte("scheduled_at", new Date().toISOString())
-      .neq("status", "cancelled")
-      .order("scheduled_at", { ascending: true })
-      .limit(limit)
-
-    if (error) throw error
-    return (data as any[])?.map((apt: any) => ({
-      id: apt.id,
-      scheduled_at: apt.scheduled_at,
-      duration_minutes: apt.duration_minutes,
-      status: apt.status,
-      google_meet_link: apt.google_meet_link || null,
-      mentor: {
-        full_name: apt.mentor?.full_name || "Mentor",
-        avatar_url: apt.mentor?.avatar_url || null,
-        job_title: apt.mentor?.job_title || null
-      }
-    })) || []
+  // Obter próximos agendamentos do mentorado (BFF: GET /api/dashboard/mentee)
+  getMenteeUpcomingAppointments: async (_userId: string, limit = 3) => {
+    const res = await fetch(`/api/dashboard/mentee?limit=${limit}`)
+    if (!res.ok) throw new Error("Erro ao buscar próximos agendamentos")
+    const data = await res.json()
+    return data.upcoming || []
   },
 
-  // Obter métricas consolidadas do dashboard do mentor
-  getMentorDashboardStats: async (mentorId: string) => {
-    const { data: appointments, error } = await (supabase
-      .from("appointments") as any)
-      .select("id, status, scheduled_at, duration_minutes, mentee_id")
-      .eq("mentor_id", mentorId)
-
-    if (error) throw error
-    const apts = (appointments as any[]) || []
-    const now = new Date()
-    const upcoming = apts.filter(a => new Date(a.scheduled_at) > now && a.status !== "cancelled").length
-    const pending = apts.filter(a => a.status === "pending" && new Date(a.scheduled_at) > now).length
-    const completed = apts.filter(a => a.status === "completed").length
-    const totalMinutes = apts.filter(a => a.status === "completed").reduce((sum, a) => sum + (a.duration_minutes || 0), 0)
-    const totalHours = Math.round((totalMinutes / 60) * 10) / 10
-    const uniqueMentees = new Set(apts.filter(a => a.status !== "cancelled").map(a => a.mentee_id)).size
-
-    return {
-      totalAppointments: apts.length,
-      upcomingAppointments: upcoming,
-      pendingRequests: pending,
-      completedSessions: completed,
-      totalMentees: uniqueMentees,
-      totalHours
-    }
+  // Obter métricas consolidadas do dashboard do mentor (BFF: GET /api/dashboard/mentor)
+  getMentorDashboardStats: async (_mentorId: string) => {
+    const res = await fetch("/api/dashboard/mentor")
+    if (!res.ok) throw new Error("Erro ao buscar métricas do dashboard")
+    const data = await res.json()
+    return data.stats
   },
 
-  // Obter próximos agendamentos do mentor
-  getMentorUpcomingAppointments: async (mentorId: string, limit = 3) => {
-    const { data, error } = await (supabase
-      .from("appointments") as any)
-      .select(`
-          id,
-          scheduled_at,
-          duration_minutes,
-          status,
-          google_meet_link,
-          mentee:profiles!mentee_id (
-              full_name,
-              avatar_url,
-              job_title
-          )
-      `)
-      .eq("mentor_id", mentorId)
-      .gte("scheduled_at", new Date().toISOString())
-      .neq("status", "cancelled")
-      .order("scheduled_at", { ascending: true })
-      .limit(limit)
-
-    if (error) throw error
-    return (data as any[])?.map((apt: any) => ({
-      id: apt.id,
-      scheduled_at: apt.scheduled_at,
-      duration_minutes: apt.duration_minutes,
-      status: apt.status,
-      google_meet_link: apt.google_meet_link || null,
-      mentee: {
-        full_name: apt.mentee?.full_name || "Mentorado",
-        avatar_url: apt.mentee?.avatar_url || null,
-        job_title: apt.mentee?.job_title || null
-      }
-    })) || []
+  // Obter próximos agendamentos do mentor (BFF: GET /api/dashboard/mentor)
+  getMentorUpcomingAppointments: async (_mentorId: string, limit = 3) => {
+    const res = await fetch(`/api/dashboard/mentor?limit=${limit}`)
+    if (!res.ok) throw new Error("Erro ao buscar próximos agendamentos")
+    const data = await res.json()
+    return data.upcoming || []
   }
 }
 

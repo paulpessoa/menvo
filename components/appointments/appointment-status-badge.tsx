@@ -1,9 +1,9 @@
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Clock, X, CheckCircle } from 'lucide-react'
+import { Calendar, Clock, X, CheckCircle, Ban, TimerOff } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 interface AppointmentStatusBadgeProps {
-    status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+    status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'rejected' | 'expired'
     className?: string
 }
 
@@ -28,6 +28,18 @@ export function AppointmentStatusBadge({ status, className }: AppointmentStatusB
             variant: 'destructive' as const,
             icon: X,
             className: 'bg-red-100 text-red-800 border-red-200',
+        },
+        rejected: {
+            label: t('rejected'),
+            variant: 'destructive' as const,
+            icon: Ban,
+            className: 'bg-red-100 text-red-800 border-red-200',
+        },
+        expired: {
+            label: t('expired'),
+            variant: 'outline' as const,
+            icon: TimerOff,
+            className: 'bg-muted text-muted-foreground border-border',
         },
         completed: {
             label: t('completed'),
