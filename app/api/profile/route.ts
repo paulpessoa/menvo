@@ -64,6 +64,9 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (updateError) {
+      if (updateError.code === "23505" && updateError.message.includes("slug")) {
+        return NextResponse.json({ error: "Esse endereço de perfil (slug) já está em uso" }, { status: 409 })
+      }
       console.error("❌ Profile update error:", updateError)
       return NextResponse.json({ 
         error: "Erro ao atualizar perfil",

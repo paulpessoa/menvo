@@ -85,6 +85,13 @@ started.
 
 ## 📓 Engineering Journal
 
+### 2026-09-23 — Profile & Onboarding Save Flow Fixed, /profile Tabs Consolidated
+- **Every `/profile` save and every mentee onboarding returned 500:** both payloads carry `learning_goals`, a column that never existed in `profiles` (PostgREST rejects the whole UPDATE). Added migration `20260923000001_profiles_learning_goals.sql` (applied to the DB on 2026-09-23).
+- **Validation papercuts that also blocked saves:** links without `https://` (e.g. `linkedin.com/in/x`) and an empty slug failed Zod. URLs are now normalized; an empty slug means "keep current"; a duplicate slug returns a clear 409. The UI now toasts the server's actual error instead of a generic one.
+- **`/profile` went from 6 tabs to 4** (Perfil · Carreira e Interesses · Mentoria · Organizações), split into `components/profile/*Section.tsx`. Old `?tab=address|interests` links still work via aliases. Mentor-request status now refreshes immediately (the page's own `useProfile` state was never refetched).
+- **Local env:** `.env.local`'s `NEXT_PUBLIC_SUPABASE_ANON_KEY` (`sb_publishable_…`) is rejected by Supabase (401); the legacy anon JWT in `.env.production` works. Verified end-to-end with test users `usertest1/2`, `mentortest1/2` (`@menvo.test`).
+- **Known, not fixed:** `mentor_skills` is selected by `app/api/ai/match` and the waiting-list match route but isn't a `profiles` column.
+
 ### 2026-09-23 — In-App Chat Hidden Behind `chat_flag`
 - **Decision:** No in-app chat for now. Mentor↔mentee contact happens on LinkedIn, which pushes the relationship outside the platform. Re-enable when users start asking for a built-in channel.
 - **Flag:** `chat_flag` (default `false`, seeded by `20260923000000_chat_feature_flag.sql`, toggled at `/dashboard/admin/feature-flags`).

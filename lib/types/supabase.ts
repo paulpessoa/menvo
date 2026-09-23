@@ -767,6 +767,7 @@ export type Database = {
           job_title: string | null
           languages: string[] | null
           last_name: string | null
+          learning_goals: string | null
           linkedin_url: string | null
           location: string | null
           mentee_status: string | null
@@ -829,6 +830,7 @@ export type Database = {
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
+          learning_goals?: string | null
           linkedin_url?: string | null
           location?: string | null
           mentee_status?: string | null
@@ -891,6 +893,7 @@ export type Database = {
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
+          learning_goals?: string | null
           linkedin_url?: string | null
           location?: string | null
           mentee_status?: string | null
