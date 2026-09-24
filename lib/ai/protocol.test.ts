@@ -10,6 +10,18 @@ describe("protocol", () => {
       { type: "text", text: "olá" },
       { type: "tool_start", name: "searchMentors" },
       { type: "mentors_found", mentors: [] },
+      {
+        type: "chips",
+        mode: "single",
+        options: [{ value: "ensino-medio", label: "Ensino Médio" }],
+        allowOther: true
+      },
+      { type: "progress", step: 1, totalSteps: 7, stepName: "Momento de carreira" },
+      {
+        type: "diagnostic_complete",
+        responseId: "123e4567-e89b-12d3-a456-426614174000",
+        analysis: { titulo_personalizado: "Seu Plano" }
+      },
       { type: "reset" },
       { type: "error", message: "boom" }
     ]

@@ -15,8 +15,8 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 145/145 passed across 30 test suites (`npm test`)
-- **Production Build:** 55/55 pages generated successfully (`npm run build`)
+- **Unit Tests:** 197/197 passed across 40 test suites (`npm test`)
+- **Production Build:** 66/66 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
 ---
@@ -78,14 +78,40 @@ started.
 - [x] **UI Width/Container Standardization:** Shared `PageContainer` component, 1280px cap app-wide, obsolete `AdminBreadcrumb` removed.
 - [x] **`/mentors` Dead-Click Fix:** Whole `MentorCard` interactive, dismissable filter chips (found via Clarity).
 - [x] **Multi-Tenant Phase 1:** Organizations, invite/request/approve membership, org admin dashboard, platform admin org CRUD. Shipped in PR #45.
-- [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Plan: [`domains/organizations.md`](domains/organizations.md) §6.
-- [ ] **AI-First Platform (diagnóstico agêntico, copiloto por papel, medição de uso, KB):** Plan: [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md). Fase 0: cota mensal + medição de custo no Postgres **feitas** (2026-09-23, migração aplicada); teto global de US$ 10/mês (`ai_budget`) também feito; `searchMentors` DTOs, `@langchain/langgraph` declarado, links de diagnóstico e esqueleto de `docs/`+`kb/` **feitos** (2026-09-23, ver diário); RLS de `quiz_responses` corrigida e aplicada (2026-09-23); registro de modelos por capacidade (`lib/ai/models`), `qwen/qwen3.8-27b` e `gpt-3.5-turbo` aposentados **feitos em código** (2026-09-23, [ADR 0004](governance/adr/0004-model-registry-by-capability.md), migrações `…000004`/`…000006` escritas, aguardando o fundador aplicá-las); protocolo SSE tipado com Zod (`lib/ai/protocol.ts`), ADRs 0001–0003 e `docs/governance/ai-policy.md` **feitos** (2026-09-24) — **Fase 0 completa em código**. Falta só: degradação para modelo barato a 80% do orçamento (ADR 0004 §10), e as migrações `…000004`/`…000006` aguardando o fundador aplicar. Decisões D1–D8 resolvidas em 2026-09-23 (plano §9); preços em §11, privacidade/retenção em §12. Fase 1 (diagnóstico agêntico) ainda não iniciada.
+- [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Shipped in code on 2026-09-17 (see journal and [`domains/organizations.md`](domains/organizations.md) §6).
+- [x] **AI-First Platform — Fase 0 (Fundação):** Cota mensal + medição de custo no Postgres (`ai_budget`), DTOs enxutos, `@langchain/langgraph`, registro de modelos por capacidade (`lib/ai/models`, ADR 0004), protocolo SSE tipado com Zod (`lib/ai/protocol.ts`), ADRs 0001–0004 e `docs/governance/ai-policy.md`.
+- [x] **AI-First Platform — Fase 1 (Diagnóstico Agêntico em Código):** Migração `20260924000000_ai_diagnostic_sessions_and_threads.sql` (`diagnostic_sessions`, `ai_threads`, `ai_messages`, `quiz_responses.user_id`), engine com máquina de estados de 7 passos (`lib/ai-menvo/diagnostic/`), componentes interativos `ChipGroup` e `DiagnosticProgressBar`, rota com streaming SSE (`app/api/assistant/route.ts`), input de voz Web Speech API, salvaguarda de crise (CVV 188) e cota mensal integrada.
+- [ ] **AI-First Platform — Fase 2 (Copiloto por Papel, Briefing e Base de Conhecimento):** Plan: [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md) §8 Fase 2. Briefing determinístico sem tokens, tools com RBAC por papel, artigos de `kb/`, geração de `llms.txt`.
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-24 — AI Platform Fase 1 Implemented: Agentic Diagnostic State Machine, Interactive Chips & Chat UI
+- **Why:** Delivers Fase 1 of `docs/AI_PLATFORM_PLAN.md`: turns the static 8-step anonymous quiz into an interactive, conversational diagnostic inside `/assistant?mode=diagnostic` with state machine progression, voice input, deterministic chips, and mentor matching.
+- **Migration `20260924000000_ai_diagnostic_sessions_and_threads.sql`:**
+  - `diagnostic_sessions`: tracks user sessions, `current_step`, JSONB `state`, 7-day expiration rolling window, status (`in_progress`, `completed`, `abandoned`), and RLS (`auth.uid() = user_id`).
+  - `ai_threads` & `ai_messages`: structured conversational history per user and mode, replacing legacy single-turn tables.
+  - `quiz_responses`: added `user_id` and `diagnostic_session_id` columns, updated SELECT/INSERT RLS policies so authenticated users own and read their responses.
+  - `profiles`: added `ai_disclosure_accepted_at` for onboarding consent.
+  - `ai_entitlements`: seeded monthly limit of 1 diagnostic for default/mentee/mentor, unlimited for admin.
+- **Protocol & Features:**
+  - `lib/ai/features.ts`: added `"diagnostic"` to `AI_FEATURES`.
+  - `lib/ai/protocol.ts`: added `chips`, `progress`, and `diagnostic_complete` events, exported `ChipOption`. Unit-tested round-trip serialization.
+- **Diagnostic Engine & Domain Logic (`lib/ai-menvo/diagnostic/`):**
+  - `steps.ts`: deterministic definitions of all 7 questions, chips options, schemas, and input types.
+  - `extract.ts`: structured extraction using registry capability `extract` (`gemini-2.5-flash-lite` -> `openai/gpt-oss-20b`) when users type free text; includes CVV 188 crisis safeguard check per §12.2.
+  - `followup.ts`: ambiguity check and gentle 1-sentence follow-up generator via registry capability `followup`.
+  - `engine.ts`: conversational turn orchestrator that advances steps, saves intermediate state, checks/consumes monthly quota, calls `analyzeQuiz` with sanitization against active platform mentors (`mentors_view`), and returns recommended mentor cards via SSE.
+- **Service Layer (`lib/services/diagnostic/diagnostic.service.ts`):**
+  - Session lifecycle management (active session query, 7-day abandonment, atomic completion, quiz response linking).
+- **Interactive UI (`components/assistant/` & `app/[locale]/assistant/page.tsx`):**
+  - `ChipGroup.tsx`: single/multi-choice buttons following Menvo button design guidelines (`rounded-xl`, text-only, deep teal primary), "Outro" text input, and "Pular" support.
+  - `DiagnosticProgressBar.tsx`: sticky step counter and progress bar with percentage.
+  - `page.tsx`: auto-initializes diagnostic mode on first load, renders progress bar, interactive chips, and Web Speech API `VoiceInput`. Wrapped in `<Suspense>`.
+- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 197 tests, all passing), `npm run build` (66/66 pages generated successfully).
 
 ### 2026-09-24 — AI Platform Fase 0 Closed Out: Typed SSE Protocol, ADRs 0001–0003, `ai-policy.md`
 - **Why:** `AI_PLATFORM_PLAN.md` §8 Fase 0 items 6 and 7 were the only Fase 0 work left that didn't need a DB migration or the founder's input, so this pass finished them to close out Fase 0 before Fase 1 (diagnóstico agêntico) starts.

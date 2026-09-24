@@ -17,6 +17,29 @@ const mentorsFoundEvent = z.object({
   type: z.literal("mentors_found"),
   mentors: z.array(z.record(z.string(), z.unknown()))
 })
+export const chipOptionSchema = z.object({
+  value: z.string(),
+  label: z.string()
+})
+export type ChipOption = z.infer<typeof chipOptionSchema>
+const chipsEvent = z.object({
+  type: z.literal("chips"),
+  mode: z.enum(["single", "multi"]),
+  options: z.array(chipOptionSchema),
+  allowOther: z.boolean().optional(),
+  canSkip: z.boolean().optional()
+})
+const progressEvent = z.object({
+  type: z.literal("progress"),
+  step: z.number().int().positive(),
+  totalSteps: z.number().int().positive(),
+  stepName: z.string().optional()
+})
+const diagnosticCompleteEvent = z.object({
+  type: z.literal("diagnostic_complete"),
+  responseId: z.string().uuid(),
+  analysis: z.record(z.string(), z.unknown())
+})
 const resetEvent = z.object({ type: z.literal("reset") })
 const errorEvent = z.object({ type: z.literal("error"), message: z.string() })
 
@@ -24,6 +47,9 @@ export const aiEventSchema = z.discriminatedUnion("type", [
   textEvent,
   toolStartEvent,
   mentorsFoundEvent,
+  chipsEvent,
+  progressEvent,
+  diagnosticCompleteEvent,
   resetEvent,
   errorEvent
 ])

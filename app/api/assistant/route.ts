@@ -6,6 +6,7 @@ import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
 import { HumanMessage, AIMessage } from "@langchain/core/messages"
 import { getAssistantAgent } from "@/lib/services/assistant/agent"
 import { encodeSseEvent, encodeSseDone } from "@/lib/ai/protocol"
+import { processDiagnosticTurn } from "@/lib/ai-menvo/diagnostic/engine"
 
 export const maxDuration = 60
 
@@ -23,11 +24,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Assistant is not enabled" }, { status: 403 })
     }
 
-    const { message: userMessage, history = [] } = await req.json()
-    if (!userMessage) {
+    const body = await req.json()
+    const { message: userMessage = "", history = [], mode = "assistant" } = body
+    if (!userMessage && mode !== "diagnostic") {
       return NextResponse.json({ error: "Message is required" }, { status: 400 })
     }
 
+    const calls: AiCallRecord[] = []
+
+    if (mode === "diagnostic") {
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            await processDiagnosticTurn(supabase, user, userMessage, {
+              onCall: (record) => calls.push(record),
+              emit: (event) => controller.enqueue(encodeSseEvent(event))
+            })
+            controller.enqueue(encodeSseDone())
+          } catch (err: any) {
+            console.error("[Assistant Diagnostic Stream Error]:", err)
+            controller.enqueue(encodeSseEvent({ type: "error", message: err.message || "Erro no diagnóstico" }))
+          } finally {
+            await recordAiCalls(supabase, "diagnostic", calls)
+            controller.close()
+          }
+        }
+      })
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache, no-transform",
+          "Connection": "keep-alive"
+        }
+      })
+    }
+
+    // Default assistant mode:
     // One credit per user message (a turn), however many model calls the
     // agent makes inside it — those are metered individually below.
     const quota = await consumeAiQuota(supabase, "assistant")
@@ -44,7 +77,6 @@ export async function POST(req: NextRequest) {
         { status: 429 }
       )
     }
-    const calls: AiCallRecord[] = []
 
     // Instanciar agent via service — async: resolve a capacidade "converse"
     // no registro de modelos (lib/ai/models), com fallback (ADR 0004).
