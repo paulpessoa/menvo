@@ -397,4 +397,26 @@ describe("saveFeedback", () => {
   })
 })
 
+describe("searchKnowledgeBase", () => {
+  it("returns matched articles with titles, summaries and links", async () => {
+    const { searchKnowledgeBase } = await import("./tools")
+    const result = searchKnowledgeBase({ query: "como funciona" }, "mentee")
+    expect(result.found).toBe(true)
+    expect(result.articles.length).toBeGreaterThan(0)
+    expect(result.articles[0]).toHaveProperty("title")
+    expect(result.articles[0]).toHaveProperty("summary")
+    expect(result.articles[0]).toHaveProperty("content")
+    expect(result.articles[0]).toHaveProperty("links")
+  })
+
+  it("handles empty results gracefully", async () => {
+    const { searchKnowledgeBase } = await import("./tools")
+    const result = searchKnowledgeBase({ query: "xyz123termonaoexistente" }, "mentee")
+    expect(result.found).toBe(false)
+    expect(result.articles).toEqual([])
+    expect(result.message).toContain("Nenhum artigo específico encontrado")
+  })
+})
+
+
 

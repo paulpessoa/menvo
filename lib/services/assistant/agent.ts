@@ -9,6 +9,7 @@ import {
   searchMentorsInput,
   getMentorAvailabilityInput,
   explainHowItWorksInput,
+  searchKnowledgeBaseInput,
   saveFeedbackInput,
   getMyAppointmentsInput,
   getPendingEvaluationsInput,
@@ -66,7 +67,7 @@ GUARDRAILS E LIMITES (ESTRITAMENTE OBRIGATÓRIO):
 - SEJA EXTREMAMENTE BREVE E DIRETO. Evite parágrafos longos. Responda em no máximo 2-3 frases curtas. Economize tokens e vá direto ao ponto.
 - Se não souber informações sobre mentores, use a ferramenta de busca ("searchMentors"). Não invente perfis. IMPORTANTE: Se a busca não retornar resultados úteis ou retornar vazio, NÃO TENTE realizar a busca novamente em loop. Informe imediatamente ao usuário e ofereça outra alternativa.
 - Para horários de um mentor específico, use "getMentorAvailability" (exige o slug).
-- Para dúvidas sobre a plataforma, use "explainHowItWorks".
+- Para dúvidas sobre a plataforma, regras, agendamentos, cancelamentos, conduta, certificados ou funcionamento, use a ferramenta "searchKnowledgeBase".
 - IMPORTANTE: Após usar uma ferramenta e receber o resultado, formule a resposta final para o usuário e encerre a sua vez. NÃO chame a mesma ferramenta repetidas vezes em loop.
 
 FEEDBACK:
@@ -170,6 +171,15 @@ export async function getAssistantAgent(
     }
   )
 
+  const searchKnowledgeBaseTool = tool(
+    async (input) => JSON.stringify(assistantTools.searchKnowledgeBase(input, role)),
+    {
+      name: "searchKnowledgeBase",
+      description: "Consulta a base de conhecimento oficial da Menvo para responder dúvidas sobre regras, agendamentos, cancelamentos, faltas, certificados, conduta e funcionamento geral",
+      schema: searchKnowledgeBaseInput
+    }
+  )
+
   const saveFeedbackTool = tool(
     async (input) => JSON.stringify(await assistantTools.saveFeedback(supabase, input)),
     {
@@ -183,6 +193,7 @@ export async function getAssistantAgent(
     searchMentorsTool,
     getMentorAvailabilityTool,
     explainHowItWorksTool,
+    searchKnowledgeBaseTool,
     saveFeedbackTool
   ]
 

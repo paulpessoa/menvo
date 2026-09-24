@@ -3,6 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { mentorPublicService } from "@/lib/services/mentors/mentor-public.service"
 import { computeAvailableSlots } from "@/lib/services/appointments/availability.service"
+import { kbService } from "@/lib/services/kb/kb.service"
 
 // --- 1. searchMentors ---
 
@@ -205,6 +206,53 @@ export function explainHowItWorks(input: z.infer<typeof explainHowItWorksInput>)
     topic: input.topic,
     answer: data.answer,
     links: data.links
+  }
+}
+
+// --- 3b. searchKnowledgeBase ---
+
+export const searchKnowledgeBaseInput = z.object({
+  query: z.string().trim().min(2).max(300)
+    .describe("Dúvida, tema ou pergunta do usuário sobre a plataforma Menvo, regras, agendamentos, certificados, conduta, etc.")
+})
+
+export interface KnowledgeBaseSearchResult {
+  found: boolean
+  message?: string
+  articles: {
+    title: string
+    summary: string
+    content: string
+    links: { label: string; url: string }[]
+  }[]
+}
+
+export function searchKnowledgeBase(
+  input: z.infer<typeof searchKnowledgeBaseInput>,
+  role: string = "mentee"
+): KnowledgeBaseSearchResult {
+  const articles = kbService.search(input.query, { role, limit: 3 })
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"
+
+  if (articles.length === 0) {
+    return {
+      found: false,
+      message: "Nenhum artigo específico encontrado na base de conhecimento para esta busca.",
+      articles: []
+    }
+  }
+
+  return {
+    found: true,
+    articles: articles.map((a) => ({
+      title: a.title,
+      summary: a.summary,
+      content: a.content.slice(0, 1000),
+      links: (a.links || []).map((l) => ({
+        label: l.label,
+        url: l.url.startsWith("http") ? l.url : `${baseUrl}${l.url}`
+      }))
+    }))
   }
 }
 
@@ -550,6 +598,7 @@ export const assistantTools = {
   searchMentors,
   getMentorAvailability,
   explainHowItWorks,
+  searchKnowledgeBase,
   saveFeedback,
   getMyAppointments,
   getPendingEvaluations,

@@ -15,7 +15,7 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 230/230 passed across 46 test suites (`npm test`)
+- **Unit Tests:** 237/237 passed across 47 test suites (`npm test`)
 - **Production Build:** 66/66 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -456,4 +456,15 @@ Implemented §4.3 and §8 item 4 of [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md)
 - **Copilot Briefing Chips (`lib/ai-menvo/copilot/briefing.ts`):** Proactively highlights pending reviews in zero-token briefing and offers direct conversational chip `⭐ Avaliar Mentoria no Chat`.
 - **Diagnostic Completion Feedback (`lib/ai-menvo/diagnostic/engine.ts`):** Emits 1-5 rating feedback chips upon diagnostic completion and captures post-completion ratings with `source: 'diagnostic'`.
 - **Feedback Schema & Route:** `feedbackSubmissionSchema` and `/api/feedback` support `source` (`assistant`, `diagnostic`, `session`, `platform`) and `context jsonb` (migration `20260924000003_feedback_source_and_context.sql`).
+
+---
+
+## 📚 AI Platform: Knowledge Base (`kb/`), `searchKnowledgeBase` & `llms.txt` — shipped 2026-09-24
+
+Implemented §6 and §8 item 6 of [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md) (completing 100% of Phase 2):
+- **20 Structured KB Articles (`kb/`):** Organized in 6 subdirectories (`comecando/`, `mentorados/`, `mentores/`, `organizacoes/`, `politicas/`, `faq/`) with complete YAML frontmatter (`id`, `title`, `audience`, `tags`, `summary`, `source_of_truth`, `links`).
+- **Deterministic Build Indexer (`scripts/build-kb.ts`):** Parses all KB markdown files, validates metadata, and deterministically generates `kb/_index.json`, `public/llms.txt`, and `public/llms-full.txt`. Linked to `"build:kb"` and Next.js `"build"`.
+- **Knowledge Base Service (`lib/services/kb/kb.service.ts`):** In-memory zero-token search engine with Portuguese stop-word filtering, audience role filtering (`mentee`, `mentor`, `admin`), and keyword scoring.
+- **`searchKnowledgeBase` Tool (`lib/services/assistant/tools.ts`):** Exposed to the Copilot agent across all user roles, replacing static text with rich, contextual knowledge base citations and platform deep links.
+
 

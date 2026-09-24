@@ -73,3 +73,5 @@ lighthouse-report.json
 .branches
 supabase/.temp/
 supabase/backup_*.sql
+
+test.mjs

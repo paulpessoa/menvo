@@ -1,0 +1,505 @@
+[
+  {
+    "id": "como-criar-conta",
+    "title": "Como criar uma conta e fazer login",
+    "category": "comecando",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "cadastro",
+      "login",
+      "conta",
+      "google",
+      "autenticacao"
+    ],
+    "summary": "Saiba como se cadastrar e acessar a plataforma Menvo de forma rápida e segura usando sua conta Google ou e-mail.",
+    "content": "# Como Criar uma Conta e Fazer Login na Menvo\n\nO acesso à Menvo é simples, rápido e seguro.\n\n## Passo a Passo\n\n1. Clique no botão **\"Entrar\"** no canto superior direito da página.\n2. Você pode se autenticar de duas formas:\n   - **Google OAuth (Recomendado):** Login em um clique usando sua conta Google existente.\n   - **Magic Link / E-mail:** Digite seu e-mail para receber um link seguro de acesso direto.\n3. No primeiro acesso, selecione seu objetivo inicial (buscar mentoria ou ser mentor voluntário) e preencha suas informações básicas de perfil.\n\n## Papel Padrão (Mentorado)\nTodo usuário cadastrado tem perfil base de **mentorado**, permitindo realizar diagnósticos de carreira mensais e agendar mentorias com qualquer mentor do catálogo. Caso queira ser mentor, é possível solicitar a função através do seu perfil.",
+    "links": [
+      {
+        "label": "Criar Conta / Entrar",
+        "url": "/auth/login"
+      }
+    ],
+    "sourcePath": "comecando/como-criar-conta.md"
+  },
+  {
+    "id": "o-que-e-a-menvo",
+    "title": "O que é a Menvo",
+    "category": "comecando",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "sobre",
+      "institucional",
+      "gratuito",
+      "missao",
+      "mentoria",
+      "tecnologia"
+    ],
+    "summary": "A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1 em tecnologia, dados, design e produtos.",
+    "content": "# O que é a Menvo\n\nA **Menvo** é uma plataforma brasileira criada para democratizar o acesso ao desenvolvimento profissional em tecnologia. Conectamos profissionais experientes (mentores voluntários) a pessoas em início de carreira, transição profissional ou em busca de evolução técnica (mentorados).\n\n## Nossos Pilares\n\n1. **100% Gratuita:** Nenhum mentorado paga por mentorias ou diagnósticos. Todo o ecossistema é mantido pelo trabalho voluntário e doação de tempo da comunidade profissional.\n2. **Mentoria 1-a-1 Personalizada:** Sessões individuais online com duração média de 45 a 60 minutos, com foco nos desafios reais do mentorado.\n3. **Plataforma AI-First:** Diagnóstico inteligente de carreira gratuito todo mês e Copiloto para apoiar no direcionamento e na escolha dos mentores mais adequados.\n4. **Impacto Social e Diversidade:** Fortalecemos grupos sub-representados no mercado de tecnologia através de tags de inclusão e parcerias com ONGs.",
+    "links": [
+      {
+        "label": "Conheça os Mentores",
+        "url": "/mentors"
+      },
+      {
+        "label": "Faça o Diagnóstico de Carreira",
+        "url": "/assistant?mode=diagnostic"
+      }
+    ],
+    "sourcePath": "comecando/o-que-e-a-menvo.md"
+  },
+  {
+    "id": "quem-pode-participar",
+    "title": "Quem pode participar da Menvo",
+    "category": "comecando",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "requisitos",
+      "perfil",
+      "transicao",
+      "iniciantes",
+      "elegibilidade"
+    ],
+    "summary": "Conheça os critérios e perfis que a Menvo atende, desde estudantes e pessoas em transição de carreira até lideranças em tecnologia.",
+    "content": "# Quem Pode Participar da Menvo?\n\nA Menvo foi desenhada para acolher e impulsionar qualquer pessoa que queira se desenvolver profissionalmente:\n\n## Como Mentorado\n- **Estudantes e recém-formados** que buscam seu primeiro emprego em desenvolvimento de software, design, dados ou produtos.\n- **Pessoas em transição de carreira** vindas de outras áreas profissionais que desejam entrar no mercado digital.\n- **Profissionais Júnior e Pleno** que querem destravar habilidades específicas, preparar-se para entrevistas, tirar dúvidas técnicas ou planejar o próximo passo na carreira.\n\n## Como Mentor Voluntário\n- Profissionais que atuam na área de tecnologia (Engenharia, Produto, UX/UI, Ciência de Dados, DevOps, Gestão, etc.) e desejam retribuir à comunidade compartilhando experiências práticas.\n- Mentores passam por uma validação de perfil antes de terem suas agendas abertas ao público.",
+    "links": [
+      {
+        "label": "Explorar Catálogo de Mentores",
+        "url": "/mentors"
+      }
+    ],
+    "sourcePath": "comecando/quem-pode-participar.md"
+  },
+  {
+    "id": "perguntas-frequentes",
+    "title": "Perguntas frequentes (FAQ)",
+    "category": "faq",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "faq",
+      "duvidas",
+      "cancelamento",
+      "certificado",
+      "faltas",
+      "suporte"
+    ],
+    "summary": "Respostas para as dúvidas mais comuns sobre custos, certificados, cancelamentos e funcionamento geral da Menvo.",
+    "content": "# Perguntas Frequentes (FAQ)\n\nReunimos aqui as dúvidas mais frequentes sobre a Menvo:\n\n### 1. A Menvo cobra alguma taxa ou mensalidade?\nNão! A Menvo é e sempre será **100% gratuita** para mentorados e mentores.\n\n### 2. A plataforma emite certificados de mentoria?\nSim, tanto para mentorados que participam das sessões quanto para mentores voluntários que necessitam comprovar horas de voluntariado e atividades complementares.\n\n### 3. O que acontece se eu precisar cancelar uma mentoria?\nSe você tiver um imprevisto, acesse `/mentee/my-mentorships` (ou `/mentor/appointments`) e cancele a mentoria com pelo menos 2 horas de antecedência. Isso libera o horário para outro colega.\n\n### 4. Quantas mentorias posso fazer por mês?\nNão há um limite rígido imposto para mentorados comprometidos, mas recomendamos agendar com moderação (por exemplo, 1 a 2 sessões por mês) para que você tenha tempo de executar os planos de ação e aprendizados entre um encontro e outro.\n\n### 5. O que fazer se o mentor ou mentorado não comparecer?\nAguarde até 10 minutos na sala do Google Meet. Caso a outra parte não entre, encerre a chamada. O agendamento poderá ser remarcado posteriormente.",
+    "links": [
+      {
+        "label": "Enviar Feedback ou Suporte",
+        "url": "/feedback"
+      }
+    ],
+    "sourcePath": "faq/perguntas-frequentes.md"
+  },
+  {
+    "id": "como-agendar-mentoria",
+    "title": "Como agendar uma sessão de mentoria",
+    "category": "mentorados",
+    "audience": [
+      "mentee",
+      "admin"
+    ],
+    "tags": [
+      "agendamento",
+      "horarios",
+      "google-meet",
+      "calendario",
+      "sessao"
+    ],
+    "summary": "Passo a passo de como escolher horários disponíveis, solicitar o agendamento e receber o link da videochamada no Google Meet.",
+    "content": "# Como Agendar uma Sessão de Mentoria\n\nAgendar uma mentoria na Menvo é totalmente gratuito e leva menos de 2 minutos:\n\n## Passo a Passo\n\n1. **Escolha o Mentor:** No perfil do mentor desejado (`/mentors/[slug]`), visualize o calendário de disponibilidade.\n2. **Selecione Data e Horário:** Os horários exibidos são no fuso de Brasília (`America/Sao_Paulo`) e cobrem os próximos 14 dias úteis.\n3. **Descreva seu Objetivo:** Digite uma breve mensagem explicando o que você deseja conversar (ex: *\"Dúvidas sobre preparação para entrevistas de Pleno\"*).\n4. **Confirmação:**\n   - O mentor recebe uma notificação por e-mail para confirmar a sessão.\n   - Assim que o mentor confirma, o evento é sincronizado automaticamente e um link exclusivo do **Google Meet** é gerado para a chamada.\n5. **Acompanhamento:** Você pode consultar todas as suas sessões e links de chamada na aba **Minhas Mentorias** (`/mentee/my-mentorships`) ou perguntando ao Copiloto.",
+    "links": [
+      {
+        "label": "Minhas Mentorias",
+        "url": "/mentee/my-mentorships"
+      }
+    ],
+    "sourcePath": "mentorados/como-agendar-mentoria.md"
+  },
+  {
+    "id": "como-avaliar-a-mentoria",
+    "title": "Como avaliar a mentoria após a sessão",
+    "category": "mentorados",
+    "audience": [
+      "mentee",
+      "admin"
+    ],
+    "tags": [
+      "avaliacao",
+      "feedback",
+      "estrelas",
+      "depoimento",
+      "mentor"
+    ],
+    "summary": "Entenda como funciona a avaliação de 1 a 5 estrelas e depoimento sobre o mentor (modelo assimétrico exclusivo para mentorados).",
+    "content": "# Como Avaliar a Mentoria\n\nApós a realização da sessão, o mentorado pode (e deve!) registrar sua avaliação sobre o encontro.\n\n## Modelo Assimétrico da Menvo\nNa Menvo, **apenas o mentorado avalia o mentor**. Isso existe porque os depoimentos e notas constroem a reputação pública do mentor voluntário na comunidade. Mentores não avaliam alunos/mentorados.\n\n## Formas de Avaliar\n\n1. **Pela Área do Mentorado:**\n   - Acesse `/mentee/my-mentorships`.\n   - Na mentoria concluída, clique em **\"Avaliar Mentoria\"**.\n   - Atribua uma nota de 1 a 5 estrelas, escreva um feedback público para o perfil do mentor e adicione notas privadas se desejar.\n\n2. **Diretamente no Chat do Copiloto:**\n   - Ao abrir `/assistant`, caso você tenha uma sessão aguardando avaliação, o Copiloto informará no resumo e exibirá o chip **\"⭐ Avaliar Mentoria no Chat\"**.\n   - Você pode simplesmente dizer: *\"Quero avaliar minha mentoria com o [Nome do Mentor]\"*. O Copiloto registrará a nota e o comentário instantaneamente através da ferramenta `evaluateMentorshipSession`.",
+    "links": [
+      {
+        "label": "Avaliar em Minhas Mentorias",
+        "url": "/mentee/my-mentorships"
+      },
+      {
+        "label": "Avaliar no Chat do Copiloto",
+        "url": "/assistant"
+      }
+    ],
+    "sourcePath": "mentorados/como-avaliar-a-mentoria.md"
+  },
+  {
+    "id": "como-encontrar-mentores",
+    "title": "Como encontrar o mentor ideal",
+    "category": "mentorados",
+    "audience": [
+      "mentee",
+      "admin"
+    ],
+    "tags": [
+      "busca",
+      "catalogo",
+      "filtros",
+      "compatibilidade",
+      "mentores"
+    ],
+    "summary": "Aprenda a usar os filtros de busca, tags de inclusão e o Copiloto com IA para encontrar o melhor mentor para suas metas.",
+    "content": "# Como Encontrar o Mentor Ideal na Menvo\n\nExistem três formas principais de encontrar mentores qualificados na Menvo:\n\n## 1. Catálogo Público com Filtros\nAcesse `/mentors` e utilize nossos filtros:\n- **Áreas de Atuação:** Front-end, Back-end, Dados, IA, Product Management, UX Design, etc.\n- **Tópicos de Mentoria:** Transição de carreira, Revisão de currículo/LinkedIn, Simulação de entrevista (Mock Interview), Arquitetura técnica e Liderança.\n- **Tags Inclusivas:** Filtre por mentores que apoiam causas específicas (Mulheres na Tecnologia, LGBTQIA+, Pessoas Negras, PCDs, etc.).\n\n## 2. Recomendação Automática pelo Diagnóstico de Carreira\nAo responder ao **Diagnóstico de Carreira** mensal (`/assistant?mode=diagnostic`), a IA analisa seus gaps e objetivos atuais e recomenda automaticamente os 3 mentores mais alinhados ao seu momento.\n\n## 3. Busca Natural via Copiloto da Menvo\nNo chat do Copiloto (`/assistant`), você pode simplesmente dizer o que precisa: *\"Estou migrando de contabilidade para ciência de dados e preciso de ajuda com SQL\"*. O assistente busca os perfis ideais e apresenta cards com acesso direto à agenda.",
+    "links": [
+      {
+        "label": "Ver Catálogo de Mentores",
+        "url": "/mentors"
+      },
+      {
+        "label": "Pedir recomendação ao Copiloto",
+        "url": "/assistant"
+      }
+    ],
+    "sourcePath": "mentorados/como-encontrar-mentores.md"
+  },
+  {
+    "id": "como-se-preparar-para-a-sessao",
+    "title": "Como se preparar para uma sessão de mentoria",
+    "category": "mentorados",
+    "audience": [
+      "mentee"
+    ],
+    "tags": [
+      "preparacao",
+      "boas-praticas",
+      "perguntas",
+      "pontualidade",
+      "reuniao"
+    ],
+    "summary": "Dicas essenciais para aproveitar ao máximo os 45-60 minutos de mentoria com um profissional experiente.",
+    "content": "# Como se Preparar para a Sessão de Mentoria\n\nAs mentorias na Menvo duram normalmente entre 45 e 60 minutos. Uma boa preparação faz toda a diferença para o seu aproveitamento:\n\n## Antes da Sessão\n1. **Defina um Objetivo Claro:** Em vez de tópicos genéricos como *\"Quero aprender tecnologia\"*, foque em dúvidas específicas: *\"Qual o melhor roteiro de estudos para Back-end em Node.js?\"* ou *\"Como posso melhorar meu portfólio no GitHub?\"*.\n2. **Separe seus Materiais:** Tenha em mãos links do seu LinkedIn, currículo em PDF, repositórios ou rascunhos que queira apresentar.\n3. **Compartilhe seu Diagnóstico:** Se já completou o Diagnóstico de Carreira na Menvo, você pode compartilhá-lo com o mentor antes do encontro para que ele conheça seu momento.\n4. **Teste sua Conexão e Câmera:** Entre no link do Google Meet 2 a 3 minutos antes do horário combinado.\n\n## Durante a Sessão\n- Seja pontual. Lembre-se de que o mentor está doando voluntariamente o tempo dele.\n- Anote os principais conselhos e tarefas práticas combinadas.\n- Sinta-se à vontade para fazer perguntas abertas e pedir exemplos de vivência real de mercado.",
+    "links": [
+      {
+        "label": "Ver Minhas Mentorias",
+        "url": "/mentee/my-mentorships"
+      }
+    ],
+    "sourcePath": "mentorados/como-se-preparar-para-a-sessao.md"
+  },
+  {
+    "id": "compartilhar-diagnostico",
+    "title": "Compartilhamento Seguro de Diagnóstico com o Mentor",
+    "category": "mentorados",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "compartilhamento",
+      "privacidade",
+      "lgpd",
+      "mentor",
+      "diagnostico"
+    ],
+    "summary": "Saiba como compartilhar seu relatório de diagnóstico com seu mentor e como revogar o acesso a qualquer momento respeitando a LGPD.",
+    "content": "# Compartilhamento Seguro do Diagnóstico\n\nPor padrão, seu Diagnóstico de Carreira é **100% privado** e protegido por políticas de segurança estritas (RLS). Nenhum mentor tem acesso aos seus dados a menos que você decida compartilhar expressamente.\n\n## Como Compartilhar com um Mentor\n\n1. Acesse o seu relatório em `/quiz/results/[id]`.\n2. Clique no botão **\"Compartilhar com Mentor\"**.\n3. Selecione o mentor para o qual deseja conceder acesso.\n4. Escolha o escopo de compartilhamento:\n   - **Resumo Profissional (Recomendado):** Compartilha seus objetivos, áreas de interesse e análise de IA, **omitindo** detalhes pessoais da pergunta 6 para proteger sua privacidade conforme a LGPD.\n   - **Diagnóstico Completo:** Compartilha todas as respostas fornecidas no diagnóstico.\n5. Clique em **\"Confirmar Compartilhamento\"**.\n\n## O que o Mentor Visualiza?\nO mentor selecionado poderá visualizar o seu diagnóstico em modo somente-leitura nas telas `/mentor/appointments` e no Dashboard do Mentor (`/dashboard/mentor`), facilitando a preparação para a sessão.\n\n## Revogação de Acesso\nVocê pode **revogar o acesso a qualquer momento** clicando em \"Gerenciar Compartilhamento\" e revogando a permissão. O mentor deixará de visualizar o relatório instantaneamente.",
+    "links": [
+      {
+        "label": "Ver Meu Diagnóstico",
+        "url": "/assistant"
+      }
+    ],
+    "sourcePath": "mentorados/compartilhar-diagnostico.md"
+  },
+  {
+    "id": "diagnostico-de-carreira",
+    "title": "Diagnóstico de Carreira com IA",
+    "category": "mentorados",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "diagnostico",
+      "quiz",
+      "ia",
+      "analise",
+      "carreira",
+      "mensal"
+    ],
+    "summary": "Como funciona o Diagnóstico de Carreira gratuito mensal da Menvo, suas 7 etapas conversacionais e a geração de relatório com recomendações.",
+    "content": "# Diagnóstico de Carreira da Menvo\n\nO **Diagnóstico de Carreira** é uma ferramenta exclusiva e gratuita desenvolvida com Inteligência Artificial para identificar seu momento profissional e traçar um plano de desenvolvimento sob medida.\n\n## Como Funciona?\n\n1. **Cota Mensal Gratuita:** Todo usuário cadastrado tem direito a 1 diagnóstico completo por mês-calendário (fuso de Brasília).\n2. **7 Etapas Conversacionais:**\n   - Momento atual (transição, primeiro emprego, recolocação, evolução de cargo).\n   - Área de interesse principal (desenvolvimento, dados, design, produtos, etc.).\n   - Maiores desafios no momento.\n   - Objetivos para os próximos 6 a 12 meses.\n   - Habilidades que você mais deseja desenvolver.\n   - Contexto pessoal/rotina (opcional).\n   - Preferências de formato de mentoria.\n3. **Análise e Relatório Completo:**\n   - Título personalizado e resumo motivador.\n   - Conselhos práticos imediatos.\n   - Próximos passos recomendados.\n   - Recomendações dos mentores voluntários mais compatíveis com o seu momento.\n4. **Retomada de Sessão:** Caso precise pausar durante o preenchimento, suas respostas ficam salvas e você pode continuar de onde parou em até 7 dias sem perder seu crédito mensal.",
+    "links": [
+      {
+        "label": "Iniciar Diagnóstico de Carreira",
+        "url": "/assistant?mode=diagnostic"
+      }
+    ],
+    "sourcePath": "mentorados/diagnostico-de-carreira.md"
+  },
+  {
+    "id": "como-conduzir-uma-mentoria",
+    "title": "Boas práticas para conduzir uma mentoria voluntária",
+    "category": "mentores",
+    "audience": [
+      "mentor"
+    ],
+    "tags": [
+      "conducao",
+      "mentoria",
+      "empatia",
+      "escuta-ativa",
+      "orientacao"
+    ],
+    "summary": "Orientações de escuta ativa, estruturação do tempo do encontro e alinhamento de expectativas com o mentorado.",
+    "content": "# Como Conduzir uma Sessão de Mentoria\n\nConduzir uma mentoria voluntária é uma experiência gratificante e transformadora para ambos os lados:\n\n## Estrutura Sugerida para 50 Minutos\n\n1. **Quebra-Gelo e Alinhamento (5 a 10 min):**\n   - Apresente-se brevemente e crie um ambiente seguro e acolhedor.\n   - Pergunte: *\"Qual o principal resultado que você espera sair daqui hoje?\"*.\n2. **Escuta Ativa e Diagnóstico (15 a 20 min):**\n   - Deixe o mentorado falar sobre suas dúvidas, histórico ou projetos.\n   - Caso o mentorado tenha compartilhado o Diagnóstico de Carreira da Menvo, use os pontos identificados pela IA para aprofundar.\n3. **Compartilhamento de Vivência Prática (15 a 20 min):**\n   - Compartilhe erros e acertos da sua trajetória.\n   - Forneça feedbacks construtivos sobre currículo, LinkedIn, código ou postura profissional.\n4. **Fechamento e Próximos Passos (5 min):**\n   - Combine 1 ou 2 ações práticas para o mentorado executar nas próximas semanas.\n   - Finalize agradecendo pelo tempo e encorajando-o em sua jornada.",
+    "links": [
+      {
+        "label": "Painel do Mentor",
+        "url": "/mentor/appointments"
+      }
+    ],
+    "sourcePath": "mentores/como-conduzir-uma-mentoria.md"
+  },
+  {
+    "id": "configurar-disponibilidade",
+    "title": "Como configurar sua disponibilidade e horários",
+    "category": "mentores",
+    "audience": [
+      "mentor",
+      "admin"
+    ],
+    "tags": [
+      "agenda",
+      "disponibilidade",
+      "horarios",
+      "slots",
+      "recorrencia"
+    ],
+    "summary": "Como definir slots semanais recorrentes de atendimento e intervalos de mentoria no painel do mentor.",
+    "content": "# Configurando sua Disponibilidade na Menvo\n\nA plataforma Menvo possui um motor de agendamento automático baseado em regras semanais recorrentes:\n\n## Regras de Agendamento\n- **Dias e Horários Recorrentes:** Você define os dias da semana (ex: terças e quintas) e as faixas de horário (ex: 19:00 às 21:00) em que tem disponibilidade para realizar mentorias voluntárias.\n- **Intervalo Mínimo:** As sessões têm duração padrão de 45 a 60 minutos, com intervalos de respiro configuráveis entre cada encontro.\n- **Janela Móvel de 14 Dias:** Seus horários são projetados automaticamente para os próximos 14 dias para evitar agendamentos muito distantes que aumentem o risco de faltas.\n- **Bloqueio de Feriados ou Férias:** Você pode pausar temporariamente seus agendamentos no painel `/mentor/availability` alterando seu status para \"Em pausa / Indisponível temporariamente\".",
+    "links": [
+      {
+        "label": "Configurar Minha Disponibilidade",
+        "url": "/mentor/availability"
+      }
+    ],
+    "sourcePath": "mentores/configurar-disponibilidade.md"
+  },
+  {
+    "id": "gestao-de-solicitacoes",
+    "title": "Como gerenciar solicitações de mentoria",
+    "category": "mentores",
+    "audience": [
+      "mentor",
+      "admin"
+    ],
+    "tags": [
+      "solicitacoes",
+      "aceitar",
+      "recusar",
+      "agendamentos",
+      "painel"
+    ],
+    "summary": "Saiba como confirmar ou recusar pedidos de mentoria pendentes, prazos recomendados e avisos por e-mail.",
+    "content": "# Gestão de Solicitações de Mentoria\n\nQuando um mentorado solicita um horário na sua agenda, você é notificado imediatamente por e-mail:\n\n## Onde Responder\n- **Painel do Mentor:** Acesse `/mentor/appointments` para ver todas as sessões pendentes, confirmadas e histórico.\n- **Pelo E-mail:** O e-mail de notificação inclui botões com token seguro para confirmar com apenas um clique.\n- **Pelo Copiloto:** No chat com o assistente, basta perguntar *\"Tenho alguma solicitação pendente?\"* para visualizar e gerenciar suas pendências via ferramenta `getMentorRequests`.\n\n## Boas Práticas\n- **Prazo de Resposta:** Procure confirmar ou recusar as solicitações em até 48 horas. Se imprevistos acontecerem, recuse com educação para que o mentorado possa buscar outro profissional sem ficar esperando.\n- **Mensagem Personalizada:** Ao confirmar, você pode adicionar notas ou instruções breves para o mentorado chegar preparado.",
+    "links": [
+      {
+        "label": "Solicitações de Mentoria",
+        "url": "/mentor/appointments"
+      }
+    ],
+    "sourcePath": "mentores/gestao-de-solicitacoes.md"
+  },
+  {
+    "id": "como-se-tornar-mentor",
+    "title": "Como se tornar um mentor voluntário",
+    "category": "mentores",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "mentor",
+      "voluntariado",
+      "cadastro",
+      "verificacao",
+      "perfil"
+    ],
+    "summary": "Conheça os passos para atuar como mentor voluntário na Menvo e impactar a vida de quem está entrando no mercado de tecnologia.",
+    "content": "# Como se Tornar Mentor Voluntário na Menvo\n\nSe você tem experiência profissional na área digital e quer retribuir à comunidade, a Menvo é o lugar perfeito para você!\n\n## Quem Pode Ser Mentor?\nProfissionais que atuam como desenvolvedores, engenheiros de dados, cientistas de dados, designers UX/UI, gerentes de produto, agilistas, tech recruiters, líderes técnicos e executivos. Não exigimos que você seja sênior há décadas: profissionais plenos com boa bagagem prática já têm muito a compartilhar com quem está começando.\n\n## Passo a Passo\n\n1. **Crie sua Conta:** Faça login na plataforma Menvo usando sua conta Google ou e-mail.\n2. **Complete seu Perfil:** Adicione sua foto, cargo atual, empresa, biografia profissional e link do seu perfil no LinkedIn.\n3. **Solicite a Função de Mentor:** No seu perfil (`/profile`), clique em **\"Quero ser Mentor\"** e informe suas áreas de especialidade, tópicos em que pode apoiar e tempo disponível por semana/mês.\n4. **Validação da Conta:** Nossa equipe revisará seu perfil profissional. Após a aprovação, a aba de Gestão de Mentorias e Configuração de Agenda será liberada na sua conta.",
+    "links": [
+      {
+        "label": "Solicitar Perfil de Mentor",
+        "url": "/profile"
+      }
+    ],
+    "sourcePath": "mentores/como-se-tornar-mentor.md"
+  },
+  {
+    "id": "integracao-google-calendar",
+    "title": "Integração com o Google Calendar",
+    "category": "mentores",
+    "audience": [
+      "mentor",
+      "admin"
+    ],
+    "tags": [
+      "google-calendar",
+      "integracao",
+      "sincronizacao",
+      "conflitos",
+      "meet"
+    ],
+    "summary": "Como conectar seu Google Agenda para bloquear horários conflitantes e criar links automáticos no Google Meet.",
+    "content": "# Integração com o Google Calendar\n\nPara evitar conflitos de agenda com sua rotina de trabalho pessoal, a Menvo permite sincronizar seu calendário Google diretamente:\n\n## Benefícios da Conexão\n1. **Detecção de Conflitos em Tempo Real:** Sempre que um mentorado for escolher um horário na sua agenda da Menvo, o sistema consulta a API `freebusy` do Google Calendar. Se você tiver uma reunião pessoal naquele horário, o slot é automaticamente ocultado da sua página pública.\n2. **Criação Automática de Eventos:** Quando você confirma uma solicitação de mentoria, um evento é adicionado ao seu Google Agenda e ao do mentorado.\n3. **Link do Google Meet Incluso:** O link seguro da videochamada é gerado e anexado diretamente ao evento da reunião.\n\n## Como Conectar\n1. Acesse o painel `/mentor/availability`.\n2. Clique no botão **\"Conectar Google Calendar\"**.\n3. Autorize o acesso de leitura de disponibilidade e gravação de eventos na conta Google desejada.",
+    "links": [
+      {
+        "label": "Conectar Google Calendar",
+        "url": "/mentor/availability"
+      }
+    ],
+    "sourcePath": "mentores/integracao-google-calendar.md"
+  },
+  {
+    "id": "como-entrar-em-uma-organizacao",
+    "title": "Como entrar ou se vincular a uma organização parceira",
+    "category": "organizacoes",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "organizacoes",
+      "convites",
+      "membros",
+      "solicitacao",
+      "adesao"
+    ],
+    "summary": "Saiba como aceitar convites de ONGs parceiras ou solicitar entrada em uma organização pelo seu perfil.",
+    "content": "# Como Entrar em uma Organização Parceira\n\nSe você faz parte de uma ONG, projeto social ou empresa parceira da Menvo, existem dois caminhos para se vincular:\n\n## 1. Através de Convite por E-mail\n- O administrador da organização enviará um convite para o seu e-mail cadastrado.\n- Ao clicar no link do convite ou acessar `/profile?tab=organizations`, você verá o convite pendente.\n- Basta clicar em **\"Aceitar Convite\"** para ser imediatamente vinculado ao hub daquela organização.\n\n## 2. Solicitando Adesão pela Página da Organização\n- Para organizações com política aberta (`join_policy: open`), acesse a página pública da entidade em `/organizations/[slug]`.\n- Clique no botão **\"Solicitar Entrada\"**.\n- O status da sua solicitação ficará como `requested` até que um administrador da organização aprove seu ingresso no painel de membros.",
+    "links": [
+      {
+        "label": "Minhas Organizações",
+        "url": "/profile?tab=organizations"
+      }
+    ],
+    "sourcePath": "organizacoes/como-entrar-em-uma-organizacao.md"
+  },
+  {
+    "id": "o-que-sao-organizacoes-parceiras",
+    "title": "O que são organizações parceiras na Menvo",
+    "category": "organizacoes",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "organizacoes",
+      "ongs",
+      "empresas",
+      "parcerias",
+      "impacto-social"
+    ],
+    "summary": "Como ONGs e empresas utilizam a Menvo para conectar seus beneficiários e colaboradores a mentores dedicados.",
+    "content": "# Organizações Parceiras na Menvo\n\nA Menvo oferece páginas e hubs dedicados para **ONGs, cooperativas sociais, bootcamps de capacitação e empresas parceiras**.\n\n## Como Funciona para a Organização?\n- **Página Pública Dedicada:** Cada organização parceira possui uma URL própria (ex: `/organizations/minha-ong`) exibindo sua missão, beneficiários e mentores parceiros.\n- **Painel de Gestão:** Administradores da organização têm um dashboard (`/dashboard/org`) para acompanhar membros ativos, solicitações de adesão e métricas de impacto de mentoria.\n- **Políticas de Entrada:** As organizações podem ser configuradas como **Abertas** (qualquer pessoa da comunidade pode solicitar entrada) ou **Exclusivas/Fechadas** (apenas mediante convite direto do administrador).",
+    "links": [
+      {
+        "label": "Ver Organizações",
+        "url": "/organizations"
+      }
+    ],
+    "sourcePath": "organizacoes/o-que-sao-organizacoes-parceiras.md"
+  },
+  {
+    "id": "codigo-de-conduta",
+    "title": "Código de conduta e convivência da comunidade",
+    "category": "politicas",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "conduta",
+      "respeito",
+      "comunidade",
+      "regras",
+      "seguranca",
+      "convivencia"
+    ],
+    "summary": "Diretrizes obrigatórias de respeito, tolerância zero a assédio e responsabilidade entre mentores e mentorados.",
+    "content": "# Código de Conduta da Menvo\n\nA Menvo é um espaço seguro, acolhedor e inclusivo voltado ao aprendizado e cooperação mútua.\n\n## Compromissos Fundamentais\n\n1. **Respeito e Inclusão:** Tratamos todas as pessoas com dignidade e empatia, independentemente de gênero, raça, etnia, orientação sexual, deficiência, idade ou nível técnico.\n2. **Tolerância Zero a Assédio:** Qualquer forma de discriminação, assédio moral, assédio sexual, constrangimento ou linguagem hostil resultará em banimento imediato da plataforma.\n3. **Compromisso e Pontualidade:** O tempo dos mentores e mentorados é valioso. Não comparecer a uma mentoria sem aviso prévio prejudica o ecossistema.\n4. **Foco no Desenvolvimento Profissional:** As sessões de mentoria têm finalidade estritamente profissional e educacional. É proibido utilizar as sessões para abordagens comerciais não solicitadas, captação indevida ou interesses pessoais escusos.\n\n## Denúncias\nQualquer violação deste código pode ser reportada confidencialmente através da página de feedback (`/feedback`) ou pelo e-mail da nossa moderação.",
+    "links": [
+      {
+        "label": "Termos e Diretrizes",
+        "url": "/terms"
+      }
+    ],
+    "sourcePath": "politicas/codigo-de-conduta.md"
+  },
+  {
+    "id": "privacidade-e-lgpd",
+    "title": "Privacidade de dados e conformidade com a LGPD",
+    "category": "politicas",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "privacidade",
+      "lgpd",
+      "dados",
+      "seguranca",
+      "retencao",
+      "protecao"
+    ],
+    "summary": "Como a Menvo protege seus dados, gerencia permissões (RLS) e aplica políticas de retenção conforme a Lei Geral de Proteção de Dados.",
+    "content": "# Privacidade de Dados e LGPD na Menvo\n\nA Menvo leva a segurança e a privacidade dos seus dados muito a sério, em total conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018):\n\n## Nossos Compromissos de Proteção\n\n1. **Privacidade por Padrão (Privacy by Default):**\n   - Respostas do Diagnóstico de Carreira e conversas com a IA são restritas exclusivamente ao seu usuário logado por meio de políticas de banco de dados (Row Level Security - RLS).\n   - Nenhum mentor ou usuário externo tem acesso às suas análises sem seu consentimento explícito.\n2. **Minimização de Dados e PII:**\n   - Chamadas de IA nunca enviam dados sensíveis de contato (como telefone, e-mail completo ou CPF) para modelos externos.\n   - O escopo padrão de compartilhamento de diagnóstico com mentores omite automaticamente o campo de contexto pessoal para resguardar sua vida privada.\n3. **Ciclo de Vida e Retenção Automatizada:**\n   - Sessões incompletas de diagnóstico com mais de 30 dias de inatividade são expurgadas automaticamente.\n   - Compartilhamentos revogados com mentores e históricos antigos de chat são purgados periodicamente pelo nosso cron job de retenção (`/api/cron/ai-retention`).",
+    "links": [
+      {
+        "label": "Política de Privacidade",
+        "url": "/privacy"
+      }
+    ],
+    "sourcePath": "politicas/privacidade-e-lgpd.md"
+  },
+  {
+    "id": "uso-etico-de-ia",
+    "title": "Uso ético e transparente de Inteligência Artificial",
+    "category": "politicas",
+    "audience": [
+      "all"
+    ],
+    "tags": [
+      "ia",
+      "etica",
+      "copiloto",
+      "transparencia",
+      "guardrails"
+    ],
+    "summary": "Como a Menvo utiliza Inteligência Artificial com responsabilidade, transparência, guardrails e sem substituir o calor humano das mentorias.",
+    "content": "# Uso Ético de Inteligência Artificial na Menvo\n\nA Inteligência Artificial na Menvo existe para **potencializar e aproximar pessoas**, e nunca para substituir a conexão humana:\n\n## Princípios de IA da Menvo\n\n1. **A IA como Facilitadora, Não Substituta:** O Copiloto e o Diagnóstico auxiliam na identificação de metas e na curadoria de perfis, mas a verdadeira mentoria e o aprendizado profundo ocorrem na conversa humana 1-a-1 entre mentor e mentorado.\n2. **Transparência Total:** Deixamos sempre claro quando uma resposta, análise ou recomendação foi gerada por modelos de IA. Nosso Copiloto não simula uma pessoa real.\n3. **Guardrails e Não Discriminação:** O Copiloto possui restrições estritas de domínio (focado em carreira e tecnologia), rejeita respostas preconceituosas e possui gatilhos de segurança para direcionar pessoas em sofrimento emocional extremo para canais especializados de apoio como o CVV (188).\n4. **Governança de Custos e Modelos:** Utilizamos modelos otimizados com limites de cota e tetos orçamentários para garantir a sustentabilidade gratuita da plataforma.",
+    "links": [
+      {
+        "label": "Copiloto Menvo",
+        "url": "/assistant"
+      }
+    ],
+    "sourcePath": "politicas/uso-etico-de-ia.md"
+  }
+]

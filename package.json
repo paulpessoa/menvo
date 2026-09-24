@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build:kb": "tsx lib/services/kb/build-kb.ts",
+    "build": "npm run build:kb && next build",
     "dev": "next dev",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",

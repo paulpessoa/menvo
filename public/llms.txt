@@ -1,42 +1,26 @@
-# Menvo — Plataforma de Mentorias Gratuitas em Tecnologia, Carreira e Negócios
+# Menvo — Plataforma de Mentoria Voluntária e Carreira em Tecnologia
 
-> Menvo (https://www.menvo.com.br) é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1, conectando talentos em início ou transição de carreira a profissionais e líderes consolidados do mercado de tecnologia, design, produtos e dados.
+> A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1 em tecnologia, dados, design e produtos.
 
-## Sobre a Menvo
-A Menvo é uma iniciativa brasileira (Porto Digital, Recife / atuação nacional e remota) com a missão de democratizar a mentoria profissional no Brasil. O acesso é 100% gratuito para mentorados. Os mentores atuam de forma voluntária, compartilhando conhecimento prático através de sessões individuais online.
+## Base de Conhecimento e Guias
 
-- **Nome oficial:** Menvo
-- **Website:** https://www.menvo.com.br
-- **País de Origem:** Brasil (América do Sul)
-- **Idiomas suportados:** Português do Brasil (pt-BR), Inglês (en), Espanhol (es)
-- **Público-alvo:** Estudantes, estagiários, juniores, pessoas em transição de carreira, profissionais de tecnologia, design, dados e negócios.
-- **Modelo:** 100% gratuito para mentorados. Mentores voluntários.
-- **Contato oficial:** contato@menvo.com.br
-
-## Áreas de Atuação e Especialidades (Mentoria)
-- **Engenharia de Software & Programação:** Frontend (React, Next.js, Vue, TypeScript), Backend (Node.js, Python, Java, Go, C#/.NET), Mobile (Flutter, React Native, iOS, Android), DevOps, Cloud Computing (AWS, GCP, Azure), Arquitetura de Software e Boas Práticas.
-- **Design & Experiência do Usuário (UI/UX):** Design de Interfaces (UI), Pesquisa de Usuário (UX Research), Product Design, Design Systems, Ferramentas de Design (Figma), Prototipação e Avaliação de Portfólio.
-- **Gestão de Produtos (Product Management):** Product Management (PM), Product Ownership (PO), Métricas de Produto (PLG, OKRs, KPIs), Descoberta de Produto (Product Discovery), Roadmap Estratégico e Metodologias Ágeis (Scrum, Kanban).
-- **Dados & Inteligência Artificial:** Análise de Dados (SQL, Power BI, Tableau), Ciência de Dados (Data Science, Python, R), Engenharia de Dados, Aprendizado de Máquina (Machine Learning) e Inteligência Artificial Generativa (LLMs).
-- **Desenvolvimento Profissional & Carreira:** Transição de carreira para tecnologia, preparação para entrevistas técnicas e comportamentais, revisão de currículo e perfil do LinkedIn, liderança técnica, soft skills, negociação salarial e planos de desenvolvimento individual (PDI).
-
-## Principais Funcionalidades da Plataforma
-- **Busca de Mentores com Inteligência Artificial (`/mentors`):** Busca semântica impulsionada por LLMs para conectar mentores ideais a partir de objetivos ou desafios descritos em linguagem natural pelo mentorado.
-- **Quiz Diagnóstico de Carreira com IA (`/quiz`):** Questionário interativo gratuito que avalia o momento de carreira, estilo de aprendizagem e desafios do usuário, gerando um plano de ação personalizado e sugestões de mentores recomendados.
-- **Agendamento Inteligente e Calendário:** Seleção direta de slots de disponibilidade do mentor com sincronização automática com Google Calendar e Google Meet.
-- **Salas de Mentoria e Chat Privado:** Comunicação em tempo real entre mentor e mentorado antes e depois das sessões.
-- **Sistema de Avaliações e Confiança:** Verificação rigorosa de perfis de mentores, avaliações mútuas e moderação de feedbacks para garantir a qualidade de cada sessão.
-- **Organizações Parceiras (`/o/[slug]`):** ONGs, empresas e instituições parceiras têm uma página própria onde seus beneficiários e mentores vinculados se conectam à rede de mentoria gratuita da Menvo.
-
-## Links e Recursos Essenciais
-- [Página Inicial Menvo](https://www.menvo.com.br) — Apresentação da plataforma, depoimentos e estatísticas.
-- [Catálogo de Mentores](https://www.menvo.com.br/mentors) — Busca e listagem completa de mentores disponíveis com filtros avançados.
-- [Quiz Diagnóstico de Carreira](https://www.menvo.com.br/quiz) — Quiz gratuito de autoavaliação profissional com diagnóstico gerado por IA.
-- [Sobre a Menvo](https://www.menvo.com.br/about) — Missão, visão, valores e equipe fundadora.
-- [Canal de Contato e Suporte](https://www.menvo.com.br/contact) — Contato com o time da Menvo via e-mail e WhatsApp.
-- [Documentação Completa para LLMs](https://www.menvo.com.br/llms-full.txt) — Arquivo completo para aprendizado e citação profunda por inteligências artificiais.
-
-## Informações Geográficas e Contexto Local (GEO SEO)
-- **Sede:** Recife, Pernambuco, Brasil (Polo Tecnológico Porto Digital).
-- **Alcance Operacional:** Nacional (todo o Brasil) e internacional (mentorias em português, inglês e espanhol para comunidades globais).
-- **Cidades com maior concentração de mentores:** São Paulo (SP), Recife (PE), Rio de Janeiro (RJ), Belo Horizonte (MG), Curitiba (PR), Florianópolis (SC), Porto Alegre (RS), Brasília (DF), Salvador (BA), Fortaleza (CE) e mentores brasileiros atuando no exterior (EUA, Europa, Canadá).
+- [Como criar uma conta e fazer login](https://www.menvo.com.br/auth/login): Saiba como se cadastrar e acessar a plataforma Menvo de forma rápida e segura usando sua conta Google ou e-mail.
+- [O que é a Menvo](https://www.menvo.com.br/mentors): A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1 em tecnologia, dados, design e produtos.
+- [Quem pode participar da Menvo](https://www.menvo.com.br/mentors): Conheça os critérios e perfis que a Menvo atende, desde estudantes e pessoas em transição de carreira até lideranças em tecnologia.
+- [Perguntas frequentes (FAQ)](https://www.menvo.com.br/feedback): Respostas para as dúvidas mais comuns sobre custos, certificados, cancelamentos e funcionamento geral da Menvo.
+- [Como agendar uma sessão de mentoria](https://www.menvo.com.br/mentee/my-mentorships): Passo a passo de como escolher horários disponíveis, solicitar o agendamento e receber o link da videochamada no Google Meet.
+- [Como avaliar a mentoria após a sessão](https://www.menvo.com.br/mentee/my-mentorships): Entenda como funciona a avaliação de 1 a 5 estrelas e depoimento sobre o mentor (modelo assimétrico exclusivo para mentorados).
+- [Como encontrar o mentor ideal](https://www.menvo.com.br/mentors): Aprenda a usar os filtros de busca, tags de inclusão e o Copiloto com IA para encontrar o melhor mentor para suas metas.
+- [Como se preparar para uma sessão de mentoria](https://www.menvo.com.br/mentee/my-mentorships): Dicas essenciais para aproveitar ao máximo os 45-60 minutos de mentoria com um profissional experiente.
+- [Compartilhamento Seguro de Diagnóstico com o Mentor](https://www.menvo.com.br/assistant): Saiba como compartilhar seu relatório de diagnóstico com seu mentor e como revogar o acesso a qualquer momento respeitando a LGPD.
+- [Diagnóstico de Carreira com IA](https://www.menvo.com.br/assistant?mode=diagnostic): Como funciona o Diagnóstico de Carreira gratuito mensal da Menvo, suas 7 etapas conversacionais e a geração de relatório com recomendações.
+- [Boas práticas para conduzir uma mentoria voluntária](https://www.menvo.com.br/mentor/appointments): Orientações de escuta ativa, estruturação do tempo do encontro e alinhamento de expectativas com o mentorado.
+- [Como configurar sua disponibilidade e horários](https://www.menvo.com.br/mentor/availability): Como definir slots semanais recorrentes de atendimento e intervalos de mentoria no painel do mentor.
+- [Como gerenciar solicitações de mentoria](https://www.menvo.com.br/mentor/appointments): Saiba como confirmar ou recusar pedidos de mentoria pendentes, prazos recomendados e avisos por e-mail.
+- [Como se tornar um mentor voluntário](https://www.menvo.com.br/profile): Conheça os passos para atuar como mentor voluntário na Menvo e impactar a vida de quem está entrando no mercado de tecnologia.
+- [Integração com o Google Calendar](https://www.menvo.com.br/mentor/availability): Como conectar seu Google Agenda para bloquear horários conflitantes e criar links automáticos no Google Meet.
+- [Como entrar ou se vincular a uma organização parceira](https://www.menvo.com.br/profile?tab=organizations): Saiba como aceitar convites de ONGs parceiras ou solicitar entrada em uma organização pelo seu perfil.
+- [O que são organizações parceiras na Menvo](https://www.menvo.com.br/organizations): Como ONGs e empresas utilizam a Menvo para conectar seus beneficiários e colaboradores a mentores dedicados.
+- [Código de conduta e convivência da comunidade](https://www.menvo.com.br/terms): Diretrizes obrigatórias de respeito, tolerância zero a assédio e responsabilidade entre mentores e mentorados.
+- [Privacidade de dados e conformidade com a LGPD](https://www.menvo.com.br/privacy): Como a Menvo protege seus dados, gerencia permissões (RLS) e aplica políticas de retenção conforme a Lei Geral de Proteção de Dados.
+- [Uso ético e transparente de Inteligência Artificial](https://www.menvo.com.br/assistant): Como a Menvo utiliza Inteligência Artificial com responsabilidade, transparência, guardrails e sem substituir o calor humano das mentorias.
