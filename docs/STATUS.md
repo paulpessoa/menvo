@@ -89,6 +89,18 @@ started.
 
 ## 📓 Engineering Journal
 
+### 2026-09-24 — AI Diagnostic RLS Fix & Real-Time SSE Streaming Feedback
+- **Why:** During manual verification of `/assistant?mode=diagnostic`, completing step 7 failed with Postgres error `new row violates row-level security policy for table "quiz_responses"`, and the message bubble lacked live streaming visual feedback during background AI analysis.
+- **Migration `20260924000001_fix_diagnostic_quiz_responses_rls.sql`:**
+  - Separated anonymous lead-capture inserts (`user_id is null and ai_analysis is null`) from authenticated diagnostic submissions.
+  - Added authenticated INSERT & UPDATE policies (`user_id = auth.uid() or public.is_admin()`) allowing the server-side completed AI analysis to be persisted safely under RLS.
+- **Real-Time Streaming UX & SSE Buffering:**
+  - `app/[locale]/assistant/page.tsx`: added live status indicator with animated ping, loader, and backend step descriptions (`toolActivity`) inside the streaming message bubble even when partial text is displayed.
+  - `lib/ai-menvo/diagnostic/engine.ts`: persists intermediate session state prior to final AI analysis, emits explicit progress on step 7 ("Análise com IA em andamento"), and sends real-time descriptive `tool_start` events ("Validando cota...", "Analisando seu momento de carreira com IA...", "Buscando mentores compatíveis...", "Salvando seu diagnóstico...").
+  - `components/assistant/DiagnosticProgressBar.tsx`: added `isProcessing` prop with active spinner and pulse effect.
+  - `app/api/assistant/route.ts`: added `export const dynamic = "force-dynamic"` and `"X-Accel-Buffering": "no"` to guarantee zero-buffering over SSE streams.
+- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 197 tests passing).
+
 ### 2026-09-24 — AI Platform Fase 1 Implemented: Agentic Diagnostic State Machine, Interactive Chips & Chat UI
 - **Why:** Delivers Fase 1 of `docs/AI_PLATFORM_PLAN.md`: turns the static 8-step anonymous quiz into an interactive, conversational diagnostic inside `/assistant?mode=diagnostic` with state machine progression, voice input, deterministic chips, and mentor matching.
 - **Migration `20260924000000_ai_diagnostic_sessions_and_threads.sql`:**

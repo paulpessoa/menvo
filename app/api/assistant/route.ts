@@ -8,6 +8,7 @@ import { getAssistantAgent } from "@/lib/services/assistant/agent"
 import { encodeSseEvent, encodeSseDone } from "@/lib/ai/protocol"
 import { processDiagnosticTurn } from "@/lib/ai-menvo/diagnostic/engine"
 
+export const dynamic = "force-dynamic"
 export const maxDuration = 60
 
 export async function POST(req: NextRequest) {
@@ -53,9 +54,10 @@ export async function POST(req: NextRequest) {
 
       return new Response(stream, {
         headers: {
-          "Content-Type": "text/event-stream",
+          "Content-Type": "text/event-stream; charset=utf-8",
           "Cache-Control": "no-cache, no-transform",
-          "Connection": "keep-alive"
+          "Connection": "keep-alive",
+          "X-Accel-Buffering": "no"
         }
       })
     }
@@ -146,9 +148,10 @@ export async function POST(req: NextRequest) {
 
     return new Response(stream, {
       headers: {
-        "Content-Type": "text/event-stream",
+        "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache, no-transform",
         "Connection": "keep-alive",
+        "X-Accel-Buffering": "no"
       },
     })
   } catch (err: any) {

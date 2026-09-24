@@ -159,7 +159,6 @@ function AssistantChat() {
             if (!event || event === "done") continue
 
             if (event.type === "text") {
-              setToolActivity(null)
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantMessageId
@@ -168,8 +167,11 @@ function AssistantChat() {
                 )
               )
             } else if (event.type === "tool_start") {
-              const randomMsg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
-              setToolActivity(randomMsg)
+              const toolLabel =
+                event.name === "searchMentors"
+                  ? "Buscando mentores compatíveis no catálogo..."
+                  : event.name || LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+              setToolActivity(toolLabel)
             } else if (event.type === "mentors_found") {
               setToolActivity(null)
               setMessages((prev) =>
@@ -206,7 +208,12 @@ function AssistantChat() {
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantMessageId
-                    ? { ...msg, text: msg.text + "\n❌ " + event.message }
+                    ? {
+                        ...msg,
+                        text: msg.text
+                          ? `${msg.text}\n\n⚠️ ${event.message}`
+                          : `⚠️ Não foi possível concluir: ${event.message}`
+                      }
                     : msg
                 )
               )
@@ -248,6 +255,7 @@ function AssistantChat() {
           currentStep={progress.step}
           totalSteps={progress.totalSteps}
           stepName={progress.stepName}
+          isProcessing={isLoading}
         />
       )}
 
@@ -277,9 +285,23 @@ function AssistantChat() {
                     : "bg-muted rounded-tl-sm self-start"
                 }`}
               >
-                <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
-                {msg.isStreaming && !msg.text && (
-                  <Loader2 className="w-4 h-4 animate-spin opacity-50" />
+                {msg.text ? (
+                  <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                ) : null}
+
+                {msg.isStreaming && (
+                  <div
+                    className={`flex items-center gap-2.5 text-xs text-primary font-medium ${
+                      msg.text ? "mt-3 pt-2.5 border-t border-border/40" : ""
+                    }`}
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>{toolActivity || "Processando com inteligência artificial..."}</span>
+                  </div>
                 )}
               </div>
 
@@ -310,7 +332,7 @@ function AssistantChat() {
           </div>
         ))}
 
-        {toolActivity && (
+        {toolActivity && !messages.some((m) => m.isStreaming) && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground ml-12">
             <Loader2 className="w-3 h-3 animate-spin text-primary" />
             <span>{toolActivity}</span>

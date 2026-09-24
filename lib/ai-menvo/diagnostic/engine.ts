@@ -284,9 +284,24 @@ async function advanceToNextStep(
   }
 
   // Final Step: Complete Diagnostic and generate analysis
+  // Persist latest answers (step 7) to avoid losing them on transient errors
+  await diagnosticService.updateSessionState(supabase, sessionId, state, TOTAL_DIAGNOSTIC_STEPS)
+
+  emit({
+    type: "progress",
+    step: TOTAL_DIAGNOSTIC_STEPS,
+    totalSteps: TOTAL_DIAGNOSTIC_STEPS,
+    stepName: "Análise com IA em andamento"
+  })
+
   emit({
     type: "text",
-    text: "Excelente! Respostas registradas. Estou analisando seu momento de carreira e buscando os mentores mais adequados para o seu perfil..."
+    text: "Excelente! Respostas registradas com sucesso. Estou analisando seu momento de carreira e buscando os mentores mais adequados para o seu perfil..."
+  })
+
+  emit({
+    type: "tool_start",
+    name: "Validando cota de diagnóstico..."
   })
 
   // 1. Quota check: consume 1 credit of "diagnostic"
@@ -301,6 +316,11 @@ async function advanceToNextStep(
     })
     return
   }
+
+  emit({
+    type: "tool_start",
+    name: "Analisando seu momento de carreira com IA..."
+  })
 
   // 2. Run analysis
   const profileName = user.user_metadata?.full_name || "Mentorado"
@@ -338,9 +358,19 @@ async function advanceToNextStep(
 
   const { analysis } = await analyzeQuiz(supabase, answers, mentors, { onCall })
 
+  emit({
+    type: "tool_start",
+    name: "Buscando mentores compatíveis no catálogo..."
+  })
+
   // 3. Search mentors matching development areas
   const query = state.answers.development_areas?.join(" ") || "carreira"
   const searchResults = await assistantTools.searchMentors(supabase, { query, limit: 3 })
+
+  emit({
+    type: "tool_start",
+    name: "Salvando seu diagnóstico e preparando recomendações..."
+  })
 
   // 4. Save to database
   const { quizResponseId } = await diagnosticService.completeDiagnostic(
