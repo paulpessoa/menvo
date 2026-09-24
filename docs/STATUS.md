@@ -15,7 +15,7 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 222/222 passed across 45 test suites (`npm test`)
+- **Unit Tests:** 224/224 passed across 46 test suites (`npm test`)
 - **Production Build:** 66/66 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -83,12 +83,25 @@ started.
 - [x] **AI-First Platform — Fase 1 (Diagnóstico Agêntico em Código):** Migração `20260924000000_ai_diagnostic_sessions_and_threads.sql` (`diagnostic_sessions`, `ai_threads`, `ai_messages`, `quiz_responses.user_id`), engine com máquina de estados de 7 passos (`lib/ai-menvo/diagnostic/`), componentes interativos `ChipGroup` e `DiagnosticProgressBar`, rota com streaming SSE (`app/api/assistant/route.ts`), input de voz Web Speech API, salvaguarda de crise (CVV 188) e cota mensal integrada.
 - [x] **AI-First Platform — Fase 2 (Copiloto por Papel, Briefing e Ferramentas RBAC):** Briefing determinístico sem tokens (`/api/assistant/briefing`), tools com RBAC por papel (`getMyAppointments`, `getPendingEvaluations`, `getMentorRequests`), prompt de sistema adaptativo por papel (`mentee`, `mentor`, `admin`), e navegação fluida por chips de atalho.
 - [x] **AI-First Platform — Fase 2 (Compartilhamento Seguro de Diagnóstico com o Mentor):** Migração `20260924000002_diagnostic_shares.sql` (`diagnostic_shares` com RLS estrita), serviço `diagnostic-shares.service.ts` com sanitização por escopo (`summary` vs `full`, LGPD §12.2), rotas BFF `/api/diagnostic/shares`, modal `ShareDiagnosticModal` na página `/quiz/results/[id]`, e visualizador só-leitura no painel do mentor (`/mentor/appointments` e `/dashboard/mentor`).
+- [x] **AI-First Platform — Fase 2 (Job de Retenção LGPD para IA):** Rota `/api/cron/ai-retention` protegida por `CRON_SECRET`, agendada diariamente no `vercel.json`, expurgando estados intermediários de diagnóstico > 30 dias, threads de IA > 12 meses e compartilhamentos revogados > 12 meses (§12.1).
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-24 — AI-First Platform: Job de Retenção e Governança LGPD (Fase 2 §8 item 5c e §12.1)
+- **Why:** Comply with LGPD privacy requirements (Law 13.709/2018 arts. 6º, 15–16) by automatically pruning stale AI conversational history, intermediate diagnostic slot data, and revoked share records.
+- **Automated Retention Cron (`app/api/cron/ai-retention/route.ts`):**
+  - Secured with `CRON_SECRET` bearer token matching `/api/cron/appointments`.
+  - Prunes `diagnostic_sessions.state` to `{}` after 30 days of completion or abandonment (preserving the session metadata, quiz result link, and monthly quota records).
+  - Purges `ai_threads` (and cascading `ai_messages`) inactive for more than 12 months.
+  - Purges `diagnostic_shares` revoked for more than 12 months.
+  - Scheduled in `vercel.json` (`0 3 * * *`, daily at 3:00 AM UTC).
+- **Testing & Verification:**
+  - Added test suite `app/api/cron/ai-retention/route.test.ts` (401 validation, successful purge counts, error collection).
+  - 46 test suites, 224 tests passing. 0 TypeScript errors.
 
 ### 2026-09-24 — AI-First Platform: Compartilhamento Seguro de Diagnóstico com o Mentor (Fase 2 §8 item 5b e §12.2)
 - **Why:** Allow mentees to selectively share their diagnostic analysis and career insights with specific mentors to enrich session preparation, with strict consent, instant revocation, and privacy boundaries (LGPD compliant).

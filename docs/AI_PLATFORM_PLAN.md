@@ -539,7 +539,9 @@ diário do `STATUS.md`.
     (§12.2): tabela `diagnostic_shares`, RLS estrita, serviço `diagnostic-shares.service.ts`,
     rotas BFF `/api/diagnostic/shares`, modal de compartilhamento em `/quiz/results/[id]`
     e visão só-leitura no painel do mentor (`/mentor/appointments` e `/dashboard/mentor`).
-5c. Job de retenção (cron) aplicando os prazos da §12.1.
+5c. **Feito (2026-09-24):** Job de retenção (cron `/api/cron/ai-retention`)
+    aplicando os prazos da §12.1 (LGPD): expurgo de estados intermediários de diagnóstico
+    (>30d), histórico conversacional inativo (>12m) e compartilhamentos revogados (>12m).
 6. Artigos iniciais de `kb/` (≈20) + geração de `llms.txt`.
 
 ### Fase 3: Ações com confirmação
