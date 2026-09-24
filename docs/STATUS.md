@@ -15,7 +15,7 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 211/211 passed across 43 test suites (`npm test`)
+- **Unit Tests:** 222/222 passed across 45 test suites (`npm test`)
 - **Production Build:** 66/66 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -82,12 +82,39 @@ started.
 - [x] **AI-First Platform — Fase 0 (Fundação):** Cota mensal + medição de custo no Postgres (`ai_budget`), DTOs enxutos, `@langchain/langgraph`, registro de modelos por capacidade (`lib/ai/models`, ADR 0004), protocolo SSE tipado com Zod (`lib/ai/protocol.ts`), ADRs 0001–0004 e `docs/governance/ai-policy.md`.
 - [x] **AI-First Platform — Fase 1 (Diagnóstico Agêntico em Código):** Migração `20260924000000_ai_diagnostic_sessions_and_threads.sql` (`diagnostic_sessions`, `ai_threads`, `ai_messages`, `quiz_responses.user_id`), engine com máquina de estados de 7 passos (`lib/ai-menvo/diagnostic/`), componentes interativos `ChipGroup` e `DiagnosticProgressBar`, rota com streaming SSE (`app/api/assistant/route.ts`), input de voz Web Speech API, salvaguarda de crise (CVV 188) e cota mensal integrada.
 - [x] **AI-First Platform — Fase 2 (Copiloto por Papel, Briefing e Ferramentas RBAC):** Briefing determinístico sem tokens (`/api/assistant/briefing`), tools com RBAC por papel (`getMyAppointments`, `getPendingEvaluations`, `getMentorRequests`), prompt de sistema adaptativo por papel (`mentee`, `mentor`, `admin`), e navegação fluida por chips de atalho.
+- [x] **AI-First Platform — Fase 2 (Compartilhamento Seguro de Diagnóstico com o Mentor):** Migração `20260924000002_diagnostic_shares.sql` (`diagnostic_shares` com RLS estrita), serviço `diagnostic-shares.service.ts` com sanitização por escopo (`summary` vs `full`, LGPD §12.2), rotas BFF `/api/diagnostic/shares`, modal `ShareDiagnosticModal` na página `/quiz/results/[id]`, e visualizador só-leitura no painel do mentor (`/mentor/appointments` e `/dashboard/mentor`).
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-24 — AI-First Platform: Compartilhamento Seguro de Diagnóstico com o Mentor (Fase 2 §8 item 5b e §12.2)
+- **Why:** Allow mentees to selectively share their diagnostic analysis and career insights with specific mentors to enrich session preparation, with strict consent, instant revocation, and privacy boundaries (LGPD compliant).
+- **Migration `20260924000002_diagnostic_shares.sql`:**
+  - Table `diagnostic_shares` (`id`, `diagnostic_session_id`, `quiz_response_id`, `mentee_id`, `mentor_id`, `scope`, `created_at`, `revoked_at`).
+  - Strict RLS: mentee controls `INSERT`, `UPDATE` (revocation), and `SELECT`; mentor has `SELECT` access strictly while `revoked_at IS NULL`; anon revoked.
+  - Granted `SELECT` policy on `quiz_responses` and `diagnostic_sessions` for mentors with active shares.
+- **Service Layer & Privacy Scoping (`lib/services/diagnostic/diagnostic-shares.service.ts`):**
+  - `shareDiagnostic`: creates or reactivates existing share with selected scope.
+  - `revokeShare`: sets `revoked_at = now()` atomically for mentee.
+  - `listSharesForMentee`: lists shared mentors with profile and active status.
+  - `listSharesForMentor` & `getSharedDiagnosticForMentor`: provides read-only access for mentors; strictly omits `personal_life_help` when `scope = 'summary'` (LGPD §12.2 invariant).
+- **BFF API Routes (`app/api/diagnostic/shares/route.ts`, `app/api/diagnostic/shares/[id]/route.ts`):**
+  - `GET /api/diagnostic/shares`: role-aware listing (`?role=mentee` or `?role=mentor`).
+  - `POST /api/diagnostic/shares`: validates input via Zod, rejects self-sharing, persists share.
+  - `DELETE/PATCH /api/diagnostic/shares/[id]`: revokes share for authenticated mentee.
+  - `GET /api/diagnostic/shares/[id]`: returns read-only insight for mentor.
+- **UI Components & Workflows:**
+  - `ShareDiagnosticModal.tsx`: 1-click sharing with suggested mentors, scope radio toggle (Resumo vs Completo), active access list with instant revocation button.
+  - `app/[locale]/quiz/results/[id]/page.tsx`: added prominent "Compartilhar com Mentor" button in the Share Actions card.
+  - `app/[locale]/mentor/appointments/page.tsx`: created mentor appointments page with tabs for sessions and shared diagnostics.
+  - `SharedDiagnosticsSection.tsx` & `SharedDiagnosticViewerModal.tsx`: cards and modal displaying mentee name, custom title, career goals, prioritized development areas, AI advice, and next steps.
+  - Integrated into `MentorDashboard` (`/dashboard/mentor`) and `MentorshipBoard` (`/mentorship/mentor`).
+- **Testing & Verification:**
+  - Added unit test suites `lib/services/diagnostic/diagnostic-shares.service.test.ts` and `app/api/diagnostic/shares/route.test.ts`.
+  - All 45 test suites / 222 tests passing. Zero TypeScript errors (`npx tsc --noEmit`).
 
 ### 2026-09-24 — AI-First Platform: Fase 2 (Copiloto por Papel, Briefing Determinístico e Ferramentas RBAC)
 - **Why:** Provide a proactive, tailored copilot experience for mentees, mentors, and admins that requires zero initial LLM tokens on open and provides secure, role-restricted operational tools.

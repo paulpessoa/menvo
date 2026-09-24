@@ -2,7 +2,7 @@
 
 import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Link, usePathname, useRouter } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -38,9 +38,19 @@ function MentorMentorshipContent() {
             </Button>
 
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-3xl font-bold">{t("title")}</h1>
-                    <p className="text-muted-foreground">{t("description")}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold">{t("title")}</h1>
+                        <p className="text-muted-foreground">{t("description")}</p>
+                    </div>
+                    {perspective === "mentor" && (
+                        <Button asChild variant="outline" size="sm" className="rounded-xl font-medium gap-2">
+                            <Link href="/mentor/appointments?tab=shares">
+                                <Sparkles className="h-4 w-4 text-primary" />
+                                Diagnósticos Compartilhados
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 <MentorPerspectiveSwitch value={perspective} onChange={setPerspective} />

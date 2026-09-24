@@ -535,8 +535,10 @@ diário do `STATUS.md`.
 3. Tools de leitura: agenda, pendências, disponibilidade, KB.
 4. Feedback ativo (diagnóstico, sessão, plataforma).
 5. Painel `/dashboard/admin/ai-usage`.
-5b. Compartilhamento do diagnóstico com mentor (§12.2): tabela, RLS,
-    opção no agendamento e em `/profile`, visão só-leitura para o mentor.
+5b. **Feito (2026-09-24):** Compartilhamento seguro do diagnóstico com mentor
+    (§12.2): tabela `diagnostic_shares`, RLS estrita, serviço `diagnostic-shares.service.ts`,
+    rotas BFF `/api/diagnostic/shares`, modal de compartilhamento em `/quiz/results/[id]`
+    e visão só-leitura no painel do mentor (`/mentor/appointments` e `/dashboard/mentor`).
 5c. Job de retenção (cron) aplicando os prazos da §12.1.
 6. Artigos iniciais de `kb/` (≈20) + geração de `llms.txt`.
 

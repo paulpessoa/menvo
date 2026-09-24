@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { createClient } from "@/lib/utils/supabase/client"
+import { ShareDiagnosticModal } from "@/components/diagnostic/ShareDiagnosticModal"
 
 interface AnalysisResult {
     precisa_refazer?: boolean
@@ -66,6 +67,7 @@ export default function QuizResultsPage() {
     const [response, setResponse] = useState<QuizResponse | null>(null)
     const [sendingEmail, setSendingEmail] = useState(false)
     const [mentorSlugMap, setMentorSlugMap] = useState<Record<string, string>>({})
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
     useEffect(() => {
         if (params.id) {
@@ -490,13 +492,21 @@ export default function QuizResultsPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <Button
+                                    size="lg"
+                                    onClick={() => setIsShareModalOpen(true)}
+                                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl shadow-sm active:scale-[0.98]"
+                                >
+                                    <Users className="mr-2 h-4 w-4" />
+                                    Compartilhar com Mentor
+                                </Button>
                                 <Button
                                     size="lg"
                                     variant="outline"
                                     onClick={handleSendEmail}
                                     disabled={sendingEmail}
-                                    className="w-full"
+                                    className="w-full rounded-xl"
                                 >
                                     {sendingEmail ? (
                                         <>
@@ -514,7 +524,7 @@ export default function QuizResultsPage() {
                                     size="lg"
                                     variant="outline"
                                     onClick={handleShareWhatsApp}
-                                    className="w-full bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300"
+                                    className="w-full bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-xl"
                                 >
                                     <Share2 className="mr-2 h-4 w-4" />
                                     {t('quiz_results.whatsapp')}
@@ -523,7 +533,7 @@ export default function QuizResultsPage() {
                                     size="lg"
                                     variant="outline"
                                     onClick={handleShareLinkedIn}
-                                    className="w-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+                                    className="w-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 rounded-xl"
                                 >
                                     <Share2 className="mr-2 h-4 w-4" />
                                     {t('quiz_results.linkedin')}
@@ -531,6 +541,14 @@ export default function QuizResultsPage() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    <ShareDiagnosticModal
+                        isOpen={isShareModalOpen}
+                        onClose={() => setIsShareModalOpen(false)}
+                        quizResponseId={response.id}
+                        suggestedMentors={analysis.mentores_sugeridos}
+                        mentorSlugMap={mentorSlugMap}
+                    />
                 </div>
             </div>
         </AnimatedBackground>

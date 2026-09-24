@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MentorUpcomingSessions, type MentorAppointment } from "@/components/dashboard/MentorUpcomingSessions"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
+import { SharedDiagnosticsSection } from "@/components/diagnostic/SharedDiagnosticsSection"
 
 interface MentorStats {
   totalAppointments: number
@@ -138,6 +139,12 @@ export default function MentorDashboard() {
                     {stats.totalReviews}
                   </Badge>
                 )}
+              </TabsTrigger>
+              <TabsTrigger
+                value="diagnostics"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-primary" /> Diagnósticos Compartilhados
               </TabsTrigger>
             </TabsList>
 
@@ -289,6 +296,11 @@ export default function MentorDashboard() {
                 </div>
                 <FeedbackManagement type="received" />
               </div>
+            </TabsContent>
+
+            {/* TAB: DIAGNÓSTICOS COMPARTILHADOS */}
+            <TabsContent value="diagnostics" className="animate-in fade-in slide-in-from-left-4 duration-500">
+              <SharedDiagnosticsSection />
             </TabsContent>
           </Tabs>
         </div>

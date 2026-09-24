@@ -89,6 +89,47 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_messages: {
+        Row: {
+          artifact: Json | null
+          content: string
+          created_at: string
+          id: string
+          metadata: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          artifact?: Json | null
+          content: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          artifact?: Json | null
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "ai_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_missing_demands: {
         Row: {
           created_at: string | null
@@ -202,6 +243,42 @@ export type Database = {
           period_start?: string
           updated_at?: string
           used_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_threads: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          metadata: Json
+          mode: string
+          summary: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          metadata?: Json
+          mode?: string
+          summary?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          metadata?: Json
+          mode?: string
+          summary?: string | null
+          title?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -563,6 +640,101 @@ export type Database = {
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_step: number
+          expires_at: string
+          id: string
+          quiz_response_id: string | null
+          state: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number
+          expires_at?: string
+          id?: string
+          quiz_response_id?: string | null
+          state?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number
+          expires_at?: string
+          id?: string
+          quiz_response_id?: string | null
+          state?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_sessions_quiz_response_id_fkey"
+            columns: ["quiz_response_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diagnostic_shares: {
+        Row: {
+          created_at: string
+          diagnostic_session_id: string | null
+          id: string
+          mentee_id: string
+          mentor_id: string
+          quiz_response_id: string | null
+          revoked_at: string | null
+          scope: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostic_session_id?: string | null
+          id?: string
+          mentee_id: string
+          mentor_id: string
+          quiz_response_id?: string | null
+          revoked_at?: string | null
+          scope?: string
+        }
+        Update: {
+          created_at?: string
+          diagnostic_session_id?: string | null
+          id?: string
+          mentee_id?: string
+          mentor_id?: string
+          quiz_response_id?: string | null
+          revoked_at?: string | null
+          scope?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnostic_shares_diagnostic_session_id_fkey"
+            columns: ["diagnostic_session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnostic_shares_quiz_response_id_fkey"
+            columns: ["quiz_response_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_responses"
             referencedColumns: ["id"]
           },
         ]
@@ -979,6 +1151,7 @@ export type Database = {
           academic_level: string | null
           address: string | null
           age: number | null
+          ai_disclosure_accepted_at: string | null
           availability_status: string | null
           avatar_url: string | null
           average_rating: number | null
@@ -1042,6 +1215,7 @@ export type Database = {
           academic_level?: string | null
           address?: string | null
           age?: number | null
+          ai_disclosure_accepted_at?: string | null
           availability_status?: string | null
           avatar_url?: string | null
           average_rating?: number | null
@@ -1105,6 +1279,7 @@ export type Database = {
           academic_level?: string | null
           address?: string | null
           age?: number | null
+          ai_disclosure_accepted_at?: string | null
           availability_status?: string | null
           avatar_url?: string | null
           average_rating?: number | null
@@ -1174,6 +1349,7 @@ export type Database = {
           created_at: string | null
           current_challenge: string | null
           development_areas: string[]
+          diagnostic_session_id: string | null
           email: string
           email_sent: boolean | null
           email_sent_at: string | null
@@ -1186,6 +1362,7 @@ export type Database = {
           processed_at: string | null
           score: number | null
           share_knowledge: string | null
+          user_id: string | null
         }
         Insert: {
           ai_analysis?: Json | null
@@ -1194,6 +1371,7 @@ export type Database = {
           created_at?: string | null
           current_challenge?: string | null
           development_areas: string[]
+          diagnostic_session_id?: string | null
           email: string
           email_sent?: boolean | null
           email_sent_at?: string | null
@@ -1206,6 +1384,7 @@ export type Database = {
           processed_at?: string | null
           score?: number | null
           share_knowledge?: string | null
+          user_id?: string | null
         }
         Update: {
           ai_analysis?: Json | null
@@ -1214,6 +1393,7 @@ export type Database = {
           created_at?: string | null
           current_challenge?: string | null
           development_areas?: string[]
+          diagnostic_session_id?: string | null
           email?: string
           email_sent?: boolean | null
           email_sent_at?: string | null
@@ -1226,8 +1406,17 @@ export type Database = {
           processed_at?: string | null
           score?: number | null
           share_knowledge?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quiz_responses_diagnostic_session_id_fkey"
+            columns: ["diagnostic_session_id"]
+            isOneToOne: false
+            referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roles: {
         Row: {
