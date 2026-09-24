@@ -403,16 +403,6 @@ export default function MentorsPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
-          {t("title")}
-        </h1>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-          {t("subtitle")}
-        </p>
-      </div>
-
       {/* Search and Filter Bar */}
       <div className="mb-2 sm:mb-3 space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
