@@ -15,7 +15,7 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 197/197 passed across 40 test suites (`npm test`)
+- **Unit Tests:** 211/211 passed across 43 test suites (`npm test`)
 - **Production Build:** 66/66 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -81,13 +81,29 @@ started.
 - [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Shipped in code on 2026-09-17 (see journal and [`domains/organizations.md`](domains/organizations.md) §6).
 - [x] **AI-First Platform — Fase 0 (Fundação):** Cota mensal + medição de custo no Postgres (`ai_budget`), DTOs enxutos, `@langchain/langgraph`, registro de modelos por capacidade (`lib/ai/models`, ADR 0004), protocolo SSE tipado com Zod (`lib/ai/protocol.ts`), ADRs 0001–0004 e `docs/governance/ai-policy.md`.
 - [x] **AI-First Platform — Fase 1 (Diagnóstico Agêntico em Código):** Migração `20260924000000_ai_diagnostic_sessions_and_threads.sql` (`diagnostic_sessions`, `ai_threads`, `ai_messages`, `quiz_responses.user_id`), engine com máquina de estados de 7 passos (`lib/ai-menvo/diagnostic/`), componentes interativos `ChipGroup` e `DiagnosticProgressBar`, rota com streaming SSE (`app/api/assistant/route.ts`), input de voz Web Speech API, salvaguarda de crise (CVV 188) e cota mensal integrada.
-- [ ] **AI-First Platform — Fase 2 (Copiloto por Papel, Briefing e Base de Conhecimento):** Plan: [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md) §8 Fase 2. Briefing determinístico sem tokens, tools com RBAC por papel, artigos de `kb/`, geração de `llms.txt`.
+- [x] **AI-First Platform — Fase 2 (Copiloto por Papel, Briefing e Ferramentas RBAC):** Briefing determinístico sem tokens (`/api/assistant/briefing`), tools com RBAC por papel (`getMyAppointments`, `getPendingEvaluations`, `getMentorRequests`), prompt de sistema adaptativo por papel (`mentee`, `mentor`, `admin`), e navegação fluida por chips de atalho.
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-24 — AI-First Platform: Fase 2 (Copiloto por Papel, Briefing Determinístico e Ferramentas RBAC)
+- **Why:** Provide a proactive, tailored copilot experience for mentees, mentors, and admins that requires zero initial LLM tokens on open and provides secure, role-restricted operational tools.
+- **Deterministic Zero-Token Briefing (`lib/ai-menvo/copilot/briefing.ts`, `app/api/assistant/briefing/route.ts`):**
+  - Computes user profile, resolved primary role (`user_roles`), current month diagnostic completion status & report link, upcoming sessions, and pending action counts (unreviewed completed sessions for mentees, pending session requests for mentors).
+  - Generates time-of-day greeting and actionable chips (`mode:diagnostic`, `link:...`, or conversational shortcut).
+  - Integrated into `/assistant` UI on load when `!isDiagnosticMode && messages.length === 0`.
+- **Role-Aware Copilot Agent & RBAC Tools (`lib/services/assistant/agent.ts`, `lib/services/assistant/tools.ts`):**
+  - Added `getMyAppointments`: queries appointments for logged-in user, formats date, time, partner name, status, meet link.
+  - Added `getPendingEvaluations`: strictly obeys Invariant #2 (mentors never evaluate mentees), checks completed appointments without reviews for mentees.
+  - Added `getMentorRequests`: exposes pending requests for mentors.
+  - Dynamically builds role-specialized system prompt (`mentor` vs `mentee` vs `admin`) and binds only authorized tools per role.
+  - Backwards-compatible overload in `getAssistantAgent(supabase, userOrOpts, opts)`.
+- **Testing & Verification:**
+  - Added unit test suites `lib/ai-menvo/copilot/briefing.test.ts`, `app/api/assistant/briefing/route.test.ts`, `lib/services/assistant/agent.test.ts`, and extended `lib/services/assistant/tools.test.ts`.
+  - All 43 test suites / 211 tests passing. Zero TypeScript errors.
 
 ### 2026-09-24 — Interactive Mentor Cards & Direct Profile Action Buttons on Diagnostic Results Page
 - **Why:** On `/quiz/results/[id]`, suggested mentors were rendered as static informative blocks without the ability to navigate to the mentor's profile or schedule a session.

@@ -66,3 +66,114 @@ describe("searchMentors", () => {
     expect(searchCatalog).toHaveBeenCalledWith(expect.objectContaining({ page: 0, limit: 3 }))
   })
 })
+
+describe("getMyAppointments", () => {
+  it("formats user appointments and identifies partner correctly", async () => {
+    const { getMyAppointments } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      neq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue({
+        data: [
+          {
+            id: "apt-1",
+            status: "confirmed",
+            scheduled_at: "2026-10-15T14:00:00Z",
+            google_meet_link: "https://meet.google.com/abc",
+            meeting_link: null,
+            mentor_id: "u1",
+            mentee_id: "u2",
+            mentor: { full_name: "Eu Mentor", job_title: "Staff" },
+            mentee: { full_name: "Aluno João", job_title: "Dev Jr" }
+          }
+        ]
+      })
+    } as unknown as SupabaseClient
+
+    const result = await getMyAppointments(mockSupabase, "u1", { limit: 5 })
+    expect(result).toHaveLength(1)
+    expect(result[0].partnerName).toBe("Aluno João")
+    expect(result[0].status).toBe("confirmed")
+    expect(result[0].meetLink).toBe("https://meet.google.com/abc")
+  })
+})
+
+describe("getPendingEvaluations", () => {
+  it("strictly enforces invariant #2: mentors never evaluate mentees", async () => {
+    const { getPendingEvaluations } = await import("./tools")
+    const result = await getPendingEvaluations({} as SupabaseClient, "mentor-1", "mentor")
+    expect(result).toEqual({ message: "Mentores não avaliam mentorados na plataforma Menvo." })
+  })
+
+  it("returns unreviewed completed appointments for mentee", async () => {
+    const { getPendingEvaluations } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn((table: string) => {
+        if (table === "appointments") {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            order: jest.fn().mockResolvedValue({
+              data: [
+                {
+                  id: "apt-done-1",
+                  scheduled_at: "2026-09-20T10:00:00Z",
+                  mentor: { full_name: "Mentor Incrível", job_title: "Tech Lead" }
+                }
+              ]
+            })
+          }
+        }
+        if (table === "appointment_feedbacks") {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockResolvedValue({
+              data: [] // no feedback submitted yet
+            })
+          }
+        }
+        return {}
+      })
+    } as unknown as SupabaseClient
+
+    const result = await getPendingEvaluations(mockSupabase as any, "mentee-1", "mentee")
+    expect(Array.isArray(result)).toBe(true)
+    expect(result).toHaveLength(1)
+    expect((result as any)[0].mentorName).toBe("Mentor Incrível")
+  })
+})
+
+describe("getMentorRequests", () => {
+  it("blocks non-mentors from accessing mentor requests", async () => {
+    const { getMentorRequests } = await import("./tools")
+    const result = await getMentorRequests({} as SupabaseClient, "mentee-1", "mentee")
+    expect(result).toEqual({ message: "Apenas mentores podem visualizar solicitações de mentoria." })
+  })
+
+  it("returns pending requests for mentors", async () => {
+    const { getMentorRequests } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockResolvedValue({
+        data: [
+          {
+            id: "req-1",
+            scheduled_at: "2026-09-28T18:00:00Z",
+            mentee: { full_name: "Dev Aspirante", job_title: "Estudante" }
+          }
+        ]
+      })
+    } as unknown as SupabaseClient
+
+    const result = await getMentorRequests(mockSupabase, "mentor-1", "mentor")
+    expect(Array.isArray(result)).toBe(true)
+    expect(result).toHaveLength(1)
+    expect((result as any)[0].menteeName).toBe("Dev Aspirante")
+  })
+})
+

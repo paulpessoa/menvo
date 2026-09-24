@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, Suspense } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { Bot, User, Sparkles, Loader2, Info, Send, FileText, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -128,16 +128,19 @@ function MessageContent({ text }: { text: string }) {
 function AssistantChat() {
   const isEnabled = useFeatureFlag("ai_assistant_flag")
   const searchParams = useSearchParams()
+  const router = useRouter()
   const isDiagnosticMode = searchParams.get("mode") === "diagnostic"
 
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isBriefingLoading, setIsBriefingLoading] = useState(false)
   const [toolActivity, setToolActivity] = useState<string | null>(null)
   const [progress, setProgress] = useState<DiagnosticProgress | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const hasInitializedDiagnostic = useRef(false)
+  const hasInitializedBriefing = useRef(false)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -152,6 +155,42 @@ function AssistantChat() {
     if (isEnabled && isDiagnosticMode && !hasInitializedDiagnostic.current && messages.length === 0) {
       hasInitializedDiagnostic.current = true
       handleSubmit("", "diagnostic")
+    }
+  }, [isEnabled, isDiagnosticMode, messages.length])
+
+  // In default copilot mode, load deterministic zero-token briefing
+  useEffect(() => {
+    if (isEnabled && !isDiagnosticMode && !hasInitializedBriefing.current && messages.length === 0) {
+      hasInitializedBriefing.current = true
+      setIsBriefingLoading(true)
+      fetch("/api/assistant/briefing")
+        .then((res) => {
+          if (!res.ok) throw new Error("Falha ao carregar briefing")
+          return res.json()
+        })
+        .then((data) => {
+          if (data.briefing) {
+            setMessages([
+              {
+                id: "briefing-welcome",
+                role: "assistant",
+                text: data.briefing.greetingMessage,
+                chips: data.briefing.suggestedChips?.length
+                  ? {
+                      mode: "single",
+                      options: data.briefing.suggestedChips
+                    }
+                  : undefined
+              }
+            ])
+          }
+        })
+        .catch((err) => {
+          console.warn("[Assistant Briefing Error]:", err)
+        })
+        .finally(() => {
+          setIsBriefingLoading(false)
+        })
     }
   }, [isEnabled, isDiagnosticMode, messages.length])
 
@@ -325,7 +364,7 @@ function AssistantChat() {
       <div className="flex items-center gap-2 px-6 py-4 border-b bg-muted/30">
         <Sparkles className="w-5 h-5 text-primary" />
         <h2 className="font-semibold text-lg">
-          {isDiagnosticMode ? "Diagnóstico de Carreira — Menvo" : "Menvo AI Assistant"}
+          {isDiagnosticMode ? "Diagnóstico de Carreira — Menvo" : "Copiloto Menvo"}
         </h2>
       </div>
 
@@ -341,8 +380,17 @@ function AssistantChat() {
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.length === 0 && !isDiagnosticMode && (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-70">
-            <Bot className="w-12 h-12 text-primary" />
-            <p>Olá! Como posso ajudar você hoje?</p>
+            {isBriefingLoading ? (
+              <>
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Preparando seu resumo...</p>
+              </>
+            ) : (
+              <>
+                <Bot className="w-12 h-12 text-primary" />
+                <p>Olá! Como posso ajudar você hoje?</p>
+              </>
+            )}
           </div>
         )}
 
@@ -396,11 +444,17 @@ function AssistantChat() {
                   canSkip={msg.chips.canSkip}
                   disabled={isLoading}
                   onSelect={(val) => {
-                    if (val.startsWith("link:")) {
-                      window.location.href = val.replace("link:", "")
+                    if (val.startsWith("mode:")) {
+                      const nextMode = val.replace("mode:", "")
+                      router.push(`/assistant?mode=${nextMode}`)
                       return
                     }
-                    handleSubmit(val, "diagnostic")
+                    if (val.startsWith("link:")) {
+                      const targetUrl = val.replace("link:", "")
+                      router.push(targetUrl)
+                      return
+                    }
+                    handleSubmit(val, isDiagnosticMode ? "diagnostic" : "assistant")
                   }}
                 />
               )}

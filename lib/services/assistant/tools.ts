@@ -238,5 +238,190 @@ export async function saveFeedback(
   return { success: true, message: "Feedback salvo com sucesso." }
 }
 
+// --- 5. getMyAppointments ---
+
+export const getMyAppointmentsInput = z.object({
+  limit: z.number().int().min(1).max(10).default(5)
+    .describe("Quantidade máxima de mentorias a retornar (padrão 5)")
+})
+
+export interface FormattedAppointment {
+  id: string
+  date: string
+  time: string
+  status: "pending" | "confirmed" | "completed" | "cancelled"
+  partnerName: string
+  partnerJobTitle: string | null
+  meetLink: string | null
+}
+
+export async function getMyAppointments(
+  supabase: SupabaseClient,
+  userId: string,
+  input: z.infer<typeof getMyAppointmentsInput>
+): Promise<FormattedAppointment[]> {
+  const { data: apts } = await supabase
+    .from("appointments")
+    .select(`
+      id,
+      status,
+      scheduled_at,
+      google_meet_link,
+      meeting_link,
+      mentor:profiles!mentor_id(full_name, job_title),
+      mentee:profiles!mentee_id(full_name, job_title),
+      mentor_id,
+      mentee_id
+    `)
+    .or(`mentee_id.eq.${userId},mentor_id.eq.${userId}`)
+    .neq("status", "cancelled")
+    .order("scheduled_at", { ascending: true })
+    .limit(input.limit)
+
+  if (!apts || apts.length === 0) {
+    return []
+  }
+
+  return apts.map((apt: any) => {
+    const isUserMentor = apt.mentor_id === userId
+    const partner = isUserMentor ? apt.mentee : apt.mentor
+    const partnerObj = Array.isArray(partner) ? partner[0] : partner
+    const dateObj = new Date(apt.scheduled_at)
+
+    return {
+      id: apt.id,
+      date: dateObj.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }),
+      time: dateObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      status: apt.status,
+      partnerName: partnerObj?.full_name || (isUserMentor ? "Mentorado" : "Mentor"),
+      partnerJobTitle: partnerObj?.job_title || null,
+      meetLink: apt.status === "confirmed" ? (apt.google_meet_link || apt.meeting_link || null) : null
+    }
+  })
+}
+
+// --- 6. getPendingEvaluations ---
+
+export const getPendingEvaluationsInput = z.object({})
+
+export interface PendingEvaluation {
+  appointmentId: string
+  mentorName: string
+  mentorJobTitle: string | null
+  date: string
+  time: string
+  reviewUrl: string
+}
+
+export async function getPendingEvaluations(
+  supabase: SupabaseClient,
+  userId: string,
+  role: string
+): Promise<PendingEvaluation[] | { message: string }> {
+  // Invariant #2: Only mentees evaluate mentors
+  if (role === "mentor") {
+    return { message: "Mentores não avaliam mentorados na plataforma Menvo." }
+  }
+
+  const { data: completedApts } = await supabase
+    .from("appointments")
+    .select(`
+      id,
+      scheduled_at,
+      mentor:profiles!mentor_id(full_name, job_title)
+    `)
+    .eq("mentee_id", userId)
+    .eq("status", "completed")
+    .order("scheduled_at", { ascending: false })
+
+  if (!completedApts || completedApts.length === 0) {
+    return []
+  }
+
+  const { data: feedbacks } = await supabase
+    .from("appointment_feedbacks")
+    .select("appointment_id")
+    .eq("reviewer_id", userId)
+
+  const reviewedIds = new Set((feedbacks || []).map((f: any) => f.appointment_id))
+  const pending = completedApts.filter((a: any) => !reviewedIds.has(a.id))
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"
+
+  return pending.map((apt: any) => {
+    const mentor = Array.isArray(apt.mentor) ? apt.mentor[0] : apt.mentor
+    const dateObj = new Date(apt.scheduled_at)
+    return {
+      appointmentId: apt.id,
+      mentorName: mentor?.full_name || "Mentor",
+      mentorJobTitle: mentor?.job_title || null,
+      date: dateObj.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }),
+      time: dateObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      reviewUrl: `${baseUrl}/mentee/my-mentorships`
+    }
+  })
+}
+
+// --- 7. getMentorRequests ---
+
+export const getMentorRequestsInput = z.object({})
+
+export interface MentorRequest {
+  appointmentId: string
+  menteeName: string
+  menteeJobTitle: string | null
+  date: string
+  time: string
+  manageUrl: string
+}
+
+export async function getMentorRequests(
+  supabase: SupabaseClient,
+  userId: string,
+  role: string
+): Promise<MentorRequest[] | { message: string }> {
+  if (role !== "mentor" && role !== "admin") {
+    return { message: "Apenas mentores podem visualizar solicitações de mentoria." }
+  }
+
+  const { data: pendingApts } = await supabase
+    .from("appointments")
+    .select(`
+      id,
+      scheduled_at,
+      mentee:profiles!mentee_id(full_name, job_title)
+    `)
+    .eq("mentor_id", userId)
+    .eq("status", "pending")
+    .order("scheduled_at", { ascending: true })
+
+  if (!pendingApts || pendingApts.length === 0) {
+    return []
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"
+
+  return pendingApts.map((apt: any) => {
+    const mentee = Array.isArray(apt.mentee) ? apt.mentee[0] : apt.mentee
+    const dateObj = new Date(apt.scheduled_at)
+    return {
+      appointmentId: apt.id,
+      menteeName: mentee?.full_name || "Mentorado",
+      menteeJobTitle: mentee?.job_title || null,
+      date: dateObj.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }),
+      time: dateObj.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+      manageUrl: `${baseUrl}/mentor/appointments`
+    }
+  })
+}
+
 // --- Registro único ---
-export const assistantTools = { searchMentors, getMentorAvailability, explainHowItWorks, saveFeedback }
+export const assistantTools = {
+  searchMentors,
+  getMentorAvailability,
+  explainHowItWorks,
+  saveFeedback,
+  getMyAppointments,
+  getPendingEvaluations,
+  getMentorRequests
+}

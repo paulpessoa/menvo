@@ -81,8 +81,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Instanciar agent via service — async: resolve a capacidade "converse"
-    // no registro de modelos (lib/ai/models), com fallback (ADR 0004).
-    const agent = await getAssistantAgent(supabase, { onCall: (record) => calls.push(record) })
+    // no registro de modelos (lib/ai/models), com fallback (ADR 0004) e RBAC por papel.
+    const agent = await getAssistantAgent(supabase, user, { onCall: (record) => calls.push(record) })
 
     // Configurar Stream SSE Nativo do Next.js
     const stream = new ReadableStream({
