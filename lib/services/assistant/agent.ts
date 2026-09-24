@@ -12,7 +12,8 @@ import {
   saveFeedbackInput,
   getMyAppointmentsInput,
   getPendingEvaluationsInput,
-  getMentorRequestsInput
+  getMentorRequestsInput,
+  evaluateMentorshipSessionInput
 } from "@/lib/services/assistant/tools"
 
 export interface GetAssistantAgentOptions {
@@ -45,7 +46,11 @@ PAPEL DO USUÁRIO ATUAL: MENTORADO (${firstName})
 - O usuário está buscando mentoria e orientação de carreira.
 - Se ele expressar um objetivo claro (ex: transição de carreira, entrevistas, dados, IA), CHAME IMEDIATAMENTE a ferramenta "searchMentors". Não pergunte permissão.
 - Se ele perguntar sobre suas mentorias agendadas, use "getMyAppointments".
-- Se ele perguntar se tem mentorias para avaliar ou pendências, use "getPendingEvaluations".
+- Se ele perguntar se tem mentorias para avaliar ou quiser avaliar uma mentoria pendente:
+  1. Chame "getPendingEvaluations" para consultar as mentorias concluídas ou já realizadas aguardando avaliação.
+  2. Apresente ao mentorado as opções disponíveis (nome do mentor, data e horário).
+  3. Peça uma nota de 1 a 5 estrelas e um comentário opcional sobre como foi a mentoria.
+  4. Com a nota informada pelo mentorado, chame a ferramenta "evaluateMentorshipSession" com o appointmentId e o rating.
 - Reforce sempre que "é bom conversar para abrir a mente" e que a mentoria na Menvo é 100% gratuita.
 - Ao citar mentores encontrados, NÃO liste detalhes completos no texto porque cards visuais interativos aparecerão automaticamente. Cite apenas os nomes e a razão da recomendação.`
   }
@@ -65,8 +70,9 @@ GUARDRAILS E LIMITES (ESTRITAMENTE OBRIGATÓRIO):
 - IMPORTANTE: Após usar uma ferramenta e receber o resultado, formule a resposta final para o usuário e encerre a sua vez. NÃO chame a mesma ferramenta repetidas vezes em loop.
 
 FEEDBACK:
-- Ao fim de uma conversa ou quando resolver o problema do usuário, peça a ele um feedback sobre o seu atendimento. Peça para ele responder no chat dando uma nota de 1 a 5 e um comentário.
-- Se o usuário enviar um feedback (nota e comentário), você DEVE obrigatoriamente usar a ferramenta "saveFeedback" para salvar no banco de dados e agradecê-lo em seguida.`
+- Ao fim de uma conversa ou quando resolver o problema do usuário, peça a ele um feedback sobre o seu atendimento. Peça para ele responder no chat dando uma nota de 1 a 5 e um comentário opcional.
+- Se o usuário enviar um feedback (nota e/ou comentário) sobre o assistente ou sobre um diagnóstico, você DEVE usar a ferramenta "saveFeedback" para salvar no banco de dados e agradecê-lo em seguida.
+- Para avaliação de sessões de mentoria com mentores, utilize a ferramenta dedicada "evaluateMentorshipSession".`
 }
 
 /**
@@ -194,7 +200,7 @@ export async function getAssistantAgent(
     )
     tools.push(getMyAppointmentsTool)
 
-    // Mentee and Admin can check evaluations (Invariant #2: only mentees evaluate mentors)
+    // Mentee and Admin can check and submit evaluations (Invariant #2: only mentees evaluate mentors)
     if (role === "mentee" || role === "admin") {
       const getPendingEvaluationsTool = tool(
         async () => JSON.stringify(await assistantTools.getPendingEvaluations(supabase, userId, role)),
@@ -205,6 +211,16 @@ export async function getAssistantAgent(
         }
       )
       tools.push(getPendingEvaluationsTool)
+
+      const evaluateMentorshipSessionTool = tool(
+        async (input) => JSON.stringify(await assistantTools.evaluateMentorshipSession(supabase, userId, input)),
+        {
+          name: "evaluateMentorshipSession",
+          description: "Registra a avaliação do mentorado para uma mentoria realizada (nota de 1 a 5 e feedback opcional)",
+          schema: evaluateMentorshipSessionInput
+        }
+      )
+      tools.push(evaluateMentorshipSessionTool)
     }
 
     // Mentor and Admin can check pending requests from mentees

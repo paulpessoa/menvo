@@ -116,11 +116,13 @@ describe("getPendingEvaluations", () => {
           return {
             select: jest.fn().mockReturnThis(),
             eq: jest.fn().mockReturnThis(),
+            in: jest.fn().mockReturnThis(),
             order: jest.fn().mockResolvedValue({
               data: [
                 {
                   id: "apt-done-1",
                   scheduled_at: "2026-09-20T10:00:00Z",
+                  status: "completed",
                   mentor: { full_name: "Mentor Incrível", job_title: "Tech Lead" }
                 }
               ]
@@ -176,4 +178,223 @@ describe("getMentorRequests", () => {
     expect((result as any)[0].menteeName).toBe("Dev Aspirante")
   })
 })
+
+describe("evaluateMentorshipSession", () => {
+  it("strictly enforces invariant #2: rejects evaluation if user is not the mentee", async () => {
+    const { evaluateMentorshipSession } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: {
+          id: "33333333-3333-3333-3333-333333333333",
+          mentor_id: "user-mentor",
+          mentee_id: "other-user",
+          status: "completed"
+        },
+        error: null
+      })
+    } as unknown as SupabaseClient
+
+    const result = await evaluateMentorshipSession(mockSupabase, "current-user", {
+      appointmentId: "33333333-3333-3333-3333-333333333333",
+      rating: 5
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain("Apenas o mentorado participante pode avaliar")
+  })
+
+  it("rejects non-existent appointments", async () => {
+    const { evaluateMentorshipSession } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({ data: null, error: { message: "Not found" } })
+    } as unknown as SupabaseClient
+
+    const result = await evaluateMentorshipSession(mockSupabase, "mentee-1", {
+      appointmentId: "33333333-3333-3333-3333-333333333333",
+      rating: 5
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain("Agendamento de mentoria não encontrado")
+  })
+
+  it("rejects sessions that are not confirmed or completed", async () => {
+    const { evaluateMentorshipSession } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: {
+          id: "33333333-3333-3333-3333-333333333333",
+          mentor_id: "mentor-1",
+          mentee_id: "mentee-1",
+          status: "cancelled"
+        },
+        error: null
+      })
+    } as unknown as SupabaseClient
+
+    const result = await evaluateMentorshipSession(mockSupabase, "mentee-1", {
+      appointmentId: "33333333-3333-3333-3333-333333333333",
+      rating: 5
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain("Só é possível avaliar sessões confirmadas ou concluídas")
+  })
+
+  it("prevents duplicate evaluations", async () => {
+    const { evaluateMentorshipSession } = await import("./tools")
+    const mockSupabase = {
+      from: jest.fn((table: string) => {
+        if (table === "appointments") {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({
+              data: {
+                id: "33333333-3333-3333-3333-333333333333",
+                mentor_id: "mentor-1",
+                mentee_id: "mentee-1",
+                status: "completed"
+              },
+              error: null
+            })
+          }
+        }
+        if (table === "appointment_feedbacks") {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({
+              data: { id: "fb-1" }
+            })
+          }
+        }
+        return {}
+      })
+    } as unknown as SupabaseClient
+
+    const result = await evaluateMentorshipSession(mockSupabase, "mentee-1", {
+      appointmentId: "33333333-3333-3333-3333-333333333333",
+      rating: 5
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain("Esta mentoria já foi avaliada anteriormente")
+  })
+
+  it("successfully records feedback and marks appointment completed", async () => {
+    const { evaluateMentorshipSession } = await import("./tools")
+    const insertFeedbackMock = jest.fn().mockResolvedValue({ error: null })
+    const insertGeneralFeedbackMock = jest.fn().mockReturnValue(Promise.resolve({ error: null }))
+    const updateAppointmentMock = jest.fn().mockReturnValue(Promise.resolve({ error: null }))
+
+    const mockSupabase = {
+      from: jest.fn((table: string) => {
+        if (table === "appointments") {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockResolvedValue({
+              data: {
+                id: "33333333-3333-3333-3333-333333333333",
+                mentor_id: "mentor-1",
+                mentee_id: "mentee-1",
+                status: "confirmed"
+              },
+              error: null
+            }),
+            update: jest.fn().mockReturnValue({
+              eq: updateAppointmentMock
+            })
+          }
+        }
+        if (table === "appointment_feedbacks") {
+          return {
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: jest.fn().mockResolvedValue({ data: null }),
+            insert: insertFeedbackMock
+          }
+        }
+        if (table === "feedback") {
+          return {
+            insert: insertGeneralFeedbackMock
+          }
+        }
+        return {}
+      })
+    } as unknown as SupabaseClient
+
+    const result = await evaluateMentorshipSession(mockSupabase, "mentee-1", {
+      appointmentId: "33333333-3333-3333-3333-333333333333",
+      rating: 5,
+      publicFeedback: "Excelente mentor!",
+      privateNotes: "Muito pontual."
+    })
+
+    expect(result.success).toBe(true)
+    expect(insertFeedbackMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        appointment_id: "33333333-3333-3333-3333-333333333333",
+        reviewer_id: "mentee-1",
+        reviewed_id: "mentor-1",
+        rating: 5,
+        public_feedback: "Excelente mentor!",
+        private_notes: "Muito pontual."
+      })
+    )
+    expect(insertGeneralFeedbackMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        user_id: "mentee-1",
+        rating: 5,
+        comment: "Excelente mentor!",
+        source: "session"
+      })
+    )
+  })
+})
+
+describe("saveFeedback", () => {
+  it("persists feedback with source and context", async () => {
+    const { saveFeedback } = await import("./tools")
+    const insertMock = jest.fn().mockResolvedValue({ error: null })
+    const mockSupabase = {
+      auth: {
+        getUser: jest.fn().mockResolvedValue({ data: { user: { id: "user-123" } } })
+      },
+      from: jest.fn().mockReturnValue({
+        insert: insertMock
+      })
+    } as unknown as SupabaseClient
+
+    const result = await saveFeedback(mockSupabase, {
+      rating: 5,
+      comment: "Adorei o atendimento!",
+      source: "diagnostic",
+      context: { session_id: "diag-123" }
+    })
+
+    expect(result.success).toBe(true)
+    expect(insertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        user_id: "user-123",
+        rating: 5,
+        comment: "Adorei o atendimento!",
+        source: "diagnostic",
+        context: { session_id: "diag-123" },
+        page_url: "/assistant?mode=diagnostic"
+      })
+    )
+  })
+})
+
 

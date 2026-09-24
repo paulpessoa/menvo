@@ -84,14 +84,16 @@ export async function POST(request: NextRequest) {
       return errorResponse(errorMessage, "VALIDATION_ERROR", 400)
     }
 
-    const { rating, comment, email } = parsed.data
+    const { rating, comment, email, source, context } = parsed.data
 
     // Create feedback
     const insertData: Record<string, any> = {
       user_id: user?.id || null,
       rating,
       comment: comment || null,
-      email: user ? null : email
+      email: user ? null : email,
+      source: source || "platform",
+      context: context || {}
     };
 
     const { error } = await supabase

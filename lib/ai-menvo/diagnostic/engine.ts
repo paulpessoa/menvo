@@ -54,6 +54,43 @@ export async function processDiagnosticTurn(
       const latest = await diagnosticService.getLatestCompletedSession(supabase, user.id)
       const reportUrl = latest?.quiz_response_id ? `/quiz/results/${latest.quiz_response_id}` : null
 
+      const ratingMatch = trimmedInput.match(/(?:nota\s*|estrelas?\s*|aval(?:iação|io)?\s*:?\s*)?([1-5])/i)
+      const isFeedbackIntent =
+        Boolean(ratingMatch) ||
+        /gostei|excelente|ótimo|bom|ajudou|melhorar|parabéns|adorei|obrigad/i.test(trimmedInput)
+
+      if (isFeedbackIntent && trimmedInput.length > 0) {
+        const rating = ratingMatch ? parseInt(ratingMatch[1], 10) : 5
+        await assistantTools.saveFeedback(supabase, {
+          rating,
+          comment: trimmedInput,
+          source: "diagnostic",
+          context: {
+            session_id: latest?.id,
+            quiz_response_id: latest?.quiz_response_id
+          }
+        }).catch((err) => console.error("Erro ao gravar feedback de diagnóstico:", err))
+
+        await streamText(
+          "Muito obrigado pela sua avaliação! Seu feedback foi registrado com sucesso e nos ajuda a aprimorar o Diagnóstico da Menvo continuamente. 🌟\n\n" +
+          "Você pode consultar seu relatório detalhado a qualquer momento:",
+          emit,
+          10
+        )
+
+        if (reportUrl) {
+          emit({
+            type: "chips",
+            mode: "single",
+            options: [
+              { label: "📄 Ver Relatório Completo", value: `link:${reportUrl}` },
+              { label: "💬 Conversar com o Copiloto", value: "mode:assistant" }
+            ]
+          })
+        }
+        return
+      }
+
       await streamText(
         "Você já realizou o seu diagnóstico gratuito de carreira neste mês! " +
         "Seu próximo diagnóstico gratuito estará disponível no início do próximo mês." +
@@ -555,11 +592,19 @@ async function advanceToNextStep(
       ]
     })
   } else if (quizResponseId) {
+    const feedbackPrompt =
+      `\n\n---\n` +
+      `**Esse diagnóstico te ajudou?** Deixe sua avaliação abaixo para continuarmos aprimorando a Menvo!`
+    await streamText(feedbackPrompt, emit, 10)
+
     emit({
       type: "chips",
       mode: "single",
       options: [
-        { label: "Ver Relatório Completo", value: `link:/quiz/results/${quizResponseId}` }
+        { label: "📄 Ver Relatório Completo", value: `link:/quiz/results/${quizResponseId}` },
+        { label: "⭐ 5 - Excelente!", value: "Minha avaliação do diagnóstico é nota 5: excelente!" },
+        { label: "⭐ 4 - Muito bom", value: "Minha avaliação do diagnóstico é nota 4: muito bom!" },
+        { label: "⭐ 3 - Regular", value: "Minha avaliação do diagnóstico é nota 3: regular." }
       ]
     })
   }

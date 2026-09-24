@@ -178,16 +178,16 @@ export async function getUserBriefing(
       }
     }
 
-    // Check completed appointments needing feedback
-    const completedApts = apts.filter((a) => a.status === "completed")
-    if (completedApts.length > 0) {
+    // Check completed or past confirmed appointments needing feedback
+    const finishedApts = apts.filter((a) => a.status === "completed" || (a.status === "confirmed" && a.scheduled_at < nowIso))
+    if (finishedApts.length > 0) {
       const { data: feedbacks } = await supabase
         .from("appointment_feedbacks")
         .select("appointment_id")
         .eq("reviewer_id", user.id)
 
       const evaluatedIds = new Set((feedbacks || []).map((f) => f.appointment_id))
-      const pendingEvals = completedApts.filter((a) => !evaluatedIds.has(a.id))
+      const pendingEvals = finishedApts.filter((a) => !evaluatedIds.has(a.id))
       hasPendingEvaluations = pendingEvals.length > 0
       pendingEvaluationsCount = pendingEvals.length
     }
@@ -261,8 +261,8 @@ export async function getUserBriefing(
 
     if (hasPendingEvaluations) {
       suggestedChips.push({
-        label: "✍️ Avaliar Mentoria Pendente",
-        value: "link:/mentee/my-mentorships"
+        label: "⭐ Avaliar Mentoria no Chat",
+        value: "Quero avaliar minha mentoria pendente"
       })
     }
 

@@ -15,7 +15,7 @@ started.
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 224/224 passed across 46 test suites (`npm test`)
+- **Unit Tests:** 230/230 passed across 46 test suites (`npm test`)
 - **Production Build:** 66/66 pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
@@ -445,3 +445,15 @@ Small, but it's the pattern the roadmap's item 3 (architecture plan,
 rather than a big-bang rewrite.
 
 Full detail: [`domains/organizations.md`](domains/organizations.md) §6.
+
+---
+
+## 🤖 AI Platform: Active Feedback & Chat Session Evaluation — shipped 2026-09-24
+
+Implemented §4.3 and §8 item 4 of [`AI_PLATFORM_PLAN.md`](AI_PLATFORM_PLAN.md):
+- **`evaluateMentorshipSession` Tool (`lib/services/assistant/tools.ts`):** Enables mentees to review completed or finished past mentorship sessions conversationally within the Copilot chat. Strictly enforces Invariant #2 (mentees only review mentors), records into `appointment_feedbacks`, synchronizes with `feedback` (`source: 'session'`), and updates appointment status to `completed`.
+- **`getPendingEvaluations` Enhancement:** Proactively detects past sessions needing feedback (`status === 'completed'` or `confirmed` with `scheduled_at < now`).
+- **Copilot Briefing Chips (`lib/ai-menvo/copilot/briefing.ts`):** Proactively highlights pending reviews in zero-token briefing and offers direct conversational chip `⭐ Avaliar Mentoria no Chat`.
+- **Diagnostic Completion Feedback (`lib/ai-menvo/diagnostic/engine.ts`):** Emits 1-5 rating feedback chips upon diagnostic completion and captures post-completion ratings with `source: 'diagnostic'`.
+- **Feedback Schema & Route:** `feedbackSubmissionSchema` and `/api/feedback` support `source` (`assistant`, `diagnostic`, `session`, `platform`) and `context jsonb` (migration `20260924000003_feedback_source_and_context.sql`).
+

@@ -212,7 +212,9 @@ export function explainHowItWorks(input: z.infer<typeof explainHowItWorksInput>)
 
 export const saveFeedbackInput = z.object({
   rating: z.number().int().min(1).max(5).describe("Avaliação de 1 a 5"),
-  comment: z.string().describe("Comentário ou feedback em texto sobre a experiência ou resposta")
+  comment: z.string().optional().describe("Comentário ou feedback em texto sobre a experiência ou resposta"),
+  source: z.enum(["assistant", "diagnostic", "session", "platform"]).default("assistant").describe("Origem do feedback"),
+  context: z.record(z.unknown()).optional().describe("Contexto adicional em formato de objeto JSON")
 })
 
 export async function saveFeedback(
@@ -224,8 +226,10 @@ export async function saveFeedback(
   const insertData = {
     user_id: user?.id || null,
     rating: input.rating,
-    comment: input.comment,
-    page_url: "/assistant"
+    comment: input.comment || null,
+    source: input.source || "assistant",
+    context: input.context || {},
+    page_url: input.source === "diagnostic" ? "/assistant?mode=diagnostic" : "/assistant"
   }
 
   const { error } = await supabase.from("feedback").insert(insertData)
@@ -328,13 +332,23 @@ export async function getPendingEvaluations(
     .select(`
       id,
       scheduled_at,
+      status,
       mentor:profiles!mentor_id(full_name, job_title)
     `)
     .eq("mentee_id", userId)
-    .eq("status", "completed")
+    .in("status", ["confirmed", "completed"])
     .order("scheduled_at", { ascending: false })
 
   if (!completedApts || completedApts.length === 0) {
+    return []
+  }
+
+  const nowIso = new Date().toISOString()
+  const finishedApts = completedApts.filter(
+    (a: any) => a.status === "completed" || (a.status === "confirmed" && a.scheduled_at < nowIso)
+  )
+
+  if (finishedApts.length === 0) {
     return []
   }
 
@@ -344,7 +358,7 @@ export async function getPendingEvaluations(
     .eq("reviewer_id", userId)
 
   const reviewedIds = new Set((feedbacks || []).map((f: any) => f.appointment_id))
-  const pending = completedApts.filter((a: any) => !reviewedIds.has(a.id))
+  const pending = finishedApts.filter((a: any) => !reviewedIds.has(a.id))
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"
 
@@ -415,6 +429,122 @@ export async function getMentorRequests(
   })
 }
 
+// --- 8. evaluateMentorshipSession ---
+
+export const evaluateMentorshipSessionInput = z.object({
+  appointmentId: z.string().uuid("ID do agendamento inválido")
+    .describe("ID único do agendamento de mentoria a ser avaliado"),
+  rating: z.number().int().min(1, "A nota deve ser de 1 a 5").max(5, "A nota deve ser de 1 a 5")
+    .describe("Nota de avaliação da mentoria de 1 a 5 estrelas"),
+  publicFeedback: z.string().max(2000, "Feedback público não pode exceder 2000 caracteres").optional()
+    .describe("Comentário público sobre a experiência com o mentor (visível no perfil do mentor)"),
+  privateNotes: z.string().max(2000, "Notas privadas não podem exceder 2000 caracteres").optional()
+    .describe("Observações ou notas privadas opcionais para o mentor")
+})
+
+export interface EvaluateMentorshipResult {
+  success: boolean
+  message: string
+}
+
+export async function evaluateMentorshipSession(
+  supabase: SupabaseClient,
+  userId: string,
+  input: z.infer<typeof evaluateMentorshipSessionInput>
+): Promise<EvaluateMentorshipResult> {
+  let client: SupabaseClient = supabase
+  try {
+    const { createServiceRoleClient } = await import("@/lib/utils/supabase/service-role")
+    client = createServiceRoleClient()
+  } catch {
+    client = supabase
+  }
+
+  // 1. Fetch appointment to verify ownership and status
+  const { data: appointment, error: fetchError } = await client
+    .from("appointments")
+    .select("id, mentor_id, mentee_id, status")
+    .eq("id", input.appointmentId)
+    .single()
+
+  if (fetchError || !appointment) {
+    return { success: false, message: "Agendamento de mentoria não encontrado." }
+  }
+
+  // 2. Invariant #2: Only the mentee can evaluate the mentor
+  if (appointment.mentee_id !== userId) {
+    return { success: false, message: "Apenas o mentorado participante pode avaliar esta mentoria." }
+  }
+
+  // 3. Status check: confirmed or completed
+  if (appointment.status !== "confirmed" && appointment.status !== "completed") {
+    return { success: false, message: "Só é possível avaliar sessões confirmadas ou concluídas." }
+  }
+
+  // 4. Check if already evaluated
+  const { data: existingFeedback } = await client
+    .from("appointment_feedbacks")
+    .select("id")
+    .eq("appointment_id", input.appointmentId)
+    .eq("reviewer_id", userId)
+    .maybeSingle()
+
+  if (existingFeedback) {
+    return { success: false, message: "Esta mentoria já foi avaliada anteriormente." }
+  }
+
+  // 5. Insert into appointment_feedbacks
+  const { error: feedbackError } = await client.from("appointment_feedbacks").insert({
+    appointment_id: input.appointmentId,
+    reviewer_id: userId,
+    reviewed_id: appointment.mentor_id,
+    rating: input.rating,
+    private_notes: input.privateNotes || null,
+    public_feedback: input.publicFeedback || null
+  })
+
+  if (feedbackError) {
+    console.error("Erro ao registrar avaliação da mentoria:", feedbackError)
+    return { success: false, message: "Erro ao registrar avaliação da mentoria." }
+  }
+
+  // 6. Also record in feedback table with source 'session' (AI_PLATFORM_PLAN §4.3)
+  try {
+    await client.from("feedback").insert({
+      user_id: userId,
+      rating: input.rating,
+      comment: input.publicFeedback || input.privateNotes || null,
+      source: "session",
+      context: {
+        appointment_id: input.appointmentId,
+        mentor_id: appointment.mentor_id
+      },
+      page_url: "/assistant"
+    })
+  } catch (err) {
+    console.error("Erro ao registrar feedback geral da sessão:", err)
+  }
+
+  // 7. Update appointment status to completed
+  try {
+    const { error: updateError } = await client
+      .from("appointments")
+      .update({ status: "completed", updated_at: new Date().toISOString() })
+      .eq("id", input.appointmentId)
+
+    if (updateError) {
+      console.error("Erro ao marcar agendamento como completed:", updateError)
+    }
+  } catch (err) {
+    console.error("Erro inesperado ao marcar agendamento como completed:", err)
+  }
+
+  return {
+    success: true,
+    message: "Avaliação registrada com sucesso! Agradecemos por compartilhar sua experiência sobre a mentoria."
+  }
+}
+
 // --- Registro único ---
 export const assistantTools = {
   searchMentors,
@@ -423,5 +553,6 @@ export const assistantTools = {
   saveFeedback,
   getMyAppointments,
   getPendingEvaluations,
-  getMentorRequests
+  getMentorRequests,
+  evaluateMentorshipSession
 }
