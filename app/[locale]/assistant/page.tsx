@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect, Suspense } from "react"
+import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { Bot, User, Sparkles, Loader2, Info, Send } from "lucide-react"
@@ -45,6 +46,55 @@ const LOADING_MESSAGES = [
   "Processando sua resposta...",
   "Procurando nas melhores conexões..."
 ]
+
+function MessageContent({ text }: { text: string }) {
+  // Extract links such as /quiz/results/[uuid] or markdown links [label](url)
+  const quizResultsMatch = text.match(/\/quiz\/results\/[a-f0-9-]{36}/i)
+  const markdownLinkMatches = Array.from(text.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g))
+
+  const actionButtons: { label: string; href: string }[] = []
+  let cleanText = text
+
+  if (quizResultsMatch) {
+    const url = quizResultsMatch[0]
+    actionButtons.push({
+      label: "Ver Relatório do Diagnóstico",
+      href: url
+    })
+    cleanText = cleanText.replace(url, "").replace(/em\s*(\.|\s*$)/g, "abaixo:")
+  }
+
+  if (markdownLinkMatches.length > 0) {
+    markdownLinkMatches.forEach((match) => {
+      if (match[1] && match[2]) {
+        actionButtons.push({
+          label: match[1],
+          href: match[2]
+        })
+        cleanText = cleanText.replace(match[0], match[1])
+      }
+    })
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="whitespace-pre-wrap leading-relaxed">{cleanText}</p>
+      {actionButtons.length > 0 && (
+        <div className="flex flex-wrap gap-2 pt-1">
+          {actionButtons.map((btn, idx) => (
+            <Link
+              key={idx}
+              href={btn.href}
+              className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-[#006276] active:scale-[0.98] transition-all shadow-sm shadow-primary/20 w-fit"
+            >
+              {btn.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function AssistantChat() {
   const isEnabled = useFeatureFlag("ai_assistant_flag")
@@ -286,7 +336,11 @@ function AssistantChat() {
                 }`}
               >
                 {msg.text ? (
-                  <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                  msg.role === "assistant" ? (
+                    <MessageContent text={msg.text} />
+                  ) : (
+                    <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                  )
                 ) : null}
 
                 {msg.isStreaming && (
@@ -312,7 +366,13 @@ function AssistantChat() {
                   allowOther={msg.chips.allowOther}
                   canSkip={msg.chips.canSkip}
                   disabled={isLoading}
-                  onSelect={(val) => handleSubmit(val, "diagnostic")}
+                  onSelect={(val) => {
+                    if (val.startsWith("link:")) {
+                      window.location.href = val.replace("link:", "")
+                      return
+                    }
+                    handleSubmit(val, "diagnostic")
+                  }}
                 />
               )}
 

@@ -46,26 +46,32 @@ export async function processDiagnosticTurn(
   let session = await diagnosticService.getActiveSession(supabase, user.id)
 
   if (!session) {
-    // Check if user already completed one this calendar month
-    const latest = await diagnosticService.getLatestCompletedSession(supabase, user.id)
-    if (latest && latest.completed_at) {
-      const completedDate = new Date(latest.completed_at)
-      const now = new Date()
-      if (
-        completedDate.getFullYear() === now.getFullYear() &&
-        completedDate.getMonth() === now.getMonth()
-      ) {
+    // Check quota entitlement before creating a new session
+    const quota = await getAiQuota(supabase, "diagnostic").catch(() => null)
+    const isLimited = quota && quota.limit !== null && quota.remaining !== null && quota.remaining <= 0
+
+    if (isLimited) {
+      const latest = await diagnosticService.getLatestCompletedSession(supabase, user.id)
+      const reportUrl = latest?.quiz_response_id ? `/quiz/results/${latest.quiz_response_id}` : null
+
+      await streamText(
+        "Você já realizou o seu diagnóstico gratuito de carreira neste mês! " +
+        "Seu próximo diagnóstico gratuito estará disponível no início do próximo mês." +
+        (reportUrl ? "\n\nVocê pode rever a sua análise anterior acessando seu relatório completo:" : ""),
+        emit,
+        10
+      )
+
+      if (reportUrl) {
         emit({
-          type: "text",
-          text:
-            "Você já realizou o seu diagnóstico gratuito de carreira neste mês! " +
-            "Seu próximo diagnóstico gratuito estará disponível no início do próximo mês. " +
-            (latest.quiz_response_id
-              ? `Você pode rever o resultado anterior acessando seu relatório em /quiz/results/${latest.quiz_response_id}.`
-              : "")
+          type: "chips",
+          mode: "single",
+          options: [
+            { label: "Ver Relatório do Diagnóstico", value: `link:${reportUrl}` }
+          ]
         })
-        return
       }
+      return
     }
 
     // Create a new session

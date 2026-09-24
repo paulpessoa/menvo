@@ -95,14 +95,14 @@ started.
   - Separated anonymous lead-capture inserts (`user_id is null and ai_analysis is null`) from authenticated diagnostic submissions.
   - Added authenticated INSERT & UPDATE policies (`user_id = auth.uid() or public.is_admin()`) allowing server-side completed AI analysis to be persisted safely under RLS.
 - **Real-Time Typewriter Streaming & UX:**
+  - `app/[locale]/assistant/page.tsx`: added `MessageContent` to automatically detect report links (e.g. `/quiz/results/[id]`) and markdown links, rendering them as styled action buttons (Deep Teal `#007585`, `rounded-xl`, text-only) instead of raw ugly URLs. Added live status indicator inside the streaming message bubble and support for link navigation chips (`link:...`).
   - `lib/ai-menvo/diagnostic/engine.ts`: introduced `streamText()` helper to stream words and markdown chunks with micro-delays over SSE, providing a lifelike typewriter streaming animation for questions and final analysis. Added clear markdown divider (`---`) between acknowledgement and analysis results.
-  - `app/[locale]/assistant/page.tsx`: added live status indicator with animated ping, loader, and backend step descriptions (`toolActivity`) inside the streaming message bubble even when partial text is displayed.
   - `components/assistant/DiagnosticProgressBar.tsx`: added `isProcessing` prop with active spinner and pulse effect.
   - `app/api/assistant/route.ts`: added `export const dynamic = "force-dynamic"` and `"X-Accel-Buffering": "no"` to guarantee zero-buffering over SSE streams.
 - **Heuristic Calibration & Quota Protection:**
   - `lib/ai-menvo/diagnostic/analyze.ts`: fixed `hasVagueOrGenericResponses` so optional `personal_life_help` is no longer required to be >20 chars (previously skipping question 6 always triggered `precisa_refazer`).
   - `lib/services/diagnostic/diagnostic.service.ts`: marks session `status: "abandoned"` instead of `"completed"` if `precisa_refazer` is true, so the user is never locked out of their monthly free diagnostic when asked to reflect more.
-  - `lib/ai-menvo/diagnostic/engine.ts`: only consumes monthly quota when analysis is successful (`!analysis.precisa_refazer`), and emits a restart chip ("Refazer diagnóstico agora" / `reiniciar`).
+  - `lib/ai-menvo/diagnostic/engine.ts`: checks quota limit rather than unconditional month lock, so unlimited users/admins are never blocked from testing; only consumes monthly quota when analysis is successful (`!analysis.precisa_refazer`), and emits a restart chip ("Refazer diagnóstico agora" / `reiniciar`).
   - `lib/ai/models/factory.ts`: added support for `GEMINI_API_KEY` alongside `GOOGLE_GENERATIVE_AI_API_KEY`.
 - **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 199 tests passing).
 
