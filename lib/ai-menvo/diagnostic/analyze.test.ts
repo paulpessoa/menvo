@@ -184,4 +184,24 @@ describe("fallbackAnalysis", () => {
     expect(result.mentores_sugeridos.length).toBe(3)
     expect(result.mentores_sugeridos.every((m) => m.mentor_nome === "" && m.disponivel === false)).toBe(true)
   })
+
+  it("does not trigger precisa_refazer when optional personal_life_help is skipped", () => {
+    const answersWithoutPersonalHelp: QuizAnswers = {
+      ...sampleAnswers,
+      personal_life_help: ""
+    }
+    const result = fallbackAnalysis(answersWithoutPersonalHelp, [])
+    expect(result.precisa_refazer).toBe(false)
+  })
+
+  it("triggers precisa_refazer when challenge or vision is genuinely vague or short", () => {
+    const vagueAnswers: QuizAnswers = {
+      ...sampleAnswers,
+      current_challenge: "teste",
+      future_vision: "não sei"
+    }
+    const result = fallbackAnalysis(vagueAnswers, [])
+    expect(result.precisa_refazer).toBe(true)
+    expect(result.titulo_personalizado).toBe("Que tal tentar novamente?")
+  })
 })

@@ -7,7 +7,7 @@ import type { AiCallRecord } from "../metering"
 import type { ModelSpec } from "./schema"
 
 const API_KEYS: Record<ModelSpec["provider"], () => string | undefined> = {
-  google: () => process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  google: () => process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY,
   groq: () => process.env.GROQ_API_KEY,
   openai: () => process.env.OPENAI_API_KEY
 }

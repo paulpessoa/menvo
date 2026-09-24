@@ -160,12 +160,13 @@ export class DiagnosticService {
       throw insertError
     }
 
-    // 3. Mark session completed
+    // 3. Mark session completed (or abandoned if precisa_refazer so the monthly quota is not locked)
+    const sessionStatus = analysis.precisa_refazer ? "abandoned" : "completed"
     const { error: sessionError } = await supabase
       .from("diagnostic_sessions")
       .update({
-        status: "completed",
-        completed_at: new Date().toISOString(),
+        status: sessionStatus,
+        completed_at: sessionStatus === "completed" ? new Date().toISOString() : null,
         quiz_response_id: quizResponseId,
         updated_at: new Date().toISOString()
       })

@@ -118,18 +118,30 @@ Responda em português brasileiro, com JSON válido no formato do schema forneci
 }
 
 function hasVagueOrGenericResponses(answers: QuizAnswers): boolean {
-  const challengeLength = answers.current_challenge?.trim().length || 0
-  const visionLength = answers.future_vision?.trim().length || 0
-  const personalHelpLength = answers.personal_life_help?.trim().length || 0
+  const challenge = (answers.current_challenge || "").trim().toLowerCase()
+  const vision = (answers.future_vision || "").trim().toLowerCase()
 
-  const hasVagueResponses = challengeLength < 20 || visionLength < 20 || personalHelpLength < 20
-  const hasGenericResponses =
-    answers.current_challenge?.toLowerCase().includes("não sei") ||
-    answers.future_vision?.toLowerCase().includes("não sei") ||
-    answers.current_challenge?.toLowerCase().includes("nada") ||
-    answers.future_vision?.toLowerCase().includes("nada")
+  // Challenge and vision are the primary signals. Very brief answers (< 6 chars) are considered vague.
+  const hasVagueResponses = challenge.length < 6 || vision.length < 6
 
-  return hasVagueResponses || Boolean(hasGenericResponses)
+  const genericPhrases = [
+    "não sei",
+    "nao sei",
+    "nada",
+    "nenhum",
+    "nenhuma",
+    "sei lá",
+    "sei la",
+    "...",
+    "teste",
+    "asdf"
+  ]
+
+  const hasGenericResponses = genericPhrases.some(
+    (term) => challenge === term || vision === term
+  )
+
+  return hasVagueResponses || hasGenericResponses
 }
 
 /**

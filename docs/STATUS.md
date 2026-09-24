@@ -89,17 +89,22 @@ started.
 
 ## 📓 Engineering Journal
 
-### 2026-09-24 — AI Diagnostic RLS Fix & Real-Time SSE Streaming Feedback
-- **Why:** During manual verification of `/assistant?mode=diagnostic`, completing step 7 failed with Postgres error `new row violates row-level security policy for table "quiz_responses"`, and the message bubble lacked live streaming visual feedback during background AI analysis.
+### 2026-09-24 — AI Diagnostic RLS Fix, Typewriter Streaming & Heuristic Calibration
+- **Why:** During manual verification of `/assistant?mode=diagnostic`, completing step 7 failed with Postgres RLS error on `quiz_responses`, the message bubble lacked live streaming feedback, text popped in all at once without typewriter effect, and skipping the optional question 6 triggered `precisa_refazer = true` in fallback analysis.
 - **Migration `20260924000001_fix_diagnostic_quiz_responses_rls.sql`:**
   - Separated anonymous lead-capture inserts (`user_id is null and ai_analysis is null`) from authenticated diagnostic submissions.
-  - Added authenticated INSERT & UPDATE policies (`user_id = auth.uid() or public.is_admin()`) allowing the server-side completed AI analysis to be persisted safely under RLS.
-- **Real-Time Streaming UX & SSE Buffering:**
+  - Added authenticated INSERT & UPDATE policies (`user_id = auth.uid() or public.is_admin()`) allowing server-side completed AI analysis to be persisted safely under RLS.
+- **Real-Time Typewriter Streaming & UX:**
+  - `lib/ai-menvo/diagnostic/engine.ts`: introduced `streamText()` helper to stream words and markdown chunks with micro-delays over SSE, providing a lifelike typewriter streaming animation for questions and final analysis. Added clear markdown divider (`---`) between acknowledgement and analysis results.
   - `app/[locale]/assistant/page.tsx`: added live status indicator with animated ping, loader, and backend step descriptions (`toolActivity`) inside the streaming message bubble even when partial text is displayed.
-  - `lib/ai-menvo/diagnostic/engine.ts`: persists intermediate session state prior to final AI analysis, emits explicit progress on step 7 ("Análise com IA em andamento"), and sends real-time descriptive `tool_start` events ("Validando cota...", "Analisando seu momento de carreira com IA...", "Buscando mentores compatíveis...", "Salvando seu diagnóstico...").
   - `components/assistant/DiagnosticProgressBar.tsx`: added `isProcessing` prop with active spinner and pulse effect.
   - `app/api/assistant/route.ts`: added `export const dynamic = "force-dynamic"` and `"X-Accel-Buffering": "no"` to guarantee zero-buffering over SSE streams.
-- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 197 tests passing).
+- **Heuristic Calibration & Quota Protection:**
+  - `lib/ai-menvo/diagnostic/analyze.ts`: fixed `hasVagueOrGenericResponses` so optional `personal_life_help` is no longer required to be >20 chars (previously skipping question 6 always triggered `precisa_refazer`).
+  - `lib/services/diagnostic/diagnostic.service.ts`: marks session `status: "abandoned"` instead of `"completed"` if `precisa_refazer` is true, so the user is never locked out of their monthly free diagnostic when asked to reflect more.
+  - `lib/ai-menvo/diagnostic/engine.ts`: only consumes monthly quota when analysis is successful (`!analysis.precisa_refazer`), and emits a restart chip ("Refazer diagnóstico agora" / `reiniciar`).
+  - `lib/ai/models/factory.ts`: added support for `GEMINI_API_KEY` alongside `GOOGLE_GENERATIVE_AI_API_KEY`.
+- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 199 tests passing).
 
 ### 2026-09-24 — AI Platform Fase 1 Implemented: Agentic Diagnostic State Machine, Interactive Chips & Chat UI
 - **Why:** Delivers Fase 1 of `docs/AI_PLATFORM_PLAN.md`: turns the static 8-step anonymous quiz into an interactive, conversational diagnostic inside `/assistant?mode=diagnostic` with state machine progression, voice input, deterministic chips, and mentor matching.

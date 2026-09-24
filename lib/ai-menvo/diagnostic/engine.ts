@@ -1,5 +1,5 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js"
-import { consumeAiQuota } from "@/lib/ai/quota"
+import { consumeAiQuota, getAiQuota } from "@/lib/ai/quota"
 import type { AiCallRecord } from "@/lib/ai/metering"
 import type { AiEvent } from "@/lib/ai/protocol"
 import { diagnosticService } from "@/lib/services/diagnostic/diagnostic.service"
@@ -13,6 +13,20 @@ import type { DiagnosticState, DiagnosticStepId } from "./types"
 export interface ProcessDiagnosticOptions {
   onCall: (record: AiCallRecord) => void
   emit: (event: AiEvent) => void
+}
+
+/**
+ * Emits text in natural streaming chunks with micro-delays
+ * to provide a smooth, lifelike typewriter streaming effect over SSE.
+ */
+async function streamText(text: string, emit: (event: AiEvent) => void, delayMs = 12): Promise<void> {
+  const chunks = text.match(/\S+\s*|\s+/g) || [text]
+  for (const chunk of chunks) {
+    emit({ type: "text", text: chunk })
+    if (delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+    }
+  }
 }
 
 /**
@@ -65,13 +79,13 @@ export async function processDiagnosticTurn(
       stepName: step1.name
     })
 
-    emit({
-      type: "text",
-      text:
-        "Olá! Boas-vindas ao Diagnóstico de Carreira da Menvo. " +
-        "Vou te fazer 7 perguntas rápidas para entender seu momento e recomendar os mentores ideais para você.\n\n" +
-        step1.questionText
-    })
+    await streamText(
+      "Olá! Boas-vindas ao Diagnóstico de Carreira da Menvo. " +
+      "Vou te fazer 7 perguntas rápidas para entender seu momento e recomendar os mentores ideais para você.\n\n" +
+      step1.questionText,
+      emit,
+      10
+    )
 
     if (step1.chipOptions) {
       emit({
@@ -92,6 +106,36 @@ export async function processDiagnosticTurn(
   }
   const currentStep = state.currentStep
 
+  // Support restarting diagnostic
+  if (trimmedInput.toLowerCase() === "reiniciar" || trimmedInput.toLowerCase() === "refazer") {
+    state.currentStep = 1
+    state.answers = {}
+    state.followups = {}
+    state.isAwaitingFollowup = false
+    await diagnosticService.updateSessionState(supabase, session.id, state, 1)
+    const step1 = DIAGNOSTIC_STEPS[1]
+    emit({
+      type: "progress",
+      step: 1,
+      totalSteps: TOTAL_DIAGNOSTIC_STEPS,
+      stepName: step1.name
+    })
+    await streamText(
+      "Vamos tentar novamente com mais calma! " + step1.questionText,
+      emit,
+      10
+    )
+    if (step1.chipOptions) {
+      emit({
+        type: "chips",
+        mode: "single",
+        options: step1.chipOptions,
+        allowOther: step1.allowOther
+      })
+    }
+    return
+  }
+
   // If user passed empty input on an active session, re-prompt current step
   if (!trimmedInput) {
     const stepDef = DIAGNOSTIC_STEPS[currentStep]
@@ -101,7 +145,7 @@ export async function processDiagnosticTurn(
       totalSteps: TOTAL_DIAGNOSTIC_STEPS,
       stepName: stepDef.name
     })
-    emit({ type: "text", text: stepDef.questionText })
+    await streamText(stepDef.questionText, emit, 10)
     if (stepDef.chipOptions) {
       emit({
         type: "chips",
@@ -269,7 +313,7 @@ async function advanceToNextStep(
       ? `${stepDef.questionText}\n\n${stepDef.descriptionText}`
       : stepDef.questionText
 
-    emit({ type: "text", text })
+    await streamText(text, emit, 10)
 
     if (stepDef.chipOptions) {
       emit({
@@ -294,23 +338,24 @@ async function advanceToNextStep(
     stepName: "Análise com IA em andamento"
   })
 
-  emit({
-    type: "text",
-    text: "Excelente! Respostas registradas com sucesso. Estou analisando seu momento de carreira e buscando os mentores mais adequados para o seu perfil..."
-  })
+  await streamText(
+    "Excelente! Respostas registradas com sucesso. Estou analisando seu momento de carreira e buscando os mentores mais adequados para o seu perfil...\n\n",
+    emit,
+    10
+  )
 
   emit({
     type: "tool_start",
     name: "Validando cota de diagnóstico..."
   })
 
-  // 1. Quota check: consume 1 credit of "diagnostic"
-  const quota = await consumeAiQuota(supabase, "diagnostic")
-  if (!quota.allowed) {
+  // 1. Quota check: read-only check first
+  const quotaCheck = await getAiQuota(supabase, "diagnostic")
+  if (!quotaCheck.allowed) {
     emit({
       type: "error",
       message:
-        quota.reason === "budget"
+        quotaCheck.reason === "budget"
           ? "O limite mensal de processamento por IA da plataforma foi atingido. Seu diagnóstico foi salvo e será processado em breve."
           : "Você já atingiu seu limite de diagnósticos para este mês."
     })
@@ -358,6 +403,11 @@ async function advanceToNextStep(
 
   const { analysis } = await analyzeQuiz(supabase, answers, mentors, { onCall })
 
+  // Only consume quota if the analysis succeeded and does not require redoing
+  if (!analysis.precisa_refazer) {
+    await consumeAiQuota(supabase, "diagnostic")
+  }
+
   emit({
     type: "tool_start",
     name: "Buscando mentores compatíveis no catálogo..."
@@ -395,13 +445,23 @@ async function advanceToNextStep(
     })
   }
 
-  emit({
-    type: "text",
-    text:
-      `🎉 **${analysis.titulo_personalizado}**\n\n` +
-      `${analysis.resumo_motivador}\n\n` +
-      `**Próximos Passos recomendados:**\n` +
-      (analysis.proximos_passos || []).map((p: string) => `• ${p}`).join("\n") +
-      `\n\n${analysis.mensagem_final}`
-  })
+  const finalText =
+    `---\n\n` +
+    `🎉 **${analysis.titulo_personalizado}**\n\n` +
+    `${analysis.resumo_motivador}\n\n` +
+    `**Próximos Passos recomendados:**\n` +
+    (analysis.proximos_passos || []).map((p: string) => `• ${p}`).join("\n") +
+    `\n\n${analysis.mensagem_final}`
+
+  await streamText(finalText, emit, 15)
+
+  if (analysis.precisa_refazer) {
+    emit({
+      type: "chips",
+      mode: "single",
+      options: [
+        { label: "Refazer diagnóstico agora", value: "reiniciar" }
+      ]
+    })
+  }
 }
