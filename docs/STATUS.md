@@ -89,6 +89,19 @@ started.
 
 ## 📓 Engineering Journal
 
+### 2026-09-24 — Mentor Suggestions in Diagnostic Text, Robust Mentor Card Resolution & Link Action Buttons
+- **Why:** During end-to-end testing of `/assistant?mode=diagnostic`, the completed diagnostic response lacked mentor suggestions in the markdown text and didn't display mentor cards (due to strict multi-word ILIKE query on joined development areas in `searchMentors`). Additionally, URLs returned in messages needed to render cleanly as action buttons without dangling raw URLs.
+- **Mentor Suggestions & Mentor Cards (`lib/ai-menvo/diagnostic/engine.ts`):**
+  - Queried all fields required by `MentorCard` (`slug`, `avatar_url`, `city`, `state`, `country`, `languages`, `inclusive_tags`, `expertise_areas`, etc.) from `mentors_view`.
+  - Added multi-tier resolution for interactive mentor cards: (1) mentors identified by name in `analysis.mentores_sugeridos`, (2) mentors scored by match with `development_areas` against topics, skills, job title, and bio, (3) top-rated available platform mentors.
+  - Included a dedicated **Mentores Recomendados para seu Momento** section in `finalText` detailing the matched mentor types, real mentor names, availability, and specific reasons.
+  - Emitted interactive completion chip button: `"Ver Relatório Completo" -> link:/quiz/results/[id]`.
+- **Search Catalog Fallback (`lib/services/assistant/tools.ts`):**
+  - Added fallback in `searchMentors`: if specific search query returns 0 matches, automatically falls back to top-rated mentors by relevance so neither the AI Copilot nor the Diagnostic ever returns an empty mentor set.
+- **Link-to-Button UI (`app/[locale]/assistant/page.tsx`):**
+  - Enhanced `MessageContent` component with clean sentence-level link regex and replacement, rendering links like `/quiz/results/[uuid]` as styled `#007585` buttons with icons (`FileText`, `ExternalLink`) and removing trailing punctuation/awkward phrases ("em .").
+- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 199 tests passing).
+
 ### 2026-09-24 — AI Diagnostic RLS Fix, Typewriter Streaming & Heuristic Calibration
 - **Why:** During manual verification of `/assistant?mode=diagnostic`, completing step 7 failed with Postgres RLS error on `quiz_responses`, the message bubble lacked live streaming feedback, text popped in all at once without typewriter effect, and skipping the optional question 6 triggered `precisa_refazer = true` in fallback analysis.
 - **Migration `20260924000001_fix_diagnostic_quiz_responses_rls.sql`:**

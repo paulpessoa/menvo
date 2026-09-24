@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { useFeatureFlag } from "@/lib/feature-flags"
-import { Bot, User, Sparkles, Loader2, Info, Send } from "lucide-react"
+import { Bot, User, Sparkles, Loader2, Info, Send, FileText, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MentorCard } from "@/components/mentors/MentorCard"
@@ -48,46 +48,75 @@ const LOADING_MESSAGES = [
 ]
 
 function MessageContent({ text }: { text: string }) {
-  // Extract links such as /quiz/results/[uuid] or markdown links [label](url)
-  const quizResultsMatch = text.match(/\/quiz\/results\/[a-f0-9-]{36}/i)
-  const markdownLinkMatches = Array.from(text.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g))
-
-  const actionButtons: { label: string; href: string }[] = []
+  const actionButtons: { label: string; href: string; icon?: "report" | "external" }[] = []
   let cleanText = text
 
-  if (quizResultsMatch) {
-    const url = quizResultsMatch[0]
-    actionButtons.push({
-      label: "Ver Relatório do Diagnóstico",
-      href: url
-    })
-    cleanText = cleanText.replace(url, "").replace(/em\s*(\.|\s*$)/g, "abaixo:")
+  // 1. Detect sentences referencing /quiz/results/[uuid]
+  const quizSentenceRegex =
+    /(?:você pode rever o resultado anterior acessando seu relatório em|acessando seu relatório em|no link em|através de)?\s*(\/quiz\/results\/([a-f0-9-]{36}))[.]?/gi
+  const quizMatches = Array.from(text.matchAll(quizSentenceRegex))
+  if (quizMatches.length > 0) {
+    for (const match of quizMatches) {
+      actionButtons.push({
+        label: "Ver Relatório do Diagnóstico",
+        href: match[1],
+        icon: "report"
+      })
+      cleanText = cleanText.replace(
+        match[0],
+        "Você pode rever a sua análise anterior acessando seu relatório completo no botão abaixo:"
+      )
+    }
   }
 
+  // Fallback match for raw /quiz/results/uuid if not caught by sentence pattern
+  const rawQuizRegex = /\/quiz\/results\/([a-f0-9-]{36})[.]?/gi
+  const rawQuizMatches = Array.from(cleanText.matchAll(rawQuizRegex))
+  for (const match of rawQuizMatches) {
+    if (!actionButtons.some((b) => b.href.includes(match[1]))) {
+      actionButtons.push({
+        label: "Ver Relatório do Diagnóstico",
+        href: `/quiz/results/${match[1]}`,
+        icon: "report"
+      })
+    }
+    cleanText = cleanText.replace(match[0], "").replace(/\s+em\s*\.?/gi, "")
+  }
+
+  // 2. Detect markdown links [label](url)
+  const markdownLinkMatches = Array.from(cleanText.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g))
   if (markdownLinkMatches.length > 0) {
-    markdownLinkMatches.forEach((match) => {
+    for (const match of markdownLinkMatches) {
       if (match[1] && match[2]) {
         actionButtons.push({
           label: match[1],
-          href: match[2]
+          href: match[2],
+          icon: match[2].includes("/quiz/results") ? "report" : "external"
         })
         cleanText = cleanText.replace(match[0], match[1])
       }
-    })
+    }
   }
 
+  cleanText = cleanText.trim()
+
   return (
-    <div className="flex flex-col gap-2">
-      <p className="whitespace-pre-wrap leading-relaxed">{cleanText}</p>
+    <div className="flex flex-col gap-3">
+      {cleanText && <p className="whitespace-pre-wrap leading-relaxed">{cleanText}</p>}
       {actionButtons.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-2.5 pt-1.5">
           {actionButtons.map((btn, idx) => (
             <Link
               key={idx}
               href={btn.href}
-              className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-[#006276] active:scale-[0.98] transition-all shadow-sm shadow-primary/20 w-fit"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-[#006276] active:scale-[0.98] transition-all shadow-md shadow-primary/25 w-fit"
             >
-              {btn.label}
+              {btn.icon === "report" ? (
+                <FileText className="w-4 h-4" />
+              ) : (
+                <ExternalLink className="w-4 h-4" />
+              )}
+              <span>{btn.label}</span>
             </Link>
           ))}
         </div>

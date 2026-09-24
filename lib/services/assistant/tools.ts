@@ -58,12 +58,20 @@ export async function searchMentors(
   supabase: SupabaseClient,
   input: z.infer<typeof searchMentorsInput>
 ): Promise<SearchMentorsResult> {
-  // searchCatalog pages are 0-indexed; page 1 would skip the best-rated mentors.
-  const result = await mentorService.searchCatalog({
+  let result = await mentorService.searchCatalog({
     filters: { search: input.query, sortBy: "relevance" },
     page: 0,
     limit: input.limit
   })
+
+  // If specific query returned 0 matches, fallback to catalog top mentors
+  if (!result.data || result.data.length === 0) {
+    result = await mentorService.searchCatalog({
+      filters: { sortBy: "relevance" },
+      page: 0,
+      limit: input.limit
+    })
+  }
 
   // safeParse strips every column outside the DTO and drops a malformed row
   // instead of failing the whole search.

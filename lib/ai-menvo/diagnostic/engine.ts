@@ -375,11 +375,12 @@ async function advanceToNextStep(
 
   // 2. Run analysis
   const profileName = user.user_metadata?.full_name || "Mentorado"
+  const MENTOR_SELECT_FIELDS =
+    "id, full_name, slug, avatar_url, bio, job_title, company, city, state, country, languages, inclusive_tags, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions, experience_years"
+
   let { data: mentorRows } = await supabase
     .from("mentors_view")
-    .select(
-      "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions"
-    )
+    .select(MENTOR_SELECT_FIELDS)
     .eq("verified", true)
     .eq("is_public", true)
     .limit(50)
@@ -387,9 +388,7 @@ async function advanceToNextStep(
   if (!mentorRows || mentorRows.length === 0) {
     const { data: allMentors } = await supabase
       .from("mentors_view")
-      .select(
-        "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions"
-      )
+      .select(MENTOR_SELECT_FIELDS)
       .limit(50)
     mentorRows = allMentors
   }
@@ -419,9 +418,69 @@ async function advanceToNextStep(
     name: "Buscando mentores compatíveis no catálogo..."
   })
 
-  // 3. Search mentors matching development areas
-  const query = state.answers.development_areas?.join(" ") || "carreira"
-  const searchResults = await assistantTools.searchMentors(supabase, { query, limit: 3 })
+  // 3. Resolve recommended mentor cards (from analysis suggestions, skills match, or top rated)
+  const recommendedCards: any[] = []
+  const usedMentorIds = new Set<string>()
+
+  // A. Priority: mentors identified by name in analysis.mentores_sugeridos
+  if (analysis.mentores_sugeridos && mentorRows) {
+    for (const s of analysis.mentores_sugeridos) {
+      if (s.mentor_nome) {
+        const found = mentorRows.find(
+          (m: any) =>
+            m.full_name?.toLowerCase().trim() === s.mentor_nome.toLowerCase().trim() &&
+            !usedMentorIds.has(m.id)
+        )
+        if (found) {
+          usedMentorIds.add(found.id)
+          recommendedCards.push(found)
+        }
+      }
+    }
+  }
+
+  // B. Fill up to 3 mentors by matching development areas with topics/skills/bio
+  if (recommendedCards.length < 3 && mentorRows && mentorRows.length > 0) {
+    const devAreas = (state.answers.development_areas || []).map((a: string) => a.toLowerCase())
+    const scored = mentorRows
+      .filter((m: any) => !usedMentorIds.has(m.id))
+      .map((m: any) => {
+        const textToMatch = [
+          ...(m.expertise_areas || []),
+          ...(m.mentorship_topics || []),
+          ...(m.mentor_skills || []),
+          m.job_title || "",
+          m.bio || ""
+        ]
+          .join(" ")
+          .toLowerCase()
+
+        let score = 0
+        for (const area of devAreas) {
+          if (textToMatch.includes(area) || area.split(/\s+/).some((w) => w.length > 3 && textToMatch.includes(w))) {
+            score += 2
+          }
+        }
+        if (m.availability_status === "available") score += 1
+        score += (m.average_rating || 0) * 0.5
+        return { mentor: m, score }
+      })
+      .sort((a, b) => b.score - a.score)
+
+    for (const item of scored) {
+      if (recommendedCards.length >= 3) break
+      usedMentorIds.add(item.mentor.id)
+      recommendedCards.push(item.mentor)
+    }
+  }
+
+  // C. Fallback: try assistantTools.searchMentors
+  if (recommendedCards.length === 0) {
+    const searchResults = await assistantTools.searchMentors(supabase, { query: "carreira", limit: 3 })
+    if (searchResults.forCard && searchResults.forCard.length > 0) {
+      recommendedCards.push(...searchResults.forCard)
+    }
+  }
 
   emit({
     type: "tool_start",
@@ -444,19 +503,45 @@ async function advanceToNextStep(
     analysis: analysis as unknown as Record<string, unknown>
   })
 
-  if (searchResults.forCard.length > 0) {
+  if (recommendedCards.length > 0) {
     emit({
       type: "mentors_found",
-      mentors: searchResults.forCard
+      mentors: recommendedCards
     })
   }
+
+  // 6. Build final text including explicit mentor recommendations and practical advice
+  const mentorSuggestionsText =
+    analysis.mentores_sugeridos && analysis.mentores_sugeridos.length > 0
+      ? `\n\n**Mentores Recomendados para seu Momento:**\n` +
+        analysis.mentores_sugeridos
+          .map((m: any) => {
+            const nomeStr = m.mentor_nome ? ` (${m.mentor_nome})` : ""
+            const statusStr = m.disponivel ? " — *Agenda disponível*" : ""
+            return `• **${m.tipo}**${nomeStr}${statusStr}: ${m.razao}`
+          })
+          .join("\n")
+      : ""
+
+  const conselhosText =
+    analysis.conselhos_praticos && analysis.conselhos_praticos.length > 0
+      ? `\n\n**Conselhos Práticos:**\n` +
+        analysis.conselhos_praticos.map((c: string) => `• ${c}`).join("\n")
+      : ""
+
+  const proximosPassosText =
+    analysis.proximos_passos && analysis.proximos_passos.length > 0
+      ? `\n\n**Próximos Passos recomendados:**\n` +
+        analysis.proximos_passos.map((p: string) => `• ${p}`).join("\n")
+      : ""
 
   const finalText =
     `---\n\n` +
     `🎉 **${analysis.titulo_personalizado}**\n\n` +
-    `${analysis.resumo_motivador}\n\n` +
-    `**Próximos Passos recomendados:**\n` +
-    (analysis.proximos_passos || []).map((p: string) => `• ${p}`).join("\n") +
+    `${analysis.resumo_motivador}` +
+    mentorSuggestionsText +
+    conselhosText +
+    proximosPassosText +
     `\n\n${analysis.mensagem_final}`
 
   await streamText(finalText, emit, 15)
@@ -467,6 +552,14 @@ async function advanceToNextStep(
       mode: "single",
       options: [
         { label: "Refazer diagnóstico agora", value: "reiniciar" }
+      ]
+    })
+  } else if (quizResponseId) {
+    emit({
+      type: "chips",
+      mode: "single",
+      options: [
+        { label: "Ver Relatório Completo", value: `link:/quiz/results/${quizResponseId}` }
       ]
     })
   }
