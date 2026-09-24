@@ -403,6 +403,10 @@ export default function MentorsPage() {
 
   return (
     <PageContainer>
+      <p className="text-center text-sm sm:text-base text-muted-foreground mb-6">
+        Você não precisa saber quem pode te ajudar, você só precisa saber o que quer conversar.
+      </p>
+
       {/* Search and Filter Bar */}
       <div className="mb-2 sm:mb-3 space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
