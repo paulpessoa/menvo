@@ -89,6 +89,17 @@ started.
 
 ## 📓 Engineering Journal
 
+### 2026-09-24 — Interactive Mentor Cards & Direct Profile Action Buttons on Diagnostic Results Page
+- **Why:** On `/quiz/results/[id]`, suggested mentors were rendered as static informative blocks without the ability to navigate to the mentor's profile or schedule a session.
+- **Interactive Mentor Cards (`app/[locale]/quiz/results/[id]/page.tsx`):**
+  - Added dynamic resolution of real mentor slugs by querying `mentors_view` on results load (`mentorSlugMap`).
+  - Transformed each suggested mentor into an interactive, clickable card with hover effects (`group hover:border-primary/60 hover:shadow-md hover:bg-muted/10 transition-all rounded-2xl`).
+  - Added dedicated action button at the bottom of each mentor card: `"Ver Perfil do Mentor"` (with `ExternalLink` icon) pointing to `/mentors/[slug]`, or fallback search `/mentors?search=[nome]` / `/mentors`.
+  - Added a global catalog button: `"Explorar Todos os Mentores na Plataforma"`.
+- **Search Query Parameter Support (`app/[locale]/mentors/page.tsx`):**
+  - Updated mentors catalog to read `search` query parameter on mount and automatically filter the catalog when navigated from diagnostic links.
+- **Verified:** `npx tsc --noEmit` (0 errors), `npm test` (40 suites, 199 tests passing).
+
 ### 2026-09-24 — Mentor Suggestions in Diagnostic Text, Robust Mentor Card Resolution & Link Action Buttons
 - **Why:** During end-to-end testing of `/assistant?mode=diagnostic`, the completed diagnostic response lacked mentor suggestions in the markdown text and didn't display mentor cards (due to strict multi-word ILIKE query on joined development areas in `searchMentors`). Additionally, URLs returned in messages needed to render cleanly as action buttons without dangling raw URLs.
 - **Mentor Suggestions & Mentor Cards (`lib/ai-menvo/diagnostic/engine.ts`):**

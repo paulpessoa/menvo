@@ -23,12 +23,14 @@ import {
     Heart,
     Sparkles,
     Mail,
-    Share2
+    Share2,
+    ExternalLink
 } from "lucide-react"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
 import { quizService } from "@/lib/services/quiz/quiz.service"
+import { createClient } from "@/lib/utils/supabase/client"
 
 interface AnalysisResult {
     precisa_refazer?: boolean
@@ -63,6 +65,7 @@ export default function QuizResultsPage() {
     const [loading, setLoading] = useState(true)
     const [response, setResponse] = useState<QuizResponse | null>(null)
     const [sendingEmail, setSendingEmail] = useState(false)
+    const [mentorSlugMap, setMentorSlugMap] = useState<Record<string, string>>({})
 
     useEffect(() => {
         if (params.id) {
@@ -140,6 +143,33 @@ export default function QuizResultsPage() {
             }
 
             setResponse(res)
+
+            // Resolve real mentor profile slugs if available
+            const mentorNames = (res.ai_analysis?.mentores_sugeridos || [])
+                .map((m) => m.mentor_nome?.trim())
+                .filter((name): name is string => Boolean(name))
+
+            if (mentorNames.length > 0) {
+                try {
+                    const supabase = createClient()
+                    const { data: mentorsFound } = await (supabase
+                        .from("mentors_view") as any)
+                        .select("full_name, slug, id")
+                        .in("full_name", mentorNames)
+
+                    if (mentorsFound && (mentorsFound as any[]).length > 0) {
+                        const map: Record<string, string> = {}
+                        for (const m of (mentorsFound as any[])) {
+                            if (m.full_name) {
+                                map[m.full_name.toLowerCase()] = m.slug || m.id || ""
+                            }
+                        }
+                        setMentorSlugMap(map)
+                    }
+                } catch (e) {
+                    console.warn("Could not resolve mentor slugs:", e)
+                }
+            }
         } catch (error) {
             console.error("Error loading results:", error)
             toast({
@@ -283,38 +313,82 @@ export default function QuizResultsPage() {
                             <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
                                 <p className="text-sm text-blue-800 dark:text-blue-200" dangerouslySetInnerHTML={{ __html: t('quiz_results.mentor_status_tooltip') }} />
                             </div>
-                            {analysis.mentores_sugeridos.map((mentor, index) => (
-                                <div key={index} className="p-4 border rounded-lg space-y-2">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <h4 className="font-semibold text-lg">{mentor.tipo}</h4>
+                            {analysis.mentores_sugeridos.map((mentor, index) => {
+                                const resolvedSlug = mentor.mentor_nome
+                                    ? mentorSlugMap[mentor.mentor_nome.toLowerCase()]
+                                    : null;
+                                const mentorHref = resolvedSlug
+                                    ? `/mentors/${resolvedSlug}`
+                                    : mentor.mentor_nome
+                                    ? `/mentors?search=${encodeURIComponent(mentor.mentor_nome)}`
+                                    : `/mentors`;
+
+                                return (
+                                    <div
+                                        key={index}
+                                        onClick={() => router.push(mentorHref)}
+                                        className="p-5 border rounded-2xl space-y-3 cursor-pointer hover:border-primary/60 hover:shadow-md hover:bg-muted/10 transition-all duration-200 group bg-card"
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1">
+                                                <h4 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                                                    {mentor.tipo}
+                                                </h4>
+                                                {mentor.mentor_nome && (
+                                                    <p className="text-sm font-medium text-muted-foreground mt-0.5">
+                                                        {t('quiz_results.mentor')}: <span className="text-foreground font-semibold">{mentor.mentor_nome}</span>
+                                                    </p>
+                                                )}
+                                            </div>
                                             {mentor.mentor_nome && (
-                                                <p className="text-sm text-muted-foreground">
-                                                    {t('quiz_results.mentor')}: {mentor.mentor_nome}
-                                                </p>
+                                                <Badge
+                                                    variant={mentor.disponivel ? "default" : "secondary"}
+                                                    className={
+                                                        mentor.disponivel
+                                                            ? "bg-green-600 hover:bg-green-700 text-white shrink-0"
+                                                            : "bg-orange-500 text-white shrink-0"
+                                                    }
+                                                >
+                                                    <CheckCircle
+                                                        className="h-3 w-3 mr-1 text-white"
+                                                    />
+                                                    {mentor.disponivel ? t('quiz_results.available') : t('quiz_results.full_schedule')}
+                                                </Badge>
                                             )}
                                         </div>
-                                        {mentor.mentor_nome && (
-                                            <Badge
-                                                variant={mentor.disponivel ? "default" : "secondary"}
-                                                className={
-                                                    mentor.disponivel
-                                                        ? "bg-green-600 hover:bg-green-700"
-                                                        : "bg-orange-500 text-white"
-                                                }
+                                        <p className="text-sm text-muted-foreground leading-relaxed">
+                                            {mentor.razao}
+                                        </p>
+                                        <div className="pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/40">
+                                            <span className="text-xs text-muted-foreground group-hover:text-primary/80 transition-colors">
+                                                {mentor.mentor_nome
+                                                    ? "Clique no card ou no botão para acessar o perfil e horários"
+                                                    : "Clique para explorar mentores cadastrados na plataforma"}
+                                            </span>
+                                            <Button
+                                                size="sm"
+                                                className="rounded-xl bg-primary text-primary-foreground font-medium text-xs hover:bg-[#006276] active:scale-[0.98] transition-all shadow-sm shadow-primary/20 gap-1.5"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(mentorHref);
+                                                }}
                                             >
-                                                <CheckCircle
-                                                    className="h-3 w-3 mr-1 text-white"
-                                                />
-                                                {mentor.disponivel ? t('quiz_results.available') : t('quiz_results.full_schedule')}
-                                            </Badge>
-                                        )}
+                                                <ExternalLink className="h-3.5 w-3.5" />
+                                                <span>{mentor.mentor_nome ? "Ver Perfil do Mentor" : "Explorar Mentores"}</span>
+                                            </Button>
+                                        </div>
                                     </div>
-                                    <p className="text-sm text-muted-foreground">
-                                        {mentor.razao}
-                                    </p>
-                                </div>
-                            ))}
+                                );
+                            })}
+                            <div className="pt-2 text-center">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => router.push("/mentors")}
+                                    className="rounded-xl border font-medium text-xs hover:bg-muted/50 transition-all"
+                                >
+                                    Explorar Todos os Mentores na Plataforma
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
 

@@ -225,6 +225,12 @@ export default function MentorsPage() {
 
   useEffect(() => {
     fetchFilterOptions()
+    if (typeof window !== "undefined") {
+      const searchParam = new URLSearchParams(window.location.search).get("search")
+      if (searchParam) {
+        setFilters((prev) => ({ ...prev, search: searchParam }))
+      }
+    }
   }, [])
 
   useEffect(() => {
