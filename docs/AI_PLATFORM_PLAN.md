@@ -11,7 +11,11 @@
 > implementado em código — a medição do LangChain agora é um callback por
 > modelo (`lib/ai/metering/callback.ts`), não mais `streamEvents`
 > (`lib/ai/langchain-metering.ts`, removido). Migrações `…000004` e `…000006`
-> escritas, aguardando o fundador aplicá-las. Ver o diário do `STATUS.md`.
+> escritas, aguardando o fundador aplicá-las. Protocolo SSE tipado com Zod
+> (`lib/ai/protocol.ts`) e ADRs 0001–0004 + `docs/governance/ai-policy.md`
+> **feitos** (2026-09-24) — Fase 0 completa em código, restando só a
+> degradação a 80% do orçamento (§3.4) e as migrações pendentes acima.
+> Ver o diário do `STATUS.md`.
 > **Para quem executa:** leia §0 (estado atual) e §1 (princípios) antes de
 > qualquer fase. As decisões do fundador estão em §9, os preços dos modelos
 > em §11 e privacidade/retenção em §12.
@@ -494,8 +498,15 @@ diário do `STATUS.md`.
 4. `ai_entitlements` + `ai_quota_ledger` + RPC `consume_ai_quota`; trocar o
    rate limit em memória do `/api/assistant` pelo gate no banco.
 5. `searchMentors`: DTO enxuto para o LLM, DTO de card para a UI.
-6. Protocolo SSE tipado com Zod (`lib/ai/protocol.ts`), compartilhado entre servidor e client.
-7. Esqueleto de `docs/` e `kb/` + ADRs 0001–0004 + `docs/governance/ai-policy.md`.
+6. **Feito (2026-09-24):** Protocolo SSE tipado com Zod (`lib/ai/protocol.ts`,
+   `aiEventSchema`, `encodeSseEvent`/`encodeSseDone`/`parseSseLine`),
+   compartilhado entre `app/api/assistant/route.ts` (encode) e
+   `app/[locale]/assistant/page.tsx` (parse) — os dois lados não podem mais
+   divergir no formato do evento. Não importa `lib/services/*` (o payload de
+   `mentors_found` é registros opacos aqui; a validação com `mentorCardDto`
+   já acontece em `lib/services/assistant/tools.ts` antes de chegar no SSE).
+7. **Feito (2026-09-24):** ADRs 0001–0004 e `docs/governance/ai-policy.md`.
+   Esqueleto de `docs/` e `kb/` já feito em 2026-09-23.
 8. Seed de `ai_model_pricing` e `ai_model_config` com a §11; `ai_budget` com US$ 10.
 9. Auditar a RLS real de `quiz_responses` (§0, item 8) e registrar o resultado no diário.
    **Feito (2026-09-23):** vazamento confirmado, corrigido e **aplicado**

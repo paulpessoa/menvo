@@ -5,6 +5,7 @@ import { consumeAiQuota } from "@/lib/ai/quota"
 import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
 import { HumanMessage, AIMessage } from "@langchain/core/messages"
 import { getAssistantAgent } from "@/lib/services/assistant/agent"
+import { encodeSseEvent, encodeSseDone } from "@/lib/ai/protocol"
 
 export const maxDuration = 60
 
@@ -50,7 +51,6 @@ export async function POST(req: NextRequest) {
     const agent = await getAssistantAgent(supabase, { onCall: (record) => calls.push(record) })
 
     // Configurar Stream SSE Nativo do Next.js
-    const encoder = new TextEncoder()
     const stream = new ReadableStream({
       async start(controller) {
         let fullAiResponse = ""
@@ -73,20 +73,20 @@ export async function POST(req: NextRequest) {
               if (chunk.content) {
                 const text = chunk.content.toString()
                 fullAiResponse += text
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "text", text })}\n\n`))
+                controller.enqueue(encodeSseEvent({ type: "text", text }))
               }
             }
-            
+
             // Informa ao frontend quando uma tool é chamada
             if (event.event === "on_tool_start") {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "tool_start", name: event.name })}\n\n`))
+              controller.enqueue(encodeSseEvent({ type: "tool_start", name: event.name }))
             }
 
             // Envia o payload de card (artifact da tool, nunca visto pelo LLM) para renderizar o UI Card
             if (event.event === "on_tool_end" && event.name === "searchMentors") {
               const mentorsData = event.data.output?.artifact
               if (mentorsData && Array.isArray(mentorsData) && mentorsData.length > 0) {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "mentors_found", mentors: mentorsData })}\n\n`))
+                controller.enqueue(encodeSseEvent({ type: "mentors_found", mentors: mentorsData }))
               }
             }
           }
@@ -100,10 +100,10 @@ export async function POST(req: NextRequest) {
             if (error) console.error("Erro ao salvar log do assistente:", error)
           })
 
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"))
+          controller.enqueue(encodeSseDone())
         } catch (err: any) {
           console.error("Erro no stream do assistente:", err)
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", message: err.message })}\n\n`))
+          controller.enqueue(encodeSseEvent({ type: "error", message: err.message }))
         } finally {
           // Before close(): the serverless function lives while the stream is open.
           await recordAiCalls(supabase, "assistant", calls)

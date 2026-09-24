@@ -7,6 +7,7 @@ import { Send, Bot, User, Sparkles, Loader2, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MentorCard } from "@/components/mentors/MentorCard"
+import { parseSseLine } from "@/lib/ai/protocol"
 
 interface Message {
   id: string
@@ -120,38 +121,33 @@ export default function AssistantPage() {
           const lines = chunk.split("\n")
           
           for (const line of lines) {
-            if (line.startsWith("data: ") && line !== "data: [DONE]") {
-              try {
-                const data = JSON.parse(line.replace("data: ", ""))
-                
-                if (data.type === "text") {
-                  setToolActivity(null)
-                  setMessages(prev => prev.map(msg => 
-                    msg.id === assistantMessageId 
-                      ? { ...msg, text: msg.text + data.text } 
-                      : msg
-                  ))
-                } else if (data.type === "tool_start") {
-                  const randomMsg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
-                  setToolActivity(randomMsg)
-                } else if (data.type === "mentors_found") {
-                  setToolActivity(null)
-                  setMessages(prev => prev.map(msg => 
-                    msg.id === assistantMessageId 
-                      ? { ...msg, mentors: data.mentors } 
-                      : msg
-                  ))
-                } else if (data.type === "error") {
-                  setToolActivity(null)
-                  setMessages(prev => prev.map(msg => 
-                    msg.id === assistantMessageId 
-                      ? { ...msg, text: msg.text + "\n❌ Erro: " + data.message } 
-                      : msg
-                  ))
-                }
-              } catch (e) {
-                // Ignore parse errors on incomplete chunks
-              }
+            const event = parseSseLine(line)
+            if (!event || event === "done") continue
+
+            if (event.type === "text") {
+              setToolActivity(null)
+              setMessages(prev => prev.map(msg =>
+                msg.id === assistantMessageId
+                  ? { ...msg, text: msg.text + event.text }
+                  : msg
+              ))
+            } else if (event.type === "tool_start") {
+              const randomMsg = LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
+              setToolActivity(randomMsg)
+            } else if (event.type === "mentors_found") {
+              setToolActivity(null)
+              setMessages(prev => prev.map(msg =>
+                msg.id === assistantMessageId
+                  ? { ...msg, mentors: event.mentors }
+                  : msg
+              ))
+            } else if (event.type === "error") {
+              setToolActivity(null)
+              setMessages(prev => prev.map(msg =>
+                msg.id === assistantMessageId
+                  ? { ...msg, text: msg.text + "\n❌ Erro: " + event.message }
+                  : msg
+              ))
             }
           }
         }
