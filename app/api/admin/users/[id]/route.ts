@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
 
 // Admin client com service role para ignorar RLS
 const supabaseAdmin = createClient(
@@ -121,26 +122,13 @@ export async function DELETE(
       )
     }
 
-    // No Supabase, deletar o perfil geralmente dispara o delete no Auth se o cascade estiver ON.
-    // Se não, precisamos deletar explicitamente no auth.admin.
-    
-    // 1. Deletar do Auth (O Supabase deletará o perfil e roles automaticamente se houver FK cascade)
-    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id)
-    
-    if (authError) {
-      // Se der erro no auth (ex: user não existe mais), tentamos deletar o perfil direto
-      console.warn("Usuário não encontrado no Auth, tentando deletar perfil...")
-    }
+    const result = await deleteUserCompletely(id, { source: "admin" })
 
-    // 2. Garantir deleção do perfil
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .delete()
-      .eq('id', id)
-
-    if (profileError) throw profileError
-
-    return NextResponse.json({ success: true, message: "Usuário removido permanentemente" })
+    return NextResponse.json({
+      success: true,
+      message: "Usuário removido permanentemente",
+      filesRemoved: result.filesRemoved
+    })
 
   } catch (error: any) {
     console.error("Erro ao deletar usuário:", error)
