@@ -1,30 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { processVerification, VerificationStatus } from '@/lib/services/verifications/notification.service'
+import { z } from 'zod'
+import { processVerification } from '@/lib/services/verifications/notification.service'
 import { requireAdmin } from '@/lib/auth/require-admin'
+
+const bodySchema = z.object({
+  userId: z.string().min(1),
+  status: z.enum(['approved', 'rejected', 'pending']),
+  notes: z.string().max(2000).optional(),
+  message: z.string().trim().min(1).max(4000).optional()
+})
 
 export async function POST(request: NextRequest) {
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response
 
-    // 2. Parse Body
-    const body = await request.json()
-    const { userId, status, notes } = body as {
-      userId: string,
-      status: VerificationStatus,
-      notes?: string
-    }
-
-    if (!userId || !status) {
+    const parsed = bodySchema.safeParse(await request.json().catch(() => null))
+    if (!parsed.success) {
       return NextResponse.json({ error: 'userId e status são obrigatórios' }, { status: 400 })
     }
 
-    // 3. Process Verification
     const result = await processVerification({
-      userId,
-      adminId: guard.admin.userId,
-      status,
-      notes
+      ...parsed.data,
+      adminId: guard.admin.userId
     })
 
     return NextResponse.json(result)

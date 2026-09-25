@@ -163,4 +163,16 @@ describe('processVerification', () => {
     expect(getOrCreateConversation).toHaveBeenCalledWith(mockCookieSupabase, 'mentor-1', 'admin-1')
     expect(sendMessage).toHaveBeenCalled()
   })
+
+  it('sends the admin-written message verbatim instead of the default text', async () => {
+    await processVerification({
+      userId: 'mentor-1',
+      adminId: 'admin-1',
+      status: 'approved',
+      notes: 'interno',
+      message: 'Oi, Bianca! Seu perfil foi aprovado.'
+    })
+
+    expect(sendMessage).toHaveBeenCalledWith(mockCookieSupabase, 'conv-1', 'admin-1', 'Oi, Bianca! Seu perfil foi aprovado.')
+  })
 })

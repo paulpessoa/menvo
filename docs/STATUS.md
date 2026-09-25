@@ -91,6 +91,14 @@ started.
 
 ## 📓 Engineering Journal
 
+### 2026-09-24 — Assistente de IA na verificação de mentores (backend)
+- **Why:** O admin escrevia à mão (ou nem escrevia) a mensagem de aprovação/ajustes e a divulgação de cada novo mentor; a aprovação mandava no chat a nota em inglês "Verification completed successfully by admin".
+- **Rota `POST /api/admin/verifications/draft`** (`requireAdmin`, Zod): `{ userId, kind: approve | reject | announce, instructions? }` → avaliação do perfil (`recommendation`, `summary`, `strengths`, `gaps`) + texto rascunho. Nunca envia nada — só sugere.
+- **`lib/ai-menvo/mentor-review/draft.ts`:** capacidade `analyze` do registro de modelos; nova feature de cota `admin_mentor_review` (migração `20260924000004`, admin ilimitado, medida em `ai_usage_events`). E-mail, URL do CV e do LinkedIn não vão para o provedor (só flags de presença).
+- **`/api/admin/verify` aceita `message`:** texto final editado pelo admin substitui a mensagem padrão do chat. Body agora validado com Zod.
+- **Pendente:** UI na página `/dashboard/admin/verifications`.
+- **Also fixed:** aba "Aguardando" de `/dashboard/admin/users` filtrava por role `mentor`, mas candidatos ficam como `mentee` até a aprovação — agora usa `verification_status = 'pending'`.
+
 ### 2026-09-24 — AI-First Platform: Job de Retenção e Governança LGPD (Fase 2 §8 item 5c e §12.1)
 - **Why:** Comply with LGPD privacy requirements (Law 13.709/2018 arts. 6º, 15–16) by automatically pruning stale AI conversational history, intermediate diagnostic slot data, and revoked share records.
 - **Automated Retention Cron (`app/api/cron/ai-retention/route.ts`):**

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     `
 
     // Se for uma aba de role específica, usamos !inner para filtrar o nível superior (Profiles)
-    if (["pending", "mentors", "mentees"].includes(tab)) {
+    if (["mentors", "mentees"].includes(tab)) {
       selectStr = `
         *,
         user_roles!inner (
@@ -52,8 +52,9 @@ export async function GET(request: NextRequest) {
       .select(selectStr, { count: "exact" })
 
     // Filtros por aba
+    // Candidatos a mentor ficam com role "mentee" até a aprovação; o pedido vive em verification_status.
     if (tab === "pending") {
-      query = query.eq("user_roles.roles.name", "mentor").eq("verified", false)
+      query = query.eq("verification_status", "pending")
     } else if (tab === "mentors") {
       query = query.eq("user_roles.roles.name", "mentor")
     } else if (tab === "mentees") {
@@ -119,9 +120,8 @@ export async function GET(request: NextRequest) {
 
     const { count: pendingCount } = await supabase
       .from("profiles")
-      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
-      .eq("verified", false)
-      .eq("user_roles.roles.name", "mentor")
+      .select("*", { count: "exact", head: true })
+      .eq("verification_status", "pending")
 
     const { count: mentorsCount } = await supabase
       .from("profiles")

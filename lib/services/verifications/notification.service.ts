@@ -9,6 +9,8 @@ export interface VerificationOptions {
   adminId: string
   status: VerificationStatus
   notes?: string
+  /** Full chat message written by the admin (e.g. an edited AI draft); replaces the default text. */
+  message?: string
 }
 
 /**
@@ -18,7 +20,8 @@ export async function processVerification({
   userId,
   adminId,
   status,
-  notes
+  notes,
+  message
 }: VerificationOptions) {
   const supabase = await createClient()
 
@@ -87,14 +90,18 @@ export async function processVerification({
     const conversationId = await getOrCreateConversation(supabase, userId, adminId)
     
     let messageContent = ''
-    if (status === 'approved') {
-      messageContent = '🎉 Parabéns! Seu perfil foi verificado e aprovado. Agora você já pode ser encontrado na plataforma Menvo.'
+    if (message) {
+      messageContent = message
     } else {
-      messageContent = '📢 Olá! Analisamos seu perfil e precisamos de alguns ajustes antes da aprovação definitiva.'
-    }
+      if (status === 'approved') {
+        messageContent = '🎉 Parabéns! Seu perfil foi verificado e aprovado. Agora você já pode ser encontrado na plataforma Menvo.'
+      } else {
+        messageContent = '📢 Olá! Analisamos seu perfil e precisamos de alguns ajustes antes da aprovação definitiva.'
+      }
 
-    if (notes) {
-      messageContent += `\n\nNotas do administrador:\n${notes}`
+      if (notes) {
+        messageContent += `\n\nNotas do administrador:\n${notes}`
+      }
     }
 
     await sendMessage(supabase, conversationId, adminId, messageContent)

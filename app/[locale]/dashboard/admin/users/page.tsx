@@ -275,7 +275,7 @@ export default function AdminUsersPage() {
                                 <FileText className="h-3.5 w-3.5 text-blue-500" />
                               </div>
                             )}
-                            {user.roles.includes('mentor') && (
+                            {(user.roles.includes('mentor') || user.verification_status === 'pending') && (
                                 <Badge variant={user.verified ? "default" : "secondary"} className={user.verified ? "bg-green-600" : "bg-yellow-100 text-yellow-800 border-none"}>
                                     {user.verified ? "VERIFICADO" : "PENDENTE"}
                                 </Badge>
