@@ -18,6 +18,8 @@ interface InviteAudienceStepProps {
   loadingCount: boolean
   eligibleCount: number | null
   skipped: AudienceSkipped | null
+  limit: number | ""
+  onLimitChange: (limit: number | "") => void
 }
 
 /**
@@ -35,7 +37,9 @@ export function InviteAudienceStep({
   onResendChange,
   loadingCount,
   eligibleCount,
-  skipped
+  skipped,
+  limit,
+  onLimitChange
 }: InviteAudienceStepProps) {
   return (
     <div className="space-y-5">
@@ -72,6 +76,22 @@ export function InviteAudienceStep({
       <div className="flex items-center space-x-2">
         <Checkbox id="resend" checked={resend} onCheckedChange={c => onResendChange(Boolean(c))} />
         <Label htmlFor="resend" className="font-normal cursor-pointer">Reenviar para quem já recebeu esta campanha</Label>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="limit">Limite de envio (opcional)</Label>
+        <Input 
+          id="limit" 
+          type="number" 
+          min="1"
+          placeholder="Ex: 150" 
+          value={limit === "" ? "" : limit.toString()} 
+          onChange={e => {
+            const val = e.target.value
+            onLimitChange(val === "" ? "" : parseInt(val, 10))
+          }} 
+        />
+        <p className="text-xs text-muted-foreground">Útil para não ultrapassar a cota diária do Brevo.</p>
       </div>
 
       <div className="rounded-lg border bg-muted/30 p-4 text-sm">

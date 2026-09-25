@@ -48,6 +48,7 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
   const [audience, setAudience] = useState<InviteAudience>(selectedUserIds.length > 0 ? "selected" : "jotform_not_invited")
   const [campaign, setCampaign] = useState(DEFAULT_CAMPAIGN)
   const [resend, setResend] = useState(false)
+  const [limit, setLimit] = useState<number | "">(150)
   const [subject, setSubject] = useState(DEFAULT_SUBJECT)
   const [body, setBody] = useState(DEFAULT_BODY)
 
@@ -134,9 +135,10 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
     setSendResults([])
     setSendDone(false)
 
+    const limitedEligibleUserIds = typeof limit === "number" ? eligibleUserIds.slice(0, limit) : eligibleUserIds;
     const batches: string[][] = []
-    for (let i = 0; i < eligibleUserIds.length; i += BATCH_SIZE) {
-      batches.push(eligibleUserIds.slice(i, i + BATCH_SIZE))
+    for (let i = 0; i < limitedEligibleUserIds.length; i += BATCH_SIZE) {
+      batches.push(limitedEligibleUserIds.slice(i, i + BATCH_SIZE))
     }
 
     const allResults: SendBatchResult[] = []
@@ -164,7 +166,8 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
     onSent()
   }
 
-  const eligibleCount = eligibleUserIds.length
+  const limitedEligibleUserIds = typeof limit === "number" ? eligibleUserIds.slice(0, limit) : eligibleUserIds;
+  const eligibleCount = limitedEligibleUserIds.length
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && !sending && onClose()}>
@@ -186,6 +189,8 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
             loadingCount={loadingCount}
             eligibleCount={eligibleCount}
             skipped={skipped}
+            limit={limit}
+            onLimitChange={setLimit}
           />
         )}
 
