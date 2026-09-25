@@ -4,7 +4,7 @@
 > `JOURNAL.md`) into one: current health, standing product/architecture
 > invariants, the active backlog, and a chronological engineering log.
 
-## 📅 Last Updated: 2026-09-27
+## 📅 Last Updated: 2026-09-25
 **Current status:** Multi-tenant Phase 1 shipped and merged (organizations,
 invite/request/approve membership, org admin dashboard). Phase 1.5
 (role-aware reporting, public/invite-only orgs, coherent emails, SEO) is
@@ -12,6 +12,8 @@ planned in [`domains/organizations.md`](domains/organizations.md) §6, not
 started. Reengagement invite campaigns (JotForm/Estágio Recife base) with
 LGPD self-service opt-out/deletion shipped — see journal below and
 [`domains/reengagement-invites.md`](domains/reengagement-invites.md).
+Automatic retention (deletion) of imported, never-activated accounts shipped
+in `RETENTION_MODE=dry_run` — see [`domains/account-retention.md`](domains/account-retention.md).
 
 ---
 
@@ -72,6 +74,8 @@ LGPD self-service opt-out/deletion shipped — see journal below and
 
 ### 🟠 P1 — High Priority
 - [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification — all completed pre-2026-09-16, see journal below for detail.
+- [ ] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) — bring the other two in line. See `docs/domains/account-retention.md` §8.
+- [ ] **`messages/{pt-BR,en,es}.json` have duplicate top-level `"privacy"` and `"terms"` keys.** JSON silently keeps the *last* occurrence, so the first block of each is dead — unreachable by `t()`, never rendered. Found because `privacy.reengagement` (added 2026-09-27) had been written into the dead first block and was never actually live; fixed by adding it and the new `privacy.retention`/`terms.inactivity` sections to the live (second) block instead. The dead blocks (~150 lines duplicated three times) are still there and should be deleted in a dedicated cleanup — didn't do it here to avoid colliding with concurrent edits to the same files.
 
 ### 🟡 P2 — Medium Priority
 - [x] Profile & Calendar Sync Polish, In-App Notifications Hub, Database Portability/BFF audit, Transactional Email Hardening, Brand Color Harmonization, Evaluation Flow Distinction, Admin Breadcrumb Unification.
@@ -90,10 +94,28 @@ LGPD self-service opt-out/deletion shipped — see journal below and
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 - [x] **Convites de reengajamento (base JotForm/Estágio Recife) + exclusão LGPD:** modal `/dashboard/admin/users` para enviar campanhas a qualquer público (selecionados, base JotForm ainda não convidada, nunca entraram, todos); e-mail com corpo editável pelo admin e rodapé fixo de LGPD; página pública `/convite/[token]` (aceitar, virar mentor, parar de receber e-mails, ou apagar dados/perfil — sem login). Ver [`domains/reengagement-invites.md`](domains/reengagement-invites.md) e ADR 0005.
 - [ ] **Exclusão de conta self-service em `/settings`:** `handleDeleteAccount` ainda é um placeholder (não deleta nada). Reusar `lib/services/admin/delete-user.service.ts` (`deleteUserCompletely(..., { source: "self_service" })`) — o mesmo serviço já usado pelo admin e pelo fluxo de convite.
+- [x] **Retenção automática de contas importadas nunca ativadas:** `account_retention` (fila), `planRetentionActions` (decisão pura, testada) + `runRetention` (execução), cron diário `/api/cron/account-retention` (falha fechado sem `CRON_SECRET`), avisos de 30 e 1 dia + confirmação de exclusão por e-mail, novas seções `terms.inactivity`/`privacy.retention`. Ver [`domains/account-retention.md`](domains/account-retention.md). **Rodando em `RETENTION_MODE=dry_run`** — só passar para `live` depois de uma revisão do Opus (checklist §10 do doc) e de conferir os números de um dry run real em produção.
+
+### 🟢 P2 — housekeeping
+- [ ] **Painel admin da fila de retenção:** ver quem está em cada etapa (aguardando aviso de 30d/1d, agendado para quando) e um botão para isentar alguém manualmente. `docs/domains/account-retention.md` §8.
+
+### 🔵 P3 — Future / Strategic (retention)
+- [ ] **Política de inatividade para contas ativas** (ex.: sem login há 24 meses), hoje só prevista no texto dos termos ("poderão ser excluídas") mas sem código. `docs/domains/account-retention.md` §8.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-25 — Retenção automática de contas importadas nunca ativadas
+- **Why:** o convite de reengajamento (acima) está sendo disparado para a base JotForm/Estágio Recife. Quem nunca ativar a conta deve ter os dados apagados por minimização (LGPD art. 6º III), não ficar acumulando para sempre. Plano completo em [`domains/account-retention.md`](domains/account-retention.md), executado em 5 fases/commits (com a ordem das Fases 2 e 3 invertida em relação ao plano: os templates de e-mail foram implementados antes do executor, porque o executor os chama diretamente e precisava deles para compilar).
+- **Migração `20260928000000_account_retention.sql`:** tabela `account_retention` (fila; `user_id` PK) e `retention_policy` adicionado ao `check` de `data_deletion_log.source`.
+- **`lib/services/retention/retention.service.ts`:** `planRetentionActions()`, função pura sem I/O, decide as ações (`release`, `enroll`, `delete`, `notice_1d`, `notice_30d`) a partir do estado da fila e do relógio. 13 testes cobrindo cada invariante do doc — inclusive um caso que pegaria um bug real se não fosse testado: alguém convidado há 200 dias na primeira execução só recebe o aviso de 30 dias, nunca é apagado direto.
+- **`lib/services/retention/run-retention.service.ts`:** `runRetention()` carrega o estado em número fixo de queries (reaproveita `fetchSignedInUserIds()`, agora exportado de `audience.service.ts`), reivindica cada aviso antes de enviar (evita envio duplicado entre execuções concorrentes) e reconfere o login imediatamente antes de cada exclusão. Um teste pegou um bug real antes de rodar em produção: o rollback do aviso de 30 dias limpava só `notice_30d_sent_at`, esquecendo `scheduled_deletion_at` — violaria a constraint `retention_schedule_set` do banco.
+- **`lib/email/brevo.ts`:** `sendRetentionNotice` (avisos de 30 e 1 dia, reaproveitando o link `/convite/[token]` do convite de reengajamento) e `sendRetentionDeletionConfirmation` (sem token, a conta já não existe mais).
+- **`/api/cron/account-retention`:** diferente de `ai-retention`/`appointments`, falha **fechado**: `CRON_SECRET` ausente → 500, não uma rota aberta (ver P1 no backlog para corrigir os outros dois). Agendado às 12h UTC no `vercel.json`. `RETENTION_MODE` (padrão `dry_run`), `RETENTION_MAX_EMAILS_PER_RUN` e `RETENTION_MAX_DELETIONS_PER_RUN` validados com Zod.
+- **Achado durante a Fase 5:** `messages/{pt-BR,en,es}.json` têm chaves `"privacy"` e `"terms"` duplicadas — o JSON mantém só a última, então o primeiro bloco de cada uma é morto. A seção `privacy.reengagement` (do trabalho de convites, 2026-09-27) tinha sido escrita no bloco morto e nunca esteve visível no site. Corrigido escrevendo `privacy.reengagement`, `privacy.retention` e `terms.inactivity` no bloco vivo (o segundo) nos três idiomas; os blocos mortos continuam lá (ver P1 no backlog).
+- **Aplicação da migração:** feita manualmente pelo Paul via SQL Editor do Supabase — o histórico de migrações do `supabase` CLI está dessincronizado da produção (8 migrações commitadas entre 2026-09-24 e 2026-09-27 aparecem como "não aplicadas" no CLI mas seus objetos já existem em produção, indício de aplicação anterior direto pelo SQL Editor). Não investigado a fundo; se precisar rodar `supabase db push` de novo, esperar o mesmo conflito e resolver com `supabase migration repair` depois de confirmar no dashboard que cada uma das 8 está de fato completa.
+- **Pendente:** rodando em `RETENTION_MODE=dry_run`. Só passar para `live` depois de uma revisão do Opus (checklist §10 do doc) e de conferir os números de pelo menos um dry run real em produção. Textos de `terms.inactivity`/`privacy.retention` ainda não revisados pelo Paul.
 
 ### 2026-09-27 — Convites de reengajamento (base JotForm/Estágio Recife) + exclusão LGPD
 - **Why:** Paul importou a base histórica do Estágio Recife (JotForm) para `profiles`, mas essas pessoas nunca pediram uma conta na Menvo. Precisava de uma forma de avisar/convidar (e convidar quem já se formou a virar mentor) e, por LGPD (art. 18), dar uma saída fácil e sem login para recusar ou apagar os dados. Plano completo em [`domains/reengagement-invites.md`](domains/reengagement-invites.md), executado em 7 fases/commits.

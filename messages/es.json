@@ -2016,6 +2016,14 @@
       "title": "Servicios de Terceros",
       "text": "Colaboramos con proveedores confiables de autenticación e infraestructura como Supabase, Vercel, Brevo y Google Cloud APIs, en cumplimiento con las normativas internacionales de protección de datos y LGPD."
     },
+    "reengagement": {
+      "title": "Base de datos de Estágio Recife",
+      "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil — el enlace de respuesta del correo lleva directo a esa opción."
+    },
+    "retention": {
+      "title": "Por cuánto tiempo guardamos sus datos",
+      "text": "Guardamos sus datos mientras su cuenta esté activa o mientras sean necesarios para la finalidad para la que fueron recopilados. Si sus datos provienen de una iniciativa asociada, como Estágio Recife, y usted nunca accede a la cuenta, serán eliminados automáticamente 90 días después de la primera invitación, con avisos por correo 30 días y 1 día antes de la eliminación. Si pidió dejar de recibir correos, no enviaremos esos avisos, y la eliminación ocurre en el mismo plazo. Después de la eliminación, conservamos solo un registro anónimo (una huella criptográfica del correo, que no permite identificarlo) para comprobar la atención de la solicitud y evitar un nuevo contacto (LGPD, arts. 15, 16 y 18)."
+    },
     "rights": {
       "title": "Sus Derechos de Privacidad",
       "text": "Tiene derecho a acceder, corregir, actualizar o solicitar la eliminación definitiva de sus datos personales en cualquier momento a través de la configuración de su cuenta o contactando a nuestro equipo."
@@ -2040,6 +2048,10 @@
     "account": {
       "title": "Cuentas y Registro",
       "text": "Usted es responsable de la exactitud de la información proporcionada y de mantener la seguridad de sus credenciales. Cada usuario debe mantener una sola cuenta personal."
+    },
+    "inactivity": {
+      "title": "Cuentas inactivas y eliminación automática",
+      "text": "Las cuentas creadas a partir de datos importados de iniciativas asociadas, como el formulario de Estágio Recife, y que nunca sean accedidas, serán eliminadas automáticamente 90 días después de la primera invitación enviada por correo. Antes de la eliminación, enviaremos dos avisos al correo registrado: uno 30 días antes y otro 1 día antes de la fecha prevista. Para mantener la cuenta, basta con acceder a ella mediante el enlace del aviso. Después de la eliminación, recibirá un correo de confirmación y podrá crear una cuenta nueva en cualquier momento. Las cuentas sin ningún acceso durante largos períodos también podrán ser eliminadas, siempre con aviso previo por correo."
     },
     "security": {
       "title": "Conducta y Seguridad",

@@ -2041,6 +2041,14 @@
       "title": "Third-Party Services",
       "text": "We partner with trusted authentication and infrastructure providers including Supabase, Vercel, Brevo, and Google Cloud APIs, compliant with international data protection regulations and LGPD."
     },
+    "reengagement": {
+      "title": "Estágio Recife database",
+      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile — the e-mail's reply link goes straight to that option."
+    },
+    "retention": {
+      "title": "How long we keep your data",
+      "text": "We keep your data while your account is active or while it's needed for the purpose it was collected for. If your data came from a partner initiative, such as Estágio Recife, and you never access the account, it will be automatically deleted 90 days after the first invitation, with e-mail warnings 30 days and 1 day before deletion. If you asked to stop receiving e-mails, we won't send those warnings, and the deletion happens on the same timeline. After deletion, we keep only an anonymous record (a cryptographic fingerprint of the e-mail, which can't identify you) to prove the request was fulfilled and to avoid contacting you again (LGPD, arts. 15, 16, and 18)."
+    },
     "rights": {
       "title": "Your Privacy Rights",
       "text": "You have the right to access, correct, update, or request permanent deletion of your personal data at any time via your account settings or by reaching out to our support team."
@@ -2065,6 +2073,10 @@
     "account": {
       "title": "Accounts & Registration",
       "text": "You are responsible for the accuracy of information provided during signup and for maintaining credential security. Each user must maintain a single personal account."
+    },
+    "inactivity": {
+      "title": "Inactive accounts and automatic deletion",
+      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for long periods may also be deleted, always with advance e-mail notice."
     },
     "security": {
       "title": "Conduct & Safety",

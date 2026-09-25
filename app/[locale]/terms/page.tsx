@@ -1,5 +1,5 @@
 "use client"
-import { FileText, Users, User, Shield, Image as ImageIcon, Mail, Database } from "lucide-react"
+import { FileText, Users, User, Shield, Image as ImageIcon, Mail, Database, Clock } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
@@ -28,6 +28,10 @@ export default function TermsPage() {
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><User className="h-5 w-5" /> {t("terms.account.title")}</h2>
           <p>{t("terms.account.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Clock className="h-5 w-5" /> {t("terms.inactivity.title")}</h2>
+          <p>{t("terms.inactivity.text")}</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Shield className="h-5 w-5" /> {t("terms.security.title")}</h2>

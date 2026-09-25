@@ -1,8 +1,29 @@
 # Retenção de contas: exclusão automática de contas importadas que nunca foram ativadas
 
-> **Status:** planejado em 2026-09-25. Implementação pelo Sonnet, fase por fase
-> (um commit por fase), seguida de revisão pelo Opus antes do primeiro
-> `RETENTION_MODE=live`.
+> **Status:** implementado em 2026-09-25 (Fases 1–5, um commit por fase, exceto
+> Fase 2/3 invertidas — ver abaixo). Rodando em `RETENTION_MODE=dry_run`.
+> **Pendente:** revisão do Opus (checklist §10) e conferência de um dry run
+> real em produção antes de `RETENTION_MODE=live`; textos de `terms.inactivity`
+> e `privacy.retention` ainda não revisados pelo Paul.
+> **Desvios do plano original:**
+> - A Fase 3 (templates de e-mail) foi implementada **antes** da Fase 2 (o
+>   executor), porque o executor chama `sendRetentionNotice`/
+>   `sendRetentionDeletionConfirmation` diretamente e precisava delas para
+>   compilar — ver os commits `0bf3e499` (Fase 3) antes de `a3ad96b9` (Fase 2).
+> - `fetchSignedInUserIds`, `sentBy: string | null` em `createInviteToken` e
+>   `retention_policy` em `DeletionSource` acabaram commitados por uma sessão
+>   concorrente (`c663593e`) que salvou a working tree compartilhada antes de
+>   eu commitar — o código está correto, só a atribuição do commit está errada.
+> - A migração foi aplicada manualmente pelo Paul via SQL Editor do Supabase,
+>   não por `supabase db push`: o histórico de migrações do CLI está
+>   dessincronizado da produção desde antes desta tarefa (8 migrações commitadas
+>   entre 2026-09-24 e 2026-09-27 aparecem como pendentes no CLI, mas seus
+>   objetos já existem em produção).
+> - Achado no caminho, corrigido como parte da Fase 5: `messages/{pt-BR,en,es}.json`
+>   tinham `"privacy"`/`"terms"` duplicados — o JSON mantém só a última
+>   ocorrência, então `privacy.reengagement` (do trabalho de convites) nunca
+>   esteve de fato visível no site. Corrigido escrevendo as seções no bloco
+>   vivo; os blocos mortos continuam lá (item P1 no backlog).
 > **Depende de:** `docs/domains/reengagement-invites.md` (tokens de convite,
 > `deleteUserCompletely`, supressão). Leia antes.
 

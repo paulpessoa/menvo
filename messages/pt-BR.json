@@ -2034,6 +2034,14 @@
       "title": "Serviços de Terceiros",
       "text": "Utilizamos serviços confiáveis de infraestrutura e autenticação, como Supabase, Vercel, Brevo e Google Cloud APIs, todos em conformidade com as normas internacionais de proteção de dados e LGPD."
     },
+    "reengagement": {
+      "title": "Base do Estágio Recife",
+      "text": "A Menvo nasceu como uma extensão do Estágio Recife. Por isso, uma parte da nossa base de mentorados vem do formulário do Estágio Recife: nome, e-mail e as respostas que a pessoa deu naquele formulário. Usamos esses dados, com base no nosso legítimo interesse (LGPD, art. 7º, IX), apenas para um contato inicial convidando a pessoa a conhecer a Menvo e completar seu perfil. Quem recebe esse convite pode, sem precisar fazer login, pedir para não receber mais e-mails ou apagar definitivamente seus dados e perfil — o link de resposta do e-mail leva direto a essa opção."
+    },
+    "retention": {
+      "title": "Por quanto tempo guardamos seus dados",
+      "text": "Guardamos seus dados enquanto sua conta estiver ativa ou enquanto forem necessários para a finalidade para a qual foram coletados. Se seus dados vieram de uma iniciativa parceira, como o Estágio Recife, e você nunca acessar a conta, eles serão apagados automaticamente 90 dias após o primeiro convite, com avisos por e-mail 30 dias e 1 dia antes da exclusão. Se você pediu para não receber mais e-mails, não enviaremos esses avisos, e a exclusão acontece no mesmo prazo. Depois da exclusão, guardamos apenas um registro anônimo (uma impressão criptográfica do e-mail, que não permite identificá-lo) para comprovar o atendimento e evitar que você seja contatado de novo (LGPD, arts. 15, 16 e 18)."
+    },
     "rights": {
       "title": "Seus Direitos (LGPD)",
       "text": "Você tem o direito de acessar, corrigir, atualizar ou solicitar a exclusão definitiva dos seus dados a qualquer momento através do seu painel de configurações ou entrando em contato conosco."
@@ -2058,6 +2066,10 @@
     "account": {
       "title": "Contas e Cadastro",
       "text": "Você é responsável pela precisão das informações fornecidas no cadastro e pela segurança de suas credenciais de acesso. Cada usuário deve manter uma única conta individual."
+    },
+    "inactivity": {
+      "title": "Contas inativas e exclusão automática",
+      "text": "Contas criadas a partir de dados importados de iniciativas parceiras, como o formulário do Estágio Recife, e que nunca forem acessadas serão excluídas automaticamente 90 dias após o primeiro convite enviado por e-mail. Antes da exclusão, enviaremos dois avisos para o e-mail cadastrado: um 30 dias antes e outro 1 dia antes da data prevista. Para manter a conta, basta acessá-la pelo link do aviso. Depois da exclusão, você recebe um e-mail de confirmação e pode criar uma nova conta a qualquer momento. Contas que ficarem sem nenhum acesso por longos períodos também poderão ser excluídas, sempre com aviso prévio por e-mail."
     },
     "security": {
       "title": "Conduta e Segurança",

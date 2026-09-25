@@ -1,5 +1,5 @@
 "use client"
-import { Shield, Mail, User, Image as ImageIcon, Database, Users, Globe, Calendar, UserPlus } from "lucide-react"
+import { Shield, Mail, User, Image as ImageIcon, Database, Users, Globe, Calendar, UserPlus, Clock } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
@@ -61,6 +61,10 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><UserPlus className="h-5 w-5" /> {t("privacy.reengagement.title")}</h2>
           <p>{t("privacy.reengagement.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Clock className="h-5 w-5" /> {t("privacy.retention.title")}</h2>
+          <p>{t("privacy.retention.text")}</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold mb-2">{t("privacy.rights.title")}</h2>
