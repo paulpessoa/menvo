@@ -92,7 +92,14 @@ export async function GET(request: NextRequest) {
       has_profile: typeof row.email === "string" && profileEmails.has(row.email.toLowerCase())
     }))
 
-    return successResponse(dataWithProfileFlag)
+    // Quem já tem conta criada (via convite em lote ou individual) some da
+    // lista de espera assim que a conta existir, sem precisar esperar o
+    // primeiro login — sync_waiting_list_status só promove para 'registered'
+    // depois do login, o que deixaria contas já criadas voltando a aparecer
+    // aqui como pendentes.
+    const visibleEntries = dataWithProfileFlag.filter(row => !row.has_profile)
+
+    return successResponse(visibleEntries)
   } catch (error) {
     return handleApiError(error)
   }

@@ -62,6 +62,7 @@ export function WaitingListTab() {
   const [matchResults, setMatchResults] = useState<Record<string, MatchResult>>({})
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [bulkRunning, setBulkRunning] = useState(false)
 
   const filteredEntries = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -115,6 +116,39 @@ export function WaitingListTab() {
       toast.error(error.message || "Erro ao criar conta e enviar convite")
     } finally {
       setPendingAction(null)
+    }
+  }
+
+  const handleBulkCreateAccounts = async () => {
+    const pendingCount = entries.filter(e => e.status === "pending").length
+    if (pendingCount === 0) {
+      toast.info("Não há registros aguardando para criar conta.")
+      return
+    }
+    if (!window.confirm(`Criar conta e enviar convite por e-mail para ${pendingCount} pessoa(s) aguardando na lista? Essa ação não pode ser desfeita.`)) {
+      return
+    }
+    setBulkRunning(true)
+    try {
+      const response = await fetch("/api/admin/waiting-list/bulk-create-accounts", { method: "POST" })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Falha ao criar contas em lote")
+      if (data.stoppedEarly) {
+        toast.warning(
+          `${data.created} conta(s) criada(s) e convite(s) enviado(s). Parou por limite de envio de e-mail — faltam ${data.remaining} registro(s). Tente novamente mais tarde ou amanhã.`
+        )
+        console.error("[bulk-create-accounts] parou cedo:", data.errors)
+      } else if (data.failed > 0) {
+        toast.warning(`${data.created} conta(s) criada(s). ${data.failed} falharam — veja o console.`)
+        console.error("[bulk-create-accounts] erros:", data.errors)
+      } else {
+        toast.success(`${data.created} conta(s) criada(s) e convite(s) enviado(s)!`)
+      }
+      fetchEntries()
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar contas em lote")
+    } finally {
+      setBulkRunning(false)
     }
   }
 
@@ -195,6 +229,17 @@ export function WaitingListTab() {
             <SelectItem value="invited">Convidado</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={handleBulkCreateAccounts}
+          disabled={bulkRunning}
+          className="gap-1.5 shrink-0"
+          title="Cria conta e envia convite por e-mail para todos os registros aguardando"
+        >
+          {bulkRunning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserPlus className="h-3.5 w-3.5" />}
+          Criar todas as contas
+        </Button>
       </div>
 
       {filteredEntries.length === 0 ? (
@@ -218,14 +263,6 @@ export function WaitingListTab() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-sm">{entry.name}</span>
-                  {/* Quem já entrou de fato nem aparece aqui (vira 'registered'),
-                      então ter perfil sem convite significa conta criada mas
-                      nunca acessada — vale um lembrete em vez de um novo cadastro. */}
-                  {entry.has_profile && entry.status !== "invited" && (
-                    <Badge variant="outline" className="text-[10px] uppercase text-amber-700 border-amber-300 bg-amber-50">
-                      Tem conta, nunca entrou
-                    </Badge>
-                  )}
                   {!hasReason && (
                     <Badge variant="outline" className="text-[10px] uppercase text-orange-700 border-orange-300 bg-orange-50">
                       Sem motivação preenchida
