@@ -12,6 +12,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { TutorialsSection } from "@/components/mentor/TutorialsSection"
+import { MenteeTutorialsSection } from "@/components/mentee/MenteeTutorialsSection"
 import type { ProfileFormData, ProfileFormPatch } from "./profile-form"
 
 interface ProfileMentorshipSectionProps {
@@ -137,7 +138,7 @@ export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMe
         </Card>
       )}
 
-      <TutorialsSection />
+      {isMentor || isPendingMentor ? <TutorialsSection /> : <MenteeTutorialsSection />}
     </div>
   )
 }

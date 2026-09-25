@@ -1038,6 +1038,7 @@
     "subtitle": "Conecte-se com mentores verificados e acelere sua carreira",
     "searchPlaceholder": "Nome, especialidade... ou descreva seu objetivo e busque com IA",
     "errorLoadingMentors": "Erro ao carregar mentores. Por favor, tente novamente.",
+    "loading": "Carregando...",
     "loadMore": "Carregar mais",
     "filters": "Filtros",
     "sheetTitle": "Filtros Avançados",
@@ -1399,6 +1400,27 @@
       "firstSession": {
         "title": "Sua primeira sessão de mentoria",
         "description": "O que esperar da sala de chat, do Google Meet e boas práticas de condução."
+      }
+    }
+  },
+  "menteeTutorials": {
+    "title": "Orientações para mentorados",
+    "subtitle": "Dicas rápidas pra você aproveitar melhor a plataforma",
+    "watchButton": "Assistir",
+    "closeButton": "Entendi",
+    "comingSoon": "Vídeo em breve",
+    "items": {
+      "findMentor": {
+        "title": "Como encontrar o mentor ideal",
+        "description": "Use os filtros de área, senioridade e idioma para achar mentores alinhados aos seus objetivos."
+      },
+      "requestSession": {
+        "title": "Como solicitar uma mentoria",
+        "description": "Envie um pedido com contexto sobre o que você busca e aguarde a confirmação do mentor."
+      },
+      "makeTheMost": {
+        "title": "Aproveite sua sessão",
+        "description": "Prepare suas perguntas, chegue no horário combinado e defina próximos passos ao final da conversa."
       }
     }
   },

@@ -1045,6 +1045,7 @@
     "subtitle": "Connect with verified mentors and accelerate your career",
     "searchPlaceholder": "Name, specialty... or describe your goal and search with AI",
     "errorLoadingMentors": "Error loading mentors. Please try again.",
+    "loading": "Loading...",
     "loadMore": "Load more",
     "filters": "Filters",
     "sheetTitle": "Advanced Filters",
@@ -1406,6 +1407,27 @@
       "firstSession": {
         "title": "Your first mentoring session",
         "description": "What to expect from the chat room, Google Meet, and best practices for running the session."
+      }
+    }
+  },
+  "menteeTutorials": {
+    "title": "Guidance for mentees",
+    "subtitle": "Quick tips to help you get the most out of the platform",
+    "watchButton": "Watch",
+    "closeButton": "Got it",
+    "comingSoon": "Video coming soon",
+    "items": {
+      "findMentor": {
+        "title": "How to find the right mentor",
+        "description": "Use the area, seniority, and language filters to find mentors aligned with your goals."
+      },
+      "requestSession": {
+        "title": "How to request a mentorship",
+        "description": "Send a request with context on what you're looking for and wait for the mentor to confirm."
+      },
+      "makeTheMost": {
+        "title": "Make the most of your session",
+        "description": "Prepare your questions, show up on time, and define next steps at the end of the conversation."
       }
     }
   },
