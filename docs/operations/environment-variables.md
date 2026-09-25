@@ -63,6 +63,14 @@ cp .env.example .env.local
 | `AI_METERING_KEY` | **Required for AI cost metering** | Server-only | Proves AI usage rows come from the server (`record_ai_usage` rejects calls without it). Its SHA-256 must be stored in `private.ai_settings` — see migration `20260923000003`. Missing = usage not recorded, so the monthly budget can't see the spend |
 | `AI_FORCE_FALLBACK` | Optional, evals-only | Local, never set in Production/Preview | Set to a capability name (e.g. `converse`) to make `lib/ai/models` drop the primary model for that one capability, so `npm run test:evals`/`npm run eval:match` can exercise the fallback model deliberately (ADR 0004 §7.1). |
 
+### Scheduled Jobs (Vercel Cron)
+| Variable | Required | Context | Description |
+|---|---|---|---|
+| `CRON_SECRET` | **Required for `/api/cron/account-retention`** | Server-only | Bearer token Vercel Cron sends as `Authorization: Bearer ${CRON_SECRET}`. Unlike the pre-existing `ai-retention`/`appointments` crons, `account-retention` fails **closed**: missing → 500, not an open endpoint. See `docs/domains/account-retention.md` §5. |
+| `RETENTION_MODE` | Optional (default `dry_run`) | Server-only | `dry_run` computes and logs the account-retention plan without writing or sending anything; `live` executes it. Keep at `dry_run` until a Paul-reviewed dry run looks correct. |
+| `RETENTION_MAX_EMAILS_PER_RUN` | Optional (default `100`) | Server-only | Caps 30-day + 1-day retention notices sent per cron run (shares the Brevo daily quota with reengagement campaigns). |
+| `RETENTION_MAX_DELETIONS_PER_RUN` | Optional (default `25`) | Server-only | Caps accounts deleted per cron run, to stay inside the Vercel function timeout. |
+
 ### Analytics (Microsoft Clarity MCP)
 | Variable | Required | Context | Description |
 |---|---|---|---|
