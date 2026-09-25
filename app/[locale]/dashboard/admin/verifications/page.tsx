@@ -25,6 +25,7 @@ import type { Verification } from "@/lib/types/models/verification"
 import { toast } from "sonner"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { Link } from "@/i18n/routing"
+import { MentorReviewAssistant } from "@/components/admin/MentorReviewAssistant"
 
 export default function AdminVerificationsPage() {
   const { user } = useAuth()
@@ -49,11 +50,16 @@ export default function AdminVerificationsPage() {
     loadVerifications()
   }, [loadVerifications])
 
-  const submitVerification = async (userId: string, status: VerificationStatus, notes: string) => {
+  const submitVerification = async (
+    userId: string,
+    status: VerificationStatus,
+    notes?: string,
+    message?: string
+  ) => {
     const response = await fetch("/api/admin/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, status, notes })
+      body: JSON.stringify({ userId, status, notes, message })
     })
     if (!response.ok) {
       const data = await response.json().catch(() => ({}))
@@ -61,30 +67,32 @@ export default function AdminVerificationsPage() {
     }
   }
 
-  const handleApprove = async (verificationId: string) => {
+  const handleApprove = async (verificationId: string, message?: string) => {
     try {
       // Goes through /api/admin/verify (service-role, requireAdmin-guarded)
       // rather than the client-side VerificationService: approving a
       // mentor request also has to assign the "mentor" role in user_roles
       // for a DIFFERENT user than the admin, which needs a service-role
       // write — see processVerification in notification.service.ts.
-      await submitVerification(verificationId, "approved", "Verification completed successfully by admin")
+      await submitVerification(verificationId, "approved", undefined, message)
       toast.success("Mentor aprovado com sucesso!")
       loadVerifications()
     } catch (error) {
       console.error("Error approving verification:", error)
       toast.error("Erro ao aprovar mentor")
+      throw error
     }
   }
 
-  const handleReject = async (verificationId: string, reason: string) => {
+  const handleReject = async (verificationId: string, reason: string, message?: string) => {
     try {
-      await submitVerification(verificationId, "rejected", reason)
+      await submitVerification(verificationId, "rejected", reason, message)
       toast.success("Aplicação rejeitada.")
       loadVerifications()
     } catch (error) {
       console.error("Error rejecting verification:", error)
       toast.error("Erro ao rejeitar mentor")
+      throw error
     }
   }
 
@@ -192,6 +200,12 @@ export default function AdminVerificationsPage() {
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Aprovar Mentor
                         </Button>
+
+                        <MentorReviewAssistant
+                          userId={verification.id}
+                          onApprove={(message) => handleApprove(verification.id, message)}
+                          onReject={(message) => handleReject(verification.id, "Ajustes solicitados via assistente de IA", message)}
+                        />
 
                         <Dialog>
                           <DialogTrigger asChild>
