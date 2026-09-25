@@ -243,9 +243,7 @@ export default function AdminUsersPage() {
                     <TabsTrigger value="mentees" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
                         Mentees <Badge variant="outline" className="ml-2">{stats.mentees}</Badge>
                     </TabsTrigger>
-                    <TabsTrigger value="undefined" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
-                        Não Definidos <Badge variant="destructive" className="ml-2">{stats.undefined}</Badge>
-                    </TabsTrigger>
+
                     <TabsTrigger value="waiting-list" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-2 bg-transparent">
                         Waiting List <Badge variant="outline" className="ml-2 text-purple-700 border-purple-300 bg-purple-50">{stats.waitingList}</Badge>
                     </TabsTrigger>

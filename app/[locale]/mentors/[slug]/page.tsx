@@ -18,12 +18,29 @@ export async function generateMetadata({
     const data = await mentorPublicService.getMentorBySlugOrId(slug)
 
     if (!data) {
+      const title = "Mentor não encontrado | Menvo"
+      const description = "O mentor que você procura não está disponível."
+      const imageUrl = "https://www.menvo.com.br/images/menvopeople.jpg"
       return {
-        title: "Mentor não encontrado | Menvo",
-        description: "O mentor que você procura não está disponível.",
+        title,
+        description,
         robots: {
           index: false,
           follow: false
+        },
+        openGraph: {
+          type: "website",
+          title,
+          description,
+          images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+          siteName: "Menvo",
+          locale: "pt_BR"
+        },
+        twitter: {
+          card: "summary_large_image",
+          title,
+          description,
+          images: [imageUrl]
         }
       }
     }
@@ -69,11 +86,25 @@ export async function generateMetadata({
     }
   } catch (error) {
     console.error("[mentors/[slug]] Erro em generateMetadata:", error)
+    const title = "Mentor não encontrado | Menvo"
+    const imageUrl = "https://www.menvo.com.br/images/menvopeople.jpg"
     return {
-      title: "Mentor não encontrado | Menvo",
+      title,
       robots: {
         index: false,
         follow: false
+      },
+      openGraph: {
+        type: "website",
+        title,
+        images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+        siteName: "Menvo",
+        locale: "pt_BR"
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        images: [imageUrl]
       }
     }
   }

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Copy, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import Loading from '../../../loading';
 
 export default function GoogleCalendarCallbackPage() {
     const searchParams = useSearchParams();
@@ -64,15 +65,7 @@ export default function GoogleCalendarCallbackPage() {
     }
 
     if (!code) {
-        return (
-            <div className="container mx-auto py-10 px-4">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Carregando...</CardTitle>
-                    </CardHeader>
-                </Card>
-            </div>
-        );
+        return <Loading />;
     }
 
     return (

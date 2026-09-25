@@ -37,83 +37,129 @@ interface MenteeProfile {
     created_at: string
 }
 
-async function getMenteeData(slug: string, currentUserId: string): Promise<{ mentee: MenteeProfile, isMentor: boolean } | null> {
+/**
+ * Fetches a mentee profile visible to anyone (is_public = true), with no auth
+ * required. Used both for link-preview metadata and for public page rendering,
+ * mirroring how mentorPublicService exposes mentor profiles.
+ */
+async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | null> {
     const supabase = await createClient()
-
-    // Buscar perfil do mentee pelo slug
-    const { data: mentee, error } = await supabase
+    const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('slug', slug)
-        .single()
+        .eq('is_public', true)
+        .maybeSingle()
 
-    if (error || !mentee) {
+    if (error || !data) {
         return null
     }
 
-    // Verificar se o usuário atual é mentor
-    const { data: mentorView } = await supabase
-        .from('mentors_view')
-        .select('id')
-        .eq('id', currentUserId)
-        .maybeSingle()
-
-    const isMentor = !!mentorView
-
-    return {
-        mentee: mentee as unknown as MenteeProfile,
-        isMentor
-    }
+    return data as unknown as MenteeProfile
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params
-    const supabase = await createClient()
+    const mentee = await getPublicMenteeProfile(slug)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    const data = user ? await getMenteeData(slug, user.id) : null
-
-    if (!data) {
-        return { title: 'Perfil do Mentee | Menvo' }
+    if (!mentee) {
+        const title = 'Mentorado não encontrado | Menvo'
+        const imageUrl = 'https://www.menvo.com.br/images/menvopeople.jpg'
+        return {
+            title,
+            robots: { index: false, follow: false },
+            openGraph: {
+                type: 'website',
+                title,
+                images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+                siteName: 'Menvo',
+                locale: 'pt_BR'
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title,
+                images: [imageUrl]
+            }
+        }
     }
 
-    const { mentee } = data
     const fullName = `${mentee.first_name} ${mentee.last_name}`.trim()
+    const title = `${fullName} - Mentorado | Menvo`
+    const description =
+        mentee.bio?.substring(0, 160) ||
+        `Conheça ${fullName} na comunidade Menvo, buscando mentoria em ${mentee.mentorship_topics?.slice(0, 3).join(", ") || "diversas áreas"}.`
+    const imageUrl = mentee.avatar_url || 'https://www.menvo.com.br/images/menvopeople.jpg'
+    const canonicalPath = `/mentee/${slug}`
 
     return {
-        title: `${fullName} - Perfil | Menvo`,
-        description: `Perfil de ${fullName} na plataforma Menvo`,
+        title,
+        description,
+        openGraph: {
+            type: 'profile',
+            url: `https://www.menvo.com.br${canonicalPath}`,
+            title,
+            description,
+            images: [{ url: imageUrl, width: 1200, height: 630, alt: fullName || title }],
+            siteName: 'Menvo',
+            locale: 'pt_BR'
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [imageUrl]
+        },
+        alternates: {
+            canonical: canonicalPath,
+            languages: {
+                'pt-BR': `/mentee/${slug}`,
+                en: `/en/mentee/${slug}`,
+                es: `/es/mentee/${slug}`
+            }
+        }
     }
 }
 
 export default async function MenteeProfilePage({ params }: PageProps) {
     const { slug } = await params
-    const supabase = await createClient()
 
-    // Verificar autenticação
+    // Public profiles (is_public = true) are viewable and crawlable by anyone,
+    // same rule the "Mural de Mentorados" community wall uses to list them.
+    const publicMentee = await getPublicMenteeProfile(slug)
+    if (publicMentee) {
+        return <MenteeProfileClient mentee={publicMentee} />
+    }
+
+    // Not public (or not found): only the owner or a mentor may view it, so this path requires auth.
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
         redirect('/login')
     }
 
-    const data = await getMenteeData(slug, user.id)
+    const { data: mentee, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle()
 
-    if (!data) {
+    if (error || !mentee) {
         notFound()
     }
 
-    const { mentee, isMentor } = data
+    const menteeProfile = mentee as unknown as MenteeProfile
+    const isOwner = user.id === menteeProfile.id
 
-    // Permitir se:
-    // 1. É mentor (pode ver qualquer mentee)
-    // 2. É o próprio perfil
-    // 3. O perfil é público
-    const isOwner = user.id === mentee.id;
-    const canView = isMentor || isOwner || mentee.is_public;
+    const { data: mentorView } = await supabase
+        .from('mentors_view')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle()
+    const isMentor = !!mentorView
 
-    if (!canView) {
+    if (!isOwner && !isMentor) {
         redirect('/unauthorized')
     }
 
-    return <MenteeProfileClient mentee={mentee} />
+    return <MenteeProfileClient mentee={menteeProfile} />
 }

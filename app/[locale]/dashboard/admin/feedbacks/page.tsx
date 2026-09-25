@@ -7,6 +7,7 @@ import { MessageSquare, Star, CheckCircle, ListFilter } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useTranslations } from "next-intl"
 import { AdminFeedbackModeration } from "@/components/admin/AdminFeedbackModeration"
+import { AdminPlatformFeedback } from "@/components/admin/AdminPlatformFeedback"
 import { Badge } from "@/components/ui/badge"
 import { PageContainer } from "@/components/layout/PageContainer"
 
@@ -49,18 +50,13 @@ export default function AdminFeedbacksPage() {
             </TabsContent>
 
             <TabsContent value="platform" className="animate-in fade-in duration-500">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Feedbacks Gerais da Plataforma</CardTitle>
-                  <CardDescription>Sugestões, críticas e elogios sobre o uso do site.</CardDescription>
-                </CardHeader>
-                <CardContent className="h-64 flex flex-col items-center justify-center text-muted-foreground italic space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-full">
-                    <ListFilter className="w-8 h-8 text-gray-300" />
-                  </div>
-                  <p>O histórico de feedbacks gerais está sendo migrado para este novo painel.</p>
-                </CardContent>
-              </Card>
+               <div className="space-y-6">
+                 <div>
+                   <h2 className="text-2xl font-bold">Feedbacks Gerais da Plataforma</h2>
+                   <p className="text-muted-foreground">Sugestões, críticas e elogios sobre o uso do site.</p>
+                 </div>
+                 <AdminPlatformFeedback />
+               </div>
             </TabsContent>
           </Tabs>
         </div>

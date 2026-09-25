@@ -97,7 +97,7 @@ const initialFilters: FilterState = {
   priceRange: [0, 500],
   availabilityStatus: "all",
   experienceYears: "all",
-  sortBy: "relevance"
+  sortBy: "newest"
 }
 
 const ITEMS_PER_PAGE = 12
@@ -949,7 +949,7 @@ export default function MentorsPage() {
                 {loadingMore ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t("common.loading")}
+                    {t("loading")}
                   </>
                 ) : (
                   t("loadMore")
