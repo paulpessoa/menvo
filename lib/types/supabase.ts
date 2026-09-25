@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      _backup_profiles_verification_20260925: {
+        Row: {
+          backed_up_at: string | null
+          id: string | null
+          is_pending_mentor: boolean | null
+          is_public: boolean | null
+          verification_status: string | null
+          verified: boolean | null
+          verified_at: string | null
+        }
+        Insert: {
+          backed_up_at?: string | null
+          id?: string | null
+          is_pending_mentor?: boolean | null
+          is_public?: boolean | null
+          verification_status?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+        }
+        Update: {
+          backed_up_at?: string | null
+          id?: string | null
+          is_pending_mentor?: boolean | null
+          is_public?: boolean | null
+          verification_status?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -644,6 +674,33 @@ export type Database = {
           },
         ]
       }
+      data_deletion_log: {
+        Row: {
+          campaign: string | null
+          completed_at: string | null
+          email_hash: string
+          id: string
+          requested_at: string
+          source: string
+        }
+        Insert: {
+          campaign?: string | null
+          completed_at?: string | null
+          email_hash: string
+          id?: string
+          requested_at?: string
+          source: string
+        }
+        Update: {
+          campaign?: string | null
+          completed_at?: string | null
+          email_hash?: string
+          id?: string
+          requested_at?: string
+          source?: string
+        }
+        Relationships: []
+      }
       diagnostic_sessions: {
         Row: {
           completed_at: string | null
@@ -739,6 +796,24 @@ export type Database = {
           },
         ]
       }
+      email_suppressions: {
+        Row: {
+          created_at: string
+          email_hash: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          email_hash: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          email_hash?: string
+          reason?: string
+        }
+        Relationships: []
+      }
       feature_flag_audit_logs: {
         Row: {
           action: string
@@ -793,28 +868,34 @@ export type Database = {
       feedback: {
         Row: {
           comment: string | null
+          context: Json
           created_at: string | null
           email: string | null
           id: string
           rating: number
+          source: string
           updated_at: string | null
           user_id: string | null
         }
         Insert: {
           comment?: string | null
+          context?: Json
           created_at?: string | null
           email?: string | null
           id?: string
           rating: number
+          source?: string
           updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           comment?: string | null
+          context?: Json
           created_at?: string | null
           email?: string | null
           id?: string
           rating?: number
+          source?: string
           updated_at?: string | null
           user_id?: string | null
         }
@@ -1164,6 +1245,7 @@ export type Database = {
           created_at: string
           cv_url: string | null
           email: string
+          email_opt_out_at: string | null
           expected_graduation: string | null
           experience_years: number | null
           expertise_areas: string[] | null
@@ -1228,6 +1310,7 @@ export type Database = {
           created_at?: string
           cv_url?: string | null
           email: string
+          email_opt_out_at?: string | null
           expected_graduation?: string | null
           experience_years?: number | null
           expertise_areas?: string[] | null
@@ -1292,6 +1375,7 @@ export type Database = {
           created_at?: string
           cv_url?: string | null
           email?: string
+          email_opt_out_at?: string | null
           expected_graduation?: string | null
           experience_years?: number | null
           expertise_areas?: string[] | null
@@ -1414,6 +1498,77 @@ export type Database = {
             columns: ["diagnostic_session_id"]
             isOneToOne: false
             referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reengagement_invites: {
+        Row: {
+          campaign: string
+          expires_at: string
+          id: string
+          opened_at: string | null
+          responded_at: string | null
+          response: string | null
+          sent_at: string
+          sent_by: string | null
+          subject: string
+          token_hash: string
+          user_id: string
+        }
+        Insert: {
+          campaign: string
+          expires_at?: string
+          id?: string
+          opened_at?: string | null
+          responded_at?: string | null
+          response?: string | null
+          sent_at?: string
+          sent_by?: string | null
+          subject: string
+          token_hash: string
+          user_id: string
+        }
+        Update: {
+          campaign?: string
+          expires_at?: string
+          id?: string
+          opened_at?: string | null
+          responded_at?: string | null
+          response?: string | null
+          sent_at?: string
+          sent_by?: string | null
+          subject?: string
+          token_hash?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reengagement_invites_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reengagement_invites_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reengagement_invites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reengagement_invites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
