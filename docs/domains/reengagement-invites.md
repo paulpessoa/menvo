@@ -1,8 +1,14 @@
 # Convites de reengajamento (base Estágio Recife / JotForm) + exclusão LGPD
 
-> **Status:** planejado em 2026-09-24, não iniciado.
-> **Executor previsto:** Sonnet, fase por fase, um commit (Conventional Commits) por fase.
-> Leia `docs/STATUS.md` e `AGENTS.md` antes de começar.
+> **Status:** implementado em 2026-09-27 (Fases 1–7, um commit por fase). Ver
+> `docs/STATUS.md` (journal de 2026-09-27) e ADR 0005 para a exceção de
+> `service_role` nas rotas públicas de convite.
+> **Desvio do plano original:** `POST /api/admin/invites/audience` retorna
+> `eligibleUserIds` (lista completa), não só uma contagem — o modal precisa
+> dos ids para montar os lotes de envio no cliente, já que não existe uma
+> rota que envia para "a audiência inteira" no servidor.
+> **Pendente:** exclusão self-service em `/settings` (P3 do backlog);
+> primeiro envio real em produção.
 
 ## 1. Objetivo
 

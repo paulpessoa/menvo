@@ -836,6 +836,10 @@
       "title": "Third-Party Services",
       "text": "We use third-party services such as Google (OAuth login and Calendar API), LinkedIn (OAuth login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy and processes data only for the specific purposes described in this policy."
     },
+    "reengagement": {
+      "title": "Estágio Recife database",
+      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile — the e-mail's reply link goes straight to that option."
+    },
     "rights": {
       "title": "Your Rights",
       "text": "You may request access, correction, or deletion of your data at any time. To exercise your rights or revoke Google Calendar access permissions, contact us at contato@menvo.com.br."

@@ -4,12 +4,14 @@
 > `JOURNAL.md`) into one: current health, standing product/architecture
 > invariants, the active backlog, and a chronological engineering log.
 
-## 📅 Last Updated: 2026-09-24
+## 📅 Last Updated: 2026-09-27
 **Current status:** Multi-tenant Phase 1 shipped and merged (organizations,
 invite/request/approve membership, org admin dashboard). Phase 1.5
 (role-aware reporting, public/invite-only orgs, coherent emails, SEO) is
 planned in [`domains/organizations.md`](domains/organizations.md) §6, not
-started.
+started. Reengagement invite campaigns (JotForm/Estágio Recife base) with
+LGPD self-service opt-out/deletion shipped — see journal below and
+[`domains/reengagement-invites.md`](domains/reengagement-invites.md).
 
 ---
 
@@ -86,10 +88,24 @@ started.
 - [x] **AI-First Platform — Fase 2 (Job de Retenção LGPD para IA):** Rota `/api/cron/ai-retention` protegida por `CRON_SECRET`, agendada diariamente no `vercel.json`, expurgando estados intermediários de diagnóstico > 30 dias, threads de IA > 12 meses e compartilhamentos revogados > 12 meses (§12.1).
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
 - [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
+- [x] **Convites de reengajamento (base JotForm/Estágio Recife) + exclusão LGPD:** modal `/dashboard/admin/users` para enviar campanhas a qualquer público (selecionados, base JotForm ainda não convidada, nunca entraram, todos); e-mail com corpo editável pelo admin e rodapé fixo de LGPD; página pública `/convite/[token]` (aceitar, virar mentor, parar de receber e-mails, ou apagar dados/perfil — sem login). Ver [`domains/reengagement-invites.md`](domains/reengagement-invites.md) e ADR 0005.
+- [ ] **Exclusão de conta self-service em `/settings`:** `handleDeleteAccount` ainda é um placeholder (não deleta nada). Reusar `lib/services/admin/delete-user.service.ts` (`deleteUserCompletely(..., { source: "self_service" })`) — o mesmo serviço já usado pelo admin e pelo fluxo de convite.
 
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-09-27 — Convites de reengajamento (base JotForm/Estágio Recife) + exclusão LGPD
+- **Why:** Paul importou a base histórica do Estágio Recife (JotForm) para `profiles`, mas essas pessoas nunca pediram uma conta na Menvo. Precisava de uma forma de avisar/convidar (e convidar quem já se formou a virar mentor) e, por LGPD (art. 18), dar uma saída fácil e sem login para recusar ou apagar os dados. Plano completo em [`domains/reengagement-invites.md`](domains/reengagement-invites.md), executado em 7 fases/commits.
+- **Migração `20260927000000_reengagement_invites.sql`:** `reengagement_invites` (token só como hash `sha256`, nunca em texto), `data_deletion_log` (comprova o atendimento do pedido de exclusão sem reter dado pessoal — só o hash do e-mail) e `email_suppressions` (lista de supressão, também por hash, para uma reimportação futura não recontatar quem já pediu para sair). `profiles.email_opt_out_at`. Também corrigiu dois FKs pré-existentes (`appointments.cancelled_by`, `ai_missing_demands.user_id` → `auth.users`) que estavam `ON DELETE NO ACTION` e bloqueariam `auth.admin.deleteUser()`.
+- **`lib/services/admin/delete-user.service.ts`:** `deleteUserCompletely()` passa a ser o único lugar que apaga uma conta — usado tanto por `DELETE /api/admin/users/[id]` quanto pelo novo `POST /api/invites/delete`. Apaga arquivos do Storage (`cvs`, `avatars`), `auth.users`, `profiles`, registra no `data_deletion_log` e suprime o e-mail.
+- **`lib/email/brevo.ts` `sendReengagementInvite`:** corpo do e-mail editável pelo admin (texto simples, `{{primeiro_nome}}`, escapado); botões e rodapé de LGPD (parar de receber e-mails / apagar dados, link para `/privacy`) fixos, o admin não consegue removê-los.
+- **Rotas admin** (`requireAdmin`, Zod): `POST /api/admin/invites/audience` (conta o público elegível — filtra suprimidos/opt-out/já convidados sem N+1), `POST /api/admin/invites/preview`, `POST /api/admin/invites/send` (lotes de ≤25, um `logAdminAction` por lote). Substituiu `POST /api/admin/users/invite-batch` (removido), que mandava o e-mail padrão do Supabase sem opção de exclusão.
+- **Rotas públicas, sem login** (`checkRateLimit` por IP, corpo só com `{ token }` — nunca um `userId`): `POST /api/invites/respond` (aceitar/virar mentor gera um link de recuperação de senha na hora; opt-out grava `email_opt_out_at`) e `POST /api/invites/delete` (exige `confirm: true`). Ver **ADR 0005** para a exceção deliberada de `service_role` nessas duas rotas (nenhum dado de sessão — o `user_id` só pode vir do token resolvido).
+- **`/dashboard/admin/users`:** botão "Convidar..." abre `InviteCampaignModal` (`components/admin/invites/`, 4 passos: público → mensagem → pré-visualização → envio) para qualquer público (selecionados, base JotForm ainda não convidada, nunca entraram, todos).
+- **Página pública `/[locale]/(auth)/convite/[token]`:** Server Component resolve o token e só registra a abertura (`markOpened`, nunca uma ação); as 4 ações (aceitar, virar mentor, parar de receber e-mails, apagar tudo) são POSTs no clique, nunca no GET — importante porque scanners de e-mail corporativo abrem links sozinhos. Exclusão tem uma segunda tela de confirmação explícita.
+- **`/privacy`:** nova seção `privacy.reengagement` (pt-BR/en/es) explicando a origem dos dados do Estágio Recife e a base legal (legítimo interesse, art. 7º IX).
+- **Pendente:** exclusão self-service em `/settings` ainda não implementada (`handleDeleteAccount` é um placeholder — ver backlog P3). Envio real em produção ainda não disparado — primeiro lote pequeno recomendado antes da base toda.
 
 ### 2026-09-24 — Assistente de IA na verificação de mentores (backend)
 - **Why:** O admin escrevia à mão (ou nem escrevia) a mensagem de aprovação/ajustes e a divulgação de cada novo mentor; a aprovação mandava no chat a nota em inglês "Verification completed successfully by admin".
