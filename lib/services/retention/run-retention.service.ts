@@ -28,6 +28,8 @@ export interface RetentionRunOptions {
   maxEmails: number
   /** Caps how many accounts this run deletes. */
   maxDeletions: number
+  /** Epoch ms after which no new send/deletion starts (leftovers are deferred), to stay inside the function timeout. */
+  deadline?: number
 }
 
 export interface RetentionReport {
@@ -56,10 +58,29 @@ function emptyReport(mode: RetentionRunOptions["mode"]): RetentionReport {
   }
 }
 
+const PAGE_SIZE = 1000
+
 /**
- * Loads everything `planRetentionActions` needs in a fixed number of
- * queries (no per-user loop), so the read side never becomes an N+1 as the
- * imported cohort grows.
+ * Reads every row of a query page by page. PostgREST silently caps a
+ * response at 1000 rows, so a plain select would quietly drop part of the
+ * cohort once it grows past that. `buildPage` must apply a stable order.
+ */
+async function fetchAllRows<T>(
+  buildPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>
+): Promise<T[]> {
+  const rows: T[] = []
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await buildPage(from, from + PAGE_SIZE - 1)
+    if (error) throw error
+    rows.push(...(data ?? []))
+    if (!data || data.length < PAGE_SIZE) return rows
+  }
+}
+
+/**
+ * Loads everything `planRetentionActions` needs with a fixed set of paged
+ * reads (no per-user loop, no id list in the URL), so the read side stays
+ * correct and cheap as the imported cohort grows.
  */
 async function loadRetentionState(): Promise<{
   state: RetentionState
@@ -68,46 +89,42 @@ async function loadRetentionState(): Promise<{
 }> {
   const supabase = createServiceRoleClient()
 
-  const { data: profiles, error: profilesError } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, email_opt_out_at")
-    .eq("origin_platform", "jotform")
-  if (profilesError) throw profilesError
+  const profiles = await fetchAllRows((from, to) =>
+    supabase
+      .from("profiles")
+      .select("id, email, full_name, email_opt_out_at")
+      .eq("origin_platform", "jotform")
+      .order("id")
+      .range(from, to)
+  )
+  const profilesById = new Map(profiles.map(p => [p.id, { email: p.email, full_name: p.full_name }]))
 
-  const profilesById = new Map((profiles ?? []).map(p => [p.id, { email: p.email, full_name: p.full_name }]))
-  const jotformIds = (profiles ?? []).map(p => p.id)
+  const invites = await fetchAllRows((from, to) =>
+    supabase.from("reengagement_invites").select("user_id, campaign, sent_at").order("id").range(from, to)
+  )
 
-  const { data: invites, error: invitesError } = jotformIds.length
-    ? await supabase
-        .from("reengagement_invites")
-        .select("user_id, campaign, sent_at")
-        .in("user_id", jotformIds)
-        .order("sent_at", { ascending: true })
-    : { data: [], error: null }
-  if (invitesError) throw invitesError
-
-  // Earliest invite per user (the list is ordered by sent_at ascending, so
-  // the first occurrence per user_id wins).
   const firstInviteByUser = new Map<string, { campaign: string; sentAt: string }>()
-  for (const invite of invites ?? []) {
-    if (!firstInviteByUser.has(invite.user_id)) {
+  for (const invite of invites) {
+    if (!profilesById.has(invite.user_id)) continue
+    const current = firstInviteByUser.get(invite.user_id)
+    if (!current || new Date(invite.sent_at) < new Date(current.sentAt)) {
       firstInviteByUser.set(invite.user_id, { campaign: invite.campaign, sentAt: invite.sent_at })
     }
   }
 
-  const { data: suppressions, error: suppressionsError } = await supabase
-    .from("email_suppressions")
-    .select("email_hash")
-  if (suppressionsError) throw suppressionsError
-  const suppressedHashes = new Set((suppressions ?? []).map(row => row.email_hash))
+  const suppressions = await fetchAllRows((from, to) =>
+    supabase.from("email_suppressions").select("email_hash").order("email_hash").range(from, to)
+  )
+  const suppressedHashes = new Set(suppressions.map(row => row.email_hash))
 
-  const { data: queueRows, error: queueError } = await supabase.from("account_retention").select("*")
-  if (queueError) throw queueError
+  const queueRows = await fetchAllRows((from, to) =>
+    supabase.from("account_retention").select("*").order("user_id").range(from, to)
+  )
 
   const signedInUserIds = await fetchSignedInUserIds()
 
   const candidates: RetentionCandidate[] = []
-  for (const profile of profiles ?? []) {
+  for (const profile of profiles) {
     const firstInvite = firstInviteByUser.get(profile.id)
     if (!firstInvite) continue // never invited: not a candidate at all
     const optedOut = Boolean(profile.email_opt_out_at) || (profile.email ? suppressedHashes.has(hashEmail(profile.email)) : false)
@@ -119,7 +136,7 @@ async function loadRetentionState(): Promise<{
     })
   }
 
-  const queue: RetentionQueueRow[] = (queueRows ?? []).map(row => ({
+  const queue: RetentionQueueRow[] = queueRows.map(row => ({
     userId: row.user_id,
     campaign: row.campaign,
     clockStartedAt: row.clock_started_at,
@@ -261,6 +278,7 @@ export async function runRetention(options: RetentionRunOptions): Promise<Retent
   }
 
   const queueByUser = new Map(state.queue.map(row => [row.userId, row]))
+  const outOfTime = () => options.deadline !== undefined && Date.now() >= options.deadline
   let emailsSent = 0
   let deletionsDone = 0
 
@@ -288,7 +306,7 @@ export async function runRetention(options: RetentionRunOptions): Promise<Retent
 
   for (const action of actions) {
     if (action.kind !== "delete") continue
-    if (deletionsDone >= options.maxDeletions) {
+    if (deletionsDone >= options.maxDeletions || outOfTime()) {
       report.deferredToNextRun.deletions += 1
       continue
     }
@@ -326,7 +344,7 @@ export async function runRetention(options: RetentionRunOptions): Promise<Retent
 
   for (const action of actions) {
     if (action.kind !== "notice_1d") continue
-    if (emailsSent >= options.maxEmails) {
+    if (emailsSent >= options.maxEmails || outOfTime()) {
       report.deferredToNextRun.emails += 1
       continue
     }
@@ -349,7 +367,7 @@ export async function runRetention(options: RetentionRunOptions): Promise<Retent
 
   for (const action of actions) {
     if (action.kind !== "notice_30d") continue
-    if (emailsSent >= options.maxEmails) {
+    if (emailsSent >= options.maxEmails || outOfTime()) {
       report.deferredToNextRun.emails += 1
       continue
     }

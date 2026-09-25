@@ -65,7 +65,7 @@ function buildSupabase(opts: {
   const queue = opts.queue
 
   const accountRetentionTable = {
-    select: () => Promise.resolve({ data: queue.map(r => ({ ...r })), error: null }),
+    select: () => ({ order: () => ({ range: () => Promise.resolve({ data: queue.map(r => ({ ...r })), error: null }) }) }),
     delete: () => ({
       eq: (_col: string, val: string) => {
         const idx = queue.findIndex(r => r.user_id === val)
@@ -105,13 +105,13 @@ function buildSupabase(opts: {
   const supabase = {
     from: jest.fn((table: string) => {
       if (table === "profiles") {
-        return { select: () => ({ eq: () => Promise.resolve({ data: opts.profiles, error: null }) }) }
+        return { select: () => ({ eq: () => ({ order: () => ({ range: () => Promise.resolve({ data: opts.profiles, error: null }) }) }) }) }
       }
       if (table === "reengagement_invites") {
-        return { select: () => ({ in: () => ({ order: () => Promise.resolve({ data: opts.invites, error: null }) }) }) }
+        return { select: () => ({ order: () => ({ range: () => Promise.resolve({ data: opts.invites, error: null }) }) }) }
       }
       if (table === "email_suppressions") {
-        return { select: () => Promise.resolve({ data: opts.suppressions ?? [], error: null }) }
+        return { select: () => ({ order: () => ({ range: () => Promise.resolve({ data: opts.suppressions ?? [], error: null }) }) }) }
       }
       if (table === "account_retention") {
         return accountRetentionTable
@@ -329,6 +329,30 @@ describe("runRetention", () => {
 
     expect(report.noticed30d).toHaveLength(1)
     expect(report.deferredToNextRun.emails).toBe(1)
+  })
+
+  it("stops starting new sends once the deadline has passed and defers them", async () => {
+    const { supabase, queue } = buildSupabase({
+      profiles: [{ id: "u1", email: "u1@example.com", full_name: "User One", email_opt_out_at: null }],
+      invites: [{ user_id: "u1", campaign: "estagiorecife-2026", sent_at: isoDaysAgo(60) }],
+      queue: [
+        {
+          user_id: "u1",
+          campaign: "estagiorecife-2026",
+          clock_started_at: isoDaysAgo(60),
+          notice_30d_sent_at: null,
+          scheduled_deletion_at: null,
+          notice_1d_sent_at: null
+        }
+      ]
+    })
+    ;(createServiceRoleClient as jest.Mock).mockReturnValue(supabase)
+
+    const report = await runRetention({ mode: "live", maxEmails: 100, maxDeletions: 25, deadline: Date.now() - 1 })
+
+    expect(sendRetentionNotice).not.toHaveBeenCalled()
+    expect(report.deferredToNextRun.emails).toBe(1)
+    expect(queue[0].notice_30d_sent_at).toBeNull()
   })
 
   it("uses createInviteToken with sentBy: null and resend: true so the link is always fresh", async () => {

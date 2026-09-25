@@ -84,7 +84,9 @@ describe("GET /api/cron/account-retention", () => {
     })
 
     await GET(req)
-    expect(runRetention).toHaveBeenCalledWith({ mode: "live", maxEmails: 50, maxDeletions: 10 })
+    expect(runRetention).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "live", maxEmails: 50, maxDeletions: 10, deadline: expect.any(Number) })
+    )
   })
 
   it("returns success: false when the report has errors, without throwing", async () => {

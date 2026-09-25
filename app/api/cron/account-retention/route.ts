@@ -2,6 +2,11 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { runRetention } from "@/lib/services/retention/run-retention.service"
 
+export const maxDuration = 60
+
+/** Stop starting new sends/deletions this long before `maxDuration` runs out. */
+const TIME_BUDGET_MS = 45_000
+
 const envSchema = z.object({
   RETENTION_MODE: z.enum(["dry_run", "live"]).default("dry_run"),
   RETENTION_MAX_EMAILS_PER_RUN: z.coerce.number().int().positive().default(100),
@@ -48,7 +53,8 @@ export async function GET(request: Request) {
     const report = await runRetention({
       mode: env.data.RETENTION_MODE,
       maxEmails: env.data.RETENTION_MAX_EMAILS_PER_RUN,
-      maxDeletions: env.data.RETENTION_MAX_DELETIONS_PER_RUN
+      maxDeletions: env.data.RETENTION_MAX_DELETIONS_PER_RUN,
+      deadline: Date.now() + TIME_BUDGET_MS
     })
 
     console.info("[CRON account-retention] Run completed:", {

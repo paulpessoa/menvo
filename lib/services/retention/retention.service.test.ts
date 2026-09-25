@@ -21,8 +21,14 @@ function queueRow(overrides: Partial<RetentionQueueRow> & { userId: string; cloc
   }
 }
 
+/** Builds a state where every queued row also has a matching (non-opted-out) candidate, unless one is given. */
 function state(overrides: Partial<RetentionState> = {}): RetentionState {
-  return { candidates: [], queue: [], signedInUserIds: new Set(), ...overrides }
+  const base: RetentionState = { candidates: [], queue: [], signedInUserIds: new Set(), ...overrides }
+  const known = new Set(base.candidates.map(c => c.userId))
+  const implicit = base.queue
+    .filter(row => !known.has(row.userId))
+    .map(row => candidate({ userId: row.userId, firstInvitedAt: row.clockStartedAt }))
+  return { ...base, candidates: [...base.candidates, ...implicit] }
 }
 
 describe("planRetentionActions", () => {
@@ -205,6 +211,23 @@ describe("planRetentionActions", () => {
       "notice_1d",
       "notice_30d"
     ])
+  })
+
+  it("never notices or deletes a queue row whose profile is no longer a JotForm candidate", () => {
+    const s: RetentionState = {
+      candidates: [],
+      queue: [
+        queueRow({
+          userId: "stale",
+          clockStartedAt: isoDaysAgo(now, 200),
+          noticeThirtyDaySentAt: isoDaysAgo(now, 31),
+          scheduledDeletionAt: isoDaysAgo(now, 1),
+          noticeOneDaySentAt: isoDaysAgo(now, 2)
+        })
+      ],
+      signedInUserIds: new Set()
+    }
+    expect(planRetentionActions(s, now)).toEqual([])
   })
 
   it("RETENTION_POLICY matches the documented timeline", () => {

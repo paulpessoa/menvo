@@ -147,8 +147,12 @@ export function planRetentionActions(state: RetentionState, now: Date): Retentio
   for (const row of state.queue) {
     if (releasedUserIds.has(row.userId)) continue
     if (state.signedInUserIds.has(row.userId)) continue
+    // Only act on rows whose profile is still a current JotForm candidate, so
+    // a stale or hand-edited queue row can never notice or delete anyone else.
+    const optedOut = optedOutByUser.get(row.userId)
+    if (optedOut === undefined) continue
 
-    const action = decideForQueueRow(row, optedOutByUser.get(row.userId) ?? false, now)
+    const action = decideForQueueRow(row, optedOut, now)
     if (!action) continue
     if (action.kind === "delete") deletions.push(action)
     else if (action.kind === "notice_1d") notices1d.push(action)
