@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { Loader2, Plus, Building2 } from "lucide-react"
+import { Loader2, Plus, Building2, Search } from "lucide-react"
 import { toast } from "sonner"
 
 interface Organization {
@@ -58,6 +58,9 @@ export default function AdminOrganizationsPage() {
   const [creating, setCreating] = useState(false)
   const [assigningId, setAssigningId] = useState<string | null>(null)
   const [adminEmailById, setAdminEmailById] = useState<Record<string, string>>({})
+  const [search, setSearch] = useState("")
+  const [typeFilter, setTypeFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
 
   const [newOrg, setNewOrg] = useState({
     name: "",
@@ -153,6 +156,19 @@ export default function AdminOrganizationsPage() {
     }
   }
 
+  const filteredOrganizations = organizations.filter((org) => {
+    const query = search.trim().toLowerCase()
+    const matchesSearch =
+      !query ||
+      org.name.toLowerCase().includes(query) ||
+      org.slug.toLowerCase().includes(query) ||
+      (org.contact_name || "").toLowerCase().includes(query) ||
+      (org.contact_email || "").toLowerCase().includes(query)
+    const matchesType = typeFilter === "all" || org.type === typeFilter
+    const matchesStatus = statusFilter === "all" || org.status === statusFilter
+    return matchesSearch && matchesType && matchesStatus
+  })
+
   return (
     <PageContainer>
       <div className="flex items-center gap-2 mb-8">
@@ -241,6 +257,41 @@ export default function AdminOrganizationsPage() {
           <CardTitle>Todas as organizações</CardTitle>
         </CardHeader>
         <CardContent>
+          {organizations.length > 0 && (
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Buscar por nome, slug ou contato..."
+                  className="pl-9"
+                />
+              </div>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-full sm:w-44">
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os tipos</SelectItem>
+                  {ORG_TYPES.map(t => (
+                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os status</SelectItem>
+                  <SelectItem value="active">Ativa</SelectItem>
+                  <SelectItem value="suspended">Suspensa</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex justify-center py-10">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -248,6 +299,10 @@ export default function AdminOrganizationsPage() {
           ) : organizations.length === 0 ? (
             <p className="text-muted-foreground text-center py-10">
               Nenhuma organização cadastrada ainda.
+            </p>
+          ) : filteredOrganizations.length === 0 ? (
+            <p className="text-muted-foreground text-center py-10">
+              Nenhuma organização encontrada para esse filtro.
             </p>
           ) : (
             <Table>
@@ -263,7 +318,7 @@ export default function AdminOrganizationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {organizations.map(org => (
+                {filteredOrganizations.map(org => (
                   <TableRow key={org.id}>
                     <TableCell className="font-medium">{org.name}</TableCell>
                     <TableCell className="text-muted-foreground">/o/{org.slug}</TableCell>

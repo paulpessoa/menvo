@@ -1,11 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { adminService } from "@/lib/services/admin/admin.service"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, Check, X, Clock, MessageCircle, User } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { Star, Check, X, Clock, MessageCircle, User, Search } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
@@ -24,7 +32,22 @@ interface AdminFeedback {
 export function AdminFeedbackModeration() {
   const [feedbacks, setFeedbacks] = useState<AdminFeedback[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [ratingFilter, setRatingFilter] = useState("all")
   const { toast } = useToast()
+
+  const filteredFeedbacks = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    return feedbacks.filter((fb) => {
+      const matchesSearch =
+        !query ||
+        (fb.mentee?.full_name || "").toLowerCase().includes(query) ||
+        (fb.mentor?.full_name || "").toLowerCase().includes(query) ||
+        (fb.comment || "").toLowerCase().includes(query)
+      const matchesRating = ratingFilter === "all" || fb.rating === Number(ratingFilter)
+      return matchesSearch && matchesRating
+    })
+  }, [feedbacks, search, ratingFilter])
 
   const fetchPendingFeedbacks = async () => {
     try {
@@ -73,15 +96,44 @@ export function AdminFeedbackModeration() {
 
   return (
     <div className="space-y-6">
+      {feedbacks.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por mentor, mentorado ou comentário..."
+              className="pl-9"
+            />
+          </div>
+          <Select value={ratingFilter} onValueChange={setRatingFilter}>
+            <SelectTrigger className="w-full sm:w-44">
+              <SelectValue placeholder="Nota" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as notas</SelectItem>
+              {[5, 4, 3, 2, 1].map((n) => (
+                <SelectItem key={n} value={String(n)}>{n} estrela{n > 1 ? "s" : ""}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {feedbacks.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
           <Check className="w-16 h-16 text-green-300 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-gray-900">Tudo limpo!</h3>
           <p className="text-gray-500 italic">Não há avaliações pendentes de moderação.</p>
         </div>
+      ) : filteredFeedbacks.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          Nenhuma avaliação encontrada para esse filtro.
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {feedbacks.map((fb) => (
+          {filteredFeedbacks.map((fb) => (
             <Card key={fb.id} className="overflow-hidden border-none shadow-sm bg-white hover:shadow-md transition-all">
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row">

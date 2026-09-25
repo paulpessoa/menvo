@@ -17,7 +17,15 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Calendar, User, CheckCircle, XCircle, Eye, Loader2, ArrowLeft } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { Calendar, User, CheckCircle, XCircle, Eye, Loader2, ArrowLeft, Search } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { VerificationService } from "@/lib/services/verifications/verifications.service"
 import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
@@ -31,6 +39,8 @@ export default function AdminVerificationsPage() {
   const { user } = useAuth()
   const [verifications, setVerifications] = useState<Verification[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [areaFilter, setAreaFilter] = useState("all")
 
   const loadVerifications = useCallback(async () => {
     try {
@@ -96,6 +106,22 @@ export default function AdminVerificationsPage() {
     }
   }
 
+  const expertiseAreas = Array.from(
+    new Set(verifications.flatMap((v) => v.mentor_expertise_areas || []))
+  ).sort()
+
+  const filteredVerifications = verifications.filter((v) => {
+    const query = search.trim().toLowerCase()
+    const matchesSearch =
+      !query ||
+      v.mentor_name.toLowerCase().includes(query) ||
+      v.mentor_email.toLowerCase().includes(query) ||
+      (v.mentor_company || "").toLowerCase().includes(query)
+    const matchesArea =
+      areaFilter === "all" || (v.mentor_expertise_areas || []).includes(areaFilter)
+    return matchesSearch && matchesArea
+  })
+
   if (loading) {
     return (
       <PageContainer className="flex flex-col items-center justify-center min-h-[400px]">
@@ -131,6 +157,31 @@ export default function AdminVerificationsPage() {
           </TabsList>
 
           <TabsContent value="pending" className="space-y-4">
+            {verifications.length > 0 && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar por nome, e-mail ou empresa..."
+                    className="pl-9"
+                  />
+                </div>
+                <Select value={areaFilter} onValueChange={setAreaFilter}>
+                  <SelectTrigger className="w-full sm:w-56">
+                    <SelectValue placeholder="Área de atuação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as áreas</SelectItem>
+                    {expertiseAreas.map((area) => (
+                      <SelectItem key={area} value={area}>{area}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             {verifications.length === 0 ? (
               <Card>
                 <CardContent className="flex items-center justify-center h-56">
@@ -141,9 +192,15 @@ export default function AdminVerificationsPage() {
                   </div>
                 </CardContent>
               </Card>
+            ) : filteredVerifications.length === 0 ? (
+              <Card>
+                <CardContent className="flex items-center justify-center h-40">
+                  <p className="text-muted-foreground">Nenhuma verificação encontrada para esse filtro.</p>
+                </CardContent>
+              </Card>
             ) : (
               <div className="grid grid-cols-1 gap-4">
-                {verifications.map((verification) => (
+                {filteredVerifications.map((verification) => (
                   <Card key={verification.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">

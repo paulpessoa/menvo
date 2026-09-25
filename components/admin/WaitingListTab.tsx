@@ -1,10 +1,23 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, UserPlus, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks, CheckCircle2, MessageCircle, Copy } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { Loader2, UserPlus, Sparkles, FileQuestion, ChevronDown, ChevronUp, ListChecks, CheckCircle2, MessageCircle, Copy, Search } from "lucide-react"
 import { toast } from "sonner"
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: "Aguardando",
+  invited: "Convidado"
+}
 
 function formatWhatsappDigits(raw: string): string | null {
   const digits = raw.replace(/\D/g, "")
@@ -47,6 +60,21 @@ export function WaitingListTab() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
   const [matchResults, setMatchResults] = useState<Record<string, MatchResult>>({})
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+
+  const filteredEntries = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    return entries.filter((entry) => {
+      const matchesSearch =
+        !query ||
+        entry.name.toLowerCase().includes(query) ||
+        entry.email.toLowerCase().includes(query) ||
+        (entry.whatsapp || "").includes(query)
+      const matchesStatus = statusFilter === "all" || entry.status === statusFilter
+      return matchesSearch && matchesStatus
+    })
+  }, [entries, search, statusFilter])
 
   const fetchEntries = useCallback(async () => {
     setLoading(true)
@@ -146,8 +174,36 @@ export function WaitingListTab() {
   }
 
   return (
-    <div className="divide-y">
-      {entries.map((entry) => {
+    <div>
+      <div className="flex flex-col sm:flex-row gap-3 p-4 pb-0">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nome, e-mail ou WhatsApp..."
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="pending">Aguardando</SelectItem>
+            <SelectItem value="invited">Convidado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {filteredEntries.length === 0 ? (
+        <p className="text-center text-sm text-muted-foreground py-10">
+          Nenhum registro encontrado para esse filtro.
+        </p>
+      ) : (
+      <div className="divide-y">
+      {filteredEntries.map((entry) => {
         const hasReason = Boolean(entry.reason && entry.reason.trim())
         const isExpanded = expandedId === entry.id
         const match = matchResults[entry.id]
@@ -334,6 +390,8 @@ export function WaitingListTab() {
           </div>
         )
       })}
+      </div>
+      )}
     </div>
   )
 }

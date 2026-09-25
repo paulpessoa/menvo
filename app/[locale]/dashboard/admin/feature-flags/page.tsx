@@ -11,10 +11,17 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { 
-  Loader2, RefreshCw, Save, Plus, Trash2, History, Tag, 
-  AlertTriangle, CheckCircle2, XCircle, Info, Shield
+import {
+  Loader2, RefreshCw, Save, Plus, Trash2, History, Tag,
+  AlertTriangle, CheckCircle2, XCircle, Info, Shield, Search
 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,6 +58,9 @@ export default function AdminFeatureFlagsPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newFlag, setNewFlag] = useState({ name: '', description: '', tags: '' });
   const [isCreating, setIsCreating] = useState(false);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [tagFilter, setTagFilter] = useState('all');
 
   const { user } = useAuth();
 
@@ -151,6 +161,20 @@ export default function AdminFeatureFlagsPage() {
     fetchData();
   }, [fetchData]);
 
+  const allTags = Array.from(new Set(flags.flatMap(f => f.tags ?? []))).sort();
+
+  const filteredFlags = flags.filter((flag) => {
+    const query = search.trim().toLowerCase();
+    const matchesSearch =
+      !query ||
+      flag.name.toLowerCase().includes(query) ||
+      (flag.description || '').toLowerCase().includes(query);
+    const matchesStatus =
+      statusFilter === 'all' || (statusFilter === 'enabled' ? flag.enabled : !flag.enabled);
+    const matchesTag = tagFilter === 'all' || (flag.tags ?? []).includes(tagFilter);
+    return matchesSearch && matchesStatus && matchesTag;
+  });
+
   return (
     <PageContainer className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -217,11 +241,53 @@ export default function AdminFeatureFlagsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-xl font-semibold flex items-center gap-2"><Tag className="h-5 w-5" /> Flags Ativas</h2>
+
+          {flags.length > 0 && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Buscar por nome ou descrição..."
+                  className="pl-9"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os status</SelectItem>
+                  <SelectItem value="enabled">Ativas</SelectItem>
+                  <SelectItem value="disabled">Inativas</SelectItem>
+                </SelectContent>
+              </Select>
+              {allTags.length > 0 && (
+                <Select value={tagFilter} onValueChange={setTagFilter}>
+                  <SelectTrigger className="w-full sm:w-40">
+                    <SelectValue placeholder="Tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as tags</SelectItem>
+                    {allTags.map(tag => (
+                      <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
+
           {loading ? (
             <div className="flex justify-center py-20 bg-muted/10 rounded-xl border border-dashed"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
+          ) : filteredFlags.length === 0 ? (
+            <p className="text-muted-foreground text-center py-10">
+              {flags.length === 0 ? 'Nenhuma feature flag criada ainda.' : 'Nenhuma flag encontrada para esse filtro.'}
+            </p>
           ) : (
             <div className="grid gap-4">
-              {flags.map((flag) => (
+              {filteredFlags.map((flag) => (
                 <Card key={flag.id} className={flag.enabled ? 'border-primary/40 bg-primary/5 shadow-sm' : 'opacity-80'}>
                   <CardHeader className="p-5 pb-2">
                     <div className="flex justify-between items-start">
