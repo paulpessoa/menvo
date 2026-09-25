@@ -22,10 +22,13 @@ export const mentorPublicService = {
       const supabase = await createClient()
 
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+      // Same visibility gate as the /mentors directory (is_public), so a
+      // profile page never exists for a mentor the directory hides.
       const query = supabase
         .from("mentors_view")
         .select("*")
         .eq("verified", true)
+        .eq("is_public", true)
 
       const { data: mentor, error } = await (isUuid
         ? query.eq("id", slug)

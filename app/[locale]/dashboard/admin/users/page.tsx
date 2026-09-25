@@ -84,6 +84,7 @@ export default function AdminUsersPage() {
   const [activeTab, setActiveTab] = useState(initialTab)
   const [originFilter, setOriginFilter] = useState<"all" | "menvo" | "jotform">("all")
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
+  const [sendingInvites, setSendingInvites] = useState(false)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const ITEMS_PER_PAGE = 30
@@ -162,6 +163,31 @@ export default function AdminUsersPage() {
     }
   }
 
+  // Único uso hoje da seleção em massa: reenviar o e-mail de convite/definição
+  // de senha (POST /api/admin/users/invite-batch) para quem ainda não entrou
+  // na plataforma. A rota já existia, mas nada na UI a chamava — marcar as
+  // linhas não tinha nenhum efeito visível.
+  const handleBulkInvite = async () => {
+    if (selectedUserIds.length === 0) return
+    setSendingInvites(true)
+    try {
+      const response = await fetch("/api/admin/users/invite-batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userIds: selectedUserIds })
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.error || "Erro ao enviar convites")
+      toast.success(data.message || "Convites enviados")
+      setSelectedUserIds([])
+      fetchData()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao enviar convites")
+    } finally {
+      setSendingInvites(false)
+    }
+  }
+
   return (
     <PageContainer>
       <div className="space-y-8">
@@ -230,7 +256,7 @@ export default function AdminUsersPage() {
                   <WaitingListTab />
                 ) : (
                 <>
-                <div className="px-4 py-2 bg-muted/30 border-b flex items-center gap-4">
+                <div className="px-4 py-2 bg-muted/30 border-b flex flex-wrap items-center gap-4">
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 cursor-pointer"
@@ -238,6 +264,15 @@ export default function AdminUsersPage() {
                       onChange={toggleSelectAll}
                     />
                     <span className="text-[10px] font-bold uppercase text-muted-foreground">Selecionar Todos ({users.length})</span>
+                    {selectedUserIds.length > 0 && (
+                      <div className="flex items-center gap-2 ml-auto">
+                        <span className="text-xs text-muted-foreground">{selectedUserIds.length} selecionado(s)</span>
+                        <Button size="sm" variant="outline" onClick={handleBulkInvite} disabled={sendingInvites} className="gap-2">
+                          {sendingInvites ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+                          Reenviar convite de acesso
+                        </Button>
+                      </div>
+                    )}
                 </div>
 
                 <div className="divide-y">

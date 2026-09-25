@@ -77,6 +77,14 @@ export async function POST(request: NextRequest) {
         break
 
       case 'toggle_verification':
+        // Aposentado: aprovar mentor só por POST /api/admin/verify, que também
+        // concede o papel, publica o perfil e avisa a pessoa.
+        return NextResponse.json(
+          { error: 'Use /api/admin/verify para decidir candidaturas a mentor' },
+          { status: 410 }
+        )
+
+      case 'toggle_verification_legacy':
         const newVerificationStatus = !targetUser.verified
         
         const { error: verificationError } = await supabase

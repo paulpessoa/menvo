@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/utils/supabase/server'
 import { createServiceRoleClient } from '@/lib/utils/supabase/service-role'
 import { getOrCreateConversation, sendMessage } from '@/lib/chat/chat-service'
+import { sendVerificationNotification } from '@/lib/email/brevo'
 
 export type VerificationStatus = 'approved' | 'rejected' | 'pending'
 
@@ -11,50 +12,77 @@ export interface VerificationOptions {
   notes?: string
   /** Full chat message written by the admin (e.g. an edited AI draft); replaces the default text. */
   message?: string
+  /** Also send the Brevo e-mail (default true). Only applies to approved/rejected. */
+  notifyEmail?: boolean
+}
+
+export interface VerificationResult {
+  success: true
+  chatSent: boolean
+  emailSent: boolean
 }
 
 /**
- * Service to handle user verification and automatic notifications
+ * Profile columns written for each decision. `verification_status` is the
+ * single source of truth; the DB trigger `sync_profile_verification_flags`
+ * keeps `is_pending_mentor`/`verified` in sync, but we still send them so the
+ * write is correct even before that migration runs.
+ *
+ * Approval also publishes the profile (`is_public`): the mentor directory only
+ * lists public profiles, and the approval message tells the mentor they are
+ * already listed. The mentor can hide it again from their own profile page.
+ */
+function buildProfileUpdate(status: VerificationStatus, notes?: string) {
+  const now = new Date().toISOString()
+  const base = {
+    verification_status: status,
+    verification_notes: notes ?? null,
+    is_pending_mentor: status === 'pending',
+    updated_at: now
+  }
+  if (status === 'approved') {
+    return { ...base, verified: true, verified_at: now, is_public: true }
+  }
+  return base
+}
+
+/**
+ * The one place a mentor application is decided — used by both
+ * /dashboard/admin/verifications and the user modal in /dashboard/admin/users
+ * (via POST /api/admin/verify), so both screens produce the same profile
+ * state, RBAC role, chat message and e-mail.
+ *
+ * Cross-user writes use the service-role client: `profiles` has no admin
+ * UPDATE policy, so the admin's own session silently updated zero rows
+ * (the approval looked successful but the profile stayed "pending").
+ * Callers must be guarded by `requireAdmin()`.
  */
 export async function processVerification({
   userId,
   adminId,
   status,
   notes,
-  message
-}: VerificationOptions) {
+  message,
+  notifyEmail = true
+}: VerificationOptions): Promise<VerificationResult> {
   const supabase = await createClient()
+  const serviceClient = createServiceRoleClient()
 
-  // 1. Update Profile Status
-  const { error: updateError } = await (supabase
+  // 1. Update profile — and fail loudly if no row was touched.
+  const { data: updated, error: updateError } = await (serviceClient
     .from('profiles') as any)
-    .update({
-      verification_status: status,
-      verification_notes: notes,
-      verified_at: status === 'approved' ? new Date().toISOString() : null,
-      updated_at: new Date().toISOString(),
-      verified: status === 'approved',
-      is_pending_mentor: status === 'pending'
-    })
+    .update(buildProfileUpdate(status, notes))
     .eq('id', userId)
+    .select('id, email, full_name')
+    .maybeSingle()
 
   if (updateError) throw new Error(`Erro ao atualizar perfil: ${updateError.message}`)
+  if (!updated) throw new Error('Perfil não encontrado')
 
-  // 1b. Assign/remove the RBAC "mentor" role.
-  // This queue is fed exclusively by mentor requests (both onboarding's
-  // POST /api/profile/role and the profile page's POST
-  // /api/profile/request-mentor set verification_status = 'pending').
-  // Approving one here previously only ever touched `profiles` columns —
-  // it never wrote to user_roles, so an approved mentor's isMentor stayed
-  // false everywhere in the app (dashboard, availability setup, and the
-  // public mentors directory all read the RBAC role, not
-  // verification_status). Uses the service-role client because this is a
-  // cross-user write with no confirmed RLS policy letting an admin's own
-  // session modify someone else's user_roles rows — same reasoning as
-  // every other cross-user admin mutation in this codebase
-  // (app/api/admin/users/[id]/route.ts, etc).
+  // 2. Approval grants the RBAC "mentor" role. isMentor, the dashboard and
+  // `mentors_view` (the public directory) all read user_roles, not profile
+  // columns. mentor/mentee are exclusive (see /api/profile/role).
   if (status === 'approved') {
-    const serviceClient = createServiceRoleClient()
     const { data: exclusiveRoles } = await serviceClient
       .from('roles')
       .select('id, name')
@@ -67,11 +95,8 @@ export async function processVerification({
       await serviceClient.from('user_roles').delete().eq('user_id', userId).eq('role_id', menteeRoleId)
     }
     if (mentorRoleId) {
-      // user_roles has no unique constraint on (user_id, role_id) — its
-      // primary key is a synthetic `id` — so `.upsert(..., { onConflict:
-      // "user_id,role_id" })` fails outright with Postgres error 42P10.
-      // Confirmed directly against the live database. Check-then-insert
-      // instead of relying on upsert.
+      // user_roles has no unique (user_id, role_id) constraint, so upsert
+      // with onConflict fails (42P10) — check-then-insert instead.
       const { data: existingRole } = await serviceClient
         .from('user_roles')
         .select('id')
@@ -85,29 +110,40 @@ export async function processVerification({
     }
   }
 
-  // 2. Send Chat Notification
+  // 3. Chat message (sent from the admin's own session so it shows as them).
+  let chatSent = false
   try {
     const conversationId = await getOrCreateConversation(supabase, userId, adminId)
-    
-    let messageContent = ''
-    if (message) {
-      messageContent = message
-    } else {
-      if (status === 'approved') {
-        messageContent = '🎉 Parabéns! Seu perfil foi verificado e aprovado. Agora você já pode ser encontrado na plataforma Menvo.'
-      } else {
-        messageContent = '📢 Olá! Analisamos seu perfil e precisamos de alguns ajustes antes da aprovação definitiva.'
-      }
 
-      if (notes) {
-        messageContent += `\n\nNotas do administrador:\n${notes}`
-      }
+    let messageContent = message
+    if (!messageContent) {
+      messageContent = status === 'approved'
+        ? '🎉 Parabéns! Seu perfil foi verificado e aprovado. Agora você já pode ser encontrado na plataforma Menvo.'
+        : '📢 Olá! Analisamos seu perfil e precisamos de alguns ajustes antes da aprovação definitiva.'
+      if (notes) messageContent += `\n\nNotas do administrador:\n${notes}`
     }
 
     await sendMessage(supabase, conversationId, adminId, messageContent)
+    chatSent = true
   } catch (chatError) {
-    // Silently log in server only if necessary
+    console.error('[VERIFICATION] Falha ao enviar mensagem no chat:', chatError)
   }
 
-  return { success: true }
+  // 4. E-mail (Brevo).
+  let emailSent = false
+  if (notifyEmail && status !== 'pending' && updated.email) {
+    try {
+      await sendVerificationNotification({
+        userEmail: updated.email,
+        userName: updated.full_name || 'Mentor',
+        status,
+        notes: message || notes
+      })
+      emailSent = true
+    } catch (emailError) {
+      console.error('[VERIFICATION] Falha ao enviar e-mail:', emailError)
+    }
+  }
+
+  return { success: true, chatSent, emailSent }
 }

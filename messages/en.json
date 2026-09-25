@@ -1045,6 +1045,7 @@
     "subtitle": "Connect with verified mentors and accelerate your career",
     "searchPlaceholder": "Name, specialty... or describe your goal and search with AI",
     "errorLoadingMentors": "Error loading mentors. Please try again.",
+    "loadMore": "Load more",
     "filters": "Filters",
     "sheetTitle": "Advanced Filters",
     "sheetDescription": "Refine your search to find the perfect mentor",

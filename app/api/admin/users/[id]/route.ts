@@ -1,6 +1,7 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
 
 // Admin client com service role para ignorar RLS
@@ -15,6 +16,30 @@ const supabaseAdmin = createClient(
   }
 )
 
+/**
+ * Profile fields an admin may edit from the user modal. Verification columns
+ * (`verified`, `verification_status`, `verification_notes`, `is_pending_mentor`)
+ * are deliberately NOT here: they only change through POST /api/admin/verify,
+ * which also assigns the mentor role and notifies the person. Unknown keys
+ * are stripped.
+ */
+const updatesSchema = z.object({
+  first_name: z.string().max(100).optional(),
+  last_name: z.string().max(100).optional(),
+  bio: z.string().max(5000).optional(),
+  avatar_url: z.string().max(2000).optional(),
+  is_public: z.boolean().optional(),
+  institution: z.string().max(200).optional(),
+  course: z.string().max(200).optional(),
+  academic_level: z.string().max(100).optional(),
+  expected_graduation: z.string().max(50).optional()
+})
+
+const patchBodySchema = z.object({
+  updates: updatesSchema.default({}),
+  roles: z.array(z.enum(["mentee", "mentor", "admin", "moderator"])).optional()
+})
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -24,9 +49,11 @@ export async function PATCH(
     if (!guard.ok) return guard.response
 
     const { id } = await params
-    const body = await request.json()
-
-    const { updates, roles } = body
+    const parsed = patchBodySchema.safeParse(await request.json().catch(() => null))
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
+    }
+    const { updates, roles } = parsed.data
 
     // 2. Atualizar Perfil
     const { data: updatedProfile, error: profileError } = await supabaseAdmin

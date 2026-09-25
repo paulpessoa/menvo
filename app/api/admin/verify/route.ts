@@ -7,9 +7,14 @@ const bodySchema = z.object({
   userId: z.string().min(1),
   status: z.enum(['approved', 'rejected', 'pending']),
   notes: z.string().max(2000).optional(),
-  message: z.string().trim().min(1).max(4000).optional()
+  message: z.string().trim().min(1).max(4000).optional(),
+  notifyEmail: z.boolean().optional()
 })
 
+/**
+ * Decides a mentor application. Single entry point for every admin screen
+ * (verifications queue and the user modal) so they can't diverge.
+ */
 export async function POST(request: NextRequest) {
   try {
     const guard = await requireAdmin()
@@ -26,11 +31,9 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json(result)
-  } catch (error: any) {
+  } catch (error) {
     console.error('[API VERIFICATION] Erro:', error)
-    return NextResponse.json(
-      { error: error.message || 'Erro interno do servidor' },
-      { status: 500 }
-    )
+    const message = error instanceof Error ? error.message : 'Erro interno do servidor'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

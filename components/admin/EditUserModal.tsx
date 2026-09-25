@@ -20,7 +20,6 @@ import {
   Save,
   Shield,
   User,
-  Star,
   Camera,
   Upload,
   GraduationCap,
@@ -31,7 +30,8 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-import { adminService, type AdminUserUpdate } from "@/lib/services/admin/admin.service"
+import { type AdminUserUpdate } from "@/lib/services/admin/admin.service"
+import { MentorApplicationPanel } from "@/components/admin/MentorApplicationPanel"
 import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 import { toast } from "sonner"
 
@@ -51,7 +51,6 @@ export function EditUserModal({
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<AdminUserUpdate>({})
   const [selectedRoles, setSelectedRoles] = useState<string[]>([])
-  const [notifyEmail, setNotifyEmail] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Hook de upload (como administrador, podemos enviar para o path do usuário)
@@ -64,8 +63,6 @@ export function EditUserModal({
         last_name: user.last_name || "",
         bio: user.bio || "",
         avatar_url: user.avatar_url || "",
-        verified: user.verified || false,
-        verification_notes: user.verification_notes || "",
         is_public: user.is_public || false,
         institution: user.institution || "",
         course: user.course || "",
@@ -113,23 +110,6 @@ export function EditUserModal({
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || "Erro ao salvar")
-      }
-
-      // 3. Notificar por E-mail se solicitado
-      if (
-        notifyEmail &&
-        (formData.verified !== user.verified ||
-          formData.verification_notes !== user.verification_notes)
-      ) {
-        await fetch("/api/admin/notify-verification", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: user.id,
-            status: formData.verified ? "approved" : "rejected",
-            notes: formData.verification_notes
-          })
-        })
       }
 
       toast.success("Usuário atualizado com sucesso!")
@@ -454,7 +434,9 @@ export function EditUserModal({
             </div>
             <p className="text-[11px] text-blue-700 italic flex items-center gap-1">
               <Shield className="h-3 w-3" /> Alterar papéis concede ou remove
-              acesso a áreas privadas instantaneamente.
+              acesso a áreas privadas instantaneamente. Para tornar alguém
+              mentor, prefira &quot;Aprovar como mentor&quot; abaixo — ele também
+              publica o perfil e avisa a pessoa.
             </p>
           </div>
 
@@ -560,62 +542,22 @@ export function EditUserModal({
             </details>
           </div>
 
-          {/* Verificação */}
-          <div className="space-y-4 p-5 border-2 rounded-xl border-yellow-200 bg-yellow-50/50">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-bold flex items-center gap-2 text-yellow-900">
-                <Star className="h-5 w-5 text-yellow-600 fill-current" />{" "}
-                Verificação Oficial Menvo
-              </Label>
-              <div className="flex items-center space-x-3 p-2 bg-white rounded-lg border border-yellow-200">
-                <Checkbox
-                  id="verified"
-                  checked={formData.verified}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, verified: checked as boolean })
-                  }
-                />
-                <Label
-                  htmlFor="verified"
-                  className="font-bold text-green-700 cursor-pointer"
-                >
-                  VERIFICADO / ATIVO
-                </Label>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="verification_notes" className="font-semibold">
-                Notas e Feedback (O usuário verá esta mensagem)
-              </Label>
-              <Textarea
-                id="verification_notes"
-                value={formData.verification_notes}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    verification_notes: e.target.value
-                  })
-                }
-                placeholder="Explique por que aprovou ou aponte o que falta para a aprovação (ex: 'Sua foto está desfocada', 'Adicione seu LinkedIn')..."
-                className="bg-white min-h-[80px]"
-              />
-            </div>
-          </div>
-
-          {/* Notificação checkbox */}
-          <div className="flex items-center space-x-3 px-2 py-3 bg-muted/30 rounded-lg">
-            <Checkbox
-              id="notify-email"
-              checked={notifyEmail}
-              onCheckedChange={(checked) => setNotifyEmail(checked as boolean)}
-            />
-            <Label
-              htmlFor="notify-email"
-              className="text-sm font-bold text-gray-700 cursor-pointer"
-            >
-              Enviar aviso automático por e-mail para o usuário (Brevo)
-            </Label>
-          </div>
+          {/* Candidatura a mentor — decisões vão por /api/admin/verify */}
+          <MentorApplicationPanel
+            userId={user.id}
+            status={user.verification_status ?? null}
+            isMentor={(user.roles || []).includes("mentor")}
+            hasTopics={
+              (user.expertise_areas?.length ?? 0) > 0 ||
+              (user.mentorship_topics?.length ?? 0) > 0
+            }
+            isPublic={formData.is_public ?? false}
+            onIsPublicChange={(value) => setFormData({ ...formData, is_public: value })}
+            onDecided={() => {
+              onSuccess()
+              onClose()
+            }}
+          />
         </div>
 
         <DialogFooter className="border-t pt-6 flex flex-col sm:flex-row justify-between gap-3">

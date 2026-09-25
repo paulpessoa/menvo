@@ -17,13 +17,13 @@ import {
   CheckCircle,
   Building2,
   TrendingUp,
-  Mail
+  Mail,
+  UserCheck
 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { PageContainer } from "@/components/layout/PageContainer"
 
@@ -52,72 +52,23 @@ export default function AdminDashboard() {
     pendingSuggestions: 0
   })
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
 
   useEffect(() => {
-    if (user?.id && supabase) {
+    if (user?.id) {
       fetchStats()
-    } else if (!supabase) {
-      setLoading(false)
     }
-  }, [user?.id, supabase])
+  }, [user?.id])
 
+  // Same endpoint (/api/admin/stats) the "Aguardando" tab in
+  // /dashboard/admin/users and the queue in /dashboard/admin/verifications
+  // are built from — one query per number, no ad hoc counting here, so the
+  // card and what you find after clicking "Acessar" always agree.
   const fetchStats = async () => {
-    if (!supabase) return
     try {
-      const { count: totalUsers } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-
-      const { data: mentorRoles, error: mentorError } = await (supabase
-        .from("user_roles")
-        .select(
-          `
-          profiles!inner(id, verified),
-          roles!inner(name)
-        `
-        )
-        .eq("roles.name", "mentor") as any)
-
-      if (mentorError) throw mentorError
-
-      const totalMentors = mentorRoles?.length || 0
-      const verifiedMentors =
-        mentorRoles?.filter((role: any) => {
-          const profile = Array.isArray(role.profiles)
-            ? role.profiles[0]
-            : role.profiles
-          return profile?.verified
-        }).length || 0
-      const pendingMentorsCount = totalMentors - verifiedMentors
-
-      const { count: totalMentees } = await supabase
-        .from("user_roles")
-        .select("*, roles!inner(name)", { count: "exact", head: true })
-        .eq("roles.name", "mentee")
-
-      const { count: totalSessions } = await supabase
-        .from("appointments")
-        .select("*", { count: "exact", head: true })
-
-      const sevenDaysAgo = new Date()
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-
-      const { count: recentSignups } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", sevenDaysAgo.toISOString())
-
-      setStats({
-        totalUsers: totalUsers || 0,
-        totalMentors,
-        verifiedMentors,
-        pendingMentors: pendingMentorsCount,
-        totalMentees: totalMentees || 0,
-        totalSessions: totalSessions || 0,
-        recentSignups: recentSignups || 0,
-        pendingSuggestions: 0
-      })
+      const response = await fetch("/api/admin/stats")
+      if (!response.ok) throw new Error("Erro ao carregar estatísticas")
+      const data = await response.json()
+      setStats({ ...data, pendingSuggestions: 0 })
     } catch (error) {
       console.error("Error fetching admin stats:", error)
     } finally {
@@ -127,12 +78,19 @@ export default function AdminDashboard() {
 
   const quickActions = [
     {
+      title: "Verificação de Mentores",
+      description: "Fila de candidaturas pendentes, com rascunho de resposta por IA",
+      href: "/dashboard/admin/verifications",
+      icon: UserCheck,
+      color: "bg-yellow-600",
+      badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
+    },
+    {
       title: "Gestão de Usuários",
-      description: "Gerenciar todos os usuários, permissões e aprovar mentores",
+      description: "Gerenciar todos os usuários, permissões e papéis",
       href: "/dashboard/admin/users",
       icon: Users,
-      color: "bg-primary",
-      badge: stats.pendingMentors > 0 ? stats.pendingMentors : undefined
+      color: "bg-primary"
     },
     {
       title: "Relatórios & IA",
@@ -302,7 +260,7 @@ export default function AdminDashboard() {
                   variant="outline"
                   className="bg-white border-yellow-300 text-yellow-800 hover:bg-yellow-100"
                 >
-                  <Link href="/dashboard/admin/users?tab=pending">
+                  <Link href="/dashboard/admin/verifications">
                     Revisar Pendências
                   </Link>
                 </Button>

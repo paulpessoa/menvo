@@ -1,5 +1,16 @@
 "use client"
 
+/**
+ * @deprecated Not mounted on any route. Its only decision action wrote
+ * straight to `profiles.verified` via VerificationService.setMentorVerification
+ * (components/admin/MentorCard.tsx), bypassing the RBAC role grant, the
+ * publish flag, and the chat/e-mail notification — a third, silently
+ * diverging way to approve a mentor next to /dashboard/admin/verifications
+ * and the /dashboard/admin/users modal. Approvals go through
+ * POST /api/admin/verify (see MentorApplicationPanel) exclusively.
+ * Kept only so it still compiles; do not wire it back up.
+ */
+
 import { useState, useEffect } from "react"
 import {
   Card,
