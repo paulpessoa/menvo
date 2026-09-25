@@ -170,6 +170,6 @@ export const config = {
   matcher: [
     // Match all paths including localized ones
     // Exclude static files and internal paths
-    "/((?!api|_next/static|_next/image|favicon.ico|site\\.webmanifest|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt|ai-catalog\\.json|\\.well-known/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|txt)$).*)"
+    "/((?!api|_next/static|_next/image|favicon.ico|site\\.webmanifest|sitemap\\.xml|robots\\.txt|llms\\.txt|llms-full\\.txt|ai-catalog\\.json|\\.well-known/.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|txt)$).*)"
   ]
 }

@@ -1,12 +1,12 @@
 "use client"
 import { Link } from "@/i18n/routing"
-import Image from "next/image"
+
 import { Button } from "@/components/ui/button"
 
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MessageSquare, Search } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+
 import dynamic from "next/dynamic"
 import { useAuth } from "@/lib/auth"
 
@@ -21,29 +21,6 @@ export default function Home() {
   const t = useTranslations("home")
   const tCommon = useTranslations("common")
   const { isAuthenticated } = useAuth()
-  const images = [
-    "/images/e.jpg",
-    "/images/d.jpg",
-    "/images/c.jpg",
-    "/images/b.jpg"
-  ]
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [loadedImages, setLoadedImages] = useState<number[]>([0, 1])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const next = (prevIndex + 1) % images.length
-        const nextNext = (next + 1) % images.length
-        setLoadedImages((prev) => {
-          if (prev.includes(next) && prev.includes(nextNext)) return prev
-          return Array.from(new Set([...prev, next, nextNext]))
-        })
-        return next
-      })
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [images.length])
 
   return (
     <div className="flex flex-col">
@@ -72,26 +49,19 @@ export default function Home() {
               </Button>
             </div>
           </div>
-          {/* Imagem */}
+          {/* Vídeo */}
           <div className="flex-1 flex justify-center items-center relative">
             <div className="absolute -inset-4 bg-primary/5 rounded-full blur-3xl" />
-            <div className="relative h-[250px] w-[250px] md:h-[350px] md:w-[350px] lg:h-[450px] lg:w-[450px] flex items-center shadow-xl rounded-3xl overflow-hidden ring-4 ring-white">
-              {images.map((src, index) => (
-                loadedImages.includes(index) && (
-                  <Image
-                    key={index}
-                    src={src}
-                    width={500}
-                    height={500}
-                    alt={t("hero.title")}
-                    priority={index === 0}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    sizes="(max-width: 768px) 250px, (max-width: 1024px) 350px, 450px"
-                    className={`rounded-lg object-cover transition-opacity duration-1000 absolute top-0 left-0 w-full h-full ${index === currentIndex ? "opacity-100" : "opacity-0"
-                      }`}
-                  />
-                )
-              ))}
+            <div className="relative h-[250px] w-[250px] md:h-[350px] md:w-[350px] lg:h-[450px] lg:w-[450px] flex items-center shadow-xl rounded-3xl overflow-hidden ring-4 ring-white bg-muted/20">
+              <video
+                src="/ai-demo-mentorhip.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="object-cover w-full h-full"
+                aria-label="Demonstração da plataforma Menvo"
+              />
             </div>
           </div>
         </div>
