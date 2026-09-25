@@ -880,7 +880,10 @@ export async function sendTestEmail(params: {
     verification: "[TESTE] Seu perfil de Mentor foi Aprovado",
     feedback: "[TESTE] Como foi sua mentoria? Seu feedback faz a diferença",
     cancellation: "[TESTE] Mentoria Cancelada",
-    reminder: "[TESTE] Lembrete: Sua mentoria é hoje"
+    reminder: "[TESTE] Lembrete: Sua mentoria é hoje",
+    retention_notice_30d: "[TESTE] Sua conta na Menvo será apagada em 30 dias",
+    retention_notice_1d: "[TESTE] Último aviso: sua conta na Menvo será apagada amanhã",
+    retention_deletion_confirmation: "[TESTE] Seus dados foram apagados da Menvo"
   };
 
   const subject = subjects[params.templateKey] || `[TESTE] Template Menvo: ${params.templateKey}`;
@@ -985,6 +988,22 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         bodyText: "Olá, {{primeiro_nome}}!\n\nTenho uma novidade. Você preencheu o formulário do Estágio Recife, e agora criamos a Menvo como uma extensão dele.\n\nVocê não precisa saber quem pode te ajudar, você só precisa saber o que quer conversar.\n\nUm abraço,\nPaul",
         inviteUrl: "https://www.menvo.com.br/convite/preview-token"
       });
+    case 'retention_notice_30d':
+      return buildRetentionNoticeHtml({
+        name: "Mariana",
+        inviteUrl: "https://www.menvo.com.br/convite/preview-token",
+        deletionDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        daysLeft: 30
+      });
+    case 'retention_notice_1d':
+      return buildRetentionNoticeHtml({
+        name: "Mariana",
+        inviteUrl: "https://www.menvo.com.br/convite/preview-token",
+        deletionDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        daysLeft: 1
+      });
+    case 'retention_deletion_confirmation':
+      return buildRetentionDeletionConfirmationHtml({ name: "Mariana" });
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }
