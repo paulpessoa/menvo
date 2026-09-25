@@ -79,6 +79,12 @@ export interface MentorProfile {
   created_at?: string
 }
 
+/** Fetched separately, only for logged-in users — see /api/mentors/[slug]/approach. */
+interface MentorApproach {
+  mentorship_approach: string | null
+  what_to_expect: string | null
+}
+
 interface MentorAvailability {
   day_of_week: number
   start_time: string
@@ -100,6 +106,21 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
   const { favorites, toggleFavorite } = useFavorites(user?.id)
   const isFavorite = favorites.includes(mentor.id)
   const isOwner = user?.id === mentor.id
+
+  const [approach, setApproach] = useState<MentorApproach | null>(null)
+  useEffect(() => {
+    if (!user || !mentor.slug) return
+    let cancelled = false
+    fetch(`/api/mentors/${mentor.slug}/approach`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.data) setApproach(json.data)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [user, mentor.slug])
 
   const handleShare = async () => {
     const url = window.location.href
@@ -250,6 +271,42 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </p>
                   </CardContent>
                 </Card>
+              </div>
+            )}
+
+            {/* Mentorship Approach / What to Expect — logged-in mentees only, never public */}
+            {user ? (
+              (approach?.mentorship_approach || approach?.what_to_expect) && (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
+                    <MessageCircle className="h-4 w-4 text-primary" />
+                    {t("mentorshipApproach")}
+                  </h3>
+                  <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem]">
+                    <CardContent className="p-8 md:p-10 space-y-6">
+                      {approach.mentorship_approach && (
+                        <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
+                          {approach.mentorship_approach}
+                        </p>
+                      )}
+                      {approach.what_to_expect && (
+                        <div className="space-y-2 pt-2 border-t border-muted">
+                          <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
+                            {t("whatToExpect")}
+                          </p>
+                          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                            {approach.what_to_expect}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              )
+            ) : (
+              <div className="flex items-center gap-3 p-4 bg-muted/20 border rounded-2xl text-sm text-muted-foreground">
+                <Info className="h-4 w-4 text-primary shrink-0" />
+                {t("loginToSeeApproach")}
               </div>
             )}
 
