@@ -28,8 +28,13 @@ export async function POST(request: NextRequest) {
 
     const { eligible, skipped } = await resolveAudience(parsed.data)
 
+    // Returns the actual id list (not just a count): the admin modal
+    // drives the send loop client-side in batches of 25
+    // (POST /api/admin/invites/send), so it needs these ids to batch —
+    // there's no "send this whole audience" endpoint that resolves the
+    // list twice.
     return NextResponse.json({
-      eligibleCount: eligible.length,
+      eligibleUserIds: eligible.map(p => p.id),
       skipped
     })
   } catch (error) {

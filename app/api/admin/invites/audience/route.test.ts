@@ -44,6 +44,6 @@ describe("POST /api/admin/invites/audience", () => {
     const res = await POST(makeRequest({ audience: "jotform_not_invited", campaign: "estagiorecife-2026" }))
     const json = await res.json()
     expect(res.status).toBe(200)
-    expect(json).toEqual({ eligibleCount: 2, skipped: { suppressed: 1, optedOut: 0, alreadyInvited: 2, noEmail: 0 } })
+    expect(json).toEqual({ eligibleUserIds: ["u1", "u2"], skipped: { suppressed: 1, optedOut: 0, alreadyInvited: 2, noEmail: 0 } })
   })
 })

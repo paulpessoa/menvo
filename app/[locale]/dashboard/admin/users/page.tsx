@@ -48,6 +48,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { UserMetrics } from "@/components/admin/UserMetrics"
 import { EditUserModal } from "@/components/admin/EditUserModal"
 import { WaitingListTab } from "@/components/admin/WaitingListTab"
+import { InviteCampaignModal } from "@/components/admin/invites/InviteCampaignModal"
 import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import type { UserProfile } from "@/lib/types/models/user"
@@ -84,7 +85,7 @@ export default function AdminUsersPage() {
   const [activeTab, setActiveTab] = useState(initialTab)
   const [originFilter, setOriginFilter] = useState<"all" | "menvo" | "jotform">("all")
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
-  const [sendingInvites, setSendingInvites] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const ITEMS_PER_PAGE = 30
@@ -163,31 +164,6 @@ export default function AdminUsersPage() {
     }
   }
 
-  // Único uso hoje da seleção em massa: reenviar o e-mail de convite/definição
-  // de senha (POST /api/admin/users/invite-batch) para quem ainda não entrou
-  // na plataforma. A rota já existia, mas nada na UI a chamava — marcar as
-  // linhas não tinha nenhum efeito visível.
-  const handleBulkInvite = async () => {
-    if (selectedUserIds.length === 0) return
-    setSendingInvites(true)
-    try {
-      const response = await fetch("/api/admin/users/invite-batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userIds: selectedUserIds })
-      })
-      const data = await response.json().catch(() => ({}))
-      if (!response.ok) throw new Error(data.error || "Erro ao enviar convites")
-      toast.success(data.message || "Convites enviados")
-      setSelectedUserIds([])
-      fetchData()
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar convites")
-    } finally {
-      setSendingInvites(false)
-    }
-  }
-
   return (
     <PageContainer>
       <div className="space-y-8">
@@ -197,6 +173,9 @@ export default function AdminUsersPage() {
             <p className="text-muted-foreground">Controle central de usuários, mentores e permissões</p>
           </div>
           <div className="flex gap-2">
+            <Button onClick={() => setIsInviteModalOpen(true)} size="sm" className="gap-2">
+              <Mail className="h-4 w-4" /> Convidar...
+            </Button>
             <Button onClick={() => fetchData()} variant="outline" size="sm">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
             </Button>
@@ -265,9 +244,9 @@ export default function AdminUsersPage() {
                     {selectedUserIds.length > 0 && (
                       <div className="flex items-center gap-2 ml-auto">
                         <span className="text-xs text-muted-foreground">{selectedUserIds.length} selecionado(s)</span>
-                        <Button size="sm" variant="outline" onClick={handleBulkInvite} disabled={sendingInvites} className="gap-2">
-                          {sendingInvites ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
-                          Reenviar convite de acesso
+                        <Button size="sm" variant="outline" onClick={() => setIsInviteModalOpen(true)} className="gap-2">
+                          <Mail className="h-3.5 w-3.5" />
+                          Convidar selecionados
                         </Button>
                       </div>
                     )}
@@ -381,11 +360,21 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      <EditUserModal 
-        user={editingUser} 
-        isOpen={isEditModalOpen} 
+      <EditUserModal
+        user={editingUser}
+        isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSuccess={fetchData}
+      />
+
+      <InviteCampaignModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        selectedUserIds={selectedUserIds}
+        onSent={() => {
+          setSelectedUserIds([])
+          fetchData()
+        }}
       />
     </PageContainer>
   )
