@@ -35,7 +35,4 @@ E se você já se formou (é bem provável!), queremos muito ter você do outro 
 
 Um recado sincero: toco a Menvo de forma voluntária, nas horas vagas. Estamos refatorando a plataforma para dar vazão aos matches entre mentores e mentorados, então alguma coisa ainda pode estar em construção. Se não encontrar um mentor para o que você precisa, é só responder este e-mail que a gente te ajuda a achar.
 
-Você não precisa saber quem pode te ajudar, você só precisa saber o que quer conversar.
-
-Um abraço,
-Paul`
+Você não precisa saber quem pode te ajudar, você só precisa saber o que quer conversar.`
