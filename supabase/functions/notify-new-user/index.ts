@@ -174,7 +174,7 @@ serve(async (req) => {
                   </div>
                   <div class="info-row">
                     <span class="label">Data:</span>
-                    <span class="value">${new Date().toLocaleString("pt-BR", {
+                    <span class="value">${new Date(payload.record.created_at).toLocaleString("pt-BR", {
                       timeZone: "America/Sao_Paulo"
                     })}</span>
                   </div>
