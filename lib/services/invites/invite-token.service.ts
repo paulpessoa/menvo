@@ -36,7 +36,8 @@ export async function createInviteToken(params: {
   userId: string
   campaign: string
   subject: string
-  sentBy: string
+  /** Admin who triggered the send, or `null` for a system-generated e-mail (e.g. the retention cron's warnings). */
+  sentBy: string | null
   resend?: boolean
 }): Promise<{ token: string; inviteId: string }> {
   ensureServerSide()

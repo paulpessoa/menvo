@@ -123,7 +123,9 @@ const getEmailLayout = (
 </head>
 <body>
     <div class="email-container">
-        <div class="header"><h1>${title}</h1></div>
+        <div class="header">
+            <img src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/menvo-logo-light.png" alt="${title}" height="32" style="display: block; margin: 0 auto; max-width: 100%; height: auto; max-height: 32px;" />
+        </div>
         <div class="content">
             ${content}
             ${signatureHtml}
@@ -609,6 +611,100 @@ export async function sendReengagementInvite(data: ReengagementInviteData & {
   subject: string;
 }): Promise<{ success: boolean; error?: string }> {
   return await sendEmail(data.email, data.subject, buildReengagementInviteHtml(data));
+}
+
+// ---------------------------------------------------------------------------
+// Retenção automática de contas importadas (JotForm) nunca ativadas
+// ---------------------------------------------------------------------------
+
+/**
+ * Aviso de que uma conta importada e nunca acessada será apagada em breve.
+ * Reaproveita o mesmo link `/convite/[token]` do fluxo de reengajamento —
+ * "Quero manter minha conta" leva ao login/definição de senha, e há também
+ * uma saída para apagar os dados imediatamente. Ver
+ * docs/domains/account-retention.md §4.3.
+ */
+export function buildRetentionNoticeHtml(data: {
+  name: string;
+  inviteUrl: string;
+  deletionDate: string;
+  daysLeft: 30 | 1;
+}): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name || "");
+  const keepUrl = `${data.inviteUrl}?intent=participate`;
+  const deleteNowUrl = `${data.inviteUrl}?intent=optout`;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const formattedDate = new Date(data.deletionDate).toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+
+  const intro = data.daysLeft === 30
+    ? `<p>Você preencheu o formulário do Estágio Recife e uma conta na Menvo foi criada para você, mas ela nunca chegou a ser acessada.</p>
+       <p>Para manter seus dados sob controle, contas assim são apagadas automaticamente depois de um tempo sem uso. Sua conta está programada para ser apagada em <strong>${formattedDate}</strong>.</p>`
+    : `<p><strong>Este é o último aviso.</strong> Sua conta na Menvo, criada a partir do formulário do Estágio Recife e nunca acessada, será apagada amanhã, dia <strong>${formattedDate}</strong>.</p>`;
+
+  const content = `
+    <h2>${firstName ? `Olá, ${firstName}` : "Olá"}!</h2>
+    ${intro}
+    <div class="button-container">
+        <a href="${keepUrl}" class="button">Quero manter minha conta</a>
+    </div>
+    <p style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
+        <a href="${deleteNowUrl}" style="color: ${COLORS.muted}; font-weight: 600; font-size: 14px; text-decoration: underline;">Pode apagar agora</a>
+    </p>
+  `;
+
+  const footerExtra = `
+    <p style="margin-top: 16px;">Você está recebendo este e-mail porque preencheu o formulário do Estágio Recife.
+      Leia nossa <a href="${appUrl}/privacy" style="color: ${COLORS.muted}; text-decoration: underline;">Política de Privacidade</a>.
+    </p>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal", footerExtra });
+}
+
+export async function sendRetentionNotice(data: {
+  name: string;
+  email: string;
+  inviteUrl: string;
+  deletionDate: string;
+  daysLeft: 30 | 1;
+}): Promise<{ success: boolean; error?: string }> {
+  const subject = data.daysLeft === 30
+    ? "Sua conta na Menvo será apagada em 30 dias"
+    : "Último aviso: sua conta na Menvo será apagada amanhã";
+  return await sendEmail(data.email, subject, buildRetentionNoticeHtml(data));
+}
+
+/**
+ * Confirmação enviada no momento da exclusão. Sem token nem link de conta —
+ * a conta já não existe mais.
+ */
+export function buildRetentionDeletionConfirmationHtml(data: { name: string }): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name || "");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+
+  const content = `
+    <h2>${firstName ? `Olá, ${firstName}` : "Olá"}!</h2>
+    <p>Como avisamos, sua conta na Menvo, criada a partir do formulário do Estágio Recife e nunca acessada, foi apagada.</p>
+    <p>Removemos seu perfil, as respostas do formulário importado e os arquivos enviados. Mantemos apenas um registro anônimo (que não permite identificá-lo) do atendimento a este pedido, para comprovação e para evitar um novo contato.</p>
+    <p>Se quiser voltar a fazer parte da Menvo no futuro, você pode criar uma conta nova quando desejar.</p>
+    <div class="button-container">
+        <a href="${appUrl}/auth/register" class="button">Criar uma conta nova</a>
+    </div>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal" });
+}
+
+export async function sendRetentionDeletionConfirmation(data: {
+  name: string;
+  email: string;
+}): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(data.email, "Seus dados foram apagados da Menvo", buildRetentionDeletionConfirmationHtml(data));
 }
 
 // ---------------------------------------------------------------------------

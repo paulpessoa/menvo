@@ -25,7 +25,7 @@ export interface ResolveAudienceResult {
  * `auth` schema isn't exposed to it). Used only by the "never signed in"
  * audience, an infrequent admin action, so the O(users) scan is fine.
  */
-async function fetchSignedInUserIds(): Promise<Set<string>> {
+export async function fetchSignedInUserIds(): Promise<Set<string>> {
   const supabase = createServiceRoleClient()
   const signedIn = new Set<string>()
   const perPage = 1000

@@ -4,7 +4,7 @@ import { hashEmail, suppress } from "@/lib/services/invites/suppression.service"
 /** Storage buckets that store files under a `${userId}/...` prefix (see app/api/upload/*). */
 const USER_FILE_BUCKETS = ["cvs", "avatars"] as const
 
-export type DeletionSource = "invite_token" | "self_service" | "admin"
+export type DeletionSource = "invite_token" | "self_service" | "admin" | "retention_policy"
 
 export interface DeleteUserResult {
   success: true
