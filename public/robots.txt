@@ -26,9 +26,9 @@ Disallow: /es/messages/
 Disallow: /appointments/
 Disallow: /en/appointments/
 Disallow: /es/appointments/
-Disallow: /mentee/
-Disallow: /en/mentee/
-Disallow: /es/mentee/
+Disallow: /mentee/appointments
+Disallow: /en/mentee/appointments
+Disallow: /es/mentee/appointments
 Disallow: /mentorship/
 Disallow: /en/mentorship/
 Disallow: /es/mentorship/
@@ -80,7 +80,7 @@ Disallow: /settings/
 Disallow: /profile/
 Disallow: /messages/
 Disallow: /appointments/
-Disallow: /mentee/
+Disallow: /mentee/appointments
 Disallow: /onboarding
 Disallow: /quiz/results/
 

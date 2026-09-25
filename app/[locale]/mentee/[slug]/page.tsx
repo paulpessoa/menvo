@@ -58,6 +58,9 @@ async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | nul
     return data as unknown as MenteeProfile
 }
 
+// ISR: Revalidar a cada 1 hora (mesmo padrão de app/[locale]/mentors/[slug])
+export const revalidate = 3600
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params
     const mentee = await getPublicMenteeProfile(slug)
