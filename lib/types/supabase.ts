@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      account_retention: {
+        Row: {
+          campaign: string
+          clock_started_at: string
+          created_at: string
+          notice_1d_sent_at: string | null
+          notice_30d_sent_at: string | null
+          policy: string
+          scheduled_deletion_at: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign: string
+          clock_started_at: string
+          created_at?: string
+          notice_1d_sent_at?: string | null
+          notice_30d_sent_at?: string | null
+          policy?: string
+          scheduled_deletion_at?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign?: string
+          clock_started_at?: string
+          created_at?: string
+          notice_1d_sent_at?: string | null
+          notice_30d_sent_at?: string | null
+          policy?: string
+          scheduled_deletion_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_retention_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_retention_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_audit_logs: {
         Row: {
           action: string
