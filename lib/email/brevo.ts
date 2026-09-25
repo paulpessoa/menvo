@@ -530,6 +530,88 @@ export async function sendWaitingListCompleteProfileRequest(data: {
 }
 
 // ---------------------------------------------------------------------------
+// Convites de reengajamento (base histórica importada, ex.: JotForm)
+// ---------------------------------------------------------------------------
+
+/**
+ * Converte o corpo do e-mail escrito pelo admin (texto simples, com
+ * `{{primeiro_nome}}` como placeholder) em HTML seguro: cada linha em
+ * branco separa um parágrafo, e todo o texto passa por `escapeHtml` antes
+ * de virar markup — o admin nunca escreve HTML diretamente aqui.
+ */
+function renderPlainTextBody(bodyText: string, firstName: string): string {
+  const withName = bodyText.replace(/\{\{\s*primeiro_nome\s*\}\}/gi, firstName);
+  return withName
+    .split(/\n\s*\n/)
+    .map(paragraph => paragraph.trim())
+    .filter(Boolean)
+    .map(paragraph => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br/>")}</p>`)
+    .join("\n");
+}
+
+/**
+ * E-mail de campanha de reengajamento (ex.: base do Estágio Recife
+ * importada do JotForm): avisa que a Menvo existe, convida a pessoa a
+ * completar o perfil ou apoiar como mentor(a), e — obrigatório por LGPD —
+ * dá uma saída fácil, sem login, para parar de receber e-mails ou apagar
+ * os dados. `inviteUrl` já aponta para a página pública `/convite/[token]`;
+ * esta função só decora os `?intent=` de cada ação (nunca executa nada
+ * sozinha — ver docs/domains/reengagement-invites.md §3.2).
+ *
+ * O corpo (`bodyText`) é escrito/editado pelo admin no modal de envio; os
+ * botões e o aviso de LGPD abaixo são fixos e não podem ser removidos por
+ * quem preenche o formulário do modal.
+ */
+export interface ReengagementInviteData {
+  name: string;
+  bodyText: string;
+  inviteUrl: string;
+  originNote?: string;
+}
+
+/**
+ * Builds the full HTML for a reengagement invite. Shared by the real send
+ * (`sendReengagementInvite`) and the admin preview endpoint, so what the
+ * admin previews is byte-for-byte what gets sent.
+ */
+export function buildReengagementInviteHtml(data: ReengagementInviteData): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const acceptUrl = `${data.inviteUrl}?intent=participate`;
+  const mentorUrl = `${data.inviteUrl}?intent=mentor`;
+  const optOutUrl = `${data.inviteUrl}?intent=optout`;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const originNote = data.originNote
+    || "Você está recebendo este e-mail porque preencheu o formulário do Estágio Recife.";
+
+  const content = `
+    ${renderPlainTextBody(data.bodyText, firstName)}
+    <div class="button-container">
+        <a href="${acceptUrl}" class="button">Acessar a Menvo e completar meu perfil</a>
+    </div>
+    <p style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
+        <a href="${mentorUrl}" style="color: ${COLORS.primary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Quero apoiar como mentor(a)</a>
+    </p>
+  `;
+
+  const footerExtra = `
+    <p style="margin-top: 16px;">${escapeHtml(originNote)} Se não quiser participar,
+      <a href="${optOutUrl}" style="color: ${COLORS.muted}; text-decoration: underline;">clique aqui</a>
+      para parar de receber e-mails ou apagar seus dados e seu perfil.
+      Leia nossa <a href="${appUrl}/privacy" style="color: ${COLORS.muted}; text-decoration: underline;">Política de Privacidade</a>.
+    </p>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal", footerExtra });
+}
+
+export async function sendReengagementInvite(data: ReengagementInviteData & {
+  email: string;
+  subject: string;
+}): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(data.email, data.subject, buildReengagementInviteHtml(data));
+}
+
+// ---------------------------------------------------------------------------
 // Organizações parceiras (multi-tenant)
 // ---------------------------------------------------------------------------
 
@@ -801,6 +883,12 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       return getEmailLayout("Participação aprovada", orgMembershipApprovedContent("Mariana", "Instituto Gira", "https://www.menvo.com.br", "mentee"), { signatureType: "personal" });
     case 'org_membership_approved_mentor':
       return getEmailLayout("Participação aprovada (mentor)", orgMembershipApprovedContent("Rodrigo", "Instituto Gira", "https://www.menvo.com.br", "mentor"), { signatureType: "personal" });
+    case 'reengagement_invite':
+      return buildReengagementInviteHtml({
+        name: "Mariana",
+        bodyText: "Olá, {{primeiro_nome}}!\n\nTenho uma novidade. Você preencheu o formulário do Estágio Recife, e agora criamos a Menvo como uma extensão dele.\n\nVocê não precisa saber quem pode te ajudar, você só precisa saber o que quer conversar.\n\nUm abraço,\nPaul",
+        inviteUrl: "https://www.menvo.com.br/convite/preview-token"
+      });
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }
