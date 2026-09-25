@@ -1,6 +1,27 @@
 import { createServiceRoleClient, ensureServerSide } from "@/lib/utils/supabase/service-role"
 import { hashEmail } from "@/lib/services/invites/suppression.service"
 
+const PAGE_SIZE = 1000
+
+/**
+ * Reads every row of a query page by page. PostgREST silently caps a
+ * response at 1000 rows, so a plain select would quietly drop part of the
+ * audience once the table grows past that (this bit an earlier version of
+ * `resolveAudience` — see docs/domains/account-retention.md). `buildPage`
+ * must apply a stable order so paging never skips or repeats a row.
+ */
+export async function fetchAllRows<T>(
+  buildPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>
+): Promise<T[]> {
+  const rows: T[] = []
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await buildPage(from, from + PAGE_SIZE - 1)
+    if (error) throw error
+    rows.push(...(data ?? []))
+    if (!data || data.length < PAGE_SIZE) return rows
+  }
+}
+
 export type InviteAudience = "selected" | "jotform_not_invited" | "never_signed_in" | "all"
 
 export interface AudienceCandidate {
@@ -62,22 +83,19 @@ export async function resolveAudience(params: {
   ensureServerSide()
   const supabase = createServiceRoleClient()
 
-  let query = supabase
-    .from("profiles")
-    .select("id, email, full_name, email_opt_out_at")
-
-  if (params.audience === "selected") {
-    if (!params.userIds?.length) return { eligible: [], skipped: { suppressed: 0, optedOut: 0, alreadyInvited: 0, noEmail: 0 } }
-    query = query.in("id", params.userIds)
-  } else if (params.audience === "jotform_not_invited") {
-    query = query.eq("origin_platform", "jotform")
+  if (params.audience === "selected" && !params.userIds?.length) {
+    return { eligible: [], skipped: { suppressed: 0, optedOut: 0, alreadyInvited: 0, noEmail: 0 } }
   }
-  // "all" and "never_signed_in" start from every profile; never_signed_in is filtered below.
 
-  const { data: profiles, error } = await query
-  if (error) throw error
+  const profiles = await fetchAllRows((from, to) => {
+    let query = supabase.from("profiles").select("id, email, full_name, email_opt_out_at").order("id")
+    if (params.audience === "selected") query = query.in("id", params.userIds!)
+    else if (params.audience === "jotform_not_invited") query = query.eq("origin_platform", "jotform")
+    // "all" and "never_signed_in" start from every profile; never_signed_in is filtered below.
+    return query.range(from, to)
+  })
 
-  let candidates = profiles ?? []
+  let candidates = profiles
 
   if (params.audience === "never_signed_in") {
     const signedIn = await fetchSignedInUserIds()
@@ -90,15 +108,15 @@ export async function resolveAudience(params: {
   // Two lookups done once up front (never per-candidate) to avoid N+1
   // queries: which of these profiles already have an invite for this
   // campaign, and which of their e-mails are on the do-not-contact list.
-  const { data: existingInvites } = await supabase
-    .from("reengagement_invites")
-    .select("user_id")
-    .eq("campaign", params.campaign)
+  const existingInvites = await fetchAllRows((from, to) =>
+    supabase.from("reengagement_invites").select("user_id").eq("campaign", params.campaign).order("user_id").range(from, to)
+  )
+  const alreadyInvitedIds = new Set(existingInvites.map(row => row.user_id))
 
-  const alreadyInvitedIds = new Set((existingInvites ?? []).map(row => row.user_id))
-
-  const { data: suppressions } = await supabase.from("email_suppressions").select("email_hash")
-  const suppressedHashes = new Set((suppressions ?? []).map(row => row.email_hash))
+  const suppressions = await fetchAllRows((from, to) =>
+    supabase.from("email_suppressions").select("email_hash").order("email_hash").range(from, to)
+  )
+  const suppressedHashes = new Set(suppressions.map(row => row.email_hash))
 
   for (const profile of candidates) {
     if (!profile.email) {

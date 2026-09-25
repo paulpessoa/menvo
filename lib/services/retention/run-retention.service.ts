@@ -5,7 +5,7 @@
  * docs/domains/account-retention.md for the design and invariants.
  */
 import { createServiceRoleClient, ensureServerSide } from "@/lib/utils/supabase/service-role"
-import { fetchSignedInUserIds } from "@/lib/services/invites/audience.service"
+import { fetchSignedInUserIds, fetchAllRows } from "@/lib/services/invites/audience.service"
 import { hashEmail } from "@/lib/services/invites/suppression.service"
 import { createInviteToken } from "@/lib/services/invites/invite-token.service"
 import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
@@ -55,25 +55,6 @@ function emptyReport(mode: RetentionRunOptions["mode"]): RetentionReport {
     noticed1d: [],
     deferredToNextRun: { emails: 0, deletions: 0 },
     errors: []
-  }
-}
-
-const PAGE_SIZE = 1000
-
-/**
- * Reads every row of a query page by page. PostgREST silently caps a
- * response at 1000 rows, so a plain select would quietly drop part of the
- * cohort once it grows past that. `buildPage` must apply a stable order.
- */
-async function fetchAllRows<T>(
-  buildPage: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>
-): Promise<T[]> {
-  const rows: T[] = []
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error } = await buildPage(from, from + PAGE_SIZE - 1)
-    if (error) throw error
-    rows.push(...(data ?? []))
-    if (!data || data.length < PAGE_SIZE) return rows
   }
 }
 

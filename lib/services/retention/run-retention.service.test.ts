@@ -14,6 +14,7 @@ jest.mock("@/lib/utils/supabase/service-role", () => ({
 }))
 
 jest.mock("@/lib/services/invites/audience.service", () => ({
+  ...jest.requireActual("@/lib/services/invites/audience.service"),
   fetchSignedInUserIds: jest.fn()
 }))
 

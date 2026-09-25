@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { resolveAudience } from "./audience.service"
+import { resolveAudience, fetchAllRows } from "./audience.service"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { hashEmail } from "@/lib/services/invites/suppression.service"
 
@@ -18,28 +18,28 @@ describe("resolveAudience", () => {
     { id: "u4", email: null, full_name: "Four", email_opt_out_at: null }
   ]
 
+  function paged(rows: any[]) {
+    // Mirrors the real supabase-js query builder: .order()/.in()/.eq()
+    // are interchangeable and chainable in any order, terminated by
+    // .range() the way resolveAudience calls it.
+    const query: any = {}
+    query.order = jest.fn().mockReturnValue(query)
+    query.in = jest.fn().mockReturnValue(query)
+    query.eq = jest.fn().mockReturnValue(query)
+    query.range = jest.fn().mockImplementation((from: number, to: number) =>
+      Promise.resolve({ data: rows.slice(from, to + 1), error: null })
+    )
+    return query
+  }
+
   function buildSupabase(overrides: { invites?: any[]; suppressions?: any[]; listUsers?: any } = {}) {
     const listUsers = overrides.listUsers ?? jest.fn().mockResolvedValue({ data: { users: [] }, error: null })
 
     return {
       from: jest.fn((table: string) => {
-        if (table === "profiles") {
-          // Mirrors the real supabase-js query builder: thenable on its
-          // own (no filter applied) *and* chainable via .in()/.eq().
-          const buildQuery = () => {
-            const query: any = Promise.resolve({ data: profiles, error: null })
-            query.in = jest.fn().mockResolvedValue({ data: profiles, error: null })
-            query.eq = jest.fn().mockResolvedValue({ data: profiles, error: null })
-            return query
-          }
-          return { select: jest.fn().mockImplementation(buildQuery) }
-        }
-        if (table === "reengagement_invites") {
-          return { select: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ data: overrides.invites ?? [] }) }) }
-        }
-        if (table === "email_suppressions") {
-          return { select: jest.fn().mockResolvedValue({ data: overrides.suppressions ?? [] }) }
-        }
+        if (table === "profiles") return { select: jest.fn().mockReturnValue(paged(profiles)) }
+        if (table === "reengagement_invites") return { select: jest.fn().mockReturnValue(paged(overrides.invites ?? [])) }
+        if (table === "email_suppressions") return { select: jest.fn().mockReturnValue(paged(overrides.suppressions ?? [])) }
         throw new Error(`unexpected table ${table}`)
       }),
       auth: { admin: { listUsers } }
@@ -95,5 +95,49 @@ describe("resolveAudience", () => {
     ;(createServiceRoleClient as jest.Mock).mockReturnValue(buildSupabase({ listUsers }))
     const result = await resolveAudience({ audience: "never_signed_in", campaign: "c1" })
     expect(result.eligible.map(p => p.id)).toEqual(["u2"])
+  })
+
+  it("reads a cohort larger than one PostgREST page (1000 rows) without silently truncating", async () => {
+    const bigProfiles = Array.from({ length: 1200 }, (_, i) => ({
+      id: `u${i}`,
+      email: `u${i}@example.com`,
+      full_name: null,
+      email_opt_out_at: null
+    }))
+    const supabase = {
+      from: jest.fn((table: string) => {
+        if (table === "profiles") return { select: jest.fn().mockReturnValue(paged(bigProfiles)) }
+        if (table === "reengagement_invites") return { select: jest.fn().mockReturnValue(paged([])) }
+        if (table === "email_suppressions") return { select: jest.fn().mockReturnValue(paged([])) }
+        throw new Error(`unexpected table ${table}`)
+      }),
+      auth: { admin: { listUsers: jest.fn() } }
+    }
+    ;(createServiceRoleClient as jest.Mock).mockReturnValue(supabase)
+
+    const result = await resolveAudience({ audience: "jotform_not_invited", campaign: "c1" })
+    expect(result.eligible).toHaveLength(1200)
+  })
+})
+
+describe("fetchAllRows", () => {
+  it("pages until a page comes back shorter than the page size", async () => {
+    const page1 = Array.from({ length: 1000 }, (_, i) => i)
+    const page2 = [1000, 1001]
+    const buildPage = jest
+      .fn()
+      .mockResolvedValueOnce({ data: page1, error: null })
+      .mockResolvedValueOnce({ data: page2, error: null })
+
+    const rows = await fetchAllRows(buildPage)
+    expect(rows).toHaveLength(1002)
+    expect(buildPage).toHaveBeenCalledTimes(2)
+    expect(buildPage).toHaveBeenNthCalledWith(1, 0, 999)
+    expect(buildPage).toHaveBeenNthCalledWith(2, 1000, 1999)
+  })
+
+  it("throws on the first page error instead of returning a partial result", async () => {
+    const buildPage = jest.fn().mockResolvedValue({ data: null, error: new Error("boom") })
+    await expect(fetchAllRows(buildPage)).rejects.toThrow("boom")
   })
 })
