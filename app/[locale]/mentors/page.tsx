@@ -258,7 +258,6 @@ export default function MentorsPage() {
     if (filters.languages.length > 0) count++
     if (filters.topics.length > 0) count++
     if (filters.inclusiveTags.length > 0) count++
-    if (filters.availabilityStatus !== "all") count++
     if (filters.experienceYears !== "all") count++
     return count
   }, [filters])
@@ -271,7 +270,6 @@ export default function MentorsPage() {
     if (filters.languages.length > 0) count += filters.languages.length
     if (filters.topics.length > 0) count += filters.topics.length
     if (filters.inclusiveTags.length > 0) count += filters.inclusiveTags.length
-    if (filters.availabilityStatus !== "all") count++
     if (filters.experienceYears !== "all") count++
     return count
   }, [filters])
@@ -641,33 +639,6 @@ export default function MentorsPage() {
                     </div>
                   </div>
 
-                  {/* Disponibilidade */}
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground flex items-center">
-                      <Clock className="h-3.5 w-3.5 mr-1.5 text-primary" />
-                      {t("availability")}
-                    </h3>
-                    <Select
-                      value={filters.availabilityStatus}
-                      onValueChange={(value) =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          availabilityStatus: value
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="h-11 rounded-xl">
-                        <SelectValue placeholder={t("availabilityPlaceholder")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t("anyStatus")}</SelectItem>
-                        <SelectItem value="available">
-                          {t("status.available")}
-                        </SelectItem>
-                        <SelectItem value="busy">{t("status.busy")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
 
                   {/* Experiência */}
                   <div className="space-y-2">
@@ -773,17 +744,6 @@ export default function MentorsPage() {
                 <X className="h-3 w-3 opacity-70 hover:opacity-100" />
               </Badge>
             ))}
-            {filters.availabilityStatus !== "all" && (
-              <Badge
-                variant="secondary"
-                onClick={() => setFilters(p => ({ ...p, availabilityStatus: "all" }))}
-                className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
-                title="Clique para remover este filtro"
-              >
-                <span>{filters.availabilityStatus === "available" ? t("status.available") : t("status.busy")}</span>
-                <X className="h-3 w-3 opacity-70 hover:opacity-100" />
-              </Badge>
-            )}
             {filters.experienceYears !== "all" && (
               <Badge
                 variant="secondary"
