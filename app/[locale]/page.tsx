@@ -1,26 +1,33 @@
-"use client"
 import { Link } from "@/i18n/routing"
 
 import { Button } from "@/components/ui/button"
 
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MessageSquare, Search } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
-import dynamic from "next/dynamic"
-import { useAuth } from "@/lib/auth"
+import { QuizDiscoverySection } from "@/components/QuizDiscoverySection"
+import { MentorCard } from "@/components/mentors/MentorCard"
+import { HeroActions } from "@/components/home/HeroActions"
+import { FinalCTA } from "@/components/home/FinalCTA"
+import { getHomeHighlights } from "@/lib/services/mentors/home-highlights"
 
-const QuizDiscoverySection = dynamic(
-  () => import("@/components/QuizDiscoverySection").then((mod) => mod.QuizDiscoverySection),
-  {
-    loading: () => <div className="w-full h-48 animate-pulse bg-muted/20" />,
-  }
-)
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  const t = await getTranslations("home")
+  const { featuredMentors, stats } = await getHomeHighlights()
+  const numberFormat = new Intl.NumberFormat(locale)
 
-export default function Home() {
-  const t = useTranslations("home")
-  const tCommon = useTranslations("common")
-  const { isAuthenticated } = useAuth()
+  // Só mostra números que existem — "0 sessões" passa a impressão oposta.
+  const statItems = [
+    { value: stats.mentors, label: t("stats.mentors") },
+    { value: stats.sessions, label: t("stats.sessions") },
+    { value: stats.topics, label: t("stats.topics") },
+  ].filter((item) => item.value > 0)
 
   return (
     <div className="flex flex-col">
@@ -38,34 +45,47 @@ export default function Home() {
             <p className="max-w-[540px] text-muted-foreground text-base md:text-lg mb-8 text-center lg:text-left leading-relaxed">
               {t("hero.description")}
             </p>
-            <div className="flex flex-col gap-3 w-full max-w-sm mx-auto lg:flex-row lg:max-w-none lg:mx-0">
-              <Button size="lg" asChild className="w-full lg:w-auto">
-                <Link href="/mentors">{t("hero.findMentor")}</Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="w-full lg:w-auto">
-                <Link href={isAuthenticated ? "/profile?tab=mentorship" : "/how-it-works?tab=mentors"}>
-                  {t("hero.becomeMentor")}
-                </Link>
-              </Button>
-            </div>
+            <HeroActions />
           </div>
           {/* Vídeo */}
           <div className="flex-1 flex justify-center items-center relative">
             <div className="absolute -inset-4 bg-primary/5 rounded-full blur-3xl" />
             <div className="relative h-[250px] w-[250px] md:h-[350px] md:w-[350px] lg:h-[450px] lg:w-[450px] flex items-center shadow-xl rounded-3xl overflow-hidden ring-4 ring-white bg-muted/20">
               <video
-                src="/ai-demo-mentorhip.mp4"
                 autoPlay
                 loop
                 muted
                 playsInline
+                preload="metadata"
+                poster="/images/ai-demo-poster.jpg"
                 className="object-cover w-full h-full"
                 aria-label="Demonstração da plataforma Menvo"
-              />
+              >
+                <source src="/ai-demo-mentorship.webm" type="video/webm" />
+                <source src="/ai-demo-mentorhip.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Impact Stats */}
+      {statItems.length > 0 && (
+        <section className="w-full border-y bg-muted/30">
+          <div className="container px-4 md:px-6 py-8">
+            <dl className="mx-auto grid max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3">
+              {statItems.map((item) => (
+                <div key={item.label} className="flex flex-col items-center gap-1">
+                  <dt className="order-2 text-sm text-muted-foreground">{item.label}</dt>
+                  <dd className="order-1 text-3xl md:text-4xl font-extrabold tracking-tight text-primary">
+                    {numberFormat.format(item.value)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+      )}
 
       {/* How It Works Section */}
       <section className="w-full py-16 md:py-24">
@@ -125,30 +145,36 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Quiz Discovery Section */}
-      <QuizDiscoverySection />
-
-      {/* CTA Section */}
-      <section className="w-full py-16 md:py-20 bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-        <div className="container  px-4 md:px-6 relative z-10">
-          <div className="flex flex-col items-center justify-center space-y-6 text-center">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
-                {t("cta.title")}
+      {/* Featured Mentors Section */}
+      {featuredMentors.length > 0 && (
+        <section className="w-full py-16 md:py-24 bg-muted/20">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-3 text-center mb-12">
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+                {t("featuredMentors.title")}
               </h2>
-              <p className="max-w-[600px] md:text-xl opacity-90 mx-auto leading-relaxed">
-                {t("cta.description")}
+              <p className="max-w-[700px] text-muted-foreground text-base md:text-lg mx-auto">
+                {t("featuredMentors.description")}
               </p>
             </div>
-            <div className="flex flex-col gap-4 min-[400px]:flex-row">
-              <Button size="xl" variant="secondary" asChild>
-                <Link href="/signup">{t("cta.signup")}</Link>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {featuredMentors.map((mentor) => (
+                <MentorCard key={mentor.id ?? mentor.slug} mentor={mentor} />
+              ))}
+            </div>
+            <div className="flex justify-center mt-12">
+              <Button variant="outline" asChild>
+                <Link href="/mentors">{t("featuredMentors.viewAll")}</Link>
               </Button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* AI Quiz Discovery Section */}
+      <QuizDiscoverySection />
+
+      <FinalCTA />
     </div>
   )
 }

@@ -77,13 +77,18 @@
   },
   "home": {
     "badge": {
-      "freeMentorship": "Plataforma de Mentores Voluntários"
+      "freeMentorship": "Mentoria 100% gratuita"
     },
     "hero": {
       "title": "Conecte-se com Mentores Voluntários",
       "description": "Encontre orientação, compartilhe experiências e cresça conosco. Nossa plataforma conecta você a mentores voluntários para sessões de mentoria gratuitas.",
       "findMentor": "Encontrar um Mentor",
       "becomeMentor": "Torne-se um Mentor"
+    },
+    "stats": {
+      "mentors": "Mentores voluntários",
+      "sessions": "Sessões realizadas",
+      "topics": "Áreas de mentoria"
     },
     "quiz": {
       "badge": "Orientação Inteligente",
@@ -92,8 +97,7 @@
       "feature1": "Diagnóstico de carreira sob medida",
       "feature2": "Recomendações compatíveis em tempo real",
       "feature3": "100% gratuito e sem compromisso",
-      "ctaButton": "Fazer Quiz de Carreira",
-      "exploreLink": "Ou explore todos os mentores"
+      "ctaButton": "Fazer Quiz de Carreira"
     },
     "howItWorks": {
       "title": "Como Funciona",
@@ -117,39 +121,13 @@
       "description": "Conheça alguns de nossos dedicados mentores voluntários",
       "viewAll": "Ver Todos os Mentores"
     },
-    "mentor": {
-      "sampleName": "Sarah Johnson",
-      "field": "Engenharia de Software",
-      "tags": [
-        "Carreira",
-        "Tecnologia",
-        "Liderança"
-      ],
-      "description": "Desenvolvedora Sênior com mais de 10 anos de experiência ajudando novos programadores a navegar na indústria de tecnologia.",
-      "languages": "Inglês, Espanhol",
-      "viewProfile": "Ver Perfil"
-    },
-    "events": {
-      "title": "Próximos Eventos",
-      "description": "Participe de nossos eventos comunitários e sessões de mentoria em grupo",
-      "card": {
-        "title": "Painel de Carreira em Tecnologia: Como Entrar no Setor",
-        "date": "15 de Junho de 2025",
-        "time": "18h00 - 20h00",
-        "description": "Participe de nosso painel de especialistas da indústria e descubra como iniciar e desenvolver sua carreira em tecnologia.",
-        "attendees": "{count} participantes",
-        "register": "Inscrever-se"
-      },
-      "viewAll": "Ver Todos os Eventos"
-    },
     "cta": {
       "title": "Pronto para Começar?",
       "description": "Junte-se a nós hoje e conecte-se com pessoas que podem ajudar você a alcançar seus objetivos",
       "signup": "Inscreva-se Agora",
-      "learnMore": "Saiba Mais"
-    },
-    "event": {
-      "type": "Online"
+      "titleAuthenticated": "Continue sua jornada",
+      "descriptionAuthenticated": "Acompanhe suas sessões, mensagens e próximos passos no seu painel.",
+      "dashboard": "Ir para o painel"
     }
   },
   "about": {

@@ -77,13 +77,18 @@
   },
   "home": {
     "badge": {
-      "freeMentorship": "Plataforma de Mentores Voluntarios"
+      "freeMentorship": "Mentoría 100% gratuita"
     },
     "hero": {
       "title": "Conéctate con Mentores Voluntarios",
       "description": "Encuentra orientación, comparte experiencias y crece con nosotros. Nuestra plataforma te conecta con mentores voluntarios para sesiones de mentoría gratuitas.",
       "findMentor": "Encontrar un Mentor",
       "becomeMentor": "Conviértete en Mentor"
+    },
+    "stats": {
+      "mentors": "Mentores voluntarios",
+      "sessions": "Sesiones realizadas",
+      "topics": "Áreas de mentoría"
     },
     "quiz": {
       "badge": "Orientación Inteligente",
@@ -92,8 +97,7 @@
       "feature1": "Diagnóstico de carrera personalizado",
       "feature2": "Recomendaciones compatibles en tiempo real",
       "feature3": "100% gratuito y sin compromiso",
-      "ctaButton": "Hacer Quiz de Carrera",
-      "exploreLink": "O explora todos los mentores"
+      "ctaButton": "Hacer Quiz de Carrera"
     },
     "howItWorks": {
       "title": "Cómo Funciona",
@@ -117,39 +121,13 @@
       "description": "Conoce a algunos de nuestros dedicados mentores voluntarios",
       "viewAll": "Ver Todos los Mentores"
     },
-    "mentor": {
-      "sampleName": "Sarah Johnson",
-      "field": "Software Engineering",
-      "tags": [
-        "Carrera",
-        "Tecnología",
-        "Liderazgo"
-      ],
-      "description": "Senior Developer con 10+ años de experiencia ayudando a nuevos programadores a navegar en la industria tecnológica.",
-      "languages": "Inglés, Español",
-      "viewProfile": "Ver Perfil"
-    },
-    "events": {
-      "title": "Próximos Eventos",
-      "description": "Únete a nuestros eventos comunitarios y sesiones de mentoría grupal",
-      "card": {
-        "title": "Panel de Carrera Tech: Cómo Entrar en la Industria",
-        "date": "15 de Junio de 2025",
-        "time": "6:00 PM - 8:00 PM",
-        "description": "Únete a nuestro panel de expertos de la industria mientras comparten ideas sobre cómo iniciar y hacer crecer tu carrera en tecnología.",
-        "attendees": "{count} asistentes",
-        "register": "Registrarse"
-      },
-      "viewAll": "Ver Todos los Eventos"
-    },
     "cta": {
       "title": "¿Listo para empezar?",
       "description": "Únete hoy y conéctate con personas que pueden ayudarte a alcanzar tus objetivos",
       "signup": "Regístrate Ahora",
-      "learnMore": "Saber Más"
-    },
-    "event": {
-      "type": "Online"
+      "titleAuthenticated": "Continúa tu camino",
+      "descriptionAuthenticated": "Sigue tus sesiones, mensajes y próximos pasos en tu panel.",
+      "dashboard": "Ir al panel"
     }
   },
   "about": {

@@ -65,16 +65,6 @@ export function QuizDiscoverySection() {
                     {t("ctaButton")}
                   </Link>
                 </Button>
-
-                <Button
-                  size="lg"
-                  variant="outline"
-                  asChild
-                >
-                  <Link href="/mentors">
-                    {t("exploreLink")}
-                  </Link>
-                </Button>
               </div>
             </div>
 
