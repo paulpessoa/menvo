@@ -53,7 +53,7 @@ class AdminService {
             .in('name', roleNames)
 
         if (rolesError) throw rolesError
-        const roles = (rolesRaw as { id: string; name: string }[]) || []
+        const roles = (rolesRaw as { id: number; name: string }[] | null) ?? []
 
         // 2. Remover roles atuais
         const { error: deleteError } = await this.supabase

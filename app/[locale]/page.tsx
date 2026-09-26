@@ -5,29 +5,21 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MessageSquare, Search } from "lucide-react"
 import { getTranslations } from "next-intl/server"
+import { preload } from "react-dom"
 
 import { QuizDiscoverySection } from "@/components/QuizDiscoverySection"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { HeroActions } from "@/components/home/HeroActions"
 import { FinalCTA } from "@/components/home/FinalCTA"
-import { getHomeHighlights } from "@/lib/services/mentors/home-highlights"
+import { getFeaturedMentors } from "@/lib/services/mentors/home-highlights"
 
-export default async function Home({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params
+const HERO_POSTER = "/images/ai-demo-poster.webp"
+
+export default async function Home() {
   const t = await getTranslations("home")
-  const { featuredMentors, stats } = await getHomeHighlights()
-  const numberFormat = new Intl.NumberFormat(locale)
-
-  // Só mostra números que existem — "0 sessões" passa a impressão oposta.
-  const statItems = [
-    { value: stats.mentors, label: t("stats.mentors") },
-    { value: stats.sessions, label: t("stats.sessions") },
-    { value: stats.topics, label: t("stats.topics") },
-  ].filter((item) => item.value > 0)
+  // A capa do vídeo é o maior elemento visível (LCP): pedir cedo, com prioridade.
+  preload(HERO_POSTER, { as: "image", fetchPriority: "high" })
+  const featuredMentors = await getFeaturedMentors()
 
   return (
     <div className="flex flex-col">
@@ -57,7 +49,7 @@ export default async function Home({
                 muted
                 playsInline
                 preload="metadata"
-                poster="/images/ai-demo-poster.jpg"
+                poster={HERO_POSTER}
                 className="object-cover w-full h-full"
                 aria-label="Demonstração da plataforma Menvo"
               >
@@ -69,23 +61,6 @@ export default async function Home({
         </div>
       </section>
 
-      {/* Impact Stats */}
-      {statItems.length > 0 && (
-        <section className="w-full border-y bg-muted/30">
-          <div className="container px-4 md:px-6 py-8">
-            <dl className="mx-auto grid max-w-4xl grid-cols-1 gap-6 text-center sm:grid-cols-3">
-              {statItems.map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-1">
-                  <dt className="order-2 text-sm text-muted-foreground">{item.label}</dt>
-                  <dd className="order-1 text-3xl md:text-4xl font-extrabold tracking-tight text-primary">
-                    {numberFormat.format(item.value)}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </section>
-      )}
 
       {/* How It Works Section */}
       <section className="w-full py-16 md:py-24">

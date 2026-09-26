@@ -85,11 +85,6 @@
       "findMentor": "Find a Mentor",
       "becomeMentor": "Become a Mentor"
     },
-    "stats": {
-      "mentors": "Volunteer mentors",
-      "sessions": "Sessions held",
-      "topics": "Mentorship areas"
-    },
     "quiz": {
       "badge": "Smart Guidance",
       "title": "Not sure which mentor to choose?",
