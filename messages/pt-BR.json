@@ -85,11 +85,6 @@
       "findMentor": "Encontrar um Mentor",
       "becomeMentor": "Torne-se um Mentor"
     },
-    "stats": {
-      "mentors": "Mentores voluntários",
-      "sessions": "Sessões realizadas",
-      "topics": "Áreas de mentoria"
-    },
     "quiz": {
       "badge": "Orientação Inteligente",
       "title": "Em dúvida de qual mentor escolher?",
