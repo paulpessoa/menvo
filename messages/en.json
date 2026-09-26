@@ -77,13 +77,18 @@
   },
   "home": {
     "badge": {
-      "freeMentorship": "Volunteer Mentorship Platform"
+      "freeMentorship": "100% free mentorship"
     },
     "hero": {
       "title": "Connect with Volunteer Mentors",
       "description": "Find guidance, share experiences, and grow together. Our platform connects you with volunteer mentors for free mentorship sessions.",
       "findMentor": "Find a Mentor",
       "becomeMentor": "Become a Mentor"
+    },
+    "stats": {
+      "mentors": "Volunteer mentors",
+      "sessions": "Sessions held",
+      "topics": "Mentorship areas"
     },
     "quiz": {
       "badge": "Smart Guidance",
@@ -92,8 +97,7 @@
       "feature1": "Tailored career diagnosis",
       "feature2": "Real-time matched mentor recommendations",
       "feature3": "100% free with no commitment",
-      "ctaButton": "Take Career Quiz",
-      "exploreLink": "Or explore all mentors"
+      "ctaButton": "Take Career Quiz"
     },
     "howItWorks": {
       "title": "How It Works",
@@ -117,39 +121,13 @@
       "description": "Meet some of our dedicated volunteer mentors",
       "viewAll": "View All Mentors"
     },
-    "mentor": {
-      "sampleName": "Sarah Johnson",
-      "field": "Software Engineering",
-      "tags": [
-        "Career",
-        "Tech",
-        "Leadership"
-      ],
-      "description": "Senior Developer with 10+ years of experience helping new programmers navigate the tech industry.",
-      "languages": "English, Spanish",
-      "viewProfile": "View Profile"
-    },
-    "events": {
-      "title": "Upcoming Events",
-      "description": "Join our community events and group mentorship sessions",
-      "card": {
-        "title": "Tech Career Panel: Breaking Into the Industry",
-        "date": "June 15, 2025",
-        "time": "6:00 PM - 8:00 PM",
-        "description": "Join our panel of industry experts as they share insights on how to start and grow your career in technology.",
-        "attendees": "{count} attendees",
-        "register": "Register"
-      },
-      "viewAll": "View All Events"
-    },
     "cta": {
       "title": "Ready to Get Started?",
       "description": "Join us today and connect with people who can help you achieve your goals",
       "signup": "Sign Up Now",
-      "learnMore": "Learn More"
-    },
-    "event": {
-      "type": "Online"
+      "titleAuthenticated": "Continue your journey",
+      "descriptionAuthenticated": "Track your sessions, messages and next steps in your dashboard.",
+      "dashboard": "Go to dashboard"
     }
   },
   "about": {
