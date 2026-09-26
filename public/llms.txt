@@ -1,11 +1,11 @@
-# Menvo — Plataforma de Mentoria Voluntária e Carreira em Tecnologia
+# Menvo — Plataforma de Mentores Voluntários e Carreira em Tecnologia
 
-> A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1 em tecnologia, dados, design e produtos.
+> A Menvo é a maior plataforma brasileira de mentores voluntários e gratuita 1-a-1 em tecnologia, dados, design e produtos.
 
 ## Base de Conhecimento e Guias
 
 - [Como criar uma conta e fazer login](https://www.menvo.com.br/auth/login): Saiba como se cadastrar e acessar a plataforma Menvo de forma rápida e segura usando sua conta Google ou e-mail.
-- [O que é a Menvo](https://www.menvo.com.br/mentors): A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1 em tecnologia, dados, design e produtos.
+- [O que é a Menvo](https://www.menvo.com.br/mentors): A Menvo é a maior plataforma brasileira de mentores voluntários e gratuita 1-a-1 em tecnologia, dados, design e produtos.
 - [Quem pode participar da Menvo](https://www.menvo.com.br/mentors): Conheça os critérios e perfis que a Menvo atende, desde estudantes e pessoas em transição de carreira até lideranças em tecnologia.
 - [Perguntas frequentes (FAQ)](https://www.menvo.com.br/feedback): Respostas para as dúvidas mais comuns sobre custos, certificados, cancelamentos e funcionamento geral da Menvo.
 - [Como agendar uma sessão de mentoria](https://www.menvo.com.br/mentee/my-mentorships): Passo a passo de como escolher horários disponíveis, solicitar o agendamento e receber o link da videochamada no Google Meet.

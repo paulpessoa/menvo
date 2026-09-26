@@ -1,6 +1,6 @@
 # Menvo — Base de Conhecimento Completa
 
-Plataforma brasileira de mentoria voluntária 1-a-1 e diagnósticos de carreira.
+plataforma brasileira de mentores voluntários 1-a-1 e diagnósticos de carreira.
 Website: https://www.menvo.com.br
 
 ---

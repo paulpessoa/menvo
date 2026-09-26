@@ -9,7 +9,7 @@
   </a>
 </p>
 
-<h1 align="center">Menvo — Mentoria Voluntária</h1>
+<h1 align="center">Menvo — Mentores Voluntários</h1>
 
 <p align="center">
   <strong>Democratizing career mentorship for youth and students seeking their first professional opportunities.</strong>

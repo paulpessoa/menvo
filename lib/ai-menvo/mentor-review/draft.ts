@@ -96,7 +96,7 @@ const KIND_INSTRUCTIONS: Record<MentorReviewKind, string> = {
 - Até 150 palavras, no máximo 3 hashtags no final, no máximo 2 emojis.`
 }
 
-const SYSTEM_PROMPT = `Você ajuda a equipe da Menvo, uma plataforma brasileira de mentoria voluntária e gratuita, a analisar candidaturas de mentores e a redigir comunicações.
+const SYSTEM_PROMPT = `Você ajuda a equipe da Menvo, uma plataforma brasileira de mentores voluntários e gratuita, a analisar candidaturas de mentores e a redigir comunicações.
 
 Regras:
 - Use apenas fatos presentes em <perfil>. Nunca invente cargos, empresas, anos de experiência, conquistas ou links.

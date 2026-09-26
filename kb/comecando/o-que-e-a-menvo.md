@@ -3,7 +3,7 @@ id: o-que-e-a-menvo
 title: O que é a Menvo
 audience: [all]
 tags: [sobre, institucional, gratuito, missao, mentoria, tecnologia]
-summary: A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1 em tecnologia, dados, design e produtos.
+summary: A Menvo é a maior plataforma brasileira de mentores voluntários e gratuita 1-a-1 em tecnologia, dados, design e produtos.
 status: current
 last_reviewed: 2026-09-24
 source_of_truth: [docs/VISION.md]

@@ -1020,7 +1020,7 @@
     }
   },
   "metadata": {
-    "title": "MENVO - Mentoria Voluntária",
+    "title": "MENVO - Mentores Voluntários",
     "description": "Conectando mentores e mentees para sessões de mentoria gratuitas",
     "keywords": [
       "mentoria",
@@ -1028,12 +1028,12 @@
       "carreira"
     ],
     "og": {
-      "title": "MENVO - Mentoria Voluntária",
+      "title": "MENVO - Mentores Voluntários",
       "description": "Conectando mentores e mentees para sessões de mentoria gratuitas",
       "siteName": "MENVO"
     },
     "twitter": {
-      "title": "MENVO - Mentoria Voluntária",
+      "title": "MENVO - Mentores Voluntários",
       "description": "Conectando mentores e mentees para sessões de mentoria gratuitas"
     }
   },
@@ -2058,7 +2058,7 @@
   "terms": {
     "badge": "Termos de Serviço",
     "title": "Termos de Uso",
-    "intro": "Bem-vindo à Menvo. Ao utilizar nossa plataforma, você concorda com os termos e diretrizes que regem nossa comunidade de mentoria voluntária gratuita.",
+    "intro": "Bem-vindo à Menvo. Ao utilizar nossa plataforma, você concorda com os termos e diretrizes que regem nossa comunidade de mentores voluntários gratuita.",
     "usage": {
       "title": "Uso da Plataforma",
       "text": "A Menvo é uma plataforma voluntária sem fins lucrativos criada para conectar profissionais dispostos a compartilhar conhecimento com pessoas em busca de orientação de carreira. Todas as mentorias são 100% gratuitas."

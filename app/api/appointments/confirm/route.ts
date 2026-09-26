@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         }
 
         description += `---\n`
-        description += `Plataforma: MENVO - Mentoria Voluntária\n`
+        description += `Plataforma: MENVO - Mentores Voluntários\n`
         description += `🔗 Link do Meet será gerado automaticamente`
 
         const eventData = {

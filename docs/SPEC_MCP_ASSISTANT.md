@@ -227,7 +227,7 @@ Sequência:
    As que precisam de banco recebem o `supabase` **da sessão do usuário**
    (o mesmo `createClient()` do passo 1), não o anônimo.
 6. **System prompt** (pt-BR, fixo, em `lib/services/assistant/prompt.ts`):
-   - Você é o assistente da Menvo, plataforma de mentoria voluntária gratuita.
+   - Você é o assistente da Menvo, plataforma de mentores voluntários.
    - Responda em português do Brasil, curto, direto, sem emojis.
    - Use as tools pra qualquer pergunta sobre mentores, horários ou como
      funciona. **Nunca invente mentor, horário ou número.** Se a tool não

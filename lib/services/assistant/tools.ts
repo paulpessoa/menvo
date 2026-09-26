@@ -170,7 +170,7 @@ export function explainHowItWorks(input: z.infer<typeof explainHowItWorksInput>)
   
   const content = {
     overview: {
-      answer: "A Menvo é a maior plataforma brasileira de mentoria voluntária e gratuita 1-a-1. Nós conectamos talentos em início ou transição de carreira a profissionais de tecnologia, design, produtos e dados.",
+      answer: "A Menvo é a maior plataforma brasileira de mentores voluntários e gratuita 1-a-1. Nós conectamos talentos em início ou transição de carreira a profissionais de tecnologia, design, produtos e dados.",
       links: [
         { label: "Catálogo de Mentores", url: `${baseUrl}/mentors` },
         { label: "Quiz de Carreira", url: `${baseUrl}/quiz` }
