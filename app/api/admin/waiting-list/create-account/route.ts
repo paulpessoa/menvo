@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
     const result = await createAccountForWaitingListEntry(entry as any)
 
     if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 500 })
+      const status = result.failedStage === "email" ? 502 : 500
+      return NextResponse.json({ error: result.error }, { status })
     }
 
     return NextResponse.json({ success: true, accountCreated: result.accountCreated })
