@@ -30,9 +30,6 @@ export default function Footer() {
                 className="hidden dark:block"
               />
             </div>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              {t("footer.description")}
-            </p>
             <div className="flex space-x-4">
               <Button
                 variant="ghost"

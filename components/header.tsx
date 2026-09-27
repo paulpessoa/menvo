@@ -5,13 +5,10 @@ import { Link, usePathname } from "@/i18n/routing"
 import Image from "next/image"
 import {
   User,
-  Settings,
-  MessageSquare,
   Shield,
   LayoutDashboard,
   Loader2,
-  Heart,
-  Bot
+  Heart
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -29,7 +26,6 @@ export default function Header() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
-  const isAssistantEnabled = useFeatureFlag("ai_assistant_flag")
   const isChatEnabled = useFeatureFlag("chat_flag")
 
   const navigation = [
@@ -54,29 +50,6 @@ export default function Header() {
       icon: User,
       color: "text-gray-700"
     })
-    if (isChatEnabled) {
-      userNavigation.push({
-        name: t("header.userMenu.messages"),
-        href: "/messages",
-        icon: MessageSquare,
-        color: "text-gray-700"
-      })
-    }
-    userNavigation.push({
-      name: t("header.userMenu.settings"),
-      href: "/settings",
-      icon: Settings,
-      color: "text-gray-700"
-    })
-
-    if (isAssistantEnabled) {
-      userNavigation.push({
-        name: "Assistente (AI)",
-        href: "/assistant",
-        icon: Bot,
-        color: "text-purple-600"
-      })
-    }
 
     if (isAdmin) {
       userNavigation.push({ type: "separator" })
