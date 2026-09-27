@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { Eye, Loader2 } from "lucide-react"
+import { Eye, Loader2, Settings } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -97,13 +97,20 @@ function ProfilePageContent() {
             <h1 className="text-3xl font-bold">Meu Perfil</h1>
             <p className="text-muted-foreground">Complete seu perfil para ser encontrado e ajudar/receber ajuda.</p>
           </div>
-          {profile.slug && (
+          <div className="flex gap-2">
+            {profile.slug && (
+              <Button variant="outline" asChild size="sm">
+                <Link href={isMentor ? `/mentors/${profile.slug}` : `/mentee/${profile.slug}`}>
+                  <Eye className="h-4 w-4 mr-2" /> Ver perfil público
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" asChild size="sm">
-              <Link href={isMentor ? `/mentors/${profile.slug}` : `/mentee/${profile.slug}`}>
-                <Eye className="h-4 w-4 mr-2" /> Ver perfil público
+              <Link href="/settings">
+                <Settings className="h-4 w-4 mr-2" /> Configurações
               </Link>
             </Button>
-          )}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
