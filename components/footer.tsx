@@ -150,7 +150,7 @@ export default function Footer() {
           </div>
           <div className="space-y-4">
             <h3 className="text-sm font-medium">{t("footer.sdgs")}</h3>
-            <div className="grid grid-cols-2 gap-2 w-fit">
+            <div className="flex flex-wrap gap-2">
               <Link
                 href="/about#sdg4"
                 className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
