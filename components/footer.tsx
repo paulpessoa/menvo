@@ -13,7 +13,7 @@ export default function Footer() {
     <footer className="border-t bg-background">
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div className="space-y-4 md:col-span-2">
+          <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Image
                 src="/menvo-logo-light.png"
@@ -72,54 +72,6 @@ export default function Footer() {
                   <Github className="h-4 w-4" />
                 </Link>
               </Button>
-            </div>
-            <div className="pt-2">
-              <div className="flex gap-2">
-                <Link
-                  href="/about#sdg4"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-4.svg"
-                    alt="ODS 4 - Educação de Qualidade"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link
-                  href="/about#sdg5"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-5.svg"
-                    alt="ODS 5 - Igualdade de Gênero"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link
-                  href="/about#sdg8"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-8.svg"
-                    alt="ODS 8 - Trabalho Decente"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link
-                  href="/about#sdg10"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-10.svg"
-                    alt="ODS 10 - Redução das Desigualdades"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-              </div>
             </div>
           </div>
           <div className="space-y-4">
@@ -195,6 +147,55 @@ export default function Footer() {
                 </Link>
               </li>
             </ul>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">{t("footer.sdgs")}</h3>
+            <div className="grid grid-cols-2 gap-2 w-fit">
+              <Link
+                href="/about#sdg4"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-4.svg"
+                  alt="ODS 4 - Educação de Qualidade"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+              <Link
+                href="/about#sdg5"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-5.svg"
+                  alt="ODS 5 - Igualdade de Gênero"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+              <Link
+                href="/about#sdg8"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-8.svg"
+                  alt="ODS 8 - Trabalho Decente"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+              <Link
+                href="/about#sdg10"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-10.svg"
+                  alt="ODS 10 - Redução das Desigualdades"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+            </div>
           </div>
         </div>
         <div className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground">
