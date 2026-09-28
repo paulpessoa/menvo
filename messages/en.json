@@ -196,10 +196,10 @@
   "howItWorks": {
     "title": "How Menvo Works",
     "description": "Our platform makes it easy to connect with mentors and schedule free mentorship sessions",
+    "metaDescription": "See how Menvo connects mentees, volunteer mentors, and partner organizations in free mentorship sessions.",
     "forMentees": "For Mentees",
     "forMentors": "For Mentors",
-    "forNGOs": "For NGOs",
-    "forCompanies": "For Companies",
+    "forOrganizations": "For Organizations",
     "mentees": {
       "step1": {
         "title": "Create Your Profile",
@@ -209,153 +209,101 @@
         "feature3": "Connect your LinkedIn profile"
       },
       "step2": {
+        "title": "Take Your Career Diagnostic",
+        "description": "Answer a few AI-guided questions about your goals and challenges. You get mentor suggestions tailored to your moment and can share the result with your mentor.",
+        "feature1": "AI-guided conversation",
+        "feature2": "Mentor suggestions for you",
+        "feature3": "Share with your mentor (optional)"
+      },
+      "step3": {
         "title": "Find the Right Mentor",
         "description": "Browse our diverse community of volunteer mentors. Use filters to find mentors based on expertise, industry, location, and more.",
         "feature1": "Filter by topics and expertise",
-        "feature2": "Search by location or language",
+        "feature2": "Search by location, language, or inclusion tags",
         "feature3": "Read reviews from other mentees"
       },
-      "step3": {
-        "title": "Schedule a Session",
-        "description": "Once you find a mentor you'd like to connect with, view their availability and schedule a free 45-minute mentorship session.",
+      "step4": {
+        "title": "Request a Session",
+        "description": "Once you find a mentor you'd like to connect with, view their availability for the next 14 days and request a free 45-minute mentorship session.",
         "feature1": "View mentor's calendar",
         "feature2": "Select a convenient time slot",
-        "feature3": "Add topics you'd like to discuss"
+        "feature3": "The mentor confirms your request"
       },
-      "step4": {
+      "step5": {
         "title": "Connect and Grow",
-        "description": "Meet with your mentor via video call. Share your challenges, ask questions, and receive personalized guidance to help you achieve your goals.",
-        "feature1": "Join via video call link",
-        "feature2": "Discuss your goals and challenges",
-        "feature3": "Receive personalized guidance"
+        "description": "Meet with your mentor via the automatic Google Meet link. Share your challenges, ask questions, and receive personalized guidance to help you achieve your goals.",
+        "feature1": "Automatic Google Meet link",
+        "feature2": "Email reminder on the day of the session",
+        "feature3": "Rate the session to unlock your next booking"
       },
       "getStarted": "Get Started as a Mentee"
     },
     "mentors": {
       "step1": {
-        "title": "Create Your Mentor Profile",
-        "description": "Sign up and create your mentor profile with details about your expertise, experience, and the topics you can help with.",
-        "feature1": "Highlight your expertise and experience",
-        "feature2": "Specify topics you can mentor on",
-        "feature3": "Connect your professional profiles"
+        "title": "Create Your Profile and Request to Become a Mentor",
+        "description": "Your account starts as a mentee. Share your experience, areas of expertise, and the topics you can help with, and request verification right from your profile.",
+        "feature1": "Start with a mentee account",
+        "feature2": "Highlight your expertise and topics",
+        "feature3": "Request verification on your profile"
       },
       "step2": {
-        "title": "Complete Verification",
-        "description": "For the safety of our community, all mentors go through a verification process. This includes a brief video call with our team.",
-        "feature1": "Schedule a verification call",
-        "feature2": "Verify your identity and expertise",
-        "feature3": "Get approved to start mentoring"
+        "title": "Review by Our Team",
+        "description": "Our team reviews your profile information to keep the community safe. You'll get a response by email and in the platform's chat.",
+        "feature1": "No calls, all through your profile",
+        "feature2": "Response by email and chat",
+        "feature3": "Approved, your profile goes public and verified"
       },
       "step3": {
         "title": "Set Your Availability",
-        "description": "Define when you're available to mentor. You have full control over your schedule and can update it anytime.",
+        "description": "Set up your recurring weekly availability. Sessions have a fixed 45-minute duration, and you can connect Google Calendar to automatically block your busy times.",
         "feature1": "Set your weekly availability",
-        "feature2": "Specify session duration",
-        "feature3": "Update your calendar as needed"
+        "feature2": "45-min sessions with a 15-min gap",
+        "feature3": "Connect Google Calendar"
       },
       "step4": {
         "title": "Conduct Mentorship Sessions",
-        "description": "Connect with mentees via video calls. Share your knowledge, provide guidance, and help them navigate their challenges.",
-        "feature1": "Receive session requests",
-        "feature2": "Conduct video mentorship sessions",
-        "feature3": "Track your impact and sessions"
+        "description": "Confirm or decline session requests, see the diagnostic your mentee shared with you, and track your impact on the platform.",
+        "feature1": "Confirm or decline session requests",
+        "feature2": "See the diagnostic shared by your mentee",
+        "feature3": "Track your sessions and ratings"
       },
       "becomeMentor": "Become a Mentor"
     },
-    "ngos": {
+    "organizations": {
       "step1": {
-        "title": "Register Your NGO for Free",
-        "description": "NGOs and social organizations can register for free on the platform to connect the youth they serve with volunteer mentors.",
-        "feature1": "100% free registration for NGOs",
-        "feature2": "Unlimited access to the platform",
-        "feature3": "Dedicated support for organizations"
+        "title": "Create Your Organization's Page",
+        "description": "Talk to our team to set up your NGO, institute, or company's public page on Menvo, open for join requests or invite-only.",
+        "feature1": "Public page at menvo.com.br/o/your-org",
+        "feature2": "Open for requests or invite-only",
+        "feature3": "Set up by our team together with you"
       },
       "step2": {
-        "title": "Connect Youth with Mentors",
-        "description": "Register the young people served by your organization and help them find mentors who can guide them in their professional and personal journeys.",
-        "feature1": "Register multiple youth from your organization",
-        "feature2": "Track mentorship progress",
-        "feature3": "Receive social impact reports"
-      },
-      "getStarted": "Register My NGO",
-      "step3": {
-        "title": "Tracking and Evolution",
-        "description": "Monitor mentorship progress and see the real impact on the lives of your youth.",
-        "feature1": "Session history",
-        "feature2": "Mentor feedback",
-        "feature3": "Progress dashboard"
-      },
-      "step4": {
-        "title": "Strengthening the Cause",
-        "description": "Use real data to demonstrate social impact and facilitate fundraising.",
-        "feature1": "Impact reports",
-        "feature2": "Structured data",
-        "feature3": "Success stories"
-      },
-      "getStarted": "Talk to our team"
-    },
-    "companies": {
-      "step1": {
-        "title": "Corporate Volunteering through Mentorship",
-        "description": "Develop corporate volunteering programs by allowing your employees to become volunteer mentors, strengthening the company's purpose.",
-        "feature1": "Engage employees in social actions",
-        "feature2": "Develop leadership through mentorship",
-        "feature3": "Strengthen organizational culture"
-      },
-      "step2": {
-        "title": "ESG Reports and Social Impact",
-        "description": "Receive detailed reports on the social impact of mentorships conducted by your employees, strengthening your ESG metrics.",
-        "feature1": "Monthly social impact reports",
-        "feature2": "Metrics for ESG reporting",
-        "feature3": "Corporate volunteering certificates"
+        "title": "Bring Your Community",
+        "description": "Invite the people your organization serves and the employees who can be volunteer mentors. You approve whoever requests to join.",
+        "feature1": "Invite beneficiaries by email",
+        "feature2": "Invite employees as mentors",
+        "feature3": "Approve whoever requests to join"
       },
       "step3": {
-        "title": "Incentive Policies and Benefits",
-        "description": "Create incentive policies for mentor employees, such as paid time off, internal recognition, and career development.",
-        "feature1": "Time bank for volunteer mentoring",
-        "feature2": "Recognition and internal gamification",
-        "feature3": "Soft skills development"
+        "title": "Connect with Mentors",
+        "description": "Beneficiaries use the platform's same mentor catalog and AI career diagnostic. Your organization's mentors serve through Menvo like any other mentor.",
+        "feature1": "Same mentor catalog and career diagnostic",
+        "feature2": "Your organization's mentors serve through the platform",
+        "feature3": "100% free"
       },
       "step4": {
-        "title": "ESG Impact and Recognition",
-        "description": "Strengthen your company social impact metrics with real and auditable data.",
-        "feature1": "ESG Certificates",
-        "feature2": "Annual reports",
-        "feature3": "Partner Company Seal"
+        "title": "Track the Impact",
+        "description": "In your organization's dashboard, see beneficiaries and mentors, who has completed the diagnostic, and how many sessions were booked and completed.",
+        "feature1": "Dashboard with beneficiaries and mentors",
+        "feature2": "Who has completed the diagnostic",
+        "feature3": "Sessions booked and completed"
       },
-      "getStarted": "Talk to our team"
+      "getStarted": "Talk to Our Team"
     },
     "faq": {
       "title": "Frequently Asked Questions",
       "description": "Find answers to the most common questions about the platform.",
-      "viewAll": "View all questions",
-      "q1": {
-        "question": "Is mentorship really free?",
-        "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow and develop."
-      },
-      "q2": {
-        "question": "How long are mentorship sessions?",
-        "answer": "Standard mentorship sessions are 45 minutes long. This provides enough time for meaningful conversation while respecting everyone's schedules."
-      },
-      "q3": {
-        "question": "How often can I meet with a mentor?",
-        "answer": "This depends on the mentor's availability and preferences. Some mentors are open to regular sessions, while others may prefer one-time meetings."
-      },
-      "q4": {
-        "question": "What happens if I need to cancel?",
-        "answer": "We ask that you cancel at least 24 hours in advance out of respect for the mentor's time. You can easily reschedule through your dashboard."
-      },
-      "q5": {
-        "question": "How do I become a verified mentor?",
-        "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
-      },
-      "q6": {
-        "question": "Is my information secure?",
-        "answer": "Yes, we take privacy and security seriously. Your personal information is protected and only shared with those you choose to connect with."
-      },
-      "stillHaveQuestions": "Still have questions?",
-      "supportDescription": "Our support team is here to help you with any questions you may have.",
-      "contactSupport": "Contact Support"
+      "viewAll": "View all questions"
     }
   },
   "faq": {
@@ -379,25 +327,17 @@
     },
     "q5": {
       "question": "How do I become a verified mentor?",
-      "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
+      "answer": "After requesting to become a mentor from your profile, our team reviews your information and replies by email and chat. Once approved, your profile goes public and verified."
     },
     "q6": {
       "question": "Is my information safe?",
       "answer": "Yes, we take privacy and security very seriously. Your personal information is protected and only shared with those you choose to connect with."
     },
     "q7": {
-      "question": "How does it work for NGOs?",
-      "answer": "NGOs can register for free and connect the youth they serve with volunteer mentors. It's a way to expand the organization's social impact at no cost."
+      "question": "How does it work for organizations (NGOs and companies)?",
+      "answer": "NGOs, institutes, and companies with volunteering programs can have a page on Menvo to connect the people they serve — or their employees — with volunteer mentors, for free. Talk to our team to set up your organization's page."
     },
     "q8": {
-      "question": "Can companies participate?",
-      "answer": "Yes! Companies can develop corporate volunteering programs through mentorship, receive ESG reports, and create incentive policies for mentor employees."
-    },
-    "q9": {
-      "question": "How does recruiter access work?",
-      "answer": "This feature is under development. Soon, recruiters will have access to qualified talent participating on the platform, always respecting user privacy."
-    },
-    "q10": {
       "question": "Can I be both a mentor and mentee?",
       "answer": "Yes! You can have both profiles on the platform. Many professionals seek mentorship in specific areas while mentoring in their areas of expertise."
     },
@@ -626,8 +566,7 @@
     "howItWorks": "How it Works",
     "mentors": "Mentors",
     "mentees": "Mentees",
-    "ngos": "NGOs",
-    "companies": "Companies",
+    "organizations": "Organizations",
     "donate": "Donate",
     "company": "Institutional",
     "aboutUs": "About Us",

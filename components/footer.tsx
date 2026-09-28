@@ -95,18 +95,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/how-it-works?tab=ngos"
+                  href="/how-it-works?tab=organizations"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  {t("footer.ngos")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/how-it-works?tab=companies"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {t("footer.companies")}
+                  {t("footer.organizations")}
                 </Link>
               </li>
             </ul>
