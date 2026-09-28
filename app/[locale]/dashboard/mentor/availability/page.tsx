@@ -490,7 +490,7 @@ export default function MentorAvailabilityPage() {
                 • <strong>Duração:</strong> Mentorias duram <strong>45 minutos</strong>. Intervalos devem ter no mínimo 45 min.
               </p>
               <p>
-                • <strong>Conflitos Automáticos:</strong> Sessões já marcadas ou eventos no seu Google Calendar são bloqueados automaticamente.
+                • <strong>Conflitos Automáticos:</strong> Horários com uma sessão já marcada na Menvo somem da sua agenda automaticamente. O link do Google Meet é gerado sozinho quando você confirma o pedido.
               </p>
             </CardContent>
           </Card>

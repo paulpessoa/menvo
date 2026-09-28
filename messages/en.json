@@ -255,10 +255,10 @@
       },
       "step3": {
         "title": "Set Your Availability",
-        "description": "Set up your recurring weekly availability. Sessions have a fixed 45-minute duration, and you can connect Google Calendar to automatically block your busy times.",
+        "description": "Set up your recurring weekly availability. Sessions have a fixed 45-minute duration, and the Google Meet link is generated automatically when you confirm a request.",
         "feature1": "Set your weekly availability",
         "feature2": "45-min sessions with a 15-min gap",
-        "feature3": "Connect Google Calendar"
+        "feature3": "Google Meet link generated automatically"
       },
       "step4": {
         "title": "Conduct Mentorship Sessions",

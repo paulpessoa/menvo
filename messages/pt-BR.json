@@ -255,10 +255,10 @@
       },
       "step3": {
         "title": "Defina Sua Disponibilidade",
-        "description": "Configure sua disponibilidade semanal recorrente. As sessões têm duração fixa de 45 minutos, e você pode conectar o Google Calendar para bloquear automaticamente seus horários ocupados.",
+        "description": "Configure sua disponibilidade semanal recorrente. As sessões têm duração fixa de 45 minutos, e o link do Google Meet é gerado automaticamente quando você confirma um pedido.",
         "feature1": "Configure sua disponibilidade semanal",
         "feature2": "Sessões de 45 min com 15 min de intervalo",
-        "feature3": "Conecte o Google Calendar"
+        "feature3": "Link do Google Meet gerado automaticamente"
       },
       "step4": {
         "title": "Realize Sessões de Mentoria",
