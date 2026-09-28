@@ -18,7 +18,8 @@ import {
   Building2,
   TrendingUp,
   Mail,
-  UserCheck
+  UserCheck,
+  MessageSquare
 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -119,6 +120,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/emails",
       icon: Mail,
       color: "bg-teal-600"
+    },
+    {
+      title: "Gestão de Feedbacks",
+      description: "Moderação e avaliações da plataforma, IA e sessões",
+      href: "/dashboard/admin/feedbacks",
+      icon: MessageSquare,
+      color: "bg-blue-600"
     }
   ]
 

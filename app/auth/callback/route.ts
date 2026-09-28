@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code")
   const type = searchParams.get("type")
   const next = searchParams.get("next") || "/dashboard"
+  // Onboarding needs `next` too: a brand-new account has no role yet, so it
+  // always passes through /onboarding before reaching wherever `next` points.
+  const onboardingUrl = next !== "/dashboard" ? `/onboarding?next=${encodeURIComponent(next)}` : "/onboarding"
   const error = searchParams.get("error")
   const errorDescription = searchParams.get("error_description")
   const errorCode = searchParams.get("error_code")
@@ -88,12 +91,14 @@ export async function GET(request: NextRequest) {
         if (roles.includes("mentee")) {
           return NextResponse.redirect(getTargetUrl(next === "/dashboard" ? "/dashboard/mentee" : next))
         }
-        
-        // No role assigned yet -> route to onboarding
-        return NextResponse.redirect(getTargetUrl("/onboarding"))
+
+        // No role assigned yet -> route to onboarding, carrying `next` along
+        // (e.g. a brand-new account from /o/[slug] must come back there after
+        // picking a role instead of landing on the generic dashboard).
+        return NextResponse.redirect(getTargetUrl(onboardingUrl))
       } else {
         // First time login or profile not setup -> send to onboarding
-        return NextResponse.redirect(getTargetUrl("/onboarding"))
+        return NextResponse.redirect(getTargetUrl(onboardingUrl))
       }
     }
   } else if (type === "recovery" || type === "invite") {

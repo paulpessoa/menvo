@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
@@ -62,6 +63,11 @@ export default function OnboardingPage() {
   const tc = useTranslations("common")
   const router = useRouter()
   const { user, profile, role, loading, needsRoleSelection, refreshProfile, getDefaultRedirectPath } = useAuth()
+  const searchParams = useSearchParams()
+  const nextParam = searchParams.get("next")
+  // Where to go after finishing: e.g. back to /o/[slug] for a new account that
+  // came from an organization invite/join link, instead of the generic dashboard.
+  const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : null
 
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedRole, setSelectedRole] = useState<"mentee" | "mentor" | null>(null)
@@ -84,16 +90,17 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push("/login?next=/onboarding")
+        const loginNext = safeNext ? `/onboarding?next=${encodeURIComponent(safeNext)}` : "/onboarding"
+        router.push(`/login?next=${encodeURIComponent(loginNext)}`)
         return
       }
 
       // If user already has a complete role and doesn't need role selection, redirect
       if (role && !needsRoleSelection()) {
-        router.push(getDefaultRedirectPath())
+        router.push(safeNext || getDefaultRedirectPath())
       }
     }
-  }, [user, role, loading, needsRoleSelection, router, getDefaultRedirectPath])
+  }, [user, role, loading, needsRoleSelection, router, getDefaultRedirectPath, safeNext])
 
   // Prefill from existing profile if available
   useEffect(() => {
@@ -198,8 +205,11 @@ export default function OnboardingPage() {
           : t("mentee.success")
       )
 
-      // Direct to corresponding dashboard
-      if (selectedRole === "mentor") {
+      // Back to where they came from (e.g. an org's /o/[slug] page) if any,
+      // otherwise the corresponding dashboard.
+      if (safeNext) {
+        router.push(safeNext)
+      } else if (selectedRole === "mentor") {
         router.push("/dashboard/mentor")
       } else {
         router.push("/dashboard/mentee")
