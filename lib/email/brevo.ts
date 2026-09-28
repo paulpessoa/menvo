@@ -103,8 +103,8 @@ const getEmailLayout = (
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: ${COLORS.text}; background-color: ${COLORS.bg}; padding: 20px; }
         .email-container { max-width: 550px; margin: 0 auto; background-color: ${COLORS.white}; border-radius: 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); overflow: hidden; border: 1px solid ${COLORS.divider}; }
-        .header { background: ${COLORS.primary}; color: white; padding: 32px 35px; text-align: center; }
-        .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.3px; color: white; }
+        .header { background: ${COLORS.white}; padding: 32px 35px; text-align: center; border-bottom: 1px solid ${COLORS.divider}; }
+        .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.3px; color: ${COLORS.text}; }
         .content { padding: 36px 35px; background-color: ${COLORS.white}; }
         .content h2 { color: ${COLORS.primary}; font-size: 19px; font-weight: 700; margin-bottom: 18px; line-height: 1.3; }
         .content p { color: ${COLORS.text}; font-size: 14px; margin-bottom: 15px; line-height: 1.6; }
@@ -124,7 +124,7 @@ const getEmailLayout = (
 <body>
     <div class="email-container">
         <div class="header">
-            <img src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/menvo-logo-dark.png" alt="${title}" height="32" style="display: block; margin: 0 auto; max-width: 100%; height: auto; max-height: 32px;" />
+            <img src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/menvo-logo-light.png" alt="${title}" height="32" style="display: block; margin: 0 auto; max-width: 100%; height: auto; max-height: 32px;" />
         </div>
         <div class="content">
             ${content}
