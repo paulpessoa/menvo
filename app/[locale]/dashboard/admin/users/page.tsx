@@ -185,14 +185,6 @@ export default function AdminUsersPage() {
             <h1 className="text-3xl font-bold">Gestão Global</h1>
             <p className="text-muted-foreground">Controle central de usuários, mentores e permissões</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => setIsInviteModalOpen(true)} size="sm" className="gap-2">
-              <Mail className="h-4 w-4" /> Convidar...
-            </Button>
-            <Button onClick={() => fetchData()} variant="outline" size="sm">
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Sincronizar
-            </Button>
-          </div>
         </div>
 
         <div className="space-y-6">
@@ -271,7 +263,7 @@ export default function AdminUsersPage() {
                   <div className="flex-1">Nome e Email</div>
                   <div className="w-32 hidden md:block text-center">Status</div>
                   <div className="w-32 hidden md:block text-center">Papel</div>
-                  <div className="w-16 text-right">Ações</div>
+                  <div className="w-20 text-right">Ações</div>
                 </div>
 
                 <div className="px-4 py-2 bg-muted/30 border-b flex flex-wrap items-center gap-4">
@@ -362,27 +354,18 @@ export default function AdminUsersPage() {
                           ))}
                         </div>
 
-                        <div className="w-16 flex items-center justify-end flex-shrink-0">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(user)}>
+                        <div className="w-20 flex items-center justify-end flex-shrink-0 gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => {
+                            const isMentor = user.roles.includes('mentor');
+                            const path = isMentor ? 'mentors' : 'mentee';
+                            const identifier = user.slug || user.id;
+                            window.open(`/${path}/${identifier}`, '_blank');
+                          }} title="Ver Perfil Público">
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(user)} title="Editar Usuário">
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => {
-                                const isMentor = user.roles.includes('mentor');
-                                const path = isMentor ? 'mentors' : 'mentee';
-                                const identifier = user.slug || user.id;
-                                window.open(`/${path}/${identifier}`, '_blank');
-                              }}>
-                                <ExternalLink className="mr-2 h-4 w-4" /> Perfil Público
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
                       </div>
                     ))
