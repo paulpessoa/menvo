@@ -105,7 +105,16 @@ Registra as mentorias efetivamente agendadas:
 | `scheduled_at` | `timestamptz` | Data e hora de início em UTC |
 | `duration_minutes` | `integer` | Duração em minutos (padrão: 45) |
 | `status` | `text` | `pending`, `confirmed`, `completed`, `cancelled`, `rejected` |
+| `pending_reminder_sent_at` | `timestamptz` | Data do lembrete único enviado ao mentor após 24h |
 | `google_meet_link` | `text` | Link gerado automaticamente via Google Calendar |
+
+---
+
+### Ciclo de vida de um pedido pendente
+
+Quando um mentorado faz um pedido, o \`status\` passa a ser \`pending\`.
+- **Após 24 horas:** Se o horário agendado ainda não passou, o mentor recebe um único lembrete por e-mail e a coluna \`pending_reminder_sent_at\` é preenchida.
+- **Após o horário da sessão passar:** Se o pedido continuar pendente, ele é cancelado automaticamente. O mentorado recebe um e-mail sugerindo procurar outro mentor. Como a verificação acontece via cron diário (10h UTC), a expiração pode ocorrer até ~24h depois do horário previsto.
 
 ---
 

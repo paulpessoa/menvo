@@ -224,7 +224,7 @@
       },
       "step4": {
         "title": "Solicita una Sesión",
-        "description": "Una vez que encuentres un mentor con el que te gustaría conectarte, mira su disponibilidad de los próximos 14 días y solicita una sesión de mentoría gratuita de 45 minutos.",
+        "description": "Una vez que encuentres un mentor con el que te gustaría conectarte, mira su disponibilidad de los próximos 14 días y solicita una sesión de mentoría gratuita de 45 minutos. Si el mentor no responde antes del horario, la solicitud se cancela y te avisamos por correo.",
         "feature1": "Mira el calendario del mentor",
         "feature2": "Selecciona un horario conveniente",
         "feature3": "El mentor confirma tu solicitud"

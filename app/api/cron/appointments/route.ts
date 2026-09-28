@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { sendAppointmentReminder, sendFeedbackRequest } from '@/lib/email/brevo';
+import { sendAppointmentReminder, sendFeedbackRequest, sendPendingRequestReminder, sendPendingRequestExpired } from '@/lib/email/brevo';
 
 /**
  * Retorna o cliente administrativo do Supabase com service_role para operações agendadas
@@ -30,7 +30,99 @@ export async function GET(request: Request) {
 
         const supabase = getAdminClient();
         const now = new Date();
-        const results = { reminders: 0, feedbacks: 0, errors: [] as string[] };
+        const results = { reminders: 0, feedbacks: 0, expired: 0, pendingReminders: 0, errors: [] as string[] };
+
+        // --- 0a. EXPIRAR PEDIDOS PENDENTES ---
+        const { data: toExpire, error: expireError } = await supabase
+            .from('appointments')
+            .select(`
+                *,
+                mentor:profiles!mentor_id(full_name, email),
+                mentee:profiles!mentee_id(full_name, email)
+            `)
+            .eq('status', 'pending')
+            .lte('scheduled_at', now.toISOString());
+
+        if (expireError) {
+            console.error('❌ [CRON] Erro ao buscar pedidos para expirar:', expireError);
+            results.errors.push(`Erro busca expiração: ${expireError.message}`);
+        } else if (toExpire && toExpire.length > 0) {
+            for (const app of toExpire) {
+                try {
+                    // C-T2 corrida com mentor confirmando: faz update filtrando status=pending e verifica se retornou id
+                    const { data: updated, error: updateError } = await supabase
+                        .from('appointments')
+                        .update({
+                            status: 'cancelled',
+                            cancelled_at: now.toISOString(),
+                            cancelled_by: null,
+                            cancellation_reason: 'Pedido expirado: o mentor não respondeu antes do horário.'
+                        })
+                        .eq('id', app.id)
+                        .eq('status', 'pending')
+                        .select('id');
+
+                    if (updateError) throw updateError;
+
+                    if (updated && updated.length > 0) {
+                        // Enviar e-mail de expiração apenas para o mentorado
+                        if (app.mentee?.email) {
+                            await sendPendingRequestExpired({
+                                menteeEmail: app.mentee.email,
+                                menteeName: app.mentee.full_name || 'Mentorado',
+                                mentorName: app.mentor?.full_name || 'Mentor',
+                                scheduledAt: app.scheduled_at
+                            });
+                        }
+                        results.expired++;
+                    }
+                } catch (e: any) {
+                    results.errors.push(`Erro expiração ${app.id}: ${e.message}`);
+                }
+            }
+        }
+
+        // --- 0b. LEMBRAR MENTOR DE PEDIDOS PENDENTES ---
+        const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const { data: toRemindPending, error: remindPendingError } = await supabase
+            .from('appointments')
+            .select(`
+                *,
+                mentor:profiles!mentor_id(full_name, email),
+                mentee:profiles!mentee_id(full_name, email)
+            `)
+            .eq('status', 'pending')
+            .is('pending_reminder_sent_at', null)
+            .lte('created_at', twentyFourHoursAgo.toISOString())
+            .gt('scheduled_at', now.toISOString());
+
+        if (remindPendingError) {
+            console.error('❌ [CRON] Erro ao buscar pedidos para lembrar mentor:', remindPendingError);
+            results.errors.push(`Erro busca lembretes pendentes: ${remindPendingError.message}`);
+        } else if (toRemindPending && toRemindPending.length > 0) {
+            for (const app of toRemindPending) {
+                try {
+                    if (app.mentor?.email) {
+                        await sendPendingRequestReminder({
+                            mentorEmail: app.mentor.email,
+                            mentorName: app.mentor.full_name || 'Mentor',
+                            menteeName: app.mentee?.full_name || 'Mentorado',
+                            scheduledAt: app.scheduled_at
+                        });
+                    }
+
+                    await supabase
+                        .from('appointments')
+                        .update({ pending_reminder_sent_at: now.toISOString() })
+                        .eq('id', app.id);
+
+                    results.pendingReminders++;
+                } catch (e: any) {
+                    results.errors.push(`Erro lembrete pendente ${app.id}: ${e.message}`);
+                }
+            }
+        }
+
 
         // --- 1. PROCESSAR LEMBRETES DO DIA (Fuso de Brasília / GMT-3) ---
         const nowBR = new Intl.DateTimeFormat('en-CA', {

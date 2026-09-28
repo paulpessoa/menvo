@@ -522,6 +522,7 @@ export type Database = {
           notes_mentee: string | null
           notes_mentor: string | null
           organization_id: string | null
+          pending_reminder_sent_at: string | null
           reminded_at: string | null
           requested_date: string | null
           requested_end_time: string | null
@@ -560,6 +561,7 @@ export type Database = {
           notes_mentee?: string | null
           notes_mentor?: string | null
           organization_id?: string | null
+          pending_reminder_sent_at?: string | null
           reminded_at?: string | null
           requested_date?: string | null
           requested_end_time?: string | null
@@ -598,6 +600,7 @@ export type Database = {
           notes_mentee?: string | null
           notes_mentor?: string | null
           organization_id?: string | null
+          pending_reminder_sent_at?: string | null
           reminded_at?: string | null
           requested_date?: string | null
           requested_end_time?: string | null

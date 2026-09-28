@@ -373,6 +373,46 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
 }
 
 /**
+ * Envia lembrete ao mentor sobre pedido pendente há mais de 24h
+ */
+export async function sendPendingRequestReminder(data: { mentorEmail: string; mentorName: string; menteeName: string; scheduledAt: string; }): Promise<void> {
+  const formattedDate = formatDateTimeBR(data.scheduledAt);
+  const content = `
+    <h2>Pedido de mentoria aguardando sua resposta</h2>
+    <p>Olá, ${escapeHtml(data.mentorName)}.</p>
+    <p>${escapeHtml(data.menteeName)} pediu uma sessão para <strong>${formattedDate}</strong> e ainda aguarda sua resposta. Se não puder atender, recuse o pedido para que ele possa procurar outro mentor.</p>
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/mentor" class="button">Responder pedido</a>
+    </div>
+  `;
+  await sendEmail(
+    data.mentorEmail,
+    `Pedido de mentoria aguardando sua resposta`,
+    getEmailLayout("Pedido Pendente", content, { signatureType: "team" })
+  );
+}
+
+/**
+ * Informa o mentorado que o pedido expirou pois o horário passou
+ */
+export async function sendPendingRequestExpired(data: { menteeEmail: string; menteeName: string; mentorName: string; scheduledAt: string; }): Promise<void> {
+  const formattedDate = formatDateTimeBR(data.scheduledAt);
+  const content = `
+    <h2>Seu pedido de mentoria expirou</h2>
+    <p>Olá, ${escapeHtml(data.menteeName)}.</p>
+    <p>Seu pedido de sessão com ${escapeHtml(data.mentorName)} para <strong>${formattedDate}</strong> não foi confirmado a tempo e foi cancelado automaticamente. Isso acontece — mentores são voluntários. Que tal pedir um horário com outro mentor?</p>
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors" class="button">Encontrar outro mentor</a>
+    </div>
+  `;
+  await sendEmail(
+    data.menteeEmail,
+    `Seu pedido de mentoria expirou`,
+    getEmailLayout("Pedido Expirado", content, { signatureType: "team" })
+  );
+}
+
+/**
  * Notifica o administrador sobre uma nova solicitação de mentor
  */
 export async function sendAdminNewMentorNotification(data: {

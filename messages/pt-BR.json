@@ -224,7 +224,7 @@
       },
       "step4": {
         "title": "Peça uma Sessão",
-        "description": "Quando encontrar um mentor com quem gostaria de se conectar, veja sua disponibilidade nos próximos 14 dias e peça uma sessão gratuita de 45 minutos.",
+        "description": "Quando encontrar um mentor com quem gostaria de se conectar, veja sua disponibilidade nos próximos 14 dias e peça uma sessão gratuita de 45 minutos. Se o mentor não responder até o horário, o pedido é cancelado e avisamos você por e-mail.",
         "feature1": "Veja a agenda do mentor",
         "feature2": "Escolha o horário mais conveniente",
         "feature3": "O mentor confirma seu pedido"

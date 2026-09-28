@@ -224,7 +224,7 @@
       },
       "step4": {
         "title": "Request a Session",
-        "description": "Once you find a mentor you'd like to connect with, view their availability for the next 14 days and request a free 45-minute mentorship session.",
+        "description": "Once you find a mentor you'd like to connect with, view their availability for the next 14 days and request a free 45-minute mentorship session. If the mentor doesn't reply before the time slot, the request is cancelled and we'll let you know by email.",
         "feature1": "View mentor's calendar",
         "feature2": "Select a convenient time slot",
         "feature3": "The mentor confirms your request"
