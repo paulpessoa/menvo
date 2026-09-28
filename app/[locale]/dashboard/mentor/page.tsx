@@ -27,6 +27,7 @@ import { useTranslations, useLocale } from "next-intl"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MentorUpcomingSessions, type MentorAppointment } from "@/components/dashboard/MentorUpcomingSessions"
+import { MentorActivationChecklist } from "@/components/dashboard/MentorActivationChecklist"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { SharedDiagnosticsSection } from "@/components/diagnostic/SharedDiagnosticsSection"
 
@@ -150,7 +151,10 @@ export default function MentorDashboard() {
 
             {/* TAB: VISÃO GERAL */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
-              
+
+              {/* Checklist de ativação: some sozinho quando tudo estiver pronto */}
+              <MentorActivationChecklist profile={profile as any} />
+
               {/* Alerta de Solicitações Pendentes */}
               {stats.pendingRequests > 0 && (
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
