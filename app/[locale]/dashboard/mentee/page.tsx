@@ -22,7 +22,6 @@ import {
   MessageSquare,
   TrendingUp,
   LayoutDashboard,
-  Star,
   Video,
   ExternalLink
 } from "lucide-react"
@@ -34,6 +33,8 @@ import { useFavorites } from "@/hooks/useFavorites"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MenteeQuizCTA } from "@/components/MenteeQuizCTA"
+import { MenteeNextStepCard } from "@/components/dashboard/MenteeNextStepCard"
+import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
@@ -74,6 +75,7 @@ export default function MenteeDashboard() {
   const t = useTranslations("dashboard")
   const locale = useLocale()
   const { user, profile } = useAuth()
+  const diagnosticHref = useDiagnosticHref()
   const [stats, setStats] = useState<MenteeStats>({
     totalAppointments: 0,
     upcomingAppointments: 0,
@@ -195,32 +197,21 @@ export default function MenteeDashboard() {
 
             {/* TAB: OVERVIEW */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
-              {/* Lembrete de Avaliação Pendente */}
-              {hasPendingReview && (
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex items-center gap-3.5">
-                    <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
-                      <Star className="h-5 w-5 fill-current" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">
-                        Você tem mentoria aguardando sua avaliação!
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Sua opinião ajuda o mentor a evoluir e fortalece a comunidade voluntária da Menvo.
-                      </p>
-                    </div>
-                  </div>
-                  <Button asChild size="sm" className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold shrink-0 shadow-sm">
-                    <Link href="/mentorship/mentee">
-                      Avaliar Agora
-                    </Link>
-                  </Button>
-                </div>
+              {/* Seu próximo passo: uma única ação, derivada do estado real
+                  (avaliar > sessão agendada > diagnóstico > buscar mentor) —
+                  substitui o banner de avaliação e o CTA de diagnóstico soltos. */}
+              {!(loading || loadingQuiz) && (
+                <MenteeNextStepCard
+                  hasPendingReview={hasPendingReview}
+                  nextSession={upcomingAppointments[0] || null}
+                  quizDone={Boolean(quizSummary)}
+                  diagnosticHref={diagnosticHref}
+                />
               )}
 
-              {/* Quiz Onboarding & Activation CTA */}
-              <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />
+              {/* Resultado do diagnóstico (só quando já existe — o CTA para
+                  fazer o diagnóstico pela 1ª vez já está no card acima). */}
+              {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title={t("mentee.stats.scheduled")} value={stats.upcomingAppointments} icon={<Calendar className="h-5 w-5" />} description={t("mentee.stats.scheduledDesc")} />
