@@ -1867,6 +1867,32 @@
       "title": "Parcerias Institucionais & Empresas",
       "description": "Deseja levar mentorias voluntárias para sua empresa, faculdade ou comunidade? Entre em contato pelo e-mail institucional.",
       "action": "Propor Parceria"
+    },
+    "organizationForm": {
+      "fields": {
+        "orgName": "Nome da Organização",
+        "orgType": "Tipo de Organização",
+        "contactName": "Nome para contato",
+        "contactEmail": "E-mail corporativo",
+        "contactPhone": "Telefone (Opcional)",
+        "peopleEstimate": "Tamanho da organização",
+        "message": "Mensagem (Opcional)"
+      },
+      "types": {
+        "ngo": "ONG / Terceiro Setor",
+        "company": "Empresa",
+        "school": "Instituição de Ensino",
+        "event": "Evento",
+        "other": "Outro"
+      },
+      "people": "pessoas",
+      "submitButton": "Enviar Solicitação",
+      "privacyNote": "Ao enviar, você concorda com nossa",
+      "privacyLink": "Política de Privacidade",
+      "successTitle": "Pedido Recebido!",
+      "successMessage": "Nossa equipe analisará seu pedido e entrará em contato em breve.",
+      "rateLimitError": "Muitas tentativas. Tente novamente mais tarde.",
+      "genericError": "Erro ao enviar pedido. Tente novamente mais tarde."
     }
   },
   "unauthorized": {

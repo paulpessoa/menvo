@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { getTranslations } from "next-intl/server"
+import { OrganizationLeadForm } from "@/components/contact/OrganizationLeadForm"
 
 export async function generateMetadata({
   params
@@ -120,22 +121,18 @@ export default async function ContactPage() {
       </div>
 
       {/* Info / Partnership Banner */}
-      <Card className="rounded-3xl border border-border bg-muted/30 p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="space-y-1.5 max-w-xl">
-            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <HeartHandshake className="w-5 h-5 text-primary" />
+      <Card id="organizacao" className="rounded-3xl border border-border bg-muted/30 p-6 md:p-8 scroll-mt-24">
+        <div className="space-y-6">
+          <div className="space-y-1.5">
+            <h3 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
+              <HeartHandshake className="w-6 h-6 text-primary" />
               {t("partnerships.title")}
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-3xl">
               {t("partnerships.description")}
             </p>
           </div>
-          <Button asChild variant="secondary" className="rounded-full font-bold shrink-0">
-            <a href="mailto:contato@menvo.com.br?subject=[Parceria]%20Interesse%20Institucional">
-              {t("partnerships.action")}
-            </a>
-          </Button>
+          <OrganizationLeadForm />
         </div>
       </Card>
     </div>

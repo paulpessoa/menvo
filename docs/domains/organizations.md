@@ -353,3 +353,12 @@ beneficiários dela").
   `/onboarding` first and loses the `next` param back to the org page
   (same gap noted in Phase 1's §5) — low priority until a real pilot
   partner's beneficiaries hit it.
+
+## 7. Leads de organizações (C-O1)
+
+Em vez de autocadastro de organizações (o que violaria o modelo fechado), há um formulário público "Quero a Menvo na minha organização" acessível via `/contact#organizacao`.
+
+- **Tabela:** `organization_leads` (nome, tipo, e-mail, telefone, estimativa de pessoas, mensagem, status: new/contacted/closed).
+- **Rota Pública:** `/api/contact/organization` usa um `service_role` client (tabela sem policy pública de insert).
+- **Rate Limit & Honeypot:** Protegido contra bots usando um rate limiter local e um campo oculto `website`. Em caso de preenchimento do honeypot, responde com 201 mas não salva no banco nem envia e-mail.
+- **Admin:** O administrador gerencia os pedidos em `/dashboard/admin/org-leads`, podendo filtrar e alterar o status (`PATCH` para `/api/admin/org-leads`), atualizando `updated_at`.

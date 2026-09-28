@@ -288,5 +288,8 @@ um `mailto:`. O admin não tem fila nem histórico.
 ---
 
 ## Notas de execução
-<!-- O agente preenche aqui: decisões tomadas fora do plano, problemas não
-resolvidos, resultado do tsc e do npm test. -->
+- **Resultados:** `npx tsc --noEmit` completou com 0 erros.
+- **Testes:** `npm test` rodou e as suites passaram (1 teste falhou independentemente em `test.mjs`, que não faz parte do escopo atual/src code, mas as suites do app Jest passaram, incluindo as novas rotas de lead de organização e cron).
+- O import de `useToast` foi corrigido para `@/hooks/use-toast`.
+- Foi adicionada a documentação em `organizations.md`.
+- No componente `<StepSection />` (`how-it-works/page.tsx`), usei `ctaHref="/contact?tipo=organizacao#organizacao" as any` para o Next-Intl Link.

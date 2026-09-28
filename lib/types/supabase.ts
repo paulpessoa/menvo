@@ -1242,6 +1242,51 @@ export type Database = {
           },
         ]
       }
+      organization_leads: {
+        Row: {
+          id: string
+          org_name: string
+          org_type: string
+          contact_name: string
+          contact_email: string
+          contact_phone: string | null
+          people_estimate: string
+          message: string | null
+          locale: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_name: string
+          org_type: string
+          contact_name: string
+          contact_email: string
+          contact_phone?: string | null
+          people_estimate: string
+          message?: string | null
+          locale?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_name?: string
+          org_type?: string
+          contact_name?: string
+          contact_email?: string
+          contact_phone?: string | null
+          people_estimate?: string
+          message?: string | null
+          locale?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           contact_email: string | null

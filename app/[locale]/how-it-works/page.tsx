@@ -153,7 +153,7 @@ function HowItWorksContent() {
             }}
             rotate="-rotate-3"
             ctaKey="getStarted"
-            ctaHref="/contact"
+            ctaHref="/contact?tipo=organizacao#organizacao" as any
           />
         </TabsContent>
       </Tabs>

@@ -127,6 +127,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/feedbacks",
       icon: MessageSquare,
       color: "bg-blue-600"
+    },
+    {
+      title: "Organizações interessadas",
+      description: "Pedidos do formulário 'Quero a Menvo na minha organização'",
+      href: "/dashboard/admin/org-leads",
+      icon: Building2,
+      color: "bg-indigo-600"
     }
   ]
 

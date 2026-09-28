@@ -1873,6 +1873,32 @@
       "title": "Institutional Partnerships & Companies",
       "description": "Looking to bring volunteer mentoring to your company, university, or organization? Reach out via our institutional email.",
       "action": "Propose Partnership"
+    },
+    "organizationForm": {
+      "fields": {
+        "orgName": "Organization Name",
+        "orgType": "Organization Type",
+        "contactName": "Contact Name",
+        "contactEmail": "Corporate Email",
+        "contactPhone": "Phone (Optional)",
+        "peopleEstimate": "Organization Size",
+        "message": "Message (Optional)"
+      },
+      "types": {
+        "ngo": "NGO / Non-profit",
+        "company": "Company",
+        "school": "Educational Institution",
+        "event": "Event",
+        "other": "Other"
+      },
+      "people": "people",
+      "submitButton": "Submit Request",
+      "privacyNote": "By submitting, you agree to our",
+      "privacyLink": "Privacy Policy",
+      "successTitle": "Request Received!",
+      "successMessage": "Our team will review your request and get back to you shortly.",
+      "rateLimitError": "Too many requests. Please try again later.",
+      "genericError": "Error submitting request. Please try again later."
     }
   },
   "unauthorized": {

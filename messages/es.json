@@ -1849,6 +1849,32 @@
       "title": "Alianzas Institucionales y Empresas",
       "description": "¿Deseas llevar mentorías voluntarias a tu empresa, universidad o comunidad? Contáctanos por correo institucional.",
       "action": "Proponer Alianza"
+    },
+    "organizationForm": {
+      "fields": {
+        "orgName": "Nombre de la Organización",
+        "orgType": "Tipo de Organización",
+        "contactName": "Nombre de contacto",
+        "contactEmail": "Correo corporativo",
+        "contactPhone": "Teléfono (Opcional)",
+        "peopleEstimate": "Tamaño de la organización",
+        "message": "Mensaje (Opcional)"
+      },
+      "types": {
+        "ngo": "ONG / Sector Tercer",
+        "company": "Empresa",
+        "school": "Institución Educativa",
+        "event": "Evento",
+        "other": "Otro"
+      },
+      "people": "personas",
+      "submitButton": "Enviar Solicitud",
+      "privacyNote": "Al enviar, aceptas nuestra",
+      "privacyLink": "Política de Privacidad",
+      "successTitle": "¡Solicitud Recibida!",
+      "successMessage": "Nuestro equipo revisará tu solicitud y se pondrá en contacto pronto.",
+      "rateLimitError": "Demasiados intentos. Intenta de nuevo más tarde.",
+      "genericError": "Error al enviar la solicitud. Intenta de nuevo más tarde."
     }
   },
   "unauthorized": {

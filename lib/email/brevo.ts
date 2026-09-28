@@ -451,6 +451,62 @@ export async function sendAdminNewMentorNotification(data: {
 }
 
 /**
+ * Notifica o administrador sobre uma nova organização interessada (lead)
+ */
+export async function sendAdminNewOrganizationLead(data: {
+  org_name: string;
+  org_type: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string | null;
+  people_estimate: string;
+  message?: string | null;
+  locale?: string | null;
+}): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL || "contato@menvo.com.br";
+  
+  const typeMap: Record<string, string> = {
+    ngo: 'ONG / Terceiro Setor',
+    company: 'Empresa',
+    school: 'Instituição de Ensino',
+    event: 'Evento',
+    other: 'Outro'
+  };
+  const typeStr = typeMap[data.org_type] || data.org_type;
+
+  const sizeMap: Record<string, string> = {
+    '1-20': '1 a 20',
+    '21-100': '21 a 100',
+    '101-500': '101 a 500',
+    '500+': 'Mais de 500'
+  };
+  const sizeStr = sizeMap[data.people_estimate] || data.people_estimate;
+
+  const content = `
+    <h2>Nova Organização Interessada</h2>
+    <p>Olá, Admin. Uma nova organização preencheu o formulário de interesse na plataforma.</p>
+    <div class="info-box">
+        <div class="info-item"><strong>Organização:</strong> ${escapeHtml(data.org_name)}</div>
+        <div class="info-item"><strong>Tipo:</strong> ${typeStr}</div>
+        <div class="info-item"><strong>Tamanho (pessoas):</strong> ${sizeStr}</div>
+        <div class="info-item"><strong>Contato:</strong> ${escapeHtml(data.contact_name)}</div>
+        <div class="info-item"><strong>E-mail:</strong> ${escapeHtml(data.contact_email)}</div>
+        ${data.contact_phone ? `<div class="info-item"><strong>Telefone:</strong> ${escapeHtml(data.contact_phone)}</div>` : ''}
+        ${data.locale ? `<div class="info-item"><strong>Idioma (locale):</strong> ${data.locale}</div>` : ''}
+        ${data.message ? `<div class="info-item" style="margin-top: 8px;"><strong>Mensagem:</strong><br/>${escapeHtml(data.message).replace(/\\n/g, '<br/>')}</div>` : ''}
+    </div>
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/admin/org-leads" class="button">Ver pedidos no painel</a>
+    </div>
+  `;
+  await sendEmail(
+    adminEmail,
+    `Nova organização interessada: ${data.org_name}`,
+    getEmailLayout("Nova Organização Interessada", content, { signatureType: "team" })
+  );
+}
+
+/**
  * Notifica o mentor que uma nova avaliação foi publicada no seu perfil
  */
 export async function sendMentorNewReviewNotification(data: {
