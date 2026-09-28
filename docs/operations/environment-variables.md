@@ -35,7 +35,6 @@ cp .env.example .env.local
 ### Feature Flags
 | Variable | Default | Description |
 |---|---|---|
-| `NEXT_PUBLIC_FEATURE_WAITING_LIST` | `false` | When true, gates new registrations behind waiting list |
 | `NEXT_PUBLIC_FEATURE_NEW_USER_REGISTRATION` | `true` | Allows immediate account creation |
 
 ### Google Calendar Integration (Meet Scheduling)

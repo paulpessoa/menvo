@@ -20,8 +20,6 @@ import { useSearchParams } from "next/navigation"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { WaitingListForm } from "@/components/WaitingListForm"
-import { useFeatureFlag } from "@/lib/feature-flags"
 
 function SignupForm() {
   const t = useTranslations("register")
@@ -29,7 +27,6 @@ function SignupForm() {
   const tc = useTranslations("common")
   const { user, loading, signUp, signInWithProvider, getDefaultRedirectPath } =
     useAuth()
-  const waitingListEnabled = useFeatureFlag("waiting_list_flag")
   const nextParam = useSearchParams().get("next")
   const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : undefined
 
@@ -96,15 +93,6 @@ function SignupForm() {
     } finally {
       setIsSocialLoading(null)
     }
-  }
-
-  // 🚀 Se a fila de espera estiver ativa, renderiza o componente de WaitingListForm
-  if (waitingListEnabled) {
-    return (
-      <div className="container py-10 md:py-16 flex justify-center">
-        <WaitingListForm />
-      </div>
-    )
   }
 
   if (success) {

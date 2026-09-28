@@ -966,19 +966,6 @@
       "description": "Conectando mentores y mentees para sesiones de mentoría gratuitas"
     }
   },
-  "waitingList": {
-    "title": "Únete a la Lista de Espera",
-    "description": "¡Gracias por tu interés! Por favor, completa el formulario a continuación.",
-    "nameLabel": "Nombre",
-    "namePlaceholder": "Ingresa tu nombre completo",
-    "emailPlaceholder": "tu@correo.com",
-    "whatsappLabel": "WhatsApp (opcional)",
-    "whatsappPlaceholder": "Tu número de WhatsApp",
-    "reasonLabel": "¿Por qué quieres formar parte?",
-    "reasonPlaceholder": "Cuéntanos por qué quieres unirte",
-    "successMessage": "¡Gracias por tu interés!",
-    "errorMessage": "Error al enviar el formulario"
-  },
   "feedback": {
     "title": "Feedback",
     "description": "Tu opinión es muy importante para nosotros. ¿Cómo podemos mejorar?",

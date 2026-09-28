@@ -1759,45 +1759,6 @@ export type Database = {
         }
         Relationships: []
       }
-      waiting_list: {
-        Row: {
-          approved_at: string | null
-          approved_by: string | null
-          created_at: string | null
-          email: string
-          id: string
-          name: string
-          reason: string | null
-          status: string | null
-          updated_at: string | null
-          whatsapp: string | null
-        }
-        Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string | null
-          email: string
-          id?: string
-          name: string
-          reason?: string | null
-          status?: string | null
-          updated_at?: string | null
-          whatsapp?: string | null
-        }
-        Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string | null
-          email?: string
-          id?: string
-          name?: string
-          reason?: string | null
-          status?: string | null
-          updated_at?: string | null
-          whatsapp?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       ai_usage_by_user_monthly: {
@@ -2120,7 +2081,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      sync_waiting_list_status: { Args: never; Returns: undefined }
     }
     Enums: {
       hub_resource_status: "pending" | "published" | "rejected" | "archived"

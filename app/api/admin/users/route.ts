@@ -93,29 +93,6 @@ export async function GET(request: NextRequest) {
 
     if (profilesError) throw profilesError
 
-    // 3b. Sinalizar quem também está na lista de espera (waiting_list) —
-    // cruzamento por e-mail, só para os usuários desta página.
-    const emails = (profiles ?? [])
-      .map((p: any) => p.email)
-      .filter((email: unknown): email is string => typeof email === "string" && email.length > 0)
-
-    let waitingListEmails = new Set<string>()
-    if (emails.length > 0) {
-      const { data: waitingListRows } = await supabase
-        .from("waiting_list")
-        .select("email")
-        .in("email", emails)
-
-      waitingListEmails = new Set(
-        (waitingListRows ?? []).map((row: any) => (row.email as string).toLowerCase())
-      )
-    }
-
-    const profilesWithWaitingListFlag = (profiles ?? []).map((p: any) => ({
-      ...p,
-      in_waiting_list: typeof p.email === "string" && waitingListEmails.has(p.email.toLowerCase())
-    }))
-
     // 4. Buscar contagens para as abas de forma eficiente
     const { count: totalCount } = await supabase
       .from("profiles")
@@ -148,15 +125,8 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
       .eq("origin_platform", "jotform")
 
-    // Mesmo filtro da aba: quem já entrou na plataforma não conta como
-    // "esperando" (ver sync_waiting_list_status).
-    const { count: waitingListCount } = await supabase
-      .from("waiting_list")
-      .select("*", { count: "exact", head: true })
-      .neq("status", "registered")
-
     return successResponse({
-      users: profilesWithWaitingListFlag,
+      users: profiles ?? [],
       pagination: {
         page,
         limit,
@@ -170,8 +140,7 @@ export async function GET(request: NextRequest) {
         mentees: menteesCount || 0,
 
         menvoOrigin: menvoOriginCount || 0,
-        jotformOrigin: jotformOriginCount || 0,
-        waitingList: waitingListCount || 0
+        jotformOrigin: jotformOriginCount || 0
       }
     })
   } catch (error) {
