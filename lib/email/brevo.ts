@@ -124,7 +124,7 @@ const getEmailLayout = (
 <body>
     <div class="email-container">
         <div class="header">
-            <img src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/menvo-logo-light.png" alt="${title}" height="32" style="display: block; margin: 0 auto; max-width: 100%; height: auto; max-height: 32px;" />
+            <img src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/menvo-logo-dark.png" alt="${title}" height="32" style="display: block; margin: 0 auto; max-width: 100%; height: auto; max-height: 32px;" />
         </div>
         <div class="content">
             ${content}
