@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, Suspense } from "react"
+import React, { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
@@ -59,20 +59,6 @@ const MENTEE_GOALS = [
 ]
 
 export default function OnboardingPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-[70vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      }
-    >
-      <OnboardingContent />
-    </Suspense>
-  )
-}
-
-function OnboardingContent() {
   const t = useTranslations("onboarding")
   const tc = useTranslations("common")
   const router = useRouter()

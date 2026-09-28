@@ -5,9 +5,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Star, Loader2, CheckCircle2, CalendarPlus } from 'lucide-react'
+import { Star, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Link } from '@/i18n/routing'
 import { mentorshipService } from '@/lib/services/mentorship/mentorship.service'
 
 interface CompleteAppointmentModalProps {
@@ -42,7 +41,6 @@ export function CompleteAppointmentModal({
     const [privateNotes, setPrivateNotes] = useState('')
     const [publicFeedback, setPublicFeedback] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [justSubmitted, setJustSubmitted] = useState(false)
 
     const otherPerson = isMentor ? appointment.mentee : appointment.mentor
     const otherPersonRole = isMentor ? 'mentee' : 'mentor'
@@ -69,16 +67,15 @@ export function CompleteAppointmentModal({
                 description: 'Seu feedback foi registrado.'
             })
 
+            onOpenChange(false)
+
+            // Reset form
+            setRating(0)
+            setPrivateNotes('')
+            setPublicFeedback('')
+
             if (onCompleted) {
                 onCompleted()
-            }
-
-            // Mentee: em vez de fechar direto, oferece continuar a jornada com
-            // o mesmo mentor. Mentor nunca chega aqui (avaliação é assimétrica).
-            if (!isMentor) {
-                setJustSubmitted(true)
-            } else {
-                onOpenChange(false)
             }
 
         } catch (error) {
@@ -91,52 +88,8 @@ export function CompleteAppointmentModal({
         }
     }
 
-    const handleOpenChange = (nextOpen: boolean) => {
-        onOpenChange(nextOpen)
-        if (!nextOpen) {
-            // Reset only after the close animation reads the current state
-            setTimeout(() => {
-                setJustSubmitted(false)
-                setRating(0)
-                setPrivateNotes('')
-                setPublicFeedback('')
-            }, 200)
-        }
-    }
-
-    if (justSubmitted) {
-        return (
-            <Dialog open={open} onOpenChange={handleOpenChange}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                            <CheckCircle2 className="h-6 w-6" />
-                        </div>
-                        <DialogTitle className="text-center">Avaliação enviada!</DialogTitle>
-                        <DialogDescription className="text-center">
-                            Obrigado por avaliar sua mentoria com {otherPerson.full_name}. Quer continuar sua evolução com {otherPersonRole === 'mentor' ? 'o mesmo mentor' : 'essa pessoa'}?
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="sm:justify-center gap-2">
-                        <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                            Fechar
-                        </Button>
-                        {otherPersonRole === 'mentor' && (
-                            <Button asChild className="bg-primary hover:bg-primary/90 text-white font-medium shadow-sm">
-                                <Link href={`/appointments/book/${otherPerson.id}`} onClick={() => handleOpenChange(false)}>
-                                    <CalendarPlus className="h-4 w-4 mr-2" />
-                                    Agendar de novo
-                                </Link>
-                            </Button>
-                        )}
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        )
-    }
-
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Avaliar Sessão de Mentoria</DialogTitle>
