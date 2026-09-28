@@ -196,10 +196,10 @@
   "howItWorks": {
     "title": "Cómo Funciona Menvo",
     "description": "Nuestra plataforma facilita la conexión con mentores y la programación de sesiones de mentoría gratuitas",
+    "metaDescription": "Descubre cómo Menvo conecta a mentees, mentores voluntarios y organizaciones aliadas en sesiones de mentoría gratuitas.",
     "forMentees": "Para Mentees",
     "forMentors": "Para Mentores",
-    "forNGOs": "Para ONGs",
-    "forCompanies": "Para Empresas",
+    "forOrganizations": "Para Organizaciones",
     "mentees": {
       "step1": {
         "title": "Crea Tu Perfil",
@@ -209,152 +209,101 @@
         "feature3": "Conecta tu perfil de LinkedIn"
       },
       "step2": {
+        "title": "Haz Tu Diagnóstico de Carrera",
+        "description": "Responde algunas preguntas guiadas por IA sobre tus objetivos y desafíos. Recibirás sugerencias de mentores para tu momento y podrás compartir el resultado con tu mentor.",
+        "feature1": "Conversación guiada por IA",
+        "feature2": "Sugerencia de mentores para ti",
+        "feature3": "Comparte con tu mentor (opcional)"
+      },
+      "step3": {
         "title": "Encuentra al Mentor Adecuado",
         "description": "Explora nuestra diversa comunidad de mentores voluntarios. Usa filtros para encontrar mentores basados en experiencia, industria, ubicación y más.",
         "feature1": "Filtra por temas y experiencia",
-        "feature2": "Busca por ubicación o idioma",
+        "feature2": "Busca por ubicación, idioma o etiquetas de inclusión",
         "feature3": "Lee reseñas de otros mentees"
       },
-      "step3": {
-        "title": "Programa una Sesión",
-        "description": "Una vez que encuentres un mentor con el que te gustaría conectarte, mira su disponibilidad y programa una sesión de mentoría gratuita de 45 minutos.",
+      "step4": {
+        "title": "Solicita una Sesión",
+        "description": "Una vez que encuentres un mentor con el que te gustaría conectarte, mira su disponibilidad de los próximos 14 días y solicita una sesión de mentoría gratuita de 45 minutos.",
         "feature1": "Mira el calendario del mentor",
         "feature2": "Selecciona un horario conveniente",
-        "feature3": "Añade los temas que te gustaría discutir"
+        "feature3": "El mentor confirma tu solicitud"
       },
-      "step4": {
+      "step5": {
         "title": "Conéctate y Crece",
-        "description": "Reúnete con tu mentor a través de una videollamada. Comparte tus desafíos, haz preguntas y recibe orientación personalizada para ayudarte a alcanzar tus objetivos.",
-        "feature1": "Únete a través del enlace de videollamada",
-        "feature2": "Discute tus objetivos y desafíos",
-        "feature3": "Recibe orientación personalizada"
+        "description": "Reúnete con tu mentor a través del enlace automático de Google Meet. Comparte tus desafíos, haz preguntas y recibe orientación personalizada para ayudarte a alcanzar tus objetivos.",
+        "feature1": "Enlace automático de Google Meet",
+        "feature2": "Recordatorio por correo el día de la sesión",
+        "feature3": "Evalúa la sesión para liberar tu próxima solicitud"
       },
       "getStarted": "Empieza como Mentee"
     },
     "mentors": {
       "step1": {
-        "title": "Crea Tu Perfil de Mentor",
-        "description": "Regístrate y crea tu perfil de mentor con detalles sobre tu experiencia y los temas con los que puedes ayudar.",
-        "feature1": "Destaca tu experiencia y conocimientos",
-        "feature2": "Especifica los temas que puedes mentorizar",
-        "feature3": "Conecta tus perfiles profesionales"
+        "title": "Crea Tu Perfil y Solicita Ser Mentor",
+        "description": "Tu cuenta empieza como mentee. Cuenta tu experiencia, áreas de conocimiento y los temas con los que puedes ayudar, y solicita la verificación directamente desde tu perfil.",
+        "feature1": "Empieza con una cuenta de mentee",
+        "feature2": "Destaca tu experiencia y temas",
+        "feature3": "Solicita la verificación en tu perfil"
       },
       "step2": {
-        "title": "Completa la Verificación",
-        "description": "Para la seguridad de nuestra comunidad, todos los mentores pasan por un proceso de verificación. Esto incluye una breve videollamada con nuestro equipo.",
-        "feature1": "Programa una llamada de verificación",
-        "feature2": "Verifica tu identidad y experiencia",
-        "feature3": "Obtén la aprobación para empezar a mentorizar"
+        "title": "Revisión de Nuestro Equipo",
+        "description": "Nuestro equipo revisa la información de tu perfil para mantener segura a la comunidad. Recibirás la respuesta por correo electrónico y en el chat de la plataforma.",
+        "feature1": "Sin llamadas, todo desde tu perfil",
+        "feature2": "Respuesta por correo y chat",
+        "feature3": "Aprobado, tu perfil queda público y verificado"
       },
       "step3": {
         "title": "Configura Tu Disponibilidad",
-        "description": "Define cuándo estás disponible para mentorizar. Tienes control total sobre tu agenda y puedes actualizarla en cualquier momento.",
+        "description": "Configura tu disponibilidad semanal recurrente. Las sesiones tienen una duración fija de 45 minutos, y puedes conectar Google Calendar para bloquear automáticamente tus horarios ocupados.",
         "feature1": "Configura tu disponibilidad semanal",
-        "feature2": "Especifica la duración de la sesión",
-        "feature3": "Actualiza tu calendario según sea necesario"
+        "feature2": "Sesiones de 45 min con 15 min de intervalo",
+        "feature3": "Conecta Google Calendar"
       },
       "step4": {
         "title": "Realiza Sesiones de Mentoría",
-        "description": "Conéctate con mentees a través de videollamadas. Comparte tus conocimientos, brinda orientación y ayúdalos a superar sus desafíos.",
-        "feature1": "Recibe solicitudes de sesiones",
-        "feature2": "Realiza sesiones de mentoría por video",
-        "feature3": "Sigue tu impacto y sesiones"
+        "description": "Confirma o rechaza solicitudes de sesión, mira el diagnóstico que tu mentee compartió contigo y sigue tu impacto en la plataforma.",
+        "feature1": "Confirma o rechaza solicitudes de sesión",
+        "feature2": "Mira el diagnóstico compartido por tu mentee",
+        "feature3": "Sigue tus sesiones y calificaciones"
       },
       "becomeMentor": "Conviértete en Mentor"
     },
-    "ngos": {
+    "organizations": {
       "step1": {
-        "title": "Registra Tu ONG Gratis",
-        "description": "Las ONGs y organizaciones sociales pueden registrarse gratis en la plataforma para conectar a los jóvenes que atienden con mentores voluntarios.",
-        "feature1": "Registro 100% gratuito para ONGs",
-        "feature2": "Acceso ilimitado a la plataforma",
-        "feature3": "Soporte dedicado para organizaciones"
+        "title": "Crea la Página de Tu Organización",
+        "description": "Habla con nuestro equipo para crear la página pública de tu ONG, instituto o empresa en Menvo, abierta a solicitudes de participación o solo por invitación.",
+        "feature1": "Página pública en menvo.com.br/o/tu-organización",
+        "feature2": "Abierta a solicitudes o solo por invitación",
+        "feature3": "Creada por nuestro equipo junto contigo"
       },
       "step2": {
-        "title": "Conecta Jóvenes con Mentores",
-        "description": "Registra a los jóvenes atendidos por tu organización y ayúdalos a encontrar mentores que puedan guiarlos en sus trayectorias profesionales y personales.",
-        "feature1": "Registra múltiples jóvenes de tu organización",
-        "feature2": "Sigue el progreso de las mentorías",
-        "feature3": "Recibe informes de impacto social"
+        "title": "Trae a Tu Comunidad",
+        "description": "Invita a las personas que atiende tu organización y a los colaboradores que pueden ser mentores voluntarios. Tú apruebas a quien solicite participar.",
+        "feature1": "Invita beneficiarios por correo",
+        "feature2": "Invita colaboradores como mentores",
+        "feature3": "Aprueba a quien solicite participar"
       },
       "step3": {
-        "title": "Seguimiento y Evolución",
-        "description": "Monitorea el progreso de las mentorías y observa el impacto real en la vida de tus jóvenes.",
-        "feature1": "Historial de sesiones",
-        "feature2": "Comentarios de mentores",
-        "feature3": "Panel de progreso"
+        "title": "Conecta con Mentores",
+        "description": "Los beneficiarios usan el mismo catálogo de mentores y el diagnóstico de carrera con IA de la plataforma. Los mentores de tu organización atienden normalmente a través de Menvo.",
+        "feature1": "Mismo catálogo y diagnóstico de carrera",
+        "feature2": "Los mentores de tu organización atienden por la plataforma",
+        "feature3": "100% gratuito"
       },
       "step4": {
-        "title": "Fortalecimiento de la Causa",
-        "description": "Utiliza datos reales para demostrar el impacto social y facilitar la recaudación de fondos.",
-        "feature1": "Informes de impacto",
-        "feature2": "Datos estructurados",
-        "feature3": "Casos de éxito"
+        "title": "Sigue el Impacto",
+        "description": "En el panel de tu organización, mira beneficiarios y mentores, quién ya hizo el diagnóstico y cuántas sesiones se agendaron y realizaron.",
+        "feature1": "Panel con beneficiarios y mentores",
+        "feature2": "Quién ya hizo el diagnóstico",
+        "feature3": "Sesiones agendadas y realizadas"
       },
-      "getStarted": "Hablar con nuestro equipo"
-    },
-    "companies": {
-      "step1": {
-        "title": "Voluntariado Corporativo a través de la Mentoría",
-        "description": "Desarrolla programas de voluntariado corporativo permitiendo que sus empleados se conviertan en mentores voluntarios, fortaleciendo el propósito de la empresa.",
-        "feature1": "Involucra a los empleados en acciones sociales",
-        "feature2": "Desarrolla el liderazgo a través de la mentoría",
-        "feature3": "Fortalece la cultura organizacional"
-      },
-      "step2": {
-        "title": "Informes ESG e Impacto Social",
-        "description": "Recibe informes detallados sobre el impacto social de las mentorías realizadas por tus empleados, fortaleciendo tus métricas ESG.",
-        "feature1": "Informes mensuales de impacto social",
-        "feature2": "Métricas para informes ESG",
-        "feature3": "Certificados de voluntariado corporativo"
-      },
-      "step3": {
-        "title": "Políticas de Incentivo y Beneficios",
-        "description": "Crea políticas de incentivo para empleados mentores, como tiempo libre remunerado, reconocimiento interno y desarrollo de carrera.",
-        "feature1": "Banco de horas para mentoría voluntaria",
-        "feature2": "Reconocimiento y gamificación interna",
-        "feature3": "Desarrollo de habilidades blandas"
-      },
-      "step4": {
-        "title": "Impacto y Reconocimiento ESG",
-        "description": "Fortalece las métricas de impacto social de tu empresa con datos reales y auditables.",
-        "feature1": "Certificados ESG",
-        "feature2": "Informes anuales",
-        "feature3": "Sello de Empresa Amiga"
-      },
-      "getStarted": "Hablar con nuestro equipo"
+      "getStarted": "Hablar con Nuestro Equipo"
     },
     "faq": {
       "title": "Preguntas Frecuentes",
       "description": "Encuentra respuestas a las preguntas más comunes sobre la plataforma.",
-      "viewAll": "Ver todas las preguntas",
-      "q1": {
-        "question": "¿La mentoría es realmente gratis?",
-        "answer": "Sí, todas las sesiones de mentoría en nuestra plataforma son completamente gratuitas. Nuestros mentores ofrecen su tiempo como voluntarios para ayudar a otros a crecer y desarrollarse."
-      },
-      "q2": {
-        "question": "¿Cuánto duran las sesiones de mentoría?",
-        "answer": "Las sesiones de mentoría estándar duran 45 minutos. Esto proporciona tiempo suficiente para una conversación significativa respetando los horarios de todos."
-      },
-      "q3": {
-        "question": "¿Con qué frecuencia puedo reunirme con un mentor?",
-        "answer": "Esto depende de la disponibilidad y preferencias del mentor. Algunos mentores están abiertos a sesiones regulares, mientras que otros prefieren reuniones únicas."
-      },
-      "q4": {
-        "question": "¿Qué pasa si necesito cancelar?",
-        "answer": "Te pedimos que canceles con al menos 24 horas de antelación por respeto al tiempo do mentor. Puedes reprogramar fácilmente a través de tu dashboard."
-      },
-      "q5": {
-        "question": "¿Cómo me convierto en un mentor verificado?",
-        "answer": "Después de crear tu perfil de mentor, deberás programar una breve llamada de verificación con nuestro equipo. Esto ayuda a garantizar la calidad y seguridad de nuestra comunidad."
-      },
-      "q6": {
-        "question": "¿Mi información está segura?",
-        "answer": "Sí, nos tomamos en serio la privacidad y la seguridad. Tu información personal está protegida y solo se comparte con aquellos con los que eliges conectarte."
-      },
-      "stillHaveQuestions": "¿Todavía tienes preguntas?",
-      "supportDescription": "Nuestro equipo de soporte está aquí para ayudarte con cualquier pregunta que puedas tener.",
-      "contactSupport": "Contactar Soporte"
+      "viewAll": "Ver todas las preguntas"
     }
   },
   "faq": {
@@ -378,25 +327,17 @@
     },
     "q5": {
       "question": "¿Cómo me convierto en un mentor verificado?",
-      "answer": "Después de crear tu perfil de mentor, deberás programar una breve llamada de verificación con nuestro equipo. Esto ayuda a garantizar la calidad y seguridad de nuestra comunidad."
+      "answer": "Después de solicitar convertirte en mentor desde tu perfil, nuestro equipo revisa tu información y responde por correo electrónico y chat. Una vez aprobado, tu perfil queda público y verificado."
     },
     "q6": {
       "question": "¿Mi información está segura?",
       "answer": "Sí, nos tomamos muy en serio la privacidad y la seguridad. Tu información personal está protegida y solo se comparte con aquellos con los que eliges conectarte."
     },
     "q7": {
-      "question": "¿Cómo funciona para las ONGs?",
-      "answer": "Las ONGs pueden registrarse de forma gratuita y conectar a los jóvenes que atienden con mentores voluntarios. Es una forma de ampliar el impacto social de la organización sin costes."
+      "question": "¿Cómo funciona para organizaciones (ONGs y empresas)?",
+      "answer": "Las ONGs, institutos y empresas con programas de voluntariado pueden tener una página en Menvo para conectar a las personas que atienden — o a sus empleados — con mentores voluntarios, de forma gratuita. Habla con nuestro equipo para crear la página de tu organización."
     },
     "q8": {
-      "question": "¿Pueden participar las empresas?",
-      "answer": "¡Sí! Las empresas pueden desarrollar programas de voluntariado corporativo a través de la mentoría, recibir informes ESG y crear políticas de incentivo para empleados mentores."
-    },
-    "q9": {
-      "question": "¿Cómo funciona el acceso para reclutadores?",
-      "answer": "Esta función está en desarrollo. Pronto, los reclutadores tendrán acceso a talentos calificados que participan en la plataforma, respetando siempre la privacidad del usuario."
-    },
-    "q10": {
       "question": "¿Puedo ser mentor y mentee al mismo tiempo?",
       "answer": "¡Sí! Puedes tener ambos perfiles en la plataforma. Muchos profesionales buscan mentoría en áreas específicas mientras mentorizan en sus áreas de especialización."
     },
@@ -625,8 +566,7 @@
     "howItWorks": "Cómo Funciona",
     "mentors": "Mentores",
     "mentees": "Mentorados",
-    "ngos": "ONGs",
-    "companies": "Empresas",
+    "organizations": "Organizaciones",
     "donate": "Donar",
     "company": "Institucional",
     "aboutUs": "Sobre Nosotros",
