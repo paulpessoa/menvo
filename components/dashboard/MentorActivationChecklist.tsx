@@ -22,12 +22,10 @@ interface MentorActivationChecklistProps {
  * on `/mentors` (see docs/domains/mentor-verification.md) and nothing today
  * tells them why — this card is that missing signal.
  *
- * Only 2 items for now, not 3: a "connect Google Calendar" item was planned
- * too, but that flow turned out to be unfinished (the OAuth callback at
- * /setup/google-calendar/callback just displays a raw code for someone to
- * paste into a terminal script — there's no self-service completion yet).
- * Linking to it here would send mentors into a dead end, so it's left out
- * until that flow is actually built.
+ * No "connect Google Calendar" item on purpose: Meet links are created on a
+ * single platform account (GOOGLE_CALENDAR_REFRESH_TOKEN) with the mentor as
+ * attendee, so mentors never connect their own calendar — see
+ * docs/product/how-it-works.md, C-T1b.
  */
 export function MentorActivationChecklist({ profile }: MentorActivationChecklistProps) {
   const [availabilityConfigured, setAvailabilityConfigured] = useState<boolean | null>(null)
