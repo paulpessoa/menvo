@@ -942,19 +942,6 @@
       "rateStars": "Avalie de 1 a 5 estrelas"
     }
   },
-  "waitingList": {
-    "title": "Junte-se à Lista de Espera",
-    "description": "Obrigado pelo seu interesse! Por favor, preencha o formulário abaixo.",
-    "nameLabel": "Nome",
-    "namePlaceholder": "Digite seu nome completo",
-    "emailPlaceholder": "seu@email.com",
-    "whatsappLabel": "WhatsApp (opcional)",
-    "whatsappPlaceholder": "Seu número de WhatsApp",
-    "reasonLabel": "Por que você quer fazer parte?",
-    "reasonPlaceholder": "Conte-nos por que você quer participar",
-    "successMessage": "Obrigado pelo seu interesse!",
-    "errorMessage": "Erro ao enviar o formulário"
-  },
   "feedback": {
     "title": "Feedback",
     "description": "Sua opinião é muito importante para nós. Como podemos melhorar?",

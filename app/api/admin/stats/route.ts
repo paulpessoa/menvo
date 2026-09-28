@@ -28,8 +28,7 @@ export async function GET() {
       { count: verifiedMentors },
       { count: totalMentees },
       { count: totalSessions },
-      { count: recentSignups },
-      { count: waitingList }
+      { count: recentSignups }
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
       supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "pending"),
@@ -50,8 +49,7 @@ export async function GET() {
       supabase
         .from("profiles")
         .select("*", { count: "exact", head: true })
-        .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-      supabase.from("waiting_list").select("*", { count: "exact", head: true }).neq("status", "registered")
+        .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
     ])
 
     return NextResponse.json({
@@ -61,8 +59,7 @@ export async function GET() {
       pendingMentors: pendingMentors || 0,
       totalMentees: totalMentees || 0,
       totalSessions: totalSessions || 0,
-      recentSignups: recentSignups || 0,
-      waitingList: waitingList || 0
+      recentSignups: recentSignups || 0
     })
   } catch (error) {
     console.error("[ADMIN STATS] Erro:", error)
