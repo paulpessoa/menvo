@@ -104,27 +104,28 @@ Priorizado. **P1** = fecha um buraco real da jornada atual; **P2** = melhora
 clara com custo baixo; **P3** = só quando houver demanda.
 
 ### Mentorados
-| ID | O quê | Por quê | Prio | Modelo |
-|---|---|---|---|---|
-| C-M1 | **Card "Seu próximo passo"** no `/dashboard/mentee`: uma única ação derivada do estado (completar perfil → fazer diagnóstico → pedir sessão → aguardando confirmação → avaliar sessão). Reusar o cálculo de estado do briefing (`lib/ai-menvo/copilot/briefing.ts`) em vez de duplicar. Substitui os CTAs soltos (`MenteeQuizCTA`, banner de avaliação). | Hoje o dashboard tem vários CTAs competindo; a jornada é linear e deve parecer linear. | P1 | Sonnet |
-| C-M2 | **"Agendar de novo"** com o mesmo mentor, logo após avaliar (link para `/appointments/book/[mentorId]`). | Continuidade é o que gera resultado em mentoria; hoje o mentorado precisa buscar o mentor de novo. | P1 | Sonnet |
-| C-M3 | **"Me avise quando abrir horário"** quando o mentor não tem disponibilidade: grava interesse e envia e-mail quando o mentor salvar novos horários. | Hoje o modal só diz "volte mais tarde" — é onde o mentorado se perde. | P2 | Opus (tabela + RLS), Sonnet (UI) |
+| ID | O quê | Por quê | Prio | Modelo | Status |
+|---|---|---|---|---|---|
+| C-M1 | **Card "Seu próximo passo"** no `/dashboard/mentee`: uma única ação derivada do estado (avaliar → sessão agendada → fazer diagnóstico → buscar mentor). Substitui os CTAs soltos (`MenteeQuizCTA` sempre visível, banner de avaliação). | Hoje o dashboard tem vários CTAs competindo; a jornada é linear e deve parecer linear. | P1 | Sonnet | ✅ Feito 2026-09-28 (`components/dashboard/MenteeNextStepCard.tsx`) — computado a partir dos dados que a página já busca, não de `lib/ai-menvo/copilot/briefing.ts` (é async/server-only, feito para `/assistant`; chamá-lo aqui duplicaria a viagem de rede) |
+| C-M2 | **"Agendar de novo"** com o mesmo mentor, logo após avaliar (link para `/appointments/book/[mentorId]`). | Continuidade é o que gera resultado em mentoria; hoje o mentorado precisa buscar o mentor de novo. | P1 | Sonnet | ✅ Feito 2026-09-28 (`complete-appointment-modal.tsx`, tela de agradecimento pós-avaliação) |
+| C-M3 | **"Me avise quando abrir horário"** quando o mentor não tem disponibilidade: grava interesse e envia e-mail quando o mentor salvar novos horários. | Hoje o modal só diz "volte mais tarde" — é onde o mentorado se perde. | P2 | Opus (tabela + RLS), Sonnet (UI) | Não iniciado |
 
 ### Mentores
-| ID | O quê | Por quê | Prio | Modelo |
-|---|---|---|---|---|
-| C-T1 | **Checklist de ativação pós-aprovação** no `/dashboard/mentor`: disponibilidade configurada · Google Calendar conectado · perfil público com temas preenchidos. Some quando completo. | Mentor aprovado sem disponibilidade ou sem `expertise_areas` não aparece/não é agendável e não sabe por quê (ver `mentor-verification.md`, regra do `/mentors`). | P1 | Sonnet |
-| C-T2 | **Pedido pendente não fica eternamente pendente:** lembrete ao mentor 24h após o pedido e expiração automática (`status → cancelled`, com e-mail ao mentorado sugerindo outros mentores) quando o horário passa sem confirmação. Estender o cron de `appointments`. | Hoje não há nada que trate `pending` — o mentorado espera sem resposta, pior ponto da jornada. | P1 | Opus (regra/cron), Sonnet (e-mails) |
-| C-T3 | **Certificado de horas voluntárias** (página imprimível/PDF em `/profile` ou dashboard): nome, período, nº de sessões e horas concluídas, nota média, link de verificação. | Reconhecimento concreto para o voluntário; também é o que empresas/ONGs pedem para comprovar voluntariado — substitui com honestidade as promessas de "ESG" e "controle de horas". | P2 | Sonnet (Opus revisa o link de verificação público) |
-| C-T4 | **"Pausar mentorias"** explícito: confirmar se o toggle de `is_public` em `ProfileAboutSection` já cobre; se sim, só dar nome e lugar claros (dashboard do mentor). | Voluntário que some por um mês não deve precisar apagar a disponibilidade. | P3 | Sonnet |
+| ID | O quê | Por quê | Prio | Modelo | Status |
+|---|---|---|---|---|---|
+| C-T1 | **Checklist de ativação pós-aprovação** no `/dashboard/mentor`: disponibilidade configurada · perfil público com temas preenchidos. Some quando completo. | Mentor aprovado sem disponibilidade ou sem `expertise_areas` não aparece/não é agendável e não sabe por quê (ver `mentor-verification.md`, regra do `/mentors`). | P1 | Sonnet | ✅ Feito 2026-09-28 (`components/dashboard/MentorActivationChecklist.tsx`) — **só 2 dos 3 itens**: o item "conectar Google Calendar" ficou de fora, ver achado abaixo |
+| C-T1b | **Achado durante o C-T1, não estava no plano:** `/setup/google-calendar/callback` não é um fluxo de auto-atendimento — ele só mostra o código OAuth cru na tela para alguém copiar e colar num script de terminal (`generateAuthUrl`/`saveGoogleCalendarTokens` existem e são por mentor, mas nada troca o código por token automaticamente). Nenhuma tela do app hoje linka para `/api/auth/google-calendar/authorize`. Sem isso, o item 3 do checklist do C-T1 seria um beco sem saída. | Descoberto ao tentar linkar o 3º item do checklist. Terminar esse fluxo (trocar o código por token no callback e salvar direto, sem terminal) é pré-requisito antes de anunciar "conecte o Google Calendar" em qualquer lugar da UI. | P1 | Opus (é OAuth/token — merece revisão) | Não iniciado |
+| C-T2 | **Pedido pendente não fica eternamente pendente:** lembrete ao mentor 24h após o pedido e expiração automática (`status → cancelled`, com e-mail ao mentorado sugerindo outros mentores) quando o horário passa sem confirmação. Estender o cron de `appointments`. | Hoje não há nada que trate `pending` — o mentorado espera sem resposta, pior ponto da jornada. | P1 | Opus (regra/cron), Sonnet (e-mails) | Não iniciado |
+| C-T3 | **Certificado de horas voluntárias** (página imprimível/PDF em `/profile` ou dashboard): nome, período, nº de sessões e horas concluídas, nota média, link de verificação. | Reconhecimento concreto para o voluntário; também é o que empresas/ONGs pedem para comprovar voluntariado — substitui com honestidade as promessas de "ESG" e "controle de horas". | P2 | Sonnet (Opus revisa o link de verificação público) | Não iniciado |
+| C-T4 | **"Pausar mentorias"** explícito: confirmar se o toggle de `is_public` em `ProfileAboutSection` já cobre; se sim, só dar nome e lugar claros (dashboard do mentor). | Voluntário que some por um mês não deve precisar apagar a disponibilidade. | P3 | Sonnet | Não iniciado |
 
 ### Organizações
-| ID | O quê | Por quê | Prio | Modelo |
-|---|---|---|---|---|
-| C-O1 | **Formulário "Quero a Menvo na minha organização"** em `/contact?tipo=organizacao` (nome, tipo, contato, nº aproximado de pessoas) no lugar do `mailto`, gravando para o admin da plataforma. | CTA da aba Organizações cai hoje num e-mail solto; o admin não tem fila. Continua sem autocadastro (decisão do doc de organizações). | P1 | Sonnet (Opus revisa a rota pública/rate limit) |
-| C-O2 | **Corrigir perda do `next` no onboarding:** conta nova que vem de `/o/[slug]` passa por `/onboarding` e não volta para a página da organização. | Gap conhecido (`organizations.md` §5 e §6.7) que quebra exatamente o fluxo que a aba passa a vender. | P1 | Sonnet |
-| C-O3 | **Relatório de impacto simples** no `/dashboard/org`: filtro de período + horas de mentoria, sessões realizadas, diagnósticos feitos, nota média — e **exportar CSV** do mesmo recorte. | É o que a organização precisa mostrar a financiadores; hoje só há contadores totais. Sem certificação ESG, sem selo. | P2 | Opus (escopo de dados/LGPD do CSV), Sonnet (UI) |
-| C-O4 | Chip "Mentor da {org}" no card público (só orgs `open`). | Já anotado como follow-up em `organizations.md` §6.7. | P3 | Sonnet |
+| ID | O quê | Por quê | Prio | Modelo | Status |
+|---|---|---|---|---|---|
+| C-O1 | **Formulário "Quero a Menvo na minha organização"** em `/contact?tipo=organizacao` (nome, tipo, contato, nº aproximado de pessoas) no lugar do `mailto`, gravando para o admin da plataforma. | CTA da aba Organizações cai hoje num e-mail solto; o admin não tem fila. Continua sem autocadastro (decisão do doc de organizações). | P1 | Sonnet (Opus revisa a rota pública/rate limit) | Não iniciado |
+| C-O2 | **Corrigir perda do `next` no onboarding:** conta nova que vem de `/o/[slug]` passa por `/onboarding` e não volta para a página da organização. | Gap conhecido (`organizations.md` §5 e §6.7) que quebra exatamente o fluxo que a aba passa a vender. | P1 | Sonnet | ✅ Feito 2026-09-28 (`app/auth/callback/route.ts` preserva `next` ao mandar para `/onboarding`; `onboarding/page.tsx` lê e usa `next` tanto no redirect de quem já tem role quanto ao concluir) |
+| C-O3 | **Relatório de impacto simples** no `/dashboard/org`: filtro de período + horas de mentoria, sessões realizadas, diagnósticos feitos, nota média — e **exportar CSV** do mesmo recorte. | É o que a organização precisa mostrar a financiadores; hoje só há contadores totais. Sem certificação ESG, sem selo. | P2 | Opus (escopo de dados/LGPD do CSV), Sonnet (UI) | Não iniciado |
+| C-O4 | Chip "Mentor da {org}" no card público (só orgs `open`). | Já anotado como follow-up em `organizations.md` §6.7. | P3 | Sonnet | Não iniciado |
 
 ### Explicitamente fora
 Recrutadores/acesso a talentos · certificados ESG e "Selo de Empresa Amiga" ·
@@ -136,9 +137,12 @@ cobrança/cotas para organizações.
 
 ## Ordem de execução
 
-1. **Parte A + B** (um PR, Sonnet).
-2. **C-M1, C-M2, C-T1, C-O2** (Sonnet — só UI/fluxo, sem schema).
-3. **C-T2, C-O1** (spec e revisão Opus → implementação Sonnet).
+1. **Parte A + B** (um PR, Sonnet). ✅ Feito, PR #56 mergeada em 2026-09-28.
+2. **C-M1, C-M2, C-T1, C-O2** (Sonnet — só UI/fluxo, sem schema). ✅ Feito e
+   commitado direto em `main` em 2026-09-28 (`6ba02cc0` + commits do C-T1/C-O2).
+   C-T1 saiu com 2 dos 3 itens — ver achado **C-T1b** acima antes de adicionar
+   o terceiro.
+3. **C-T1b, C-T2, C-O1** (spec e revisão Opus → implementação Sonnet).
 4. **P2** conforme prioridade do Paul: C-O3, C-T3, C-M3.
 
 Quando uma feature da Parte C for entregue, adicionar o item correspondente na
