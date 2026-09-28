@@ -73,7 +73,7 @@ export function StepSection({ section, steps, images, icons, rotate, ctaKey, cta
                 height={350}
                 alt={title}
                 sizes="(max-width: 768px) 100vw, 450px"
-                className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-background"
+                className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-background w-full max-w-[450px] h-[300px] md:h-[350px]"
               />
             </div>
           </div>
