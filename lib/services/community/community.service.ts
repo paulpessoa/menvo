@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/lib/types/supabase"
+import { createClient } from "@/lib/utils/supabase/client"
 
 export interface CommunityProfile {
   id: string
@@ -128,20 +129,7 @@ export const communityService = {
 
     const supabase = createClient()
     const { data, error } = await (supabase.from("profiles") as any)
-      .select(
-        `
-          id,
-          full_name,
-          avatar_url,
-          bio,
-          job_title,
-          company,
-          linkedin_url,
-          github_url,
-          expertise_areas,
-          slug
-        `
-      )
+      .select(COMMUNITY_COLUMNS)
       .in("id", validIds)
 
     if (error) {
@@ -150,16 +138,7 @@ export const communityService = {
     }
 
     return ((data as RawProfileRow[]) || []).map((p) => ({
-      id: p.id,
-      full_name: p.full_name,
-      avatar_url: p.avatar_url,
-      bio: p.bio,
-      job_title: p.job_title,
-      company: p.company,
-      linkedin_url: p.linkedin_url,
-      github_url: p.github_url,
-      expertise_areas: p.expertise_areas,
-      slug: p.slug,
+      ...p,
       role: "mentee",
     }))
   },
