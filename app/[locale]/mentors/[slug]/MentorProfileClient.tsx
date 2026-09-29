@@ -200,9 +200,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         {mentor.full_name?.split(" ").map(n => n[0]).join("") || "M"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-2 -right-2 bg-primary text-white p-2 rounded-full border-4 border-white shadow-lg">
-                      <Briefcase className="h-5 w-5" />
-                    </div>
                   </div>
                   
                   <div className="flex-1 space-y-3">
@@ -211,19 +208,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         <h1 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
                           {mentor.full_name}
                         </h1>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => toggleFavorite(mentor.id)}
-                                className={`h-9 w-9 rounded-full transition-all ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-muted/50 text-gray-400 hover:text-red-400'}`}
-                            >
-                                <Heart className={`h-4.5 w-4.5 ${isFavorite ? 'fill-current' : ''}`} />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9 rounded-full bg-muted/50 text-gray-400">
-                                <Share2 className="h-4.5 w-4.5" />
-                            </Button>
-                        </div>
                       </div>
                       <p className="text-lg md:text-xl text-primary font-bold">
                         {mentor.job_title}
@@ -249,12 +233,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         <Calendar className="h-3.5 w-3.5 text-primary" />
                         Membro desde {formatDate(mentor.created_at)}
                       </div>
-                      {mentor.availability_status === "available" && (
-                        <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          Disponível para mentoria
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -316,75 +294,59 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
 
             {/* Specialties & Inclusion */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {(mentor.mentorship_topics?.length || mentor.expertise_areas?.length) && (
+                {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
                     <div className="space-y-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
                             <BookOpen className="h-4 w-4 text-primary" />
-                            {t("specialties")}
+                            {t("topics")}
                         </h3>
                         <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
                             <CardContent className="p-8 space-y-6">
-                                {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">{t("topics")}</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.mentorship_topics.map((topic, i) => (
-                                                <Badge key={i} className="bg-primary/5 text-primary border-none font-bold px-3 py-1 rounded-xl">
-                                                    {topic}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">Expertise</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.expertise_areas.map((area, i) => (
-                                                <Badge key={i} variant="outline" className="border-2 font-bold px-3 py-1 rounded-xl text-gray-600">
-                                                    {area}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <div className="flex flex-wrap gap-2">
+                                    {mentor.mentorship_topics.map((topic, i) => (
+                                        <Badge key={i} className="bg-primary/5 text-primary border-none font-bold px-3 py-1 rounded-xl">
+                                            {topic}
+                                        </Badge>
+                                    ))}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
                 )}
-
-                {(mentor.languages?.length || mentor.inclusive_tags?.length) && (
+                {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
                     <div className="space-y-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
                             <Award className="h-4 w-4 text-primary" />
+                            {t("expertise")}
+                        </h3>
+                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
+                            <CardContent className="p-8 space-y-6">
+                                <div className="flex flex-wrap gap-2">
+                                    {mentor.expertise_areas.map((area, i) => (
+                                        <Badge key={i} variant="outline" className="border-2 font-bold px-3 py-1 rounded-xl text-gray-600">
+                                            {area}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
+                {mentor.inclusive_tags && mentor.inclusive_tags.length > 0 && (
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
+                            <Heart className="h-4 w-4 text-primary" />
                             {t("cultureAndInclusion")}
                         </h3>
                         <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
                             <CardContent className="p-8 space-y-6">
-                                {mentor.languages && mentor.languages.length > 0 && (
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">{t("languages")}</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.languages.map((lang, i) => (
-                                                <Badge key={i} className="bg-muted text-gray-700 border-none font-bold px-3 py-1 rounded-xl">
-                                                    {lang}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {mentor.inclusive_tags && mentor.inclusive_tags.length > 0 && (
-                                    <div className="space-y-3">
-                                        <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">{t("inclusion")}</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {mentor.inclusive_tags.map((tag, i) => (
-                                                <Badge key={i} className="bg-purple-50 text-purple-700 border-none font-bold px-3 py-1 rounded-xl">
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <div className="flex flex-wrap gap-2">
+                                    {mentor.inclusive_tags.map((tag, i) => (
+                                        <Badge key={i} className="bg-purple-50 text-purple-700 border-none font-bold px-3 py-1 rounded-xl">
+                                            {tag}
+                                        </Badge>
+                                    ))}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -450,27 +412,42 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    className="w-full rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
-                    disabled={
-                      availability.length === 0 ||
-                      mentor.availability_status === "busy" ||
-                      mentor.availability_status === "unavailable"
-                    }
-                    onClick={() => {
-                      if (!user) {
-                        setShowLoginModal(true)
-                      } else {
-                        setIsScheduleModalOpen(true)
+                  <div className="flex gap-2">
+                    <Button
+                      className="flex-1 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
+                      disabled={
+                        availability.length === 0 ||
+                        mentor.availability_status === "busy" ||
+                        mentor.availability_status === "unavailable"
                       }
-                    }}
-                  >
-                    {mentor.availability_status === "busy" ||
-                    mentor.availability_status === "unavailable" ||
-                    availability.length === 0
-                      ? t("fullSchedule")
-                      : t("bookMentorship")}
-                  </Button>
+                      onClick={() => {
+                        if (!user) {
+                          setShowLoginModal(true)
+                        } else {
+                          setIsScheduleModalOpen(true)
+                        }
+                      }}
+                    >
+                      {mentor.availability_status === "busy" ||
+                      mentor.availability_status === "unavailable" ||
+                      availability.length === 0
+                        ? t("fullSchedule")
+                        : t("bookMentorship")}
+                    </Button>
+                    <div className="flex gap-2 shrink-0">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => toggleFavorite(mentor.id)}
+                        className={`h-14 w-14 rounded-2xl border-2 transition-all ${isFavorite ? 'bg-red-50 border-red-100 text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                      >
+                        <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={handleShare} className="h-14 w-14 rounded-2xl border-2 text-gray-400 hover:text-primary">
+                        <Share2 className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </div>
                 )}
 
                 <div className="flex items-start gap-3 p-3.5 bg-muted/30 rounded-2xl">
@@ -527,19 +504,32 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
         {/* Mobile Sticky Action Bar */}
         {!isOwner && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-            <Button
-              size="xl"
-              onClick={() => {
-                if (!user) setShowLoginModal(true)
-                else setIsScheduleModalOpen(true)
-              }}
-              className="w-full rounded-2xl font-black shadow-2xl shadow-primary/40"
-              disabled={mentor.availability_status === "busy" || mentor.availability_status === "unavailable"}
-            >
-              {mentor.availability_status === "busy" || mentor.availability_status === "unavailable"
-                ? t("fullSchedule")
-                : t("bookMentorship")}
-            </Button>
+            <div className="flex gap-2 max-w-[600px] mx-auto">
+              <Button
+                size="xl"
+                onClick={() => {
+                  if (!user) setShowLoginModal(true)
+                  else setIsScheduleModalOpen(true)
+                }}
+                className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40 h-14"
+                disabled={mentor.availability_status === "busy" || mentor.availability_status === "unavailable"}
+              >
+                {mentor.availability_status === "busy" || mentor.availability_status === "unavailable"
+                  ? t("fullSchedule")
+                  : t("bookMentorship")}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleFavorite(mentor.id)}
+                className={`h-14 w-14 shrink-0 rounded-2xl border-2 transition-all ${isFavorite ? 'bg-red-50 border-red-100 text-red-500 bg-white' : 'text-gray-400 hover:text-red-400 bg-white'}`}
+              >
+                <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleShare} className="h-14 w-14 shrink-0 rounded-2xl border-2 text-gray-400 hover:text-primary bg-white">
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
