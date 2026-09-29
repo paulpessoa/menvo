@@ -359,8 +359,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
           {/* Right Column: Actions & Availability */}
           <div className="space-y-8">
             {/* Booking Card */}
-            <Card className="border-none shadow-2xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white relative">
-              <div className="h-2 bg-gradient-to-r from-primary-700 via-primary-600 to-primary"></div>
+            <Card className="border-none shadow-xl shadow-primary/10 rounded-[2rem] overflow-hidden bg-white relative">
               <CardHeader className="pb-3 pt-7 px-7">
                 <CardTitle className="text-xl font-black tracking-tight">
                   {t("scheduleSession")}
@@ -371,7 +370,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
               </CardHeader>
               <CardContent className="px-7 pb-7 space-y-5">
                 {/* Meta details */}
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5">
                   {[
                     { icon: Clock, label: t("durationLabel"), value: t("durationValue") },
                     { icon: Video, label: t("formatLabel"), value: t("formatValue") },
