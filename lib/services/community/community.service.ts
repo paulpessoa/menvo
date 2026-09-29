@@ -115,4 +115,52 @@ export const communityService = {
       hasMore,
     }
   },
+
+  /**
+   * Fetches specific community profiles by id, used to render the AI match
+   * modal's recommendations. Same UUID guard as `mentorService.getMentorsByIds`:
+   * a single hallucinated id from the model must not zero out the valid ones.
+   */
+  async getProfilesByIds(ids: string[]): Promise<CommunityProfile[]> {
+    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    const validIds = (ids || []).filter((id) => uuidPattern.test(id))
+    if (validIds.length === 0) return []
+
+    const supabase = createClient()
+    const { data, error } = await (supabase.from("profiles") as any)
+      .select(
+        `
+          id,
+          full_name,
+          avatar_url,
+          bio,
+          job_title,
+          company,
+          linkedin_url,
+          github_url,
+          expertise_areas,
+          slug
+        `
+      )
+      .in("id", validIds)
+
+    if (error) {
+      console.error("[CommunityService] Error fetching profiles by ids:", error)
+      return []
+    }
+
+    return ((data as RawProfileRow[]) || []).map((p) => ({
+      id: p.id,
+      full_name: p.full_name,
+      avatar_url: p.avatar_url,
+      bio: p.bio,
+      job_title: p.job_title,
+      company: p.company,
+      linkedin_url: p.linkedin_url,
+      github_url: p.github_url,
+      expertise_areas: p.expertise_areas,
+      slug: p.slug,
+      role: "mentee",
+    }))
+  },
 }

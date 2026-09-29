@@ -136,10 +136,10 @@ export default function MenteeProfileClient({ mentee }: Props) {
               <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                 <MessageCircle className="h-32 w-32" />
               </div>
-              <CardHeader className="pb-10 pt-12 px-8 md:px-12">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-center md:text-left">
+              <CardHeader className="pb-8 pt-10 px-6 md:px-10">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 text-center md:text-left">
                   <div className="relative">
-                    <Avatar className="h-32 w-32 md:h-40 md:w-40 border-8 border-white shadow-2xl">
+                    <Avatar className="h-28 w-28 md:h-36 md:w-36 border-8 border-white shadow-2xl">
                       <AvatarImage src={mentee.avatar_url} />
                       <AvatarFallback className="text-4xl font-bold bg-primary/5 text-primary">
                         {initials}
@@ -149,10 +149,10 @@ export default function MenteeProfileClient({ mentee }: Props) {
                       <Sparkles className="h-5 w-5" />
                     </div>
                   </div>
-                  <div className="flex-1 space-y-4">
-                    <div className="space-y-1">
+                  <div className="flex-1 space-y-3">
+                    <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                        <h1 className="text-4xl font-black tracking-tight text-gray-900">
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
                           {fullName}
                         </h1>
                         <Badge
@@ -162,10 +162,10 @@ export default function MenteeProfileClient({ mentee }: Props) {
                           Buscando Mentoria
                         </Badge>
                       </div>
-                      <p className="text-2xl text-primary/70 font-bold">
+                      <p className="text-lg md:text-xl text-primary font-bold">
                         {mentee.job_title || "Mentorado"}
                         {mentee.company && (
-                          <span className="text-muted-foreground/60 font-medium">
+                          <span className="text-muted-foreground/70 font-semibold">
                             {" "}
                             @ {mentee.company}
                           </span>
@@ -173,17 +173,17 @@ export default function MenteeProfileClient({ mentee }: Props) {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm text-gray-500 font-bold uppercase tracking-wider">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 pt-1">
                       {(mentee.city || mentee.country) && (
-                        <div className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-1.5 text-primary/40" />
+                        <div className="flex items-center gap-1.5 bg-muted/60 text-gray-600 px-3 py-1.5 rounded-full text-xs font-bold">
+                          <MapPin className="h-3.5 w-3.5 text-primary" />
                           {[mentee.city, mentee.state, mentee.country]
                             .filter(Boolean)
                             .join(", ")}
                         </div>
                       )}
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1.5 text-primary/40" />
+                      <div className="flex items-center gap-1.5 bg-muted/60 text-gray-600 px-3 py-1.5 rounded-full text-xs font-bold">
+                        <Calendar className="h-3.5 w-3.5 text-primary" />
                         Desde {formatDate(mentee.created_at)}
                       </div>
                     </div>
@@ -214,8 +214,8 @@ export default function MenteeProfileClient({ mentee }: Props) {
                   Trajetória e Motivação
                 </h3>
                 <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem]">
-                  <CardContent className="p-8 md:p-10">
-                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap italic">
+                  <CardContent className="p-6 md:p-8">
+                    <p className="text-gray-700 text-base md:text-lg leading-relaxed whitespace-pre-wrap italic">
                       "{mentee.bio}"
                     </p>
                   </CardContent>

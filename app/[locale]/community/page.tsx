@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Search, Users, Info, MessageCircle, Loader2 } from "lucide-react"
+import { useState, useEffect, useRef, useMemo } from "react"
+import { Search, Users, Loader2, Info, MessageCircle, Sparkles, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { MenteeCard } from "@/components/MenteeCard"
+import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { useAuth } from "@/lib/auth"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useRouter } from "@/i18n/routing"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { toast } from "sonner"
 import {
   Sheet,
@@ -19,13 +21,18 @@ import {
 } from "@/components/ui/sheet"
 import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
-import type { CommunityProfile } from "@/lib/services/community/community.service"
+import { useAiQuota } from "@/hooks/useAiQuota"
+import {
+  communityService,
+  type CommunityProfile,
+} from "@/lib/services/community/community.service"
 
 const ITEMS_PER_PAGE = 12
 
 export default function CommunityPage() {
   const tCommunity = useTranslations("community")
   const tCommon = useTranslations("common")
+  const locale = useLocale()
   const [profiles, setProfiles] = useState<CommunityProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -36,6 +43,14 @@ export default function CommunityPage() {
   // Chat Sidebar State
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<CommunityProfile | null>(null)
+
+  // AI Match State
+  const [suggestedProfiles, setSuggestedProfiles] = useState<Record<string, string>>({})
+  const [aiJustification, setAiJustification] = useState<string | null>(null)
+  const [aiQuery, setAiQuery] = useState<string | null>(null)
+  const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<CommunityProfile[]>([])
+  const [aiLoading, setAiLoading] = useState(false)
+  const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
 
   const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
@@ -141,6 +156,93 @@ export default function CommunityPage() {
     setIsChatOpen(true)
   }
 
+  const handleClearAI = () => {
+    setSuggestedProfiles({})
+    setAiJustification(null)
+    setAiQuery(null)
+    setAiRecommendedProfiles([])
+  }
+
+  const handleAIMatch = async (
+    suggestions: Array<{ profile_id: string; reason: string }>,
+    justification: string,
+    searchQuery: string
+  ) => {
+    const suggestionsMap: Record<string, string> = {}
+    const ids: string[] = []
+    suggestions.forEach((s) => {
+      suggestionsMap[s.profile_id] = s.reason
+      ids.push(s.profile_id)
+    })
+    setSuggestedProfiles(suggestionsMap)
+    setAiJustification(justification)
+    setAiQuery(searchQuery)
+
+    try {
+      const recommended = await communityService.getProfilesByIds(ids)
+      setAiRecommendedProfiles(recommended)
+    } catch (err) {
+      console.error("[CommunityPage] Erro ao carregar membros recomendados pela IA:", err)
+    }
+
+    setTimeout(() => window.scrollTo({ top: 350, behavior: "smooth" }), 100)
+  }
+
+  const handleAISearch = async (query: string) => {
+    setAiLoading(true)
+    try {
+      const response = await fetch("/api/ai/match-community", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      })
+      const result = await response.json()
+      setAiQuota(result.quota)
+
+      if (response.status === 429) {
+        const resetDate = result.quota?.resetsAt
+          ? new Date(result.quota.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+          : ""
+        toast.error(
+          result.quota?.reason === "budget"
+            ? tCommunity("magicSearch.budgetExhausted", { date: resetDate })
+            : tCommunity("magicSearch.quotaExhausted", { date: resetDate })
+        )
+        return
+      }
+
+      if (!response.ok) throw new Error(result.error || tCommunity("magicSearch.error"))
+
+      if (result.no_match) {
+        toast.info(tCommunity("magicSearch.noMatch"))
+        handleClearAI()
+      } else {
+        await handleAIMatch(result.suggestions, result.global_justification, query)
+        toast.success(tCommunity("magicSearch.success"))
+      }
+    } catch (error) {
+      console.error("[CommunityPage] Magic Search Error:", error)
+      toast.error(tCommunity("magicSearch.error"))
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const displayedAIProfiles = useMemo(() => {
+    if (!Object.keys(suggestedProfiles).length) return []
+    const map = new Map<string, CommunityProfile>()
+    aiRecommendedProfiles.forEach((p) => map.set(p.id, p))
+    profiles.forEach((p) => {
+      if (suggestedProfiles[p.id]) map.set(p.id, p)
+    })
+    return Array.from(map.values())
+  }, [suggestedProfiles, aiRecommendedProfiles, profiles])
+
+  const otherProfiles = useMemo(() => {
+    const aiIds = new Set(displayedAIProfiles.map((p) => p.id))
+    return profiles.filter((p) => !aiIds.has(p.id))
+  }, [profiles, displayedAIProfiles])
+
   return (
     <RequireRole roles={["mentor", "admin"]}>
       <div className="container mx-auto px-4 py-12">
@@ -162,16 +264,71 @@ export default function CommunityPage() {
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md mb-12">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder={tCommunity("searchPlaceholder")}
-          className="pl-10 h-11"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+      {/* Search + AI Match */}
+      <div className="flex flex-col sm:flex-row gap-2.5 max-w-2xl mb-12">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={tCommunity("searchPlaceholder")}
+            className="pl-10 h-11 rounded-xl"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <AIMatchButton
+          title={tCommunity("magicSearch.title")}
+          description={tCommunity("magicSearch.disclaimer")}
+          placeholder={tCommunity("magicSearch.placeholder")}
+          loading={aiLoading}
+          loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
+          minCharsMessage={tCommunity("magicSearch.minChars")}
+          submitLabel={tCommunity("magicSearch.button")}
+          buttonLabel={tCommunity("magicSearch.button")}
+          quota={aiQuota}
+          quotaHint={(q) =>
+            q.reason === "budget"
+              ? tCommunity("magicSearch.budgetExhausted", {
+                  date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                })
+              : q.remaining! > 0
+                ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
+                : tCommunity("magicSearch.quotaExhausted", {
+                    date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                  })
+          }
+          onSubmit={handleAISearch}
         />
       </div>
+
+      {/* AI Recommendation Banner */}
+      {aiJustification && (
+        <div className="mb-8 rounded-2xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-2 border-primary/20 p-5 sm:p-6 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300 max-w-4xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className="bg-primary text-white text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                  <Sparkles className="w-3.5 h-3.5" /> Recomendações da IA
+                </Badge>
+                {aiQuery && (
+                  <span className="text-xs font-semibold text-muted-foreground truncate">
+                    Para quem você quer ajudar: <strong className="text-foreground">"{aiQuery}"</strong>
+                  </span>
+                )}
+              </div>
+              <p className="text-sm font-medium text-foreground leading-relaxed pt-1">{aiJustification}</p>
+            </div>
+            <Button
+              onClick={handleClearAI}
+              variant="outline"
+              size="sm"
+              className="rounded-xl border-primary/30 hover:border-primary text-xs font-semibold shrink-0 h-9"
+            >
+              <X className="h-3.5 w-3.5 mr-1" />
+              Limpar busca com IA
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Results Grid */}
       {loading ? (
@@ -198,7 +355,17 @@ export default function CommunityPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {profiles.map((profile) => (
+            {displayedAIProfiles.map((profile) => (
+              <MenteeCard
+                key={`ai-${profile.id}`}
+                profile={profile}
+                isMentor={isMentor}
+                onChat={handleChat}
+                isAIHighlighted
+                aiReason={suggestedProfiles[profile.id]}
+              />
+            ))}
+            {otherProfiles.map((profile) => (
               <MenteeCard
                 key={profile.id}
                 profile={profile}

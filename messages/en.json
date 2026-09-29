@@ -492,7 +492,22 @@
       "becomeMentor": "Become a Mentor"
     },
     "viewProfile": "View profile",
-    "myProfile": "My profile"
+    "myProfile": "My profile",
+    "magicSearch": {
+      "title": "AI search for who to help",
+      "placeholder": "Describe who you'd like to help (e.g. 'I want to help someone starting out in Design looking for their first internship')",
+      "button": "Search with AI",
+      "loading": "Working the magic...",
+      "error": "The magic failed this time. Please try again shortly.",
+      "noMatch": "We couldn't find an exact match, but we logged your interest to look for new members!",
+      "success": "We found the members that best match what you're looking for!",
+      "minChars": "Please describe who you'd like to help in a bit more detail.",
+      "disclaimer": "Our AI analyzes the bios and interests of every community member for you.",
+      "loginRequired": "AI-powered search is available to logged-in users only.",
+      "quotaRemaining": "You have {remaining} of {limit} AI searches left this month.",
+      "quotaExhausted": "You've used all your AI searches this month. They renew on {date}. Regular search is still available.",
+      "budgetExhausted": "AI search hit the platform's usage limit this month and returns on {date}. Regular search is still available."
+    }
   },
   "mentors": {
     "title": "Find a Mentor",
@@ -1047,6 +1062,7 @@
       "featureUnderDevelopment": "This feature is still under development. Coming soon!"
     },
     "magicSearch": {
+      "title": "Search for a mentor with AI",
       "placeholder": "Describe your challenge (e.g.: 'I want help to get my first Design internship')",
       "button": "Search with AI",
       "loading": "Magic in progress...",

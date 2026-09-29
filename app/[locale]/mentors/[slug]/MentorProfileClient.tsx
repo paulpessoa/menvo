@@ -191,10 +191,10 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
               <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
                 <Sparkles className="h-32 w-32" />
               </div>
-              <CardHeader className="pb-10 pt-12 px-8 md:px-12">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-8 text-center md:text-left">
+              <CardHeader className="pb-8 pt-10 px-6 md:px-10">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 text-center md:text-left">
                   <div className="relative">
-                    <Avatar className="h-32 w-32 md:h-40 md:w-40 border-8 border-white shadow-2xl">
+                    <Avatar className="h-28 w-28 md:h-36 md:w-36 border-8 border-white shadow-2xl">
                       <AvatarImage src={mentor.avatar_url || undefined} />
                       <AvatarFallback className="text-4xl font-bold bg-primary/5 text-primary">
                         {mentor.full_name?.split(" ").map(n => n[0]).join("") || "M"}
@@ -205,30 +205,30 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </div>
                   </div>
                   
-                  <div className="flex-1 space-y-4">
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                        <h1 className="text-4xl font-black tracking-tight text-gray-900">
+                  <div className="flex-1 space-y-3">
+                    <div className="space-y-1.5">
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                        <h1 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
                           {mentor.full_name}
                         </h1>
                         <div className="flex gap-2">
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => toggleFavorite(mentor.id)}
-                                className={`h-10 w-10 rounded-full transition-all ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-muted/50 text-gray-400 hover:text-red-400'}`}
+                                className={`h-9 w-9 rounded-full transition-all ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-muted/50 text-gray-400 hover:text-red-400'}`}
                             >
-                                <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+                                <Heart className={`h-4.5 w-4.5 ${isFavorite ? 'fill-current' : ''}`} />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={handleShare} className="h-10 w-10 rounded-full bg-muted/50 text-gray-400">
-                                <Share2 className="h-5 w-5" />
+                            <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9 rounded-full bg-muted/50 text-gray-400">
+                                <Share2 className="h-4.5 w-4.5" />
                             </Button>
                         </div>
                       </div>
-                      <p className="text-2xl text-primary/70 font-bold">
+                      <p className="text-lg md:text-xl text-primary font-bold">
                         {mentor.job_title}
                         {mentor.company && (
-                          <span className="text-muted-foreground/60 font-medium">
+                          <span className="text-muted-foreground/70 font-semibold">
                             {" "}
                             @ {mentor.company}
                           </span>
@@ -236,22 +236,26 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm text-gray-500 font-bold uppercase tracking-wider">
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 pt-1">
                       {(mentor.city || mentor.country) && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-primary/40" />
+                        <div className="flex items-center gap-1.5 bg-muted/60 text-gray-600 px-3 py-1.5 rounded-full text-xs font-bold">
+                          <MapPin className="h-3.5 w-3.5 text-primary" />
                           {[mentor.city, mentor.state, mentor.country]
                             .filter(Boolean)
                             .join(", ")}
                         </div>
                       )}
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary/40" />
+                      <div className="flex items-center gap-1.5 bg-muted/60 text-gray-600 px-3 py-1.5 rounded-full text-xs font-bold">
+                        <Calendar className="h-3.5 w-3.5 text-primary" />
                         Membro desde {formatDate(mentor.created_at)}
                       </div>
+                      {mentor.availability_status === "available" && (
+                        <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Disponível para mentoria
+                        </div>
+                      )}
                     </div>
-
-
                   </div>
                 </div>
               </CardHeader>
@@ -265,8 +269,8 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   {t("about")}
                 </h3>
                 <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem]">
-                  <CardContent className="p-8 md:p-10">
-                    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap italic">
+                  <CardContent className="p-6 md:p-8">
+                    <p className="text-gray-700 text-base md:text-lg leading-relaxed whitespace-pre-wrap italic">
                       "{mentor.bio}"
                     </p>
                   </CardContent>
@@ -394,42 +398,38 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
           <div className="space-y-8">
             {/* Booking Card */}
             <Card className="border-none shadow-2xl shadow-primary/5 rounded-[2rem] overflow-hidden bg-white relative">
-              <div className="h-3 bg-gradient-to-r from-primary-700 via-primary-600 to-primary"></div>
-              <CardHeader className="pb-3 pt-8 px-8">
-                <CardTitle className="text-2xl font-black uppercase tracking-tighter">
+              <div className="h-2 bg-gradient-to-r from-primary-700 via-primary-600 to-primary"></div>
+              <CardHeader className="pb-3 pt-7 px-7">
+                <CardTitle className="text-xl font-black tracking-tight">
                   {t("scheduleSession")}
                 </CardTitle>
-                <CardDescription className="font-bold text-primary">
+                <CardDescription className="font-semibold text-primary">
                   {t("freeMentorships")}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-8 pb-8 space-y-6">
+              <CardContent className="px-7 pb-7 space-y-5">
                 {/* Meta details */}
-                <div className="grid grid-cols-2 gap-3 p-4 bg-muted/20 border rounded-2xl text-xs">
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                      <Clock className="h-3.5 w-3.5 text-primary" /> {t("durationLabel")}
-                    </span>
-                    <p className="font-bold text-foreground">{t("durationValue")}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                      <Video className="h-3.5 w-3.5 text-primary" /> {t("formatLabel")}
-                    </span>
-                    <p className="font-bold text-foreground">{t("formatValue")}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                      <CheckCircle className="h-3.5 w-3.5 text-primary" /> {t("costLabel")}
-                    </span>
-                    <p className="font-bold text-primary">{t("costValue")}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                      <Calendar className="h-3.5 w-3.5 text-primary" /> {t("windowLabel")}
-                    </span>
-                    <p className="font-bold text-foreground">{t("windowValue")}</p>
-                  </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {[
+                    { icon: Clock, label: t("durationLabel"), value: t("durationValue") },
+                    { icon: Video, label: t("formatLabel"), value: t("formatValue") },
+                    { icon: CheckCircle, label: t("costLabel"), value: t("costValue"), highlight: true },
+                    { icon: Calendar, label: t("windowLabel"), value: t("windowValue") }
+                  ].map(({ icon: Icon, label, value, highlight }, i) => (
+                    <div key={i} className="flex items-start gap-2.5 p-3 bg-muted/30 rounded-xl">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide leading-tight">
+                          {label}
+                        </p>
+                        <p className={`text-sm font-bold truncate ${highlight ? "text-primary" : "text-foreground"}`}>
+                          {value}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 {isOwner ? (

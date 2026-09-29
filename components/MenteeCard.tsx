@@ -45,9 +45,13 @@ interface MenteeCardProps {
   profile: UserProfile
   isMentor: boolean
   onChat: (userId: string) => void
+  /** Highlights the card as an AI-recommended match */
+  isAIHighlighted?: boolean
+  /** Short AI-generated reason for the recommendation */
+  aiReason?: string
 }
 
-export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
+export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false, aiReason }: MenteeCardProps) {
   // Mentees fill "mentorship_topics" (what they want to learn); expertise_areas is a mentor field
   const topics = profile.mentorship_topics?.length ? profile.mentorship_topics : profile.expertise_areas
   const tCommunity = useTranslations("community")
@@ -104,8 +108,19 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
 
   return (
     <>
-      <Card className="hover:shadow-xl transition-all duration-300 flex flex-col h-full border-none shadow-sm bg-white group overflow-hidden rounded-[2rem]">
+      <Card
+        className={`hover:shadow-xl transition-all duration-300 flex flex-col h-full shadow-sm bg-white group overflow-hidden rounded-[2rem] relative ${
+          isAIHighlighted ? "border-primary/40 ring-1 ring-primary/20" : "border-none"
+        }`}
+      >
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+
+        {isAIHighlighted && (
+          <div className="absolute top-4 left-4 z-[2] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/90 text-white backdrop-blur-md shadow-sm">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Recomendado pela IA</span>
+          </div>
+        )}
         
         <CardHeader className="pb-3 px-6 pt-8">
           <div className="flex flex-col items-center text-center space-y-3">
@@ -137,12 +152,21 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
 
         <CardContent className="space-y-5 flex-1 flex flex-col px-8 pb-8">
           <div className="space-y-3 flex-1 text-center">
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              {tCommunity("seekingHelpWith")}
-            </p>
-            <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed italic">
-              "{profile.bio || tCommunity("noBioProvided")}"
-            </p>
+            {aiReason ? (
+              <p className="text-xs text-primary italic line-clamp-3 leading-relaxed border-l-2 border-primary/40 pl-2.5 bg-primary/5 py-1.5 rounded-r-md text-left">
+                <Sparkles className="w-3 h-3 inline-block mr-1 -mt-0.5" />
+                {aiReason}
+              </p>
+            ) : (
+              <>
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                  {tCommunity("seekingHelpWith")}
+                </p>
+                <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed italic">
+                  "{profile.bio || tCommunity("noBioProvided")}"
+                </p>
+              </>
+            )}
           </div>
 
           {topics && topics.length > 0 && (
