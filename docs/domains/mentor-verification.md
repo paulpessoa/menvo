@@ -15,7 +15,7 @@
 | Selo público | `profiles.verified` / `verified_at` | Ligado automaticamente pelo mesmo trigger quando `verification_status` vira `approved`. |
 | Aparece em `/mentors` | role `mentor` **+** `is_public = true` **+** `expertise_areas`/`mentorship_topics` preenchidos | Os três precisam ser verdadeiros ao mesmo tempo (`mentors_view`, filtrada por `is_public` e `mentor_skills is not null`). A aprovação liga `is_public`; o mentor pode desligar depois em `/profile`. |
 
-Um candidato **fica com role `mentee`** até ser aprovado — só ganha `mentor`
+Um candidato **fica com role `mentee`** até ser aprovado - só ganha `mentor`
 na aprovação. Por isso a aba "Aguardando" filtra por
 `verification_status = 'pending'`, nunca por role.
 
@@ -26,7 +26,7 @@ Toda aprovação/rejeição passa por `processVerification()`
 `POST /api/admin/verify`. Ele faz, em uma chamada:
 
 1. Atualiza `profiles` com o service-role client (a policy de UPDATE de
-   `profiles` é só `auth.uid() = id` — a sessão do próprio admin não
+   `profiles` é só `auth.uid() = id` - a sessão do próprio admin não
    alcança o perfil de outra pessoa; usar o client normal faz o UPDATE
    "funcionar" sem erro e não tocar em nenhuma linha).
 2. Na aprovação: concede a role `mentor` e remove `mentee` (mutuamente
@@ -36,15 +36,15 @@ Toda aprovação/rejeição passa por `processVerification()`
 
 Duas telas usam esse endpoint:
 
-- **`/dashboard/admin/verifications`** — fila dedicada, com rascunho por IA
+- **`/dashboard/admin/verifications`** - fila dedicada, com rascunho por IA
   (`MentorReviewAssistant` → `POST /api/admin/verifications/draft`).
-- **`/dashboard/admin/users`** — modal de edição de usuário
+- **`/dashboard/admin/users`** - modal de edição de usuário
   (`MentorApplicationPanel`), para decidir sem sair da ficha da pessoa.
 
 Não existe um terceiro caminho. `VerificationService.completeVerification`
 e `.setMentorVerification` (client-side, sem service-role) e a tela antiga
 `/dashboard/admin/users/manage` (aposentada, agora redireciona) ficaram
-`@deprecated` de propósito — nunca reative-os.
+`@deprecated` de propósito - nunca reative-os.
 
 ## Números do painel admin
 
@@ -60,4 +60,4 @@ ao clicar em "Acessar".
 | Candidato a mentor | `/profile` → aba de solicitação | Pede para virar mentor (`POST /api/profile/request-mentor` ou `/api/profile/role`). Fica `mentee` + `verification_status='pending'` até a decisão. |
 | Mentor aprovado | `/profile` | Controla a própria visibilidade (`is_public`) e dados públicos. |
 | Admin | `/dashboard/admin/verifications` | Fila de candidaturas pendentes, com assistente de IA para rascunhar a mensagem. |
-| Admin | `/dashboard/admin/users` | Ficha completa de qualquer usuário — edição de perfil, papéis, e o mesmo painel de aprovação (`MentorApplicationPanel`) para decidir sem trocar de tela. |
+| Admin | `/dashboard/admin/users` | Ficha completa de qualquer usuário - edição de perfil, papéis, e o mesmo painel de aprovação (`MentorApplicationPanel`) para decidir sem trocar de tela. |

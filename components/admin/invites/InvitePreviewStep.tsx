@@ -15,7 +15,7 @@ interface InvitePreviewStepProps {
 /**
  * Passo 3 do modal de convite: pré-visualização exata do HTML que será
  * enviado (mesma função `buildReengagementInviteHtml` usada no envio
- * real — ver app/api/admin/invites/preview) e um botão para mandar um
+ * real - ver app/api/admin/invites/preview) e um botão para mandar um
  * teste para o próprio admin antes de confirmar o envio em massa.
  */
 export function InvitePreviewStep({ loading, html, onSendTest, sendingTest, eligibleCount }: InvitePreviewStepProps) {

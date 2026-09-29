@@ -41,7 +41,7 @@ class VerificationServiceClass {
   /**
    * @deprecated Use POST /api/admin/verify instead. This ran the profile
    * update AND (previously) would need to assign the "mentor" RBAC role
-   * client-side with the caller's own anon-key session — cross-user writes
+   * client-side with the caller's own anon-key session - cross-user writes
    * to user_roles have no confirmed RLS policy for that, unlike the admin
    * policy that already covers `profiles`. The API route does this
    * server-side with a service-role client, which is guaranteed to work

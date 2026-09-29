@@ -25,7 +25,7 @@ function bumpCount(): void {
   try {
     localStorage.setItem(STORAGE_KEY, String(readCount() + 1))
   } catch {
-    /* storage unavailable — silently ignore */
+    /* storage unavailable - silently ignore */
   }
 }
 
@@ -41,7 +41,7 @@ function bumpCount(): void {
  * - Shows at most MAX_SHOWS times across browser sessions (localStorage counter).
  * - On localStorage clear the counter resets and the widget shows again.
  *
- * **Core Web Vitals — zero regression guarantees:**
+ * **Core Web Vitals - zero regression guarantees:**
  * - `ssr: false` via DeferredClientWidgets → no HTML emitted by the server (TTFB safe).
  * - Event listeners registered only inside `requestIdleCallback` + 3 s delay
  *   → thread is free for LCP / INP during the critical load window.
@@ -51,7 +51,7 @@ function bumpCount(): void {
  *
  * **Controls:**
  * - ▶ / ⏸ Play / Pause via YouTube iframe `postMessage` API.
- * - 🔊 / 🔇 Toggle mute (video auto-plays muted — browsers require it).
+ * - 🔊 / 🔇 Toggle mute (video auto-plays muted - browsers require it).
  * - ✕ Close widget & increment counter.
  */
 export function FounderPitchWidget() {
@@ -251,7 +251,7 @@ export function FounderPitchWidget() {
             </div>
           )}
 
-          {/* Overlay pointer-events:none — impede acesso à chrome do YouTube que sobrou */}
+          {/* Overlay pointer-events:none - impede acesso à chrome do YouTube que sobrou */}
           <div className="absolute inset-0 pointer-events-none z-20" />
         </div>
 

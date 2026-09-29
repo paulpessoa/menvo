@@ -15,7 +15,7 @@ const bodySchema = z.object({
 })
 
 /**
- * Sends one batch (≤25, enforced above — keeps each call well under the
+ * Sends one batch (≤25, enforced above - keeps each call well under the
  * Vercel function timeout) of a reengagement campaign. The admin modal
  * calls this once per batch across the full audience, showing progress
  * between calls. Idempotent per (user, campaign) unless `resend` is set:

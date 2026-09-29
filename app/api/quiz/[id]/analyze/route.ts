@@ -11,11 +11,11 @@ export const maxDuration = 60
 /**
  * Replaces `supabase/functions/analyze-quiz` (ADR 0004 §7.3, decision D8 =
  * option A): runs the quiz analysis through the model registry, metered and
- * inside the global AI budget, and — unlike the old Edge Function — cannot
+ * inside the global AI budget, and - unlike the old Edge Function - cannot
  * be re-triggered without limit just by knowing a quiz response's `id`.
  *
  * Anonymous by design (the quiz itself is anonymous, D1): `claim_quiz_analysis`
- * is the only thing that reads `quiz_responses` here, and it's the gate —
+ * is the only thing that reads `quiz_responses` here, and it's the gate -
  * RLS on that table denies a direct anonymous read (migration `…000005`).
  */
 export async function POST(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -26,7 +26,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
 
   const serverKey = process.env.AI_METERING_KEY
   if (!serverKey) {
-    console.warn("[quiz/analyze] AI_METERING_KEY não configurada — análise indisponível")
+    console.warn("[quiz/analyze] AI_METERING_KEY não configurada - análise indisponível")
     return NextResponse.json({ error: "Análise temporariamente indisponível" }, { status: 503 })
   }
 
@@ -46,7 +46,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
 
   // Not claimed: already processed, claimed by another request in the last
   // 2 minutes, or the platform budget is exhausted this month. The results
-  // page (`/quiz/results/[id]`) polls regardless, so this is not an error —
+  // page (`/quiz/results/[id]`) polls regardless, so this is not an error -
   // it just means "nothing to do right now".
   if (!claim?.claimed) {
     return NextResponse.json({ ok: true, claimed: false })

@@ -1,4 +1,4 @@
-# Spec — MCP público + Assistente in-app (item 4 do plano de arquitetura)
+# Spec - MCP público + Assistente in-app (item 4 do plano de arquitetura)
 
 > **Para quem executa (agente no Antigravity IDE):** este documento é
 > autocontido. Leia inteiro antes de escrever código. Tudo que você precisa
@@ -13,7 +13,7 @@
 > 3. **Não instale dependências além das listadas na §2.**
 > 4. Siga `AGENTS.md` (raiz do repo): componentes nunca chamam Supabase
 >    direto; Zod nas bordas; `"use client"` só quando precisa.
-> 5. Ao terminar, escreva `HANDOFF.md` na raiz (§9) — é o que o revisor lê.
+> 5. Ao terminar, escreva `HANDOFF.md` na raiz (§9) - é o que o revisor lê.
 
 ---
 
@@ -35,7 +35,7 @@ lib/services/assistant/tools.ts        ← as 3 funções puras (fonte da verdad
   entender como a plataforma funciona. Sem login. É vitrine técnica.
 - **Assistente in-app** (`/assistant`): chat pra usuário logado, mesmas 3
   tools, atrás de feature flag, com rate limit. É o canal real pra
-  mentorado e organização — eles não vão configurar MCP.
+  mentorado e organização - eles não vão configurar MCP.
 
 Decisões já tomadas com o fundador (não reabra):
 - LangChain.js, **não** Vercel AI SDK.
@@ -47,7 +47,7 @@ Decisões já tomadas com o fundador (não reabra):
 Contexto do repo que importa:
 - Next.js 15 App Router, TypeScript, Supabase (auth + Postgres + RLS).
 - Já existe `lib/services/ai/groq.service.ts` (match de mentores por IA)
-  — **não toque nele**, e não reutilize seu prompt. É outra feature.
+  - **não toque nele**, e não reutilize seu prompt. É outra feature.
 - Já existe `lib/rate-limit.ts` com `checkRateLimit(key, { maxRequests,
   windowMs })` in-memory. Use-o.
 - Já existe `lib/feature-flags.tsx` com `useFeatureFlag("nome_flag")`
@@ -73,22 +73,22 @@ de escrever. Não chute.
 
 Variáveis de ambiente (adicione ao `.env.local` se faltar; **não** commite
 valores):
-- `GROQ_API_KEY` — já existe.
-- `GOOGLE_GENERATIVE_AI_API_KEY` — nova. Se não estiver definida, o
+- `GROQ_API_KEY` - já existe.
+- `GOOGLE_GENERATIVE_AI_API_KEY` - nova. Se não estiver definida, o
   fallback Gemini é pulado silenciosamente (log `console.warn`), o Groq
   segue sozinho.
-- `NEXT_PUBLIC_APP_URL` — já existe, usado nas respostas das tools.
+- `NEXT_PUBLIC_APP_URL` - já existe, usado nas respostas das tools.
 
 Documente as duas novas em `docs/operations/environment-variables.md` (tabela
 existente; adicione linhas).
 
 ---
 
-## 3. As três tools — `lib/services/assistant/tools.ts`
+## 3. As três tools - `lib/services/assistant/tools.ts`
 
 Funções puras. **Recebem um `SupabaseClient` como primeiro argumento**
 (padrão já usado em `lib/services/organizations/org-dashboard.service.ts`
-— copie o estilo). Nunca importam `next/*`, `cookies()`, `NextRequest`.
+- copie o estilo). Nunca importam `next/*`, `cookies()`, `NextRequest`.
 Cada uma exporta: um schema Zod de entrada, um tipo de saída, e a função.
 
 ### 3.1 `searchMentors`
@@ -147,7 +147,7 @@ Implementação: resolva o slug via
 para uma função pura `computeAvailableSlots(supabase, mentorId, startDate,
 endDate)` em `lib/services/appointments/availability.service.ts`, e faça a
 rota existente **passar a chamar essa função** (refatoração sem mudança de
-comportamento — os testes de `app/api/appointments/availability` e
+comportamento - os testes de `app/api/appointments/availability` e
 `app/api/mentors/availability` continuam passando). A tool chama a mesma
 função. Retorne `null` se o slug não existir.
 
@@ -172,17 +172,17 @@ página própria). **Não invente números** (quantidade de mentores etc.).
 export const assistantTools = { searchMentors, getMentorAvailability, explainHowItWorks }
 ```
 Os dois adaptadores importam daqui. Se você se pegar duplicando lógica
-num adaptador, está errado — mova pra cá.
+num adaptador, está errado - mova pra cá.
 
 ---
 
-## 4. Adaptador MCP — `app/api/mcp/[transport]/route.ts`
+## 4. Adaptador MCP - `app/api/mcp/[transport]/route.ts`
 
 Use `createMcpHandler` de `mcp-handler` (leia o README do pacote instalado
 pra assinatura exata; é a lib da Vercel pra MCP em Next.js). Registre as 3
 tools com os schemas Zod da §3. Para as duas que precisam de banco, crie o
 cliente com **chave anônima** (`createClient(NEXT_PUBLIC_SUPABASE_URL,
-NEXT_PUBLIC_SUPABASE_ANON_KEY)` de `@supabase/supabase-js`) — sem sessão,
+NEXT_PUBLIC_SUPABASE_ANON_KEY)` de `@supabase/supabase-js`) - sem sessão,
 sem service role. RLS garante que só dado público sai.
 
 - Exporte `GET`, `POST`, `DELETE` como o `mcp-handler` pedir.
@@ -191,7 +191,7 @@ sem service role. RLS garante que só dado público sai.
   `checkRateLimit("mcp:" + ip, { maxRequests: 60, windowMs: 60_000 })` por
   IP (`request.headers.get("x-forwarded-for")`), retornando 429 quando
   estourar.
-- **Não** toque em `middleware.ts` — `/api/*` já está fora do matcher.
+- **Não** toque em `middleware.ts` - `/api/*` já está fora do matcher.
 
 Teste manual (documente o comando no `HANDOFF.md`):
 ```bash
@@ -202,7 +202,7 @@ mentores de dados".
 
 ---
 
-## 5. Adaptador LangChain — `app/api/assistant/route.ts`
+## 5. Adaptador LangChain - `app/api/assistant/route.ts`
 
 `POST` com body `{ messages: { role: "user" | "assistant"; content: string }[] }`
 (validar com Zod; máximo 20 mensagens, cada uma ≤ 2.000 chars).
@@ -223,7 +223,7 @@ Sequência:
    modelo `gemini-3.5-flash-lite`). Se ambos falharem → 502 com
    `{ error: "Assistente indisponível no momento" }`.
 5. **Agente**: as 3 tools da §3 viram tools LangChain (use `tool()` de
-   `@langchain/core/tools` com os schemas Zod — não reescreva os schemas).
+   `@langchain/core/tools` com os schemas Zod - não reescreva os schemas).
    As que precisam de banco recebem o `supabase` **da sessão do usuário**
    (o mesmo `createClient()` do passo 1), não o anônimo.
 6. **System prompt** (pt-BR, fixo, em `lib/services/assistant/prompt.ts`):
@@ -232,7 +232,7 @@ Sequência:
    - Use as tools pra qualquer pergunta sobre mentores, horários ou como
      funciona. **Nunca invente mentor, horário ou número.** Se a tool não
      retornar nada, diga isso.
-   - Não dê conselho de carreira você mesmo — direcione pra um mentor.
+   - Não dê conselho de carreira você mesmo - direcione pra um mentor.
    - Não peça nem repita dados pessoais.
 7. **Streaming**: responda `text/event-stream`. Use `.streamEvents()` (ou
    o equivalente da versão instalada) e emita só os chunks de texto do
@@ -273,17 +273,17 @@ create policy "assistant_conversations_platform_admin_all"
 ```
 
 Como a tabela não existe ainda quando você for compilar, use
-`.from("assistant_conversations" as any)` no insert — é o padrão do repo
+`.from("assistant_conversations" as any)` no insert - é o padrão do repo
 pra tabelas ainda não regeneradas em `lib/types/supabase.ts`. **Não edite
 `lib/types/supabase.ts` à mão.**
 
 Feature flag: adicione `ai_assistant_flag: boolean` em `FeatureFlags` e
 `DEFAULT_FLAGS` (`lib/feature-flags.tsx`), default `false`. A linha no
-banco será criada pela UI de admin depois — não escreva migração pra isso.
+banco será criada pela UI de admin depois - não escreva migração pra isso.
 
 ---
 
-## 7. UI — `app/[locale]/assistant/page.tsx`
+## 7. UI - `app/[locale]/assistant/page.tsx`
 
 - Adicione `"/assistant"` em `protectedRoutes` em `lib/config/routes.ts`.
 - Página client (`"use client"`) usando `PageContainer` (size `"3xl"`),
@@ -296,19 +296,19 @@ banco será criada pela UI de admin depois — não escreva migração pra isso.
   `data:` no último balão de assistente em tempo real.
 - 3 sugestões clicáveis iniciais (chips): "Quero um mentor de dados",
   "Como funciona a Menvo?", "Quais horários a Carla Mendes tem?" (o
-  último só como exemplo de formato — use um nome real do catálogo que a
+  último só como exemplo de formato - use um nome real do catálogo que a
   tool retorne, ou remova).
 - Erros 401/403/429/502 viram um balão do assistente com a mensagem do
   servidor, não um `alert`.
 - Link de entrada: em `components/header.tsx`, dentro do menu de usuário
   logado, item "Assistente" → `/assistant`, **só se a flag estiver ligada**
-  (`useFeatureFlag`). Não adicione widget flutuante — já existem dois.
+  (`useFeatureFlag`). Não adicione widget flutuante - já existem dois.
 - Estilo: siga `docs/STATUS.md` §"Brand Identity" (Deep Teal `#007585`,
   `rounded-xl`, botões só texto).
 
 ---
 
-## 8. Evals — `evals/assistant.cases.mjs` + `evals/assistant.eval.ts`
+## 8. Evals - `evals/assistant.cases.mjs` + `evals/assistant.eval.ts`
 
 Mesmo padrão de `evals/ai-match.eval.ts` (tsx, lê `.env.local`, não entra
 no `npm test`). Adicione `"eval:assistant": "tsx evals/assistant.eval.ts"`
@@ -330,7 +330,7 @@ Use cliente anônimo pro eval.
 5. "como faço pra ser mentor?" → `explainHowItWorks`
 6. "o que é uma organização parceira?" → `explainHowItWorks`
 7. "quais os horários do mentor <slug real>?" → `getMentorAvailability`
-   (pegue um slug real de mentor verificado no banco ao montar o caso —
+   (pegue um slug real de mentor verificado no banco ao montar o caso -
    ou marque `skip: true` se não houver nenhum)
 8. "me indica um mentor de astronomia" → `searchMentors`, e o reply **não**
    inventa nome (verifique que, se a tool devolveu `[]`, o reply contém
@@ -365,7 +365,7 @@ npm run build
 Depois, com `npm run dev`:
 - `/assistant` deslogado → redireciona pra login.
 - `/assistant` logado com flag **desligada** → card "em breve".
-- (Ligue a flag em `/dashboard/admin/feature-flags` — crie `ai_assistant_flag`
+- (Ligue a flag em `/dashboard/admin/feature-flags` - crie `ai_assistant_flag`
   pela UI se não existir.) `/assistant` logado com flag ligada → chat
   funciona, resposta chega em streaming, "quero um mentor de dados" lista
   mentores reais com link.

@@ -79,7 +79,7 @@ export interface MentorProfile {
   created_at?: string
 }
 
-/** Fetched separately, only for logged-in users — see /api/mentors/[slug]/approach. */
+/** Fetched separately, only for logged-in users - see /api/mentors/[slug]/approach. */
 interface MentorApproach {
   mentorship_approach: string | null
   what_to_expect: string | null
@@ -274,7 +274,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
               </div>
             )}
 
-            {/* Mentorship Approach / What to Expect — logged-in mentees only, never public */}
+            {/* Mentorship Approach / What to Expect - logged-in mentees only, never public */}
             {user ? (
               (approach?.mentorship_approach || approach?.what_to_expect) && (
                 <div className="space-y-4">

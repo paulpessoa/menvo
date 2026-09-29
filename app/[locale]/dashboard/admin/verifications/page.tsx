@@ -84,7 +84,7 @@ export default function AdminVerificationsPage() {
       // rather than the client-side VerificationService: approving a
       // mentor request also has to assign the "mentor" role in user_roles
       // for a DIFFERENT user than the admin, which needs a service-role
-      // write — see processVerification in notification.service.ts.
+      // write - see processVerification in notification.service.ts.
       await submitVerification(verificationId, "approved", undefined, message)
       toast.success("Mentor aprovado com sucesso!")
       loadVerifications()
@@ -377,7 +377,7 @@ function VerificationDetails({ verification }: { verification: Verification }) {
             <Label htmlFor="resume" className="text-sm cursor-pointer">
               {verification.cv_url ? (
                 <a href={verification.cv_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  Currículo enviado — ver PDF
+                  Currículo enviado - ver PDF
                 </a>
               ) : (
                 "Currículo não enviado"

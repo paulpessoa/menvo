@@ -26,7 +26,7 @@ interface InviteAudienceStepProps {
 /**
  * Passo 1 do modal de convite: escolhe quem recebe a campanha. A
  * contagem de elegíveis vem sempre do servidor (POST /api/admin/invites/audience)
- * — nunca calculada no cliente — para refletir supressões e opt-outs reais.
+ * - nunca calculada no cliente - para refletir supressões e opt-outs reais.
  */
 export function InviteAudienceStep({
   audience,
@@ -71,7 +71,7 @@ export function InviteAudienceStep({
       <div className="space-y-2">
         <Label htmlFor="campaign">Campanha</Label>
         <Input id="campaign" value={campaign} onChange={e => onCampaignChange(e.target.value)} placeholder="estagiorecife-2026" />
-        <p className="text-xs text-muted-foreground">Identifica este envio — cada pessoa recebe no máximo um convite por campanha.</p>
+        <p className="text-xs text-muted-foreground">Identifica este envio - cada pessoa recebe no máximo um convite por campanha.</p>
       </div>
 
       <div className="flex items-center space-x-2">

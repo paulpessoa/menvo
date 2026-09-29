@@ -1,12 +1,12 @@
 ---
-title: "ADR 0001 — LangGraph/LangChain como orquestrador de agentes de IA"
+title: "ADR 0001 - LangGraph/LangChain como orquestrador de agentes de IA"
 owner: paul
 status: current
 last_reviewed: 2026-09-24
 source_of_truth: [lib/services/assistant/agent.ts, lib/ai/models/factory.ts, package.json]
 ---
 
-# ADR 0001 — LangGraph/LangChain como orquestrador
+# ADR 0001 - LangGraph/LangChain como orquestrador
 
 - **Status:** implementado. O assistente (`converse`) já roda sobre
   `createAgent` (pacote `langchain`) com `modelFallbackMiddleware`
@@ -32,11 +32,11 @@ Adotar **LangChain.js + LangGraph** (`@langchain/core`, `@langchain/langgraph`,
    classe implementa `BaseChatModel`. Um SDK de um único provedor amarraria
    a Menvo a ele.
 2. **`createAgent` (não `createReactAgent`, que é `@deprecated`)** para o
-   subgrafo `assistant` com tools — ver ADR 0004 §1 item 2 sobre por que o
+   subgrafo `assistant` com tools - ver ADR 0004 §1 item 2 sobre por que o
    prebuilt não aceita `withFallbacks`.
 3. **`StateGraph` próprio** (não o `createReactAgent`/`createAgent`
    genérico) para o subgrafo `diagnostic` da Fase 1: é uma máquina de
-   estados com slots que o código já conhece (§2.2 do plano) — um agente
+   estados com slots que o código já conhece (§2.2 do plano) - um agente
    ReAct gastaria tokens decidindo "qual a próxima pergunta". Ainda não
    implementado; registrado aqui porque a escolha do orquestrador é a
    mesma.
@@ -54,5 +54,5 @@ Adotar **LangChain.js + LangGraph** (`@langchain/core`, `@langchain/langgraph`,
   `^`), porque comportamento interno (como o de `withFallbacks` documentado
   na ADR 0004) já mudou entre versões menores.
 - Verificar comportamento no `node_modules` instalado antes de assumir uma
-  API, nunca de memória — LangChain.js muda rápido (prática seguida na
+  API, nunca de memória - LangChain.js muda rápido (prática seguida na
   ADR 0004).

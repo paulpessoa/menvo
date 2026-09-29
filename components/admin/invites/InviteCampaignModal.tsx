@@ -38,7 +38,7 @@ interface InviteCampaignModalProps {
 }
 
 /**
- * Convida (ou reenvia convite para) uma campanha de reengajamento —
+ * Convida (ou reenvia convite para) uma campanha de reengajamento -
  * fluxo completo em 4 passos: público, mensagem, pré-visualização e
  * envio. Ver docs/domains/reengagement-invites.md Fase 5.
  */

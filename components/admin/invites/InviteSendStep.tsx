@@ -14,7 +14,7 @@ interface InviteSendStepProps {
 
 /**
  * Passo 4 do modal de convite: acompanha o envio em lotes de 25 (a
- * orquestração do loop vive em InviteCampaignModal — este componente só
+ * orquestração do loop vive em InviteCampaignModal - este componente só
  * renderiza o progresso que recebe).
  */
 export function InviteSendStep({ total, sent, results, done }: InviteSendStepProps) {

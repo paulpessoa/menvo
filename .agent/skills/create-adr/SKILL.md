@@ -9,7 +9,7 @@ metadata:
 
 # ADR Creator
 
-You are an expert in creating Architecture Decision Records (ADRs) — concise, durable documents that capture the context, decision, and consequences of significant architectural choices so future team members understand *why* things are the way they are.
+You are an expert in creating Architecture Decision Records (ADRs) - concise, durable documents that capture the context, decision, and consequences of significant architectural choices so future team members understand *why* things are the way they are.
 
 ## When to Use This Skill
 
@@ -23,20 +23,20 @@ Use this skill when:
 
 Do NOT use for:
 
-- Decisions not yet made — use `create-rfc` to drive the decision process first
-- Implementation planning after the decision — use `technical-design-doc-creator`
+- Decisions not yet made - use `create-rfc` to drive the decision process first
+- Implementation planning after the decision - use `technical-design-doc-creator`
 - Simple configuration choices or trivial code decisions
 - Meeting notes or general documentation
 
-## ADR vs RFC — Critical Distinction
+## ADR vs RFC - Critical Distinction
 
 | Aspect | ADR | RFC |
 |--------|-----|-----|
 | **Timing** | Decision already made (or being finalized) | Before the decision (seeking input) |
 | **Purpose** | Record for future team members | Proposal seeking approval |
 | **Audience** | Engineers joining months or years later | Current stakeholders |
-| **Length** | Short — 200–500 words | Long — thorough comparison |
-| **Mutability** | Immutable — superseded, never edited | Iterative — evolves during review |
+| **Length** | Short - 200–500 words | Long - thorough comparison |
+| **Mutability** | Immutable - superseded, never edited | Iterative - evolves during review |
 | **Tone** | Historical record | Deliberative proposal |
 
 If the user says "I need to decide whether to do X" → use `create-rfc`.
@@ -85,27 +85,27 @@ If the user provides minimal context, use **AskQuestion** to collect essential i
       "id": "adr_format",
       "prompt": "Which ADR format would you like to use?",
       "options": [
-        { "id": "madr", "label": "MADR — structured, with options comparison (recommended)" },
-        { "id": "nygard", "label": "Nygard — minimal: Context / Decision / Consequences" },
-        { "id": "y_statement", "label": "Y-Statement — single paragraph, very compact" }
+        { "id": "madr", "label": "MADR - structured, with options comparison (recommended)" },
+        { "id": "nygard", "label": "Nygard - minimal: Context / Decision / Consequences" },
+        { "id": "y_statement", "label": "Y-Statement - single paragraph, very compact" }
       ]
     },
     {
       "id": "adr_status",
       "prompt": "What is the current status of this decision?",
       "options": [
-        { "id": "accepted", "label": "Accepted — decision is final" },
-        { "id": "proposed", "label": "Proposed — decision is being finalized" },
-        { "id": "deprecated", "label": "Deprecated — this approach is no longer recommended" },
-        { "id": "superseded", "label": "Superseded — replaced by a newer decision" }
+        { "id": "accepted", "label": "Accepted - decision is final" },
+        { "id": "proposed", "label": "Proposed - decision is being finalized" },
+        { "id": "deprecated", "label": "Deprecated - this approach is no longer recommended" },
+        { "id": "superseded", "label": "Superseded - replaced by a newer decision" }
       ]
     },
     {
       "id": "adr_supersedes",
       "prompt": "Does this ADR supersede a previous decision?",
       "options": [
-        { "id": "yes", "label": "Yes — I'll provide the ADR number/title" },
-        { "id": "no", "label": "No — this is a new decision" }
+        { "id": "yes", "label": "Yes - I'll provide the ADR number/title" },
+        { "id": "no", "label": "No - this is a new decision" }
       ]
     }
   ]
@@ -114,21 +114,21 @@ If the user provides minimal context, use **AskQuestion** to collect essential i
 
 ### Step 2: Validate Mandatory Fields
 
-**MANDATORY fields — ask if missing**:
+**MANDATORY fields - ask if missing**:
 
-- **Decision title** (noun phrase, not a question — e.g., "Use Redis for session storage")
+- **Decision title** (noun phrase, not a question - e.g., "Use Redis for session storage")
 - **Date** of the decision (or today's date)
 - **Status** (Accepted / Proposed / Deprecated / Superseded)
-- **Context** — the forces, constraints, and situation that made this decision necessary
-- **The decision itself** — what was chosen and why
-- **Consequences** — what becomes easier, harder, or different as a result
+- **Context** - the forces, constraints, and situation that made this decision necessary
+- **The decision itself** - what was chosen and why
+- **Consequences** - what becomes easier, harder, or different as a result
 
 **RECOMMENDED fields**:
-- **Decision drivers** — the key criteria or constraints
-- **Options considered** — what alternatives were evaluated
-- **Pros/cons per option** — honest trade-off assessment
-- **Decision outcome rationale** — why this option over the others
-- **Links** — related ADRs, RFCs, tickets, or documentation
+- **Decision drivers** - the key criteria or constraints
+- **Options considered** - what alternatives were evaluated
+- **Pros/cons per option** - honest trade-off assessment
+- **Decision outcome rationale** - why this option over the others
+- **Links** - related ADRs, RFCs, tickets, or documentation
 
 If any mandatory fields are missing, ask IN THE USER'S LANGUAGE before generating the document.
 
@@ -181,15 +181,15 @@ Would you like me to:
 
 ## Decision Drivers
 
-- {Driver 1 — e.g., "Must support 10k concurrent users"}
-- {Driver 2 — e.g., "Team has no Go experience"}
-- {Driver 3 — e.g., "Must be deployable on-premise"}
+- {Driver 1 - e.g., "Must support 10k concurrent users"}
+- {Driver 2 - e.g., "Team has no Go experience"}
+- {Driver 3 - e.g., "Must be deployable on-premise"}
 
 ## Considered Options
 
 - {Option A}
 - {Option B}
-- {Option C — "Do nothing / status quo" when relevant}
+- {Option C - "Do nothing / status quo" when relevant}
 
 ## Decision Outcome
 
@@ -202,7 +202,7 @@ Chosen option: **"{Option A}"**, because {concise rationale tied to decision dri
 
 ### Negative Consequences
 
-- {Trade-off 1 — be honest}
+- {Trade-off 1 - be honest}
 - {Trade-off 2}
 
 ## Pros and Cons of the Options
@@ -245,14 +245,14 @@ Accepted | Proposed | Deprecated | Superseded by ADR-{NNN}
 ## Context
 
 {What is the situation that led to this decision?
-What forces are at play — technical, business, organizational?
+What forces are at play - technical, business, organizational?
 What constraints exist? 2–5 sentences.}
 
 ## Decision
 
 {What did we decide to do?
 State it directly, in active voice: "We will use X" or "We decided to adopt Y."
-Include a brief rationale — why this option over the alternatives.}
+Include a brief rationale - why this option over the alternatives.}
 
 ## Consequences
 
@@ -288,10 +288,10 @@ Before finalizing, verify:
 
 - [ ] **Title** is a noun phrase describing the decision (not a question, not a vague label)
 - [ ] **Date** is included (decisions without dates lose context quickly)
-- [ ] **Status** is set correctly — Accepted, Proposed, Deprecated, or Superseded
+- [ ] **Status** is set correctly - Accepted, Proposed, Deprecated, or Superseded
 - [ ] **Context** explains the *forces* that made this decision necessary, not just what was done
 - [ ] **Decision** is stated directly and tied to the context
-- [ ] **Consequences** include honest trade-offs — not just positives
+- [ ] **Consequences** include honest trade-offs - not just positives
 - [ ] **Options** (MADR format) include at least 2 alternatives actually considered
 - [ ] **Supersedes / superseded by** links are included when applicable
 - [ ] **File** follows naming convention: `NNN-kebab-case-title.md`
@@ -343,7 +343,7 @@ native support for JSONB columns, which our schema design requires.
 Our cloud provider (AWS) offers managed PostgreSQL via RDS at acceptable cost.
 ```
 
-Context should explain the *forces* — why wasn't the alternative obviously better?
+Context should explain the *forces* - why wasn't the alternative obviously better?
 
 ---
 
@@ -395,19 +395,19 @@ make it significantly better suited for high-frequency session reads. The operat
 cost of an additional service is justified by the simplified session expiry logic.
 ```
 
-The rationale is *why this option and not the others* — not just what was chosen.
+The rationale is *why this option and not the others* - not just what was chosen.
 
 ---
 
 ## Important Notes
 
-- **ADRs are immutable** — never edit the decision. Supersede with a new ADR.
-- **Short is better** — 200–500 words is ideal. If it needs to be longer, move detail to a linked TDD or RFC.
-- **Context ages** — always date the ADR; what seems obvious now won't be in 3 years.
-- **Honest consequences** — a one-sided ADR loses credibility. Future engineers will hit the downsides regardless.
-- **Link everything** — related ADRs, the RFC that drove the decision, tickets, PR references.
-- **Language adaptation** — always write in the user's language.
-- **Number sequentially** — check the directory before assigning a number.
+- **ADRs are immutable** - never edit the decision. Supersede with a new ADR.
+- **Short is better** - 200–500 words is ideal. If it needs to be longer, move detail to a linked TDD or RFC.
+- **Context ages** - always date the ADR; what seems obvious now won't be in 3 years.
+- **Honest consequences** - a one-sided ADR loses credibility. Future engineers will hit the downsides regardless.
+- **Link everything** - related ADRs, the RFC that drove the decision, tickets, PR references.
+- **Language adaptation** - always write in the user's language.
+- **Number sequentially** - check the directory before assigning a number.
 
 ## Example Prompts that Trigger This Skill
 

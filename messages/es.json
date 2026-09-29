@@ -335,7 +335,7 @@
     },
     "q7": {
       "question": "¿Cómo funciona para organizaciones (ONGs y empresas)?",
-      "answer": "Las ONGs, institutos y empresas con programas de voluntariado pueden tener una página en Menvo para conectar a las personas que atienden — o a sus empleados — con mentores voluntarios, de forma gratuita. Habla con nuestro equipo para crear la página de tu organización."
+      "answer": "Las ONGs, institutos y empresas con programas de voluntariado pueden tener una página en Menvo para conectar a las personas que atienden - o a sus empleados - con mentores voluntarios, de forma gratuita. Habla con nuestro equipo para crear la página de tu organización."
     },
     "q8": {
       "question": "¿Puedo ser mentor y mentee al mismo tiempo?",
@@ -751,7 +751,7 @@
     },
     "reengagement": {
       "title": "Base de datos de Estágio Recife",
-      "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil — el enlace de respuesta del correo lleva directo a esa opción."
+      "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil - el enlace de respuesta del correo lleva directo a esa opción."
     },
     "rights": {
       "title": "Tus Derechos",
@@ -1056,7 +1056,7 @@
     "suggestModal": {
       "cta": "Sugiere un tema",
       "title": "Sugerir un tema o mentor",
-      "description": "¿No encontraste lo que buscabas? Cuéntanos — cada sugerencia nos ayuda a decidir qué mentores invitar a la plataforma.",
+      "description": "¿No encontraste lo que buscabas? Cuéntanos - cada sugerencia nos ayuda a decidir qué mentores invitar a la plataforma.",
       "contextLabel": "Enviaremos junto los filtros de tu búsqueda:",
       "topicLabel": "¿Qué estabas buscando?",
       "topicPlaceholder": "Ej: Producto, Carrera en TI, Diseño de Servicios...",
@@ -1570,13 +1570,13 @@
       "meetPending": "El enlace de Google Meet aparece aquí en cuanto se genere.",
       "howItWorksTitle": "Cómo funciona tu sesión",
       "howItWorksMeet": "Las mentorías confirmadas son 100% online por Google Meet. El enlace se genera automáticamente y aparece en la tarjeta de la sesión.",
-      "howItWorksTip": "Entra 5 minutos antes y lleva tus objetivos principales. Después de la sesión, evalúa a tu mentor — ayuda a la comunidad.",
+      "howItWorksTip": "Entra 5 minutos antes y lleva tus objetivos principales. Después de la sesión, evalúa a tu mentor - ayuda a la comunidad.",
       "exploreMentors": "Explorar mentores",
       "asMentor": {
         "tab": "Recibidas",
         "tabSub": "Tú como mentor",
         "actionTitle": "Esperando tu respuesta",
-        "actionHint": "Confirma o rechaza antes de la fecha — las solicitudes sin respuesta expiran.",
+        "actionHint": "Confirma o rechaza antes de la fecha - las solicitudes sin respuesta expiran.",
         "upcomingEmpty": "Aún no hay sesiones confirmadas.",
         "emptyTitle": "Aún no recibiste solicitudes de mentoría",
         "emptyDesc": "Mantén tu disponibilidad actualizada para que los mentees vean horarios libres.",
@@ -1950,7 +1950,7 @@
     },
     "reengagement": {
       "title": "Base de datos de Estágio Recife",
-      "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil — el enlace de respuesta del correo lleva directo a esa opción."
+      "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil - el enlace de respuesta del correo lleva directo a esa opción."
     },
     "retention": {
       "title": "Por cuánto tiempo guardamos sus datos",

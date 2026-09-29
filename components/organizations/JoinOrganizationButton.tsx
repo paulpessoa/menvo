@@ -97,7 +97,7 @@ export function JoinOrganizationButton({ slug, orgName, joinPolicy }: Props) {
   if (status === "requested") {
     return (
       <p className="flex items-center gap-2 text-muted-foreground mt-2">
-        <Clock className="h-5 w-5" /> Solicitação enviada — aguardando aprovação da organização
+        <Clock className="h-5 w-5" /> Solicitação enviada - aguardando aprovação da organização
       </p>
     )
   }

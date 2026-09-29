@@ -6,7 +6,7 @@ last_reviewed: 2026-09-28
 source_of_truth: [lib/services/appointments/availability.service.ts, app/api/appointments/availability/route.ts, app/api/mentors/availability/route.ts]
 ---
 
-# Sistema de Agenda e Disponibilidade de Mentorias — Menvo
+# Sistema de Agenda e Disponibilidade de Mentorias - Menvo
 
 Este documento consolida as **regras de negócio, arquitetura e fluxo de dados** do sistema de agendamento e disponibilidade entre mentores e mentorados na Menvo.
 
@@ -63,15 +63,15 @@ Um slot projetado só é exibido como disponível para o mentorado se passar por
 3. **Ciclo Virtuoso de Feedback (Avaliações Pendentes):**
    - Se o mentorado tiver alguma mentoria passada que ainda não foi avaliada, o sistema bloqueia novos agendamentos e solicita a avaliação da sessão anterior.
 
-> **Não existe** filtro de conflito com o Google Calendar de cada mentor — os
+> **Não existe** filtro de conflito com o Google Calendar de cada mentor - os
 > mentores não conectam agenda própria. O Google Meet de toda sessão é criado
 > numa **única conta pessoal do Paul** (MVP deliberado, `GOOGLE_CALENDAR_*`),
-> com mentor e mentorado como convidados — não é a agenda de ninguém mais.
+> com mentor e mentorado como convidados - não é a agenda de ninguém mais.
 > Um `getCalendarBusyIntervals` que consultava `calendar.freebusy.query` nessa
 > mesma conta e aplicava o resultado a **todos os mentores** existiu até
 > 2026-09-28: qualquer mentoria confirmada de qualquer mentor (ou um evento
 > pessoal do Paul) bloqueava o mesmo horário para todo mundo. Removido nessa
-> data — ver `docs/product/how-it-works.md`, C-T5.
+> data - ver `docs/product/how-it-works.md`, C-T5.
 
 ### 3. Fuso Horário e Precisão
 * Todo o banco de dados armazena os horários em **UTC**.

@@ -14,7 +14,7 @@ interface InviteMessageStepProps {
 /**
  * Passo 2 do modal de convite: assunto e corpo, editáveis pelo admin.
  * Os botões de ação e o rodapé de LGPD (opt-out/exclusão) são fixos e
- * entram automaticamente — ver lib/email/brevo.ts `buildReengagementInviteHtml`.
+ * entram automaticamente - ver lib/email/brevo.ts `buildReengagementInviteHtml`.
  */
 export function InviteMessageStep({ subject, onSubjectChange, body, onBodyChange }: InviteMessageStepProps) {
   return (

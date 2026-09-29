@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [{ url: "https://www.menvo.com.br/images/menvopeople.jpg", width: 1200, height: 630, alt: title }]
     },
-    // Invite-only orgs aren't meant to be discovered by strangers — keep
+    // Invite-only orgs aren't meant to be discovered by strangers - keep
     // them out of search results even though the page itself still works
     // for anyone holding the direct link.
     robots: (organization as any).join_policy === "invite_only"
@@ -62,7 +62,7 @@ export default async function OrganizationLandingPage({ params }: PageProps) {
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{organization.name}</h1>
       <p className="text-muted-foreground max-w-[600px] md:text-lg">
         A {organization.name} é parceira da Menvo. Participe do grupo dela para se conectar com
-        mentores voluntários — gratuito, sempre.
+        mentores voluntários - gratuito, sempre.
       </p>
       <JoinOrganizationButton
         slug={organization.slug}

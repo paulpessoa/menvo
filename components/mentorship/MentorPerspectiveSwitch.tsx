@@ -22,7 +22,7 @@ function useActionCount(perspective: Perspective) {
 
 /**
  * Two-option switch between "mentorias que recebo" (mentor) and "mentorias
- * que solicito" (mentee) — the one distinction a mentor must never confuse.
+ * que solicito" (mentee) - the one distinction a mentor must never confuse.
  *
  * Each side shows its own pending-action count so the mentor sees at a glance
  * whether the other side needs them, without switching.

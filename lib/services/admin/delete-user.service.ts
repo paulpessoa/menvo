@@ -12,14 +12,14 @@ export interface DeleteUserResult {
 }
 
 /**
- * The one place a Menvo account is permanently deleted — used by the
+ * The one place a Menvo account is permanently deleted - used by the
  * admin "remove user" action and by the public invite-token self-service
  * deletion flow, so both paths log the same LGPD deletion record, clear
  * the same storage files, and suppress the same e-mail from future
  * campaigns/imports.
  *
  * Runs with the service-role client because deleting from `auth.users`
- * requires the Admin API (there is no user-facing equivalent) — the
+ * requires the Admin API (there is no user-facing equivalent) - the
  * caller must already be authorized (`requireAdmin()` for the admin
  * path, a validated invite token for the self-service path). See
  * docs/domains/reengagement-invites.md §3.3 for why this is a deliberate,

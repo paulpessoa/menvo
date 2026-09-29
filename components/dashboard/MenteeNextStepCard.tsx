@@ -47,7 +47,7 @@ export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, di
             <div>
               <h4 className="text-sm font-bold text-foreground">Seu próximo passo: avaliar sua última mentoria</h4>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Sua opinião ajuda o mentor a evoluir — e libera seu próximo agendamento.
+                Sua opinião ajuda o mentor a evoluir - e libera seu próximo agendamento.
               </p>
             </div>
           </div>

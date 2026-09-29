@@ -25,7 +25,7 @@ const RECOMMENDATION_LABEL: Record<MentorReviewDraft["recommendation"], string> 
 /**
  * Renders one generated draft (assessment + editable message) and its
  * primary action: send for approve/reject tabs, copy-to-clipboard for
- * announce. Purely presentational — all state lives in the parent dialog.
+ * announce. Purely presentational - all state lives in the parent dialog.
  */
 export function MentorReviewDraftPanel({
   tab,

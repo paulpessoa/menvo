@@ -11,7 +11,7 @@ This skill runs the **Patterns 1–5** analysis pipeline before service extracti
 
 ### Quick start (what users can say)
 
-- **Full pipeline:** “Run modular decomposition Patterns 1 through 5 on this repo,” “Analyze this monolith for splitting—inventory, coupling, and domain grouping.”
+- **Full pipeline:** “Run modular decomposition Patterns 1 through 5 on this repo,” “Analyze this monolith for splitting-inventory, coupling, and domain grouping.”
 - **Single early step:** “Identify and size components here,” “Find duplicated domain logic across modules,” “Analyze coupling between our packages.”
 - **With DDD lens:** “Group components into domains and check bounded contexts,” “Use DDD strategic design on this codebase before we group services.”
 
@@ -24,27 +24,27 @@ If the user only wants **extraction order, phases, or migration roadmap** after 
 3. **Load references:** For each pattern, open the matching `references/pattern-NN-*.md` file and follow its instructions. Use the optional `*-quick-reference.md` for the same number when a short checklist is enough.
 4. **Carry context forward:** Reuse outputs from earlier patterns in later ones (e.g. component inventory from Pattern 1 informs coupling in 4 and grouping in 5). Reference concrete paths, modules, or tables from previous steps.
 5. **Domain language (Pattern 5):** If subdomains or bounded contexts need grounding beyond structure, read `references/domain-analysis.md` **before or alongside** Pattern 5. Optionally open `references/domain-analysis-quick-reference.md` or `references/domain-analysis-examples.md` for condensed rules or illustrations.
-6. **Deliver:** Produce clear, actionable findings per pattern or one consolidated report—always tied to evidence from the repository (files, dependencies, metrics), not generic advice.
+6. **Deliver:** Produce clear, actionable findings per pattern or one consolidated report-always tied to evidence from the repository (files, dependencies, metrics), not generic advice.
 
 ### Usage examples
 
-**Example 1 — Full pipeline**
+**Example 1 - Full pipeline**
 
 ```
-User: "We're going to split this monolith—run the full decomposition analysis (Patterns 1–5)."
+User: "We're going to split this monolith-run the full decomposition analysis (Patterns 1–5)."
 
 Agent: Execute patterns 1→5 in order, loading each references/pattern-NN-*.md, preserving outputs between steps, then summarize cross-cutting recommendations.
 ```
 
-**Example 2 — Coupling after inventory**
+**Example 2 - Coupling after inventory**
 
 ```
-User: "We already have a rough module list—focus on coupling (Pattern 4) and then domain grouping (Pattern 5)."
+User: "We already have a rough module list-focus on coupling (Pattern 4) and then domain grouping (Pattern 5)."
 
 Agent: If no prior inventory exists in the thread, either run Pattern 1 briefly or derive an explicit module list from the repo before 4 and 5. State any assumptions.
 ```
 
-**Example 3 — DDD before grouping**
+**Example 3 - DDD before grouping**
 
 ```
 User: "Map bounded contexts and language, then group components into domains."
@@ -67,7 +67,7 @@ Agent: Read references/domain-analysis.md (and optional quick reference/examples
 | 4    | Coupling analysis                  | `references/pattern-04-coupling.md`                                                                        |
 | 5    | Domain identification and grouping | `references/pattern-05-domain-grouping.md` (optional: `pattern-05-domain-grouping-quick-reference.md`)     |
 
-## Pattern 6 — planning and extraction
+## Pattern 6 - planning and extraction
 
 **Pattern 6** (_create domain services / extraction_) is not duplicated here. After Pattern 5, switch to **decomposition-planning-roadmap** for phased extraction order, milestones, and migration-style planning. For full legacy migration strategy (strangler-fig, cross-stack rewrites, research-heavy plans), optionally use **legacy-migration-planner** in addition.
 

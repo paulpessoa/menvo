@@ -77,7 +77,7 @@ describe("resolveAudience", () => {
     const result = await resolveAudience({ audience: "all", campaign: "c1" })
     expect(result.eligible.map(p => p.id)).toEqual(["u2"])
     expect(result.skipped.suppressed).toBe(1)
-    // profiles, reengagement_invites, email_suppressions — three calls total, not one per candidate.
+    // profiles, reengagement_invites, email_suppressions - three calls total, not one per candidate.
     expect(supabase.from).toHaveBeenCalledTimes(3)
   })
 

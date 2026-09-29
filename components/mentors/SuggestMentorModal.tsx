@@ -38,7 +38,7 @@ interface SuggestMentorModalProps {
 
 /**
  * Captures demand the catalog can't serve yet. Opened from the empty state of
- * /mentors, so it arrives pre-filled with the search term and active filters —
+ * /mentors, so it arrives pre-filled with the search term and active filters -
  * the less the person has to retype, the more likely they finish.
  */
 export function SuggestMentorModal({ isOpen, onClose, initialTopic = "", context }: SuggestMentorModalProps) {

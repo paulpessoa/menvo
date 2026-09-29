@@ -186,7 +186,7 @@ export default function MenteeDashboard() {
             {/* TAB: OVERVIEW */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
               {/* Seu próximo passo: uma única ação, derivada do estado real
-                  (avaliar > sessão agendada > diagnóstico > buscar mentor) —
+                  (avaliar > sessão agendada > diagnóstico > buscar mentor) -
                   substitui o banner de avaliação e o CTA de diagnóstico soltos. */}
               {!(loading || loadingQuiz) && (
                 <MenteeNextStepCard
@@ -197,7 +197,7 @@ export default function MenteeDashboard() {
                 />
               )}
 
-              {/* Resultado do diagnóstico (só quando já existe — o CTA para
+              {/* Resultado do diagnóstico (só quando já existe - o CTA para
                   fazer o diagnóstico pela 1ª vez já está no card acima). */}
               {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
 

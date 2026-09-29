@@ -7,7 +7,7 @@ const PAGE_SIZE = 1000
  * Reads every row of a query page by page. PostgREST silently caps a
  * response at 1000 rows, so a plain select would quietly drop part of the
  * audience once the table grows past that (this bit an earlier version of
- * `resolveAudience` — see docs/domains/account-retention.md). `buildPage`
+ * `resolveAudience` - see docs/domains/account-retention.md). `buildPage`
  * must apply a stable order so paging never skips or repeats a row.
  */
 export async function fetchAllRows<T>(
@@ -42,7 +42,7 @@ export interface ResolveAudienceResult {
 
 /**
  * Every user ID with at least one auth.users sign-in, paginating through
- * the Admin API (there is no way to filter this from PostgREST — the
+ * the Admin API (there is no way to filter this from PostgREST - the
  * `auth` schema isn't exposed to it). Used only by the "never signed in"
  * audience, an infrequent admin action, so the O(users) scan is fine.
  */
@@ -67,7 +67,7 @@ export async function fetchSignedInUserIds(): Promise<Set<string>> {
 
 /**
  * Turns an admin-chosen audience into the concrete list of people a
- * reengagement campaign can actually reach — after removing anyone
+ * reengagement campaign can actually reach - after removing anyone
  * suppressed (asked to be deleted/opted out), opted out via
  * `profiles.email_opt_out_at`, or already invited for this exact
  * campaign (unless `resend` is set). Shared by the count-preview

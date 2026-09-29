@@ -20,7 +20,7 @@ const bodySchema = z.object({
 /**
  * AI draft for the mentor verification screen: an assessment of the
  * application plus the approval message, the adjustment request, or a
- * LinkedIn announcement post. Suggestion only — it never notifies anyone;
+ * LinkedIn announcement post. Suggestion only - it never notifies anyone;
  * the admin edits the text and sends it through /api/admin/verify.
  */
 export async function POST(request: NextRequest) {

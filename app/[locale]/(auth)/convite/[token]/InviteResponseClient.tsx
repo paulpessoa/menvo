@@ -23,7 +23,7 @@ const RESPONSE_LABEL: Record<string, string> = {
 }
 
 /**
- * Botões de ação do convite. Cada um dispara um POST só no clique — abrir
+ * Botões de ação do convite. Cada um dispara um POST só no clique - abrir
  * esta página nunca executa nada (ver page.tsx e §3.2 do design doc).
  */
 export function InviteResponseClient({ token, firstName, alreadyResponded }: InviteResponseClientProps) {
@@ -94,7 +94,7 @@ export function InviteResponseClient({ token, firstName, alreadyResponded }: Inv
             <MailX className="h-6 w-6 text-muted-foreground" />
           </div>
           <CardTitle>Combinado, {firstName}.</CardTitle>
-          <CardDescription>Você não vai mais receber e-mails da Menvo. Seus dados continuam guardados caso mude de ideia — se preferir apagá-los também, é só voltar aqui.</CardDescription>
+          <CardDescription>Você não vai mais receber e-mails da Menvo. Seus dados continuam guardados caso mude de ideia - se preferir apagá-los também, é só voltar aqui.</CardDescription>
         </CardHeader>
       </Card>
     )

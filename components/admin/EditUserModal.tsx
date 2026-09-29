@@ -423,7 +423,7 @@ export function EditUserModal({
             <p className="text-[11px] text-blue-700 italic flex items-center gap-1">
               <Shield className="h-3 w-3" /> Alterar papéis concede ou remove
               acesso a áreas privadas instantaneamente. Para tornar alguém
-              mentor, prefira &quot;Aprovar como mentor&quot; abaixo — ele também
+              mentor, prefira &quot;Aprovar como mentor&quot; abaixo - ele também
               publica o perfil e avisa a pessoa.
             </p>
           </div>
@@ -530,7 +530,7 @@ export function EditUserModal({
             </details>
           </div>
 
-          {/* Candidatura a mentor — decisões vão por /api/admin/verify */}
+          {/* Candidatura a mentor - decisões vão por /api/admin/verify */}
           <MentorApplicationPanel
             userId={user.id}
             status={user.verification_status ?? null}

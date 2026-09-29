@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 
-/** Botões do hero — o link de "Torne-se um Mentor" depende do login. */
+/** Botões do hero - o link de "Torne-se um Mentor" depende do login. */
 export function HeroActions() {
   const t = useTranslations("home.hero")
   const { isAuthenticated } = useAuth()

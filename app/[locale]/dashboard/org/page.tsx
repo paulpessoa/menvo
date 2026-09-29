@@ -61,8 +61,8 @@ function MemberRow({
 }) {
   return (
     <TableRow className={m.status === "invited" ? "opacity-60" : undefined}>
-      <TableCell className="font-medium">{m.fullName ?? "—"}</TableCell>
-      <TableCell className="text-muted-foreground">{m.email ?? "—"}</TableCell>
+      <TableCell className="font-medium">{m.fullName ?? "-"}</TableCell>
+      <TableCell className="text-muted-foreground">{m.email ?? "-"}</TableCell>
       <TableCell>
         {m.status === "invited" ? (
           <Badge variant="outline">Convidado</Badge>
@@ -329,7 +329,7 @@ export default function OrgAdminDashboardPage() {
                 <div key={m.userId} className="flex items-center justify-between gap-3 p-2 border rounded-lg">
                   <div className="min-w-0">
                     <p className="font-medium truncate">
-                      {m.fullName ?? "—"}
+                      {m.fullName ?? "-"}
                       {m.platformRole && (
                         <span className="text-xs text-muted-foreground ml-2">
                           ({m.platformRole === "mentor" ? "mentor" : "mentorado"})
@@ -359,7 +359,7 @@ export default function OrgAdminDashboardPage() {
           <CardDescription>
             {isOpen
               ? "Aberta: qualquer pessoa logada pode solicitar participação em /o/" + organization?.slug + "."
-              : "Somente por convite: a página existe, mas ninguém pode solicitar participação sozinho — só quem você convidar entra."}
+              : "Somente por convite: a página existe, mas ninguém pode solicitar participação sozinho - só quem você convidar entra."}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center gap-3">

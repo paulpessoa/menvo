@@ -6,7 +6,7 @@ import { z } from "zod"
  * AI_PLATFORM_PLAN.md §8 Fase 0 item 6.
  *
  * lib/ai/ is the reusable core (AI_PLATFORM_PLAN.md §10) and never imports
- * from lib/services/* — the `mentors_found` payload is validated by the
+ * from lib/services/* - the `mentors_found` payload is validated by the
  * caller (lib/services/assistant/tools.ts' `mentorCardDto`) before it
  * reaches this schema, so here it's opaque records, not the Menvo shape.
  */
@@ -70,7 +70,7 @@ export function encodeSseDone(): Uint8Array {
 
 /**
  * Parses one `data: ...` SSE line into a typed event, `"done"`, or `null`
- * (not a data line, or a payload the schema rejects — e.g. a partial chunk
+ * (not a data line, or a payload the schema rejects - e.g. a partial chunk
  * mid-decode). Never throws: the client reads a stream byte-by-byte and a
  * line can arrive incomplete.
  */

@@ -63,7 +63,7 @@ export default function AdminDashboard() {
 
   // Same endpoint (/api/admin/stats) the "Aguardando" tab in
   // /dashboard/admin/users and the queue in /dashboard/admin/verifications
-  // are built from — one query per number, no ad hoc counting here, so the
+  // are built from - one query per number, no ad hoc counting here, so the
   // card and what you find after clicking "Acessar" always agree.
   const fetchStats = async () => {
     try {

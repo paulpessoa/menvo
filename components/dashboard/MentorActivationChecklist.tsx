@@ -20,11 +20,11 @@ interface MentorActivationChecklistProps {
  * done everything needed to actually be bookable. A mentor with the `mentor`
  * role but no availability or no topics filled in is invisible/un-bookable
  * on `/mentors` (see docs/domains/mentor-verification.md) and nothing today
- * tells them why — this card is that missing signal.
+ * tells them why - this card is that missing signal.
  *
  * No "connect Google Calendar" item on purpose: Meet links are created on a
  * single platform account (GOOGLE_CALENDAR_REFRESH_TOKEN) with the mentor as
- * attendee, so mentors never connect their own calendar — see
+ * attendee, so mentors never connect their own calendar - see
  * docs/product/how-it-works.md, C-T1b.
  */
 export function MentorActivationChecklist({ profile }: MentorActivationChecklistProps) {
@@ -50,7 +50,7 @@ export function MentorActivationChecklist({ profile }: MentorActivationChecklist
       (((profile.expertise_areas?.length ?? 0) > 0) || ((profile.mentorship_topics?.length ?? 0) > 0))
   )
 
-  // Still loading availability — don't flash a wrong state.
+  // Still loading availability - don't flash a wrong state.
   if (availabilityConfigured === null) return null
 
   const items = [

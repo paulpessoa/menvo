@@ -6,7 +6,7 @@
  * the last resort when no provider is available or every attempt fails.
  *
  * Returns, next to the result, one `AiCallRecord` per attempt so the caller
- * can meter cost — including attempts that failed and the keyword fallback.
+ * can meter cost - including attempts that failed and the keyword fallback.
  */
 import { z } from "zod"
 import type { SupabaseClient } from "@supabase/supabase-js"
@@ -49,13 +49,13 @@ interface MentorSummary {
 
 /**
  * O modelo às vezes "inventa" um mentor_id que não é o valor exato do campo
- * `id` fornecido no contexto — por exemplo, uma versão simplificada do nome
+ * `id` fornecido no contexto - por exemplo, uma versão simplificada do nome
  * (`"nayane_prudencio"`) em vez do UUID real. Isso passaria despercebido até
  * o front-end tentar buscar esse ID no banco: como o Postgres rejeita a
  * cláusula `.in()` inteira quando um valor não é um UUID válido, um único
  * ID alucinado derruba a exibição de TODOS os mentores sugeridos, mesmo os
  * que vieram certos. Filtramos aqui, na fronteira do serviço de IA, pra
- * nunca deixar um ID inventado sair — não importa qual provedor (OpenAI,
+ * nunca deixar um ID inventado sair - não importa qual provedor (OpenAI,
  * Groq ou o fallback determinístico) gerou o resultado.
  */
 function sanitizeResult(result: AIMatchResult, validIds: Set<string>): AIMatchResult {
@@ -135,7 +135,7 @@ REGRAS CRÍTICAS DE INTEGRIDADE:
 3. JUSTIFICATIVA HONESTA: Se "no_match" for true, em "global_justification", explique cordialmente que a rede Menvo ainda não possui especialistas específicos nessa área, mas que novas conexões são adicionadas semanalmente.
 4. FOCO DE NEGÓCIO: Dê prioridade a Carreira, Tecnologia, Programação, Produto, Design, Dados, Gestão e Educação.
 5. Retorne NO MÁXIMO 4 mentores recomendados.
-6. ID EXATO: o campo "mentor_id" de cada sugestão deve ser IDÊNTICO, caractere por caractere, ao valor do campo "id" do mentor correspondente na lista acima (um UUID, ex: "0737122a-0579-4981-9802-41883d6563a3"). NUNCA invente, abrevie ou crie uma versão do nome como id — copie o "id" exatamente como está na lista.
+6. ID EXATO: o campo "mentor_id" de cada sugestão deve ser IDÊNTICO, caractere por caractere, ao valor do campo "id" do mentor correspondente na lista acima (um UUID, ex: "0737122a-0579-4981-9802-41883d6563a3"). NUNCA invente, abrevie ou crie uma versão do nome como id - copie o "id" exatamente como está na lista.
 
 FORMATO JSON OBRIGATÓRIO:
 {
@@ -153,7 +153,7 @@ export const aiMatchService = {
   /**
    * Finds the best mentor matches for a given query against available mentors
    * context. `supabase` is the caller's session client, used only to resolve
-   * the `rank` capability's model chain (`ai_model_config`, RLS applies) —
+   * the `rank` capability's model chain (`ai_model_config`, RLS applies) -
    * no domain query happens here.
    */
   async findOptimalMentors(

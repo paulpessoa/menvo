@@ -3,7 +3,7 @@ import { createServiceRoleClient, ensureServerSide } from "@/lib/utils/supabase/
 
 /**
  * The do-not-contact list (`email_suppressions`) is keyed by a hash, never
- * the plaintext e-mail — once someone asks to be deleted we should still be
+ * the plaintext e-mail - once someone asks to be deleted we should still be
  * able to recognize them on a future JotForm re-import without retaining
  * their address. This is the single place that hash is computed, so every
  * caller normalizes the same way (lowercased, trimmed) before hashing.
@@ -15,7 +15,7 @@ export function hashEmail(email: string): string {
 /**
  * True if this e-mail asked to be deleted or opted out before. Callers
  * (bulk invite send, future JotForm import) must skip suppressed
- * addresses — sending to them again would defeat the LGPD request that put
+ * addresses - sending to them again would defeat the LGPD request that put
  * them here.
  */
 export async function isSuppressed(email: string): Promise<boolean> {

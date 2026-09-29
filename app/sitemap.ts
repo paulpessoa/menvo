@@ -6,7 +6,7 @@ import type { Database } from '@/lib/types/supabase'
 const BASE_URL = 'https://www.menvo.com.br'
 
 // Without this, Next.js prerenders sitemap.ts once at build time and serves
-// that static file until the next deploy — a newly approved mentor (or one
+// that static file until the next deploy - a newly approved mentor (or one
 // who edits their profile) wouldn't appear/update in the sitemap until
 // someone redeploys. Regenerate at most hourly instead.
 export const revalidate = 3600
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   })
 
   // Individual mentor profiles are the highest-value, most unique content
-  // this site has for search — each is keyword-rich and one-of-a-kind —
+  // this site has for search - each is keyword-rich and one-of-a-kind -
   // but they were entirely missing from the sitemap, so search engines had
   // no way to discover them short of crawling internal links.
   try {
@@ -89,7 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[sitemap] Failed to load mentor profiles:', error)
   }
 
-  // Partner organization landing pages (/o/[slug]) — only ones that opted
+  // Partner organization landing pages (/o/[slug]) - only ones that opted
   // into being discoverable (roadmap §6.5). Invite-only orgs are excluded:
   // their page still resolves for someone holding the direct link, but
   // isn't meant to be found by strangers via search.

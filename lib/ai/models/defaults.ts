@@ -5,7 +5,7 @@ import type { ModelChain } from "./types"
  * Built-in copy of the `ai_model_config` seed (AI_PLATFORM_PLAN.md §11.2;
  * migration `supabase/migrations/20260923000004_ai_model_config.sql`). Used
  * whenever the table is empty, unreadable, or a row fails validation (ADR
- * 0004 §5) — the platform never depends on the database being seeded to have
+ * 0004 §5) - the platform never depends on the database being seeded to have
  * a working model.
  *
  * Keep this in sync with the migration's `insert into ai_model_config …`:

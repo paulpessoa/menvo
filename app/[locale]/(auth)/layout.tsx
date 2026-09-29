@@ -13,7 +13,7 @@ interface AuthLayoutProps {
 
 /**
  * Layout unificado para todas as páginas de autenticação do Menvo.
- * Não repete a logo — o Header global já a exibe no topo.
+ * Não repete a logo - o Header global já a exibe no topo.
  */
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (

@@ -41,7 +41,7 @@ Stitch is FREE (Google Labs) with generation limits:
 - Gemini 3 Flash: faster generation, higher monthly limits
 - Gemini 3 Pro: higher fidelity, deeper reasoning, lower limits
 
-Stitch is an IDEATION tool — it generates starting points, not final
+Stitch is an IDEATION tool - it generates starting points, not final
 production code. This makes it perfect for our workflow: visualize first,
 code after approval.
 
@@ -77,7 +77,7 @@ Frame it as a time-saver, not a requirement. Example:
 "Before we write any code, I'd suggest we prototype this in Google Stitch
 first. It'll take 2 minutes to generate the screens, you can see exactly
 what the result will look like, and we avoid any rework. I can generate
-the prompts for you — you just paste them in stitch.withgoogle.com.
+the prompts for you - you just paste them in stitch.withgoogle.com.
 
 If you have the Stitch MCP connected, I can even generate the designs
 directly from here. Want me to help you set that up?"
@@ -104,7 +104,7 @@ Auth method:     API Key (recommended) or OAuth token
 
 ### Generic MCP Configuration Pattern
 
-Every MCP client uses the same core structure — only the config file
+Every MCP client uses the same core structure - only the config file
 format and field names differ. The universal pattern is:
 
 ```
@@ -118,7 +118,7 @@ When helping the user configure their specific tool:
 2. Locate where that tool stores MCP server configs (usually a JSON file)
 3. Apply the pattern above using that tool's config schema
 
-For reference, here are examples for common tools (may change — always
+For reference, here are examples for common tools (may change - always
 defer to the tool's own MCP documentation if these don't work):
 
 **JSON-based config** (Cursor, VSCode, Windsurf, Antigravity, etc.):
@@ -142,7 +142,7 @@ The exact file path and wrapping structure varies per tool. If the user
 doesn't know where their config goes, suggest checking the tool's docs
 for "MCP server configuration" or "remote MCP setup".
 
-### OAuth (Advanced — edge cases only)
+### OAuth (Advanced - edge cases only)
 
 Some environments don't allow persistent API keys on disk. In those
 cases, Stitch supports OAuth via Google Cloud Application Default
@@ -158,7 +158,7 @@ X-Goog-User-Project: <PROJECT_ID>
 
 If the user needs OAuth, refer them to the official Stitch MCP setup
 documentation at stitch.withgoogle.com/docs/mcp/setup for the most
-current instructions. Do NOT attempt to script this — the process
+current instructions. Do NOT attempt to script this - the process
 involves browser-based login flows that are best done interactively.
 
 ### Verifying Connection
@@ -171,9 +171,9 @@ After setup, ask the agent: "Show me my Stitch projects" or
 
 | Problem | Solution |
 |---------|----------|
-| "Unauthenticated" error | API key invalid or OAuth token expired — regenerate |
+| "Unauthenticated" error | API key invalid or OAuth token expired - regenerate |
 | "Permission denied" | For OAuth: ensure `serviceUsageConsumer` role is granted |
-| Connection timeout | Stitch MCP is remote — check internet, retry in 30s |
+| Connection timeout | Stitch MCP is remote - check internet, retry in 30s |
 | Tool not found | Ensure MCP URL is exactly `https://stitch.googleapis.com/mcp` |
 | Config not recognized | Check your tool's MCP docs for the correct config format |
 
@@ -192,7 +192,7 @@ Content: The actual content on the screen (sections, components, text)
 Image:   Optional reference image for visual direction
 ```
 
-The first prompt does NOT need to be perfect. Stitch is iterative —
+The first prompt does NOT need to be perfect. Stitch is iterative -
 generate, review, refine one thing at a time.
 
 ### Prompt Quality Rules
@@ -210,7 +210,7 @@ DON'T:
 
 - Write 5000+ character prompts (Stitch drops components)
 - Combine multiple structural changes in one edit prompt
-- Say vague things like "make it look cool" — use Style Word Bank instead
+- Say vague things like "make it look cool" - use Style Word Bank instead
 - Forget to specify which screen when editing
 
 ### Translating Design Direction to Stitch Prompts
@@ -239,14 +239,14 @@ Literata, Source Serif Four
 
 If the user's chosen font is not in this list, pick the closest match
 from the list above and note the substitution. The final code will use
-the actual desired font — Stitch is just for prototyping.
+the actual desired font - Stitch is just for prototyping.
 
 ### Prompt Templates by Project Type
 
 **Landing Page:**
 
 ```
-Idea: A landing page for [product/service name] — [one-line description].
+Idea: A landing page for [product/service name] - [one-line description].
 Theme: [mood adjectives]. [Light/Dark] theme with [color description].
   [Style keyword if applicable: Editorial, Bento Grid, Swiss Style, etc.]
 Content: Hero section with headline "[actual headline text]" and
@@ -268,7 +268,7 @@ Content: Sidebar navigation with [items]. Main area with [widget types:
 **Mobile App Screen:**
 
 ```
-Idea: [Screen name] screen for [app name] — [app description].
+Idea: [Screen name] screen for [app name] - [app description].
 Theme: [mood]. [Color scheme]. [Style keyword].
 Content: [Top navigation/header]. [Main content area with specific
   components]. [Bottom navigation with tab items]. [Specific text,
@@ -308,11 +308,11 @@ After initial generation, refine with targeted prompts:
 
 - **Use for:** Complex logic, multi-section layouts, dashboards,
   production-candidate designs
-- **Behavior:** Takes longer, "thinks" through implications — navigation
+- **Behavior:** Takes longer, "thinks" through implications - navigation
   flow, hierarchy, color interactions
 - **Best when:** Building complex dashboards, nuanced landing pages,
   multi-step flows
-- **MCP `modelId`:** `GEMINI_3_PRO` (current value — may change as new
+- **MCP `modelId`:** `GEMINI_3_PRO` (current value - may change as new
   models are released)
 
 ### Gemini 3 Flash
@@ -320,7 +320,7 @@ After initial generation, refine with targeted prompts:
 - **Use for:** Quick ideation, rapid iteration, exploring multiple concepts
 - **Behavior:** Fast generation, good for getting past blank canvas
 - **Best when:** Early exploration, generating many options quickly
-- **MCP `modelId`:** `GEMINI_3_FLASH` (current value — may change)
+- **MCP `modelId`:** `GEMINI_3_FLASH` (current value - may change)
 
 ### Default Model Selection
 
@@ -349,31 +349,31 @@ Use these keywords to give precise creative direction:
 
 **Layout & Structure:**
 
-- Bento Grid — modular, card-based, compartmentalized
-- Editorial — magazine feel, large serif headings, generous whitespace
-- Swiss Style — grid systems, sans-serif, flush-left, objectively clear
-- Split-Screen — vertical division, color block paired with imagery
+- Bento Grid - modular, card-based, compartmentalized
+- Editorial - magazine feel, large serif headings, generous whitespace
+- Swiss Style - grid systems, sans-serif, flush-left, objectively clear
+- Split-Screen - vertical division, color block paired with imagery
 
 **Texture & Depth:**
 
-- Glassmorphism — frosted glass, translucency, background blur
-- Claymorphism — soft 3D shapes, inner shadows, friendly/tactile
-- Skeuomorphic — realistic textures (leather, paper, metal)
-- Grainy/Noise — film grain overlays on gradients, warmth
+- Glassmorphism - frosted glass, translucency, background blur
+- Claymorphism - soft 3D shapes, inner shadows, friendly/tactile
+- Skeuomorphic - realistic textures (leather, paper, metal)
+- Grainy/Noise - film grain overlays on gradients, warmth
 
 **Atmosphere & Era:**
 
-- Brutalist — raw, system fonts, high contrast, hard edges
-- Cyberpunk — dark mode, neon accents (cyan/magenta), glitch effects
-- Y2K — chrome textures, bubble letters, bright blues/pinks, pill buttons
-- Retro-Futurism — 80s synthwave, sunsets, wireframe grids, VHS aesthetic
+- Brutalist - raw, system fonts, high contrast, hard edges
+- Cyberpunk - dark mode, neon accents (cyan/magenta), glitch effects
+- Y2K - chrome textures, bubble letters, bright blues/pinks, pill buttons
+- Retro-Futurism - 80s synthwave, sunsets, wireframe grids, VHS aesthetic
 
 **Color & Contrast:**
 
-- Duotone — entire UI from two contrasting colors
-- Monochromatic — single base hue with shade variations
-- Pastel Goth — soft pastels with stark black typography
-- Dark Mode OLED — true black (#000000), maximum contrast
+- Duotone - entire UI from two contrasting colors
+- Monochromatic - single base hue with shade variations
+- Pastel Goth - soft pastels with stark black typography
+- Dark Mode OLED - true black (#000000), maximum contrast
 
 These keywords can be combined in prompts:
 "Redesign this dashboard. Use a modern Bento Grid layout. Dark mode
@@ -402,7 +402,7 @@ background. Use the Inter font for headers."
 
 ### Translating Between Device Types
 
-Don't resize — translate. When converting app to web (or vice versa),
+Don't resize - translate. When converting app to web (or vice versa),
 prompt for the structural changes needed:
 
 ```
@@ -560,11 +560,11 @@ has a preference for speed vs quality.
 
 The `get_screen` response includes:
 
-- `htmlCode` — File object with `downloadUrl` for the HTML/CSS
-- `screenshot` — File object with `downloadUrl` for the PNG image
-- `figmaExport` — File object for Figma-compatible export
-- `theme` — DesignTheme used for generation
-- `prompt` — Original prompt used
+- `htmlCode` - File object with `downloadUrl` for the HTML/CSS
+- `screenshot` - File object with `downloadUrl` for the PNG image
+- `figmaExport` - File object for Figma-compatible export
+- `theme` - DesignTheme used for generation
+- `prompt` - Original prompt used
 
 ### AI Generation
 
@@ -576,7 +576,7 @@ The `get_screen` response includes:
 | `generate_variants` | Generate design variants | `projectId`, `selectedScreenIds[]`, `prompt`, `variantOptions`, `modelId` (optional) |
 
 IMPORTANT: `generate_screen_from_text` and `edit_screens` take a few
-minutes. Connection errors don't mean failure — check with `get_screen`
+minutes. Connection errors don't mean failure - check with `get_screen`
 after a few minutes. Do NOT retry immediately or you'll create duplicates.
 
 If `output_components` contains `suggestion` entries, present them to
@@ -597,9 +597,9 @@ the user. If accepted, call again with the suggestion as the new prompt.
 
 ### Model ID Enum Values
 
-`MODEL_ID_UNSPECIFIED` (default — recommended), `GEMINI_3_PRO` (higher
+`MODEL_ID_UNSPECIFIED` (default - recommended), `GEMINI_3_PRO` (higher
 quality), `GEMINI_3_FLASH` (faster). These enum values may change as
-Stitch releases new models — always prefer `MODEL_ID_UNSPECIFIED` unless
+Stitch releases new models - always prefer `MODEL_ID_UNSPECIFIED` unless
 the user has a specific reason to pin a model.
 
 ### Roundness Enum Values
@@ -699,7 +699,7 @@ LITERATA, SOURCE_SERIF_FOUR
 
 9. Suggest creating a Prototype to test:
    "Select the screen → Generate → Prototype.
-    This creates an interactive version — check hover states,
+    This creates an interactive version - check hover states,
     scroll behavior, and input sizes."
 
 10. Once approved, user exports code (View Code → HTML/CSS)

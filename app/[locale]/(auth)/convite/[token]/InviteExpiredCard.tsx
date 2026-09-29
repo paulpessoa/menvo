@@ -5,8 +5,8 @@ import { AlertCircle } from "lucide-react"
 
 /**
  * Estado exibido quando o token não existe, foi adulterado ou expirou.
- * Nunca revela qual desses três é o motivo real — só que o link "expirou
- * ou é inválido" — para não confirmar a um terceiro que um e-mail
+ * Nunca revela qual desses três é o motivo real - só que o link "expirou
+ * ou é inválido" - para não confirmar a um terceiro que um e-mail
  * específico existe na base (ver resolveInviteToken).
  */
 export function InviteExpiredCard({ reason }: { reason: "invalid" | "expired" }) {

@@ -40,7 +40,7 @@ export interface AiUsageReport {
 
 /**
  * Monthly AI cost report for the admin panel. Reads the aggregated views
- * (`security_invoker`, so RLS decides who sees what — only admins see every
+ * (`security_invoker`, so RLS decides who sees what - only admins see every
  * user). Aggregation lives in SQL because PostgREST aggregates are disabled.
  *
  * @param month First day of the month, `YYYY-MM-01`.

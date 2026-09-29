@@ -30,7 +30,7 @@ const DOT: Record<MentorshipSectionProps["tone"], string> = {
  *
  * Why a section list instead of tabs: every bucket is visible at once, so the
  * user never has to click through empty tabs to find the one thing that needs
- * them — the old screen had 8 tabs, most of them empty.
+ * them - the old screen had 8 tabs, most of them empty.
  */
 export function MentorshipSection({
   title,

@@ -11,7 +11,7 @@ export const modelParamsSchema = z
   .object({
     temperature: z.number().min(0).max(2).optional(),
     maxOutputTokens: z.number().int().positive().max(32_768).optional(),
-    // Default: 1 on the primary, 0 on fallbacks (index.ts) — fast enough
+    // Default: 1 on the primary, 0 on fallbacks (index.ts) - fast enough
     // that a fallback switch happens in seconds, not the SDK's default of 6.
     maxRetries: z.number().int().min(0).max(3).optional(),
     timeoutMs: z.number().int().min(1_000).max(120_000).optional()

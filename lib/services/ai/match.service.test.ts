@@ -44,7 +44,7 @@ beforeEach(() => {
   mockGetStructuredModel.mockReset()
 })
 
-describe("aiMatchService.findOptimalMentors — hallucinated mentor_id", () => {
+describe("aiMatchService.findOptimalMentors - hallucinated mentor_id", () => {
   it("drops suggestions whose mentor_id is not a real mentor id", async () => {
     mockModel({
       suggestions: [
@@ -92,7 +92,7 @@ describe("aiMatchService.findOptimalMentors — hallucinated mentor_id", () => {
   })
 })
 
-describe("aiMatchService.findOptimalMentors — metering and fallback", () => {
+describe("aiMatchService.findOptimalMentors - metering and fallback", () => {
   it("reports the model's token usage for a successful call", async () => {
     mockModel({ suggestions: [], global_justification: "", suggested_topics: [], no_match: true })
 

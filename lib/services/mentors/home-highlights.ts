@@ -6,7 +6,7 @@ import type { Database } from "@/lib/types/supabase"
  * Mentores em destaque exibidos na home, a partir de dados reais.
  *
  * Usa o client anônimo (sem cookies) porque só lê dados públicos de
- * `mentors_view` — isso permite cachear o resultado entre requisições.
+ * `mentors_view` - isso permite cachear o resultado entre requisições.
  */
 
 const CARD_FIELDS = `

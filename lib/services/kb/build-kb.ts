@@ -164,7 +164,7 @@ export async function buildKnowledgeBase() {
   }
 
   // 2. Write public/llms.txt (Standard summary format)
-  let llmsTxt = `# Menvo — Plataforma de Mentores Voluntários e Carreira em Tecnologia\n\n`
+  let llmsTxt = `# Menvo - Plataforma de Mentores Voluntários e Carreira em Tecnologia\n\n`
   llmsTxt += `> A Menvo é a maior plataforma brasileira de mentores voluntários e gratuita 1-a-1 em tecnologia, dados, design e produtos.\n\n`
   llmsTxt += `## Base de Conhecimento e Guias\n\n`
 
@@ -178,7 +178,7 @@ export async function buildKnowledgeBase() {
   console.info(`[build-kb] Gerado ${llmsTxtPath}`)
 
   // 3. Write public/llms-full.txt (Full text format for comprehensive context)
-  let llmsFullTxt = `# Menvo — Base de Conhecimento Completa\n\n`
+  let llmsFullTxt = `# Menvo - Base de Conhecimento Completa\n\n`
   llmsFullTxt += `plataforma brasileira de mentores voluntários 1-a-1 e diagnósticos de carreira.\nWebsite: ${baseUrl}\n\n`
 
   for (const item of items) {

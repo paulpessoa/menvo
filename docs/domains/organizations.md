@@ -6,17 +6,17 @@ last_reviewed: 2026-09-23
 source_of_truth: [supabase/migrations/20260921000000_organizations_v2.sql, supabase/migrations/20260921000004_org_join_policy.sql, lib/services/organizations/org-dashboard.service.ts, app/api/org/[id]/route.ts]
 ---
 
-# 🏢 Multi-Tenant Roadmap — Menvo for Organizations
+# 🏢 Multi-Tenant Roadmap - Menvo for Organizations
 
-> **Status: Phase 1 and Phase 1.5 shipped and merged to `main` — see §6.**
+> **Status: Phase 1 and Phase 1.5 shipped and merged to `main` - see §6.**
 > Written 2026-09-16 based on the founder's
 > vision to offer Menvo as infrastructure to partner organizations (Instituto
 > Gira, Porto Social, Instituto Braude's reading circle, SEBRAE, online
 > hackathons, etc.) so they can register the youth/beneficiaries they serve
-> and tap into (or bring) mentors — while keeping the free public
+> and tap into (or bring) mentors - while keeping the free public
 > mentor-mentee core loop as the backbone. Read
 > [`docs/STATUS.md`](../STATUS.md) (Engineering Journal, "Earlier Milestones")
-> for why this direction was previously reversed — that history matters for
+> for why this direction was previously reversed - that history matters for
 > how this got rebuilt.
 
 ---
@@ -28,7 +28,7 @@ Module Deprecation: Removed multi-tenant organizations in favor of a lean,
 direct mentor-to-mentee relationship."** The same journal lists "Dashboard
 Simplification (Anti-Overengineering)" as a completed P1 item. The old
 implementation left real fossils behind (its deployment guide has since been
-deleted as obsolete — this is what it covered):
+deleted as obsolete - this is what it covered):
 
 - A full deployment
   guide for `organizations`, `organization_members`,
@@ -46,24 +46,24 @@ deleted as obsolete — this is what it covered):
 
 **What this means**: either the `organizations`/`organization_members` tables
 still exist live in Supabase and `lib/types/supabase.ts` is just stale (the
-generated-types script failed tonight — see "Open question #1" below), or
+generated-types script failed tonight - see "Open question #1" below), or
 they were dropped and these functions are dead/broken. Either way, **do not
-design this from a blank slate** — the first real step is finding out exactly
+design this from a blank slate** - the first real step is finding out exactly
 what's still there, so the rebuild reuses instead of duplicates.
 
 **The lesson to carry forward**: the previous version was reversed for being
 over-engineered and diluting the core 1:1 mentorship loop. The plan below is
-deliberately leaner than v1 — fewer tables, no invitation/activity-log
+deliberately leaner than v1 - fewer tables, no invitation/activity-log
 sprawl until a real partner proves the need for it.
 
 ---
 
-## 1. Decisions — answered 2026-09-16
+## 1. Decisions - answered 2026-09-16
 
 1. **Live DB state (verified with `supabase gen types` against production):**
    `organizations` and `organization_members` are **gone**. What survives:
    - `mentor_visibility_settings` table (`visibility_scope`,
-     `visible_to_organizations text[]`) — reusable as-is.
+     `visible_to_organizations text[]`) - reusable as-is.
    - ~10 orphaned SQL functions referencing the dropped tables:
      `check_organization_quota`, `get_organization_quota_usage`,
      `expire_organization_memberships`, `expire_partner_invitations`,
@@ -79,12 +79,12 @@ sprawl until a real partner proves the need for it.
 3. **Orgs can bring their own mentors, and the mentor decides visibility**:
    public to everyone, or only to members of their org. This maps 1:1 onto
    the existing `mentor_visibility_settings.visibility_scope` +
-   `visible_to_organizations` — no new concept needed.
+   `visible_to_organizations` - no new concept needed.
 4. **Free pilot.** No quotas, no billing. Dropping `check_organization_quota`
    is fine.
 5. **URL: path prefix `/o/[slug]/...`** for the pilot. No subdomain, no
    branding.
-6. **First pilot: Instituto Gira** — founder can talk to Leonildo (diretor
+6. **First pilot: Instituto Gira** - founder can talk to Leonildo (diretor
    presidente) from the week of 2026-09-21. Schema below is designed so that
    call can only *add* scope, not invalidate it.
 
@@ -111,15 +111,15 @@ Phase 0: Discovery          Phase 1: MVP                 Phase 2: Opt-in mentors
 
 ### Why this order
 - **Phase 1 deliberately skips** invitation emails, activity logs, and
-  membership expiration cron jobs from v1 — those are exactly the kind of
+  membership expiration cron jobs from v1 - those are exactly the kind of
   scope that got the previous version reversed. Add them only if the Gira
   pilot proves they're needed, not preemptively.
 - **Phase 1 reuses the existing mentee signup/dashboard/booking flow
-  entirely** — an org-tagged mentee is still just a mentee (`user_roles`,
+  entirely** - an org-tagged mentee is still just a mentee (`user_roles`,
   `profiles`, `appointments` unchanged). The only new surface is: (a) a
   `organization_id` tag at signup, and (b) a read-only admin view scoped to
   that tag. This is the leanest possible version of "multi-tenant."
-- **Mentor-side changes wait for Phase 2** on purpose — the core value prop
+- **Mentor-side changes wait for Phase 2** on purpose - the core value prop
   for a pilot partner is "get your beneficiaries matched with mentors,"
   which Phase 1 already delivers using the existing public mentor pool. Org-
   exclusive/private mentor pools are a real feature but not required to
@@ -136,17 +136,17 @@ Phase 0: Discovery          Phase 1: MVP                 Phase 2: Opt-in mentors
   `suspended`).
 - `organization_members`: `organization_id`, `user_id`, `role` (`admin` |
   `beneficiary`), `created_at`. A user can belong to at most one org as
-  `beneficiary` initially (keep it simple — multi-org membership is a Phase
+  `beneficiary` initially (keep it simple - multi-org membership is a Phase
   3+ problem if it ever comes up).
 
 **New routes**:
-- `/o/[slug]/signup` — same signup form as `/signup`, but sets
+- `/o/[slug]/signup` - same signup form as `/signup`, but sets
   `organization_id` on the created profile/member row. Reuses
   `app/[locale]/(auth)/signup/page.tsx` logic, not a fork.
-- `/dashboard/admin/organizations` — global admin: approve pending orgs,
+- `/dashboard/admin/organizations` - global admin: approve pending orgs,
   see org list (superset of what `/dashboard/admin/users` already does,
   filtered by org).
-- `/dashboard/org/[slug]` — org admin's own scoped dashboard: list of their
+- `/dashboard/org/[slug]` - org admin's own scoped dashboard: list of their
   beneficiaries, whether each completed the quiz / booked a session,
   aggregate counts. Read-only for the pilot; no bulk CSV import yet unless
   Gira specifically needs it for their existing beneficiary list.
@@ -157,7 +157,7 @@ import, multi-org membership per user.
 
 ---
 
-## 4. Phase 1 — concrete design (ready to implement)
+## 4. Phase 1 - concrete design (ready to implement)
 
 **Migration `supabase/migrations/<ts>_organizations_v2.sql`:**
 ```sql
@@ -186,13 +186,13 @@ Mentor-side visibility: reuse `mentor_visibility_settings`. `/mentors`
 catalog query adds `where visibility_scope = 'public' or organization_id =
 any(visible_to_organizations)` for logged-in org members.
 
-**Routes (all reuse existing pages/components — no forks):**
-- `/o/[slug]` — public landing: org name + "Cadastre-se" CTA. Tiny.
-- `/o/[slug]/signup` — `signup/page.tsx` with `?org=slug` → after account
+**Routes (all reuse existing pages/components - no forks):**
+- `/o/[slug]` - public landing: org name + "Cadastre-se" CTA. Tiny.
+- `/o/[slug]/signup` - `signup/page.tsx` with `?org=slug` → after account
   creation inserts `organization_members(role='member')`.
-- `/dashboard/org` — org admin view: members list (name, quiz done?, sessions
+- `/dashboard/org` - org admin view: members list (name, quiz done?, sessions
   booked/completed), read-only. Guarded by `organization_members.role='admin'`.
-- `/dashboard/admin/organizations` — platform admin: create org, assign org
+- `/dashboard/admin/organizations` - platform admin: create org, assign org
   admin by email, suspend.
 - Mentor profile settings: existing visibility UI gets the org picker
   (already backed by `/api/mentors/visibility`).
@@ -203,7 +203,7 @@ membership expiry, CSV import, branding, multi-org per user, quotas.
 **Where it grows next (Phase 2+):** org-scoped reports/export, org admin
 inviting mentors by email, subdomain branding, per-org quiz variants.
 
-## 5. Status — Phase 1 built and applied (2026-09-17)
+## 5. Status - Phase 1 built and applied (2026-09-17)
 
 Migrations `20260921000000..000002` are applied to production. What's live
 on `feat/multi-tenant-phase1` (PR #45):
@@ -221,8 +221,8 @@ on `feat/multi-tenant-phase1` (PR #45):
 
 - Invites require an existing Menvo account (the org admin gets a clear
   message otherwise: share the `/o/[slug]` link). No org-specific signup
-  page — `/signup?next=/o/[slug]` brings a new account back to the org page.
-- `/dashboard/admin/organizations` — platform admin: create org, suspend/
+  page - `/signup?next=/o/[slug]` brings a new account back to the org page.
+- `/dashboard/admin/organizations` - platform admin: create org, suspend/
   reactivate, assign an org admin by e-mail.
 - RLS: self read/request/accept/leave; org admins (`is_org_admin()`,
   security definer to avoid policy recursion) manage their org's rows;
@@ -239,7 +239,7 @@ on `feat/multi-tenant-phase1` (PR #45):
 
 ---
 
-## 6. Phase 1.5 — shipped (2026-09-17)
+## 6. Phase 1.5 - shipped (2026-09-17)
 
 Triggered by review of the merged Phase 1 (#45). Three founder questions
 and the answers we're building to:
@@ -253,13 +253,13 @@ An org admin can also be a mentor or mentee themselves. Reports split by
 that derived kind.
 
 **Q2. Should the org choose whether `/o/[slug]` is public?**
-Yes — `organizations.join_policy`: `open` (default; anyone logged in can
+Yes - `organizations.join_policy`: `open` (default; anyone logged in can
 request) | `invite_only` (page still resolves for people who hold an invite
 link, but shows "participação por convite" and no request button; excluded
 from sitemap, `noindex`). Requesting always requires login (that's already
 the case); the policy only controls whether strangers can *ask*.
 
-**Q3. Emails must be coherent with the above.** Yes — copy is picked by the
+**Q3. Emails must be coherent with the above.** Yes - copy is picked by the
 recipient's platform role (mentor vs mentee), and the sentence "acompanha
 sua jornada ... mentores dedicados a ela" goes away. See 6.3.
 
@@ -317,7 +317,7 @@ Rewrite the three org templates with role-aware copy:
   "Beneficiário" badge next to each active membership, from the viewer's
   own platform role.
 - `MentorCard`/mentor profile: small "Mentor da {org}" chip for active
-  org mentors — **only if** the org is `open` (an invite-only org is not
+  org mentors - **only if** the org is `open` (an invite-only org is not
   advertised on public cards). Skip if it complicates the card; note it in
   §7 instead.
 
@@ -330,11 +330,11 @@ Rewrite the three org templates with role-aware copy:
 - `public/robots.txt`: nothing to add (`/o/` is public by design).
 - `llms.txt` / `llms-full.txt`: one line describing partner org pages.
 
-### 6.6 Cleanup / docs — done
-- Test org "Org Teste Claude" suspended (not deleted — no delete endpoint
+### 6.6 Cleanup / docs - done
+- Test org "Org Teste Claude" suspended (not deleted - no delete endpoint
   exists by design, suspension is the intended way to retire an org).
 
-### 6.7 Verification — done (2026-09-17)
+### 6.7 Verification - done (2026-09-17)
 `tsc --noEmit` and jest (124/124) clean. In preview, with a real admin
 session: toggled `join_policy` open → invite_only → open on the test org;
 confirmed the landing's `<meta name="robots">` flips to `noindex, nofollow`
@@ -347,11 +347,11 @@ como mentor da organização e pode receber pedidos de mentoria vindos dos
 beneficiários dela").
 
 **Follow-ups deliberately not done** (noted, not urgent):
-- Mentor card "Mentor da {org}" chip on public profiles — skipped per
+- Mentor card "Mentor da {org}" chip on public profiles - skipped per
   §6.4's own escape hatch, to avoid complicating `MentorCard`.
 - A brand-new account signing up from `/o/[slug]` still lands on
   `/onboarding` first and loses the `next` param back to the org page
-  (same gap noted in Phase 1's §5) — low priority until a real pilot
+  (same gap noted in Phase 1's §5) - low priority until a real pilot
   partner's beneficiaries hit it.
 
 ## 7. Leads de organizações (C-O1)

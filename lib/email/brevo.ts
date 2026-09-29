@@ -17,7 +17,7 @@ const COLORS = {
 /**
  * Escapa texto livre fornecido pelo usuário antes de interpolar em HTML de
  * e-mail. Necessário para qualquer campo de formulário longo (bio,
- * abordagem de mentoria etc.) — ao contrário de nome/e-mail, esses campos
+ * abordagem de mentoria etc.) - ao contrário de nome/e-mail, esses campos
  * são grandes o bastante para um usuário mal-intencionado esconder markup.
  */
 function escapeHtml(value: string): string {
@@ -400,7 +400,7 @@ export async function sendPendingRequestExpired(data: { menteeEmail: string; men
   const content = `
     <h2>Seu pedido de mentoria expirou</h2>
     <p>Olá, ${escapeHtml(data.menteeName)}.</p>
-    <p>Seu pedido de sessão com ${escapeHtml(data.mentorName)} para <strong>${formattedDate}</strong> não foi confirmado a tempo e foi cancelado automaticamente. Isso acontece — mentores são voluntários. Que tal pedir um horário com outro mentor?</p>
+    <p>Seu pedido de sessão com ${escapeHtml(data.mentorName)} para <strong>${formattedDate}</strong> não foi confirmado a tempo e foi cancelado automaticamente. Isso acontece - mentores são voluntários. Que tal pedir um horário com outro mentor?</p>
     <div class="button-container">
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors" class="button">Encontrar outro mentor</a>
     </div>
@@ -545,7 +545,7 @@ export async function sendMentorNewReviewNotification(data: {
  * Converte o corpo do e-mail escrito pelo admin (texto simples, com
  * `{{primeiro_nome}}` como placeholder) em HTML seguro: cada linha em
  * branco separa um parágrafo, e todo o texto passa por `escapeHtml` antes
- * de virar markup — o admin nunca escreve HTML diretamente aqui.
+ * de virar markup - o admin nunca escreve HTML diretamente aqui.
  */
 function renderPlainTextBody(bodyText: string, firstName: string): string {
   const withName = bodyText.replace(/\{\{\s*primeiro_nome\s*\}\}/gi, firstName);
@@ -560,11 +560,11 @@ function renderPlainTextBody(bodyText: string, firstName: string): string {
 /**
  * E-mail de campanha de reengajamento (ex.: base do Estágio Recife
  * importada do JotForm): avisa que a Menvo existe, convida a pessoa a
- * completar o perfil ou apoiar como mentor(a), e — obrigatório por LGPD —
+ * completar o perfil ou apoiar como mentor(a), e - obrigatório por LGPD -
  * dá uma saída fácil, sem login, para parar de receber e-mails ou apagar
  * os dados. `inviteUrl` já aponta para a página pública `/convite/[token]`;
  * esta função só decora os `?intent=` de cada ação (nunca executa nada
- * sozinha — ver docs/domains/reengagement-invites.md §3.2).
+ * sozinha - ver docs/domains/reengagement-invites.md §3.2).
  *
  * O corpo (`bodyText`) é escrito/editado pelo admin no modal de envio; os
  * botões e o aviso de LGPD abaixo são fixos e não podem ser removidos por
@@ -625,7 +625,7 @@ export async function sendReengagementInvite(data: ReengagementInviteData & {
 
 /**
  * Aviso de que uma conta importada e nunca acessada será apagada em breve.
- * Reaproveita o mesmo link `/convite/[token]` do fluxo de reengajamento —
+ * Reaproveita o mesmo link `/convite/[token]` do fluxo de reengajamento -
  * "Quero manter minha conta" leva ao login/definição de senha, e há também
  * uma saída para apagar os dados imediatamente. Ver
  * docs/domains/account-retention.md §4.3.
@@ -686,7 +686,7 @@ export async function sendRetentionNotice(data: {
 }
 
 /**
- * Confirmação enviada no momento da exclusão. Sem token nem link de conta —
+ * Confirmação enviada no momento da exclusão. Sem token nem link de conta -
  * a conta já não existe mais.
  */
 export function buildRetentionDeletionConfirmationHtml(data: { name: string }): string {
@@ -722,9 +722,9 @@ type OrgRecipientRole = "mentor" | "mentee";
 function orgInviteContent(firstName: string, orgName: string, appUrl: string, role: OrgRecipientRole) {
   const body = role === "mentor"
     ? `<p>A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer contar com você como mentor(a) do grupo dela na plataforma.</p>
-       <p>Ao aceitar, você aparece como mentor da ${orgName} e pode receber pedidos de mentoria vindos dos beneficiários dela — sua agenda e seu processo de aceite continuam exatamente os mesmos.</p>`
+       <p>Ao aceitar, você aparece como mentor da ${orgName} e pode receber pedidos de mentoria vindos dos beneficiários dela - sua agenda e seu processo de aceite continuam exatamente os mesmos.</p>`
     : `<p>A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer acompanhar sua jornada de mentoria na plataforma.</p>
-       <p>Ao aceitar, a organização passa a ver seu progresso (sessões agendadas, quiz de carreira) para te apoiar melhor — sua conta continua exatamente a mesma.</p>`;
+       <p>Ao aceitar, a organização passa a ver seu progresso (sessões agendadas, quiz de carreira) para te apoiar melhor - sua conta continua exatamente a mesma.</p>`;
   return `
     <h2>Você foi convidado(a) para a ${orgName}</h2>
     <p>Olá, ${firstName}!</p>

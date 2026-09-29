@@ -1,4 +1,4 @@
-# Plano — Menvo AI-First: Diagnóstico Agêntico, Copiloto, Medição de Uso e Base de Conhecimento
+# Plano - Menvo AI-First: Diagnóstico Agêntico, Copiloto, Medição de Uso e Base de Conhecimento
 
 > **Status:** proposta aprovada, 2026-09-23. **Já implementado (Fase 0,
 > quase completa):** §5 `ai_usage_events`, `ai_model_pricing`, `ai_entitlements`,
@@ -8,12 +8,12 @@
 > `/dashboard/admin/ai-usage`. Migração `20260923000002` aplicada em 2026-09-23.
 > RLS de `quiz_responses` corrigida e aplicada (`…000005`). Registro de
 > modelos por capacidade (`lib/ai/models`, [ADR 0004](governance/adr/0004-model-registry-by-capability.md))
-> implementado em código — a medição do LangChain agora é um callback por
+> implementado em código - a medição do LangChain agora é um callback por
 > modelo (`lib/ai/metering/callback.ts`), não mais `streamEvents`
 > (`lib/ai/langchain-metering.ts`, removido). Migrações `…000004` e `…000006`
 > escritas, aguardando o fundador aplicá-las. Protocolo SSE tipado com Zod
 > (`lib/ai/protocol.ts`) e ADRs 0001–0004 + `docs/governance/ai-policy.md`
-> **feitos** (2026-09-24) — Fase 0 completa em código, restando só a
+> **feitos** (2026-09-24) - Fase 0 completa em código, restando só a
 > degradação a 80% do orçamento (§3.4) e as migrações pendentes acima.
 > Ver o diário do `STATUS.md`.
 > **Para quem executa:** leia §0 (estado atual) e §1 (princípios) antes de
@@ -183,7 +183,7 @@ o que viola o `AGENTS.md`. Por isso, na Fase 1:
 | 5 | Áreas de desenvolvimento | Chips múltiplos + "outro" | Só se "outro" |
 | 6 | Vida pessoal | Texto ou voz (pode pular) | `extract` |
 | 7 | Compartilhar conhecimento | Chips | Não |
-| — | Nome/e-mail | **Removido** (vem da sessão) | — |
+| - | Nome/e-mail | **Removido** (vem da sessão) | - |
 | F | Análise + mentores sugeridos | Cards | `analyze` (1 chamada) + `searchMentors` |
 
 - Todo passo aceita texto livre, mesmo onde há chips. Se o usuário digitar
@@ -256,19 +256,19 @@ Registro de tools (`lib/ai/tools/registry.ts`) com metadados:
 |---|:-:|:-:|:-:|:-:|
 | Diagnóstico mensal | ✓ | ✓ | ✓ | ✓ |
 | Compartilhar/revogar meu diagnóstico com um mentor | ✓ | ✓ | ✓ | ✓ |
-| Ver diagnóstico compartilhado comigo (só leitura) | — | ✓ | — | — |
-| Sugerir mentores (a partir do diagnóstico) | ✓ | — | — | ✓ |
+| Ver diagnóstico compartilhado comigo (só leitura) | - | ✓ | - | - |
+| Sugerir mentores (a partir do diagnóstico) | ✓ | - | - | ✓ |
 | Ver disponibilidade de um mentor | ✓ | ✓ | ✓ | ✓ |
-| Minha agenda / próximas sessões | ✓ | ✓ | — | ✓ |
+| Minha agenda / próximas sessões | ✓ | ✓ | - | ✓ |
 | Pendências ("o que falta eu fazer") | ✓ | ✓ | ✓ | ✓ |
-| Completar/atualizar perfil (com confirmação) | ✓ | ✓ | — | — |
-| Confirmar/recusar solicitações (com confirmação) | — | ✓ | — | — |
-| Configurar disponibilidade (guiado) | — | ✓ | — | — |
-| Preparar sessão (usa o diagnóstico **só se** compartilhado, §12.2) | — | ✓ | — | — |
-| Plano de ação pós-sessão | ✓ | — | — | — |
-| Resumo da organização | — | — | ✓ | ✓ |
-| Uso de IA / custos | — | — | — | ✓ |
-| Feedback (atendimento, sessão, plataforma) | ✓ | ✓ | ✓ | — |
+| Completar/atualizar perfil (com confirmação) | ✓ | ✓ | - | - |
+| Confirmar/recusar solicitações (com confirmação) | - | ✓ | - | - |
+| Configurar disponibilidade (guiado) | - | ✓ | - | - |
+| Preparar sessão (usa o diagnóstico **só se** compartilhado, §12.2) | - | ✓ | - | - |
+| Plano de ação pós-sessão | ✓ | - | - | - |
+| Resumo da organização | - | - | ✓ | ✓ |
+| Uso de IA / custos | - | - | - | ✓ |
+| Feedback (atendimento, sessão, plataforma) | ✓ | ✓ | ✓ | - |
 | Tirar dúvidas da plataforma (base de conhecimento) | ✓ | ✓ | ✓ | ✓ |
 
 ### 4.2 Briefing ao abrir o chat (sem LLM)
@@ -501,7 +501,7 @@ diário do `STATUS.md`.
 6. **Feito (2026-09-24):** Protocolo SSE tipado com Zod (`lib/ai/protocol.ts`,
    `aiEventSchema`, `encodeSseEvent`/`encodeSseDone`/`parseSseLine`),
    compartilhado entre `app/api/assistant/route.ts` (encode) e
-   `app/[locale]/assistant/page.tsx` (parse) — os dois lados não podem mais
+   `app/[locale]/assistant/page.tsx` (parse) - os dois lados não podem mais
    divergir no formato do evento. Não importa `lib/services/*` (o payload de
    `mentors_found` é registros opacos aqui; a validação com `mentorCardDto`
    já acontece em `lib/services/assistant/tools.ts` antes de chegar no SSE).
@@ -606,19 +606,19 @@ O núcleo `lib/ai/` sai da Fase 0–1 com fronteiras claras:
 |---|---|---:|---:|---:|---|
 | Google | `gemini-2.5-flash-lite` | 0,10 | 0,01 | 0,40 | áudio entrada 0,30 |
 | Google | `gemini-3.1-flash-lite` | 0,25 | 0,025 | 1,50 | áudio entrada 0,50 |
-| Google | `gemini-3.5-flash-lite` | 0,30 | — | 2,50 | modelo atual do assistente; sem cache |
+| Google | `gemini-3.5-flash-lite` | 0,30 | - | 2,50 | modelo atual do assistente; sem cache |
 | Google | `gemini-2.5-flash` | 0,30 | 0,03 | 2,50 | áudio entrada 1,00 |
 | Google | `gemini-3.8-flash` | 0,75 | 0,075 | 3,75 | até 31/12/2026; **1,50 / 0,15 / 7,50 a partir de 01/01/2027** |
 | Google | `gemini-3.5-flash` | 1,50 | 0,15 | 9,00 | |
-| Groq | `openai/gpt-oss-20b` | 0,075 | — | 0,30 | |
-| Groq | `openai/gpt-oss-120b` | 0,15 | — | 0,60 | |
-| Groq | `qwen/qwen3.8-27b` | 0,80 | — | 4,00 | preview; hoje referenciado no código, **aposentar** |
-| Groq | `whisper-large-v3-turbo` | — | — | — | **US$ 0,04 / hora de áudio** (STT) |
-| Groq | `whisper-large-v3` | — | — | — | US$ 0,111 / hora de áudio |
+| Groq | `openai/gpt-oss-20b` | 0,075 | - | 0,30 | |
+| Groq | `openai/gpt-oss-120b` | 0,15 | - | 0,60 | |
+| Groq | `qwen/qwen3.8-27b` | 0,80 | - | 4,00 | preview; hoje referenciado no código, **aposentar** |
+| Groq | `whisper-large-v3-turbo` | - | - | - | **US$ 0,04 / hora de áudio** (STT) |
+| Groq | `whisper-large-v3` | - | - | - | US$ 0,111 / hora de áudio |
 | OpenAI | `gpt-5-nano` | 0,05 | 0,005 | 0,40 | |
 | OpenAI | `gpt-4o-mini` | 0,15 | 0,075 | 0,60 | usado hoje no match |
 | OpenAI | `gpt-5-mini` | 0,25 | 0,025 | 2,00 | |
-| OpenAI | `gpt-4o-mini-transcribe` | — | — | — | US$ 0,003 / minuto |
+| OpenAI | `gpt-4o-mini-transcribe` | - | - | - | US$ 0,003 / minuto |
 | Anthropic | `claude-haiku-4-5` | 1,00 | 0,10 | 5,00 | referência; caro para este volume |
 | Anthropic | `claude-sonnet-5` | 2,00 | 0,20 | 10,00 | referência |
 
@@ -634,7 +634,7 @@ modelos, por isso ficam fora do registro até terem preço público.
 | `followup` (pergunta de aprofundamento) | `gemini-2.5-flash-lite` | `openai/gpt-oss-20b` (Groq) | Uma frase |
 | `converse` (copiloto com tools) | `gemini-3.5-flash-lite` | `openai/gpt-oss-120b` (Groq) | Já validado com tools no código atual; o fallback é mais barato e de outro provedor |
 | `analyze` (análise final do diagnóstico) | `gemini-2.5-flash` | `gpt-5-mini` (OpenAI) | Melhor qualidade por um custo baixo; tem cache (o prompt fixo é grande) |
-| `classify_batch` (tema de feedback, job diário) | `gemini-2.5-flash-lite` | — | Não é interativo |
+| `classify_batch` (tema de feedback, job diário) | `gemini-2.5-flash-lite` | - | Não é interativo |
 | `stt` (Fase 3, se necessário) | `whisper-large-v3-turbo` (Groq) | `gpt-4o-mini-transcribe` | US$ 0,04/h |
 
 Toda troca de modelo passa por evals (§7) antes de ativar em produção.

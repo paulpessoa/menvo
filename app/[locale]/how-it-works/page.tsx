@@ -26,7 +26,7 @@ export default function HowItWorksPage() {
 
 const VALID_TABS = ["mentees", "mentors", "organizations"]
 // Old links (footer, bookmarks) used separate ngos/companies tabs before the
-// two were merged into a single "organizations" audience — keep them working.
+// two were merged into a single "organizations" audience - keep them working.
 const TAB_ALIASES: Record<string, string> = { ngos: "organizations", companies: "organizations" }
 
 function HowItWorksContent() {

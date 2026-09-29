@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/auth/require-admin"
  * and echoed by /dashboard/admin/users (tab badges) and
  * /dashboard/admin/verifications (queue count). Before this, the dashboard
  * computed "Mentores Pendentes" from `profiles.verified` while the other two
- * screens used `verification_status = 'pending'` — same word, two different
+ * screens used `verification_status = 'pending'` - same word, two different
  * counts, so the number on the card never matched what you found inside.
  *
  * "Pending" here always means verification_status = 'pending' (see

@@ -22,7 +22,7 @@ interface MentorshipBoardProps {
  * "Requer sua ação" → "Próximas sessões" → "Histórico".
  *
  * Why perspective-aware: the same appointment means different work for each
- * side — a pending request is the mentor's to answer but the mentee's to wait
+ * side - a pending request is the mentor's to answer but the mentee's to wait
  * on; a finished session is the mentee's to evaluate but history for the mentor.
  */
 export function MentorshipBoard({ perspective }: MentorshipBoardProps) {

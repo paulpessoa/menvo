@@ -27,7 +27,7 @@ const TAB_LABEL: Record<ReviewKind, string> = {
  * AI-assisted drafting for a mentor application: an assessment (strengths,
  * gaps, recommendation) plus an editable message for approval, a request
  * for changes, or a LinkedIn announcement post. Never sends anything on
- * its own — approval/rejection still goes through the parent's handlers,
+ * its own - approval/rejection still goes through the parent's handlers,
  * and "Divulgação" only copies the text to the clipboard.
  */
 export function MentorReviewAssistant({

@@ -233,7 +233,7 @@ async function sendNoticeWithClaim(params: {
  * Runs the retention plan once. Order matches `planRetentionActions`:
  * releases and enrollments first (cheap, no external calls), then
  * deletions (so they never get stuck behind the e-mail cap), then the 1-day
- * and 30-day notices, each capped by `maxEmails`/`maxDeletions` — whatever
+ * and 30-day notices, each capped by `maxEmails`/`maxDeletions` - whatever
  * doesn't fit this run is picked up by the next one, and the timing
  * invariants in retention.service.ts guarantee that delay only ever pushes
  * a deletion later, never earlier.

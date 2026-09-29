@@ -1,4 +1,4 @@
-# Menvo — Base de Conhecimento Completa
+# Menvo - Base de Conhecimento Completa
 
 plataforma brasileira de mentores voluntários 1-a-1 e diagnósticos de carreira.
 Website: https://www.menvo.com.br

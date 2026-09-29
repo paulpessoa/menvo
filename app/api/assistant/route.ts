@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     // Default assistant mode:
     // One credit per user message (a turn), however many model calls the
-    // agent makes inside it — those are metered individually below.
+    // agent makes inside it - those are metered individually below.
     const quota = await consumeAiQuota(supabase, "assistant")
     if (!quota.allowed) {
       return NextResponse.json(
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Instanciar agent via service — async: resolve a capacidade "converse"
+    // Instanciar agent via service - async: resolve a capacidade "converse"
     // no registro de modelos (lib/ai/models), com fallback (ADR 0004) e RBAC por papel.
     const agent = await getAssistantAgent(supabase, user, { onCall: (record) => calls.push(record) })
 

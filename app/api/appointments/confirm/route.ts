@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     // aleatório). O caminho por appointmentId vem do botão "Confirmar" do
     // dashboard do mentor e não carrega segredo nenhum, então exige sessão
     // e confere que quem está confirmando é o próprio mentor do agendamento
-    // — sem isso, qualquer pessoa com o UUID confirmaria a sessão de outro
+    // - sem isso, qualquer pessoa com o UUID confirmaria a sessão de outro
     // mentor (evento no Google Calendar e e-mail incluídos).
     if (!token && appointmentId) {
       const sessionClient = await createServerClient()

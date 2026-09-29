@@ -1,4 +1,4 @@
-# Menvo — Plataforma de Mentores Voluntários e Carreira em Tecnologia
+# Menvo - Plataforma de Mentores Voluntários e Carreira em Tecnologia
 
 > A Menvo é a maior plataforma brasileira de mentores voluntários e gratuita 1-a-1 em tecnologia, dados, design e produtos.
 

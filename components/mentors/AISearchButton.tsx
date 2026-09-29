@@ -21,7 +21,7 @@ interface AISearchButtonProps {
  * tecla.
  *
  * O botão sempre tem a mesma aparência (não vira um botão diferente pra
- * quem não está logado) — a exigência de login é comunicada num toast com
+ * quem não está logado) - a exigência de login é comunicada num toast com
  * um atalho pra ir ao /login, em vez de navegar pra lá sem avisar por quê.
  */
 export function AISearchButton({ query, loading, onSearch }: AISearchButtonProps) {

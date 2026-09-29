@@ -48,7 +48,7 @@ async function fetchRows(supabase: SupabaseClient): Promise<unknown[] | null> {
 /**
  * Reads all of `ai_model_config` (RLS applies: the caller's own client, no
  * service_role) with a 60s in-memory cache, and resolves one capability out
- * of it. Never throws — every failure mode (RLS denies anon, table missing,
+ * of it. Never throws - every failure mode (RLS denies anon, table missing,
  * timeout, network error) degrades to `DEFAULT_MODEL_CONFIG` (ADR 0004 §5),
  * because by the time this is called `consume_ai_quota` has already gated
  * the request; refusing to serve a default model here would be strictly

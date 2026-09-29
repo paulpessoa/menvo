@@ -4,7 +4,7 @@
 > `docs/STATUS.md` (journal de 2026-09-27) e ADR 0005 para a exceção de
 > `service_role` nas rotas públicas de convite.
 > **Desvio do plano original:** `POST /api/admin/invites/audience` retorna
-> `eligibleUserIds` (lista completa), não só uma contagem — o modal precisa
+> `eligibleUserIds` (lista completa), não só uma contagem - o modal precisa
 > dos ids para montar os lotes de envio no cliente, já que não existe uma
 > rota que envia para "a audiência inteira" no servidor.
 > **Pendente:** exclusão self-service em `/settings` (P3 do backlog);
@@ -136,7 +136,7 @@ alter table public.profiles add column if not exists email_opt_out_at timestampt
 alter table public.reengagement_invites enable row level security;
 alter table public.data_deletion_log   enable row level security;
 alter table public.email_suppressions  enable row level security;
--- Admin: SELECT via is_admin() (ou helper equivalente já usado nas outras policies admin — conferir).
+-- Admin: SELECT via is_admin() (ou helper equivalente já usado nas outras policies admin - conferir).
 -- anon/authenticated: nenhuma policy. O acesso público passa só pelo serviço server-side (§3.3).
 ```
 

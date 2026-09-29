@@ -42,7 +42,7 @@ interface MentorStats {
 }
 
 /**
- * Dashboard do Mentor — Menvo
+ * Dashboard do Mentor - Menvo
  * Focado no core loop: Próximas sessões com Google Meet, alertas de solicitações pendentes,
  * atalho rápido para disponibilidade (45 min) e avaliações recebidas.
  */
@@ -201,7 +201,7 @@ export default function MentorDashboard() {
                 />
                 <StatCard
                   title="Avaliação Média"
-                  value={stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "—"}
+                  value={stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "-"}
                   icon={<Star className="h-5 w-5 text-amber-500 fill-amber-500" />}
                   description={`${stats.totalReviews} avaliações`}
                 />

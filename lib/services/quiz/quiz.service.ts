@@ -14,7 +14,7 @@ import type {
  * cross-account read of the table: a logged-in user reads only rows
  * matching their own e-mail, and there is no `anon` SELECT at all. The
  * anonymous quiz still needs to read back its own just-submitted row by
- * `id` (the results page, shared on LinkedIn/WhatsApp by design) — that
+ * `id` (the results page, shared on LinkedIn/WhatsApp by design) - that
  * goes through `get_quiz_result`, a `security definer` RPC that returns
  * only `id`, `processed_at` and `ai_analysis`, never name/e-mail/answers.
  */
@@ -25,7 +25,7 @@ class QuizService {
    * Retrieves the most recent quiz response for a given email address.
    * Useful for determining if a logged-in mentee has already completed the assessment.
    *
-   * Only works for the caller's own e-mail — RLS enforces this even though
+   * Only works for the caller's own e-mail - RLS enforces this even though
    * the query itself doesn't filter by session, since the caller is
    * expected to pass their own logged-in e-mail (dashboard/mentee/page.tsx).
    *
@@ -71,7 +71,7 @@ class QuizService {
   }
 
   /**
-   * Retrieves the public result view for a quiz response by its UUID — the
+   * Retrieves the public result view for a quiz response by its UUID - the
    * only three fields `/quiz/results/[id]` renders. Works for anonymous
    * visitors (the results link is shared) through the `get_quiz_result` RPC,
    * never a direct `.select()` on `quiz_responses`.
@@ -135,10 +135,10 @@ class QuizService {
 
   /**
    * Asks the server to analyze a quiz response (POST /api/quiz/[id]/analyze
-   * — model registry, metered, inside the AI budget; ADR 0004 §7.3, replaces
+   * - model registry, metered, inside the AI budget; ADR 0004 §7.3, replaces
    * the old analyze-quiz Edge Function). Safe to call more than once: the
    * server claims the row atomically, so a duplicate request does nothing.
-   * Never throws — the results page polls for the outcome either way.
+   * Never throws - the results page polls for the outcome either way.
    *
    * @param id - UUID of the quiz response
    */

@@ -32,7 +32,7 @@ const STATUS_LABEL: Record<string, { label: string; className: string }> = {
 
 /**
  * Mentor-application section of the admin user modal. Decisions go through
- * POST /api/admin/verify — the same path as /dashboard/admin/verifications —
+ * POST /api/admin/verify - the same path as /dashboard/admin/verifications -
  * so approving here also grants the mentor role, publishes the profile and
  * notifies the person by chat and e-mail. It also shows *why* someone is or
  * isn't in the /mentors directory, which needs all three checks below.
@@ -55,7 +55,7 @@ export function MentorApplicationPanel({
 
   const decide = async (decision: "approved" | "rejected") => {
     if (decision === "rejected" && !notes.trim()) {
-      toast.error("Escreva o que precisa ser ajustado — a pessoa recebe esse texto.")
+      toast.error("Escreva o que precisa ser ajustado - a pessoa recebe esse texto.")
       return
     }
     setSubmitting(decision)

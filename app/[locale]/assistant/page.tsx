@@ -365,7 +365,7 @@ function AssistantChat() {
       <div className="flex items-center gap-2 px-6 py-4 border-b bg-muted/30">
         <Sparkles className="w-5 h-5 text-primary" />
         <h2 className="font-semibold text-lg">
-          {isDiagnosticMode ? "Diagnóstico de Carreira — Menvo" : "Copiloto Menvo"}
+          {isDiagnosticMode ? "Diagnóstico de Carreira - Menvo" : "Copiloto Menvo"}
         </h2>
       </div>
 

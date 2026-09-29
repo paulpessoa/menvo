@@ -9,7 +9,7 @@
   </a>
 </p>
 
-<h1 align="center">Menvo — Mentores Voluntários</h1>
+<h1 align="center">Menvo - Mentores Voluntários</h1>
 
 <p align="center">
   <strong>Democratizing career mentorship for youth and students seeking their first professional opportunities.</strong>
@@ -122,34 +122,34 @@ menvo/
 ## 🗺️ Route Architecture
 
 ### 🔓 Public Pages
-- `/` — Homepage with interactive hero, testimonials, and quiz activation CTA.
-- `/about` — Platform mission, SDG commitments, and volunteer team.
-- `/mentors` — Public directory of verified mentors with category and skill filters.
-- `/how-it-works` — Comprehensive guides for mentees, mentors, NGOs, and companies.
-- `/community` — Community discovery board for members offering and seeking guidance.
-- `/doar` — Direct zero-fee PIX donation card to support platform servers.
-- `/contact` — Official contact channels (Email & WhatsApp support).
-- `/quiz` — Career diagnostic onboarding flow with personalized recommendations.
-- `/privacy` & `/terms` — Privacy Policy (LGPD compliant) and Terms of Service.
+- `/` - Homepage with interactive hero, testimonials, and quiz activation CTA.
+- `/about` - Platform mission, SDG commitments, and volunteer team.
+- `/mentors` - Public directory of verified mentors with category and skill filters.
+- `/how-it-works` - Comprehensive guides for mentees, mentors, NGOs, and companies.
+- `/community` - Community discovery board for members offering and seeking guidance.
+- `/doar` - Direct zero-fee PIX donation card to support platform servers.
+- `/contact` - Official contact channels (Email & WhatsApp support).
+- `/quiz` - Career diagnostic onboarding flow with personalized recommendations.
+- `/privacy` & `/terms` - Privacy Policy (LGPD compliant) and Terms of Service.
 
 ### 🔐 Authentication Flow
-- `/login` — User authentication (Email + Password, Google OAuth, LinkedIn).
-- `/signup` — Registration with role selection (`mentee` or `mentor`).
-- `/reset-password` — Secure password recovery.
-- `/confirm-email` — Verification link & 6-digit OTP code confirmation.
+- `/login` - User authentication (Email + Password, Google OAuth, LinkedIn).
+- `/signup` - Registration with role selection (`mentee` or `mentor`).
+- `/reset-password` - Secure password recovery.
+- `/confirm-email` - Verification link & 6-digit OTP code confirmation.
 
 ### 🛡️ Protected Pages (Authenticated Users)
-- `/dashboard` — Unified dashboard with dynamic views for Mentees and Mentors.
-- `/profile` — Profile editor with optional street privacy and 1-click geolocation.
-- `/messages` — Real-time direct chat between matched pairs.
-- `/mentorship/mentor` & `/mentorship/mentee` — Session history, reviews, and Google Meet access.
-- `/settings` — Account security, notifications, and language preferences.
+- `/dashboard` - Unified dashboard with dynamic views for Mentees and Mentors.
+- `/profile` - Profile editor with optional street privacy and 1-click geolocation.
+- `/messages` - Real-time direct chat between matched pairs.
+- `/mentorship/mentor` & `/mentorship/mentee` - Session history, reviews, and Google Meet access.
+- `/settings` - Account security, notifications, and language preferences.
 
 ### 👑 Admin Management
-- `/dashboard/admin` — Central platform overview and operational KPIs.
-- `/dashboard/admin/users` — User management and role administration.
-- `/dashboard/admin/reports` — Community metrics, session completion rates, and evaluations.
-- `/dashboard/admin/feature-flags` — Dynamic feature flag toggles.
+- `/dashboard/admin` - Central platform overview and operational KPIs.
+- `/dashboard/admin/users` - User management and role administration.
+- `/dashboard/admin/reports` - Community metrics, session completion rates, and evaluations.
+- `/dashboard/admin/feature-flags` - Dynamic feature flag toggles.
 
 ---
 
@@ -223,7 +223,7 @@ Contributions must adhere to the constraints defined in `AGENTS.md`:
 ## 📚 Documentation
 
 Full engineering and product documentation lives in [`docs/`](docs/). Start
-at [`docs/STATUS.md`](docs/STATUS.md) — it's the living single source
+at [`docs/STATUS.md`](docs/STATUS.md) - it's the living single source
 of truth for current system status, architectural invariants, and an index
 of every other doc (backlog, scheduling engine, evaluation model, SEO,
 deployment, Google Calendar setup, environment variables, and more).

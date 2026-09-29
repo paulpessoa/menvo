@@ -335,7 +335,7 @@
     },
     "q7": {
       "question": "How does it work for organizations (NGOs and companies)?",
-      "answer": "NGOs, institutes, and companies with volunteering programs can have a page on Menvo to connect the people they serve — or their employees — with volunteer mentors, for free. Talk to our team to set up your organization's page."
+      "answer": "NGOs, institutes, and companies with volunteering programs can have a page on Menvo to connect the people they serve - or their employees - with volunteer mentors, for free. Talk to our team to set up your organization's page."
     },
     "q8": {
       "question": "Can I be both a mentor and mentee?",
@@ -751,7 +751,7 @@
     },
     "reengagement": {
       "title": "Estágio Recife database",
-      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile — the e-mail's reply link goes straight to that option."
+      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile - the e-mail's reply link goes straight to that option."
     },
     "rights": {
       "title": "Your Rights",
@@ -1056,7 +1056,7 @@
     "suggestModal": {
       "cta": "Suggest a topic",
       "title": "Suggest a topic or mentor",
-      "description": "Couldn't find what you were looking for? Tell us — every suggestion helps us decide which mentors to invite to the platform.",
+      "description": "Couldn't find what you were looking for? Tell us - every suggestion helps us decide which mentors to invite to the platform.",
       "contextLabel": "We'll send your search filters along with it:",
       "topicLabel": "What were you looking for?",
       "topicPlaceholder": "E.g. Product, Tech Careers, Service Design...",
@@ -1575,13 +1575,13 @@
       "meetPending": "The Google Meet link shows up here as soon as it's generated.",
       "howItWorksTitle": "How your session works",
       "howItWorksMeet": "Confirmed mentorships happen 100% online via Google Meet. The link is generated automatically and shows on the session card.",
-      "howItWorksTip": "Join 5 minutes early and bring your main goals. After the session, rate your mentor — it helps the community.",
+      "howItWorksTip": "Join 5 minutes early and bring your main goals. After the session, rate your mentor - it helps the community.",
       "exploreMentors": "Explore mentors",
       "asMentor": {
         "tab": "Received",
         "tabSub": "You as mentor",
         "actionTitle": "Awaiting your answer",
-        "actionHint": "Confirm or decline before the date — unanswered requests expire.",
+        "actionHint": "Confirm or decline before the date - unanswered requests expire.",
         "upcomingEmpty": "No confirmed sessions yet.",
         "emptyTitle": "You haven't received any mentorship requests yet",
         "emptyDesc": "Keep your availability up to date so mentees see open slots.",
@@ -1974,7 +1974,7 @@
     },
     "reengagement": {
       "title": "Estágio Recife database",
-      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile — the e-mail's reply link goes straight to that option."
+      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile - the e-mail's reply link goes straight to that option."
     },
     "retention": {
       "title": "How long we keep your data",
