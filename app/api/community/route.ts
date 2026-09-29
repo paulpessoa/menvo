@@ -30,6 +30,11 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || ""
     const page = Math.max(0, parseInt(searchParams.get("page") || "0", 10) || 0)
     const limit = Math.min(48, Math.max(1, parseInt(searchParams.get("limit") || "12", 10) || 12))
+    const country = searchParams.get("country") || undefined
+    const state = searchParams.get("state") || undefined
+    const city = searchParams.get("city") || undefined
+    const topics = searchParams.getAll("topics[]")
+    const sortBy = (searchParams.get("sortBy") as "newest" | "name") || "newest"
 
     // The request-scoped client carries the mentor's session, which the
     // profiles RLS policy needs in order to return mentee rows.
@@ -37,6 +42,11 @@ export async function GET(request: NextRequest) {
       search,
       page,
       limit,
+      country,
+      state,
+      city,
+      topics: topics.length > 0 ? topics : undefined,
+      sortBy,
     })
 
     return NextResponse.json(result)

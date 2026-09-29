@@ -1014,3 +1014,66 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }
 }
+
+// =============================================
+// Mentor → Mentee Contact Email
+// =============================================
+
+interface MentorContactEmailData {
+  menteeEmail: string;
+  menteeName: string;
+  mentorName: string;
+  mentorJobTitle?: string;
+  mentorCompany?: string;
+  mentorBio?: string;
+  mentorExpertise: string[];
+  mentorSlug: string;
+  mentorLinkedin?: string;
+  mentorAvatarUrl?: string;
+}
+
+/**
+ * Sends a notification email to a mentee informing them that a mentor
+ * wants to connect. Includes the mentor's profile card so the mentee
+ * can decide whether to reach out.
+ */
+export async function sendMentorContactEmail(data: MentorContactEmailData) {
+  const expertiseBadges = data.mentorExpertise.slice(0, 5).map(e =>
+    `<span style="display:inline-block;background:${COLORS.primary}15;color:${COLORS.primary};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:2px 4px 2px 0;">${escapeHtml(e)}</span>`
+  ).join('');
+
+  const mentorProfileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors/${data.mentorSlug}`;
+
+  const content = `
+    <h2>Alguém quer te ajudar! 🎉</h2>
+    <p>Oi, <strong>${escapeHtml(data.menteeName)}</strong>! Um mentor da Menvo viu seu perfil e quer se conectar com você:</p>
+    
+    <div style="background:#f8fafc;border-radius:16px;padding:24px;margin:24px 0;border:1px solid ${COLORS.divider};">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;">
+        <tr>
+          ${data.mentorAvatarUrl ? `<td style="width:72px;vertical-align:top;padding-right:16px;">
+            <img src="${data.mentorAvatarUrl}" alt="${escapeHtml(data.mentorName)}" width="64" height="64" style="border-radius:50%;display:block;object-fit:cover;width:64px;height:64px;border:3px solid ${COLORS.primary};" />
+          </td>` : ''}
+          <td style="vertical-align:top;">
+            <p style="font-weight:800;color:#111827;font-size:18px;margin:0 0 4px 0;">${escapeHtml(data.mentorName)}</p>
+            ${data.mentorJobTitle ? `<p style="font-size:14px;color:${COLORS.primary};font-weight:600;margin:0 0 2px 0;">${escapeHtml(data.mentorJobTitle)}${data.mentorCompany ? ` @ ${escapeHtml(data.mentorCompany)}` : ''}</p>` : ''}
+            ${data.mentorBio ? `<p style="font-size:13px;color:${COLORS.muted};margin:8px 0 0 0;font-style:italic;line-height:1.5;">"${escapeHtml(data.mentorBio.slice(0, 200))}${data.mentorBio.length > 200 ? '...' : ''}"</p>` : ''}
+          </td>
+        </tr>
+      </table>
+      ${expertiseBadges ? `<div style="margin-top:16px;">${expertiseBadges}</div>` : ''}
+    </div>
+
+    <div class="button-container">
+      <a href="${mentorProfileUrl}" class="button">Ver Perfil do Mentor</a>
+    </div>
+
+    ${data.mentorLinkedin ? `<p style="text-align:center;margin-top:-10px;margin-bottom:20px;"><a href="${data.mentorLinkedin}" target="_blank" style="color:${COLORS.primary};font-weight:600;font-size:14px;text-decoration:underline;">Conectar no LinkedIn</a></p>` : ''}
+
+    <div class="divider"></div>
+    <p><strong>Dica:</strong> Responda logo! Mentores voluntários têm agenda concorrida e a disposição de ajudar pode não durar para sempre. 😊</p>
+  `;
+
+  const subject = `${data.mentorName} quer ser seu mentor na Menvo!`;
+  return await sendEmail(data.menteeEmail, subject, getEmailLayout(subject, content, { signatureType: "personal" }));
+}

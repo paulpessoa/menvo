@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { MessageCircle, Linkedin, Github, AlertCircle, X, Eye, Sparkles, User } from "lucide-react"
+import { MessageCircle, Linkedin, AlertCircle, X, Eye, Sparkles, User, FileText } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -34,6 +34,7 @@ interface UserProfile {
   company: string | null
   linkedin_url: string | null
   github_url: string | null
+  cv_url?: string | null
   expertise_areas: string[] | null
   mentorship_topics?: string[] | null
   learning_goals?: string | null
@@ -134,16 +135,29 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
                   {profile.full_name?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute -bottom-1 -right-1 bg-green-500 h-4 w-4 rounded-full border-2 border-white shadow-sm" title="Disponível para aprender" />
             </div>
             <div className="space-y-1">
               <CardTitle className="text-xl font-extrabold text-gray-900 group-hover:text-primary transition-colors">
                 {profile.full_name || "Membro Menvo"}
               </CardTitle>
-              <div className="flex flex-col items-center text-sm font-semibold text-primary/70">
-                <span>{profile.job_title || "Mentorado"}</span>
-                {profile.company && (
+              {profile.job_title && (
+                <div className="flex flex-col items-center text-sm font-semibold text-primary/70">
+                  <span>{profile.job_title}</span>
+                  {profile.company && (
                     <span className="text-xs text-muted-foreground font-medium">@{profile.company}</span>
+                  )}
+                </div>
+              )}
+              <div className="flex items-center justify-center gap-2 pt-1">
+                {profile.linkedin_url && (
+                  <div className="flex items-center gap-1 text-blue-500" title="Tem LinkedIn">
+                    <Linkedin className="h-3.5 w-3.5" />
+                  </div>
+                )}
+                {profile.cv_url && (
+                  <div className="flex items-center gap-1 text-primary" title="Tem currículo">
+                    <FileText className="h-3.5 w-3.5" />
+                  </div>
                 )}
               </div>
             </div>
@@ -183,46 +197,20 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
             </div>
           )}
 
-          <div className="flex flex-col gap-4 pt-6">
-            <div className="flex items-center justify-between gap-4">
-               <div className="flex gap-2">
-                {profile.linkedin_url && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 rounded-xl text-blue-600 bg-blue-50/50 hover:bg-blue-100 hover:scale-110 transition-all"
-                    onClick={(e) => handleProtectedAction(e, () => window.open(profile.linkedin_url!, '_blank'))}
-                  >
-                    <Linkedin className="h-4 w-4" />
-                  </Button>
-                )}
-                {profile.github_url && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 rounded-xl text-gray-900 bg-gray-100/50 hover:bg-gray-200 hover:scale-110 transition-all"
-                    onClick={(e) => handleProtectedAction(e, () => window.open(profile.github_url!, '_blank'))}
-                  >
-                    <Github className="h-4 w-4" />
-                  </Button>
-                )}
-               </div>
-               
-               <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleViewProfile}
-                  className="rounded-xl text-xs font-bold text-muted-foreground hover:text-primary hover:border-primary px-4"
-               >
-                 {tCommunity("viewProfile")}
-               </Button>
-            </div>
+          <div className="flex items-center gap-3 pt-6">
+            <Button
+              variant="outline"
+              onClick={handleViewProfile}
+              className="flex-1 rounded-xl text-sm font-bold text-muted-foreground hover:text-primary hover:border-primary h-12"
+            >
+              {tCommunity("viewProfile")}
+            </Button>
 
             <Button
               size="lg"
               onClick={handleHelpClick}
               variant={isSelf ? "outline" : "default"}
-              className={`w-full gap-2 font-bold rounded-xl h-12 transition-all ${
+              className={`flex-[1.5] gap-2 font-bold rounded-xl h-12 transition-all ${
                 isSelf
                   ? "border-primary/30 text-primary hover:bg-primary/5 hover:border-primary"
                   : "shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01]"

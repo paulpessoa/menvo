@@ -11,6 +11,8 @@ export interface CommunityProfile {
   company: string | null
   linkedin_url: string | null
   github_url: string | null
+  cv_url: string | null
+  languages: string[] | null
   expertise_areas: string[] | null
   mentorship_topics: string[] | null
   learning_goals: string | null
@@ -24,6 +26,11 @@ export interface GetCommunityProfilesParams {
   search?: string
   page?: number
   limit?: number
+  country?: string
+  state?: string
+  city?: string
+  topics?: string[]
+  sortBy?: "newest" | "name"
 }
 
 export interface GetCommunityProfilesResult {
@@ -37,7 +44,7 @@ export interface GetCommunityProfilesResult {
  * original_data here: this list is what mentors receive about a mentee.
  */
 const COMMUNITY_COLUMNS =
-  "id, full_name, avatar_url, bio, job_title, company, linkedin_url, github_url, expertise_areas, mentorship_topics, learning_goals, slug"
+  "id, full_name, avatar_url, bio, job_title, company, linkedin_url, github_url, cv_url, languages, expertise_areas, mentorship_topics, learning_goals, slug"
 
 /** Strips characters that would break out of a PostgREST `or()` filter. */
 function sanitizeSearchTerm(term: string): string {
@@ -55,7 +62,16 @@ export const communityService = {
    */
   async getCommunityProfiles(
     supabase: SupabaseClient<Database>,
-    { search = "", page = 0, limit = 12 }: GetCommunityProfilesParams = {}
+    {
+      search = "",
+      page = 0,
+      limit = 12,
+      country,
+      state,
+      city,
+      topics,
+      sortBy = "newest",
+    }: GetCommunityProfilesParams = {}
   ): Promise<GetCommunityProfilesResult> {
     const from = page * limit
     const to = from + limit - 1
@@ -85,6 +101,12 @@ export const communityService = {
       query = query.not("id", "in", `(${mentorIds.join(",")})`)
     }
 
+    // Exact Match Filters
+    if (country && country !== "all") query = query.eq("country", country)
+    if (state && state !== "all") query = query.eq("state", state)
+    if (city && city !== "all") query = query.eq("city", city)
+    if (topics && topics.length > 0) query = query.overlaps("mentorship_topics", topics)
+
     // Search filter
     const term = sanitizeSearchTerm(search)
     if (term) {
@@ -93,7 +115,14 @@ export const communityService = {
       )
     }
 
-    query = query.order("updated_at", { ascending: false }).range(from, to)
+    // Sort
+    if (sortBy === "name") {
+      query = query.order("full_name", { ascending: true })
+    } else {
+      query = query.order("updated_at", { ascending: false })
+    }
+    
+    query = query.range(from, to)
 
     const { data, error, count } = await query
 

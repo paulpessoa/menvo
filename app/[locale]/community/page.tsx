@@ -26,6 +26,31 @@ import {
   communityService,
   type CommunityProfile,
 } from "@/lib/services/community/community.service"
+import { mentorService } from "@/lib/services/mentors/mentors.service"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { ArrowDownUp, Filter } from "lucide-react"
+
+interface FilterState {
+  country: string
+  state: string
+  city: string
+  topics: string[]
+  sortBy: "newest" | "name"
+}
+
+const initialFilters: FilterState = {
+  country: "all",
+  state: "all",
+  city: "",
+  topics: [],
+  sortBy: "newest"
+}
 
 const ITEMS_PER_PAGE = 12
 
@@ -62,6 +87,33 @@ export default function CommunityPage() {
     cachedRoles?.roles?.includes("mentor") ||
     false
 
+  const [filters, setFilters] = useState<FilterState>(initialFilters)
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
+  const [availableFilters, setAvailableFilters] = useState({
+    countries: [] as string[],
+    states: [] as string[],
+    cities: [] as string[],
+    topics: [] as string[]
+  })
+
+  useEffect(() => {
+    mentorService.getCatalogFilterOptions().then((opts) => setAvailableFilters({
+      countries: opts.countries,
+      states: opts.states,
+      cities: opts.cities,
+      topics: opts.topics
+    })).catch(console.error)
+  }, [])
+
+  const activeFacetCount = useMemo(() => {
+    let count = 0
+    if (filters.country !== "all") count++
+    if (filters.state !== "all") count++
+    if (filters.city) count++
+    if (filters.topics.length > 0) count += filters.topics.length
+    return count
+  }, [filters])
+
   // Tracking query ID to safely discard out-of-order responses and avoid race conditions
   const queryIdRef = useRef(0)
 
@@ -84,6 +136,12 @@ export default function CommunityPage() {
         page: pageNum.toString(),
         limit: ITEMS_PER_PAGE.toString(),
       })
+
+      if (filters.country !== "all") queryParams.append("country", filters.country)
+      if (filters.state !== "all") queryParams.append("state", filters.state)
+      if (filters.city) queryParams.append("city", filters.city)
+      filters.topics.forEach(t => queryParams.append("topics[]", t))
+      queryParams.append("sortBy", filters.sortBy)
       
       const response = await fetch(`/api/community?${queryParams.toString()}`)
       if (!response.ok) {
@@ -124,7 +182,7 @@ export default function CommunityPage() {
     }, delay)
 
     return () => clearTimeout(timer)
-  }, [searchTerm])
+  }, [searchTerm, filters])
 
   const handleLoadMore = () => {
     if (loadingMore || !hasMore) return
@@ -246,23 +304,10 @@ export default function CommunityPage() {
   return (
     <RequireRole roles={["mentor", "admin"]}>
       <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2">
-            {tCommunity("title")}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            {tCommunity("subtitle")}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
-          <Info className="h-5 w-5 text-primary shrink-0" />
-          <p className="text-xs text-primary/80 leading-snug">
-            {tCommunity("mentorTip")}
-          </p>
-        </div>
-      </div>
+        {/* Header - Cute Phrase */}
+        <p className="text-center text-sm sm:text-base text-muted-foreground mb-6">
+          Seu hobby, sua vivência, sua história — alguém está buscando exatamente isso.
+        </p>
 
       {/* Search + AI Match */}
       <div className="flex flex-col sm:flex-row gap-2.5 max-w-2xl mb-12">
@@ -298,7 +343,209 @@ export default function CommunityPage() {
           }
           onSubmit={handleAISearch}
         />
+        
+        {/* Sort & Filters */}
+        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
+          <Select
+            value={filters.sortBy}
+            onValueChange={(val: any) =>
+              setFilters((prev) => ({ ...prev, sortBy: val }))
+            }
+          >
+            <SelectTrigger className="w-full sm:w-[155px] h-11 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
+              <div className="flex items-center gap-1.5 truncate">
+                <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <SelectValue placeholder="Ordenar por" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="newest">Mais recentes</SelectItem>
+              <SelectItem value="name">Ordem alfabética</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto h-11 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40"
+              >
+                <span>Filtros</span>
+                {activeFacetCount > 0 && (
+                  <Badge className="ml-1 h-5 min-w-5 px-1.5 rounded-full text-[10px] flex items-center justify-center bg-primary text-primary-foreground">
+                    {activeFacetCount}
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-md p-0 flex flex-col h-full bg-background border-l border-border/60">
+              <SheetHeader className="p-5 pb-4 border-b border-border/60 shrink-0 text-left">
+                <div className="flex items-center justify-between">
+                  <SheetTitle className="text-lg font-bold flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-primary" />
+                    Filtros
+                  </SheetTitle>
+                  {activeFacetCount > 0 && (
+                    <Badge variant="secondary" className="text-xs font-semibold">
+                      {activeFacetCount} {activeFacetCount === 1 ? "ativo" : "ativos"}
+                    </Badge>
+                  )}
+                </div>
+              </SheetHeader>
+
+              <div className="flex-1 overflow-y-auto p-5 space-y-6">
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Estado
+                  </h3>
+                  <Select
+                    value={filters.state}
+                    onValueChange={(value) =>
+                      setFilters((prev) => ({ ...prev, state: value }))
+                    }
+                  >
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue placeholder="Qualquer estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Qualquer estado</SelectItem>
+                      {availableFilters.states.map((state) => (
+                        <SelectItem key={state} value={state}>
+                          {state}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {availableFilters.cities.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                      Cidade
+                    </h3>
+                    <Select
+                      value={filters.city || "all"}
+                      onValueChange={(value) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          city: value === "all" ? "" : value
+                        }))
+                      }
+                    >
+                      <SelectTrigger className="h-11 rounded-xl">
+                        <SelectValue placeholder="Qualquer cidade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Qualquer cidade</SelectItem>
+                        {availableFilters.cities.map((city) => (
+                          <SelectItem key={city} value={city}>
+                            {city}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="space-y-2.5">
+                  <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Tópicos de Mentoria
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
+                    {availableFilters.topics.map((topic) => {
+                      const isSelected = filters.topics.includes(topic)
+                      return (
+                        <button
+                          key={topic}
+                          type="button"
+                          onClick={() => {
+                            setFilters((prev) => ({
+                              ...prev,
+                              topics: isSelected
+                                ? prev.topics.filter((t) => t !== topic)
+                                : [...prev.topics, topic]
+                            }))
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer border ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                              : "bg-card hover:bg-muted text-muted-foreground border-border/80"
+                          }`}
+                        >
+                          {topic}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="sticky bottom-0 bg-background/95 backdrop-blur-md border-t border-border/60 p-4 flex items-center gap-2.5 shrink-0 z-10">
+                <Button
+                  variant="outline"
+                  className="flex-1 h-11 rounded-xl text-xs sm:text-sm font-semibold"
+                  onClick={() => setFilters(initialFilters)}
+                >
+                  Limpar
+                </Button>
+                <Button
+                  className="flex-1 h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-xs sm:text-sm shadow-md"
+                  onClick={() => setIsFilterSheetOpen(false)}
+                >
+                  Ver Resultados
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
+      
+      {/* Active Filter Badges */}
+      {activeFacetCount > 0 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto py-1 mb-8 text-xs scrollbar-none">
+          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider shrink-0 mr-1">
+            Ativos:
+          </span>
+          {filters.state !== "all" && (
+            <Badge
+              variant="secondary"
+              onClick={() => setFilters(p => ({ ...p, state: "all", city: "" }))}
+              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+            >
+              <span>Estado: {filters.state}</span>
+              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
+            </Badge>
+          )}
+          {filters.city && (
+            <Badge
+              variant="secondary"
+              onClick={() => setFilters(p => ({ ...p, city: "" }))}
+              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+            >
+              <span>Cidade: {filters.city}</span>
+              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
+            </Badge>
+          )}
+          {filters.topics.map((topic) => (
+            <Badge
+              key={topic}
+              variant="secondary"
+              onClick={() => setFilters(p => ({ ...p, topics: p.topics.filter(t => t !== topic) }))}
+              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+            >
+              <span>{topic}</span>
+              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
+            </Badge>
+          )}
+          <button
+            type="button"
+            onClick={() => setFilters(initialFilters)}
+            className="text-[11px] font-semibold text-primary hover:underline shrink-0 ml-1.5 cursor-pointer"
+          >
+            Limpar tudo
+          </button>
+        </div>
+      )}
 
       {/* AI Recommendation Banner */}
       {aiJustification && (
