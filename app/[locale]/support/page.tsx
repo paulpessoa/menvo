@@ -179,6 +179,9 @@ export default function SupportPage() {
               <p>
                 A Menvo atua exclusivamente como provedor de aplicação (conforme o Marco Civil da Internet), recebendo e armazenando esta denúncia para análise interna. Não atuamos como juízes, não garantimos a retenção perpétua destes dados, nem assumimos responsabilidade direta por atos praticados por terceiros.
               </p>
+              <p>
+                Após a apuração, a plataforma reserva-se o direito de tomar medidas administrativas (como advertência ou banimento) com base em critérios próprios. Contudo, <strong>quaisquer questões de responsabilidade civil, penal ou reparação financeira devem ser tratadas pelas partes envolvidas através das autoridades oficiais competentes.</strong>
+              </p>
               <div className="flex items-start space-x-2 pt-2">
                 <Checkbox 
                   id="legal" 
