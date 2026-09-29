@@ -14,6 +14,14 @@ import { quizSubmitSchema } from "@/lib/schemas/quiz"
  * (20260923000005_quiz_responses_privacy.sql); the Zod schema here is a
  * first line of defense, not the only one.
  *
+ * `user_id` must be `auth.uid()` when the caller is logged in (or left null
+ * for an anonymous caller) - the `authenticated` insert policy
+ * (20260924000001_fix_diagnostic_quiz_responses_rls.sql) rejects anything
+ * else with a WITH CHECK violation, which showed up as a 500 here until this
+ * was added (a pre-existing bug: the old browser-side submitQuiz never set
+ * it either, so a logged-in submission from /quiz was already broken before
+ * this route existed).
+ *
  * The id is generated here, not returned by a `.select()` after insert:
  * anonymous callers have no SELECT policy on this table, so a `.select()`
  * would fail even though the insert succeeded.
@@ -35,11 +43,16 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   const id = crypto.randomUUID()
   const payload = parsed.data
 
   const { error } = await supabase.from("quiz_responses").insert({
     id,
+    user_id: user?.id ?? null,
     name: payload.name,
     email: payload.email.trim().toLowerCase(),
     linkedin_url: payload.linkedin_url || null,

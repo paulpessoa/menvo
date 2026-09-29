@@ -26,9 +26,12 @@ const validPayload = {
   personal_life_help: 'Gostaria de equilibrar melhor estudo e trabalho.'
 }
 
-function makeSupabaseMock(insertError: unknown = null) {
+function makeSupabaseMock(insertError: unknown = null, userId: string | null = null) {
   const insert = jest.fn().mockResolvedValue({ error: insertError })
-  return { from: jest.fn().mockReturnValue({ insert }) }
+  return {
+    from: jest.fn().mockReturnValue({ insert }),
+    auth: { getUser: jest.fn().mockResolvedValue({ data: { user: userId ? { id: userId } : null } }) }
+  }
 }
 
 describe('POST /api/quiz', () => {
@@ -97,6 +100,38 @@ describe('POST /api/quiz', () => {
     const insertedRow = (supabase.from('quiz_responses').insert as jest.Mock).mock.calls[0][0]
     expect(insertedRow.email).toBe('ana@example.com')
     expect(insertedRow.id).toBe(body.id)
+  })
+
+  it('sets user_id from the session for a logged-in caller (regression: WITH CHECK on the authenticated insert policy needs it)', async () => {
+    const req = new Request('http://localhost:3000/api/quiz', {
+      method: 'POST',
+      body: JSON.stringify(validPayload)
+    })
+
+    const supabase = makeSupabaseMock(null, 'user-123')
+    ;(createClient as jest.Mock).mockResolvedValue(supabase)
+
+    const res = await POST(req as any)
+    expect(res.status).toBe(200)
+
+    const insertedRow = (supabase.from('quiz_responses').insert as jest.Mock).mock.calls[0][0]
+    expect(insertedRow.user_id).toBe('user-123')
+  })
+
+  it('leaves user_id null for an anonymous caller', async () => {
+    const req = new Request('http://localhost:3000/api/quiz', {
+      method: 'POST',
+      body: JSON.stringify(validPayload)
+    })
+
+    const supabase = makeSupabaseMock()
+    ;(createClient as jest.Mock).mockResolvedValue(supabase)
+
+    const res = await POST(req as any)
+    expect(res.status).toBe(200)
+
+    const insertedRow = (supabase.from('quiz_responses').insert as jest.Mock).mock.calls[0][0]
+    expect(insertedRow.user_id).toBeNull()
   })
 
   it('returns 500 when the insert fails', async () => {
