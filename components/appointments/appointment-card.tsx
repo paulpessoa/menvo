@@ -239,12 +239,24 @@ export function AppointmentCard({
               <div className="flex items-center gap-2 text-sm">
                 <XCircle className="w-4 h-4 text-red-600" />
                 <span className="font-medium text-red-900">
-                  {t("cancelledBy", {
-                    name:
-                      appointment.cancelled_by === currentUserId
-                        ? t("you")
-                        : otherPerson.full_name
-                  })}
+                  {(() => {
+                    const isCancelledAutomatically = 
+                      !appointment.cancelled_by && 
+                      appointment.cancelled_at && 
+                      appointment.scheduled_at && 
+                      new Date(appointment.cancelled_at) >= new Date(appointment.scheduled_at);
+                    
+                    if (isCancelledAutomatically) {
+                      return t("cancelledAutomatically");
+                    }
+                    
+                    return t("cancelledBy", {
+                      name:
+                        appointment.cancelled_by === currentUserId
+                          ? t("you")
+                          : otherPerson.full_name
+                    });
+                  })()}
                 </span>
               </div>
               <p className="text-sm font-medium text-red-900 pl-6 mb-1">

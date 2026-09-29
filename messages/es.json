@@ -1623,6 +1623,7 @@
     "menteeComments": "Comentarios del Mentee:",
     "mentorNotes": "Notas del Mentor:",
     "cancelledBy": "Cancelada por {name}",
+    "cancelledAutomatically": "Cancelada automáticamente",
     "you": "tú",
     "reason": "Razón:",
     "cancelledAt": "Cancelada el {date}",
@@ -1858,6 +1859,11 @@
         "contactPhone": "Teléfono (Opcional)",
         "peopleEstimate": "Tamaño de la organización",
         "message": "Mensaje (Opcional)"
+      },
+      "errors": {
+        "orgName": "El nombre debe tener al menos 2 caracteres",
+        "contactName": "El nombre debe tener al menos 2 caracteres",
+        "contactEmail": "Correo electrónico no válido"
       },
       "types": {
         "ngo": "ONG / Sector Tercer",

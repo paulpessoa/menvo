@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations, useLocale } from "next-intl"
 import { Loader2, CheckCircle2 } from "lucide-react"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -87,7 +87,7 @@ export function OrganizationLeadForm() {
         <div className="space-y-2">
           <Label htmlFor="org_name">{t("fields.orgName")}</Label>
           <Input id="org_name" {...form.register("org_name")} />
-          {form.formState.errors.org_name && <p className="text-sm text-destructive">{form.formState.errors.org_name.message}</p>}
+          {form.formState.errors.org_name && <p className="text-sm text-destructive">{t("errors.orgName")}</p>}
         </div>
 
         <div className="space-y-2">
@@ -109,13 +109,13 @@ export function OrganizationLeadForm() {
         <div className="space-y-2">
           <Label htmlFor="contact_name">{t("fields.contactName")}</Label>
           <Input id="contact_name" {...form.register("contact_name")} />
-          {form.formState.errors.contact_name && <p className="text-sm text-destructive">{form.formState.errors.contact_name.message}</p>}
+          {form.formState.errors.contact_name && <p className="text-sm text-destructive">{t("errors.contactName")}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="contact_email">{t("fields.contactEmail")}</Label>
           <Input id="contact_email" type="email" {...form.register("contact_email")} />
-          {form.formState.errors.contact_email && <p className="text-sm text-destructive">{form.formState.errors.contact_email.message}</p>}
+          {form.formState.errors.contact_email && <p className="text-sm text-destructive">{t("errors.contactEmail")}</p>}
         </div>
 
         <div className="space-y-2">
@@ -151,7 +151,7 @@ export function OrganizationLeadForm() {
 
       <p className="text-xs text-center text-muted-foreground mt-4">
         {t("privacyNote")}{" "}
-        <Link href={`/${locale}/privacy`} className="underline hover:text-foreground">
+        <Link href="/privacy" className="underline hover:text-foreground">
           {t("privacyLink")}
         </Link>
       </p>

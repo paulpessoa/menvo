@@ -1647,6 +1647,7 @@
     "menteeComments": "Mentee Comments:",
     "mentorNotes": "Mentor Notes:",
     "cancelledBy": "Cancelled by {name}",
+    "cancelledAutomatically": "Cancelled automatically",
     "you": "you",
     "reason": "Reason:",
     "cancelledAt": "Cancelled on {date}",
@@ -1882,6 +1883,11 @@
         "contactPhone": "Phone (Optional)",
         "peopleEstimate": "Organization Size",
         "message": "Message (Optional)"
+      },
+      "errors": {
+        "orgName": "Name must be at least 2 characters",
+        "contactName": "Name must be at least 2 characters",
+        "contactEmail": "Invalid email"
       },
       "types": {
         "ngo": "NGO / Non-profit",

@@ -1641,6 +1641,7 @@
     "menteeComments": "Comentários do Mentee:",
     "mentorNotes": "Anotações do Mentor:",
     "cancelledBy": "Cancelado por {name}",
+    "cancelledAutomatically": "Cancelado automaticamente",
     "you": "você",
     "reason": "Motivo:",
     "cancelledAt": "Cancelado em {date}",
@@ -1876,6 +1877,11 @@
         "contactPhone": "Telefone (Opcional)",
         "peopleEstimate": "Tamanho da organização",
         "message": "Mensagem (Opcional)"
+      },
+      "errors": {
+        "orgName": "Nome deve ter no mínimo 2 caracteres",
+        "contactName": "Nome deve ter no mínimo 2 caracteres",
+        "contactEmail": "E-mail inválido"
       },
       "types": {
         "ngo": "ONG / Terceiro Setor",
