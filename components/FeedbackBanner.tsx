@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Star, MessageSquare, X } from "lucide-react"
+import { Star, MessageSquarePlus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
+import { TextareaWithVoice } from "@/components/ui/textarea-with-voice"
 import {
   Dialog,
   DialogContent,
@@ -24,9 +24,9 @@ import { useFeatureFlag } from "@/lib/feature-flags"
 export function FeedbackBanner() {
   const t = useTranslations()
   const { isAuthenticated } = useAuth()
-  const feedbackEnabled = useFeatureFlag("feedback_app_flag")
+  const feedbackEnabled = true
   const { toast } = useToast()
-  
+
   const [isOpen, setIsOpen] = useState(false)
   const [rating, setRating] = useState<number | null>(null)
   const [comment, setComment] = useState("")
@@ -78,15 +78,29 @@ export function FeedbackBanner() {
   return (
     <>
       {/* Botão Flutuante */}
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-primary hover:scale-110 transition-transform"
-        size="icon"
-        aria-label="Enviar feedback sobre a Menvo"
-      >
-        <MessageSquare className="h-6 w-6" />
-        <span className="sr-only">Enviar feedback sobre a Menvo</span>
-      </Button>
+      <div className="fixed bottom-6 right-6 z-50 flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-105 transition-transform group">
+        <div className="relative flex items-center justify-center rounded-full p-[2px] overflow-hidden shadow-2xl bg-primary">
+          {/* Borda giratória */}
+          <div className="absolute inset-0 z-0 flex items-center justify-center">
+            <div
+              className="w-[300%] aspect-square animate-[spin_3s_linear_infinite]"
+              style={{
+                background: 'conic-gradient(from 0deg, transparent 0 270deg, rgba(255,255,255,0.9) 360deg)'
+              }}
+            />
+          </div>
+          {/* Botão interno */}
+          <Button
+            onClick={() => setIsOpen(true)}
+            className="relative z-10 flex items-center gap-2 rounded-full bg-primary hover:bg-primary/95 px-5 h-12 border-none transition-colors"
+            size="default"
+            aria-label="Reclame aqui"
+          >
+            <MessageSquarePlus className="h-5 w-5" />
+            <span className="font-bold text-sm tracking-wider">Reclame Aqui</span>
+          </Button>
+        </div>
+      </div>
 
       {/* Modal de Feedback */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -104,44 +118,45 @@ export function FeedbackBanner() {
             </div>
           ) : (
             <>
-              <DialogHeader>
-                <DialogTitle>O que você está achando da Menvo?</DialogTitle>
-                <DialogDescription>
-                  Sua avaliação ajuda a melhorar a experiência de mentoria para todos.
+              <DialogHeader className="text-center sm:text-center space-y-3 pb-2">
+                <DialogTitle className="text-2xl font-bold">Manda a real!</DialogTitle>
+                <DialogDescription className="text-base text-muted-foreground">
+                  Não se acanhe! Se você criticar, vou ler, aprender com isso e tentar melhorar.
+                  Sua opinião fará parte desse impacto na sociedade.
                 </DialogDescription>
               </DialogHeader>
-              
-              <div className="py-6 space-y-6">
+
+              <div className="py-4 space-y-6">
                 <div className="flex justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
                       onClick={() => setRating(num)}
-                      className={`p-2 rounded-lg transition-all ${
-                        rating === num ? 'bg-primary text-white scale-110' : 'bg-muted hover:bg-muted/80'
-                      }`}
+                      className={`p-2 rounded-lg transition-all ${rating === num ? 'bg-primary text-white scale-110' : 'bg-muted hover:bg-muted/80'
+                        }`}
                     >
                       <Star className={`h-8 w-8 ${rating === num ? 'fill-current' : 'text-muted-foreground'}`} />
                     </button>
                   ))}
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Conte-nos mais (opcional)</p>
-                  <Textarea
-                    placeholder="Elogios, críticas ou sugestões..."
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold">Conta tudo (não esconde nada):</p>
+                  <TextareaWithVoice
+                    placeholder="Pode descer a lenha ou rasgar seda, o espaço é seu..."
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    rows={4}
+                    onChange={(val) => setComment(val)}
+                    minHeight="min-h-[100px]"
+                    className="resize-none"
                   />
                 </div>
 
-                <Button 
-                  onClick={handleSubmit} 
-                  className="w-full" 
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full font-bold text-base h-11"
                   disabled={isSubmitting || !rating}
                 >
-                  {isSubmitting ? "Enviando..." : "Enviar Feedback"}
+                  {isSubmitting ? "Enviando pra gente..." : "Soltar o verbo!"}
                 </Button>
               </div>
             </>
