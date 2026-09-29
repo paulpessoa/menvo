@@ -1030,6 +1030,7 @@ interface MentorContactEmailData {
   mentorSlug: string;
   mentorLinkedin?: string;
   mentorAvatarUrl?: string;
+  customMessage?: string;
 }
 
 /**
@@ -1048,6 +1049,12 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
     <h2>Alguém quer te ajudar! 🎉</h2>
     <p>Oi, <strong>${escapeHtml(data.menteeName)}</strong>! Um mentor da Menvo viu seu perfil e quer se conectar com você:</p>
     
+    ${data.customMessage ? `
+    <div style="background:#fff;border-left:4px solid ${COLORS.primary};padding:16px 20px;margin:20px 0;font-style:italic;color:#374151;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:0 8px 8px 0;">
+      <p style="margin:0;line-height:1.6;">"${escapeHtml(data.customMessage).replace(/\n/g, '<br>')}"</p>
+    </div>
+    ` : ''}
+
     <div style="background:#f8fafc;border-radius:16px;padding:24px;margin:24px 0;border:1px solid ${COLORS.divider};">
       <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;">
         <tr>

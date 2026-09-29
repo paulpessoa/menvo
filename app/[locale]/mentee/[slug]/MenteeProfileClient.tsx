@@ -42,6 +42,7 @@ import {
 import { Link, useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { toast } from "sonner"
+import { ContactMenteeModal } from "@/components/ContactMenteeModal"
 
 interface MenteeProfile {
   id: string
@@ -75,7 +76,6 @@ interface Props {
 
 export default function MenteeProfileClient({ mentee }: Props) {
   const [isPdfViewerOpen, setIsPdfViewerOpen] = useState(false)
-  const [sendingMessage, setSendingMessage] = useState(false)
   const { user, profile: currentUserProfile } = useAuth()
   const router = useRouter()
 
@@ -106,31 +106,6 @@ export default function MenteeProfileClient({ mentee }: Props) {
       return
     }
     router.push(`/messages?userId=${mentee.id}`)
-  }
-
-  const handleSendMessage = async () => {
-    if (!user) {
-      toast.info("Faça login para enviar uma mensagem")
-      router.push("/login")
-      return
-    }
-    setSendingMessage(true)
-    try {
-      const res = await fetch("/api/community/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ menteeId: mentee.id })
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Erro ao enviar mensagem")
-      }
-      toast.success("Mensagem enviada! O mentorado receberá um e-mail com seu perfil.")
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar mensagem")
-    } finally {
-      setSendingMessage(false)
-    }
   }
 
   return (
@@ -223,26 +198,19 @@ export default function MenteeProfileClient({ mentee }: Props) {
                     {/* CTA Buttons Desktop */}
                     {!isOwner && (
                       <div className="hidden md:flex gap-3 pt-4">
-                        {canContact && (
+                        <ContactMenteeModal
+                          menteeId={mentee.id}
+                          menteeName={mentee.first_name || "Mentorado"}
+                          isLoggedIn={!!user}
+                        >
                           <Button
                             size="xl"
-                            onClick={handleChat}
                             className="rounded-2xl px-12 font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
                           >
                             <MessageCircle className="mr-2 h-6 w-6" />
-                            {contactLabel}
+                            Oferecer Ajuda
                           </Button>
-                        )}
-                        <Button
-                          size="xl"
-                          variant="outline"
-                          onClick={handleSendMessage}
-                          disabled={sendingMessage}
-                          className="rounded-2xl px-8 font-black border-2 border-primary/30 text-primary hover:bg-primary/5 hover:border-primary"
-                        >
-                          <Send className="mr-2 h-5 w-5" />
-                          {sendingMessage ? "Enviando..." : "Enviar Mensagem"}
-                        </Button>
+                        </ContactMenteeModal>
                       </div>
                     )}
                   </div>
@@ -393,7 +361,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
                     onClick={() => setIsPdfViewerOpen(true)}
                   >
                     <Eye className="h-5 w-5 mr-2" />
-                    Ver Trajetória
+                    Visualizar
                   </Button>
                 </CardContent>
               </Card>
@@ -466,26 +434,19 @@ export default function MenteeProfileClient({ mentee }: Props) {
         {!isOwner && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
             <div className="flex gap-3">
-              {canContact && (
+              <ContactMenteeModal
+                menteeId={mentee.id}
+                menteeName={mentee.first_name || "Mentorado"}
+                isLoggedIn={!!user}
+              >
                 <Button
                   size="xl"
-                  onClick={handleChat}
                   className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40"
                 >
                   <MessageCircle className="mr-2 h-6 w-6" />
-                  {contactLabel}
+                  Oferecer Ajuda
                 </Button>
-              )}
-              <Button
-                size="xl"
-                variant="outline"
-                onClick={handleSendMessage}
-                disabled={sendingMessage}
-                className="flex-1 rounded-2xl font-black border-2"
-              >
-                <Send className="mr-2 h-5 w-5" />
-                {sendingMessage ? "Enviando..." : "Mensagem"}
-              </Button>
+              </ContactMenteeModal>
             </div>
           </div>
         )}

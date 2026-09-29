@@ -6,6 +6,7 @@ import { z } from "zod"
 
 const contactSchema = z.object({
   menteeId: z.string().uuid("ID do mentorado inválido"),
+  message: z.string().optional(),
 })
 
 /**
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    const { menteeId } = parsed.data
+    const { menteeId, message } = parsed.data
 
     if (user.id === menteeId) {
       return NextResponse.json({ error: "Você não pode enviar mensagem para si mesmo" }, { status: 400 })
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
       mentorSlug: mentorProfile.slug || user.id,
       mentorLinkedin: mentorProfile.linkedin_url || undefined,
       mentorAvatarUrl: mentorProfile.avatar_url || undefined,
+      customMessage: message,
     })
 
     return NextResponse.json({ success: true })

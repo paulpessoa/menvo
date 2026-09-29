@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { ContactMenteeModal } from "./ContactMenteeModal"
 import { MessageCircle, Linkedin, AlertCircle, X, Eye, Sparkles, User, FileText } from "lucide-react"
 import {
   Card,
@@ -86,24 +87,6 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
     }
     if (profile.slug) {
       router.push(`/mentee/${profile.slug}`)
-    }
-  }
-
-  const handleHelpClick = () => {
-    if (!isAuthenticated) {
-      setShowLoginModal(true)
-      return
-    }
-
-    if (isSelf) {
-      router.push("/profile")
-      return
-    }
-
-    if (!effectiveIsMentor) {
-      setShowDisclaimer(true)
-    } else {
-      onChat(profile.id)
     }
   }
 
@@ -199,33 +182,36 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
 
           <div className="flex items-center gap-3 pt-6">
             <Button
-              variant="outline"
-              onClick={handleViewProfile}
-              className="flex-1 rounded-xl text-sm font-bold text-muted-foreground hover:text-primary hover:border-primary h-12"
-            >
-              {tCommunity("viewProfile")}
-            </Button>
-
-            <Button
               size="lg"
-              onClick={handleHelpClick}
-              variant={isSelf ? "outline" : "default"}
-              className={`flex-[1.5] gap-2 font-bold rounded-xl h-12 transition-all ${
-                isSelf
-                  ? "border-primary/30 text-primary hover:bg-primary/5 hover:border-primary"
-                  : "shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01]"
-              }`}
+              onClick={handleViewProfile}
+              className="flex-[1.5] gap-2 font-bold rounded-xl h-12 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01]"
             >
               {isSelf ? (
                 <>
-                  <User className="h-5 w-5 text-primary" /> {tCommunity("myProfile")}
+                  <User className="h-5 w-5" /> Meu Perfil
                 </>
               ) : (
                 <>
-                  <MessageCircle className="h-5 w-5" /> {tCommunity("offerHelp")}
+                  Ver Perfil
                 </>
               )}
             </Button>
+
+            {!isSelf && (
+              <ContactMenteeModal
+                menteeId={profile.id}
+                menteeName={profile.full_name || "Mentorado"}
+                isLoggedIn={isAuthenticated}
+              >
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-12"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  {tCommunity("offerHelp")}
+                </Button>
+              </ContactMenteeModal>
+            )}
           </div>
         </CardContent>
       </Card>

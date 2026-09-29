@@ -30,7 +30,8 @@ export interface GetCommunityProfilesParams {
   state?: string
   city?: string
   topics?: string[]
-  sortBy?: "newest" | "name"
+  sortBy?: "newest" | "oldest" | "name"
+  organization?: string
 }
 
 export interface GetCommunityProfilesResult {
@@ -71,6 +72,7 @@ export const communityService = {
       city,
       topics,
       sortBy = "newest",
+      organization,
     }: GetCommunityProfilesParams = {}
   ): Promise<GetCommunityProfilesResult> {
     const from = page * limit
@@ -106,6 +108,11 @@ export const communityService = {
     if (state && state !== "all") query = query.eq("state", state)
     if (city && city !== "all") query = query.eq("city", city)
     if (topics && topics.length > 0) query = query.overlaps("mentorship_topics", topics)
+    
+    // Organization filter (search in company or institution)
+    if (organization && organization !== "all") {
+      query = query.or(`company.ilike.%${organization}%,institution.ilike.%${organization}%`)
+    }
 
     // Search filter
     const term = sanitizeSearchTerm(search)
@@ -118,8 +125,10 @@ export const communityService = {
     // Sort
     if (sortBy === "name") {
       query = query.order("full_name", { ascending: true })
+    } else if (sortBy === "oldest") {
+      query = query.order("created_at", { ascending: true })
     } else {
-      query = query.order("updated_at", { ascending: false })
+      query = query.order("created_at", { ascending: false })
     }
     
     query = query.range(from, to)
