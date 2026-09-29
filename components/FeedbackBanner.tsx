@@ -219,10 +219,10 @@ export function FeedbackBanner() {
                     <button
                       key={num}
                       onClick={() => setRating(num)}
-                      className={`p-2 rounded-lg transition-all ${rating === num ? 'bg-primary text-white scale-110' : 'bg-muted hover:bg-muted/80'
+                      className={`p-2 rounded-lg transition-all ${rating !== null && num <= rating ? 'bg-primary text-white scale-110' : 'bg-muted hover:bg-muted/80'
                         }`}
                     >
-                      <Star className={`h-8 w-8 ${rating === num ? 'fill-current' : 'text-muted-foreground'}`} />
+                      <Star className={`h-8 w-8 ${rating !== null && num <= rating ? 'fill-current' : 'text-muted-foreground'}`} />
                     </button>
                   ))}
                 </div>
