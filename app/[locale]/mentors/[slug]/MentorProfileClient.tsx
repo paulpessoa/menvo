@@ -495,9 +495,9 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 gap-3 px-8 pb-10">
                   {mentor.linkedin_url && (
-                    <Button variant="outline" className="w-full justify-start h-12 rounded-xl font-bold border-2 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100 transition-all" asChild>
+                    <Button variant="default" className="w-full justify-start h-12 rounded-xl font-bold bg-[#0a66c2] text-white hover:bg-[#004182] border-none transition-all" asChild>
                       <a href={mentor.linkedin_url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4 mr-2" />
+                        <Linkedin className="h-5 w-5 mr-2 fill-current" />
                         LinkedIn
                       </a>
                     </Button>

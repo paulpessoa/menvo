@@ -366,9 +366,9 @@ export default function MenteeProfileClient({ mentee }: Props) {
                 <CardContent className="grid grid-cols-3 gap-3 px-8 pb-10">
                   {mentee.linkedin_url && (
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="icon"
-                      className="w-full h-12 rounded-xl text-blue-600 border-blue-50 bg-blue-50/30 hover:bg-blue-100 transition-colors"
+                      className="w-full h-12 rounded-xl bg-[#0a66c2] text-white hover:bg-[#004182] border-none transition-colors"
                       asChild
                     >
                       <a

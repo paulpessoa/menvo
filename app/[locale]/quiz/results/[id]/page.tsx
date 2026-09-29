@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import {  Trophy, Users, Lightbulb, Target, ArrowRight, CheckCircle, Heart, Sparkles, Mail, Share2, ExternalLink , Loader2 } from "lucide-react"
+import {  Trophy, Users, Lightbulb, Target, ArrowRight, CheckCircle, Heart, Sparkles, Mail, Share2, ExternalLink, Linkedin, Loader2 } from "lucide-react"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
@@ -519,11 +519,11 @@ export default function QuizResultsPage() {
                                 </Button>
                                 <Button
                                     size="lg"
-                                    variant="outline"
+                                    variant="default"
                                     onClick={handleShareLinkedIn}
-                                    className="w-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 rounded-xl"
+                                    className="w-full bg-[#0a66c2] text-white hover:bg-[#004182] border-none rounded-xl"
                                 >
-                                    <Share2 className="mr-2 h-4 w-4" />
+                                    <Linkedin className="mr-2 h-4 w-4 fill-current" />
                                     {t('quiz_results.linkedin')}
                                 </Button>
                             </div>
