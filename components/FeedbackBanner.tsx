@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Star, MessageSquarePlus, X } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Star, MessageSquarePlus, Video, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TextareaWithVoice } from "@/components/ui/textarea-with-voice"
 import {
@@ -32,7 +32,10 @@ export function FeedbackBanner() {
   const [comment, setComment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showThankYou, setShowThankYou] = useState(false)
+  const [showVideoPrompt, setShowVideoPrompt] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -62,6 +65,8 @@ export function FeedbackBanner() {
       setShowThankYou(true)
       setRating(null)
       setComment("")
+      // Se enviou, não precisa mais ver o vídeo de cobrança
+      localStorage.setItem("hasSeenFeedbackVideoPrompt", "true")
     } catch (error) {
       toast({
         title: "Erro ao enviar",
@@ -71,6 +76,42 @@ export function FeedbackBanner() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // O usuário está tentando fechar o modal
+      if (!showThankYou && !showVideoPrompt) {
+        // Se ainda não opinou e não está vendo o prompt de vídeo
+        const hasSeenVideo = localStorage.getItem("hasSeenFeedbackVideoPrompt")
+        if (hasSeenVideo !== "true") {
+          // Intercepta o fechamento e mostra o vídeo de motivação
+          setShowVideoPrompt(true)
+          return
+        }
+      }
+    } else {
+      // Resetar estados quando abrir o modal novamente
+      setShowVideoPrompt(false)
+      setShowThankYou(false)
+      setIsPlaying(false)
+    }
+
+    // Se for um fechamento definitivo (já viu o vídeo ou já opinou)
+    if (!open && showVideoPrompt) {
+      localStorage.setItem("hasSeenFeedbackVideoPrompt", "true")
+      setShowVideoPrompt(false)
+      setIsPlaying(false)
+    }
+
+    setIsOpen(open)
+  }
+
+  const closeDefinitely = () => {
+    localStorage.setItem("hasSeenFeedbackVideoPrompt", "true")
+    setShowVideoPrompt(false)
+    setIsPlaying(false)
+    setIsOpen(false)
   }
 
   if (!mounted || !feedbackEnabled) return null
@@ -103,9 +144,56 @@ export function FeedbackBanner() {
       </div>
 
       {/* Modal de Feedback */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
-          {showThankYou ? (
+          {showVideoPrompt ? (
+            <div className="space-y-4 py-2">
+              <DialogTitle className="sr-only">Recado rápido</DialogTitle>
+
+              {/* Vídeo de Onboarding */}
+              <div
+                className="aspect-[9/16] max-h-[70vh] w-full bg-black rounded-lg flex flex-col items-center justify-center border-2 border-muted relative overflow-hidden shadow-inner cursor-pointer group"
+                onClick={() => {
+                  if (videoRef.current) {
+                    if (isPlaying) {
+                      videoRef.current.pause()
+                      setIsPlaying(false)
+                    } else {
+                      videoRef.current.play()
+                      setIsPlaying(true)
+                    }
+                  }
+                }}
+              >
+                <video
+                  ref={videoRef}
+                  playsInline
+                  className="w-full h-full object-cover"
+                  onEnded={() => setIsPlaying(false)}
+                >
+                  <source src="/feedback-onboarding.webm" type="video/webm" />
+                  <source src="/feedback-onboarding.mp4" type="video/mp4" />
+                  Seu navegador não suporta a reprodução deste vídeo.
+                </video>
+
+                {/* Overlay de Play Centralizado */}
+                {!isPlaying && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity group-hover:bg-black/50">
+                    <div className="w-16 h-16 bg-primary/90 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
+                      <Play className="h-8 w-8 text-primary-foreground ml-1" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-2">
+
+                <Button className="flex-1 font-bold" onClick={() => setShowVideoPrompt(false)}>
+                  Escrever / Falar
+                </Button>
+              </div>
+            </div>
+          ) : showThankYou ? (
             <div className="py-10 text-center space-y-4">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                 <Star className="h-8 w-8 text-green-600 fill-green-600" />
@@ -121,8 +209,7 @@ export function FeedbackBanner() {
               <DialogHeader className="text-center sm:text-center space-y-3 pb-2">
                 <DialogTitle className="text-2xl font-bold">Manda a real!</DialogTitle>
                 <DialogDescription className="text-base text-muted-foreground">
-                  Não se acanhe! Se você criticar, vou ler, aprender com isso e tentar melhorar.
-                  Sua opinião fará parte desse impacto na sociedade.
+                  Se você criticar, reclamar ou elogiar, vou ler, aprender com isso e tentar melhorar.
                 </DialogDescription>
               </DialogHeader>
 
@@ -143,7 +230,7 @@ export function FeedbackBanner() {
                 <div className="space-y-3">
                   <p className="text-sm font-semibold">Conta tudo (não esconde nada):</p>
                   <TextareaWithVoice
-                    placeholder="Pode descer a lenha ou rasgar seda, o espaço é seu..."
+                    placeholder="Pode rasgar seda, o espaço é seu..."
                     value={comment}
                     onChange={(val) => setComment(val)}
                     minHeight="min-h-[100px]"
@@ -156,7 +243,7 @@ export function FeedbackBanner() {
                   className="w-full font-bold text-base h-11"
                   disabled={isSubmitting || !rating}
                 >
-                  {isSubmitting ? "Enviando pra gente..." : "Soltar o verbo!"}
+                  {isSubmitting ? "Enviando..." : "Enviar"}
                 </Button>
               </div>
             </>
