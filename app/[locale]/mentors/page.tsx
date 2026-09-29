@@ -38,7 +38,7 @@ import {
 import { useAuth } from "@/lib/auth"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
-import { AISearchButton } from "@/components/mentors/AISearchButton"
+import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { toast } from "sonner"
 import { useLocale, useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
@@ -346,8 +346,7 @@ export default function MentorsPage() {
     setFilters((prev) => ({ ...prev, search: "", topics: [] }))
   }
 
-  const handleAISearch = async () => {
-    const query = filters.search.trim()
+  const handleAISearch = async (query: string) => {
     setAiLoading(true)
     try {
       const response = await fetch("/api/ai/match", {
@@ -414,7 +413,7 @@ export default function MentorsPage() {
       {/* Search and Filter Bar */}
       <div className="mb-2 sm:mb-3 space-y-3">
         <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
-          {/* Search + AI Search (same field feeds both) */}
+          {/* Search + AI Match */}
           <div className="flex-1 flex gap-2 min-w-0">
             <div className="flex-1 relative min-w-0">
               <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
@@ -424,28 +423,26 @@ export default function MentorsPage() {
                 onChange={(e) => {
                   const value = e.target.value
                   if (isAIMode) {
-                    // Editar o texto depois de um resultado de IA invalida
-                    // aquele resultado — volta pro fluxo normal de digitação.
+                    // Editar a busca literal depois de um resultado de IA
+                    // invalida aquele resultado — volta pro fluxo normal.
                     handleClearAI()
-                    setFilters((prev) => ({ ...prev, search: value }))
-                  } else {
-                    setFilters((prev) => ({ ...prev, search: value }))
                   }
+                  setFilters((prev) => ({ ...prev, search: value }))
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isAIMode) {
+                  if (e.key === "Enter") {
                     e.preventDefault()
                     fetchMentors(true, undefined, filters.search)
                   }
                 }}
-                className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
-                  isAIMode ? "border-primary/40" : "border-border/80"
-                } ${filters.search ? "pr-10" : ""}`}
+                className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
+                  filters.search ? "pr-10" : ""
+                }`}
               />
               {filters.search && (
                 <button
                   type="button"
-                  onClick={handleClearAI}
+                  onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                   aria-label="Limpar busca"
                 >
@@ -453,7 +450,30 @@ export default function MentorsPage() {
                 </button>
               )}
             </div>
-            <AISearchButton query={filters.search} loading={aiLoading} onSearch={handleAISearch} />
+            <AIMatchButton
+              title={t("magicSearch.title")}
+              description={t("magicSearch.disclaimer")}
+              placeholder={t("magicSearch.placeholder")}
+              loading={aiLoading}
+              loginRequiredMessage={t("magicSearch.loginRequired")}
+              minCharsMessage={t("magicSearch.minChars")}
+              submitLabel={t("magicSearch.button")}
+              buttonLabel={t("magicSearch.button")}
+              quota={aiQuota}
+              quotaHint={(q) =>
+                q.reason === "budget"
+                  ? t("magicSearch.budgetExhausted", {
+                      date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                    })
+                  : q.remaining! > 0
+                    ? t("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
+                    : t("magicSearch.quotaExhausted", {
+                        date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                      })
+              }
+              onSubmit={handleAISearch}
+              compact
+            />
           </div>
 
           {/* Sort & Filters Action Row (balanced 50-50 on mobile, compact on desktop) */}

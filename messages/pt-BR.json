@@ -549,6 +549,21 @@
       "whyDescription": "Como mentor verificado, você ganha acesso a ferramentas de agendamento, calendário sincronizado e avaliações oficiais.",
       "chatAnyway": "Apenas Conversar",
       "becomeMentor": "Tornar-se Mentor"
+    },
+    "magicSearch": {
+      "title": "Buscar com IA quem ajudar",
+      "placeholder": "Descreva quem você quer ajudar (ex: 'Quero ajudar alguém que está começando em Design e busca o primeiro estágio')",
+      "button": "Buscar com IA",
+      "loading": "Mágica em andamento...",
+      "error": "A mágica falhou desta vez. Tente novamente em instantes.",
+      "noMatch": "Não encontramos um match exato, mas registramos seu interesse para buscar novos membros!",
+      "success": "Encontramos os membros mais alinhados ao que você procura!",
+      "minChars": "Por favor, descreva quem você quer ajudar com um pouco mais de detalhes.",
+      "disclaimer": "Nossa IA analisa as bios e interesses de todos os membros da comunidade para você.",
+      "loginRequired": "A busca mágica com IA é exclusiva para usuários logados.",
+      "quotaRemaining": "Você tem {remaining} de {limit} buscas com IA este mês.",
+      "quotaExhausted": "Você usou todas as buscas com IA deste mês. Elas renovam em {date}. A busca normal continua liberada.",
+      "budgetExhausted": "A busca com IA atingiu o limite de uso da plataforma neste mês e volta em {date}. A busca normal continua liberada."
     }
   },
   "mentors": {
@@ -1103,6 +1118,7 @@
       "featureUnderDevelopment": "Esta funcionalidade ainda está em desenvolvimento. Em breve!"
     },
     "magicSearch": {
+      "title": "Buscar mentor com IA",
       "placeholder": "Descreva seu desafio (ex: 'Quero ajuda para conseguir meu primeiro estágio em Design')",
       "button": "Buscar com IA",
       "loading": "Mágica em andamento...",
