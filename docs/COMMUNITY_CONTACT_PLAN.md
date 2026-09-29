@@ -502,3 +502,57 @@ e regenerar `lib/types/supabase.ts`.
 
 - Enquanto a RPC do §2 não existir: `.eq("community_ready", true)` em
   `community.service.ts`.
+
+---
+
+## 13. Tirar o acesso a tabelas do navegador (backend como única porta)
+
+**Por quê:** a anon key é pública; mover chamadas para o servidor só protege
+quando, no fim, `anon`/`authenticated` **perdem o acesso às tabelas** e o
+servidor passa a ser a única porta (validação com Zod, papel checado,
+rate limit, log). Sem o passo final (§13.4), a refatoração não muda nada para
+um atacante.
+
+### 13.1 Ficam no navegador
+
+- Supabase **Auth** (login, sessão, reset de senha): `lib/auth/auth-context.tsx`,
+  `app/[locale]/(auth)/{forgot-password,set-password,update-password,confirm-email}`.
+- **Realtime** do chat (`chat.service.ts`, `MessagesBadge.tsx`) enquanto a
+  `chat_flag` estiver desligada; revisar se o chat for ligado.
+
+### 13.2 Migrar para rotas `app/api/**` (ordem)
+
+1. `lib/services/quiz/quiz.service.ts` → `POST /api/quiz` e
+   `GET /api/quiz/[id]` (o resultado só para o dono ou por token);
+   `app/[locale]/quiz/results/[id]/page.tsx` passa a usar a rota.
+2. Admin: `admin.service.ts`, `verifications.service.ts`,
+   `reports.service.ts`, `app/[locale]/dashboard/admin/users/page.tsx` →
+   rotas em `app/api/admin/**` com checagem `is_admin` no servidor (padrão das
+   rotas admin que já existem).
+3. `favorites.service.ts`, `notifications.service.ts`,
+   `app/[locale]/settings/page.tsx` → rotas `app/api/me/**`.
+4. `mentors.service.ts` (catálogo) → `GET /api/mentors`,
+   `GET /api/mentors/filters`, com cache.
+5. `lib/google-calendar-db.ts`: **bug** — usa o cliente de navegador dentro
+   de `app/api/calendar/status`, ou seja, sem sessão. Trocar por cliente de
+   servidor (ou service role, com checagem do `userId` da sessão). Conferir
+   antes se `anon` lê `google_calendar_tokens`.
+
+Regras para cada rota: sessão validada no servidor; `select` com colunas
+explícitas (nunca `*`); entrada validada com Zod; mesmo formato de erro das
+rotas existentes; testes no padrão de `*.service.test.ts`.
+
+### 13.3 Leitura do próprio perfil
+
+Trocar os `select('*')` do próprio perfil por uma lista explícita:
+`lib/auth/server-utils.ts`, `app/auth/callback/route.ts`,
+`app/api/auth/me/route.ts`, `app/api/profile/route.ts`,
+`app/api/profile/update/route.ts`. É pré-requisito do §13.4.
+
+### 13.4 Fechar a porta (Opus)
+
+Depois de 13.2 e 13.3 no ar e testados: migração que revoga
+`select/insert/update/delete` de `anon`/`authenticated` nas tabelas migradas,
+e colunas sensíveis de `profiles` (`email`, `phone`, `age`, `address`,
+`original_data`...) de `authenticated`. Isso também encerra a etapa B do §2.
+Validar com `has_table_privilege`/`has_column_privilege`, como em 2026-09-29.
