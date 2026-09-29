@@ -182,4 +182,41 @@ export const communityService = {
       role: "mentee",
     }))
   },
+
+  /**
+   * Obtém opções de filtros baseados nos perfis da comunidade (mentorados).
+   */
+  async getCommunityFilterOptions(
+    supabase: any
+  ): Promise<{
+    organizations: string[]
+    topics: string[]
+  }> {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("company, institution, mentorship_topics")
+      .eq("community_ready", true)
+
+    if (error) {
+      console.error("[CommunityService] Erro ao buscar opções de filtro:", error)
+      return { organizations: [], topics: [] }
+    }
+
+    const orgs = new Set<string>()
+    const topics = new Set<string>()
+
+    ;(data || []).forEach((profile: any) => {
+      if (profile.company) orgs.add(profile.company)
+      if (profile.institution) orgs.add(profile.institution)
+      
+      if (profile.mentorship_topics && Array.isArray(profile.mentorship_topics)) {
+        profile.mentorship_topics.forEach((t: string) => topics.add(t))
+      }
+    })
+
+    return {
+      organizations: Array.from(orgs).sort(),
+      topics: Array.from(topics).sort(),
+    }
+  },
 }

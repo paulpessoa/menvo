@@ -12,6 +12,7 @@ import { RequireRole } from "@/lib/auth/auth-guard"
 import { useRouter } from "@/i18n/routing"
 import { useLocale, useTranslations } from "next-intl"
 import { toast } from "sonner"
+import { createClient } from "@/lib/utils/supabase/client"
 import {
   Sheet,
   SheetContent,
@@ -90,17 +91,14 @@ export default function CommunityPage() {
   const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
   const [availableFilters, setAvailableFilters] = useState({
-    countries: [] as string[],
-    states: [] as string[],
-    cities: [] as string[],
+    organizations: [] as string[],
     topics: [] as string[]
   })
 
   useEffect(() => {
-    mentorService.getCatalogFilterOptions().then((opts) => setAvailableFilters({
-      countries: opts.countries,
-      states: opts.states,
-      cities: opts.cities,
+    const supabase = createClient()
+    communityService.getCommunityFilterOptions(supabase).then((opts) => setAvailableFilters({
+      organizations: opts.organizations,
       topics: opts.topics
     })).catch(console.error)
   }, [])
@@ -370,10 +368,9 @@ export default function CommunityPage() {
             list="organizations-list"
           />
           <datalist id="organizations-list">
-            <option value="Sebrae" />
-            <option value="Prouni" />
-            <option value="Hackathon" />
-            <option value="ONG" />
+            {availableFilters.organizations.map((org, index) => (
+              <option key={index} value={org} />
+            ))}
           </datalist>
 
           <Popover>
