@@ -710,89 +710,93 @@
     }
   },
   "privacy": {
-    "badge": "Privacy",
+    "badge": "Privacy & Security",
     "title": "Privacy Policy",
-    "intro": "Your privacy is important to us. This policy explains how we collect, use, and protect your data at Menvo.",
+    "intro": "At Menvo, transparency and personal data protection are core principles of our voluntary mentorship community.",
     "dataCollection": {
-      "title": "Data Collection",
-      "text": "We collect information you provide when creating an account, such as name, email, profile photo, and professional details. We also collect social login data (Google, LinkedIn) if you choose to authenticate with these platforms."
+      "title": "Information Collection",
+      "text": "We collect information necessary to connect mentors and mentees, such as name, email, professional bio, fields of expertise, and scheduling availability voluntarily provided during registration."
     },
-    "email": {
-      "title": "Emails & Communication",
-      "text": "We use your email for essential communications, mentorship notifications, and updates. Emails are sent via Brevo, respecting your privacy and opt-out preferences."
-    },
-    "photos": {
-      "title": "Photos & Visual Content",
-      "text": "Profile photos and uploaded images are securely stored in Supabase and used only for identification and profile personalization."
-    },
-    "storage": {
-      "title": "Data Storage",
-      "text": "All data is securely stored in Supabase, with access restricted to the Menvo team and following best security practices."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar API",
-      "text": "We use the Google Calendar API exclusively to create mentorship events when a session is confirmed by the mentor. We create the event in our own calendar and send email invitations to both mentor and mentee. We do NOT access, read, or modify your personal Google Calendar. You only receive an email invitation that you can freely accept or decline. The data used is only: date, time, session duration, and participants' emails."
+    "dataUsage": {
+      "title": "Use of Data",
+      "text": "Collected data is used exclusively to facilitate mentorship sessions, personalize recommendations, send transactional notices, and enhance community experience."
     },
     "dataSharing": {
       "title": "Data Sharing",
-      "text": "We do not share your personal data with third parties for commercial or marketing purposes. Data is shared only with essential services for platform operation: Supabase (secure storage), Brevo (transactional email delivery), Google (OAuth authentication and calendar event creation), and LinkedIn (OAuth authentication). Each service processes data only for the specific purposes described in this policy."
+      "text": "We do not sell, rent, or trade your personal data with third parties. Public profile details are only visible to other registered users on the platform for mentorship booking purposes."
     },
-    "dataUsage": {
-      "title": "Data Usage",
-      "text": "Your data is used exclusively to: (1) Authenticate and manage your account; (2) Facilitate connections between mentors and mentees; (3) Create mentorship events in Google Calendar; (4) Send notifications and communications related to your mentorships; (5) Improve platform experience and security. We never use your data for AI/ML model training or purposes unrelated to mentorship."
+    "email": {
+      "title": "Email Communications",
+      "text": "We send transactional emails related to appointments, confirmations, cancellations, reminders, and feedback requests via Brevo. You can manage your preferences at any time."
+    },
+    "photos": {
+      "title": "Profile Pictures",
+      "text": "Photos uploaded to profiles are securely stored in Supabase Storage and used strictly for visual identification in sessions and public catalog."
+    },
+    "storage": {
+      "title": "Storage & Security",
+      "text": "We apply industry-standard security practices, encryption in transit and at rest, strict Row Level Security (RLS) policies, and secure cloud infrastructure to protect your data."
+    },
+    "googleCalendar": {
+      "title": "Google Calendar and Google Meet Integration",
+      "text": "When connecting or booking a mentorship with Google Calendar integration, Menvo accesses Google APIs exclusively to create calendar events with Google Meet video links and verify schedule conflicts for selected time slots.\n\nMenvo's use and transfer of information received from Google APIs to any other app will adhere to the Google API Services User Data Policy, including the Limited Use requirements. We do not read, store, or share unrelated personal calendar entries."
     },
     "mentorship": {
-      "title": "Mentorship & Interactions",
-      "text": "Information about mentorship sessions, reviews, and messages is used to improve the experience and ensure community safety."
+      "title": "Session Confidentiality",
+      "text": "Conversations during mentorship sessions remain strictly confidential between mentor and mentee. Menvo does not record calls or monitor the contents of video meetings."
     },
     "thirdParty": {
       "title": "Third-Party Services",
-      "text": "We use third-party services such as Google (OAuth login and Calendar API), LinkedIn (OAuth login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy and processes data only for the specific purposes described in this policy."
+      "text": "We partner with trusted authentication and infrastructure providers including Supabase, Vercel, Brevo, and Google Cloud APIs, compliant with international data protection regulations and LGPD."
     },
     "reengagement": {
       "title": "Estágio Recife database",
       "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile - the e-mail's reply link goes straight to that option."
     },
+    "retention": {
+      "title": "How long we keep your data",
+      "text": "We keep your data while your account is active or while it's needed for the purpose it was collected for. If your data came from a partner initiative, such as Estágio Recife, and you never access the account, it will be automatically deleted 90 days after the first invitation, with e-mail warnings 30 days and 1 day before deletion. If you asked to stop receiving e-mails, we won't send those warnings, and the deletion happens on the same timeline. After deletion, we keep only an anonymous record (a cryptographic fingerprint of the e-mail, which can't identify you) to prove the request was fulfilled and to avoid contacting you again (LGPD, arts. 15, 16, and 18)."
+    },
     "rights": {
-      "title": "Your Rights",
-      "text": "You may request access, correction, or deletion of your data at any time. To exercise your rights or revoke Google Calendar access permissions, contact us at contato@menvo.com.br."
+      "title": "Your Privacy Rights",
+      "text": "You have the right to access, correct, update, or request permanent deletion of your personal data at any time via your account settings or by reaching out to our support team."
     },
     "contact": {
-      "title": "Contact",
-      "text": "Questions about privacy? Contact us at contato@menvo.com.br."
+      "title": "Data Protection Officer Contact",
+      "text": "For questions, requests, or exercising privacy rights, please contact our team at contato@menvo.com.br."
     },
     "links": {
       "cookies": "Cookie Policy",
-      "terms": "Terms of Service"
+      "terms": "Terms of Use"
     }
   },
   "cookies": {
-    "badge": "Cookies",
+    "badge": "Transparency",
     "title": "Cookie Policy",
-    "intro": "We use cookies to enhance your experience, ensure essential features, and analyze platform usage.",
+    "intro": "Learn how we use cookies and similar technologies to ensure a secure and efficient experience on Menvo.",
     "essential": {
       "title": "Essential Cookies",
-      "text": "Required for site operation, authentication, and security. Cannot be disabled."
+      "text": "These cookies are strictly necessary for platform functionality, maintaining secure authenticated sessions via Supabase, and preserving language and theme choices."
     },
     "social": {
-      "title": "Social Login",
-      "text": "Cookies may be used for authentication via Google and LinkedIn, enabling secure login."
+      "title": "Social Authentication Cookies",
+      "text": "Used when logging in or signing up via external providers like Google and LinkedIn for identity verification and secure profile linkage."
     },
     "preferences": {
-      "title": "Preferences",
-      "text": "We store your language and settings preferences to personalize your experience."
+      "title": "Preference Cookies",
+      "text": "Enable the platform to remember your personalized settings, such as catalog view layout and detected timezone."
     },
     "analytics": {
-      "title": "Analytics & Performance",
-      "text": "We use cookies and analytics tools like Microsoft Clarity to understand how the platform is used and improve our services. Clarity helps us visualize how users interact with the site through session recordings and heatmaps. For users from the European Union (EEA), United Kingdom, and Switzerland, we request your explicit consent before activating these analytics tools."
+      "title": "Analytics Cookies",
+      "text": "Help us understand how the community navigates the platform through aggregated anonymous metrics, allowing continuous improvements to booking and search."
     },
     "clarity": {
-      "title": "Microsoft Clarity",
-      "text": "We use Microsoft Clarity to understand how you use our website through behavioral metrics, heatmaps, and session recordings. Data collected by Clarity is processed according to Microsoft's Privacy Policy. For users from the EEA, UK, and Switzerland, Clarity will only be activated after your explicit consent through the cookie banner."
+      "title": "User Experience Mapping",
+      "text": "We may use aggregate telemetry to diagnose usability issues while strictly masking sensitive user information."
     },
     "links": {
       "privacy": "Privacy Policy",
-      "terms": "Terms of Service"
+      "terms": "Terms of Use"
     }
   },
   "cookieConsent": {
@@ -823,63 +827,48 @@
     }
   },
   "terms": {
-    "badge": "Terms",
-    "title": "Terms of Service",
-    "intro": "By using Menvo, you agree to these terms. Please read carefully to understand your rights and responsibilities.",
+    "badge": "Terms of Service",
+    "title": "Terms of Use",
+    "intro": "Welcome to Menvo. By using our platform, you agree to the terms and guidelines governing our free voluntary mentorship community.",
     "usage": {
-      "title": "Platform Usage",
-      "text": "Menvo connects mentors and mentees for free sessions. Use must be respectful and in accordance with applicable laws."
+      "title": "Platform Use",
+      "text": "Menvo is a non-profit volunteer platform created to connect professionals willing to share knowledge with individuals seeking career guidance. All mentorships are 100% free."
     },
     "account": {
-      "title": "Account & Social Login",
-      "text": "You may create an account via email or social login (Google, LinkedIn). Keep your credentials secure and do not share your account."
+      "title": "Accounts & Registration",
+      "text": "You are responsible for the accuracy of information provided during signup and for maintaining credential security. Each user must maintain a single personal account."
+    },
+    "inactivity": {
+      "title": "Inactive accounts and automatic deletion",
+      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for long periods may also be deleted, always with advance e-mail notice."
     },
     "security": {
-      "title": "Security",
-      "text": "We take measures to protect your data, but you are also responsible for keeping your password secure."
+      "title": "Conduct & Safety",
+      "text": "Harassment, discrimination, charging fees for mentorships, or misuse of platform communication channels is strictly prohibited. Violations lead to immediate account termination."
     },
     "content": {
-      "title": "Content & Photos",
-      "text": "You are responsible for content you upload (photos, text). Do not upload offensive or copyrighted content without permission."
+      "title": "Intellectual Property",
+      "text": "All platform design, branding, code, and content belong exclusively to Menvo. Content shared by users during sessions remains the property of their respective creators."
     },
     "communication": {
-      "title": "Communication & Emails",
-      "text": "We will send important communications about mentorships and updates. You may opt out of promotional emails."
+      "title": "Communications",
+      "text": "By signing up, you agree to receive essential platform notifications, including booking updates, messages between mentors and mentees, and session reminders."
     },
     "storage": {
-      "title": "Storage & Third Parties",
-      "text": "Data is stored in Supabase and emails are sent via Brevo. We use third-party social login."
+      "title": "Service Availability",
+      "text": "We strive to keep the platform reliable and available, though uninterrupted service cannot be guaranteed. We reserve the right to perform maintenance and updates."
     },
     "rights": {
-      "title": "Rights & Responsibilities",
-      "text": "You may access and delete your data. Misuse of the platform may result in account suspension."
+      "title": "Limitation of Liability",
+      "text": "Menvo connects people, but is not liable for guidance, professional advice, or decisions made as a result of voluntary mentorship sessions between users."
     },
     "contact": {
-      "title": "Contact",
-      "text": "Questions? Contact us at contato@menvo.com.br"
+      "title": "Questions & Support",
+      "text": "For inquiries regarding these terms or to report an issue, please contact contato@menvo.com.br."
     },
     "links": {
       "privacy": "Privacy Policy",
       "cookies": "Cookie Policy"
-    },
-    "warning": {
-      "title": "Attention",
-      "message": "The platform is currently under development. We're very happy to receive your feedback and opinion on what you've seen so far!",
-      "dismiss": "Got it",
-      "giveFeedback": "Give Feedback"
-    },
-    "feedback": {
-      "title": "What did you think of Menvo?",
-      "description": "Your opinion is very important to us! Tell us what you thought of the platform.",
-      "openFeedback": "Open Feedback",
-      "helpUsImprove": "Help us improve the platform",
-      "commentPlaceholder": "Tell us what you thought of the platform...",
-      "emailPlaceholder": "Your email (optional)",
-      "submit": "Submit Feedback",
-      "thankYou": "Thank you for your feedback!",
-      "error": "Error submitting feedback. Please try again.",
-      "ratingRequired": "Please select a rating.",
-      "rateStars": "Rate with {count} stars"
     }
   },
   "metadata": {
@@ -1932,139 +1921,17 @@
     },
     "toastSuccess": "Password updated successfully!"
   },
-  "privacy": {
-    "badge": "Privacy & Security",
-    "title": "Privacy Policy",
-    "intro": "At Menvo, transparency and personal data protection are core principles of our voluntary mentorship community.",
-    "dataCollection": {
-      "title": "Information Collection",
-      "text": "We collect information necessary to connect mentors and mentees, such as name, email, professional bio, fields of expertise, and scheduling availability voluntarily provided during registration."
-    },
-    "dataUsage": {
-      "title": "Use of Data",
-      "text": "Collected data is used exclusively to facilitate mentorship sessions, personalize recommendations, send transactional notices, and enhance community experience."
-    },
-    "dataSharing": {
-      "title": "Data Sharing",
-      "text": "We do not sell, rent, or trade your personal data with third parties. Public profile details are only visible to other registered users on the platform for mentorship booking purposes."
-    },
-    "email": {
-      "title": "Email Communications",
-      "text": "We send transactional emails related to appointments, confirmations, cancellations, reminders, and feedback requests via Brevo. You can manage your preferences at any time."
-    },
-    "photos": {
-      "title": "Profile Pictures",
-      "text": "Photos uploaded to profiles are securely stored in Supabase Storage and used strictly for visual identification in sessions and public catalog."
-    },
-    "storage": {
-      "title": "Storage & Security",
-      "text": "We apply industry-standard security practices, encryption in transit and at rest, strict Row Level Security (RLS) policies, and secure cloud infrastructure to protect your data."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar and Google Meet Integration",
-      "text": "When connecting or booking a mentorship with Google Calendar integration, Menvo accesses Google APIs exclusively to create calendar events with Google Meet video links and verify schedule conflicts for selected time slots.\n\nMenvo's use and transfer of information received from Google APIs to any other app will adhere to the Google API Services User Data Policy, including the Limited Use requirements. We do not read, store, or share unrelated personal calendar entries."
-    },
-    "mentorship": {
-      "title": "Session Confidentiality",
-      "text": "Conversations during mentorship sessions remain strictly confidential between mentor and mentee. Menvo does not record calls or monitor the contents of video meetings."
-    },
-    "thirdParty": {
-      "title": "Third-Party Services",
-      "text": "We partner with trusted authentication and infrastructure providers including Supabase, Vercel, Brevo, and Google Cloud APIs, compliant with international data protection regulations and LGPD."
-    },
-    "reengagement": {
-      "title": "Estágio Recife database",
-      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile - the e-mail's reply link goes straight to that option."
-    },
-    "retention": {
-      "title": "How long we keep your data",
-      "text": "We keep your data while your account is active or while it's needed for the purpose it was collected for. If your data came from a partner initiative, such as Estágio Recife, and you never access the account, it will be automatically deleted 90 days after the first invitation, with e-mail warnings 30 days and 1 day before deletion. If you asked to stop receiving e-mails, we won't send those warnings, and the deletion happens on the same timeline. After deletion, we keep only an anonymous record (a cryptographic fingerprint of the e-mail, which can't identify you) to prove the request was fulfilled and to avoid contacting you again (LGPD, arts. 15, 16, and 18)."
-    },
-    "rights": {
-      "title": "Your Privacy Rights",
-      "text": "You have the right to access, correct, update, or request permanent deletion of your personal data at any time via your account settings or by reaching out to our support team."
-    },
-    "contact": {
-      "title": "Data Protection Officer Contact",
-      "text": "For questions, requests, or exercising privacy rights, please contact our team at contato@menvo.com.br."
-    },
-    "links": {
-      "cookies": "Cookie Policy",
-      "terms": "Terms of Use"
-    }
-  },
-  "terms": {
-    "badge": "Terms of Service",
-    "title": "Terms of Use",
-    "intro": "Welcome to Menvo. By using our platform, you agree to the terms and guidelines governing our free voluntary mentorship community.",
-    "usage": {
-      "title": "Platform Use",
-      "text": "Menvo is a non-profit volunteer platform created to connect professionals willing to share knowledge with individuals seeking career guidance. All mentorships are 100% free."
-    },
-    "account": {
-      "title": "Accounts & Registration",
-      "text": "You are responsible for the accuracy of information provided during signup and for maintaining credential security. Each user must maintain a single personal account."
-    },
-    "inactivity": {
-      "title": "Inactive accounts and automatic deletion",
-      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for long periods may also be deleted, always with advance e-mail notice."
-    },
-    "security": {
-      "title": "Conduct & Safety",
-      "text": "Harassment, discrimination, charging fees for mentorships, or misuse of platform communication channels is strictly prohibited. Violations lead to immediate account termination."
-    },
-    "content": {
-      "title": "Intellectual Property",
-      "text": "All platform design, branding, code, and content belong exclusively to Menvo. Content shared by users during sessions remains the property of their respective creators."
-    },
-    "communication": {
-      "title": "Communications",
-      "text": "By signing up, you agree to receive essential platform notifications, including booking updates, messages between mentors and mentees, and session reminders."
-    },
-    "storage": {
-      "title": "Service Availability",
-      "text": "We strive to keep the platform reliable and available, though uninterrupted service cannot be guaranteed. We reserve the right to perform maintenance and updates."
-    },
-    "rights": {
-      "title": "Limitation of Liability",
-      "text": "Menvo connects people, but is not liable for guidance, professional advice, or decisions made as a result of voluntary mentorship sessions between users."
-    },
-    "contact": {
-      "title": "Questions & Support",
-      "text": "For inquiries regarding these terms or to report an issue, please contact contato@menvo.com.br."
-    },
-    "links": {
-      "privacy": "Privacy Policy",
-      "cookies": "Cookie Policy"
-    }
-  },
-  "cookies": {
-    "badge": "Transparency",
-    "title": "Cookie Policy",
-    "intro": "Learn how we use cookies and similar technologies to ensure a secure and efficient experience on Menvo.",
-    "essential": {
-      "title": "Essential Cookies",
-      "text": "These cookies are strictly necessary for platform functionality, maintaining secure authenticated sessions via Supabase, and preserving language and theme choices."
-    },
-    "social": {
-      "title": "Social Authentication Cookies",
-      "text": "Used when logging in or signing up via external providers like Google and LinkedIn for identity verification and secure profile linkage."
-    },
-    "preferences": {
-      "title": "Preference Cookies",
-      "text": "Enable the platform to remember your personalized settings, such as catalog view layout and detected timezone."
-    },
-    "analytics": {
-      "title": "Analytics Cookies",
-      "text": "Help us understand how the community navigates the platform through aggregated anonymous metrics, allowing continuous improvements to booking and search."
-    },
-    "clarity": {
-      "title": "User Experience Mapping",
-      "text": "We may use aggregate telemetry to diagnose usability issues while strictly masking sensitive user information."
-    },
-    "links": {
-      "privacy": "Privacy Policy",
-      "terms": "Terms of Use"
-    }
+  "organizationLanding": {
+    "subtitle": "{name} is a Menvo partner. Join their group to connect with volunteer mentors - free, always.",
+    "requestedStatus": "Request sent - pending organization approval",
+    "joinToParticipate": "Log in to join",
+    "noAccountYet": "Don't have an account yet?",
+    "register": "Sign up",
+    "andReturnToRequest": "and come back here to request access.",
+    "youArePartOf": "You are a member of {name}",
+    "findMentor": "Find a mentor",
+    "requestToJoin": "Request to join",
+    "joinAutomatically": "Join automatically",
+    "inviteOnlyMsg": "{name} approves new accounts manually or via closed invite link. Request access below and they will screen your application according to the project criteria."
   }
 }

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { MenteeCard } from "@/components/MenteeCard"
 import { useAuth } from "@/lib/auth"
+import { RequireRole } from "@/lib/auth/auth-guard"
 import { useRouter } from "@/i18n/routing"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
@@ -66,11 +67,18 @@ export default function CommunityPage() {
     }
 
     try {
-      const result = await communityService.getCommunityProfiles({
+      const queryParams = new URLSearchParams({
         search,
-        page: pageNum,
-        limit: ITEMS_PER_PAGE,
+        page: pageNum.toString(),
+        limit: ITEMS_PER_PAGE.toString(),
       })
+      
+      const response = await fetch(`/api/community?${queryParams.toString()}`)
+      if (!response.ok) {
+        throw new Error("Failed to load community profiles")
+      }
+      
+      const result = await response.json()
 
       // If a newer query was initiated while this one was in flight, discard this result
       if (currentQueryId !== queryIdRef.current) return
@@ -136,8 +144,9 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Header */}
+    <RequireRole roles={["mentor", "admin"]}>
+      <div className="container mx-auto px-4 py-12">
+        {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div>
           <h1 className="text-4xl font-bold tracking-tight mb-2">
@@ -249,6 +258,7 @@ export default function CommunityPage() {
         </SheetContent>
       </Sheet>
       )}
-    </div>
+      </div>
+    </RequireRole>
   )
 }

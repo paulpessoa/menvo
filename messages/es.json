@@ -710,89 +710,93 @@
     }
   },
   "privacy": {
-    "badge": "Privacidad",
+    "badge": "Privacidad y Seguridad",
     "title": "Política de Privacidad",
-    "intro": "Tu privacidad es importante para nosotros. Esta política explica cómo recopilamos, usamos y protegemos tus datos en Menvo.",
+    "intro": "En Menvo, la transparencia y la protección de sus datos personales son principios fundamentales de nuestra comunidad voluntaria.",
     "dataCollection": {
-      "title": "Recopilación de Datos",
-      "text": "Recopilamos información que proporcionas al crear una cuenta, como nombre, correo electrónico, foto de perfil y detalles profesionales. También recopilamos datos de inicio de sesión social (Google, LinkedIn) si eliges autenticarte con estas plataformas."
-    },
-    "email": {
-      "title": "Correos y Comunicación",
-      "text": "Usamos tu correo electrónico para comunicaciones esenciales, notificaciones de mentoría y actualizaciones. Los correos se envían a través de Brevo, respetando tu privacidad y preferencias de exclusión."
-    },
-    "photos": {
-      "title": "Fotos y Contenido Visual",
-      "text": "Las fotos de perfil y las imágenes subidas se almacenan de forma segura en Supabase y se utilizan solo para la identificación y personalización del perfil."
-    },
-    "storage": {
-      "title": "Almacenamiento de Datos",
-      "text": "Todos los datos se almacenan de forma segura en Supabase, con acceso restringido al equipo de Menvo y siguiendo las mejores prácticas de seguridad."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar API",
-      "text": "Utilizamos la API de Google Calendar exclusivamente para crear eventos de mentoría cuando una sesión es confirmada por el mentor. Creamos el evento en nuestro propio calendario y enviamos invitaciones por correo electrónico tanto al mentor como al mentee. NO accedemos, leemos ni modificamos tu calendario personal de Google. Solo recibes una invitación por correo electrónico que puedes aceptar o rechazar libremente. Los datos utilizados son solo: fecha, hora, duración de la sesión y correos electrónicos de los participantes."
-    },
-    "dataSharing": {
-      "title": "Intercambio de Datos",
-      "text": "No compartimos tus datos personales con terceros para fines comerciales o de marketing. Los datos se comparten solo con servicios esenciales para el funcionamiento de la plataforma: Supabase (almacenamiento seguro), Brevo (entrega de correos transaccionales), Google (autenticación OAuth y creación de eventos de calendario) y LinkedIn (autenticación OAuth). Cada servicio procesa los datos solo para los fines específicos descritos en esta política."
+      "title": "Recopilación de Información",
+      "text": "Recopilamos información necesaria para conectar mentores y aprendices, como nombre, correo electrónico, biografía profesional, áreas de especialidad y disponibilidad horaria informada voluntariamente durante el registro."
     },
     "dataUsage": {
       "title": "Uso de Datos",
-      "text": "Tus datos se utilizan exclusivamente para: (1) Autenticar y administrar tu cuenta; (2) Facilitar conexiones entre mentores y mentees; (3) Crear eventos de mentoría en Google Calendar; (4) Enviar notificaciones y comunicaciones relacionadas con tus mentorías; (5) Mejorar la experiencia y seguridad de la plataforma. Nunca utilizamos tus datos para el entrenamiento de modelos de IA/ML o para fines no relacionados con la mentoría."
+      "text": "Los datos recopilados se utilizan exclusivamente para facilitar las sesiones de mentoría, personalizar recomendaciones, emitir avisos transaccionales y mejorar la experiencia comunitaria."
+    },
+    "dataSharing": {
+      "title": "Compartición de Datos",
+      "text": "No vendemos, alquilamos ni comercializamos sus datos personales con terceros. Los detalles de perfil público solo son visibles para otros usuarios registrados con fines de reserva de mentorías."
+    },
+    "email": {
+      "title": "Comunicaciones por Correo",
+      "text": "Enviamos correos electrónicos transaccionales relacionados con citas, confirmaciones, cancelaciones, recordatorios y solicitudes de retroalimentación a través de Brevo. Puede gestionar sus preferencias en cualquier momento."
+    },
+    "photos": {
+      "title": "Fotos de Perfil",
+      "text": "Las fotos subidas al perfil se almacenan de forma segura en Supabase Storage y se utilizan únicamente para identificación visual en las sesiones y en el catálogo público."
+    },
+    "storage": {
+      "title": "Almacenamiento y Seguridad",
+      "text": "Adoptamos prácticas avanzadas de seguridad, cifrado en tránsito y en reposo, políticas estrictas de Row Level Security (RLS) e infraestructura en la nube segura para proteger su información."
+    },
+    "googleCalendar": {
+      "title": "Integración con Google Calendar y Google Meet",
+      "text": "Al conectar o programar una mentoría con integración a Google Calendar, Menvo accede a las API de Google exclusivamente para crear eventos de calendario con enlaces de videoconferencia de Google Meet y verificar conflictos de horario para los espacios seleccionados.\n\nEl uso y la transferencia a cualquier otra aplicación de la información recibida de las API de Google por parte de Menvo cumplirán con la Política de datos del usuario de los servicios de API de Google (Google API Services User Data Policy), incluidos los requisitos de uso limitado (Limited Use requirements). No leemos, almacenamos ni compartimos datos personales de calendarios no relacionados con las mentorías voluntarias de Menvo."
     },
     "mentorship": {
-      "title": "Mentoría e Interacciones",
-      "text": "La información sobre las sesiones de mentoría, reseñas y mensajes se utiliza para mejorar la experiencia y garantizar la seguridad de la comunidad."
+      "title": "Confidencialidad de las Sesiones",
+      "text": "Las conversaciones durante las sesiones de mentoría son estrictamente confidenciales entre mentor y aprendiz. Menvo no graba las llamadas ni monitorea el contenido de las reuniones virtuales."
     },
     "thirdParty": {
       "title": "Servicios de Terceros",
-      "text": "Utilizamos servicios de terceros como Google (inicio de sesión OAuth y API de Calendar), LinkedIn (inicio de sesión OAuth), Supabase (almacenamiento) y Brevo (correos electrónicos). Cada servicio tiene su propia política de privacidad y procesa los datos solo para los fines específicos descritos en esta política."
+      "text": "Colaboramos con proveedores confiables de autenticación e infraestructura como Supabase, Vercel, Brevo y Google Cloud APIs, en cumplimiento con las normativas internacionales de protección de datos y LGPD."
     },
     "reengagement": {
       "title": "Base de datos de Estágio Recife",
       "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil - el enlace de respuesta del correo lleva directo a esa opción."
     },
+    "retention": {
+      "title": "Por cuánto tiempo guardamos sus datos",
+      "text": "Guardamos sus datos mientras su cuenta esté activa o mientras sean necesarios para la finalidad para la que fueron recopilados. Si sus datos provienen de una iniciativa asociada, como Estágio Recife, y usted nunca accede a la cuenta, serán eliminados automáticamente 90 días después de la primera invitación, con avisos por correo 30 días y 1 día antes de la eliminación. Si pidió dejar de recibir correos, no enviaremos esos avisos, y la eliminación ocurre en el mismo plazo. Después de la eliminación, conservamos solo un registro anónimo (una huella criptográfica del correo, que no permite identificarlo) para comprobar la atención de la solicitud y evitar un nuevo contacto (LGPD, arts. 15, 16 y 18)."
+    },
     "rights": {
-      "title": "Tus Derechos",
-      "text": "Puedes solicitar el acceso, corrección o eliminación de tus datos en cualquier momento. Para ejercer tus derechos o revocar los permisos de acceso a Google Calendar, contáctanos en contato@menvo.com.br."
+      "title": "Sus Derechos de Privacidad",
+      "text": "Tiene derecho a acceder, corregir, actualizar o solicitar la eliminación definitiva de sus datos personales en cualquier momento a través de la configuración de su cuenta o contactando a nuestro equipo."
     },
     "contact": {
-      "title": "Contacto",
-      "text": "¿Preguntas sobre privacidad? Contáctanos en contato@menvo.com.br."
+      "title": "Contacto de Privacidad",
+      "text": "Para preguntas o para ejercer sus derechos de privacidad, comuníquese con nuestro equipo en contato@menvo.com.br."
     },
     "links": {
       "cookies": "Política de Cookies",
-      "terms": "Términos de Servicio"
+      "terms": "Términos de Uso"
     }
   },
   "cookies": {
-    "badge": "Cookies",
+    "badge": "Transparencia",
     "title": "Política de Cookies",
-    "intro": "Utilizamos cookies para mejorar tu experiencia, garantizar funciones esenciales y analizar el uso de la plataforma.",
+    "intro": "Conozca cómo utilizamos cookies y tecnologías similares para garantizar una experiencia segura y eficiente en Menvo.",
     "essential": {
       "title": "Cookies Esenciales",
-      "text": "Requeridas para el funcionamiento del sitio, la autenticación y la seguridad. No se pueden desactivar."
+      "text": "Estas cookies son estrictamente necesarias para el funcionamiento de la plataforma, manteniendo sesiones autenticadas seguras a través de Supabase y preservando sus preferencias de idioma y tema."
     },
     "social": {
-      "title": "Inicio de Sesión Social",
-      "text": "Se pueden utilizar cookies para la autenticación a través de Google y LinkedIn, permitiendo un inicio de sesión seguro."
+      "title": "Cookies de Autenticación Social",
+      "text": "Se utilizan al iniciar sesión o registrarse a través de proveedores externos como Google y LinkedIn para verificación de identidad y vinculación segura de perfiles."
     },
     "preferences": {
-      "title": "Preferencias",
-      "text": "Almacenamos tu idioma y preferencias de configuración para personalizar tu experiencia."
+      "title": "Cookies de Preferencias",
+      "text": "Permiten que la plataforma recuerde sus configuraciones personalizadas, como la vista de catálogo y la zona horaria detectada."
     },
     "analytics": {
-      "title": "Análisis y Rendimiento",
-      "text": "Utilizamos cookies y herramientas de análisis como Microsoft Clarity para comprender cómo se utiliza la plataforma y mejorar nuestros servicios. Clarity nos ayuda a visualizar cómo interactúan los usuarios con el sitio a través de grabaciones de sesiones y mapas de calor. Para los usuarios de la Unión Europea (EEE), el Reino Unido y Suiza, solicitamos tu consentimiento explícito antes de activar estas herramientas de análisis."
+      "title": "Cookies de Análisis y Métricas",
+      "text": "Nos ayudan a comprender cómo la comunidad navega por la plataforma a través de métricas agregadas anónimas, permitiendo mejoras continuas en las reservas y búsquedas."
     },
     "clarity": {
-      "title": "Microsoft Clarity",
-      "text": "Utilizamos Microsoft Clarity para comprender cómo utilizas nuestro sitio web a través de métricas de comportamiento, mapas de calor y grabaciones de sesiones. Los datos recopilados por Clarity se procesan de acuerdo con la Política de Privacidad de Microsoft. Para los usuarios de la EEE, el Reino Unido y Suiza, Clarity solo se activará después de tu consentimiento explícito a través del banner de cookies."
+      "title": "Mapeo de Experiencia de Usuario",
+      "text": "Podemos utilizar telemetría agregada para diagnosticar problemas de usabilidad, protegiendo siempre la privacidad de los datos sensibles."
     },
     "links": {
       "privacy": "Política de Privacidad",
-      "terms": "Términos de Servicio"
+      "terms": "Términos de Uso"
     }
   },
   "cookieConsent": {
@@ -823,63 +827,48 @@
     }
   },
   "terms": {
-    "badge": "Términos",
-    "title": "Términos de Servicio",
-    "intro": "Al usar Menvo, aceptas estos términos. Por favor, lee atentamente para comprender tus derechos y responsabilidades.",
+    "badge": "Términos de Servicio",
+    "title": "Términos de Uso",
+    "intro": "Bienvenido a Menvo. Al utilizar nuestra plataforma, acepta los términos y pautas que rigen nuestra comunidad de mentoría voluntaria gratuita.",
     "usage": {
       "title": "Uso de la Plataforma",
-      "text": "Menvo conecta mentores y mentees para sesiones gratuitas. El uso debe ser respetuoso y de acuerdo con las leyes aplicables."
+      "text": "Menvo es una plataforma voluntaria sin fines de lucro creada para conectar profesionales dispuestos a compartir conocimientos con personas en busca de orientación profesional. Todas las mentorías son 100% gratuitas."
     },
     "account": {
-      "title": "Cuenta e Inicio de Sesión Social",
-      "text": "Puedes crear una cuenta a través de correo electrónico o inicio de sesión social (Google, LinkedIn). Mantén tus credenciales seguras y no compartas tu cuenta."
+      "title": "Cuentas y Registro",
+      "text": "Usted es responsable de la exactitud de la información proporcionada y de mantener la seguridad de sus credenciales. Cada usuario debe mantener una sola cuenta personal."
+    },
+    "inactivity": {
+      "title": "Cuentas inactivas y eliminación automática",
+      "text": "Las cuentas creadas a partir de datos importados de iniciativas asociadas, como el formulario de Estágio Recife, y que nunca sean accedidas, serán eliminadas automáticamente 90 días después de la primera invitación enviada por correo. Antes de la eliminación, enviaremos dos avisos al correo registrado: uno 30 días antes y otro 1 día antes de la fecha prevista. Para mantener la cuenta, basta con acceder a ella mediante el enlace del aviso. Después de la eliminación, recibirá un correo de confirmación y podrá crear una cuenta nueva en cualquier momento. Las cuentas sin ningún acceso durante largos períodos también podrán ser eliminadas, siempre con aviso previo por correo."
     },
     "security": {
-      "title": "Seguridad",
-      "text": "Tomamos medidas para proteger tus datos, pero también eres responsable de mantener tu contraseña segura."
+      "title": "Conducta y Seguridad",
+      "text": "Queda estrictamente prohibido el acoso, la discriminación, el cobro financiero por mentorías o el uso indebido de los canales de comunicación. Las infracciones conllevarán la cancelación inmediata de la cuenta."
     },
     "content": {
-      "title": "Contenido y Fotos",
-      "text": "Eres responsable del contenido que subes (fotos, texto). No subas contenido ofensivo o con derechos de autor sin permiso."
+      "title": "Propiedad Intelectual",
+      "text": "Todo el diseño, marca, código y contenido de la plataforma pertenecen exclusivamente a Menvo. El contenido compartido por los usuarios durante las sesiones sigue siendo propiedad de sus respectivos autores."
     },
     "communication": {
-      "title": "Comunicación y Correos",
-      "text": "Enviaremos comunicaciones importantes sobre mentorías y actualizaciones. Puedes optar por no recibir correos promocionales."
+      "title": "Comunicaciones",
+      "text": "Al registrarse, acepta recibir notificaciones esenciales de la plataforma, incluidas actualizaciones de reservas, mensajes entre mentores y aprendices y recordatorios de sesiones."
     },
     "storage": {
-      "title": "Almacenamiento y Terceros",
-      "text": "Los datos se almacenan en Supabase y los correos se envían a través de Brevo. Utilizamos inicio de sesión social de terceros."
+      "title": "Disponibilidad del Servicio",
+      "text": "Nos esforzamos por mantener la plataforma confiable y disponible, aunque no se puede garantizar un servicio ininterrumpido. Nos reservamos el derecho de realizar mantenimientos y actualizaciones."
     },
     "rights": {
-      "title": "Derechos y Responsabilidades",
-      "text": "Puedes acceder y eliminar tus datos. El uso indebido de la plataforma puede resultar en la suspensión de la cuenta."
+      "title": "Limitación de Responsabilidad",
+      "text": "Menvo conecta personas, pero no se hace responsable de las orientaciones, consejos profesionales o decisiones tomadas a raíz de las sesiones de mentoría voluntaria entre usuarios."
     },
     "contact": {
-      "title": "Contacto",
-      "text": "¿Preguntas? Contáctanos en contato@menvo.com.br"
+      "title": "Preguntas y Soporte",
+      "text": "Para consultas sobre estos términos o para informar de un problema, comuníquese con contato@menvo.com.br."
     },
     "links": {
       "privacy": "Política de Privacidad",
       "cookies": "Política de Cookies"
-    },
-    "warning": {
-      "title": "Atención",
-      "message": "La plataforma está actualmente en desarrollo. ¡Estamos muy felices de recibir tus comentarios y opinión sobre lo que has visto hasta ahora!",
-      "dismiss": "Entendido",
-      "giveFeedback": "Dar Feedback"
-    },
-    "feedback": {
-      "title": "¿Qué te pareció Menvo?",
-      "description": "¡Tu opinión es muy importante para nosotros! Cuéntanos qué te pareció la plataforma.",
-      "openFeedback": "Abrir Feedback",
-      "helpUsImprove": "Ayúdanos a mejorar la plataforma",
-      "commentPlaceholder": "Cuéntanos qué te pareció la plataforma...",
-      "emailPlaceholder": "Tu correo electrónico (opcional)",
-      "submit": "Enviar Feedback",
-      "thankYou": "¡Gracias por tu feedback!",
-      "error": "Error al enviar el feedback. Por favor, inténtalo de nuevo.",
-      "ratingRequired": "Por favor, selecciona una calificación.",
-      "rateStars": "Calificar con {count} estrellas"
     }
   },
   "metadata": {
@@ -1908,139 +1897,17 @@
     },
     "toastSuccess": "¡Contraseña actualizada con éxito!"
   },
-  "privacy": {
-    "badge": "Privacidad y Seguridad",
-    "title": "Política de Privacidad",
-    "intro": "En Menvo, la transparencia y la protección de sus datos personales son principios fundamentales de nuestra comunidad voluntaria.",
-    "dataCollection": {
-      "title": "Recopilación de Información",
-      "text": "Recopilamos información necesaria para conectar mentores y aprendices, como nombre, correo electrónico, biografía profesional, áreas de especialidad y disponibilidad horaria informada voluntariamente durante el registro."
-    },
-    "dataUsage": {
-      "title": "Uso de Datos",
-      "text": "Los datos recopilados se utilizan exclusivamente para facilitar las sesiones de mentoría, personalizar recomendaciones, emitir avisos transaccionales y mejorar la experiencia comunitaria."
-    },
-    "dataSharing": {
-      "title": "Compartición de Datos",
-      "text": "No vendemos, alquilamos ni comercializamos sus datos personales con terceros. Los detalles de perfil público solo son visibles para otros usuarios registrados con fines de reserva de mentorías."
-    },
-    "email": {
-      "title": "Comunicaciones por Correo",
-      "text": "Enviamos correos electrónicos transaccionales relacionados con citas, confirmaciones, cancelaciones, recordatorios y solicitudes de retroalimentación a través de Brevo. Puede gestionar sus preferencias en cualquier momento."
-    },
-    "photos": {
-      "title": "Fotos de Perfil",
-      "text": "Las fotos subidas al perfil se almacenan de forma segura en Supabase Storage y se utilizan únicamente para identificación visual en las sesiones y en el catálogo público."
-    },
-    "storage": {
-      "title": "Almacenamiento y Seguridad",
-      "text": "Adoptamos prácticas avanzadas de seguridad, cifrado en tránsito y en reposo, políticas estrictas de Row Level Security (RLS) e infraestructura en la nube segura para proteger su información."
-    },
-    "googleCalendar": {
-      "title": "Integración con Google Calendar y Google Meet",
-      "text": "Al conectar o programar una mentoría con integración a Google Calendar, Menvo accede a las API de Google exclusivamente para crear eventos de calendario con enlaces de videoconferencia de Google Meet y verificar conflictos de horario para los espacios seleccionados.\n\nEl uso y la transferencia a cualquier otra aplicación de la información recibida de las API de Google por parte de Menvo cumplirán con la Política de datos del usuario de los servicios de API de Google (Google API Services User Data Policy), incluidos los requisitos de uso limitado (Limited Use requirements). No leemos, almacenamos ni compartimos datos personales de calendarios no relacionados con las mentorías voluntarias de Menvo."
-    },
-    "mentorship": {
-      "title": "Confidencialidad de las Sesiones",
-      "text": "Las conversaciones durante las sesiones de mentoría son estrictamente confidenciales entre mentor y aprendiz. Menvo no graba las llamadas ni monitorea el contenido de las reuniones virtuales."
-    },
-    "thirdParty": {
-      "title": "Servicios de Terceros",
-      "text": "Colaboramos con proveedores confiables de autenticación e infraestructura como Supabase, Vercel, Brevo y Google Cloud APIs, en cumplimiento con las normativas internacionales de protección de datos y LGPD."
-    },
-    "reengagement": {
-      "title": "Base de datos de Estágio Recife",
-      "text": "Menvo nació como una extensión de Estágio Recife. Por eso, parte de nuestra base de mentorados proviene del formulario de Estágio Recife: nombre, correo electrónico y las respuestas dadas en ese formulario. Usamos estos datos, con base en nuestro interés legítimo (LGPD de Brasil, art. 7, IX), solo para un contacto inicial invitando a conocer Menvo y completar su perfil. Quien recibe esa invitación puede, sin necesidad de iniciar sesión, pedir dejar de recibir correos o eliminar definitivamente sus datos y perfil - el enlace de respuesta del correo lleva directo a esa opción."
-    },
-    "retention": {
-      "title": "Por cuánto tiempo guardamos sus datos",
-      "text": "Guardamos sus datos mientras su cuenta esté activa o mientras sean necesarios para la finalidad para la que fueron recopilados. Si sus datos provienen de una iniciativa asociada, como Estágio Recife, y usted nunca accede a la cuenta, serán eliminados automáticamente 90 días después de la primera invitación, con avisos por correo 30 días y 1 día antes de la eliminación. Si pidió dejar de recibir correos, no enviaremos esos avisos, y la eliminación ocurre en el mismo plazo. Después de la eliminación, conservamos solo un registro anónimo (una huella criptográfica del correo, que no permite identificarlo) para comprobar la atención de la solicitud y evitar un nuevo contacto (LGPD, arts. 15, 16 y 18)."
-    },
-    "rights": {
-      "title": "Sus Derechos de Privacidad",
-      "text": "Tiene derecho a acceder, corregir, actualizar o solicitar la eliminación definitiva de sus datos personales en cualquier momento a través de la configuración de su cuenta o contactando a nuestro equipo."
-    },
-    "contact": {
-      "title": "Contacto de Privacidad",
-      "text": "Para preguntas o para ejercer sus derechos de privacidad, comuníquese con nuestro equipo en contato@menvo.com.br."
-    },
-    "links": {
-      "cookies": "Política de Cookies",
-      "terms": "Términos de Uso"
-    }
-  },
-  "terms": {
-    "badge": "Términos de Servicio",
-    "title": "Términos de Uso",
-    "intro": "Bienvenido a Menvo. Al utilizar nuestra plataforma, acepta los términos y pautas que rigen nuestra comunidad de mentoría voluntaria gratuita.",
-    "usage": {
-      "title": "Uso de la Plataforma",
-      "text": "Menvo es una plataforma voluntaria sin fines de lucro creada para conectar profesionales dispuestos a compartir conocimientos con personas en busca de orientación profesional. Todas las mentorías son 100% gratuitas."
-    },
-    "account": {
-      "title": "Cuentas y Registro",
-      "text": "Usted es responsable de la exactitud de la información proporcionada y de mantener la seguridad de sus credenciales. Cada usuario debe mantener una sola cuenta personal."
-    },
-    "inactivity": {
-      "title": "Cuentas inactivas y eliminación automática",
-      "text": "Las cuentas creadas a partir de datos importados de iniciativas asociadas, como el formulario de Estágio Recife, y que nunca sean accedidas, serán eliminadas automáticamente 90 días después de la primera invitación enviada por correo. Antes de la eliminación, enviaremos dos avisos al correo registrado: uno 30 días antes y otro 1 día antes de la fecha prevista. Para mantener la cuenta, basta con acceder a ella mediante el enlace del aviso. Después de la eliminación, recibirá un correo de confirmación y podrá crear una cuenta nueva en cualquier momento. Las cuentas sin ningún acceso durante largos períodos también podrán ser eliminadas, siempre con aviso previo por correo."
-    },
-    "security": {
-      "title": "Conducta y Seguridad",
-      "text": "Queda estrictamente prohibido el acoso, la discriminación, el cobro financiero por mentorías o el uso indebido de los canales de comunicación. Las infracciones conllevarán la cancelación inmediata de la cuenta."
-    },
-    "content": {
-      "title": "Propiedad Intelectual",
-      "text": "Todo el diseño, marca, código y contenido de la plataforma pertenecen exclusivamente a Menvo. El contenido compartido por los usuarios durante las sesiones sigue siendo propiedad de sus respectivos autores."
-    },
-    "communication": {
-      "title": "Comunicaciones",
-      "text": "Al registrarse, acepta recibir notificaciones esenciales de la plataforma, incluidas actualizaciones de reservas, mensajes entre mentores y aprendices y recordatorios de sesiones."
-    },
-    "storage": {
-      "title": "Disponibilidad del Servicio",
-      "text": "Nos esforzamos por mantener la plataforma confiable y disponible, aunque no se puede garantizar un servicio ininterrumpido. Nos reservamos el derecho de realizar mantenimientos y actualizaciones."
-    },
-    "rights": {
-      "title": "Limitación de Responsabilidad",
-      "text": "Menvo conecta personas, pero no se hace responsable de las orientaciones, consejos profesionales o decisiones tomadas a raíz de las sesiones de mentoría voluntaria entre usuarios."
-    },
-    "contact": {
-      "title": "Preguntas y Soporte",
-      "text": "Para consultas sobre estos términos o para informar de un problema, comuníquese con contato@menvo.com.br."
-    },
-    "links": {
-      "privacy": "Política de Privacidad",
-      "cookies": "Política de Cookies"
-    }
-  },
-  "cookies": {
-    "badge": "Transparencia",
-    "title": "Política de Cookies",
-    "intro": "Conozca cómo utilizamos cookies y tecnologías similares para garantizar una experiencia segura y eficiente en Menvo.",
-    "essential": {
-      "title": "Cookies Esenciales",
-      "text": "Estas cookies son estrictamente necesarias para el funcionamiento de la plataforma, manteniendo sesiones autenticadas seguras a través de Supabase y preservando sus preferencias de idioma y tema."
-    },
-    "social": {
-      "title": "Cookies de Autenticación Social",
-      "text": "Se utilizan al iniciar sesión o registrarse a través de proveedores externos como Google y LinkedIn para verificación de identidad y vinculación segura de perfiles."
-    },
-    "preferences": {
-      "title": "Cookies de Preferencias",
-      "text": "Permiten que la plataforma recuerde sus configuraciones personalizadas, como la vista de catálogo y la zona horaria detectada."
-    },
-    "analytics": {
-      "title": "Cookies de Análisis y Métricas",
-      "text": "Nos ayudan a comprender cómo la comunidad navega por la plataforma a través de métricas agregadas anónimas, permitiendo mejoras continuas en las reservas y búsquedas."
-    },
-    "clarity": {
-      "title": "Mapeo de Experiencia de Usuario",
-      "text": "Podemos utilizar telemetría agregada para diagnosticar problemas de usabilidad, protegiendo siempre la privacidad de los datos sensibles."
-    },
-    "links": {
-      "privacy": "Política de Privacidad",
-      "terms": "Términos de Uso"
-    }
+  "organizationLanding": {
+    "subtitle": "{name} es socio de Menvo. Únete a su grupo para conectar con mentores voluntarios - gratis, siempre.",
+    "requestedStatus": "Solicitud enviada - en espera de aprobación de la organización",
+    "joinToParticipate": "Iniciar sesión para unirse",
+    "noAccountYet": "¿Aún no tienes cuenta?",
+    "register": "Regístrate",
+    "andReturnToRequest": "y vuelve aquí para solicitar acceso.",
+    "youArePartOf": "Eres miembro de {name}",
+    "findMentor": "Encontrar un mentor",
+    "requestToJoin": "Solicitar unirse",
+    "joinAutomatically": "Unirse automáticamente",
+    "inviteOnlyMsg": "{name} aprueba cuentas nuevas manualmente o a través de un enlace de invitación cerrado. Solicita acceso a continuación y ellos evaluarán tu solicitud según los criterios del proyecto."
   }
 }
