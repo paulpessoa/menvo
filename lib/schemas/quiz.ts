@@ -16,6 +16,28 @@ export const quizFormDataSchema = z.object({
 
 export type QuizFormData = z.infer<typeof quizFormDataSchema>;
 
+/**
+ * Server-side shape of a quiz submission (`POST /api/quiz`), snake_case to
+ * match `quiz_responses` Insert columns. Client fields not listed here
+ * (ai_analysis, processed_at, score, email_sent...) are never accepted from
+ * the request body - the RLS insert policy also rejects them, this is just
+ * the first line of defense.
+ */
+export const quizSubmitSchema = z.object({
+  name: z.string().trim().min(2).max(200),
+  email: z.string().trim().email().max(254),
+  linkedin_url: z.string().trim().url().max(300).nullable().optional().or(z.literal('')),
+  career_moment: z.string().trim().min(1).max(200),
+  mentorship_experience: z.string().trim().min(1).max(200),
+  development_areas: z.array(z.string().trim().min(1).max(120)).min(1).max(20),
+  current_challenge: z.string().trim().min(11).max(4000),
+  future_vision: z.string().trim().min(11).max(4000),
+  share_knowledge: z.string().trim().min(1).max(200),
+  personal_life_help: z.string().trim().min(11).max(4000),
+});
+
+export type QuizSubmitPayload = z.infer<typeof quizSubmitSchema>;
+
 export const stepValidation = {
   1: (data: Partial<QuizFormData>) => !!data.careerMoment,
   2: (data: Partial<QuizFormData>) => !!data.currentChallenge && data.currentChallenge.trim().length > 10,

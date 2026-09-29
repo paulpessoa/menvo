@@ -28,7 +28,6 @@ import {
 } from "@/components/ui/select"
 import { Calendar, User, CheckCircle, XCircle, Eye, ArrowLeft, Search } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { VerificationService } from "@/lib/services/verifications/verifications.service"
 import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
 import type { Verification } from "@/lib/types/models/verification"
 import { toast } from "sonner"
@@ -46,7 +45,9 @@ export default function AdminVerificationsPage() {
   const loadVerifications = useCallback(async () => {
     try {
       if (user?.id) {
-        const data = await VerificationService.getPendingVerifications(user.id)
+        const response = await fetch("/api/admin/verifications/pending")
+        if (!response.ok) throw new Error("Erro ao carregar verificações pendentes")
+        const { verifications: data } = await response.json()
         setVerifications(data)
       }
     } catch (error) {

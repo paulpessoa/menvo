@@ -30,7 +30,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { UserMetrics } from "@/components/admin/UserMetrics"
 import { EditUserModal } from "@/components/admin/EditUserModal"
 import { InviteCampaignModal } from "@/components/admin/invites/InviteCampaignModal"
-import { createClient } from "@/lib/utils/supabase/client"
 import { toast } from "sonner"
 import type { UserProfile } from "@/lib/types/models/user"
 

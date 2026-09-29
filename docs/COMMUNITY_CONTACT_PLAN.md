@@ -522,25 +522,58 @@ um atacante.
 
 ### 13.2 Migrar para rotas `app/api/**` (ordem)
 
-1. `lib/services/quiz/quiz.service.ts` → `POST /api/quiz` e
-   `GET /api/quiz/[id]` (o resultado só para o dono ou por token);
-   `app/[locale]/quiz/results/[id]/page.tsx` passa a usar a rota.
-2. Admin: `admin.service.ts`, `verifications.service.ts`,
-   `reports.service.ts`, `app/[locale]/dashboard/admin/users/page.tsx` →
-   rotas em `app/api/admin/**` com checagem `is_admin` no servidor (padrão das
-   rotas admin que já existem).
-3. `favorites.service.ts`, `notifications.service.ts`,
-   `app/[locale]/settings/page.tsx` → rotas `app/api/me/**`.
-4. `mentors.service.ts` (catálogo) → `GET /api/mentors`,
-   `GET /api/mentors/filters`, com cache.
-5. `lib/google-calendar-db.ts`: **bug** — usa o cliente de navegador dentro
-   de `app/api/calendar/status`, ou seja, sem sessão. Trocar por cliente de
-   servidor (ou service role, com checagem do `userId` da sessão). Conferir
-   antes se `anon` lê `google_calendar_tokens`.
-
 Regras para cada rota: sessão validada no servidor; `select` com colunas
 explícitas (nunca `*`); entrada validada com Zod; mesmo formato de erro das
 rotas existentes; testes no padrão de `*.service.test.ts`.
+
+1. ✅ **Feito (2026-09-29, Sonnet).** `lib/services/quiz/quiz.service.ts` →
+   `POST /api/quiz`, `GET /api/quiz/[id]`, `GET /api/quiz/latest`,
+   `POST /api/quiz/[id]/send-email`. O serviço agora é um wrapper fino em
+   cima de `fetch`, com os mesmos nomes de método, para minimizar mudança
+   nas 3 telas que o chamavam. `submitQuiz` valida com
+   `quizSubmitSchema` (`lib/schemas/quiz.ts`) e gera o UUID no servidor,
+   não mais no cliente. O lookup de mentor por nome em
+   `/quiz/results/[id]` (consultava `mentors_view` direto) virou
+   `GET /api/mentors/lookup`. Teste: `app/api/quiz/route.test.ts`.
+2. ✅ **Feito (2026-09-29, Sonnet).** Admin: `admin.service.ts` (só os
+   métodos com chamador real: `getAllMentors` → `GET /api/admin/mentors`,
+   `getPendingFeedbacks` → `GET /api/admin/feedbacks`; `updateUserProfile`/
+   `setUserRoles`/`deleteUser` não tinham nenhum chamador e foram
+   removidos, os equivalentes já existiam em `app/api/admin/users/**`),
+   `verifications.service.ts` (`getPendingVerifications` →
+   `GET /api/admin/verifications/pending`; `completeVerification`/
+   `setMentorVerification` já eram trechos mortos, só alcançáveis pelo
+   `MentorManagementPanel` não montado - deixados como estavam, marcados),
+   `reports.service.ts` → `GET /api/admin/reports?since=`. Todas com
+   `requireAdmin()`. `dashboard/admin/users/page.tsx` só tinha um import
+   não usado de `createClient`, removido.
+3. ✅ **Feito (2026-09-29, Sonnet).** `favorites.service.ts` →
+   `GET`/`POST /api/me/favorites`; `notifications.service.ts` →
+   `GET /api/me/notifications?role=`. As duas rotas derivam o usuário da
+   sessão (nunca de um `userId` que o cliente mandasse), o que já fecha
+   parte da etapa B do §2 para essas duas tabelas.
+   `app/[locale]/settings/page.tsx` só usa `supabase.auth` (reautenticação
+   de senha) - é Auth, fica no navegador por §13.1, não precisava mudar.
+4. **Ainda não feito** — prioridade mais baixa, dados já públicos.
+   `mentors.service.ts` (catálogo, 590 linhas, 9 métodos, vários
+   chamadores: `/mentors`, `/api/ai/match`, `lib/services/assistant/tools.ts`)
+   → `GET /api/mentors`, `GET /api/mentors/filters`, com cache. Maior
+   arquivo do lote; fazer numa sessão dedicada, um método por vez, com
+   teste antes de mexer no próximo.
+5. ✅ **Feito (2026-09-29, Sonnet).** `lib/google-calendar-db.ts`: **era um
+   bug real**, não só o padrão a evitar - usava o cliente de navegador
+   dentro de `app/api/calendar/status`, ou seja, rodava como `anon`, sem
+   sessão, mesmo chamado de uma rota de servidor. Trocado para o cliente
+   de servidor (`await createClient()` de `lib/utils/supabase/server`) nas
+   4 funções do arquivo. Achado nessa investigação: a tabela
+   `google_calendar_tokens` não tem nenhum outro lugar no código que
+   escreva nela - o fluxo real de agendamento usa um calendário único via
+   `lib/services/mentorship/google-calendar.service.ts` (env vars), e
+   `/api/auth/google-calendar/*` + `/setup/google-calendar/callback` são
+   um script de setup avulso (gera um refresh token para colar em env var,
+   nunca salva na tabela). Ou seja, a função corrigida provavelmente nunca
+   roda com dados reais hoje - mas se alguém reativar esse fluxo, já
+   funciona certo. `select('*')` na leitura também virou lista explícita.
 
 ### 13.3 Leitura do próprio perfil
 

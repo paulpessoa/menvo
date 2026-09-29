@@ -25,7 +25,6 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Filter, Users, CheckCircle, Clock, RefreshCw, AlertTriangle } from "lucide-react"
-import { adminService } from "@/lib/services/admin/admin.service"
 import { MentorCard } from "./MentorCard"
 import { toast } from "sonner"
 
@@ -75,9 +74,11 @@ export function MentorManagementPanel() {
     setLoading(true)
 
     try {
-      const data = await adminService.getAllMentors()
+      const response = await fetch('/api/admin/mentors')
+      if (!response.ok) throw new Error("Erro ao buscar mentores")
+      const { mentors: data } = await response.json()
 
-      const mentorData: Mentor[] = (data || []).map((m) => ({
+      const mentorData: Mentor[] = (data || []).map((m: any) => ({
         id: m.id || "",
         email: m.email || "",
         first_name: m.first_name || "",

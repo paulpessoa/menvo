@@ -1,69 +1,41 @@
-import { createClient } from "@/lib/utils/supabase/client"
 import type {
-  QuizResponseInsert,
   QuizResponseSummary,
   QuizResultView,
   QuizAnalysisResult
 } from "@/lib/types/models/quiz"
 
+export interface QuizSubmitInput {
+  name: string
+  email: string
+  linkedin_url?: string | null
+  career_moment: string
+  mentorship_experience: string
+  development_areas: string[]
+  current_challenge: string
+  future_vision: string
+  share_knowledge: string
+  personal_life_help: string
+}
+
 /**
- * Service to manage quiz responses, AI analysis trigger, and user diagnostic queries.
- *
- * `quiz_responses` RLS (migration `20260923000005_quiz_responses_privacy.sql`,
- * audit in STATUS.md 2026-09-23) no longer allows an anonymous or
- * cross-account read of the table: a logged-in user reads only rows
- * matching their own e-mail, and there is no `anon` SELECT at all. The
- * anonymous quiz still needs to read back its own just-submitted row by
- * `id` (the results page, shared on LinkedIn/WhatsApp by design) - that
- * goes through `get_quiz_result`, a `security definer` RPC that returns
- * only `id`, `processed_at` and `ai_analysis`, never name/e-mail/answers.
+ * Client-side wrapper around the quiz API routes (`app/api/quiz/**`). Kept
+ * as a thin fetch layer, rather than talking to Supabase directly from the
+ * browser, so every read/write on `quiz_responses` goes through one place
+ * that validates input and can be rate-limited (docs/COMMUNITY_CONTACT_PLAN.md §13).
  */
 class QuizService {
-  private supabase = createClient()
-
   /**
-   * Retrieves the most recent quiz response for a given email address.
-   * Useful for determining if a logged-in mentee has already completed the assessment.
-   *
-   * Only works for the caller's own e-mail - RLS enforces this even though
-   * the query itself doesn't filter by session, since the caller is
-   * expected to pass their own logged-in e-mail (dashboard/mentee/page.tsx).
-   *
-   * @param email - User's email address
-   * @returns QuizResponseSummary or null if none found
+   * Retrieves the caller's own most recent quiz response, used by
+   * `/dashboard/mentee` to check whether the diagnostic was already done.
+   * The server derives the e-mail from the session - the parameter here is
+   * unused, kept only so existing callers don't need to change.
    */
-  async getLatestQuizResponseByEmail(email: string): Promise<QuizResponseSummary | null> {
-    if (!email) return null
-
+  async getLatestQuizResponseByEmail(_email: string): Promise<QuizResponseSummary | null> {
     try {
-      const normalizedEmail = email.trim().toLowerCase()
-
-      const { data, error } = await (this.supabase
-        .from("quiz_responses") as any)
-        .select("id, name, email, score, processed_at, created_at, development_areas, career_moment, ai_analysis")
-        .eq("email", normalizedEmail)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (error) {
-        console.error("[QuizService] Error fetching quiz response by email:", error)
-        return null
-      }
-
-      if (!data) return null
-
-      return {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        score: data.score,
-        processed_at: data.processed_at,
-        created_at: data.created_at,
-        development_areas: data.development_areas || [],
-        career_moment: data.career_moment,
-        ai_analysis: (data.ai_analysis as unknown as QuizAnalysisResult) || null
-      }
+      const res = await fetch("/api/quiz/latest")
+      if (!res.ok) return null
+      const { summary } = await res.json()
+      return summary ?? null
     } catch (err) {
       console.error("[QuizService] Unexpected error fetching quiz by email:", err)
       return null
@@ -73,31 +45,15 @@ class QuizService {
   /**
    * Retrieves the public result view for a quiz response by its UUID - the
    * only three fields `/quiz/results/[id]` renders. Works for anonymous
-   * visitors (the results link is shared) through the `get_quiz_result` RPC,
-   * never a direct `.select()` on `quiz_responses`.
-   *
-   * @param id - UUID of the quiz response
-   * @returns QuizResultView or null if not found
+   * visitors (the results link is shared).
    */
   async getQuizResponseById(id: string): Promise<QuizResultView | null> {
     if (!id) return null
 
     try {
-      const { data, error } = await (this.supabase.rpc as any)("get_quiz_result", { p_id: id })
-
-      if (error) {
-        console.error("[QuizService] Error loading quiz results by ID:", error)
-        return null
-      }
-
-      const row = Array.isArray(data) ? data[0] : data
-      if (!row) return null
-
-      return {
-        id: row.id,
-        processed_at: row.processed_at,
-        ai_analysis: (row.ai_analysis as unknown as QuizAnalysisResult) || null
-      }
+      const res = await fetch(`/api/quiz/${id}`)
+      if (!res.ok) return null
+      return await res.json()
     } catch (err) {
       console.error("[QuizService] Unexpected error loading quiz results:", err)
       return null
@@ -107,38 +63,29 @@ class QuizService {
   /**
    * Submits a new quiz response and triggers the background AI analysis.
    *
-   * The id is generated on the client because the insert can no longer be
-   * followed by a `.select()`: PostgREST does a SELECT to return the
-   * inserted row, and an anonymous submitter has no SELECT policy on
-   * `quiz_responses` any more (only their own row, once logged in, does).
-   *
-   * @param payload - Quiz response data matching table insert schema
+   * @param payload - Quiz response data
    * @returns The generated id, to route to `/quiz/results/[id]`
    */
-  async submitQuiz(payload: QuizResponseInsert): Promise<{ id: string }> {
-    const id = crypto.randomUUID()
-
-    const { error } = await (this.supabase.from("quiz_responses") as any).insert({
-      ...payload,
-      id,
-      email: payload.email.trim().toLowerCase()
+  async submitQuiz(payload: QuizSubmitInput): Promise<{ id: string }> {
+    const res = await fetch("/api/quiz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     })
 
-    if (error) {
-      throw error
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data?.error || "Não foi possível enviar o questionário")
     }
 
-    await this.requestAnalysis(id)
-
-    return { id }
+    return data as { id: string }
   }
 
   /**
    * Asks the server to analyze a quiz response (POST /api/quiz/[id]/analyze
-   * - model registry, metered, inside the AI budget; ADR 0004 §7.3, replaces
-   * the old analyze-quiz Edge Function). Safe to call more than once: the
-   * server claims the row atomically, so a duplicate request does nothing.
-   * Never throws - the results page polls for the outcome either way.
+   * - model registry, metered, inside the AI budget). Safe to call more than
+   * once: the server claims the row atomically, so a duplicate request does
+   * nothing. Never throws - the results page polls for the outcome either way.
    *
    * @param id - UUID of the quiz response
    */
@@ -151,17 +98,15 @@ class QuizService {
   }
 
   /**
-   * Invokes the Edge Function to send an email with the quiz analysis results.
+   * Re-sends the quiz analysis results by e-mail.
    *
    * @param responseId - UUID of the quiz response
    */
   async sendResultsEmail(responseId: string): Promise<void> {
-    const { error } = await this.supabase.functions.invoke("send-quiz-email", {
-      body: { responseId }
-    })
-
-    if (error) {
-      throw error
+    const res = await fetch(`/api/quiz/${responseId}/send-email`, { method: "POST" })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data?.error || "Não foi possível enviar o e-mail")
     }
   }
 }

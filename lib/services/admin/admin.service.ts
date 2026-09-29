@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/utils/supabase/client'
 import type { Database } from '@/lib/types/supabase'
 
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
@@ -19,134 +18,12 @@ export interface AdminUserUpdate {
     expected_graduation?: string
 }
 
-class AdminService {
-    private supabase = createClient()
-
-    /**
-     * Atualiza dados de qualquer perfil (apenas admins via RLS)
-     */
-    async updateUserProfile(userId: string, updates: AdminUserUpdate): Promise<ProfileRow> {
-        const updatePayload: ProfileUpdate = {
-            ...updates,
-            updated_at: new Date().toISOString()
-        }
-
-        const { data, error } = await (this.supabase
-            .from('profiles') as any)
-            .update(updatePayload)
-            .eq('id', userId)
-            .select()
-            .single()
-
-        if (error) throw error
-        return data as ProfileRow
-    }
-
-    /**
-     * Gerencia roles de um usuário de forma consistente
-     */
-    async setUserRoles(userId: string, roleNames: string[]): Promise<boolean> {
-        // 1. Buscar os IDs das roles solicitadas
-        const { data: rolesRaw, error: rolesError } = await this.supabase
-            .from('roles')
-            .select('id, name')
-            .in('name', roleNames)
-
-        if (rolesError) throw rolesError
-        const roles = (rolesRaw as { id: number; name: string }[] | null) ?? []
-
-        // 2. Remover roles atuais
-        const { error: deleteError } = await this.supabase
-            .from('user_roles')
-            .delete()
-            .eq('user_id', userId)
-
-        if (deleteError) throw deleteError
-
-        if (roles.length === 0) return true
-
-        // 3. Inserir novas roles
-        const inserts = roles.map(role => ({
-            user_id: userId,
-            role_id: role.id
-        }))
-
-        const { error: insertError } = await (this.supabase
-            .from('user_roles') as any)
-            .insert(inserts)
-
-        if (insertError) throw insertError
-        return true
-    }
-
-    /**
-     * Deleta um usuário permanentemente
-     */
-    async deleteUser(userId: string): Promise<boolean> {
-        const { error } = await this.supabase
-            .from('profiles')
-            .delete()
-            .eq('id', userId)
-
-        if (error) throw error
-        return true
-    }
-
-    /**
-     * Busca todos os mentores para o painel administrativo através da view mentors_view
-     */
-    async getAllMentors(): Promise<(Omit<MentorViewRow, 'email'> & { email: string | null })[]> {
-        const { data, error } = await this.supabase
-            .from('mentors_view')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-        if (error) throw error
-        const mentors = (data || []) as Omit<MentorViewRow, 'email'>[]
-
-        // mentors_view no longer carries email (it is readable by anonymous
-        // visitors); admins read it from profiles, which RLS lets them see.
-        const ids = mentors.map(m => m.id).filter((id): id is string => Boolean(id))
-        const emailById = new Map<string, string | null>()
-        if (ids.length > 0) {
-            const { data: emails, error: emailError } = await this.supabase
-                .from('profiles')
-                .select('id, email')
-                .in('id', ids)
-            if (emailError) throw emailError
-            for (const row of (emails || []) as { id: string; email: string | null }[]) {
-                emailById.set(row.id, row.email)
-            }
-        }
-
-        return mentors.map(m => ({ ...m, email: (m.id && emailById.get(m.id)) || null }))
-    }
-
-    /**
-     * Busca avaliações pendentes de moderação
-     */
-    async getPendingFeedbacks(): Promise<{
-        id: string
-        rating: number
-        comment: string | null
-        status: 'pending' | 'approved' | 'rejected'
-        created_at: string
-        mentee: { full_name: string | null; avatar_url: string | null } | null
-        mentor: { full_name: string | null; avatar_url: string | null } | null
-    }[]> {
-        const { data, error } = await this.supabase
-            .from('appointment_feedbacks')
-            .select(`
-                id, rating, comment, status, created_at,
-                mentee:profiles!reviewer_id(full_name, avatar_url),
-                mentor:profiles!reviewed_id(full_name, avatar_url)
-            `)
-            .eq('status', 'pending')
-            .order('created_at', { ascending: true })
-
-        if (error) throw error
-        return (data as any) || []
-    }
-}
-
-export const adminService = new AdminService()
+// The class this file used to export (`adminService`) ran every admin
+// mutation - update/delete a profile, list mentors, list pending feedbacks -
+// straight from the browser's Supabase client (docs/COMMUNITY_CONTACT_PLAN.md
+// §13). Its callers now go through app/api/admin/** instead:
+//   - getAllMentors  -> GET /api/admin/mentors
+//   - getPendingFeedbacks -> GET /api/admin/feedbacks
+//   - updateUserProfile/setUserRoles/deleteUser had no callers left; the
+//     equivalent admin actions already live in app/api/admin/users/**.
+// Only the types above are still imported (components/admin/EditUserModal.tsx).

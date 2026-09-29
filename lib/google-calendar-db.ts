@@ -1,5 +1,5 @@
 
-import { createClient } from '@/lib/utils/supabase/client';
+import { createClient } from '@/lib/utils/supabase/server';
 import { google } from 'googleapis';
 import type { Database, TablesInsert } from '@/lib/types/supabase';
 
@@ -22,8 +22,12 @@ export async function saveGoogleCalendarTokens(
     scope?: string;
   }
 ) {
-  const supabase = createClient();
-  
+  // Server client: carries the caller's session, so RLS on
+  // google_calendar_tokens (user_id = auth.uid()) applies as expected. The
+  // previous version used the browser client here, which has no session on
+  // the server and silently ran as anon.
+  const supabase = await createClient();
+
   // Calcular expiry_date como timestamp em milissegundos
   const expiryDate = Date.now() + (tokens.expires_in * 1000);
 
@@ -49,10 +53,10 @@ export async function saveGoogleCalendarTokens(
  * Obter tokens do Google Calendar do Supabase
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await (supabase
     .from('google_calendar_tokens')
-    .select('*')
+    .select('user_id, access_token, refresh_token, expiry_date')
     .eq('user_id', userId)
     .maybeSingle() as any);
 
@@ -81,7 +85,7 @@ export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCal
  */
 export async function createUserGoogleCalendarClient(userId: string) {
   const tokens = await getGoogleCalendarTokens(userId);
-  
+
   if (!tokens) {
     throw new Error('User has not connected Google Calendar');
   }
@@ -100,7 +104,7 @@ export async function createUserGoogleCalendarClient(userId: string) {
       });
 
       const { credentials } = await oauth2Client.refreshAccessToken();
-      
+
       // Salva os novos tokens
       if (credentials.access_token && credentials.expiry_date) {
         await saveGoogleCalendarTokens(userId, {
@@ -140,7 +144,7 @@ export async function hasGoogleCalendarConnected(userId: string): Promise<boolea
  * Desconectar Google Calendar do usuário
  */
 export async function disconnectGoogleCalendar(userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase
     .from('google_calendar_tokens')
     .delete()

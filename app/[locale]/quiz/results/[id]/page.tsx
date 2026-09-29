@@ -18,7 +18,6 @@ import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
 import { quizService } from "@/lib/services/quiz/quiz.service"
-import { createClient } from "@/lib/utils/supabase/client"
 import { ShareDiagnosticModal } from "@/components/diagnostic/ShareDiagnosticModal"
 
 interface AnalysisResult {
@@ -141,11 +140,8 @@ export default function QuizResultsPage() {
 
             if (mentorNames.length > 0) {
                 try {
-                    const supabase = createClient()
-                    const { data: mentorsFound } = await (supabase
-                        .from("mentors_view") as any)
-                        .select("full_name, slug, id")
-                        .in("full_name", mentorNames)
+                    const res = await fetch(`/api/mentors/lookup?names=${encodeURIComponent(mentorNames.join(","))}`)
+                    const { mentors: mentorsFound } = await res.json()
 
                     if (mentorsFound && (mentorsFound as any[]).length > 0) {
                         const map: Record<string, string> = {}
