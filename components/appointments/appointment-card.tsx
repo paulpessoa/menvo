@@ -22,6 +22,8 @@ import { useState } from "react"
 import { useTranslations, useFormatter } from "next-intl"
 import { useRouter } from "@/i18n/routing"
 import { useFeatureFlag } from "@/lib/feature-flags"
+import { toast } from "sonner"
+import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 
 interface AppointmentFeedbackItem {
   id: string | number
@@ -75,7 +77,23 @@ export function AppointmentCard({
   const format = useFormatter()
   const router = useRouter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
+  const [isCompleting, setIsCompleting] = useState(false)
   const isChatEnabled = useFeatureFlag("chat_flag")
+
+  const handleMentorComplete = async () => {
+    try {
+      setIsCompleting(true)
+      await mentorshipService.markCompleted(String(appointment.id))
+      toast.success(t("sessionCompletedSuccess", { defaultValue: "Sessão concluída com sucesso!" }))
+      if (onAppointmentUpdate) {
+        onAppointmentUpdate({ ...appointment, status: "completed" })
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao concluir a sessão.")
+    } finally {
+      setIsCompleting(false)
+    }
+  }
 
   const mentor = Array.isArray(appointment.mentor)
     ? appointment.mentor[0]
@@ -151,10 +169,11 @@ export function AppointmentCard({
     (appointment.status === "confirmed" || appointment.status === "completed") &&
     isPast &&
     !hasUserEvaluated
+  const canMentorComplete = isMentor && appointment.status === "confirmed" && isPast
 
   const showLinkedin = !isChatEnabled && (canChat || canConfirm) && !!otherPerson?.linkedin_url
   const hasActions =
-    (isChatEnabled && (canChat || canConfirm)) || showLinkedin || canComplete || canConfirm || canCancel || canJoinMeet
+    (isChatEnabled && (canChat || canConfirm)) || showLinkedin || canComplete || canConfirm || canCancel || canJoinMeet || canMentorComplete
 
   const handleProfileClick = () => {
     if (!isMentor && otherPerson?.id) {
@@ -301,6 +320,18 @@ export function AppointmentCard({
         </div>
 
         <div className="flex gap-2 flex-wrap sm:ml-auto">
+          {canMentorComplete && (
+            <Button
+              size="sm"
+              className="bg-primary hover:bg-primary/90 text-white font-medium"
+              onClick={handleMentorComplete}
+              disabled={isCompleting}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              {t("markAsCompleted", { defaultValue: "Marcar Concluída" })}
+            </Button>
+          )}
+
           {canComplete && (
             <Button
               size="sm"
