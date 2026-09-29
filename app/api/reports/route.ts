@@ -2,8 +2,8 @@ import { NextResponse } from "next/server"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 
 export async function POST(request: Request) {
-  const supabase = createServerClient()
-  
+  const supabase = await createServerClient()
+
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     // TODO: Disparar email para o Admin informando da denúncia
-    
+
     return NextResponse.json({ success: true, reportId: data.id })
   } catch (error) {
     console.error("[REPORTS_API]", error)

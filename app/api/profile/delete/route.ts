@@ -3,7 +3,7 @@ import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
 
 export async function DELETE() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {

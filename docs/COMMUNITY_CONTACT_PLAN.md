@@ -42,7 +42,25 @@ A Privacidade agora diz que e-mail e telefone "nunca são exibidos para outros
 usuários". Na interface isso é verdade; na API, não. Os e-mails do §6 vão
 levar mentores ao mural, então isso precisa estar fechado antes.
 
-**Estado (2026-09-29):** o schema real de `profiles` (policies antigas,
+**Diagnóstico rodado (2026-09-29, bloco 6):** `anon` lia **578 linhas, 578
+e-mails, 6 telefones e 564 `original_data`**, ou seja, a base inteira. A
+`mentors_view` também expõe `email`, `phone`, `address` e `external_id` dos
+mentores. Correção de emergência:
+`supabase/migrations/20260929150000_profiles_emergency_exposure_fix.sql`,
+com policies *restrictive* (valem por cima de qualquer policy antiga), colunas
+limitadas para `anon` em `profiles` e `mentors_view`, e uma trava que aborta se
+`mentors_view` for `security_invoker`. `mentor-public.service.ts` deixou de
+fazer `select("*")`. **Ainda aberto:** usuário logado lê e-mail/telefone de
+mentores públicos e de quem ele pode ver (etapa B, a seguir).
+
+**Incidente (LGPD, art. 48):** não sabemos se alguém extraiu os dados. Olhar
+nos logs da API do Supabase (Logs Explorer → API/edge) por requisições a
+`/rest/v1/profiles` com a anon key pedindo `email`/`original_data` ou muitas
+linhas. Se houver sinal de extração em massa, a Resolução CD/ANPD nº 15/2024
+pede comunicação à ANPD e aos titulares (prazo de 3 dias úteis a partir do
+conhecimento). Confirmar com o advogado.
+
+**Estado anterior (2026-09-29):** o schema real de `profiles` (policies antigas,
 `mentors_view`, grants) só existe no banco; as migrações `*_remote_baseline`
 são marcadores vazios. Antes de escrever a correção, rodar
 `supabase/diagnostics/20260929_profiles_exposure.sql` no SQL Editor e colar o
@@ -299,7 +317,7 @@ já tenha perfis bons. Mentor que chega num mural vazio ou fraco não volta.
 
 1. **Registrar o aceite:** hoje o cadastro não grava que a pessoa aceitou os
    Termos. Sem isso, o "termo de adesão" é fraco. **Feito no banco
-   (2026-09-29):** migração `20260929000001_terms_acceptances.sql` (tabela
+   (2026-09-29):** migração `20260929150002_terms_acceptances.sql` (tabela
    só de inserção, com `accepted_at` sempre vindo do banco) e
    `lib/legal/terms.ts` (`CURRENT_TERMS_VERSION`). Falta a UI (§12.1).
 2. **Revisão por advogado.** Os textos foram escritos com cuidado, mas não
@@ -433,7 +451,7 @@ amarram a React ou Next.
 
 ## 12. Especificação para quem implementa (Sonnet)
 
-Antes de começar: aplicar as migrações `20260929000000` e `20260929000001`
+Antes de começar: aplicar as migrações `20260929150001` e `20260929150002`
 e regenerar `lib/types/supabase.ts`.
 
 ### 12.1 Gate de aceite dos Termos (+ idade, quando decidida)
@@ -468,7 +486,7 @@ e regenerar `lib/types/supabase.ts`.
 - No `/profile` de mentorado: um item por condição do §5 (perfil público,
   bio ≥ 80, tópicos ou objetivos, LinkedIn), cada item com um link para o
   campo. O critério fica em `lib/services/community/readiness.ts`,
-  **espelhando o SQL** da migração `20260929000000`; um teste garante que os
+  **espelhando o SQL** da migração `20260929150001`; um teste garante que os
   limites (80, 40) batem.
 
 ### 12.4 Ligar o filtro do mural (14/10)

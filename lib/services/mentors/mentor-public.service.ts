@@ -1,6 +1,15 @@
 import { createClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 
+/**
+ * Everything the public mentor page may show. Never `*`: mentors_view also
+ * carries email, phone, address and external_id, and this result is
+ * serialized to the browser of anonymous visitors. Anonymous SELECT on
+ * mentors_view is limited to these columns (migration 20260929150000).
+ */
+const PUBLIC_MENTOR_COLUMNS =
+  "id, slug, first_name, last_name, full_name, avatar_url, bio, job_title, company, city, state, country, location, timezone, languages, expertise_areas, mentor_skills, mentorship_topics, free_topics, inclusive_tags, experience_years, academic_level, institution, course, expected_graduation, linkedin_url, github_url, twitter_url, website_url, portfolio_url, cv_url, mentorship_approach, mentorship_guidelines, what_to_expect, ideal_mentee, availability, availability_status, average_rating, total_reviews, total_sessions, chat_enabled, is_public, is_volunteer, verified, verification_status, created_at, updated_at"
+
 export interface PublicMentorData {
   mentor: any
   availability: any[]
@@ -26,7 +35,7 @@ export const mentorPublicService = {
       // profile page never exists for a mentor the directory hides.
       const query = supabase
         .from("mentors_view")
-        .select("*")
+        .select(PUBLIC_MENTOR_COLUMNS)
         .eq("verified", true)
         .eq("is_public", true)
 

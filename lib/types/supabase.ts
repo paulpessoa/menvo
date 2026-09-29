@@ -1807,6 +1807,53 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reports: {
+        Row: {
+          id: string
+          reporter_id: string
+          reported_email: string | null
+          category: string
+          description: string
+          evidence_paths: string[] | null
+          status: string
+          admin_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reporter_id: string
+          reported_email?: string | null
+          category: string
+          description: string
+          evidence_paths?: string[] | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reporter_id?: string
+          reported_email?: string | null
+          category?: string
+          description?: string
+          evidence_paths?: string[] | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       ai_usage_by_user_monthly: {
