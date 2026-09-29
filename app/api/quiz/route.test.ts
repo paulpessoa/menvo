@@ -13,6 +13,14 @@ jest.mock('@/lib/rate-limit', () => ({
   checkRateLimit: jest.fn()
 }))
 
+// `after()` only works inside a real request scope; run its callback inline.
+jest.mock('next/server', () => ({
+  ...jest.requireActual('next/server'),
+  after: jest.fn((cb: () => unknown) => {
+    void cb()
+  })
+}))
+
 const validPayload = {
   name: 'Ana Silva',
   email: 'Ana@Example.com',
@@ -132,6 +140,26 @@ describe('POST /api/quiz', () => {
 
     const insertedRow = (supabase.from('quiz_responses').insert as jest.Mock).mock.calls[0][0]
     expect(insertedRow.user_id).toBeNull()
+  })
+
+  it('does not wait for the AI analysis before responding (regression: 504 FUNCTION_INVOCATION_TIMEOUT)', async () => {
+    global.fetch = jest.fn().mockReturnValue(new Promise(() => {})) // never resolves
+    const supabase = makeSupabaseMock()
+    ;(createClient as jest.Mock).mockResolvedValue(supabase)
+
+    const req = new Request('http://localhost:3000/api/quiz', {
+      method: 'POST',
+      body: JSON.stringify(validPayload)
+    })
+
+    const res = await POST(req as any)
+    const body = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(global.fetch).toHaveBeenCalledWith(
+      new URL(`http://localhost:3000/api/quiz/${body.id}/analyze`),
+      { method: 'POST' }
+    )
   })
 
   it('returns 500 when the insert fails', async () => {

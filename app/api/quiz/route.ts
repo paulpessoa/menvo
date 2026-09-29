@@ -1,7 +1,11 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse, after } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limit"
 import { quizSubmitSchema } from "@/lib/schemas/quiz"
+
+// `after()` work counts against the function's duration; the analyze call it
+// waits on has the same 60s cap.
+export const maxDuration = 60
 
 /**
  * POST /api/quiz - submits a new quiz response and kicks off the (async,
@@ -70,13 +74,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Não foi possível salvar suas respostas" }, { status: 500 })
   }
 
-  // Best-effort trigger; the results page polls and retries on its own, so a
-  // failure here (e.g. AI budget exhausted) never blocks the response.
-  try {
-    await fetch(new URL(`/api/quiz/${id}/analyze`, request.url), { method: "POST" })
-  } catch (analysisError) {
-    console.warn("[POST /api/quiz] Aviso ao disparar análise:", analysisError)
-  }
+  // Best-effort trigger, run after the response is sent: the analysis takes
+  // 10s+ and awaiting it here hit FUNCTION_INVOCATION_TIMEOUT (504). The
+  // results page polls and retries on its own, so a failure here (e.g. AI
+  // budget exhausted) never matters to the caller.
+  const analyzeUrl = new URL(`/api/quiz/${id}/analyze`, request.url)
+  after(async () => {
+    try {
+      await fetch(analyzeUrl, { method: "POST" })
+    } catch (analysisError) {
+      console.warn("[POST /api/quiz] Aviso ao disparar análise:", analysisError)
+    }
+  })
 
   return NextResponse.json({ id })
 }
