@@ -363,12 +363,11 @@ export default function MenteeProfileClient({ mentee }: Props) {
                 <CardHeader className="pb-4 pt-8 px-8">
                   <CardTitle className="text-lg font-black uppercase tracking-tighter">Conecte-se</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-3 gap-3 px-8 pb-10">
+                <CardContent className="grid grid-cols-1 gap-3 px-8 pb-10">
                   {mentee.linkedin_url && (
                     <Button
                       variant="default"
-                      size="icon"
-                      className="w-full h-12 rounded-xl bg-[#0a66c2] text-white hover:bg-[#004182] border-none transition-colors"
+                      className="w-full justify-start h-12 rounded-xl font-bold bg-[#0a66c2] text-white hover:bg-[#004182] border-none transition-colors"
                       asChild
                     >
                       <a
@@ -376,15 +375,15 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Linkedin className="h-6 w-6 fill-current" />
+                        <Linkedin className="mr-2 h-5 w-5 fill-current" />
+                        LinkedIn
                       </a>
                     </Button>
                   )}
                   {mentee.github_url && (
                     <Button
                       variant="outline"
-                      size="icon"
-                      className="w-full h-12 rounded-xl text-gray-900 border-gray-100 bg-gray-50 hover:bg-gray-200 transition-colors"
+                      className="w-full justify-start h-12 rounded-xl font-bold text-gray-900 border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
                       asChild
                     >
                       <a
@@ -392,15 +391,15 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Github className="h-6 w-6 fill-current" />
+                        <Github className="mr-2 h-5 w-5 fill-current" />
+                        GitHub
                       </a>
                     </Button>
                   )}
                   {mentee.portfolio_url && (
                     <Button
                       variant="outline"
-                      size="icon"
-                      className="w-full h-12 rounded-xl text-primary border-primary/5 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      className="w-full justify-start h-12 rounded-xl font-bold text-primary border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                       asChild
                     >
                       <a
@@ -408,7 +407,8 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Globe className="h-6 w-6" />
+                        <Globe className="mr-2 h-5 w-5" />
+                        Portfolio
                       </a>
                     </Button>
                   )}
