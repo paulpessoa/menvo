@@ -24,6 +24,7 @@ import {
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
+import { MenvoLoader } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { PageContainer } from "@/components/layout/PageContainer"
@@ -147,7 +148,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <MenvoLoader />
       </div>
     )
   }
