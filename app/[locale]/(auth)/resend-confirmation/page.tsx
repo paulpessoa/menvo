@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, ArrowLeft, AlertCircle, CheckCircle2, LayoutDashboard } from "lucide-react"
+import {  Mail, ArrowLeft, AlertCircle, CheckCircle2, LayoutDashboard , Loader2 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { auth as authService } from "@/lib/services/auth/auth.service"
 import { useTranslations } from "next-intl"
@@ -169,7 +169,7 @@ function ResendConfirmationContent() {
           >
             {loading ? (
               <>
-                <MenvoDots className="mr-2" />
+                <Loader2 className="mr-2 animate-spin h-4 w-4" />
                 {tLogin("loggingIn")}
               </>
             ) : (

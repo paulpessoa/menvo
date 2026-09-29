@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { Plus, Building2, Search } from "lucide-react"
+import {  Plus, Building2, Search , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface Organization {
@@ -244,7 +244,7 @@ export default function AdminOrganizationsPage() {
             disabled={creating || !newOrg.name || !newOrg.slug}
           >
             {creating ? (
-              <MenvoDots className="mr-2" />
+              <Loader2 className="mr-2 animate-spin h-4 w-4" />
             ) : (
               <Plus className="h-4 w-4 mr-2" />
             )}
@@ -350,7 +350,7 @@ export default function AdminOrganizationsPage() {
                           onClick={() => handleAssignAdmin(org.id)}
                         >
                           {assigningId === org.id ? (
-                            <MenvoDots />
+                            <Loader2 className="animate-spin h-4 w-4" />
                           ) : (
                             "Atribuir"
                           )}

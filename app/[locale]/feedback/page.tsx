@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Star, Send, CheckCircle2, ArrowLeft } from "lucide-react"
+import {  Star, Send, CheckCircle2, ArrowLeft , Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { toast } from "sonner"
@@ -189,7 +189,7 @@ export default function FeedbackPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <MenvoDots className="mr-2" />{" "}
+                    <Loader2 className="mr-2 animate-spin h-4 w-4" />{" "}
                     Enviando...
                   </>
                 ) : (

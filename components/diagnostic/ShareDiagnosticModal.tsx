@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Share2, Check, X, Shield, Users } from "lucide-react"
+import {  Share2, Check, X, Shield, Users , Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import type { DiagnosticShareWithMentor, DiagnosticShareScope } from "@/lib/types/models/diagnostic-shares"
 
@@ -225,7 +225,7 @@ export function ShareDiagnosticModal({
                             onClick={() => handleShareWithMentor(mentorId, mentorName)}
                             className="rounded-xl active:scale-[0.98]"
                           >
-                            {isSharing ? <MenvoDots /> : "Compartilhar"}
+                            {isSharing ? <Loader2 className="animate-spin h-4 w-4" /> : "Compartilhar"}
                           </Button>
                         )
                       ) : (
@@ -282,7 +282,7 @@ export function ShareDiagnosticModal({
                               onClick={() => handleRevokeShare(share.id, share.mentor?.full_name || "Mentor")}
                               className="text-destructive hover:bg-destructive/10 rounded-xl"
                             >
-                              {isRevoking ? <MenvoDots /> : "Revogar"}
+                              {isRevoking ? <Loader2 className="animate-spin h-4 w-4" /> : "Revogar"}
                             </Button>
                           )}
                         </div>

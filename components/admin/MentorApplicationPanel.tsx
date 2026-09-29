@@ -1,6 +1,5 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Star, CheckCircle2, XCircle } from "lucide-react"
+import {  Star, CheckCircle2, XCircle , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 export type MentorApplicationStatus = "pending" | "approved" | "rejected" | null
@@ -133,12 +132,12 @@ export function MentorApplicationPanel({
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => decide("approved")} disabled={submitting !== null}>
-              {submitting === "approved" && <MenvoDots className="mr-2" />}
+              {submitting === "approved" && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
               Aprovar como mentor
             </Button>
             {status === "pending" && (
               <Button variant="outline" onClick={() => decide("rejected")} disabled={submitting !== null}>
-                {submitting === "rejected" && <MenvoDots className="mr-2" />}
+                {submitting === "rejected" && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                 Pedir ajustes
               </Button>
             )}

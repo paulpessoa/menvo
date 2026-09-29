@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Mail, CheckCircle, AlertTriangle, Shield } from "lucide-react"
+import {  Mail, CheckCircle, AlertTriangle, Shield , Loader2 } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 
 export default function ConfirmEmailPage() {
@@ -301,7 +301,7 @@ function ConfirmEmailContent() {
               >
                 {isSubmitting ? (
                   <>
-                    <MenvoDots className="mr-2" />
+                    <Loader2 className="mr-2 animate-spin h-4 w-4" />
                     Confirmando...
                   </>
                 ) : (
@@ -332,7 +332,7 @@ function ConfirmEmailContent() {
               >
                 {isResending ? (
                   <>
-                    <MenvoDots className="mr-2" />
+                    <Loader2 className="mr-2 animate-spin h-4 w-4" />
                     Reenviando...
                   </>
                 ) : (

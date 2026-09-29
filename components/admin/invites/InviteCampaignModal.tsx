@@ -1,6 +1,6 @@
+import { Loader2 } from "lucide-react"
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -233,7 +233,7 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
           )}
           {step === "send" && (
             <Button onClick={onClose} disabled={sending}>
-              {sending ? <MenvoDots className="mr-2" /> : null}
+              {sending ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : null}
               {sendDone ? "Fechar" : "Enviando..."}
             </Button>
           )}

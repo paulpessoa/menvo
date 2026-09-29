@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
-import { RefreshCw, Save, Plus, Trash2, History, Tag, AlertTriangle, CheckCircle2, XCircle, Info, Shield, Search } from "lucide-react";
+import {  RefreshCw, Save, Plus, Trash2, History, Tag, AlertTriangle, CheckCircle2, XCircle, Info, Shield, Search , Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -227,7 +227,7 @@ export default function AdminFeatureFlagsPage() {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
                 <Button onClick={createFlag} disabled={isCreating}>
-                  {isCreating ? <MenvoDots className="mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                  {isCreating ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : <Save className="h-4 w-4 mr-2" />}
                   Salvar
                 </Button>
               </DialogFooter>

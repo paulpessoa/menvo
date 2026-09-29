@@ -3,7 +3,7 @@
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useRef } from 'react';
 import { chatService } from '@/lib/services/chat/chat.service';
-import { Send } from "lucide-react";
+import {  Send , Loader2 } from "lucide-react";
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -330,7 +330,7 @@ export function ChatInterface({
                         className="p-2 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {sending ? (
-                            <MenvoDots />
+                            <Loader2 className="animate-spin h-4 w-4" />
                         ) : (
                             <Send className="w-5 h-5" />
                         )}

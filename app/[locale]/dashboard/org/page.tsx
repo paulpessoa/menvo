@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck } from "lucide-react"
+import {  Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface OrgOption {
@@ -311,7 +311,7 @@ export default function OrgAdminDashboardPage() {
               />
             </div>
             <Button onClick={invite} disabled={inviting || !inviteEmail.trim()}>
-              {inviting ? <MenvoDots /> : "Convidar"}
+              {inviting ? <Loader2 className="animate-spin h-4 w-4" /> : "Convidar"}
             </Button>
           </CardContent>
         </Card>

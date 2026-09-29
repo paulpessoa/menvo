@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react"
 "use client"
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
@@ -67,7 +68,7 @@ export function LoadingButton({
         >
             {isLoading ? (
                 <>
-                    <MenvoDots className="mr-2" />
+                    <Loader2 className="mr-2 animate-spin h-4 w-4" />
                     {displayLoadingText}
                 </>
             ) : (

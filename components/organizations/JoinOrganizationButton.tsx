@@ -1,12 +1,11 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import { Link, useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
 import { toast } from "sonner"
-import { CheckCircle2, Clock } from "lucide-react"
+import {  CheckCircle2, Clock , Loader2 } from "lucide-react"
 
 type MembershipStatus = "none" | "requested" | "invited" | "active"
 
@@ -60,7 +59,7 @@ export function JoinOrganizationButton({ slug, orgName, joinPolicy }: Props) {
   if (authLoading || status === null) {
     return (
       <Button size="lg" disabled className="mt-2">
-        <MenvoDots />
+        <Loader2 className="animate-spin h-4 w-4" />
       </Button>
     )
   }
@@ -113,7 +112,7 @@ export function JoinOrganizationButton({ slug, orgName, joinPolicy }: Props) {
 
   return (
     <Button size="lg" className="mt-2" onClick={join} disabled={submitting}>
-      {submitting ? <MenvoDots className="mr-2" /> : null}
+      {submitting ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : null}
       {status === "invited" ? "Aceitar convite" : "Solicitar participação"}
     </Button>
   )

@@ -1,8 +1,7 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useRef } from "react"
-import { Search, Users, Info, MessageCircle } from "lucide-react"
+import {  Search, Users, Info, MessageCircle , Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { MenteeCard } from "@/components/MenteeCard"
@@ -214,7 +213,7 @@ export default function CommunityPage() {
                 className="px-8 shadow-sm"
               >
                 {loadingMore ? (
-                  <MenvoDots className="mr-2" />
+                  <Loader2 className="mr-2 animate-spin h-4 w-4" />
                 ) : null}
                 {tCommunity("loadMore")}
               </Button>

@@ -1,6 +1,5 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useRef } from "react"
 import {
   Dialog,
@@ -16,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Save, Shield, User, Camera, Upload, GraduationCap, ExternalLink, MailCheck, Trash2, Info } from "lucide-react"
+import {  Save, Shield, User, Camera, Upload, GraduationCap, ExternalLink, MailCheck, Trash2, Info , Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 import { type AdminUserUpdate } from "@/lib/services/admin/admin.service"
@@ -196,7 +195,7 @@ export function EditUserModal({
                   className="gap-2"
                 >
                   {imageUpload.isUploading ? (
-                    <MenvoDots />
+                    <Loader2 className="animate-spin h-4 w-4" />
                   ) : (
                     <Upload className="h-4 w-4" />
                   )}
@@ -575,7 +574,7 @@ export function EditUserModal({
             >
               {loading ? (
                 <>
-                  <MenvoDots className="mr-2" />{" "}
+                  <Loader2 className="mr-2 animate-spin h-4 w-4" />{" "}
                   Processando...
                 </>
               ) : (

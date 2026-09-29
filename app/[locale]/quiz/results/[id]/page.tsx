@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Trophy, Users, Lightbulb, Target, ArrowRight, CheckCircle, Heart, Sparkles, Mail, Share2, ExternalLink } from "lucide-react"
+import {  Trophy, Users, Lightbulb, Target, ArrowRight, CheckCircle, Heart, Sparkles, Mail, Share2, ExternalLink , Loader2 } from "lucide-react"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
@@ -498,7 +498,7 @@ export default function QuizResultsPage() {
                                 >
                                     {sendingEmail ? (
                                         <>
-                                            <MenvoDots className="mr-2" />
+                                            <Loader2 className="mr-2 animate-spin h-4 w-4" />
                                             {t('quiz_results.sending')}
                                         </>
                                     ) : (

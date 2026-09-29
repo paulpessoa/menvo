@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Clock, Plus, Trash2, Save, Calendar, CheckCircle, AlertTriangle, Info } from "lucide-react"
+import {  Clock, Plus, Trash2, Save, Calendar, CheckCircle, AlertTriangle, Info , Loader2 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 
@@ -424,7 +424,7 @@ export default function MentorAvailabilityPage() {
             >
               {saving ? (
                 <>
-                  <MenvoDots />{" "}
+                  <Loader2 className="animate-spin h-4 w-4" />{" "}
                   {commonT("saving")}
                 </>
               ) : (

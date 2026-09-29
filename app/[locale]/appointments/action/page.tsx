@@ -1,12 +1,11 @@
 'use client';
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, XCircle } from "lucide-react";
+import {  CheckCircle, XCircle , Loader2 } from "lucide-react";
 
 export default function AppointmentActionPage() {
     const searchParams = useSearchParams();
@@ -127,7 +126,7 @@ export default function AppointmentActionPage() {
                             variant={action === 'confirm' ? 'default' : 'destructive'}
                         >
                             {loading ? (
-                                <MenvoDots />
+                                <Loader2 className="animate-spin h-4 w-4" />
                             ) : action === 'confirm' ? (
                                 'Confirmar'
                             ) : (

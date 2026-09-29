@@ -2,7 +2,7 @@
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { Button } from "@/components/ui/button"
-import { Send } from "lucide-react"
+import {  Send , Loader2 } from "lucide-react"
 
 interface InvitePreviewStepProps {
   loading: boolean
@@ -26,7 +26,7 @@ export function InvitePreviewStep({ loading, html, onSendTest, sendingTest, elig
           Pré-visualização do e-mail que será enviado para <strong>{eligibleCount}</strong> pessoa(s).
         </p>
         <Button size="sm" variant="outline" onClick={onSendTest} disabled={sendingTest} className="gap-2">
-          {sendingTest ? <MenvoDots /> : <Send className="h-3.5 w-3.5" />}
+          {sendingTest ? <Loader2 className="animate-spin h-4 w-4" /> : <Send className="h-3.5 w-3.5" />}
           Enviar teste para mim
         </Button>
       </div>

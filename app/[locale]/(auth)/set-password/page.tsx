@@ -15,7 +15,7 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Lock, CheckCircle, AlertTriangle, UserPlus } from "lucide-react"
+import {  Lock, CheckCircle, AlertTriangle, UserPlus , Loader2 } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
@@ -232,7 +232,7 @@ export default function SetPasswordPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <MenvoDots className="mr-2" />
+                  <Loader2 className="mr-2 animate-spin h-4 w-4" />
                   {tCommon("saving")}
                 </>
               ) : (

@@ -15,7 +15,7 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Users, UserCheck, UserX, RefreshCw, Mail, MailCheck, Calendar, Shield, Eye, MoreVertical, Check, X, AlertTriangle, Edit, ExternalLink, SquareCheck, FileText, Filter, ChevronDown } from "lucide-react"
+import {  Search, Users, UserCheck, UserX, RefreshCw, Mail, MailCheck, Calendar, Shield, Eye, MoreVertical, Check, X, AlertTriangle, Edit, ExternalLink, SquareCheck, FileText, Filter, ChevronDown , Loader2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -354,7 +354,7 @@ export default function AdminUsersPage() {
               {hasMore && !loading && (
                 <div className="p-4 border-t flex justify-center bg-gray-50/50">
                   <Button variant="outline" onClick={() => fetchData(true)} disabled={loadingMore} className="gap-2">
-                    {loadingMore ? <MenvoDots /> : <RefreshCw className="h-4 w-4" />}
+                    {loadingMore ? <Loader2 className="animate-spin h-4 w-4" /> : <RefreshCw className="h-4 w-4" />}
                     Carregar Mais Usuários
                   </Button>
                 </div>

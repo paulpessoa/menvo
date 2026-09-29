@@ -2,7 +2,7 @@
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
-import { X, Calendar, Clock, Star, Plus, CheckCircle, AlertCircle, Check } from "lucide-react"
+import {  X, Calendar, Clock, Star, Plus, CheckCircle, AlertCircle, Check , Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -410,7 +410,7 @@ export function BookMentorshipModal({
                   >
                     {isSubmitting ? (
                       <>
-                        <MenvoDots className="mr-2" />
+                        <Loader2 className="mr-2 animate-spin h-4 w-4" />
                         {t("submitting")}
                       </>
                     ) : (

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Lock, CheckCircle2, AlertCircle } from "lucide-react"
+import {  Lock, CheckCircle2, AlertCircle , Loader2 } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
@@ -173,7 +173,7 @@ function UpdatePasswordForm() {
           <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isLoading}>
             {isLoading ? (
               <>
-                <MenvoDots className="mr-2" /> Atualizando...
+                <Loader2 className="mr-2 animate-spin h-4 w-4" /> Atualizando...
               </>
             ) : (
               "Salvar Nova Senha"

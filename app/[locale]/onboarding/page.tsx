@@ -7,7 +7,7 @@ import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { Users, GraduationCap, CheckCircle2, ArrowRight, ArrowLeft, Sparkles, MapPin, Briefcase, Building2, Linkedin, Compass, Check } from "lucide-react"
+import {  Users, GraduationCap, CheckCircle2, ArrowRight, ArrowLeft, Sparkles, MapPin, Briefcase, Building2, Linkedin, Compass, Check , Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -474,7 +474,7 @@ function OnboardingContent() {
                         className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
                       >
                         {isDetectingLocation ? (
-                          <MenvoDots />
+                          <Loader2 className="animate-spin h-4 w-4" />
                         ) : (
                           <MapPin className="h-3.5 w-3.5" />
                         )}
@@ -619,7 +619,7 @@ function OnboardingContent() {
               >
                 {isSubmitting ? (
                   <>
-                    <MenvoDots />
+                    <Loader2 className="animate-spin h-4 w-4" />
                     {t("saving")}
                   </>
                 ) : (

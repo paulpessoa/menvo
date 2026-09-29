@@ -1,8 +1,7 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useRef } from "react"
-import { Camera, MapPin } from "lucide-react"
+import {  Camera, MapPin , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -74,7 +73,7 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
               disabled={imageUpload.isUploading}
               className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg"
             >
-              {imageUpload.isUploading ? <MenvoDots /> : <Camera className="h-4 w-4" />}
+              {imageUpload.isUploading ? <Loader2 className="animate-spin h-4 w-4" /> : <Camera className="h-4 w-4" />}
             </button>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
           </div>
@@ -101,7 +100,7 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
           <div className="flex items-center justify-between gap-4">
             <h3 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Localização</h3>
             <Button type="button" variant="outline" size="sm" onClick={location.detect} disabled={location.isDetecting}>
-              {location.isDetecting && <MenvoDots className="mr-2" />}
+              {location.isDetecting && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
               {location.isDetecting ? "Detectando..." : "Detectar"}
             </Button>
           </div>

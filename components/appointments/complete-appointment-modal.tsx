@@ -1,12 +1,11 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Star, CheckCircle2, CalendarPlus } from "lucide-react"
+import {  Star, CheckCircle2, CalendarPlus , Loader2 } from "lucide-react"
 import { toast } from 'sonner'
 import { Link } from '@/i18n/routing'
 import { mentorshipService } from '@/lib/services/mentorship/mentorship.service'
@@ -233,7 +232,7 @@ export function CompleteAppointmentModal({
                     >
                         {isSubmitting ? (
                             <>
-                                <MenvoDots className="mr-2" />
+                                <Loader2 className="mr-2 animate-spin h-4 w-4" />
                                 Avaliando...
                             </>
                         ) : (

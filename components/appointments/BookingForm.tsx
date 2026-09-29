@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Calendar, Clock, CheckCircle } from "lucide-react"
+import {  Calendar, Clock, CheckCircle , Loader2 } from "lucide-react"
 import {
   type MentorAvailability as AvailableTimeSlot,
   mentorshipUtils
@@ -252,7 +252,7 @@ export default function BookingForm({
             className="flex-1 shadow-lg shadow-primary/20"
           >
             {loading ? (
-              <MenvoDots />
+              <Loader2 className="animate-spin h-4 w-4" />
             ) : (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />
