@@ -95,14 +95,31 @@ class AdminService {
     /**
      * Busca todos os mentores para o painel administrativo através da view mentors_view
      */
-    async getAllMentors(): Promise<MentorViewRow[]> {
+    async getAllMentors(): Promise<(Omit<MentorViewRow, 'email'> & { email: string | null })[]> {
         const { data, error } = await this.supabase
             .from('mentors_view')
             .select('*')
             .order('created_at', { ascending: false })
 
         if (error) throw error
-        return data || []
+        const mentors = (data || []) as Omit<MentorViewRow, 'email'>[]
+
+        // mentors_view no longer carries email (it is readable by anonymous
+        // visitors); admins read it from profiles, which RLS lets them see.
+        const ids = mentors.map(m => m.id).filter((id): id is string => Boolean(id))
+        const emailById = new Map<string, string | null>()
+        if (ids.length > 0) {
+            const { data: emails, error: emailError } = await this.supabase
+                .from('profiles')
+                .select('id, email')
+                .in('id', ids)
+            if (emailError) throw emailError
+            for (const row of (emails || []) as { id: string; email: string | null }[]) {
+                emailById.set(row.id, row.email)
+            }
+        }
+
+        return mentors.map(m => ({ ...m, email: (m.id && emailById.get(m.id)) || null }))
     }
 
     /**

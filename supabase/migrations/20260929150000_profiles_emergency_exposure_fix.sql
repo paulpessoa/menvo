@@ -9,27 +9,15 @@
 -- remove nem reescreve policies: usa policies RESTRICTIVE, que o Postgres
 -- combina com AND com todas as permissivas existentes, sejam quais forem.
 --
--- Não mexe em colunas para `authenticated`: várias rotas leem o próprio
--- perfil com select('*') pelo cliente do usuário (etapa B do §2).
-
--- 0. Trava: se mentors_view for security_invoker, restringir colunas de
---    profiles para anon pode quebrar o diretório público. Nesse caso, parar.
-do $$
-declare
-  opts text[];
-begin
-  select c.reloptions into opts
-  from pg_class c
-  join pg_namespace n on n.oid = c.relnamespace
-  where n.nspname = 'public' and c.relname = 'mentors_view';
-
-  if opts is not null and exists (
-    select 1 from unnest(opts) o
-    where lower(o) in ('security_invoker=true', 'security_invoker=on', 'security_invoker=1')
-  ) then
-    raise exception 'mentors_view é security_invoker: revisar esta migração antes de aplicar (ver §2 do plano)';
-  end if;
-end $$;
+-- Só restringe LINHAS. Colunas ficam para depois:
+--  - mentors_view é security_invoker, então o Postgres checa os privilégios
+--    de quem consulta em todas as colunas de profiles que a view usa
+--    (inclusive email/phone). Revogar colunas de anon quebraria /mentors.
+--    Primeiro é preciso recriar a view sem as colunas sensíveis.
+--  - várias rotas leem o próprio perfil com select('*') pelo cliente do
+--    usuário (etapa B do §2).
+-- Efeito: anon deixa de ver qualquer mentorado; e-mail/telefone de mentores
+-- PÚBLICOS continuam legíveis até a próxima migração.
 
 -- 1. Helpers SECURITY DEFINER: as policies abaixo consultam user_roles,
 --    appointments e diagnostic_shares sem depender da RLS dessas tabelas
@@ -130,40 +118,9 @@ create policy "Authenticated profile visibility (restrictive)"
     or public.is_admin_of_orgs_member(id)
   );
 
--- 4. Colunas para anon em profiles: nada de email, phone, age, address,
---    original_data, verification_notes, external_id, email_opt_out_at,
---    invite_sent_at, origin_platform, ai_disclosure_accepted_at.
-revoke select on public.profiles from anon;
-grant select (
-  id, slug, first_name, last_name, full_name, avatar_url, bio, job_title, company,
-  city, state, country, location, timezone, languages, expertise_areas,
-  mentorship_topics, free_topics, inclusive_tags, experience_years,
-  linkedin_url, github_url, twitter_url, website_url, portfolio_url, cv_url,
-  mentorship_approach, mentorship_guidelines, what_to_expect, ideal_mentee,
-  institution, course, academic_level, expected_graduation, learning_goals,
-  average_rating, total_reviews, total_sessions, availability_status,
-  verified, verification_status, is_public, is_volunteer, chat_enabled,
-  search_vector, created_at, updated_at
-) on public.profiles to anon;
-
--- 5. Colunas para anon em mentors_view (a view também expunha email, phone,
---    address, external_id e origin_platform de todos os mentores).
-revoke select on public.mentors_view from anon;
-grant select (
-  id, slug, first_name, last_name, full_name, avatar_url, bio, job_title, company,
-  city, state, country, location, timezone, languages, expertise_areas,
-  mentor_skills, mentorship_topics, free_topics, inclusive_tags, experience_years,
-  academic_level, institution, course, expected_graduation,
-  linkedin_url, github_url, twitter_url, website_url, portfolio_url, cv_url,
-  mentorship_approach, mentorship_guidelines, what_to_expect, ideal_mentee,
-  availability, availability_status, average_rating, total_reviews, total_sessions,
-  chat_enabled, is_public, is_volunteer, is_pending_mentor, show_in_community,
-  verified, verification_status, created_at, updated_at
-) on public.mentors_view to anon;
-
--- Verificação depois de aplicar (deve retornar só mentores públicos e zero
--- e-mails; o select de email deve falhar com "permission denied"):
+-- Verificação depois de aplicar (anon deve ver só mentores públicos e
+-- nenhum mentorado):
 --   begin; set local role anon;
---   select count(*) from public.profiles;
---   select email from public.profiles limit 1;  -- erro esperado
+--   select count(*) as linhas, count(original_data) as original_data
+--   from public.profiles;
 --   rollback;

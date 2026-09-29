@@ -47,11 +47,20 @@ e-mails, 6 telefones e 564 `original_data`**, ou seja, a base inteira. A
 `mentors_view` também expõe `email`, `phone`, `address` e `external_id` dos
 mentores. Correção de emergência:
 `supabase/migrations/20260929150000_profiles_emergency_exposure_fix.sql`,
-com policies *restrictive* (valem por cima de qualquer policy antiga), colunas
-limitadas para `anon` em `profiles` e `mentors_view`, e uma trava que aborta se
-`mentors_view` for `security_invoker`. `mentor-public.service.ts` deixou de
-fazer `select("*")`. **Ainda aberto:** usuário logado lê e-mail/telefone de
-mentores públicos e de quem ele pode ver (etapa B, a seguir).
+só com policies *restrictive* de **linhas** (valem por cima de qualquer policy
+antiga): anon passa a ver só mentores públicos. A 1ª versão também limitava
+colunas, mas a trava abortou porque **`mentors_view` é `security_invoker`**:
+o Postgres checa as colunas de `profiles` usadas pela view (inclusive `email`)
+com o papel de quem consulta, então revogar colunas de anon quebraria
+`/mentors`. `mentor-public.service.ts` deixou de fazer `select("*")`.
+
+**Ainda aberto (etapa A2):** e-mail/telefone/endereço de **mentores públicos**
+continuam legíveis por anon, via `profiles` e via `mentors_view`. Correção:
+recriar `mentors_view` sem `email`, `phone`, `address`, `external_id` e
+`origin_platform` (precisa do `pg_get_viewdef` do bloco 4), passar o
+`admin.service.ts` (que lê `mentors_view` com `*` e mostra `mentor.email`) a
+buscar o e-mail em `profiles`, e só então revogar essas colunas de anon em
+`profiles`. Usuário logado: etapa B, a seguir.
 
 **Incidente (LGPD, art. 48):** não sabemos se alguém extraiu os dados. Olhar
 nos logs da API do Supabase (Logs Explorer → API/edge) por requisições a

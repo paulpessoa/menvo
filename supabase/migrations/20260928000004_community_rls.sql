@@ -8,6 +8,9 @@ DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.prof
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 
 -- 2. Create the new restrictive policy
+-- (idempotent: it was first applied by hand in the SQL editor, so `db push`
+-- found it already there and stopped)
+DROP POLICY IF EXISTS "Public profiles visibility restricted" ON public.profiles;
 CREATE POLICY "Public profiles visibility restricted"
 ON public.profiles
 FOR SELECT USING (
