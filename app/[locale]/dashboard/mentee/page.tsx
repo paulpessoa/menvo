@@ -157,7 +157,7 @@ export default function MenteeDashboard() {
 
   return (
     <RequireRole roles={["mentee"]}>
-      <div className="container mx-auto px-4 py-8 ">
+      <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
 
           {/* Header */}
@@ -298,7 +298,7 @@ export default function MenteeDashboard() {
                         const isConfirmed = appt.status === "confirmed"
 
                         return (
-                          <Card key={appt.id} className="border-l-4 border-l-primary overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all">
+                          <Card key={appt.id} className="overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all">
                             <CardContent className="p-4 space-y-3">
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex items-center gap-3 min-w-0">

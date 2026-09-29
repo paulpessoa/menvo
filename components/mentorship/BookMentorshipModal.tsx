@@ -218,13 +218,7 @@ export function BookMentorshipModal({
 
         <div className="flex flex-col max-h-[90vh]">
           <div className="p-6 bg-gradient-to-r from-primary to-primary-700 text-white relative">
-            <button
-              onClick={onClose}
-              className="absolute top-5 right-5 text-white/80 hover:text-white transition-colors"
-              aria-label="Fechar"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            
             <span className="text-xs font-bold uppercase tracking-wider text-white/80">
               {t("modalTitle")}
             </span>

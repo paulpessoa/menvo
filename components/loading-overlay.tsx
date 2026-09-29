@@ -1,5 +1,5 @@
-import { Loader2 } from "lucide-react"
 "use client"
+import { Loader2 } from "lucide-react"
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import React from 'react'

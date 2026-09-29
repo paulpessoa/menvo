@@ -203,7 +203,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
         {/* Motivo da IA */}
         {aiReason && (
-          <p className="text-xs text-primary-700 dark:text-primary-300 italic line-clamp-2 mt-3 leading-relaxed border-l-2 border-primary/40 pl-2.5 bg-primary-50/50 dark:bg-primary-950/20 py-1.5 rounded-r-md">
+          <p className="text-xs text-primary-700 dark:text-primary-300 italic line-clamp-2 mt-3 leading-relaxed border-primary/40 pl-2.5 bg-primary-50/50 dark:bg-primary-950/20 py-1.5 rounded-r-md">
             <Sparkles className="w-3 h-3 inline-block mr-1 -mt-0.5" />
             {aiReason}
           </p>
@@ -211,7 +211,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
         {/* Bio */}
         {!aiReason && mentor.bio && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2 mt-3 leading-relaxed border-l-2 border-primary/30 pl-2.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2 mt-3 leading-relaxed border-primary/30 pl-2.5">
             &ldquo;{mentor.bio}&rdquo;
           </p>
         )}

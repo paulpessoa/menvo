@@ -97,7 +97,7 @@ export default function MentorDashboard() {
 
   return (
     <RequireRole roles={["mentor"]}>
-      <div className="container mx-auto px-4 py-8 ">
+      <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
 
           {/* Header e Boas-vindas */}

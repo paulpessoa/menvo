@@ -264,7 +264,7 @@ export async function sendVerificationNotification(data: VerificationData): Prom
   const content = `
     <h2>Olá, ${userName}!</h2>
     <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
-    <div class="info-box" style="border-left: 4px solid ${isApproved ? '#007585' : '#F59E0B'}">
+    <div class="info-box">
         <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado' : 'Ajustes Necessários'}</p>
         ${notes ? `<p><strong>Observações:</strong> ${notes}</p>` : ''}
     </div>
@@ -321,7 +321,7 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
   const content = `
     <h2>Sua mentoria está confirmada!</h2>
     <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
-    <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
+    <div class="info-box">
         <div class="info-item"><strong>Mentor(a):</strong> ${mentorName}</div>
         <div class="info-item"><strong>Mentorado(a):</strong> ${menteeName}</div>
         <div class="info-item"><strong>Data e Hora:</strong> ${formattedDate}</div>
@@ -355,7 +355,7 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
     <h2>Mentoria Cancelada</h2>
     <p>Olá, ${data.recipientName}.</p>
     <p>${noticeText}</p>
-    <div class="info-box" style="border-left: 4px solid #EF4444;">
+    <div class="info-box">
         <div class="info-item"><strong>Data e Hora Original:</strong> ${formattedDate}</div>
         <div class="info-item"><strong>Cancelado por:</strong> ${data.cancelledByName}</div>
         <div class="info-item"><strong>Motivo informado:</strong><br/><em>"${data.reason}"</em></div>
@@ -519,7 +519,7 @@ export async function sendMentorNewReviewNotification(data: {
   const content = `
     <h2>Você recebeu uma nova avaliação</h2>
     <p>Olá, ${data.mentorName}! Um mentorado acaba de deixar um depoimento sobre a sua mentoria.</p>
-    <div class="info-box" style="border-left: 4px solid #F59E0B">
+    <div class="info-box">
         <p><strong>De:</strong> ${data.menteeName}</p>
         <p><strong>Nota:</strong> ${data.rating}/5</p>
         ${data.comment ? `<p style="margin-top: 10px; font-style: italic;">"${data.comment}"</p>` : ''}
@@ -905,7 +905,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       const content = `
         <h2>Sua mentoria está confirmada!</h2>
         <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
-        <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
+        <div class="info-box">
             <div class="info-item"><strong>Mentor(a):</strong> Dr. Carlos Mendes</div>
             <div class="info-item"><strong>Mentorado(a):</strong> Mariana Silva</div>
             <div class="info-item"><strong>Data e Hora:</strong> Terça-feira, 15 de Setembro de 2026 às 14:00</div>
@@ -923,7 +923,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       const content = `
         <h2>Olá, Rodrigo!</h2>
         <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
-        <div class="info-box" style="border-left: 4px solid #007585">
+        <div class="info-box">
             <p style="margin-bottom: 5px;"><strong>Status:</strong> Aprovado</p>
             <p><strong>Observações:</strong> Perfil profissional verificado com sucesso. Experiência e formação alinhadas com o propósito da nossa comunidade.</p>
         </div>
@@ -951,7 +951,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         <h2>Mentoria Cancelada</h2>
         <p>Olá, Gabriel.</p>
         <p>Informamos que <strong>Juliana Ramos</strong> precisou cancelar a mentoria agendada para <strong>12/09/2026 às 16:00</strong>.</p>
-        <div class="info-box" style="border-left: 4px solid #EF4444;">
+        <div class="info-box">
             <div class="info-item"><strong>Data e Hora Original:</strong> 12/09/2026 às 16:00</div>
             <div class="info-item"><strong>Cancelado por:</strong> Juliana Ramos</div>
             <div class="info-item"><strong>Motivo informado:</strong><br/><em>"Conflito de agenda imprevisto no trabalho. Peço desculpas pelo transtorno."</em></div>

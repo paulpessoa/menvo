@@ -136,7 +136,7 @@ export default function AdminReportsPage() {
 
           {/* KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="border-l-4 border-l-blue-600">
+            <Card className="">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Total de Usuários</CardTitle>
               </CardHeader>
@@ -144,7 +144,7 @@ export default function AdminReportsPage() {
                 <div className="text-3xl font-bold">{stats?.totalUsers.toLocaleString()}</div>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-green-600">
+            <Card className="">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Mentores</CardTitle>
               </CardHeader>
@@ -152,7 +152,7 @@ export default function AdminReportsPage() {
                 <div className="text-3xl font-bold">{stats?.totalMentors}</div>
               </CardContent>
             </Card>
-            <Card className="border-l-4 border-l-purple-600">
+            <Card className="">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Mentees</CardTitle>
               </CardHeader>
