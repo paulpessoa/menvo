@@ -1050,12 +1050,13 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
   const mentorProfileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors/${data.mentorSlug}`;
 
   const content = `
-    <h2>Alguém quer te ajudar! 🎉</h2>
-    <p>Oi, <strong>${escapeHtml(data.menteeName)}</strong>! Um mentor da Menvo viu seu perfil e quer se conectar com você:</p>
+    <h2>Alguém quer ajudar você.</h2>
+    <p>Oi, <strong>${escapeHtml(data.menteeName)}</strong>! A ajuda que você esperava chegou. Um mentor da Menvo viu seu perfil e quer se conectar com você.</p>
     
     ${data.customMessage ? `
-    <div style="background:#fff;border-left:4px solid ${COLORS.primary};padding:16px 20px;margin:20px 0;font-style:italic;color:#374151;box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:0 8px 8px 0;">
-      <p style="margin:0;line-height:1.6;">"${escapeHtml(data.customMessage).replace(/\n/g, '<br>')}"</p>
+    <p>Olha a mensagem que ${escapeHtml(data.mentorName.split(' ')[0])} deixou:</p>
+    <div style="background:#fefce8;padding:24px 28px;margin:24px 0;font-family:'Comic Sans MS', 'Caveat', 'Patrick Hand', cursive, sans-serif;font-size:16px;color:#422006;border-radius:12px;box-shadow:2px 4px 12px rgba(0,0,0,0.06);transform:rotate(-0.5deg);">
+      <p style="margin:0;line-height:1.7;">"${escapeHtml(data.customMessage).replace(/\n/g, '<br>')}"</p>
     </div>
     ` : ''}
 
@@ -1079,12 +1080,10 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
       <a href="${mentorProfileUrl}" class="button">Ver Perfil do Mentor</a>
     </div>
 
-    ${data.mentorLinkedin ? `<p style="text-align:center;margin-top:-10px;margin-bottom:20px;"><a href="${data.mentorLinkedin}" target="_blank" style="color:${COLORS.primary};font-weight:600;font-size:14px;text-decoration:underline;">Conectar no LinkedIn</a></p>` : ''}
-
     <div class="divider"></div>
-    <p><strong>Dica:</strong> Responda logo! Mentores voluntários têm agenda concorrida e a disposição de ajudar pode não durar para sempre. 😊</p>
+    <p><strong>Dica:</strong> Responda logo! Mentores voluntários têm agenda concorrida e a disposição de ajudar pode não durar para sempre.</p>
   `;
 
-  const subject = `${data.mentorName} quer ser seu mentor na Menvo!`;
-  return await sendEmail(data.menteeEmail, subject, getEmailLayout(subject, content, { signatureType: "personal" }), data.mentorEmail);
+  const subject = `${data.mentorName} quer ajudar você.`;
+  return await sendEmail(data.menteeEmail, subject, getEmailLayout(subject, content), data.mentorEmail);
 }

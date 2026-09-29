@@ -374,9 +374,8 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   {[
                     { icon: Clock, label: t("durationLabel"), value: t("durationValue") },
                     { icon: Video, label: t("formatLabel"), value: t("formatValue") },
-                    { icon: CheckCircle, label: t("costLabel"), value: t("costValue"), highlight: true },
                     { icon: Calendar, label: t("windowLabel"), value: t("windowValue") }
-                  ].map(({ icon: Icon, label, value, highlight }, i) => (
+                  ].map(({ icon: Icon, label, value }, i) => (
                     <div key={i} className="flex items-start gap-2.5 p-3 bg-muted/30 rounded-xl">
                       <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <Icon className="h-4 w-4" />
@@ -385,7 +384,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide leading-tight">
                           {label}
                         </p>
-                        <p className={`text-sm font-bold truncate ${highlight ? "text-primary" : "text-foreground"}`}>
+                        <p className={`text-sm font-bold truncate text-foreground`}>
                           {value}
                         </p>
                       </div>
@@ -429,9 +428,14 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     >
                       {mentor.availability_status === "busy" ||
                       mentor.availability_status === "unavailable" ||
-                      availability.length === 0
-                        ? t("fullSchedule")
-                        : t("bookMentorship")}
+                      availability.length === 0 ? (
+                        t("fullSchedule")
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-5 h-5" />
+                          <span>Disponível</span>
+                        </div>
+                      )}
                     </Button>
                     <div className="flex gap-2 shrink-0">
                       <Button

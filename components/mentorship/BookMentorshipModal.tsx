@@ -297,7 +297,7 @@ export function BookMentorshipModal({
                         <div className="flex items-center gap-3.5">
                           <div className="flex flex-col items-center justify-center w-12 h-12 bg-primary/10 rounded-xl group-hover:bg-primary text-primary group-hover:text-white transition-all shadow-xs">
                             <span className="text-[10px] uppercase font-extrabold tracking-wider">
-                              {slot.formatted_date.split(",")[0]}
+                              {slot.date.toLocaleDateString(intlLocale, { month: "short" }).replace(".", "")}
                             </span>
                             <span className="text-lg font-black leading-none mt-0.5">
                               {slot.date.getDate()}
