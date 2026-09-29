@@ -18,6 +18,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger
 } from "@/components/ui/sheet"
 import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
@@ -536,7 +537,7 @@ export default function CommunityPage() {
               <span>{topic}</span>
               <X className="h-3 w-3 opacity-70 hover:opacity-100" />
             </Badge>
-          )}
+          ))}
           <button
             type="button"
             onClick={() => setFilters(initialFilters)}

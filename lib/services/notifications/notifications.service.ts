@@ -3,6 +3,7 @@ export type NotificationType =
   | "booking_confirmed"
   | "booking_cancelled"
   | "pending_evaluation"
+  | "session_starting_soon"
 
 export interface InAppNotification {
   id: string
