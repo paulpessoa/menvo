@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import {  Search, Users, Info, MessageCircle , Loader2 } from "lucide-react"
+import { Search, Users, Info, MessageCircle, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { MenteeCard } from "@/components/MenteeCard"
@@ -19,10 +19,7 @@ import {
 } from "@/components/ui/sheet"
 import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
-import {
-  communityService,
-  CommunityProfile,
-} from "@/lib/services/community/community.service"
+import type { CommunityProfile } from "@/lib/services/community/community.service"
 
 const ITEMS_PER_PAGE = 12
 
@@ -129,12 +126,13 @@ export default function CommunityPage() {
     const targetProfile = profiles.find((p) => p.id === targetUserId)
     if (!targetProfile) return
 
-    // Chat desligado: a troca acontece no LinkedIn (ou no perfil, se não houver LinkedIn)
+    // Chat desligado: o mentor vai ao perfil completo, lê o contexto e usa os
+    // canais que o mentorado deixou visíveis (hoje, o LinkedIn)
     if (!isChatEnabled) {
-      if (targetProfile.linkedin_url) {
-        window.open(targetProfile.linkedin_url, "_blank", "noopener,noreferrer")
-      } else if (targetProfile.slug) {
+      if (targetProfile.slug) {
         router.push(`/mentee/${targetProfile.slug}`)
+      } else if (targetProfile.linkedin_url) {
+        window.open(targetProfile.linkedin_url, "_blank", "noopener,noreferrer")
       }
       return
     }
@@ -150,18 +148,16 @@ export default function CommunityPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
         <div>
           <h1 className="text-4xl font-bold tracking-tight mb-2">
-            Mural de Mentorados
+            {tCommunity("title")}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Conheça pessoas que buscam aprender e ofereça sua mentoria de forma
-            proativa.
+            {tCommunity("subtitle")}
           </p>
         </div>
         <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
           <Info className="h-5 w-5 text-primary shrink-0" />
           <p className="text-xs text-primary/80 leading-snug">
-            Dica: Mentores proativos que ajudam quem busca conhecimento ganham
-            3x mais visibilidade.
+            {tCommunity("mentorTip")}
           </p>
         </div>
       </div>
@@ -170,7 +166,7 @@ export default function CommunityPage() {
       <div className="relative max-w-md mb-12">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Buscar por nome, objetivo ou interesse..."
+          placeholder={tCommunity("searchPlaceholder")}
           className="pl-10 h-11"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}

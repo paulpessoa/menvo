@@ -13,7 +13,6 @@ interface MenteeProfile {
     id: string
     first_name: string
     last_name: string
-    email: string
     avatar_url?: string
     city?: string
     state?: string
@@ -25,7 +24,7 @@ interface MenteeProfile {
     course?: string
     academic_level?: string
     expected_graduation?: string
-    career_goals?: string
+    learning_goals?: string
     expertise_areas?: string[]
     mentorship_topics?: string[]
     linkedin_url?: string
@@ -38,15 +37,23 @@ interface MenteeProfile {
 }
 
 /**
- * Fetches a mentee profile visible to anyone (is_public = true), with no auth
- * required. Used both for link-preview metadata and for public page rendering,
- * mirroring how mentorPublicService exposes mentor profiles.
+ * Columns a mentor may see about a mentee. Never use `*` here: the row also
+ * holds email, phone, age, address and original_data (partner form answers),
+ * and whatever is selected ends up serialized into the client payload.
+ */
+const MENTEE_PUBLIC_COLUMNS =
+    'id, first_name, last_name, avatar_url, city, state, country, bio, job_title, company, institution, course, academic_level, expected_graduation, learning_goals, expertise_areas, mentorship_topics, linkedin_url, github_url, portfolio_url, cv_url, languages, is_public, created_at'
+
+/**
+ * Fetches a mentee profile with is_public = true. RLS ("Public profiles
+ * visibility restricted") only returns it when the viewer is the owner, a
+ * mentor or an admin, so anonymous visitors and crawlers get null.
  */
 async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | null> {
     const supabase = await createClient()
     const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(MENTEE_PUBLIC_COLUMNS)
         .eq('slug', slug)
         .eq('is_public', true)
         .maybeSingle()
@@ -97,6 +104,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title,
         description,
+        // Mentee data is only for signed-in mentors; never index it
+        robots: { index: false, follow: false },
         openGraph: {
             type: 'profile',
             url: `https://www.menvo.com.br${canonicalPath}`,
@@ -126,8 +135,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function MenteeProfilePage({ params }: PageProps) {
     const { slug } = await params
 
-    // Public profiles (is_public = true) are viewable and crawlable by anyone,
-    // same rule the "Mural de Mentorados" community wall uses to list them.
+    // Public profiles (is_public = true) are visible to mentors/admins, the same
+    // rule the "Mural de Mentorados" community wall uses to list them.
     const publicMentee = await getPublicMenteeProfile(slug)
     if (publicMentee) {
         return <MenteeProfileClient mentee={publicMentee} />
@@ -142,7 +151,7 @@ export default async function MenteeProfilePage({ params }: PageProps) {
 
     const { data: mentee, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(MENTEE_PUBLIC_COLUMNS)
         .eq('slug', slug)
         .maybeSingle()
 

@@ -28,12 +28,12 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get("search") || ""
-    const page = parseInt(searchParams.get("page") || "0", 10)
-    const limit = parseInt(searchParams.get("limit") || "12", 10)
+    const page = Math.max(0, parseInt(searchParams.get("page") || "0", 10) || 0)
+    const limit = Math.min(48, Math.max(1, parseInt(searchParams.get("limit") || "12", 10) || 12))
 
-    // Using the same service but wrapped in an API. 
-    // This allows the server to query securely on behalf of authorized users.
-    const result = await communityService.getCommunityProfiles({
+    // The request-scoped client carries the mentor's session, which the
+    // profiles RLS policy needs in order to return mentee rows.
+    const result = await communityService.getCommunityProfiles(supabase, {
       search,
       page,
       limit,

@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { TextareaWithVoice } from "@/components/ui/textarea-with-voice"
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -53,11 +53,11 @@ export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMe
     <div className="space-y-4">
       <div className="space-y-1">
         <Label>{t("form.mentorshipApproachLabel")}</Label>
-        <Textarea value={form.mentorship_approach} onChange={(e) => onChange({ mentorship_approach: e.target.value })} placeholder={t("form.mentorshipApproachPlaceholder")} />
+        <TextareaWithVoice minHeight="min-h-[96px]" value={form.mentorship_approach} onChange={(v) => onChange({ mentorship_approach: v })} placeholder={t("form.mentorshipApproachPlaceholder")} />
       </div>
       <div className="space-y-1">
         <Label>{t("form.whatToExpectLabel")}</Label>
-        <Textarea value={form.what_to_expect} onChange={(e) => onChange({ what_to_expect: e.target.value })} placeholder={t("form.whatToExpectPlaceholder")} />
+        <TextareaWithVoice minHeight="min-h-[96px]" value={form.what_to_expect} onChange={(v) => onChange({ what_to_expect: v })} placeholder={t("form.whatToExpectPlaceholder")} />
       </div>
     </div>
   )
@@ -106,7 +106,7 @@ export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMe
                 <AlertDialogTrigger asChild>
                   <Button type="button" size="sm" className="gap-2 shrink-0"><UserPlus className="h-4 w-4" /> {t("form.becomeMentorButton")}</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent className="max-w-lg">
+                <AlertDialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                   <AlertDialogHeader>
                     <AlertDialogTitle>{t("form.becomeMentorTitle")}</AlertDialogTitle>
                     <AlertDialogDescription>{t("form.becomeMentorDescription")}</AlertDialogDescription>

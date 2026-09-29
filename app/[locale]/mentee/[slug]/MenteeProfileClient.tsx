@@ -45,7 +45,6 @@ interface MenteeProfile {
   id: string
   first_name: string
   last_name: string
-  email: string
   avatar_url?: string
   city?: string
   state?: string
@@ -57,7 +56,7 @@ interface MenteeProfile {
   course?: string
   academic_level?: string
   expected_graduation?: string
-  career_goals?: string
+  learning_goals?: string
   expertise_areas?: string[]
   mentorship_topics?: string[]
   linkedin_url?: string
@@ -251,14 +250,14 @@ export default function MenteeProfileClient({ mentee }: Props) {
                       </p>
                     )}
 
-                    {mentee.career_goals && (
+                    {mentee.learning_goals && (
                       <div className="pt-8 border-t border-gray-50">
                         <h4 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
                           <Target className="h-5 w-5 text-primary" />
                           Onde quero chegar
                         </h4>
                         <p className="text-gray-700 text-lg leading-relaxed">
-                          {mentee.career_goals}
+                          {mentee.learning_goals}
                         </p>
                       </div>
                     )}

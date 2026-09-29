@@ -1,5 +1,5 @@
 "use client"
-import { FileText, Users, User, Shield, Image as ImageIcon, Mail, Database, Clock } from "lucide-react"
+import { FileText, Users, User, Shield, Image as ImageIcon, Mail, Database, Clock, HeartHandshake, MessagesSquare, Github, ShieldCheck } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
@@ -19,11 +19,20 @@ export default function TermsPage() {
         <p className="text-muted-foreground max-w-xl">
           {t("terms.intro")}
         </p>
+        <p className="text-xs text-muted-foreground mt-2">{t("terms.updatedAt")}</p>
       </div>
       <div className="space-y-8 text-left">
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Users className="h-5 w-5" /> {t("terms.usage.title")}</h2>
           <p>{t("terms.usage.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><HeartHandshake className="h-5 w-5" /> {t("terms.volunteering.title")}</h2>
+          <p>{t("terms.volunteering.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><ShieldCheck className="h-5 w-5" /> {t("terms.minors.title")}</h2>
+          <p>{t("terms.minors.text")}</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><User className="h-5 w-5" /> {t("terms.account.title")}</h2>
@@ -34,12 +43,20 @@ export default function TermsPage() {
           <p>{t("terms.inactivity.text")}</p>
         </section>
         <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><MessagesSquare className="h-5 w-5" /> {t("terms.contactBetweenUsers.title")}</h2>
+          <p>{t("terms.contactBetweenUsers.text")}</p>
+        </section>
+        <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Shield className="h-5 w-5" /> {t("terms.security.title")}</h2>
           <p>{t("terms.security.text")}</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><ImageIcon className="h-5 w-5" /> {t("terms.content.title")}</h2>
           <p>{t("terms.content.text")}</p>
+        </section>
+        <section>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Github className="h-5 w-5" /> {t("terms.openSource.title")}</h2>
+          <p>{t("terms.openSource.text")}</p>
         </section>
         <section>
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-2"><Mail className="h-5 w-5" /> {t("terms.communication.title")}</h2>
@@ -61,6 +78,7 @@ export default function TermsPage() {
       <div className="mt-10 flex flex-wrap gap-4 justify-center text-sm">
         <Link href="/privacy" className="underline text-muted-foreground hover:text-foreground">{t("terms.links.privacy")}</Link>
         <Link href="/cookies" className="underline text-muted-foreground hover:text-foreground">{t("terms.links.cookies")}</Link>
+        <a href="https://github.com/paulpessoa/menvo" target="_blank" rel="noopener noreferrer" className="underline text-muted-foreground hover:text-foreground">{t("footer.contribute")}</a>
       </div>
     </div>
   )

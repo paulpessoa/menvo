@@ -472,9 +472,9 @@
     }
   },
   "community": {
-    "title": "Muro de la Comunidad",
+    "title": "Muro de Mentorados",
     "subtitle": "Conoce a personas que buscan aprender y ofrece tu mentoría de forma proactiva.",
-    "mentorTip": "Consejo: Los mentores proactivos que ayudan a quienes buscan conocimiento obtienen 3 veces más visibilidad.",
+    "mentorTip": "Consejo: lee el perfil antes de contactar y, en tu primer mensaje, di quién eres y cómo puedes ayudar.",
     "searchPlaceholder": "Buscar por nombre, objetivo o interés...",
     "seekingHelpWith": "Busca ayuda con:",
     "noBioProvided": "Este miembro aún no ha descrito sus objetivos en detalle.",
@@ -490,7 +490,9 @@
       "whyDescription": "Como mentor verificado, obtienes acceso a herramientas de programación, calendario sincronizado y reseñas oficiales.",
       "chatAnyway": "Solo Chatear",
       "becomeMentor": "Convertirse en Mentor"
-    }
+    },
+    "viewProfile": "Ver perfil",
+    "myProfile": "Mi perfil"
   },
   "mentors": {
     "title": "Encontrar un Mentor",
@@ -578,7 +580,9 @@
     "allRightsReserved": "Todos los direitos reservados.",
     "privacyPolicy": "Privacidad",
     "termsOfService": "Términos",
-    "cookiePolicy": "Cookies"
+    "cookiePolicy": "Cookies",
+    "openSource": "Código abierto",
+    "contribute": "Contribuye en GitHub"
   },
   "donate": {
     "hero": {
@@ -723,7 +727,7 @@
     },
     "dataSharing": {
       "title": "Compartición de Datos",
-      "text": "No vendemos, alquilamos ni comercializamos sus datos personales con terceros. Los detalles de perfil público solo son visibles para otros usuarios registrados con fines de reserva de mentorías."
+      "text": "No vendemos, alquilamos ni comercializamos tus datos personales. Los perfiles de mentores son públicos. Los perfiles de mentorados solo aparecen en el muro de mentorados cuando la persona activa “Perfil público”, y aun así solo son visibles para mentores y administradores con sesión iniciada. En el muro y en la página del mentorado mostramos nombre, foto, cargo, biografía, objetivos, áreas de interés y los enlaces que registraste (LinkedIn, GitHub, portafolio y currículum). El correo, el teléfono y las respuestas de formularios nunca se muestran a otros usuarios. Puedes desactivar la visibilidad en cualquier momento desde tu perfil."
     },
     "email": {
       "title": "Comunicaciones por Correo",
@@ -832,7 +836,7 @@
     "intro": "Bienvenido a Menvo. Al utilizar nuestra plataforma, acepta los términos y pautas que rigen nuestra comunidad de mentoría voluntaria gratuita.",
     "usage": {
       "title": "Uso de la Plataforma",
-      "text": "Menvo es una plataforma voluntaria sin fines de lucro creada para conectar profesionales dispuestos a compartir conocimientos con personas en busca de orientación profesional. Todas las mentorías son 100% gratuitas."
+      "text": "Menvo es una iniciativa voluntaria y sin fines de lucro que conecta a profesionales dispuestos a compartir conocimiento con personas que buscan orientación profesional. El uso de la plataforma y todas las mentorías son 100% gratuitos. Está prohibido cobrar u ofrecer pago por mentorías realizadas a través de Menvo."
     },
     "account": {
       "title": "Cuentas y Registro",
@@ -844,11 +848,11 @@
     },
     "security": {
       "title": "Conducta y Seguridad",
-      "text": "Queda estrictamente prohibido el acoso, la discriminación, el cobro financiero por mentorías o el uso indebido de los canales de comunicación. Las infracciones conllevarán la cancelación inmediata de la cuenta."
+      "text": "Está prohibido cualquier tipo de acoso, discriminación, cobro por mentorías o uso inadecuado de los canales de comunicación. Las infracciones pueden llevar a la suspensión o eliminación de la cuenta. Para denunciar un comportamiento, escribe a contato@menvo.com.br."
     },
     "content": {
-      "title": "Propiedad Intelectual",
-      "text": "Todo el diseño, marca, código y contenido de la plataforma pertenecen exclusivamente a Menvo. El contenido compartido por los usuarios durante las sesiones sigue siendo propiedad de sus respectivos autores."
+      "title": "Código abierto y propiedad intelectual",
+      "text": "El código fuente de Menvo es abierto (open source) y se distribuye bajo la licencia MIT en github.com/paulpessoa/menvo. El nombre, la marca y la identidad visual de Menvo no forman parte de esa licencia y no pueden usarse para representar otros proyectos. Lo que publicas en tu perfil y lo que se comparte en las mentorías sigue perteneciendo a sus autores; al publicarlo, autorizas a Menvo a mostrar ese contenido en la plataforma para los fines de estos Términos."
     },
     "communication": {
       "title": "Comunicaciones",
@@ -860,7 +864,7 @@
     },
     "rights": {
       "title": "Limitación de Responsabilidad",
-      "text": "Menvo conecta personas, pero no se hace responsable de las orientaciones, consejos profesionales o decisiones tomadas a raíz de las sesiones de mentoría voluntaria entre usuarios."
+      "text": "Menvo conecta personas, pero no se responsabiliza por las orientaciones, consejos o decisiones que surjan de las mentorías, ni por la conducta de los participantes dentro o fuera de la plataforma. Los consejos de mentoría no sustituyen la asesoría profesional especializada, como la jurídica, psicológica, financiera o médica."
     },
     "contact": {
       "title": "Preguntas y Soporte",
@@ -869,6 +873,23 @@
     "links": {
       "privacy": "Política de Privacidad",
       "cookies": "Política de Cookies"
+    },
+    "updatedAt": "Última actualización: 29 de septiembre de 2026",
+    "volunteering": {
+      "title": "Participación voluntaria y sin vínculo",
+      "text": "Mentores y mentorados participan por voluntad propia, de forma gratuita, y cualquiera puede dejar de hacerlo en cualquier momento, sin aviso previo ni justificación. La mentoría no es remunerada y no crea vínculo laboral, societario, asociativo ni de prestación de servicios, ni obligaciones laborales, de seguridad social o similares, ni entre los participantes ni entre ellos y Menvo, en línea con la Ley brasileña de Servicio Voluntario (Ley nº 9.608/1998, art. 1º, párrafo único). Aceptar estos Términos al registrarte vale como acuerdo de adhesión a la actividad voluntaria. Como la relación es gratuita, se aplica el art. 392 del Código Civil brasileño: quien ofrece la mentoría sin recibir nada a cambio solo responde por daños causados con dolo. Menvo no garantiza que todo mentorado encuentre un mentor ni que una mentoría lleve a un resultado específico."
+    },
+    "contactBetweenUsers": {
+      "title": "Contacto entre mentores y mentorados",
+      "text": "Los mentores pueden ver los perfiles de mentorados que activaron “Perfil público” y contactarlos por los canales que el propio mentorado dejó visibles, como LinkedIn. El primer contacto debe ser una oferta de mentoría: di quién eres y cómo puedes ayudar. Está prohibido usar este acceso para reclutamiento, venta de cursos, productos o servicios, captación de clientes, spam o cualquier propósito que no sea la mentoría voluntaria. Las conversaciones fuera de la plataforma (LinkedIn, WhatsApp, correo, etc.) son responsabilidad de las personas involucradas. Menvo actúa como intermediaria, y su responsabilidad por el contenido generado por usuarios sigue el art. 19 del Marco Civil de Internet de Brasil (Ley nº 12.965/2014). Aun así, podemos suspender o eliminar cuentas que incumplan estos Términos."
+    },
+    "openSource": {
+      "title": "Contribuye con Menvo",
+      "text": "Como el proyecto es open source, cualquier persona puede contribuir con código, revisión de textos, traducciones, diseño o sugerencias. Abre un issue o un pull request en github.com/paulpessoa/menvo, o escribe a contato@menvo.com.br. Las contribuciones también son voluntarias, siguen las mismas reglas de participación sin vínculo de estos Términos, y el código contribuido queda licenciado bajo MIT."
+    },
+    "minors": {
+      "title": "Edad mínima y cuidado con menores",
+      "text": "Para usar Menvo debes tener 16 años o más, según lo declarado al registrarte. Las personas de 16 y 17 años pueden buscar mentores y agendar sesiones con normalidad, pero no aparecen en el Muro de Mentorados: quien activa “Perfil público” declara tener 18 años o más. Los mentores que atiendan a menores deben realizar las sesiones por el enlace de reunión de la plataforma, no pedir contactos personales ni proponer encuentros presenciales. Cualquier sospecha de conducta inadecuada puede informarse a contato@menvo.com.br, y la cuenta involucrada puede suspenderse durante la revisión."
     }
   },
   "metadata": {

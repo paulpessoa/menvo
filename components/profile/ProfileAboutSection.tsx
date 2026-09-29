@@ -54,7 +54,9 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
           <div className="space-y-1">
             <Label htmlFor="is_public" className="text-base font-bold">Perfil público</Label>
             <p className="text-xs text-muted-foreground">
-              {isMentor ? "Aparecer no diretório de mentores." : "Aparecer no mural de mentorados."}
+              {isMentor
+                ? "Aparecer no diretório de mentores."
+                : "Aparecer no mural de mentorados, visível só para mentores logados. Seu e-mail e telefone nunca são exibidos. Ao ativar, você declara ter 18 anos ou mais."}
             </p>
           </div>
           <Switch id="is_public" checked={form.is_public} onCheckedChange={(v) => onChange({ is_public: v })} />

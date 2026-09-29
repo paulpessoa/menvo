@@ -472,9 +472,9 @@
     }
   },
   "community": {
-    "title": "Community Board",
+    "title": "Mentee Board",
     "subtitle": "Meet people looking to learn and proactively offer your mentorship.",
-    "mentorTip": "Tip: Proactive mentors who help those seeking knowledge get 3x more visibility.",
+    "mentorTip": "Tip: read the profile before reaching out, and in your first message say who you are and how you can help.",
     "searchPlaceholder": "Search by name, goal, or interest...",
     "seekingHelpWith": "Seeking help with:",
     "noBioProvided": "This member hasn't described their goals in detail yet.",
@@ -490,7 +490,9 @@
       "whyDescription": "As a verified mentor, you gain access to scheduling tools, synced calendar, and official reviews.",
       "chatAnyway": "Just Chat",
       "becomeMentor": "Become a Mentor"
-    }
+    },
+    "viewProfile": "View profile",
+    "myProfile": "My profile"
   },
   "mentors": {
     "title": "Find a Mentor",
@@ -578,7 +580,9 @@
     "allRightsReserved": "All rights reserved.",
     "privacyPolicy": "Privacy",
     "termsOfService": "Terms",
-    "cookiePolicy": "Cookies"
+    "cookiePolicy": "Cookies",
+    "openSource": "Open source",
+    "contribute": "Contribute on GitHub"
   },
   "donate": {
     "hero": {
@@ -723,7 +727,7 @@
     },
     "dataSharing": {
       "title": "Data Sharing",
-      "text": "We do not sell, rent, or trade your personal data with third parties. Public profile details are only visible to other registered users on the platform for mentorship booking purposes."
+      "text": "We do not sell, rent or trade your personal data. Mentor profiles are public. Mentee profiles only appear on the mentee board when the person turns on “Public profile”, and even then they are visible only to signed-in mentors and administrators. On the board and on the mentee page we show name, photo, job title, bio, goals, areas of interest and the links you added (LinkedIn, GitHub, portfolio and résumé). Email, phone number and form answers are never shown to other users. You can turn visibility off at any time in your profile."
     },
     "email": {
       "title": "Email Communications",
@@ -832,7 +836,7 @@
     "intro": "Welcome to Menvo. By using our platform, you agree to the terms and guidelines governing our free voluntary mentorship community.",
     "usage": {
       "title": "Platform Use",
-      "text": "Menvo is a non-profit volunteer platform created to connect professionals willing to share knowledge with individuals seeking career guidance. All mentorships are 100% free."
+      "text": "Menvo is a volunteer, non-profit initiative that connects professionals willing to share knowledge with people seeking career guidance. Using the platform and every mentorship is 100% free. Charging or offering payment for mentorships arranged through Menvo is not allowed."
     },
     "account": {
       "title": "Accounts & Registration",
@@ -844,11 +848,11 @@
     },
     "security": {
       "title": "Conduct & Safety",
-      "text": "Harassment, discrimination, charging fees for mentorships, or misuse of platform communication channels is strictly prohibited. Violations lead to immediate account termination."
+      "text": "Any form of harassment, discrimination, charging for mentorships or misuse of communication channels is forbidden. Violations may lead to suspension or deletion of the account. To report behavior, email contato@menvo.com.br."
     },
     "content": {
-      "title": "Intellectual Property",
-      "text": "All platform design, branding, code, and content belong exclusively to Menvo. Content shared by users during sessions remains the property of their respective creators."
+      "title": "Open source and intellectual property",
+      "text": "Menvo's source code is open source and released under the MIT license at github.com/paulpessoa/menvo. The Menvo name, brand and visual identity are not covered by that license and may not be used to represent other projects. What you publish on your profile and what is shared in mentorships still belongs to its authors; by publishing it, you allow Menvo to display that content on the platform for the purposes of these Terms."
     },
     "communication": {
       "title": "Communications",
@@ -860,7 +864,7 @@
     },
     "rights": {
       "title": "Limitation of Liability",
-      "text": "Menvo connects people, but is not liable for guidance, professional advice, or decisions made as a result of voluntary mentorship sessions between users."
+      "text": "Menvo connects people but is not responsible for the guidance, advice or decisions that come out of mentorships, nor for participants' conduct on or off the platform. Mentoring advice does not replace specialized professional advice such as legal, psychological, financial or medical."
     },
     "contact": {
       "title": "Questions & Support",
@@ -869,6 +873,23 @@
     "links": {
       "privacy": "Privacy Policy",
       "cookies": "Cookie Policy"
+    },
+    "updatedAt": "Last updated: September 29, 2026",
+    "volunteering": {
+      "title": "Voluntary participation, no employment relationship",
+      "text": "Mentors and mentees take part of their own free will, at no cost, and anyone can stop at any time without notice or justification. Mentoring is unpaid and creates no employment, partnership, association or service relationship, nor any labor, social security or similar obligation, either between participants or between them and Menvo, in line with the Brazilian Volunteer Service Law (Law No. 9,608/1998, art. 1, sole paragraph). Accepting these Terms at sign-up serves as the agreement to take part in volunteer activity. Because the relationship is free of charge, art. 392 of the Brazilian Civil Code applies: whoever offers mentoring without receiving anything in return is only liable for damage caused intentionally. Menvo does not guarantee that every mentee will find a mentor or that a mentorship will lead to any specific outcome."
+    },
+    "contactBetweenUsers": {
+      "title": "Contact between mentors and mentees",
+      "text": "Mentors can see the profiles of mentees who turned on “Public profile” and reach out through the channels the mentee chose to show, such as LinkedIn. The first contact must be an offer of mentoring: say who you are and how you can help. Using this access for recruiting, selling courses, products or services, finding clients, spam or anything other than volunteer mentoring is not allowed. Conversations outside the platform (LinkedIn, WhatsApp, email, etc.) are the responsibility of the people involved. Menvo acts as an intermediary, and its liability for user-generated content follows art. 19 of the Brazilian Internet Civil Framework (Law No. 12,965/2014). Even so, we may suspend or delete accounts that break these Terms."
+    },
+    "openSource": {
+      "title": "Contribute to Menvo",
+      "text": "Because the project is open source, anyone can contribute code, copy reviews, translations, design or suggestions. Open an issue or a pull request at github.com/paulpessoa/menvo, or email contato@menvo.com.br. Contributions are voluntary too, follow the same no-employment rules in these Terms, and contributed code is licensed under MIT."
+    },
+    "minors": {
+      "title": "Minimum age and care with minors",
+      "text": "You must be 16 or older to use Menvo, as declared at sign-up. People aged 16 and 17 can search for mentors and book sessions as usual, but they do not appear on the Mentee Board: turning on “Public profile” means declaring you are 18 or older. Mentors who meet with minors must hold sessions through the platform's meeting link, must not ask for personal contacts, and must not propose in-person meetings. Any suspicion of inappropriate conduct can be reported to contato@menvo.com.br, and the account involved may be suspended while it is reviewed."
     }
   },
   "metadata": {

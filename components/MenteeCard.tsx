@@ -35,6 +35,8 @@ interface UserProfile {
   linkedin_url: string | null
   github_url: string | null
   expertise_areas: string[] | null
+  mentorship_topics?: string[] | null
+  learning_goals?: string | null
   slug: string | null
   role: string
 }
@@ -46,6 +48,8 @@ interface MenteeCardProps {
 }
 
 export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
+  // Mentees fill "mentorship_topics" (what they want to learn); expertise_areas is a mentor field
+  const topics = profile.mentorship_topics?.length ? profile.mentorship_topics : profile.expertise_areas
   const tCommunity = useTranslations("community")
   const { isAuthenticated, user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
@@ -141,9 +145,9 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
             </p>
           </div>
 
-          {profile.expertise_areas && profile.expertise_areas.length > 0 && (
+          {topics && topics.length > 0 && (
             <div className="flex flex-wrap justify-center gap-1.5 pt-2">
-              {profile.expertise_areas.slice(0, 3).map((area, i) => (
+              {topics.slice(0, 3).map((area, i) => (
                 <Badge
                   key={i}
                   variant="secondary"
@@ -186,7 +190,7 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
                   onClick={handleViewProfile}
                   className="rounded-xl text-xs font-bold text-muted-foreground hover:text-primary hover:border-primary px-4"
                >
-                 Ver Perfil
+                 {tCommunity("viewProfile")}
                </Button>
             </div>
 
@@ -202,7 +206,7 @@ export function MenteeCard({ profile, isMentor, onChat }: MenteeCardProps) {
             >
               {isSelf ? (
                 <>
-                  <User className="h-5 w-5 text-primary" /> Meu Perfil
+                  <User className="h-5 w-5 text-primary" /> {tCommunity("myProfile")}
                 </>
               ) : (
                 <>

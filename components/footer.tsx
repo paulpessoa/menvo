@@ -138,6 +138,16 @@ export default function Footer() {
                   {t("footer.contact")}
                 </Link>
               </li>
+              <li>
+                <a
+                  href="https://github.com/paulpessoa/menvo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {t("footer.openSource")}
+                </a>
+              </li>
             </ul>
           </div>
           <div className="space-y-4">

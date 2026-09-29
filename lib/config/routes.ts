@@ -28,7 +28,8 @@ export const protectedRoutes = [
   "/mentorship",
   "/volunteer-activities",
   "/onboarding",
-  "/settings"
+  "/settings",
+  "/support"
 ]
 
 export const adminRoutes = ["/dashboard/admin"]
@@ -39,7 +40,8 @@ export const onboardingRequiredRoutes = [
   "/messages",
   "/calendar",
   "/mentorship",
-  "/settings"
+  "/settings",
+  "/support"
 ]
 
 export const authRoutes = [

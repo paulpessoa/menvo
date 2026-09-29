@@ -19,6 +19,25 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const { toast } = useToast()
 
+  // Refs keep the recognition handlers (created once) reading current values;
+  // without them the closures froze transcript/isListening at their first render.
+  const transcriptRef = useRef("")
+  const isListeningRef = useRef(false)
+  const onTranscriptRef = useRef(onTranscript)
+  const toastRef = useRef(toast)
+  onTranscriptRef.current = onTranscript
+  toastRef.current = toast
+
+  const updateTranscript = (value: string) => {
+    transcriptRef.current = value
+    setTranscript(value)
+  }
+
+  const updateListening = (value: boolean) => {
+    isListeningRef.current = value
+    setIsListening(value)
+  }
+
   useEffect(() => {
     // Verificar se o browser suporta Web Speech API
     if (typeof window !== "undefined") {
@@ -32,7 +51,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
         // Configurar o reconhecimento
         recognitionRef.current.continuous = true
         recognitionRef.current.interimResults = true
-        recognitionRef.current.lang = "pt-BR"
+        recognitionRef.current.lang = document.documentElement.lang || "pt-BR"
 
         // Eventos do reconhecimento
         recognitionRef.current.onresult = (event: any) => {
@@ -56,20 +75,20 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
           }
 
           // Combinar com transcript anterior + novos resultados
-          let fullTranscript = transcript
+          let fullTranscript = transcriptRef.current
           if (finalTranscript) {
-            fullTranscript = transcript + (transcript ? ' ' : '') + finalTranscript
-            setTranscript(fullTranscript)
+            fullTranscript = fullTranscript + (fullTranscript ? ' ' : '') + finalTranscript.trim()
+            updateTranscript(fullTranscript)
           }
 
           // Mostrar resultado em tempo real (incluindo interim)
           const displayTranscript = fullTranscript + (interimTranscript ? (fullTranscript ? ' ' : '') + interimTranscript : '')
-          onTranscript(displayTranscript)
+          onTranscriptRef.current(displayTranscript)
 
           // Iniciar timer para parar após 3 segundos de silêncio
           if (finalTranscript || interimTranscript) {
             silenceTimerRef.current = setTimeout(() => {
-              if (recognitionRef.current && isListening) {
+              if (recognitionRef.current && isListeningRef.current) {
                 recognitionRef.current.stop()
               }
             }, 3000)
@@ -78,7 +97,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
 
         recognitionRef.current.onerror = (event: any) => {
           console.error("Speech recognition error:", event.error)
-          setIsListening(false)
+          updateListening(false)
 
           let errorMessage = "Erro no reconhecimento de voz"
           switch (event.error) {
@@ -96,7 +115,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
               break
           }
 
-          toast({
+          toastRef.current({
             title: "Erro na transcrição",
             description: errorMessage,
             variant: "destructive"
@@ -104,7 +123,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
         }
 
         recognitionRef.current.onend = () => {
-          setIsListening(false)
+          updateListening(false)
         }
       }
     }
@@ -117,7 +136,8 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
         clearTimeout(silenceTimerRef.current)
       }
     }
-  }, [onTranscript, toast])
+    // Runs once: handlers read current values through the refs above
+  }, [])
 
   const startListening = () => {
     if (!recognitionRef.current) return
@@ -129,7 +149,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
         silenceTimerRef.current = null
       }
       recognitionRef.current.start()
-      setIsListening(true)
+      updateListening(true)
       toast({
         title: "Transcrição iniciada",
         description: "Fale agora. Parará automaticamente após 3s de silêncio."
@@ -154,7 +174,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
     }
 
     recognitionRef.current.stop()
-    setIsListening(false)
+    updateListening(false)
     toast({
       title: "Transcrição finalizada",
       description: "Sua fala foi transcrita com sucesso."
@@ -162,7 +182,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
   }
 
   const clearTranscript = () => {
-    setTranscript("")
+    updateTranscript("")
     onTranscript("")
     toast({
       title: "Transcrição limpa",
