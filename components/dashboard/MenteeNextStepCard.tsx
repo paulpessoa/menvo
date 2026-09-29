@@ -52,7 +52,7 @@ export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, di
             </div>
           </div>
           <Button asChild size="sm" className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold shrink-0 shadow-sm">
-            <Link href="/mentorship/mentee">Avaliar Agora</Link>
+            <Link href="/mentorship/mentee#action">Avaliar Agora</Link>
           </Button>
         </CardContent>
       </Card>

@@ -89,7 +89,7 @@ export default function ConfirmAppointmentPage() {
                         </h2>
                         <p className="text-gray-600 mb-6">{message}</p>
                         <button
-                            onClick={() => router.push('/mentorship/mentor')}
+                            onClick={() => router.push('/mentorship/mentor#upcoming')}
                             className="w-full bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
                         >
                             {t('viewAppointment')}

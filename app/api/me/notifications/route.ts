@@ -6,6 +6,7 @@ export type NotificationType =
   | "booking_confirmed"
   | "booking_cancelled"
   | "pending_evaluation"
+  | "session_starting_soon"
 
 export interface InAppNotification {
   id: string
@@ -101,12 +102,28 @@ export async function GET(request: NextRequest) {
           title: "Nova solicitação de mentoria",
           message: `${counterpartName} solicitou uma mentoria para ${dateFormatted}.`,
           timestamp: apt.created_at || apt.updated_at,
-          actionUrl: "/dashboard/mentor",
+          actionUrl: "/mentorship/mentor#action",
         })
       }
 
       if (apt.status === "confirmed") {
         const isUpcoming = scheduledDate > now
+
+        if (isUpcoming) {
+          const minutesUntilStart = (scheduledDate.getTime() - now.getTime()) / (1000 * 60)
+          
+          if (minutesUntilStart <= 30 && minutesUntilStart > 0) {
+            notifications.push({
+              id: `session-starting-soon-${apt.id}`,
+              type: "session_starting_soon",
+              title: "Sessão começando em breve!",
+              message: `Sua mentoria com ${counterpartName} começa em ${Math.ceil(minutesUntilStart)} minutos.`,
+              timestamp: new Date().toISOString(),
+              actionUrl: isMentor ? "/mentorship/mentor#upcoming" : "/mentorship/mentee#upcoming",
+            })
+          }
+        }
+
         notifications.push({
           id: `booking-confirmed-${apt.id}`,
           type: "booking_confirmed",
@@ -115,7 +132,9 @@ export async function GET(request: NextRequest) {
             ? `Sua mentoria com ${counterpartName} está agendada para ${dateFormatted}.`
             : `Mentoria com ${counterpartName} realizada em ${dateFormatted}.`,
           timestamp: apt.updated_at || apt.created_at,
-          actionUrl: isMentor ? "/dashboard/mentor" : "/dashboard/mentee",
+          actionUrl: isMentor
+            ? (isUpcoming ? "/mentorship/mentor#upcoming" : "/mentorship/mentor#history")
+            : (isUpcoming ? "/mentorship/mentee#upcoming" : "/mentorship/mentee#history"),
         })
       }
 
@@ -131,7 +150,9 @@ export async function GET(request: NextRequest) {
             title: "Mentoria cancelada",
             message: `A mentoria de ${dateFormatted} com ${counterpartName} foi cancelada.${reasonSnippet}`,
             timestamp: apt.updated_at || apt.created_at,
-            actionUrl: isMentor ? "/dashboard/mentor" : "/dashboard/mentee",
+            actionUrl: isMentor
+              ? "/mentorship/mentor#history"
+              : "/mentorship/mentee#history",
           })
         }
       }
@@ -143,7 +164,7 @@ export async function GET(request: NextRequest) {
           title: "Avaliação pendente",
           message: `Como foi sua sessão com ${counterpartName}? Deixe seu depoimento para apoiar o mentor.`,
           timestamp: apt.scheduled_at || apt.created_at,
-          actionUrl: "/dashboard/mentee",
+          actionUrl: "/mentorship/mentee#action",
         })
       }
     }

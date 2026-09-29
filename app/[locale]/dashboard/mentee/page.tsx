@@ -1,7 +1,8 @@
 "use client"
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import {
   Card,
   CardContent,
@@ -173,232 +174,151 @@ export default function MenteeDashboard() {
             </Button>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
-              <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
-              </TabsTrigger>
-              <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
-              </TabsTrigger>
-            </TabsList>
-
-            {/* TAB: OVERVIEW */}
-            <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
-              {/* Seu próximo passo: uma única ação, derivada do estado real
-                  (avaliar > sessão agendada > diagnóstico > buscar mentor) -
-                  substitui o banner de avaliação e o CTA de diagnóstico soltos. */}
-              {!(loading || loadingQuiz) && (
-                <MenteeNextStepCard
-                  hasPendingReview={hasPendingReview}
-                  nextSession={upcomingAppointments[0] || null}
-                  quizDone={Boolean(quizSummary)}
-                  diagnosticHref={diagnosticHref}
-                />
-              )}
-
-              {/* Resultado do diagnóstico (só quando já existe - o CTA para
-                  fazer o diagnóstico pela 1ª vez já está no card acima). */}
-              {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title={t("mentee.stats.scheduled")} value={stats.upcomingAppointments} icon={<Calendar className="h-5 w-5" />} description={t("mentee.stats.scheduledDesc")} />
-                <StatCard title={t("mentee.stats.mentors")} value={stats.totalMentors} icon={<Users className="h-5 w-5" />} description={t("mentee.stats.mentorsDesc")} />
-                <StatCard title={t("mentee.stats.completed")} value={stats.completedSessions} icon={<CheckCircle className="h-5 w-5 text-green-500" />} description={t("mentee.stats.completedDesc")} />
-                <StatCard title={t("mentee.stats.hours")} value={`${stats.totalHours}h`} icon={<Clock className="h-5 w-5 text-primary" />} description={t("mentee.stats.hoursDesc")} />
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <QuickActionCard
-                      title={t("mentee.actions.myMentorshipsAction")}
-                      desc={t("mentee.actions.myMentorshipsActionDesc")}
-                      link="/mentorship/mentee"
-                      icon={<Calendar className="w-6 h-6 text-primary" />}
-                    />
-                    <QuickActionCard
-                      title={t("mentee.actions.exploreMentorsAction")}
-                      desc={t("mentee.actions.exploreMentorsActionDesc")}
-                      link="/mentors"
-                      icon={<Search className="w-6 h-6 text-primary" />}
-                    />
-                  </div>
-
-                  <Card className="rounded-2xl border border-gray-100 shadow-xs">
-                    <CardHeader className="flex flex-row items-center justify-between pb-4">
-                      <div>
-                        <CardTitle className="text-xl font-bold flex items-center gap-2">
-                          <Heart className="h-5 w-5 text-red-500 fill-current" /> {t("mentee.sections.favorites")}
-                        </CardTitle>
-                        <CardDescription>{t("mentee.sections.favoritesDesc")}</CardDescription>
-                      </div>
-                      <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium">
-                        <Link href="/mentors">{t("mentee.sections.viewAll")}</Link>
-                      </Button>
-                    </CardHeader>
-                    <CardContent>
-                      {loadingFavorites ? (
-                        <div className="flex justify-center py-8"><MenvoDots /></div>
-                      ) : favoriteMentorsData.length === 0 ? (
-                        <div className="py-8 px-4 text-center rounded-2xl border border-dashed border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">
-                          <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">
-                            <Heart className="h-6 w-6 text-red-400" />
-                          </div>
-                          <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.sections.noFavorites")}</p>
-                          <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.sections.noFavoritesDesc")}</p>
-                          <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold hover:border-primary/40 hover:text-primary">
-                            <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {favoriteMentorsData.filter((m) => m.slug || m.id).map((m) => (
-                            <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
-                              <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
-                                <Avatar className="h-12 w-12 border">
-                                  <AvatarImage src={m.avatar_url || undefined} />
-                                  <AvatarFallback>{m.full_name[0]}</AvatarFallback>
-                                </Avatar>
-                                <div className="min-w-0">
-                                  <p className="text-sm font-bold truncate">{m.full_name}</p>
-                                  <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
-                                </div>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">{t("mentee.sections.upcoming")}</h2>
-                  {upcomingAppointments.length === 0 ? (
-                    <Card className="bg-gradient-to-b from-gray-50/60 to-white/40 border border-dashed border-gray-200 rounded-2xl overflow-hidden shadow-xs">
-                      <CardContent className="py-10 px-6 text-center flex flex-col items-center justify-center">
-                        <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 shadow-xs">
-                          <Calendar className="h-7 w-7 text-primary" />
-                        </div>
-                        <h3 className="font-bold text-gray-900 text-base mb-1">{t("mentee.sections.noAppointments")}</h3>
-                        <p className="text-xs text-muted-foreground max-w-sm mb-5 leading-relaxed">
-                          {t("mentee.sections.noAppointmentsDesc")}
-                        </p>
-                        <Button asChild size="sm" className="rounded-xl font-bold text-xs bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all px-5 h-10">
-                          <Link href="/mentors">{t("mentee.sections.bookNow")}</Link>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="space-y-4">
-                      {upcomingAppointments.map((appt) => {
-                        const dateObj = new Date(appt.scheduled_at)
-                        const isToday = dateObj.toDateString() === new Date().toDateString()
-                        const isConfirmed = appt.status === "confirmed"
-
-                        return (
-                          <Card key={appt.id} className="overflow-hidden rounded-2xl shadow-xs hover:shadow-md transition-all">
-                            <CardContent className="p-4 space-y-3">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-center gap-3 min-w-0">
-                                  <Avatar className="h-10 w-10 border shrink-0">
-                                    <AvatarImage src={appt.mentor.avatar_url || undefined} />
-                                    <AvatarFallback>{appt.mentor.full_name[0]}</AvatarFallback>
-                                  </Avatar>
-                                  <div className="min-w-0">
-                                    <p className="text-sm font-bold truncate">{appt.mentor.full_name}</p>
-                                    <p className="text-[11px] text-muted-foreground truncate">{appt.mentor.job_title || "Mentor"}</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  {isToday && (
-                                    <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px] font-bold">
-                                      Hoje
-                                    </Badge>
-                                  )}
-                                  <Badge variant={isConfirmed ? "default" : "outline"} className={`text-[10px] font-semibold ${isConfirmed ? "bg-emerald-600 hover:bg-emerald-600 text-white" : ""}`}>
-                                    {isConfirmed ? "Confirmada" : "Pendente"}
-                                  </Badge>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <Clock className="w-3.5 h-3.5 text-primary shrink-0" />
-                                <span className={isToday ? "font-bold text-foreground" : ""}>
-                                  {dateObj.toLocaleString(locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                                </span>
-                                <span>({appt.duration_minutes || 45} min)</span>
-                              </div>
-
-                              <div className="flex items-center gap-2 pt-1">
-                                {isConfirmed && appt.google_meet_link && (
-                                  <Button asChild size="sm" className="flex-1 font-bold rounded-xl h-9 bg-primary hover:bg-primary/90 text-white shadow-xs">
-                                    <a href={appt.google_meet_link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1.5">
-                                      <Video className="w-3.5 h-3.5" />
-                                      <span>Entrar no Meet</span>
-                                      <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
-                                    </a>
-                                  </Button>
-                                )}
-                                <Button asChild size="sm" variant={isConfirmed && appt.google_meet_link ? "outline" : "secondary"} className={`font-bold rounded-xl h-9 ${isConfirmed && appt.google_meet_link ? "px-3" : "w-full"}`}>
-                                  <Link href="/mentorship/mentee">{t("mentee.sections.viewDetails")}</Link>
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* TAB: FEEDBACKS */}
-            <TabsContent value="feedbacks" className="animate-in fade-in slide-in-from-left-4 duration-500">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacksTitle")}</h2>
-                  <p className="text-muted-foreground">{t("mentee.tabs.feedbacksDesc")}</p>
-                </div>
-                <FeedbackManagement type="sent" />
-              </div>
-            </TabsContent>
-          </Tabs>
+          <Suspense fallback={<div className="py-10 flex justify-center"><MenvoDots /></div>}>
+            <MenteeDashboardTabs 
+              stats={stats} 
+              upcomingAppointments={upcomingAppointments} 
+              favoriteMentorsData={favoriteMentorsData} 
+              loading={loading} 
+              loadingFavorites={loadingFavorites} 
+              loadingQuiz={loadingQuiz} 
+              quizSummary={quizSummary} 
+              hasPendingReview={hasPendingReview} 
+              diagnosticHref={diagnosticHref} 
+              locale={locale} 
+            />
+          </Suspense>
         </div>
       </div>
     </RequireRole>
   )
 }
 
-function StatCard({ title, value, icon, description }: { title: string, value: any, icon: any, description: string }) {
-  return (
-    <Card className="rounded-2xl border border-gray-100 shadow-xs bg-white hover:shadow-md transition-all">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xs font-bold text-gray-500 uppercase tracking-wider">{title}</CardTitle>
-        <div className="p-2 bg-primary/5 rounded-xl text-primary">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-black">{value}</div>
-        <p className="text-xs text-muted-foreground mt-1">{description}</p>
-      </CardContent>
-    </Card>
-  )
-}
+function MenteeDashboardTabs({ 
+  stats, upcomingAppointments, favoriteMentorsData, loading, loadingFavorites, loadingQuiz, quizSummary, hasPendingReview, diagnosticHref, locale 
+}: any) {
+  const t = useTranslations("dashboard")
+  const searchParams = useSearchParams()
+  const defaultTab = searchParams.get("tab") || "overview"
 
-function QuickActionCard({ title, desc, link, icon }: { title: string, desc: string, link: string, icon: any }) {
   return (
-    <Link href={link}>
-      <Card className="rounded-2xl hover:border-primary/40 transition-all cursor-pointer h-full border-gray-100 shadow-xs hover:shadow-md group bg-white">
-        <CardContent className="p-6 flex items-start gap-4">
-          <div className="p-3 bg-gray-50 rounded-2xl group-hover:bg-primary/10 transition-colors">{icon}</div>
-          <div>
-            <h3 className="font-bold text-gray-900 group-hover:text-primary transition-colors">{title}</h3>
-            <p className="text-sm text-gray-500 leading-tight mt-1">{desc}</p>
+    <Tabs defaultValue={defaultTab} className="space-y-6">
+      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
+        <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+          <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
+        </TabsTrigger>
+        <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+          <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
+        </TabsTrigger>
+      </TabsList>
+
+      {/* TAB: OVERVIEW */}
+      <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
+        {!(loading || loadingQuiz) && (
+          <MenteeNextStepCard
+            hasPendingReview={hasPendingReview}
+            nextSession={upcomingAppointments[0] || null}
+            quizDone={Boolean(quizSummary)}
+            diagnosticHref={diagnosticHref}
+          />
+        )}
+
+        {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
+
+        {/* Barra de Métricas Compacta */}
+        <div className="flex flex-wrap items-center gap-4 text-sm bg-muted/30 rounded-2xl p-4 border border-border/50">
+          <div className="flex items-center gap-2 font-medium">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">{t("mentee.stats.scheduled")}:</span>
+            <span className="text-foreground">{stats.upcomingAppointments}</span>
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+          <div className="w-1 h-1 rounded-full bg-border" />
+          <div className="flex items-center gap-2 font-medium">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">{t("mentee.stats.mentors")}:</span>
+            <span className="text-foreground">{stats.totalMentors}</span>
+          </div>
+          <div className="w-1 h-1 rounded-full bg-border" />
+          <div className="flex items-center gap-2 font-medium">
+            <CheckCircle className="h-4 w-4 text-emerald-500" />
+            <span className="text-muted-foreground">{t("mentee.stats.completed")}:</span>
+            <span className="text-foreground">{stats.completedSessions}</span>
+          </div>
+          <div className="w-1 h-1 rounded-full bg-border" />
+          <div className="flex items-center gap-2 font-medium">
+            <Clock className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground">{t("mentee.stats.hours")}:</span>
+            <span className="text-foreground">{stats.totalHours}h</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium text-muted-foreground hover:text-foreground">
+            <Link href="/mentorship/mentee">Ver todas as sessões e histórico →</Link>
+          </Button>
+        </div>
+
+        {/* Favoritos */}
+        <div className="max-w-3xl pt-2">
+            <Card className="rounded-2xl border border-gray-100 shadow-xs">
+              <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <div>
+                  <CardTitle className="text-xl font-bold flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-red-500 fill-current" /> {t("mentee.sections.favorites")}
+                  </CardTitle>
+                  <CardDescription>{t("mentee.sections.favoritesDesc")}</CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium">
+                  <Link href="/mentors">{t("mentee.sections.viewAll")}</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingFavorites ? (
+                  <div className="flex justify-center py-8"><MenvoDots /></div>
+                ) : favoriteMentorsData.length === 0 ? (
+                  <div className="py-8 px-4 text-center rounded-2xl border border-dashed border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">
+                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">
+                      <Heart className="h-6 w-6 text-red-400" />
+                    </div>
+                    <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.sections.noFavorites")}</p>
+                    <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.sections.noFavoritesDesc")}</p>
+                    <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold hover:border-primary/40 hover:text-primary">
+                      <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
+                      <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
+                        <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
+                          <Avatar className="h-12 w-12 border">
+                            <AvatarImage src={m.avatar_url || undefined} />
+                            <AvatarFallback>{m.full_name[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold truncate">{m.full_name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+        </div>
+      </TabsContent>
+
+      {/* TAB: FEEDBACKS */}
+      <TabsContent value="feedbacks" className="animate-in fade-in slide-in-from-left-4 duration-500">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacksTitle")}</h2>
+            <p className="text-muted-foreground">{t("mentee.tabs.feedbacksDesc")}</p>
+          </div>
+          <FeedbackManagement type="sent" />
+        </div>
+      </TabsContent>
+    </Tabs>
   )
 }

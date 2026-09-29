@@ -52,7 +52,7 @@ export function MentorshipSection({
   const hidden = appointments.length - visible.length
 
   return (
-    <section className="space-y-3" aria-label={title}>
+    <section id={tone} className="space-y-3" aria-label={title}>
       <div>
         <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">
           <span className={cn("h-2 w-2 rounded-full", DOT[tone])} />

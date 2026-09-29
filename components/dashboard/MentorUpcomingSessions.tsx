@@ -49,7 +49,7 @@ export function MentorUpcomingSessions({
           </p>
         </div>
         <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium text-xs">
-          <Link href="/mentorship/mentor">Ver Todas</Link>
+          <Link href="/mentorship/mentor#upcoming">Ver Todas</Link>
         </Button>
       </CardHeader>
 
@@ -154,7 +154,7 @@ export function MentorUpcomingSessions({
                       variant={isConfirmed && appt.google_meet_link ? "outline" : "secondary"}
                       className="flex-1 sm:flex-initial font-bold rounded-xl h-9 px-3"
                     >
-                      <Link href="/mentorship/mentor">Gerenciar</Link>
+                      <Link href="/mentorship/mentor#upcoming">Gerenciar</Link>
                     </Button>
                   </div>
                 </div>

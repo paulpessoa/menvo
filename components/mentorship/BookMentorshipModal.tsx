@@ -193,7 +193,7 @@ export function BookMentorshipModal({
         setSuccess(false)
         setSelectedSlot(null)
         setMessage("")
-        window.location.href = `/${locale}/mentorship/mentee`
+        window.location.href = `/${locale}/mentorship/mentee#upcoming`
       }, 1500)
     } catch (err: any) {
       setError(err.message || "Falha ao confirmar o agendamento.")
@@ -245,7 +245,7 @@ export function BookMentorshipModal({
                   {t("pendingEvaluationsDesc")}
                 </p>
                 <Button asChild className="mt-4 rounded-xl font-semibold shadow-sm">
-                  <Link href="/mentorship/mentee">{t("evaluateNow")}</Link>
+                  <Link href="/mentorship/mentee#action">{t("evaluateNow")}</Link>
                 </Button>
               </div>
             ) : error && !selectedSlot ? (
