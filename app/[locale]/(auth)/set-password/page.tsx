@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import { useRouter, Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
@@ -14,13 +15,7 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  Lock,
-  Loader2,
-  CheckCircle,
-  AlertTriangle,
-  UserPlus
-} from "lucide-react"
+import { Lock, CheckCircle, AlertTriangle, UserPlus } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
@@ -104,7 +99,7 @@ export default function SetPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 text-foreground">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+          <MenvoDots className="mx-auto mb-2" />
           <p className="text-gray-600">{t("checkingSession")}</p>
         </div>
       </div>
@@ -237,7 +232,7 @@ export default function SetPasswordPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <MenvoDots className="mr-2" />
                   {tCommon("saving")}
                 </>
               ) : (

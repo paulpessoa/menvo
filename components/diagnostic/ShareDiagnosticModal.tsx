@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -14,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Loader2, Share2, Check, X, Shield, Users } from "lucide-react"
+import { Share2, Check, X, Shield, Users } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import type { DiagnosticShareWithMentor, DiagnosticShareScope } from "@/lib/types/models/diagnostic-shares"
 
@@ -224,7 +225,7 @@ export function ShareDiagnosticModal({
                             onClick={() => handleShareWithMentor(mentorId, mentorName)}
                             className="rounded-xl active:scale-[0.98]"
                           >
-                            {isSharing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Compartilhar"}
+                            {isSharing ? <MenvoDots /> : "Compartilhar"}
                           </Button>
                         )
                       ) : (
@@ -247,7 +248,7 @@ export function ShareDiagnosticModal({
                 <h4 className="text-sm font-semibold">Mentores com Acesso Ativo</h4>
                 {loadingShares ? (
                   <div className="flex justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    <MenvoDots />
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -281,7 +282,7 @@ export function ShareDiagnosticModal({
                               onClick={() => handleRevokeShare(share.id, share.mentor?.full_name || "Mentor")}
                               className="text-destructive hover:bg-destructive/10 rounded-xl"
                             >
-                              {isRevoking ? <Loader2 className="h-3 w-3 animate-spin" /> : "Revogar"}
+                              {isRevoking ? <MenvoDots /> : "Revogar"}
                             </Button>
                           )}
                         </div>

@@ -1,10 +1,11 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations, useLocale } from "next-intl"
-import { Loader2, CheckCircle2 } from "lucide-react"
+import { CheckCircle2 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 
 import { Button } from "@/components/ui/button"
@@ -145,7 +146,7 @@ export function OrganizationLeadForm() {
       </div>
 
       <Button type="submit" className="w-full" disabled={status === "submitting"}>
-        {status === "submitting" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+        {status === "submitting" ? <MenvoDots className="mr-2" /> : null}
         {t("submitButton")}
       </Button>
 

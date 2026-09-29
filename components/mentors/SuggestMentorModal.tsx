@@ -1,11 +1,12 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { CheckCircle2, Lightbulb, Loader2 } from "lucide-react"
+import { CheckCircle2, Lightbulb } from "lucide-react"
 
 import {
   mentorSuggestionSchema,
@@ -170,7 +171,7 @@ export function SuggestMentorModal({ isOpen, onClose, initialTopic = "", context
                   {t("cancel")}
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSubmitting && <MenvoDots className="mr-2" />}
                   {isSubmitting ? t("submitting") : t("submit")}
                 </Button>
               </div>

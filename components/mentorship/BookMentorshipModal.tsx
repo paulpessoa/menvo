@@ -1,17 +1,8 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
-import {
-  X,
-  Calendar,
-  Clock,
-  Loader2,
-  Star,
-  Plus,
-  CheckCircle,
-  AlertCircle,
-  Check
-} from "lucide-react"
+import { X, Calendar, Clock, Star, Plus, CheckCircle, AlertCircle, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -243,7 +234,7 @@ export function BookMentorshipModal({
           <div className="p-6 flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                <MenvoDots />
                 <p className="text-sm text-muted-foreground animate-pulse text-center">
                   Buscando horários disponíveis...
                 </p>
@@ -419,7 +410,7 @@ export function BookMentorshipModal({
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <MenvoDots className="mr-2" />
                         {t("submitting")}
                       </>
                     ) : (

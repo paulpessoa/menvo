@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, Link } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation"
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Mail, ArrowLeft, AlertCircle, CheckCircle2, LayoutDashboard } from "lucide-react"
+import { Mail, ArrowLeft, AlertCircle, CheckCircle2, LayoutDashboard } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { auth as authService } from "@/lib/services/auth/auth.service"
 import { useTranslations } from "next-intl"
@@ -17,7 +18,7 @@ export default function ResendConfirmationPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >
@@ -168,7 +169,7 @@ function ResendConfirmationContent() {
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <MenvoDots className="mr-2" />
                 {tLogin("loggingIn")}
               </>
             ) : (

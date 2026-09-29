@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import {
   Select,
@@ -20,20 +21,7 @@ import {
   SheetTrigger
 } from "@/components/ui/sheet"
 import Link from "next/link"
-import {
-  Search,
-  Filter,
-  MapPin,
-  Clock,
-  Users,
-  Briefcase,
-  Heart,
-  Loader2,
-  ArrowDownUp,
-  SearchX,
-  Sparkles,
-  X
-} from "lucide-react"
+import { Search, Filter, MapPin, Clock, Users, Briefcase, Heart, ArrowDownUp, SearchX, Sparkles, X } from "lucide-react"
 
 import { useAuth } from "@/lib/auth"
 import { MentorCard } from "@/components/mentors/MentorCard"
@@ -908,7 +896,7 @@ export default function MentorsPage() {
               >
                 {loadingMore ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <MenvoDots className="mr-2" />
                     {t("loading")}
                   </>
                 ) : (

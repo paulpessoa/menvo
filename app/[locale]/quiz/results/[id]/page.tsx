@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import {
@@ -12,20 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import {
-    Trophy,
-    Users,
-    Lightbulb,
-    Target,
-    ArrowRight,
-    Loader2,
-    CheckCircle,
-    Heart,
-    Sparkles,
-    Mail,
-    Share2,
-    ExternalLink
-} from "lucide-react"
+import { Trophy, Users, Lightbulb, Target, ArrowRight, CheckCircle, Heart, Sparkles, Mail, Share2, ExternalLink } from "lucide-react"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
@@ -191,7 +179,7 @@ export default function QuizResultsPage() {
                     <Card className="w-full max-w-md">
                         <CardContent className="pt-6">
                             <div className="flex flex-col items-center space-y-4">
-                                <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+                                <MenvoDots />
                                 <div className="text-center">
                                     <h3 className="font-semibold text-lg">
                                         {t('quiz_results.processing_analysis')}
@@ -510,7 +498,7 @@ export default function QuizResultsPage() {
                                 >
                                     {sendingEmail ? (
                                         <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            <MenvoDots className="mr-2" />
                                             {t('quiz_results.sending')}
                                         </>
                                     ) : (

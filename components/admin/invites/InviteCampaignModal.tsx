@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import {
   Dialog,
@@ -10,7 +11,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+
 import { toast } from "sonner"
 import { useAuth } from "@/lib/auth"
 import { InviteAudienceStep } from "./InviteAudienceStep"
@@ -232,7 +233,7 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
           )}
           {step === "send" && (
             <Button onClick={onClose} disabled={sending}>
-              {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {sending ? <MenvoDots className="mr-2" /> : null}
               {sendDone ? "Fechar" : "Enviando..."}
             </Button>
           )}

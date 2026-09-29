@@ -1,10 +1,11 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2 } from "lucide-react"
+
 import { AUDIENCE_LABELS, type AudienceSkipped, type InviteAudience } from "./types"
 
 interface InviteAudienceStepProps {
@@ -97,7 +98,7 @@ export function InviteAudienceStep({
       <div className="rounded-lg border bg-muted/30 p-4 text-sm">
         {loadingCount ? (
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Calculando público...
+            <MenvoDots /> Calculando público...
           </div>
         ) : eligibleCount === null ? (
           <p className="text-muted-foreground">Escolha um público para ver quantas pessoas vão receber o e-mail.</p>

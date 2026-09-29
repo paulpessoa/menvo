@@ -1,7 +1,8 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { Progress } from "@/components/ui/progress"
-import { Loader2, CheckCircle2, XCircle } from "lucide-react"
+import { CheckCircle2, XCircle } from "lucide-react"
 import type { SendBatchResult } from "./types"
 
 interface InviteSendStepProps {
@@ -32,7 +33,7 @@ export function InviteSendStep({ total, sent, results, done }: InviteSendStepPro
 
       {!done && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Não feche esta janela até o envio terminar.
+          <MenvoDots /> Não feche esta janela até o envio terminar.
         </div>
       )}
 

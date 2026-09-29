@@ -1,26 +1,13 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import React, { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { 
-  Users, 
-  GraduationCap, 
-  CheckCircle2, 
-  ArrowRight, 
-  ArrowLeft, 
-  Sparkles, 
-  Loader2, 
-  MapPin, 
-  Briefcase, 
-  Building2, 
-  Linkedin, 
-  Compass, 
-  Check 
-} from "lucide-react"
+import { Users, GraduationCap, CheckCircle2, ArrowRight, ArrowLeft, Sparkles, MapPin, Briefcase, Building2, Linkedin, Compass, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -63,7 +50,7 @@ export default function OnboardingPage() {
     <Suspense
       fallback={
         <div className="min-h-[70vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >
@@ -240,7 +227,7 @@ function OnboardingContent() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
           <p className="text-sm text-muted-foreground">{tc("loading")}</p>
         </div>
       </div>
@@ -487,7 +474,7 @@ function OnboardingContent() {
                         className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
                       >
                         {isDetectingLocation ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <MenvoDots />
                         ) : (
                           <MapPin className="h-3.5 w-3.5" />
                         )}
@@ -632,7 +619,7 @@ function OnboardingContent() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <MenvoDots />
                     {t("saving")}
                   </>
                 ) : (

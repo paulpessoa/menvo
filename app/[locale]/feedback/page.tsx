@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Star, Send, CheckCircle2, Loader2, ArrowLeft } from "lucide-react"
+import { Star, Send, CheckCircle2, ArrowLeft } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { toast } from "sonner"
@@ -72,7 +73,7 @@ export default function FeedbackPage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <MenvoDots />
       </div>
     )
   }
@@ -188,7 +189,7 @@ export default function FeedbackPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-6 w-6 animate-spin" />{" "}
+                    <MenvoDots className="mr-2" />{" "}
                     Enviando...
                   </>
                 ) : (

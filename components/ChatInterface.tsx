@@ -1,8 +1,9 @@
 'use client';
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useRef } from 'react';
 import { chatService } from '@/lib/services/chat/chat.service';
-import { Send, Loader2 } from 'lucide-react';
+import { Send } from "lucide-react";
 import { toast } from 'sonner';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -241,7 +242,7 @@ export function ChatInterface({
     if (loading) {
         return (
             <div className="flex items-center justify-center h-96">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <MenvoDots />
             </div>
         );
     }
@@ -329,7 +330,7 @@ export function ChatInterface({
                         className="p-2 bg-primary text-primary-foreground rounded-full hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {sending ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <MenvoDots />
                         ) : (
                             <Send className="w-5 h-5" />
                         )}

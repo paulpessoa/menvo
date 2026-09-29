@@ -1,25 +1,12 @@
 "use client"
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StepSection } from "@/components/how-it-works/StepSection"
-import {
-  BarChart3,
-  Building2,
-  Calendar,
-  Clock,
-  MessageSquare,
-  Search,
-  Shield,
-  Sparkles,
-  TrendingUp,
-  User,
-  Users,
-  Video,
-  Loader2
-} from "lucide-react"
+import { BarChart3, Building2, Calendar, Clock, MessageSquare, Search, Shield, Sparkles, TrendingUp, User, Users, Video } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 
@@ -28,7 +15,7 @@ export default function HowItWorksPage() {
     <Suspense
       fallback={
         <div className="container max-w-7xl mx-auto px-4 py-12 flex justify-center min-h-[60vh] items-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >

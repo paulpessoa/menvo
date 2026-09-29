@@ -1,7 +1,8 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import React from 'react'
-import { Loader2 } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { useTranslations } from "next-intl"
 import { MenvoLoader } from './ui/menvo-loader'
@@ -66,7 +67,7 @@ export function LoadingButton({
         >
             {isLoading ? (
                 <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <MenvoDots className="mr-2" />
                     {displayLoadingText}
                 </>
             ) : (
@@ -89,7 +90,7 @@ export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) 
     }
 
     return (
-        <Loader2 className={cn(
+        <MenvoDots className={cn(
             "animate-spin text-blue-600",
             sizeClasses[size],
             className

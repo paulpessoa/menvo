@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import {
   Dialog,
@@ -14,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslations } from "next-intl"
 import { Badge } from "@/components/ui/badge"
-import { X, Loader2, Plus } from "lucide-react"
+import { X, Plus } from "lucide-react"
 
 interface SuggestionModalProps {
   isOpen: boolean
@@ -248,7 +249,7 @@ export function SuggestionModal({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <MenvoDots className="mr-2" />
                 {t("common.submitting")}
               </>
             ) : t("common.submit")}

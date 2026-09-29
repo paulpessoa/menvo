@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useCallback, useEffect, useState } from "react"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { Loader2, Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck } from "lucide-react"
+import { Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck } from "lucide-react"
 import { toast } from "sonner"
 
 interface OrgOption {
@@ -225,7 +226,7 @@ export default function OrgAdminDashboardPage() {
   if (loading) {
     return (
       <PageContainer className="flex justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <MenvoDots />
       </PageContainer>
     )
   }
@@ -310,7 +311,7 @@ export default function OrgAdminDashboardPage() {
               />
             </div>
             <Button onClick={invite} disabled={inviting || !inviteEmail.trim()}>
-              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Convidar"}
+              {inviting ? <MenvoDots /> : "Convidar"}
             </Button>
           </CardContent>
         </Card>

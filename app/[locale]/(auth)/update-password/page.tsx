@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import type React from "react"
 import { useState, Suspense, useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Lock, CheckCircle2, AlertCircle } from "lucide-react"
+import { Lock, CheckCircle2, AlertCircle } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
@@ -38,7 +39,7 @@ function UpdatePasswordForm() {
     return (
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col items-center justify-center p-12 space-y-4">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <MenvoDots />
           <p className="text-muted-foreground animate-pulse text-lg">Validando sua sessão segura...</p>
         </CardContent>
       </Card>
@@ -172,7 +173,7 @@ function UpdatePasswordForm() {
           <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Atualizando...
+                <MenvoDots className="mr-2" /> Atualizando...
               </>
             ) : (
               "Salvar Nova Senha"
@@ -189,7 +190,7 @@ export default function UpdatePasswordPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[300px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >

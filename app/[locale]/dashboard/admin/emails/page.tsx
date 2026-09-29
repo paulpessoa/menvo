@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth/auth-context"
@@ -15,24 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { PageContainer } from "@/components/layout/PageContainer"
-import {
-  Mail,
-  Smartphone,
-  Monitor,
-  ExternalLink,
-  ArrowLeft,
-  CheckCircle,
-  UserCheck,
-  Star,
-  CalendarX,
-  Bell,
-  Send,
-  Loader2,
-  AlertCircle,
-  Building2,
-  UserPlus,
-  BadgeCheck
-} from "lucide-react"
+import { Mail, Smartphone, Monitor, ExternalLink, ArrowLeft, CheckCircle, UserCheck, Star, CalendarX, Bell, Send, AlertCircle, Building2, UserPlus, BadgeCheck } from "lucide-react"
 
 interface EmailTemplateMeta {
   key: string
@@ -328,7 +312,7 @@ export default function AdminEmailPreviewPage() {
               >
                 {isSending ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Disparando via Brevo...
+                    <MenvoDots /> Disparando via Brevo...
                   </>
                 ) : (
                   <>

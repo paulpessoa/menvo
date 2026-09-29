@@ -11,6 +11,7 @@
  * Kept only so it still compiles; do not wire it back up.
  */
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import {
   Card,
@@ -23,16 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Search,
-  Filter,
-  Users,
-  CheckCircle,
-  Clock,
-  Loader2,
-  RefreshCw,
-  AlertTriangle
-} from "lucide-react"
+import { Search, Filter, Users, CheckCircle, Clock, RefreshCw, AlertTriangle } from "lucide-react"
 import { adminService } from "@/lib/services/admin/admin.service"
 import { MentorCard } from "./MentorCard"
 import { toast } from "sonner"
@@ -179,7 +171,7 @@ export function MentorManagementPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <MenvoDots />
         <span className="ml-2">Carregando mentores...</span>
       </div>
     )

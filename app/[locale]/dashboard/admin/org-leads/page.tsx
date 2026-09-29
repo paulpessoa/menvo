@@ -1,9 +1,10 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, Inbox, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { Building2, Inbox, CheckCircle2, XCircle } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { Badge } from "@/components/ui/badge"
 import { PageContainer } from "@/components/layout/PageContainer"
@@ -110,7 +111,7 @@ export default function AdminOrgLeadsPage() {
             <div className="space-y-4">
               {loading ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                  <MenvoDots />
                 </div>
               ) : leads.length === 0 ? (
                 <Card>

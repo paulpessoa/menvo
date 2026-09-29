@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Calendar, Clock, CheckCircle, Loader2 } from "lucide-react"
+import { Calendar, Clock, CheckCircle } from "lucide-react"
 import {
   type MentorAvailability as AvailableTimeSlot,
   mentorshipUtils
@@ -152,7 +153,7 @@ export default function BookingForm({
 
           {fetchingSlots ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+              <MenvoDots className="/40" />
             </div>
           ) : availableSlots.length === 0 ? (
             <div className="text-center py-12 border rounded-xl bg-muted/30">
@@ -251,7 +252,7 @@ export default function BookingForm({
             className="flex-1 shadow-lg shadow-primary/20"
           >
             {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <MenvoDots />
             ) : (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />

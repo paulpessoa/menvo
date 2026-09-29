@@ -1,10 +1,11 @@
 'use client'
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { AnimatedBackground } from '@/components/ui/animated-background'
 import { useTranslations } from 'next-intl'
 import { QuizFormData, stepValidation } from '@/lib/schemas/quiz'
@@ -278,7 +279,7 @@ export function QuizForm({ onSubmit, onBack, initialData, isAuthenticated = fals
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <MenvoDots className="mr-2" />
                           {t('quiz_form.processing')}
                         </>
                       ) : (

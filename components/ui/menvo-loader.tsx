@@ -30,20 +30,28 @@ export function MenvoLoader({ className, fullScreen = false }: { className?: str
 
       {/* 3 pontos pulsantes na cor brand */}
       <div className="flex items-center gap-2" role="status" aria-label="Carregando">
-        <span
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
-          style={{ animationDelay: "0ms", animationDuration: "900ms" }}
-        />
-        <span
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
-          style={{ animationDelay: "160ms", animationDuration: "900ms" }}
-        />
-        <span
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
-          style={{ animationDelay: "320ms", animationDuration: "900ms" }}
-        />
+        <MenvoDots />
         <span className="sr-only">Carregando...</span>
       </div>
+    </div>
+  )
+}
+export function MenvoDots({ className }: { className?: string }) {
+  return (
+    <div className={cn("flex items-center gap-1.5", className)} role="status" aria-label="Carregando">
+      <span
+        className="h-1.5 w-1.5 rounded-full bg-current animate-bounce"
+        style={{ animationDelay: "0ms", animationDuration: "900ms" }}
+      />
+      <span
+        className="h-1.5 w-1.5 rounded-full bg-current animate-bounce"
+        style={{ animationDelay: "160ms", animationDuration: "900ms" }}
+      />
+      <span
+        className="h-1.5 w-1.5 rounded-full bg-current animate-bounce"
+        style={{ animationDelay: "320ms", animationDuration: "900ms" }}
+      />
+      <span className="sr-only">Carregando...</span>
     </div>
   )
 }

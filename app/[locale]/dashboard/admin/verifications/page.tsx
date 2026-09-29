@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Calendar, User, CheckCircle, XCircle, Eye, Loader2, ArrowLeft, Search } from "lucide-react"
+import { Calendar, User, CheckCircle, XCircle, Eye, ArrowLeft, Search } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { VerificationService } from "@/lib/services/verifications/verifications.service"
 import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
@@ -125,7 +126,7 @@ export default function AdminVerificationsPage() {
   if (loading) {
     return (
       <PageContainer className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+        <MenvoDots className="mb-3" />
         <p className="text-muted-foreground">Carregando verificações de mentores...</p>
       </PageContainer>
     )

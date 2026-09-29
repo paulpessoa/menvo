@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import {
   Card,
@@ -11,20 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Calendar,
-  Users,
-  Search,
-  Clock,
-  CheckCircle,
-  Heart,
-  Loader2,
-  MessageSquare,
-  TrendingUp,
-  LayoutDashboard,
-  Video,
-  ExternalLink
-} from "lucide-react"
+import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
@@ -251,7 +239,7 @@ export default function MenteeDashboard() {
                     </CardHeader>
                     <CardContent>
                       {loadingFavorites ? (
-                        <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                        <div className="flex justify-center py-8"><MenvoDots /></div>
                       ) : favoriteMentorsData.length === 0 ? (
                         <div className="py-8 px-4 text-center rounded-2xl border border-dashed border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">
                           <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">

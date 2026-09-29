@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, Link } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation"
@@ -15,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Mail, Loader2, CheckCircle, AlertTriangle, Shield } from "lucide-react"
+import { Mail, CheckCircle, AlertTriangle, Shield } from "lucide-react"
 import { createClient } from "@/lib/utils/supabase/client"
 
 export default function ConfirmEmailPage() {
@@ -23,7 +24,7 @@ export default function ConfirmEmailPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[300px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >
@@ -207,7 +208,7 @@ function ConfirmEmailContent() {
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
             {status === "loading" && (
-              <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+              <MenvoDots />
             )}
             {status === "success" && (
               <CheckCircle className="h-12 w-12 text-green-600" />
@@ -300,7 +301,7 @@ function ConfirmEmailContent() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <MenvoDots className="mr-2" />
                     Confirmando...
                   </>
                 ) : (
@@ -331,7 +332,7 @@ function ConfirmEmailContent() {
               >
                 {isResending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <MenvoDots className="mr-2" />
                     Reenviando...
                   </>
                 ) : (

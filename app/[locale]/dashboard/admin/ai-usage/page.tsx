@@ -1,8 +1,9 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2 } from "lucide-react"
+
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,7 +43,7 @@ export default function AdminAIUsagePage() {
             <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-full sm:w-44" />
           </div>
 
-          {isLoading && <Loader2 className="h-6 w-6 animate-spin text-primary" />}
+          {isLoading && <MenvoDots />}
           {error && <p className="text-destructive">Não foi possível carregar o relatório.</p>}
 
           {data && (

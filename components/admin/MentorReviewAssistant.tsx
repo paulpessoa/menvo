@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -13,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { Sparkles, Loader2 } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { MentorReviewDraftPanel, type MentorReviewDraft, type ReviewKind } from "./MentorReviewDraftPanel"
 
@@ -127,7 +128,7 @@ export function MentorReviewAssistant({
               </div>
 
               <Button onClick={generate} disabled={loading} size="sm">
-                {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                {loading ? <MenvoDots className="mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
                 Gerar
               </Button>
 

@@ -1,9 +1,10 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import React from "react"
 import { Progress } from "@/components/ui/progress"
 
-import { Loader2 } from "lucide-react"
+
 
 export interface DiagnosticProgressBarProps {
   currentStep: number
@@ -31,7 +32,7 @@ export function DiagnosticProgressBar({
             Etapa {currentStep} de {totalSteps}
             {stepName ? `: ${stepName}` : ""}
             {isProcessing && (
-              <Loader2 className="w-3 h-3 animate-spin text-primary ml-1" />
+              <MenvoDots className="ml-1" />
             )}
           </span>
           <span className="font-medium text-primary">{percentage}% concluído</span>

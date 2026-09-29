@@ -1,10 +1,11 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import React, { useState, useRef, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useFeatureFlag } from "@/lib/feature-flags"
-import { Bot, User, Sparkles, Loader2, Info, Send, FileText, ExternalLink } from "lucide-react"
+import { Bot, User, Sparkles, Info, Send, FileText, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MentorCard } from "@/components/mentors/MentorCard"
@@ -382,7 +383,7 @@ function AssistantChat() {
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-70">
             {isBriefingLoading ? (
               <>
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <MenvoDots />
                 <p className="text-sm text-muted-foreground">Preparando seu resumo...</p>
               </>
             ) : (
@@ -430,7 +431,7 @@ function AssistantChat() {
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </span>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <MenvoDots />
                     <span>{toolActivity || "Processando com inteligência artificial..."}</span>
                   </div>
                 )}
@@ -477,7 +478,7 @@ function AssistantChat() {
 
         {toolActivity && !messages.some((m) => m.isStreaming) && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground ml-12">
-            <Loader2 className="w-3 h-3 animate-spin text-primary" />
+            <MenvoDots />
             <span>{toolActivity}</span>
           </div>
         )}
@@ -553,7 +554,7 @@ export default function AssistantPage() {
     <Suspense
       fallback={
         <div className="flex justify-center items-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >

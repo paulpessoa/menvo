@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import {
   Card,
   CardContent,
@@ -7,7 +8,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { TrendingUp, PieChart as PieIcon, Loader2 } from "lucide-react"
+import { TrendingUp, PieChart as PieIcon } from "lucide-react"
 import {
   BarChart,
   Bar,
@@ -50,7 +51,7 @@ export function AdminReportsCharts({
         <CardContent className="h-[300px] pt-4">
           {loading ? (
             <div className="h-full flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <MenvoDots />
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -89,7 +90,7 @@ export function AdminReportsCharts({
         <CardContent className="h-[300px] pt-4">
           {loading ? (
             <div className="h-full flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <MenvoDots />
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

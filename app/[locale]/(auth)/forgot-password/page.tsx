@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import type React from "react"
 
 import { useState, Suspense } from "react"
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, Mail, Loader2, AlertTriangle, CheckCircle } from "lucide-react"
+import { ArrowLeft, Mail, AlertTriangle, CheckCircle } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { createClient } from "@/lib/utils/supabase/client"
 import { useTranslations } from "next-intl"
@@ -110,7 +111,7 @@ function ForgotPasswordForm() {
           <Button type="submit" className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform mt-4" disabled={isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <MenvoDots className="mr-2" />
                 {tLogin("loggingIn")}
               </>
             ) : (
@@ -133,7 +134,7 @@ export default function ForgotPasswordPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[300px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <MenvoDots />
       </div>
     }>
       <ForgotPasswordForm />

@@ -1,24 +1,12 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  CheckCircle,
-  XCircle,
-  Eye,
-  Clock,
-  MapPin,
-  Briefcase,
-  Mail,
-  Loader2,
-  AlertTriangle,
-  Linkedin,
-  FileText,
-  ExternalLink
-} from "lucide-react"
+import { CheckCircle, XCircle, Eye, Clock, MapPin, Briefcase, Mail, AlertTriangle, Linkedin, FileText, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 import { Link } from "@/i18n/routing"
 import { VerificationService } from "@/lib/services/verifications/verifications.service"
@@ -283,7 +271,7 @@ export function MentorCard({
                     }
                   >
                     {isVerifying ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      <MenvoDots className="mr-1" />
                     ) : (
                       <CheckCircle className="h-4 w-4 mr-1" />
                     )}
@@ -297,7 +285,7 @@ export function MentorCard({
                     disabled={isVerifying}
                   >
                     {isVerifying ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      <MenvoDots className="mr-1" />
                     ) : (
                       <XCircle className="h-4 w-4 mr-1" />
                     )}

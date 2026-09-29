@@ -1,10 +1,11 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Loader2, Copy, Send } from "lucide-react"
+import { Copy, Send } from "lucide-react"
 
 export type ReviewKind = "approve" | "reject" | "announce"
 
@@ -93,7 +94,7 @@ export function MentorReviewDraftPanel({
             onClick={onSend}
             disabled={submitting}
           >
-            {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+            {submitting ? <MenvoDots className="mr-2" /> : <Send className="h-4 w-4 mr-2" />}
             {tab === "approve" ? "Aprovar e enviar" : "Enviar pedido de ajustes"}
           </Button>
         )}

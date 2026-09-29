@@ -1,10 +1,11 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Clock, Video, ExternalLink, Loader2 } from "lucide-react"
+import { Calendar, Clock, Video, ExternalLink } from "lucide-react"
 import { Link } from "@/i18n/routing"
 
 export interface MentorAppointment {
@@ -55,7 +56,7 @@ export function MentorUpcomingSessions({
       <CardContent>
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <MenvoDots />
           </div>
         ) : appointments.length === 0 ? (
           <div className="py-10 px-4 text-center rounded-2xl border border-dashed border-gray-200 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">

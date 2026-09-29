@@ -1,6 +1,7 @@
 "use client"
 
-import { Sparkles, Loader2 } from "lucide-react"
+import { MenvoDots } from "@/components/ui/menvo-loader"
+import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
@@ -56,7 +57,7 @@ export function AISearchButton({ query, loading, onSearch }: AISearchButtonProps
       className="h-11 sm:h-12 rounded-xl px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shrink-0"
     >
       {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <MenvoDots />
       ) : (
         <Sparkles className="h-4 w-4" />
       )}

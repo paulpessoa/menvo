@@ -19,6 +19,7 @@ import {
   DialogDescription
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { MenvoDots } from "./ui/menvo-loader"
 
 interface Feedback {
   id: string
@@ -97,7 +98,12 @@ export function FeedbackManagement({ type = 'received' }: FeedbackManagementProp
     }
   }
 
-  if (loading) return <div className="py-10 text-center text-muted-foreground italic">Carregando avaliações...</div>
+  if (loading) return (
+    <div className="py-10 text-center text-muted-foreground flex flex-col items-center gap-2 italic">
+      <MenvoDots />
+      Carregando avaliações...
+    </div>
+  )
 
   return (
     <div className="space-y-4">
@@ -133,7 +139,7 @@ export function FeedbackManagement({ type = 'received' }: FeedbackManagementProp
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col items-end gap-2 shrink-0">
                     <span className="text-[11px] text-gray-400">
                       {format(new Date(fb.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
@@ -170,7 +176,7 @@ export function FeedbackManagement({ type = 'received' }: FeedbackManagementProp
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <p className="text-sm font-medium">Seu comentário:</p>
-              <Textarea 
+              <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 rows={5}

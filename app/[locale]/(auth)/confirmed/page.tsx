@@ -1,11 +1,12 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Loader2 } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 
 export default function EmailConfirmedPage() {
@@ -55,7 +56,7 @@ export default function EmailConfirmedPage() {
     return (
       <Card className="w-full max-w-md">
         <CardContent className="flex items-center justify-center p-6">
-          <Loader2 className="h-6 w-6 animate-spin" />
+          <MenvoDots />
           <span className="ml-2">{tCommon("loading")}</span>
         </CardContent>
       </Card>
