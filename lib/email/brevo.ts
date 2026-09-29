@@ -464,7 +464,7 @@ export async function sendAdminNewOrganizationLead(data: {
   locale?: string | null;
 }): Promise<void> {
   const adminEmail = process.env.ADMIN_EMAIL || "contato@menvo.com.br";
-  
+
   const typeMap: Record<string, string> = {
     ngo: 'ONG / Terceiro Setor',
     company: 'Empresa',
@@ -1050,13 +1050,12 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
   const mentorProfileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors/${data.mentorSlug}`;
 
   const content = `
-    <h2>Alguém quer ajudar você.</h2>
-    <p>Oi, <strong>${escapeHtml(data.menteeName)}</strong>! A ajuda que você esperava chegou. Um mentor da Menvo viu seu perfil e quer se conectar com você.</p>
+    <p>Um mentor da Menvo viu seu perfil e quer se conectar com você.</p>
     
     ${data.customMessage ? `
-    <p>Olha a mensagem que ${escapeHtml(data.mentorName.split(' ')[0])} deixou:</p>
-    <div style="background:#fefce8;padding:24px 28px;margin:24px 0;font-family:'Comic Sans MS', 'Caveat', 'Patrick Hand', cursive, sans-serif;font-size:16px;color:#422006;border-radius:12px;box-shadow:2px 4px 12px rgba(0,0,0,0.06);transform:rotate(-0.5deg);">
-      <p style="margin:0;line-height:1.7;">"${escapeHtml(data.customMessage).replace(/\n/g, '<br>')}"</p>
+    <p>Olha a mensagem:</p>
+    <div style="background:#f8fafc;padding:24px 28px;margin:24px 0;border-radius:12px;border:1px solid ${COLORS.divider};">
+      <p style="margin:0;line-height:1.7;font-size:16px;font-style:italic;color:#374151;">"${escapeHtml(data.customMessage).replace(/\n/g, '<br>')}"</p>
     </div>
     ` : ''}
 
@@ -1069,7 +1068,7 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
           <td style="vertical-align:top;">
             <p style="font-weight:800;color:#111827;font-size:18px;margin:0 0 4px 0;">${escapeHtml(data.mentorName)}</p>
             ${data.mentorJobTitle ? `<p style="font-size:14px;color:${COLORS.primary};font-weight:600;margin:0 0 2px 0;">${escapeHtml(data.mentorJobTitle)}${data.mentorCompany ? ` @ ${escapeHtml(data.mentorCompany)}` : ''}</p>` : ''}
-            ${data.mentorBio ? `<p style="font-size:13px;color:${COLORS.muted};margin:8px 0 0 0;font-style:italic;line-height:1.5;">"${escapeHtml(data.mentorBio.slice(0, 200))}${data.mentorBio.length > 200 ? '...' : ''}"</p>` : ''}
+            ${data.mentorBio ? `<p style="font-size:13px;color:${COLORS.muted};margin:8px 0 0 0;font-style:italic;line-height:1.5;">"${escapeHtml(data.mentorBio.slice(0, 140))}${data.mentorBio.length > 140 ? '...' : ''}"</p>` : ''}
           </td>
         </tr>
       </table>
@@ -1077,7 +1076,7 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
     </div>
 
     <div class="button-container">
-      <a href="${mentorProfileUrl}" class="button">Ver Perfil do Mentor</a>
+      <a href="${mentorProfileUrl}" class="button">Ver Perfil</a>
     </div>
 
     <div class="divider"></div>
