@@ -134,6 +134,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/org-leads",
       icon: Building2,
       color: "bg-indigo-600"
+    },
+    {
+      title: "Organizações ativas",
+      description: "Gestão das organizações parceiras da Menvo",
+      href: "/dashboard/admin/organizations",
+      icon: Building2,
+      color: "bg-emerald-600"
     }
   ]
 

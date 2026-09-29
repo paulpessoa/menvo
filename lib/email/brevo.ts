@@ -493,7 +493,7 @@ export async function sendAdminNewOrganizationLead(data: {
         <div class="info-item"><strong>E-mail:</strong> ${escapeHtml(data.contact_email)}</div>
         ${data.contact_phone ? `<div class="info-item"><strong>Telefone:</strong> ${escapeHtml(data.contact_phone)}</div>` : ''}
         ${data.locale ? `<div class="info-item"><strong>Idioma (locale):</strong> ${data.locale}</div>` : ''}
-        ${data.message ? `<div class="info-item" style="margin-top: 8px;"><strong>Mensagem:</strong><br/>${escapeHtml(data.message).replace(/\\n/g, '<br/>')}</div>` : ''}
+        ${data.message ? `<div class="info-item" style="margin-top: 8px;"><strong>Mensagem:</strong><br/>${escapeHtml(data.message).replace(/\n/g, '<br/>')}</div>` : ''}
     </div>
     <div class="button-container">
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/admin/org-leads" class="button">Ver pedidos no painel</a>

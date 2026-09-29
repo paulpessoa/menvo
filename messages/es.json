@@ -1846,9 +1846,8 @@
       "action": "Chatear por WhatsApp"
     },
     "partnerships": {
-      "title": "Alianzas Institucionales y Empresas",
-      "description": "¿Deseas llevar mentorías voluntarias a tu empresa, universidad o comunidad? Contáctanos por correo institucional.",
-      "action": "Proponer Alianza"
+      "title": "Quiero Menvo en mi organización",
+      "description": "ONG, empresas, escuelas y eventos: cuéntanos un poco sobre tu organización y nuestro equipo te contactará por correo."
     },
     "organizationForm": {
       "fields": {

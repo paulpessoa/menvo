@@ -1870,9 +1870,8 @@
       "action": "Chat on WhatsApp"
     },
     "partnerships": {
-      "title": "Institutional Partnerships & Companies",
-      "description": "Looking to bring volunteer mentoring to your company, university, or organization? Reach out via our institutional email.",
-      "action": "Propose Partnership"
+      "title": "Bring Menvo to my organization",
+      "description": "NGOs, companies, schools and events: tell us a bit about your organization and our team will get back to you by email."
     },
     "organizationForm": {
       "fields": {

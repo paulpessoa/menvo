@@ -1864,9 +1864,8 @@
       "action": "Conversar pelo WhatsApp"
     },
     "partnerships": {
-      "title": "Parcerias Institucionais & Empresas",
-      "description": "Deseja levar mentorias voluntárias para sua empresa, faculdade ou comunidade? Entre em contato pelo e-mail institucional.",
-      "action": "Propor Parceria"
+      "title": "Quero a Menvo na minha organização",
+      "description": "ONGs, empresas, escolas e eventos: conte um pouco sobre sua organização e nossa equipe entra em contato por e-mail."
     },
     "organizationForm": {
       "fields": {
