@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
     await sendMentorContactEmail({
       menteeEmail: menteeAuth.user.email,
       menteeName: menteeProfile.first_name || menteeProfile.full_name || "Mentorado",
+      mentorEmail: user.email!,
       mentorName: mentorProfile.full_name || "Um mentor",
       mentorJobTitle: mentorProfile.job_title || undefined,
       mentorCompany: mentorProfile.company || undefined,

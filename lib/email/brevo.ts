@@ -821,9 +821,11 @@ export async function sendOrgMembershipApproved(data: {
 async function sendEmail(
   to: string | string[],
   subject: string,
-  htmlContent: string
+  htmlContent: string,
+  cc?: string | string[]
 ): Promise<{ success: boolean; error?: string }> {
   const recipients = Array.isArray(to) ? to.map(email => ({ email })) : [{ email: to }];
+  const ccRecipients = cc ? (Array.isArray(cc) ? cc.map(email => ({ email })) : [{ email: cc }]) : undefined;
   const apiKey = process.env.BREVO_API_KEY;
 
   if (!apiKey) {
@@ -848,6 +850,7 @@ async function sendEmail(
           email: process.env.BREVO_SENDER_EMAIL || "contato@menvo.com.br"
         },
         to: recipients,
+        ...(ccRecipients && { cc: ccRecipients }),
         subject,
         htmlContent
       })
@@ -1022,6 +1025,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
 interface MentorContactEmailData {
   menteeEmail: string;
   menteeName: string;
+  mentorEmail: string;
   mentorName: string;
   mentorJobTitle?: string;
   mentorCompany?: string;
@@ -1082,5 +1086,5 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
   `;
 
   const subject = `${data.mentorName} quer ser seu mentor na Menvo!`;
-  return await sendEmail(data.menteeEmail, subject, getEmailLayout(subject, content, { signatureType: "personal" }));
+  return await sendEmail(data.menteeEmail, subject, getEmailLayout(subject, content, { signatureType: "personal" }), data.mentorEmail);
 }

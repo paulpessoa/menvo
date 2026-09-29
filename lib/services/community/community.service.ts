@@ -30,7 +30,7 @@ export interface GetCommunityProfilesParams {
   state?: string
   city?: string
   topics?: string[]
-  sortBy?: "newest" | "oldest" | "name"
+  sortBy?: "newest" | "oldest" | "name" | "name-desc"
   organization?: string
 }
 
@@ -125,6 +125,8 @@ export const communityService = {
     // Sort
     if (sortBy === "name") {
       query = query.order("full_name", { ascending: true })
+    } else if (sortBy === "name-desc") {
+      query = query.order("full_name", { ascending: false })
     } else if (sortBy === "oldest") {
       query = query.order("created_at", { ascending: true })
     } else {

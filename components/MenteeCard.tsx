@@ -181,6 +181,22 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
           )}
 
           <div className="flex items-center gap-3 pt-6">
+            {!isSelf && (
+              <ContactMenteeModal
+                menteeId={profile.id}
+                menteeName={profile.full_name || "Mentorado"}
+                isLoggedIn={isAuthenticated}
+              >
+                <Button
+                  variant="outline"
+                  className="flex-[1] rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-12"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  {tCommunity("offerHelp")}
+                </Button>
+              </ContactMenteeModal>
+            )}
+
             <Button
               size="lg"
               onClick={handleViewProfile}
@@ -196,22 +212,6 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
                 </>
               )}
             </Button>
-
-            {!isSelf && (
-              <ContactMenteeModal
-                menteeId={profile.id}
-                menteeName={profile.full_name || "Mentorado"}
-                isLoggedIn={isAuthenticated}
-              >
-                <Button
-                  variant="outline"
-                  className="flex-1 rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-12"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  {tCommunity("offerHelp")}
-                </Button>
-              </ContactMenteeModal>
-            )}
           </div>
         </CardContent>
       </Card>

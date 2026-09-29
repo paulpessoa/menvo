@@ -35,12 +35,14 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { ArrowDownUp, Filter } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ArrowDownUp, Filter, Check } from "lucide-react"
 
 interface FilterState {
   organization: string
   topics: string[]
-  sortBy: "newest" | "oldest" | "name"
+  sortBy: "newest" | "oldest" | "name" | "name-desc"
 }
 
 const initialFilters: FilterState = {
@@ -73,6 +75,7 @@ export default function CommunityPage() {
   const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<CommunityProfile[]>([])
   const [aiLoading, setAiLoading] = useState(false)
   const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
+  const [topicSearch, setTopicSearch] = useState("")
 
   const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
@@ -302,43 +305,43 @@ export default function CommunityPage() {
           Seu hobby, sua vivência, sua história — alguém está buscando exatamente isso.
         </p>
 
-      {/* Search + AI Match */}
-      <div className="flex flex-col sm:flex-row gap-2.5 max-w-2xl mb-12">
-        <div className="relative flex-1">
+      {/* Search + Filters (Single Row) */}
+      <div className="flex flex-col xl:flex-row gap-3 w-full mb-8">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={tCommunity("searchPlaceholder")}
-            className="pl-10 h-11 rounded-xl"
+            className="pl-10 h-11 rounded-xl w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <AIMatchButton
-          title={tCommunity("magicSearch.title")}
-          description={tCommunity("magicSearch.disclaimer")}
-          placeholder={tCommunity("magicSearch.placeholder")}
-          loading={aiLoading}
-          loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
-          minCharsMessage={tCommunity("magicSearch.minChars")}
-          submitLabel={tCommunity("magicSearch.button")}
-          buttonLabel={tCommunity("magicSearch.button")}
-          quota={aiQuota}
-          quotaHint={(q) =>
-            q.reason === "budget"
-              ? tCommunity("magicSearch.budgetExhausted", {
-                  date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
-                })
-              : q.remaining! > 0
-                ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
-                : tCommunity("magicSearch.quotaExhausted", {
+        
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto shrink-0">
+          <AIMatchButton
+            title={tCommunity("magicSearch.title")}
+            description={tCommunity("magicSearch.disclaimer")}
+            placeholder={tCommunity("magicSearch.placeholder")}
+            loading={aiLoading}
+            loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
+            minCharsMessage={tCommunity("magicSearch.minChars")}
+            submitLabel={tCommunity("magicSearch.button")}
+            buttonLabel={tCommunity("magicSearch.button")}
+            quota={aiQuota}
+            quotaHint={(q) =>
+              q.reason === "budget"
+                ? tCommunity("magicSearch.budgetExhausted", {
                     date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
                   })
-          }
-          onSubmit={handleAISearch}
-        />
-        
-        {/* Sort & Filters */}
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
+                : q.remaining! > 0
+                  ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
+                  : tCommunity("magicSearch.quotaExhausted", {
+                      date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                    })
+            }
+            onSubmit={handleAISearch}
+          />
+
           <Select
             value={filters.sortBy}
             onValueChange={(val: any) =>
@@ -354,36 +357,79 @@ export default function CommunityPage() {
             <SelectContent className="rounded-xl">
               <SelectItem value="newest">Mais recentes</SelectItem>
               <SelectItem value="oldest">Mais antigos</SelectItem>
-              <SelectItem value="name">Ordem alfabética</SelectItem>
+              <SelectItem value="name">A-Z</SelectItem>
+              <SelectItem value="name-desc">Z-A</SelectItem>
             </SelectContent>
           </Select>
 
           <Input
-            placeholder="Filtrar por organização (ex: ONG, Hackathon)"
+            placeholder="Organização..."
             value={filters.organization}
             onChange={(e) => setFilters(p => ({ ...p, organization: e.target.value }))}
-            className="w-full sm:w-[220px] h-11 rounded-xl bg-card border-border/80 text-sm placeholder:text-muted-foreground/70 shadow-2xs"
+            className="w-full sm:w-[160px] h-11 rounded-xl bg-card border-border/80 text-sm placeholder:text-muted-foreground/70 shadow-2xs"
+            list="organizations-list"
           />
+          <datalist id="organizations-list">
+            <option value="Sebrae" />
+            <option value="Prouni" />
+            <option value="Hackathon" />
+            <option value="ONG" />
+          </datalist>
 
-          <Select
-            value={filters.topics[0] || "all"}
-            onValueChange={(val) =>
-              setFilters((prev) => ({ ...prev, topics: val === "all" ? [] : [val] }))
-            }
-          >
-            <SelectTrigger className="w-full sm:w-[200px] h-11 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
-              <div className="flex items-center gap-1.5 truncate">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full sm:w-[180px] h-11 rounded-xl bg-card border-border/80 shadow-2xs font-medium text-xs sm:text-sm flex items-center justify-start gap-1.5 px-3"
+              >
                 <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <SelectValue placeholder="Tópico" />
+                <span className="truncate">
+                  {filters.topics.length === 0 
+                    ? "Tópicos" 
+                    : `${filters.topics.length} selecionado(s)`}
+                </span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[240px] p-2 rounded-xl" align="end">
+              <div className="flex flex-col gap-2">
+                <Input
+                  placeholder="Buscar tópico..."
+                  value={topicSearch}
+                  onChange={(e) => setTopicSearch(e.target.value)}
+                  className="h-8 text-sm rounded-lg"
+                />
+                <div className="max-h-[200px] overflow-y-auto pr-1 flex flex-col gap-1.5 mt-1">
+                  {availableFilters.topics
+                    .filter(t => t.toLowerCase().includes(topicSearch.toLowerCase()))
+                    .map((topic) => {
+                      const isChecked = filters.topics.includes(topic)
+                      return (
+                        <label
+                          key={topic}
+                          className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
+                        >
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={(checked) => {
+                              setFilters(prev => ({
+                                ...prev,
+                                topics: checked 
+                                  ? [...prev.topics, topic]
+                                  : prev.topics.filter(t => t !== topic)
+                              }))
+                            }}
+                          />
+                          <span className="text-sm leading-none truncate flex-1">{topic}</span>
+                        </label>
+                      )
+                    })}
+                  {availableFilters.topics.length > 0 && availableFilters.topics.filter(t => t.toLowerCase().includes(topicSearch.toLowerCase())).length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">Nenhum tópico encontrado.</p>
+                  )}
+                </div>
               </div>
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="all">Qualquer tópico</SelectItem>
-              {availableFilters.topics.map(t => (
-                <SelectItem key={t} value={t}>{t}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       

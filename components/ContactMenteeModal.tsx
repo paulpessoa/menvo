@@ -73,30 +73,24 @@ export function ContactMenteeModal({ menteeId, menteeName, contactLabel = "Ofere
           <DialogTitle className="text-xl md:text-2xl font-black text-center text-foreground">
             Oferecer Ajuda
           </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground font-medium text-sm md:text-base px-2">
-            Envie uma mensagem para <strong>{menteeName}</strong>. Seu perfil completo da Menvo também será enviado junto.
+          <DialogDescription className="text-center text-muted-foreground font-medium text-sm md:text-base px-2 leading-relaxed">
+            Escreva uma mensagem para iniciar a conversa com <strong>{menteeName}</strong>.
           </DialogDescription>
         </DialogHeader>
         
-        <div className="py-4">
+        <div className="py-4 space-y-4">
           <Textarea
-            placeholder="Ex: Olá! Vi seu perfil e acredito que posso te ajudar com..."
+            placeholder="Ex: Olá! Vi seu perfil e acredito que posso te ajudar com a área de..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="min-h-[120px] resize-none rounded-xl border-border/60 focus:border-primary shadow-sm"
           />
+          <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg border border-border/50 text-center">
+            Ao enviar, o seu perfil completo da Menvo também será enviado junto para que o mentorado conheça sua trajetória. Uma cópia será enviada para o seu próprio e-mail.
+          </p>
         </div>
 
         <DialogFooter className="sm:justify-stretch">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(false)}
-            className="rounded-xl w-full sm:w-auto font-semibold hidden sm:flex"
-            disabled={sending}
-          >
-            Cancelar
-          </Button>
           <Button
             onClick={handleSend}
             disabled={sending || !message.trim()}
