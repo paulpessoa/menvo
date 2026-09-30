@@ -3,17 +3,9 @@
 import { useState } from "react"
 import { useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
-import { Sparkles, Users, Target, Compass } from "lucide-react"
+import { Compass, Info, ShieldCheck, Sparkles, Target, Users } from "lucide-react"
 import { QuizForm, QuizFormData } from "@/components/quiz/QuizForm"
 import { useToast } from "@/hooks/use-toast"
-import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 import { quizService } from "@/lib/services/quiz/quiz.service"
@@ -89,84 +81,92 @@ export default function QuizPage() {
     )
   }
 
+  const benefits = [
+    {
+      icon: Target,
+      title: t('quiz_page.personalized_analysis'),
+      description: t('quiz_page.personalized_analysis_description')
+    },
+    {
+      icon: Users,
+      title: t('quiz_page.ideal_mentors'),
+      description: t('quiz_page.ideal_mentors_description')
+    },
+    {
+      icon: Compass,
+      title: t('quiz_page.practical_steps'),
+      description: t('quiz_page.practical_steps_description')
+    }
+  ]
+
+  // Mesma linguagem visual da página de resultados (/quiz/results/[id]):
+  // fundo em degradê accent, título grande, cartões rounded-2xl e faixa primária.
   return (
-    <AnimatedBackground>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Hero Section */}
-          <div className="text-center mb-12 space-y-6">
-            <h1
-              className="text-3xl md:text-4xl font-bold text-primary"
-            >
-              {t('quiz_page.title')}
-            </h1>
+    <div className="bg-gradient-to-b from-accent/70 via-background to-background">
+      <div className="mx-auto max-w-5xl px-4 pb-16 pt-10 md:pt-14">
+        <header className="border-b pb-8">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+            {t('quiz_page.eyebrow')}
+          </p>
+          <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl">
+            {t('quiz_page.title')}
+          </h1>
+          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+            {t('quiz_page.subtitle')}
+          </p>
+        </header>
 
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              {t('quiz_page.subtitle')}
-            </p>
-          </div>
-
-          {/* Benefits Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <Card className="border-2 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
-              <CardHeader>
-                <Target className="h-8 w-8 text-purple-600 mb-2" />
-                <CardTitle className="text-lg">{t('quiz_page.personalized_analysis')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {t('quiz_page.personalized_analysis_description')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-              <CardHeader>
-                <Users className="h-8 w-8 text-blue-600 mb-2" />
-                <CardTitle className="text-lg">{t('quiz_page.ideal_mentors')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {t('quiz_page.ideal_mentors_description')}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
-              <CardHeader>
-                <Compass className="h-8 w-8 text-emerald-600 mb-2" />
-                <CardTitle className="text-lg">{t('quiz_page.practical_steps')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  {t('quiz_page.practical_steps_description')}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Main CTA Card */}
-          <Card className="border-2 border-teal-200 dark:border-teal-800 shadow-lg">
-            <CardContent className="space-y-6">
-              <Button
-                size="lg"
-                className="w-full text-lg mt-8 h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-md"
-                onClick={() => setShowQuiz(true)}
+        <section className="mt-10">
+          <h2 className="mb-4 text-xl font-bold tracking-tight text-foreground">
+            {t('quiz_page.benefits_title')}
+          </h2>
+          <ul className="grid gap-4 md:grid-cols-3">
+            {benefits.map(({ icon: Icon, title, description }) => (
+              <li
+                key={title}
+                className="flex flex-col rounded-2xl border bg-card p-5 transition-colors hover:border-primary/60"
               >
-                {t('quiz_page.start_quiz')}
-                <Sparkles className="ml-2 h-5 w-5" />
-              </Button>
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-4 text-lg font-bold">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {description}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-              <p className="text-xs text-center text-muted-foreground">
-                {t('quiz_page.responses_confidential')}
-              </p>
-              <p className="text-xs text-center text-muted-foreground">
-                {t('quiz_page.usage_limit_note')}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        <section className="mt-12">
+          <div className="flex flex-col gap-4 rounded-2xl bg-primary p-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-lg font-bold">{t('quiz_page.cta_title')}</p>
+              <p className="mt-1 text-sm opacity-90">{t('quiz_page.cta_description')}</p>
+            </div>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="shrink-0 rounded-xl font-bold"
+              onClick={() => setShowQuiz(true)}
+            >
+              {t('quiz_page.start_quiz')}
+              <Sparkles className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </section>
+
+        <footer className="mt-10 space-y-3 border-t pt-6 text-xs leading-relaxed text-muted-foreground">
+          <p className="flex items-start gap-2">
+            <ShieldCheck className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+            {t('quiz_page.responses_confidential')}
+          </p>
+          <p className="flex items-start gap-2">
+            <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+            {t('quiz_page.usage_limit_note')}
+          </p>
+        </footer>
       </div>
-    </AnimatedBackground>
+    </div>
   )
 }

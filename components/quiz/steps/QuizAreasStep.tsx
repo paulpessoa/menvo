@@ -31,25 +31,29 @@ export function QuizAreasStep({
   otherAreaPlaceholder,
 }: QuizAreasStepProps) {
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground mb-4">{selectAllText}</p>
-      {options.map((option) => (
-        <div
-          key={option.value}
-          className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-        >
-          <Checkbox
-            id={option.value}
-            checked={selectedAreas.includes(option.value)}
-            onCheckedChange={() => onToggleArea(option.value)}
-          />
-          <Label htmlFor={option.value} className="flex-1 cursor-pointer">
-            {option.label}
+    <div className="space-y-3">
+      <p className="mb-1 text-sm text-muted-foreground">{selectAllText}</p>
+      {options.map((option) => {
+        const selected = selectedAreas.includes(option.value)
+        return (
+          <Label
+            key={option.value}
+            htmlFor={option.value}
+            className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 text-base font-medium leading-snug transition-colors hover:border-primary/60 ${
+              selected ? 'border-primary bg-accent' : 'bg-card'
+            }`}
+          >
+            <Checkbox
+              id={option.value}
+              checked={selected}
+              onCheckedChange={() => onToggleArea(option.value)}
+            />
+            <span className="flex-1">{option.label}</span>
           </Label>
-        </div>
-      ))}
-      <div className="pt-2">
-        <Label htmlFor="other-area" className="text-sm">
+        )
+      })}
+      <div className="pt-3">
+        <Label htmlFor="other-area" className="text-sm font-medium">
           {otherAreaSpecifyText}
         </Label>
         <Input
@@ -57,7 +61,7 @@ export function QuizAreasStep({
           placeholder={otherAreaPlaceholder}
           value={otherArea}
           onChange={(e) => onChangeOther(e.target.value)}
-          className="mt-2"
+          className="mt-2 h-12 rounded-xl bg-card"
         />
       </div>
     </div>
