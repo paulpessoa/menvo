@@ -6,6 +6,10 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import { sendAppointmentRequest } from "@/lib/email/brevo"
+import {
+  MENTORSHIP_REASON_REQUIRED_MESSAGE,
+  mentorshipReasonSchema
+} from "@/lib/schemas/appointment"
 import { randomUUID } from "crypto"
 
 export async function POST(request: NextRequest) {
@@ -68,6 +72,17 @@ export async function POST(request: NextRequest) {
       return errorResponse("Missing required fields", "VALIDATION_ERROR", 400)
     }
 
+    // O motivo é obrigatório: é o único contexto que o mentor recebe sobre o pedido.
+    const reasonCheck = mentorshipReasonSchema.safeParse(resolvedNotes)
+    if (!reasonCheck.success) {
+      return errorResponse(
+        reasonCheck.error.issues[0]?.message || MENTORSHIP_REASON_REQUIRED_MESSAGE,
+        "VALIDATION_ERROR",
+        400
+      )
+    }
+    const reason = reasonCheck.data
+
     // Prevenir auto-agendamento
     if (resolvedMentorId === user.id) {
       return errorResponse("Você não pode agendar uma mentoria consigo mesmo", "FORBIDDEN", 400)
@@ -126,8 +141,8 @@ export async function POST(request: NextRequest) {
         scheduled_at: resolvedScheduledAt,
         duration_minutes: resolvedDuration,
         topic: Array.isArray(resolvedTopics) ? resolvedTopics.join(", ") : "",
-        notes_mentee: resolvedNotes,
-        message: resolvedNotes,
+        notes_mentee: reason,
+        message: reason,
         status: "pending",
         action_token: actionToken,
         token_expires_at: tokenExpiresAt,
@@ -151,7 +166,7 @@ export async function POST(request: NextRequest) {
         mentorName: mentor.full_name || "Mentor",
         menteeName: menteeProfile?.full_name || user.email || "Mentee",
         scheduledAt: resolvedScheduledAt,
-        message: resolvedNotes,
+        message: reason,
         token: actionToken,
       }).catch((emailErr) => {
         // Email failure não deve quebrar o agendamento
