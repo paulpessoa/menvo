@@ -17,7 +17,7 @@ const COLORS = {
 /**
  * Escapa texto livre fornecido pelo usuário antes de interpolar em HTML de
  * e-mail. Necessário para qualquer campo de formulário longo (bio,
- * abordagem de mentoria etc.) — ao contrário de nome/e-mail, esses campos
+ * abordagem de mentoria etc.) - ao contrário de nome/e-mail, esses campos
  * são grandes o bastante para um usuário mal-intencionado esconder markup.
  */
 function escapeHtml(value: string): string {
@@ -103,8 +103,8 @@ const getEmailLayout = (
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: ${COLORS.text}; background-color: ${COLORS.bg}; padding: 20px; }
         .email-container { max-width: 550px; margin: 0 auto; background-color: ${COLORS.white}; border-radius: 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); overflow: hidden; border: 1px solid ${COLORS.divider}; }
-        .header { background: ${COLORS.primary}; color: white; padding: 32px 35px; text-align: center; }
-        .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.3px; color: white; }
+        .header { background: ${COLORS.white}; padding: 32px 35px; text-align: center; border-bottom: 1px solid ${COLORS.divider}; }
+        .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.3px; color: ${COLORS.text}; }
         .content { padding: 36px 35px; background-color: ${COLORS.white}; }
         .content h2 { color: ${COLORS.primary}; font-size: 19px; font-weight: 700; margin-bottom: 18px; line-height: 1.3; }
         .content p { color: ${COLORS.text}; font-size: 14px; margin-bottom: 15px; line-height: 1.6; }
@@ -264,7 +264,7 @@ export async function sendVerificationNotification(data: VerificationData): Prom
   const content = `
     <h2>Olá, ${userName}!</h2>
     <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
-    <div class="info-box" style="border-left: 4px solid ${isApproved ? '#007585' : '#F59E0B'}">
+    <div class="info-box">
         <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado' : 'Ajustes Necessários'}</p>
         ${notes ? `<p><strong>Observações:</strong> ${notes}</p>` : ''}
     </div>
@@ -321,7 +321,7 @@ export async function sendAppointmentConfirmation(data: AppointmentConfirmationD
   const content = `
     <h2>Sua mentoria está confirmada!</h2>
     <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
-    <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
+    <div class="info-box">
         <div class="info-item"><strong>Mentor(a):</strong> ${mentorName}</div>
         <div class="info-item"><strong>Mentorado(a):</strong> ${menteeName}</div>
         <div class="info-item"><strong>Data e Hora:</strong> ${formattedDate}</div>
@@ -355,7 +355,7 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
     <h2>Mentoria Cancelada</h2>
     <p>Olá, ${data.recipientName}.</p>
     <p>${noticeText}</p>
-    <div class="info-box" style="border-left: 4px solid #EF4444;">
+    <div class="info-box">
         <div class="info-item"><strong>Data e Hora Original:</strong> ${formattedDate}</div>
         <div class="info-item"><strong>Cancelado por:</strong> ${data.cancelledByName}</div>
         <div class="info-item"><strong>Motivo informado:</strong><br/><em>"${data.reason}"</em></div>
@@ -369,6 +369,46 @@ export async function sendAppointmentCancellation(data: AppointmentCancellationD
     data.recipientEmail,
     `Mentoria de ${formattedDate} cancelada`,
     getEmailLayout("Mentoria Cancelada", content, { signatureType: "team" })
+  );
+}
+
+/**
+ * Envia lembrete ao mentor sobre pedido pendente há mais de 24h
+ */
+export async function sendPendingRequestReminder(data: { mentorEmail: string; mentorName: string; menteeName: string; scheduledAt: string; }): Promise<void> {
+  const formattedDate = formatDateTimeBR(data.scheduledAt);
+  const content = `
+    <h2>Pedido de mentoria aguardando sua resposta</h2>
+    <p>Olá, ${escapeHtml(data.mentorName)}.</p>
+    <p>${escapeHtml(data.menteeName)} pediu uma sessão para <strong>${formattedDate}</strong> e ainda aguarda sua resposta. Se não puder atender, recuse o pedido para que ele possa procurar outro mentor.</p>
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/mentor" class="button">Responder pedido</a>
+    </div>
+  `;
+  await sendEmail(
+    data.mentorEmail,
+    `Pedido de mentoria aguardando sua resposta`,
+    getEmailLayout("Pedido Pendente", content, { signatureType: "team" })
+  );
+}
+
+/**
+ * Informa o mentorado que o pedido expirou pois o horário passou
+ */
+export async function sendPendingRequestExpired(data: { menteeEmail: string; menteeName: string; mentorName: string; scheduledAt: string; }): Promise<void> {
+  const formattedDate = formatDateTimeBR(data.scheduledAt);
+  const content = `
+    <h2>Seu pedido de mentoria expirou</h2>
+    <p>Olá, ${escapeHtml(data.menteeName)}.</p>
+    <p>Seu pedido de sessão com ${escapeHtml(data.mentorName)} para <strong>${formattedDate}</strong> não foi confirmado a tempo e foi cancelado automaticamente. Isso acontece - mentores são voluntários. Que tal pedir um horário com outro mentor?</p>
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors" class="button">Encontrar outro mentor</a>
+    </div>
+  `;
+  await sendEmail(
+    data.menteeEmail,
+    `Seu pedido de mentoria expirou`,
+    getEmailLayout("Pedido Expirado", content, { signatureType: "team" })
   );
 }
 
@@ -411,6 +451,62 @@ export async function sendAdminNewMentorNotification(data: {
 }
 
 /**
+ * Notifica o administrador sobre uma nova organização interessada (lead)
+ */
+export async function sendAdminNewOrganizationLead(data: {
+  org_name: string;
+  org_type: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string | null;
+  people_estimate: string;
+  message?: string | null;
+  locale?: string | null;
+}): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL || "contato@menvo.com.br";
+
+  const typeMap: Record<string, string> = {
+    ngo: 'ONG / Terceiro Setor',
+    company: 'Empresa',
+    school: 'Instituição de Ensino',
+    event: 'Evento',
+    other: 'Outro'
+  };
+  const typeStr = typeMap[data.org_type] || data.org_type;
+
+  const sizeMap: Record<string, string> = {
+    '1-20': '1 a 20',
+    '21-100': '21 a 100',
+    '101-500': '101 a 500',
+    '500+': 'Mais de 500'
+  };
+  const sizeStr = sizeMap[data.people_estimate] || data.people_estimate;
+
+  const content = `
+    <h2>Nova Organização Interessada</h2>
+    <p>Olá, Admin. Uma nova organização preencheu o formulário de interesse na plataforma.</p>
+    <div class="info-box">
+        <div class="info-item"><strong>Organização:</strong> ${escapeHtml(data.org_name)}</div>
+        <div class="info-item"><strong>Tipo:</strong> ${typeStr}</div>
+        <div class="info-item"><strong>Tamanho (pessoas):</strong> ${sizeStr}</div>
+        <div class="info-item"><strong>Contato:</strong> ${escapeHtml(data.contact_name)}</div>
+        <div class="info-item"><strong>E-mail:</strong> ${escapeHtml(data.contact_email)}</div>
+        ${data.contact_phone ? `<div class="info-item"><strong>Telefone:</strong> ${escapeHtml(data.contact_phone)}</div>` : ''}
+        ${data.locale ? `<div class="info-item"><strong>Idioma (locale):</strong> ${data.locale}</div>` : ''}
+        ${data.message ? `<div class="info-item" style="margin-top: 8px;"><strong>Mensagem:</strong><br/>${escapeHtml(data.message).replace(/\n/g, '<br/>')}</div>` : ''}
+    </div>
+    <div class="button-container">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/admin/org-leads" class="button">Ver pedidos no painel</a>
+    </div>
+  `;
+  await sendEmail(
+    adminEmail,
+    `Nova organização interessada: ${data.org_name}`,
+    getEmailLayout("Nova Organização Interessada", content, { signatureType: "team" })
+  );
+}
+
+/**
  * Notifica o mentor que uma nova avaliação foi publicada no seu perfil
  */
 export async function sendMentorNewReviewNotification(data: {
@@ -423,7 +519,7 @@ export async function sendMentorNewReviewNotification(data: {
   const content = `
     <h2>Você recebeu uma nova avaliação</h2>
     <p>Olá, ${data.mentorName}! Um mentorado acaba de deixar um depoimento sobre a sua mentoria.</p>
-    <div class="info-box" style="border-left: 4px solid #F59E0B">
+    <div class="info-box">
         <p><strong>De:</strong> ${data.menteeName}</p>
         <p><strong>Nota:</strong> ${data.rating}/5</p>
         ${data.comment ? `<p style="margin-top: 10px; font-style: italic;">"${data.comment}"</p>` : ''}
@@ -441,96 +537,6 @@ export async function sendMentorNewReviewNotification(data: {
   );
 }
 
-/**
- * Pede que alguém da lista de espera entre em contato caso ainda tenha
- * interesse em participar da Menvo como mentor ou mentorado.
- */
-export async function sendWaitingListContactRequest(data: {
-  name: string;
-  email: string;
-}): Promise<{ success: boolean; error?: string }> {
-  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
-  const content = `
-    <h2>Você ainda tem interesse na Menvo?</h2>
-    <p>Olá, ${firstName}! Vimos que você se cadastrou na nossa lista de espera há um tempo e queremos entender melhor como podemos te ajudar.</p>
-    <p>Você tem interesse em participar da Menvo como:</p>
-    <div class="info-box">
-        <div class="info-item">🎓 <strong>Mentorado(a):</strong> buscando orientação de carreira, técnica ou de negócios</div>
-        <div class="info-item">🤝 <strong>Mentor(a) voluntário(a):</strong> compartilhando sua experiência com quem está começando</div>
-    </div>
-    <p>Responda este e-mail nos contando qual dessas opções combina com você (ou as duas!) e o que você está buscando no momento. Assim conseguimos te ajudar a encontrar a pessoa certa o quanto antes.</p>
-    <div class="button-container">
-        <a href="${appUrl}/signup" class="button">Criar minha conta na Menvo</a>
-    </div>
-    <p>Ficamos no aguardo do seu retorno!</p>
-  `;
-  return await sendEmail(
-    data.email,
-    "Você ainda tem interesse na Menvo?",
-    getEmailLayout("Continua com a gente?", content, { signatureType: "personal" })
-  );
-}
-
-/**
- * Avisa alguém da lista de espera que já criamos uma conta na Menvo para
- * ela (como mentee, por padrão) e traz um link de convite com token —
- * ao clicar, a pessoa já entra autenticada e só precisa definir uma senha.
- */
-export async function sendWaitingListAccountInvite(data: {
-  name: string;
-  email: string;
-  inviteLink: string;
-}): Promise<{ success: boolean; error?: string }> {
-  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
-  const content = `
-    <h2>Sua conta na Menvo já está pronta!</h2>
-    <p>Olá, ${firstName}! Vimos seu interesse na nossa lista de espera e já criamos uma conta para você começar — sem precisar preencher cadastro do zero.</p>
-    <p>Falta só um passo: defina sua senha de acesso clicando no botão abaixo.</p>
-    <div class="button-container">
-        <a href="${data.inviteLink}" class="button">Definir minha senha e entrar</a>
-    </div>
-    <p>Depois de entrar, complete seu perfil (ou faça nosso <a href="${appUrl}/quiz" style="color: ${COLORS.primary}; font-weight: 600;">Quiz de Carreira</a> de 2 minutos) para que possamos te ajudar a encontrar a mentoria certa — inclusive com sugestões feitas manualmente pela nossa equipe.</p>
-    <p style="font-size: 13px; color: ${COLORS.muted};">Por segurança, este link expira em algumas horas. Se ele não funcionar mais, é só solicitar um novo em "Esqueceu a senha?" na tela de login usando este mesmo e-mail.</p>
-  `;
-  return await sendEmail(
-    data.email,
-    "Sua conta na Menvo já está pronta — falta só a senha",
-    getEmailLayout("Bem-vindo(a) à Menvo!", content, { signatureType: "personal" })
-  );
-}
-
-/**
- * Pede que alguém complete o perfil (ou faça o quiz de carreira) porque
- * ainda não descrevemos o que essa pessoa busca — sem isso não dá para
- * sugerir ou fazer um match, manual ou automático.
- */
-export async function sendWaitingListCompleteProfileRequest(data: {
-  name: string;
-  email: string;
-}): Promise<{ success: boolean; error?: string }> {
-  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
-  const content = `
-    <h2>Nos conte o que você está buscando</h2>
-    <p>Olá, ${firstName}! Para te ajudarmos a encontrar a mentoria certa, precisamos entender melhor seus objetivos — e ainda não temos essa informação sobre você.</p>
-    <p>Escolha uma das opções abaixo (leva menos de 2 minutos):</p>
-    <div class="button-container">
-        <a href="${appUrl}/quiz" class="button">Fazer o Quiz de Carreira</a>
-    </div>
-    <p style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
-        <a href="${appUrl}/profile" style="color: ${COLORS.primary}; font-weight: 600; font-size: 14px; text-decoration: underline;">Ou completar meu perfil diretamente</a>
-    </p>
-    <p>Com essa informação, nossa equipe consegue sugerir os mentores mais alinhados com o seu momento — e, se preferir, também podemos fazer essa conexão manualmente.</p>
-  `;
-  return await sendEmail(
-    data.email,
-    "Nos conte o que você busca na Menvo",
-    getEmailLayout("O que você está buscando?", content, { signatureType: "personal" })
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Convites de reengajamento (base histórica importada, ex.: JotForm)
 // ---------------------------------------------------------------------------
@@ -539,7 +545,7 @@ export async function sendWaitingListCompleteProfileRequest(data: {
  * Converte o corpo do e-mail escrito pelo admin (texto simples, com
  * `{{primeiro_nome}}` como placeholder) em HTML seguro: cada linha em
  * branco separa um parágrafo, e todo o texto passa por `escapeHtml` antes
- * de virar markup — o admin nunca escreve HTML diretamente aqui.
+ * de virar markup - o admin nunca escreve HTML diretamente aqui.
  */
 function renderPlainTextBody(bodyText: string, firstName: string): string {
   const withName = bodyText.replace(/\{\{\s*primeiro_nome\s*\}\}/gi, firstName);
@@ -554,11 +560,11 @@ function renderPlainTextBody(bodyText: string, firstName: string): string {
 /**
  * E-mail de campanha de reengajamento (ex.: base do Estágio Recife
  * importada do JotForm): avisa que a Menvo existe, convida a pessoa a
- * completar o perfil ou apoiar como mentor(a), e — obrigatório por LGPD —
+ * completar o perfil ou apoiar como mentor(a), e - obrigatório por LGPD -
  * dá uma saída fácil, sem login, para parar de receber e-mails ou apagar
  * os dados. `inviteUrl` já aponta para a página pública `/convite/[token]`;
  * esta função só decora os `?intent=` de cada ação (nunca executa nada
- * sozinha — ver docs/domains/reengagement-invites.md §3.2).
+ * sozinha - ver docs/domains/reengagement-invites.md §3.2).
  *
  * O corpo (`bodyText`) é escrito/editado pelo admin no modal de envio; os
  * botões e o aviso de LGPD abaixo são fixos e não podem ser removidos por
@@ -619,7 +625,7 @@ export async function sendReengagementInvite(data: ReengagementInviteData & {
 
 /**
  * Aviso de que uma conta importada e nunca acessada será apagada em breve.
- * Reaproveita o mesmo link `/convite/[token]` do fluxo de reengajamento —
+ * Reaproveita o mesmo link `/convite/[token]` do fluxo de reengajamento -
  * "Quero manter minha conta" leva ao login/definição de senha, e há também
  * uma saída para apagar os dados imediatamente. Ver
  * docs/domains/account-retention.md §4.3.
@@ -680,7 +686,7 @@ export async function sendRetentionNotice(data: {
 }
 
 /**
- * Confirmação enviada no momento da exclusão. Sem token nem link de conta —
+ * Confirmação enviada no momento da exclusão. Sem token nem link de conta -
  * a conta já não existe mais.
  */
 export function buildRetentionDeletionConfirmationHtml(data: { name: string }): string {
@@ -708,6 +714,56 @@ export async function sendRetentionDeletionConfirmation(data: {
 }
 
 // ---------------------------------------------------------------------------
+// Análise do quiz de carreira (/quiz)
+// ---------------------------------------------------------------------------
+
+export interface QuizResultsEmailData {
+  name: string;
+  title: string;
+  summary: string;
+  /** Link com o token `?k=` (lib/quiz/result-link.ts) - abre a análise e permite criar a conta. */
+  resultUrl: string;
+}
+
+/**
+ * E-mail curto: só o título e um trecho do resumo. A análise completa
+ * (mentores, conselhos, próximos passos) fica atrás do botão, na página de
+ * resultados - onde a pessoa também pode criar uma senha e guardar tudo na
+ * conta. Título e resumo vêm da IA (que lê texto livre do usuário), por isso
+ * passam por escapeHtml como qualquer outro texto não confiável.
+ */
+export function buildQuizResultsEmailHtml(data: QuizResultsEmailData): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name || "");
+  const summary = data.summary.length > 320 ? `${data.summary.slice(0, 317).trimEnd()}...` : data.summary;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+
+  const content = `
+    <h2>${firstName ? `Olá, ${firstName}!` : "Olá!"} Sua análise está pronta</h2>
+    <div class="info-box">
+        <p style="font-weight: 700; margin-bottom: 8px;">${escapeHtml(data.title)}</p>
+        <p style="margin-bottom: 0; color: ${COLORS.muted};">${escapeHtml(summary)}</p>
+    </div>
+    <p>Na análise completa estão os mentores sugeridos para o seu momento, conselhos práticos e os próximos passos.</p>
+    <div class="button-container">
+        <a href="${data.resultUrl}" class="button">Ver minha análise completa</a>
+    </div>
+    <p style="font-size: 13px; color: ${COLORS.muted}; text-align: center;">Pelo mesmo link você pode criar uma senha e guardar a análise na sua conta da Menvo.</p>
+  `;
+
+  const footerExtra = `
+    <p style="margin-top: 16px;">Você recebeu este e-mail porque respondeu o questionário de carreira da Menvo.
+      Leia nossa <a href="${appUrl}/privacy" style="color: ${COLORS.muted}; text-decoration: underline;">Política de Privacidade</a>.
+    </p>
+  `;
+
+  return getEmailLayout("Sua análise de carreira", content, { signatureType: "personal", footerExtra });
+}
+
+export async function sendQuizResultsEmail(data: QuizResultsEmailData & { email: string }): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(data.email, "Sua análise de carreira está pronta", buildQuizResultsEmailHtml(data));
+}
+
+// ---------------------------------------------------------------------------
 // Organizações parceiras (multi-tenant)
 // ---------------------------------------------------------------------------
 
@@ -716,9 +772,9 @@ type OrgRecipientRole = "mentor" | "mentee";
 function orgInviteContent(firstName: string, orgName: string, appUrl: string, role: OrgRecipientRole) {
   const body = role === "mentor"
     ? `<p>A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer contar com você como mentor(a) do grupo dela na plataforma.</p>
-       <p>Ao aceitar, você aparece como mentor da ${orgName} e pode receber pedidos de mentoria vindos dos beneficiários dela — sua agenda e seu processo de aceite continuam exatamente os mesmos.</p>`
+       <p>Ao aceitar, você aparece como mentor da ${orgName} e pode receber pedidos de mentoria vindos dos beneficiários dela - sua agenda e seu processo de aceite continuam exatamente os mesmos.</p>`
     : `<p>A <strong>${orgName}</strong> é uma organização parceira da Menvo e quer acompanhar sua jornada de mentoria na plataforma.</p>
-       <p>Ao aceitar, a organização passa a ver seu progresso (sessões agendadas, quiz de carreira) para te apoiar melhor — sua conta continua exatamente a mesma.</p>`;
+       <p>Ao aceitar, a organização passa a ver seu progresso (sessões agendadas, quiz de carreira) para te apoiar melhor - sua conta continua exatamente a mesma.</p>`;
   return `
     <h2>Você foi convidado(a) para a ${orgName}</h2>
     <p>Olá, ${firstName}!</p>
@@ -815,9 +871,11 @@ export async function sendOrgMembershipApproved(data: {
 async function sendEmail(
   to: string | string[],
   subject: string,
-  htmlContent: string
+  htmlContent: string,
+  cc?: string | string[]
 ): Promise<{ success: boolean; error?: string }> {
   const recipients = Array.isArray(to) ? to.map(email => ({ email })) : [{ email: to }];
+  const ccRecipients = cc ? (Array.isArray(cc) ? cc.map(email => ({ email })) : [{ email: cc }]) : undefined;
   const apiKey = process.env.BREVO_API_KEY;
 
   if (!apiKey) {
@@ -842,6 +900,7 @@ async function sendEmail(
           email: process.env.BREVO_SENDER_EMAIL || "contato@menvo.com.br"
         },
         to: recipients,
+        ...(ccRecipients && { cc: ccRecipients }),
         subject,
         htmlContent
       })
@@ -883,7 +942,8 @@ export async function sendTestEmail(params: {
     reminder: "[TESTE] Lembrete: Sua mentoria é hoje",
     retention_notice_30d: "[TESTE] Sua conta na Menvo será apagada em 30 dias",
     retention_notice_1d: "[TESTE] Último aviso: sua conta na Menvo será apagada amanhã",
-    retention_deletion_confirmation: "[TESTE] Seus dados foram apagados da Menvo"
+    retention_deletion_confirmation: "[TESTE] Seus dados foram apagados da Menvo",
+    quiz_results: "[TESTE] Sua análise de carreira está pronta"
   };
 
   const subject = subjects[params.templateKey] || `[TESTE] Template Menvo: ${params.templateKey}`;
@@ -899,7 +959,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       const content = `
         <h2>Sua mentoria está confirmada!</h2>
         <p>Tudo pronto! A sessão de mentoria voluntária foi agendada com sucesso:</p>
-        <div class="info-box" style="border-left: 4px solid ${COLORS.primary};">
+        <div class="info-box">
             <div class="info-item"><strong>Mentor(a):</strong> Dr. Carlos Mendes</div>
             <div class="info-item"><strong>Mentorado(a):</strong> Mariana Silva</div>
             <div class="info-item"><strong>Data e Hora:</strong> Terça-feira, 15 de Setembro de 2026 às 14:00</div>
@@ -917,7 +977,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       const content = `
         <h2>Olá, Rodrigo!</h2>
         <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
-        <div class="info-box" style="border-left: 4px solid #007585">
+        <div class="info-box">
             <p style="margin-bottom: 5px;"><strong>Status:</strong> Aprovado</p>
             <p><strong>Observações:</strong> Perfil profissional verificado com sucesso. Experiência e formação alinhadas com o propósito da nossa comunidade.</p>
         </div>
@@ -945,7 +1005,7 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
         <h2>Mentoria Cancelada</h2>
         <p>Olá, Gabriel.</p>
         <p>Informamos que <strong>Juliana Ramos</strong> precisou cancelar a mentoria agendada para <strong>12/09/2026 às 16:00</strong>.</p>
-        <div class="info-box" style="border-left: 4px solid #EF4444;">
+        <div class="info-box">
             <div class="info-item"><strong>Data e Hora Original:</strong> 12/09/2026 às 16:00</div>
             <div class="info-item"><strong>Cancelado por:</strong> Juliana Ramos</div>
             <div class="info-item"><strong>Motivo informado:</strong><br/><em>"Conflito de agenda imprevisto no trabalho. Peço desculpas pelo transtorno."</em></div>
@@ -1004,7 +1064,83 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       });
     case 'retention_deletion_confirmation':
       return buildRetentionDeletionConfirmationHtml({ name: "Mariana" });
+    case 'quiz_results':
+      return buildQuizResultsEmailHtml({
+        name: "Mariana Silva",
+        title: "Rota prática para o primeiro estágio em tecnologia",
+        summary: "Mariana, suas respostas mostram clareza sobre onde você quer chegar: um estágio em desenvolvimento front-end. O que falta agora é transformar estudo em provas concretas do que você sabe fazer - um portfólio pequeno e candidaturas bem direcionadas.",
+        resultUrl: "https://www.menvo.com.br/quiz/results/preview"
+      });
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }
+}
+
+// =============================================
+// Mentor → Mentee Contact Email
+// =============================================
+
+interface MentorContactEmailData {
+  menteeEmail: string;
+  menteeName: string;
+  mentorEmail: string;
+  mentorName: string;
+  mentorJobTitle?: string;
+  mentorCompany?: string;
+  mentorBio?: string;
+  mentorExpertise: string[];
+  mentorSlug: string;
+  mentorLinkedin?: string;
+  mentorAvatarUrl?: string;
+  customMessage?: string;
+}
+
+/**
+ * Sends a notification email to a mentee informing them that a mentor
+ * wants to connect. Includes the mentor's profile card so the mentee
+ * can decide whether to reach out.
+ */
+export async function sendMentorContactEmail(data: MentorContactEmailData) {
+  const expertiseBadges = data.mentorExpertise.slice(0, 5).map(e =>
+    `<span style="display:inline-block;background:${COLORS.primary}15;color:${COLORS.primary};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin:2px 4px 2px 0;">${escapeHtml(e)}</span>`
+  ).join('');
+
+  const mentorProfileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors/${data.mentorSlug}`;
+
+  const content = `
+    <p>Um mentor da Menvo viu seu perfil e quer se conectar com você.</p>
+    
+    ${data.customMessage ? `
+    <p>Olha a mensagem:</p>
+    <div style="background:#f8fafc;padding:24px 28px;margin:24px 0;border-radius:12px;border:1px solid ${COLORS.divider};">
+      <p style="margin:0;line-height:1.7;font-size:16px;font-style:italic;color:#374151;">"${escapeHtml(data.customMessage).replace(/\n/g, '<br>')}"</p>
+    </div>
+    ` : ''}
+
+    <div style="background:#f8fafc;border-radius:16px;padding:24px;margin:24px 0;border:1px solid ${COLORS.divider};">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;">
+        <tr>
+          ${data.mentorAvatarUrl ? `<td style="width:72px;vertical-align:top;padding-right:16px;">
+            <img src="${data.mentorAvatarUrl}" alt="${escapeHtml(data.mentorName)}" width="64" height="64" style="border-radius:50%;display:block;object-fit:cover;width:64px;height:64px;border:3px solid ${COLORS.primary};" />
+          </td>` : ''}
+          <td style="vertical-align:top;">
+            <p style="font-weight:800;color:#111827;font-size:18px;margin:0 0 4px 0;">${escapeHtml(data.mentorName)}</p>
+            ${data.mentorJobTitle ? `<p style="font-size:14px;color:${COLORS.primary};font-weight:600;margin:0 0 2px 0;">${escapeHtml(data.mentorJobTitle)}${data.mentorCompany ? ` @ ${escapeHtml(data.mentorCompany)}` : ''}</p>` : ''}
+            ${data.mentorBio ? `<p style="font-size:13px;color:${COLORS.muted};margin:8px 0 0 0;font-style:italic;line-height:1.5;">"${escapeHtml(data.mentorBio.slice(0, 140))}${data.mentorBio.length > 140 ? '...' : ''}"</p>` : ''}
+          </td>
+        </tr>
+      </table>
+      ${expertiseBadges ? `<div style="margin-top:16px;">${expertiseBadges}</div>` : ''}
+    </div>
+
+    <div class="button-container">
+      <a href="${mentorProfileUrl}" class="button">Ver Perfil</a>
+    </div>
+
+    <div class="divider"></div>
+    <p><strong>Dica:</strong> Responda logo! Mentores voluntários têm agenda concorrida e a disposição de ajudar pode não durar para sempre.</p>
+  `;
+
+  const subject = `${data.mentorName} quer ajudar você.`;
+  return await sendEmail(data.menteeEmail, subject, getEmailLayout(subject, content), data.mentorEmail);
 }

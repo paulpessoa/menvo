@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { MenvoLoader } from "@/components/ui/menvo-loader";
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
 import { mentorService } from '@/lib/services/mentors/mentors.service';
@@ -57,7 +58,7 @@ export default function BookAppointmentPage() {
         return (
             <div className="container mx-auto px-4 py-8">
                 <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <MenvoLoader />
                 </div>
             </div>
         );

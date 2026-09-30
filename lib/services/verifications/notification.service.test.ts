@@ -109,7 +109,7 @@ describe('processVerification', () => {
 
   it('does not insert a duplicate mentor row when one already exists', async () => {
     // Regression test: user_roles has no unique constraint on
-    // (user_id, role_id) — its primary key is a synthetic `id` — so
+    // (user_id, role_id) - its primary key is a synthetic `id` - so
     // `.upsert(..., { onConflict: "user_id,role_id" })` fails outright with
     // Postgres error 42P10, confirmed directly against the live database.
     // The fix checks for an existing row first; this must not insert when
@@ -168,7 +168,7 @@ describe('processVerification', () => {
 
   it('updates the profile with the service-role client and publishes it on approval', async () => {
     // Regression test: the update used the admin's own session, and
-    // `profiles` has no admin UPDATE policy — RLS matched zero rows without
+    // `profiles` has no admin UPDATE policy - RLS matched zero rows without
     // an error, so the approval "succeeded" but the profile stayed pending
     // and hidden from /mentors (Bianca Dias, 2026-09-25).
     await processVerification({ userId: 'mentor-1', adminId: 'admin-1', status: 'approved' })

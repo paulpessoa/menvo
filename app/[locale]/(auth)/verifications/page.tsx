@@ -1,9 +1,10 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
-import { Loader2 } from "lucide-react"
+
 
 /**
  * Redirecionador para a página correta de verificações administrativas.
@@ -27,7 +28,7 @@ export default function VerificationsRedirectPage() {
 
   return (
     <div className="min-h-[50vh] flex flex-col items-center justify-center p-6">
-      <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+      <MenvoDots className="mb-3" />
       <p className="text-sm text-muted-foreground">Redirecionando para a central de verificações...</p>
     </div>
   )

@@ -24,7 +24,7 @@ function hashToken(token: string): string {
 /**
  * Creates (or, with `resend`, rotates) the invite token for one person in
  * one campaign. The plaintext token is returned once, embedded in the
- * e-mail, and never stored — only its sha256 hash lives in
+ * e-mail, and never stored - only its sha256 hash lives in
  * `reengagement_invites.token_hash`, so a database leak alone can't be
  * used to impersonate a recipient's accept/delete link.
  *
@@ -71,11 +71,11 @@ export async function createInviteToken(params: {
 
 /**
  * Looks up an invite by its plaintext token (from the URL) and returns the
- * invite row plus the recipient's profile — or a reason the link can't be
+ * invite row plus the recipient's profile - or a reason the link can't be
  * used. Does not check `response`: a link that was already answered still
  * *resolves*, so the caller (the /convite/[token] page) can render an
  * "you already responded" state instead of a generic error. Never reveals
- * whether a token merely doesn't exist vs. belongs to someone else —
+ * whether a token merely doesn't exist vs. belongs to someone else -
  * both come back as "invalid".
  */
 export async function resolveInviteToken(token: string): Promise<ResolveInviteResult> {
@@ -105,7 +105,7 @@ export async function resolveInviteToken(token: string): Promise<ResolveInviteRe
   return { ok: true, invite, profile }
 }
 
-/** Records the first time the response page was opened. Never changes state beyond that timestamp — opening a link must stay side-effect free (see docs/domains/reengagement-invites.md §3.2). */
+/** Records the first time the response page was opened. Never changes state beyond that timestamp - opening a link must stay side-effect free (see docs/domains/reengagement-invites.md §3.2). */
 export async function markOpened(inviteId: string): Promise<void> {
   ensureServerSide()
   const supabase = createServiceRoleClient()
@@ -124,7 +124,7 @@ export async function markOpened(inviteId: string): Promise<void> {
 }
 
 /**
- * Records the recipient's final choice. Only succeeds once per invite —
+ * Records the recipient's final choice. Only succeeds once per invite -
  * returns `false` (instead of overwriting) if this invite already has a
  * response, so a replayed or double-clicked POST can't flip an already
  * "deleted" invite back to "accepted", and can't be used to re-trigger a

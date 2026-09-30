@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Heart, GraduationCap, MailX, Trash2, CheckCircle2, ShieldCheck } from "lucide-react"
+import {  Heart, GraduationCap, MailX, Trash2, CheckCircle2, ShieldCheck , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface InviteResponseClientProps {
@@ -23,7 +23,7 @@ const RESPONSE_LABEL: Record<string, string> = {
 }
 
 /**
- * Botões de ação do convite. Cada um dispara um POST só no clique — abrir
+ * Botões de ação do convite. Cada um dispara um POST só no clique - abrir
  * esta página nunca executa nada (ver page.tsx e §3.2 do design doc).
  */
 export function InviteResponseClient({ token, firstName, alreadyResponded }: InviteResponseClientProps) {
@@ -94,7 +94,7 @@ export function InviteResponseClient({ token, firstName, alreadyResponded }: Inv
             <MailX className="h-6 w-6 text-muted-foreground" />
           </div>
           <CardTitle>Combinado, {firstName}.</CardTitle>
-          <CardDescription>Você não vai mais receber e-mails da Menvo. Seus dados continuam guardados caso mude de ideia — se preferir apagá-los também, é só voltar aqui.</CardDescription>
+          <CardDescription>Você não vai mais receber e-mails da Menvo. Seus dados continuam guardados caso mude de ideia - se preferir apagá-los também, é só voltar aqui.</CardDescription>
         </CardHeader>
       </Card>
     )
@@ -137,7 +137,7 @@ export function InviteResponseClient({ token, firstName, alreadyResponded }: Inv
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <Button variant="destructive" className="w-full gap-2" onClick={confirmDelete} disabled={loadingAction === "delete"}>
-            {loadingAction === "delete" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            {loadingAction === "delete" ? <Loader2 className="animate-spin h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
             Sim, apagar definitivamente
           </Button>
           <Button variant="ghost" className="w-full" onClick={() => setView("main")} disabled={loadingAction === "delete"}>
@@ -164,7 +164,7 @@ export function InviteResponseClient({ token, firstName, alreadyResponded }: Inv
           disabled={loadingAction !== null}
           variant={intent === "mentor" || intent === "optout" ? "outline" : "default"}
         >
-          {loadingAction === "accept" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Heart className="h-4 w-4" />}
+          {loadingAction === "accept" ? <Loader2 className="animate-spin h-4 w-4" /> : <Heart className="h-4 w-4" />}
           Quero acessar e completar meu perfil
         </Button>
         <Button
@@ -173,7 +173,7 @@ export function InviteResponseClient({ token, firstName, alreadyResponded }: Inv
           onClick={() => respond("accept_mentor")}
           disabled={loadingAction !== null}
         >
-          {loadingAction === "accept_mentor" ? <Loader2 className="h-4 w-4 animate-spin" /> : <GraduationCap className="h-4 w-4" />}
+          {loadingAction === "accept_mentor" ? <Loader2 className="animate-spin h-4 w-4" /> : <GraduationCap className="h-4 w-4" />}
           Quero apoiar como mentor(a)
         </Button>
       </CardContent>
@@ -186,7 +186,7 @@ export function InviteResponseClient({ token, firstName, alreadyResponded }: Inv
           onClick={() => respond("opt_out")}
           disabled={loadingAction !== null}
         >
-          {loadingAction === "opt_out" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MailX className="h-4 w-4" />}
+          {loadingAction === "opt_out" ? <Loader2 className="animate-spin h-4 w-4" /> : <MailX className="h-4 w-4" />}
           Parar de receber e-mails
         </Button>
         <Button

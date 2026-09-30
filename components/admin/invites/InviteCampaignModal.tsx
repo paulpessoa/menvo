@@ -1,4 +1,5 @@
 "use client"
+import { Loader2 } from "lucide-react"
 
 import { useEffect, useState } from "react"
 import {
@@ -10,7 +11,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+
 import { toast } from "sonner"
 import { useAuth } from "@/lib/auth"
 import { InviteAudienceStep } from "./InviteAudienceStep"
@@ -37,7 +38,7 @@ interface InviteCampaignModalProps {
 }
 
 /**
- * Convida (ou reenvia convite para) uma campanha de reengajamento —
+ * Convida (ou reenvia convite para) uma campanha de reengajamento -
  * fluxo completo em 4 passos: público, mensagem, pré-visualização e
  * envio. Ver docs/domains/reengagement-invites.md Fase 5.
  */
@@ -232,7 +233,7 @@ export function InviteCampaignModal({ isOpen, onClose, selectedUserIds, onSent }
           )}
           {step === "send" && (
             <Button onClick={onClose} disabled={sending}>
-              {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {sending ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : null}
               {sendDone ? "Fechar" : "Enviando..."}
             </Button>
           )}

@@ -1,11 +1,12 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Sparkles, Calendar, ArrowUpRight, Compass, Shield } from "lucide-react"
+import { Sparkles, Calendar, ArrowUpRight, Compass, Shield } from "lucide-react"
 import { SharedDiagnosticViewerModal } from "./SharedDiagnosticViewerModal"
 import type { SharedDiagnosticInsight } from "@/lib/types/models/diagnostic-shares"
 
@@ -38,7 +39,7 @@ export function SharedDiagnosticsSection() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <MenvoDots />
         <p className="text-sm">Carregando diagnósticos compartilhados...</p>
       </div>
     )

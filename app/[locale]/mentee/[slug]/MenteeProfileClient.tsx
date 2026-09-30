@@ -36,16 +36,18 @@ import {
   Eye,
   Github,
   Linkedin,
-  Globe
+  Globe,
+  Send
 } from "lucide-react"
 import { Link, useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
+import { toast } from "sonner"
+import { ContactMenteeModal } from "@/components/ContactMenteeModal"
 
 interface MenteeProfile {
   id: string
   first_name: string
   last_name: string
-  email: string
   avatar_url?: string
   city?: string
   state?: string
@@ -57,7 +59,7 @@ interface MenteeProfile {
   course?: string
   academic_level?: string
   expected_graduation?: string
-  career_goals?: string
+  learning_goals?: string
   expertise_areas?: string[]
   mentorship_topics?: string[]
   linkedin_url?: string
@@ -146,9 +148,6 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full border-4 border-white shadow-lg animate-pulse">
-                      <Sparkles className="h-5 w-5" />
-                    </div>
                   </div>
                   <div className="flex-1 space-y-3">
                     <div className="space-y-1.5">
@@ -156,12 +155,6 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         <h1 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
                           {fullName}
                         </h1>
-                        <Badge
-                          variant="secondary"
-                          className="bg-primary/10 text-primary border-none font-black uppercase tracking-widest text-[10px] px-3 py-1"
-                        >
-                          Buscando Mentoria
-                        </Badge>
                       </div>
                       <p className="text-lg md:text-xl text-primary font-bold">
                         {mentee.job_title || "Mentorado"}
@@ -187,19 +180,37 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         <Calendar className="h-3.5 w-3.5 text-primary" />
                         Desde {formatDate(mentee.created_at)}
                       </div>
+
+                      
+                      {mentee.github_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-2.5 rounded-full text-gray-700 border-gray-200 bg-gray-50/50 hover:bg-gray-100 font-semibold text-xs"
+                          onClick={() => window.open(mentee.github_url!, '_blank')}
+                        >
+                          <Github className="h-3 w-3 mr-1.5" />
+                          GitHub
+                        </Button>
+                      )}
                     </div>
 
-                    {/* Chat CTA Desktop */}
-                    {!isOwner && canContact && (
-                      <div className="hidden md:flex pt-4">
-                        <Button
-                          size="xl"
-                          onClick={handleChat}
-                          className="rounded-2xl px-12 font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
+                    {/* CTA Buttons Desktop */}
+                    {!isOwner && (
+                      <div className="hidden md:flex gap-3 pt-4">
+                        <ContactMenteeModal
+                          menteeId={mentee.id}
+                          menteeName={mentee.first_name || "Mentorado"}
+                          isLoggedIn={!!user}
                         >
-                          <MessageCircle className="mr-2 h-6 w-6" />
-                          {contactLabel}
-                        </Button>
+                          <Button
+                            size="xl"
+                            className="rounded-2xl px-12 font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
+                          >
+                            <MessageCircle className="mr-2 h-6 w-6" />
+                            Oferecer Ajuda
+                          </Button>
+                        </ContactMenteeModal>
                       </div>
                     )}
                   </div>
@@ -251,14 +262,14 @@ export default function MenteeProfileClient({ mentee }: Props) {
                       </p>
                     )}
 
-                    {mentee.career_goals && (
+                    {mentee.learning_goals && (
                       <div className="pt-8 border-t border-gray-50">
                         <h4 className="text-xs font-black text-gray-900 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
                           <Target className="h-5 w-5 text-primary" />
                           Onde quero chegar
                         </h4>
                         <p className="text-gray-700 text-lg leading-relaxed">
-                          {mentee.career_goals}
+                          {mentee.learning_goals}
                         </p>
                       </div>
                     )}
@@ -350,7 +361,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
                     onClick={() => setIsPdfViewerOpen(true)}
                   >
                     <Eye className="h-5 w-5 mr-2" />
-                    Ver Trajetória
+                    Visualizar
                   </Button>
                 </CardContent>
               </Card>
@@ -364,12 +375,11 @@ export default function MenteeProfileClient({ mentee }: Props) {
                 <CardHeader className="pb-4 pt-8 px-8">
                   <CardTitle className="text-lg font-black uppercase tracking-tighter">Conecte-se</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-3 gap-3 px-8 pb-10">
+                <CardContent className="grid grid-cols-1 gap-3 px-8 pb-10">
                   {mentee.linkedin_url && (
                     <Button
-                      variant="outline"
-                      size="icon"
-                      className="w-full h-12 rounded-xl text-blue-600 border-blue-50 bg-blue-50/30 hover:bg-blue-100 transition-colors"
+                      variant="default"
+                      className="w-full justify-start h-12 rounded-xl font-bold bg-[#0a66c2] text-white hover:bg-[#004182] border-none transition-colors"
                       asChild
                     >
                       <a
@@ -377,15 +387,15 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Linkedin className="h-6 w-6 fill-current" />
+                        <Linkedin className="mr-2 h-5 w-5 fill-current" />
+                        LinkedIn
                       </a>
                     </Button>
                   )}
                   {mentee.github_url && (
                     <Button
                       variant="outline"
-                      size="icon"
-                      className="w-full h-12 rounded-xl text-gray-900 border-gray-100 bg-gray-50 hover:bg-gray-200 transition-colors"
+                      className="w-full justify-start h-12 rounded-xl font-bold text-gray-900 border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
                       asChild
                     >
                       <a
@@ -393,15 +403,15 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Github className="h-6 w-6 fill-current" />
+                        <Github className="mr-2 h-5 w-5 fill-current" />
+                        GitHub
                       </a>
                     </Button>
                   )}
                   {mentee.portfolio_url && (
                     <Button
                       variant="outline"
-                      size="icon"
-                      className="w-full h-12 rounded-xl text-primary border-primary/5 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      className="w-full justify-start h-12 rounded-xl font-bold text-primary border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                       asChild
                     >
                       <a
@@ -409,7 +419,8 @@ export default function MenteeProfileClient({ mentee }: Props) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Globe className="h-6 w-6" />
+                        <Globe className="mr-2 h-5 w-5" />
+                        Portfolio
                       </a>
                     </Button>
                   )}
@@ -420,16 +431,23 @@ export default function MenteeProfileClient({ mentee }: Props) {
         </div>
 
         {/* Mobile Sticky Action Bar */}
-        {!isOwner && canContact && (
+        {!isOwner && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-            <Button
-              size="xl"
-              onClick={handleChat}
-              className="w-full rounded-2xl font-black shadow-2xl shadow-primary/40"
-            >
-              <MessageCircle className="mr-2 h-6 w-6" />
-              {contactLabel}
-            </Button>
+            <div className="flex gap-3">
+              <ContactMenteeModal
+                menteeId={mentee.id}
+                menteeName={mentee.first_name || "Mentorado"}
+                isLoggedIn={!!user}
+              >
+                <Button
+                  size="xl"
+                  className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40"
+                >
+                  <MessageCircle className="mr-2 h-6 w-6" />
+                  Oferecer Ajuda
+                </Button>
+              </ContactMenteeModal>
+            </div>
           </div>
         )}
 

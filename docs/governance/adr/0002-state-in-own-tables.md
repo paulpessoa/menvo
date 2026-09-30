@@ -1,12 +1,12 @@
 ---
-title: "ADR 0002 — Estado do agente em tabelas próprias com RLS, não em checkpointer"
+title: "ADR 0002 - Estado do agente em tabelas próprias com RLS, não em checkpointer"
 owner: paul
 status: current
 last_reviewed: 2026-09-24
 source_of_truth: [app/api/assistant/route.ts, AGENTS.md]
 ---
 
-# ADR 0002 — Estado em tabelas próprias, sem checkpointer do LangGraph
+# ADR 0002 - Estado em tabelas próprias, sem checkpointer do LangGraph
 
 - **Status:** implementado (o assistente hoje já é stateless no servidor;
   o histórico vem do client a cada request). Decide também como a Fase 1
@@ -22,8 +22,8 @@ memória a um agente LangGraph.
 ## Decisão
 
 **Não usar `PostgresSaver`/checkpointer do LangGraph.** Motivo: ele conecta
-no Postgres com uma role própria e **ignora Row Level Security** — viola a
-invariante `AGENTS.md` "Security first — never bypass RLS" e o princípio 4
+no Postgres com uma role própria e **ignora Row Level Security** - viola a
+invariante `AGENTS.md` "Security first - never bypass RLS" e o princípio 4
 do plano ("permissão no servidor, não no prompt", que pressupõe que toda
 leitura/escrita passa pelo cliente Supabase da sessão).
 
@@ -35,11 +35,11 @@ Em vez disso:
    já faz hoje.
 2. **Estado de longo prazo vive em tabelas próprias, com RLS normal**
    (mesmo padrão de toda a base): `ai_threads`, `ai_messages`,
-   `diagnostic_sessions.state jsonb` (Fase 1 — slots preenchidos, passo
+   `diagnostic_sessions.state jsonb` (Fase 1 - slots preenchidos, passo
    atual, contagem de follow-ups). A rota lê o estado, invoca o grafo,
-   grava o novo estado — três passos explícitos, nenhum "mágico".
+   grava o novo estado - três passos explícitos, nenhum "mágico".
 3. Um checkpointer só entra se aparecer um caso real de `interrupt()` longo
-   que essas tabelas não cubram (ex.: uma pausa multi-turno complexa) — e
+   que essas tabelas não cubram (ex.: uma pausa multi-turno complexa) - e
    nesse caso um novo ADR registra a exceção e como ela continua respeitando
    RLS (ex.: um `checkpointer` customizado que usa o cliente da sessão).
 

@@ -18,7 +18,7 @@ export function hasApiKey(provider: ModelSpec["provider"]): boolean {
 }
 
 export interface CreateChatModelOptions {
-  /** True for every model past the first in the chain — used for the default
+  /** True for every model past the first in the chain - used for the default
    * `maxRetries` and for tagging metering rows `status: "fallback"`. */
   isFallback: boolean
   onCall: (record: AiCallRecord) => void
@@ -27,7 +27,7 @@ export interface CreateChatModelOptions {
 /**
  * Instantiates the LangChain chat model for one `ModelSpec`, with a metering
  * callback attached in the constructor (so it survives `bindTools`,
- * `withStructuredOutput` and `withFallbacks` — ADR 0004 §6). Parameter names
+ * `withStructuredOutput` and `withFallbacks` - ADR 0004 §6). Parameter names
  * differ per provider (Gemini: `maxOutputTokens`; Groq/OpenAI: `maxTokens`),
  * which is exactly what this function exists to hide from call sites.
  */

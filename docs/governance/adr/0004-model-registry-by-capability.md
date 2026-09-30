@@ -1,16 +1,16 @@
 ---
-title: "ADR 0004 — Registro de modelos por capacidade (lib/ai/models + ai_model_config)"
+title: "ADR 0004 - Registro de modelos por capacidade (lib/ai/models + ai_model_config)"
 owner: paul
 status: current
 last_reviewed: 2026-09-23
 source_of_truth: [supabase/migrations/20260923000004_ai_model_config.sql, supabase/migrations/20260923000006_quiz_analyze_registry.sql, lib/ai/models, lib/ai/metering/callback.ts, lib/services/assistant/agent.ts, lib/services/ai/match.service.ts, lib/ai-menvo/diagnostic/analyze.ts, app/api/quiz/[id]/analyze/route.ts]
 ---
 
-# ADR 0004 — Registro de modelos por capacidade
+# ADR 0004 - Registro de modelos por capacidade
 
 - **Status:** implementado (2026-09-23). Código em produção assim que
   publicado; migrações `20260923000004` (registro) e `20260923000006`
-  (análise do quiz no registro) **escritas, não aplicadas** — aguardando o
+  (análise do quiz no registro) **escritas, não aplicadas** - aguardando o
   fundador aplicá-las (a `20260923000005`, correção da RLS do quiz, já foi
   aplicada e é pré-requisito da `000006`). Até lá, tudo funciona com os
   defaults embutidos no código (`source: "default"`, §5).
@@ -111,9 +111,9 @@ lib/ai/models/
   capabilities.ts   AI_CAPABILITIES, aiCapabilitySchema, AiCapability
   schema.ts         modelParamsSchema, modelSpecSchema, modelConfigRowSchema (Zod)
   defaults.ts       DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> (= semente)
-  resolve.ts        resolveModelChain(capability, rows) — puro, sem I/O
-  load.ts           loadModelChain(supabase, capability) — lê a tabela, cache 60 s
-  factory.ts        createChatModel(spec, opts) — provedor → classe LangChain
+  resolve.ts        resolveModelChain(capability, rows) - puro, sem I/O
+  load.ts           loadModelChain(supabase, capability) - lê a tabela, cache 60 s
+  factory.ts        createChatModel(spec, opts) - provedor → classe LangChain
   index.ts          getModel / getStructuredModel / getAgentModels (reexporta o resto)
 ```
 
@@ -209,7 +209,7 @@ de pé e só a leitura da config falhou; derrubar a IA por isso seria pior.
 
 | Situação | Resultado | Log |
 |---|---|---|
-| Linha válida e `active` | `source: "db"` | — |
+| Linha válida e `active` | `source: "db"` | - |
 | Tabela vazia / capacidade sem linha | default do código, `source: "default"` | nenhum (estado normal antes da migração) |
 | `active = false` | default | nenhum |
 | Linha reprovada no Zod (provedor desconhecido, `params` com chave extra…) | default | `console.warn` com a capacidade e o erro do Zod |

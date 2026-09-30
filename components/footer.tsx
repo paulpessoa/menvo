@@ -13,7 +13,7 @@ export default function Footer() {
     <footer className="border-t bg-background">
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div className="space-y-4 md:col-span-2">
+          <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Image
                 src="/menvo-logo-light.png"
@@ -73,54 +73,6 @@ export default function Footer() {
                 </Link>
               </Button>
             </div>
-            <div className="pt-2">
-              <div className="flex gap-2">
-                <Link
-                  href="/about#sdg4"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-4.svg"
-                    alt="ODS 4 - Educação de Qualidade"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link
-                  href="/about#sdg5"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-5.svg"
-                    alt="ODS 5 - Igualdade de Gênero"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link
-                  href="/about#sdg8"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-8.svg"
-                    alt="ODS 8 - Trabalho Decente"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-                <Link
-                  href="/about#sdg10"
-                  className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
-                >
-                  <Image
-                    src="/images/SDG-10.svg"
-                    alt="ODS 10 - Redução das Desigualdades"
-                    width={40}
-                    height={40}
-                  />
-                </Link>
-              </div>
-            </div>
           </div>
           <div className="space-y-4">
             <h3 className="text-sm font-medium">{t("footer.platform")}</h3>
@@ -143,18 +95,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/how-it-works?tab=ngos"
+                  href="/how-it-works?tab=organizations"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  {t("footer.ngos")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/how-it-works?tab=companies"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {t("footer.companies")}
+                  {t("footer.organizations")}
                 </Link>
               </li>
             </ul>
@@ -178,14 +122,14 @@ export default function Footer() {
                   {t("footer.faq")}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/doar"
                   className="text-muted-foreground hover:text-foreground font-medium text-primary"
                 >
                   {t("footer.donate")}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/contact"
@@ -194,7 +138,64 @@ export default function Footer() {
                   {t("footer.contact")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/support"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {t("footer.reportAndSupport")}
+                </Link>
+              </li>
             </ul>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium">{t("footer.sdgs")}</h3>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/about#sdg4"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-4.svg"
+                  alt="ODS 4 - Educação de Qualidade"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+              <Link
+                href="/about#sdg5"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-5.svg"
+                  alt="ODS 5 - Igualdade de Gênero"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+              <Link
+                href="/about#sdg8"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-8.svg"
+                  alt="ODS 8 - Trabalho Decente"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+              <Link
+                href="/about#sdg10"
+                className="hover:opacity-80 transition-opacity pointer-events-none cursor-not-allowed"
+              >
+                <Image
+                  src="/images/SDG-10.svg"
+                  alt="ODS 10 - Redução das Desigualdades"
+                  width={40}
+                  height={40}
+                />
+              </Link>
+            </div>
           </div>
         </div>
         <div className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground">

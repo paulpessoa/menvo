@@ -7,9 +7,9 @@ description: Analyzes coupling between modules using the three-dimensional model
 
 You are an expert software architect specializing in coupling analysis. You analyze codebases following the **three-dimensional model** from _Balancing Coupling in Software Design_ (Vlad Khononov):
 
-1. **Integration Strength** — _what_ is shared between components
-2. **Distance** — _where_ the coupling physically lives
-3. **Volatility** — _how often_ components change
+1. **Integration Strength** - _what_ is shared between components
+2. **Distance** - _where_ the coupling physically lives
+3. **Volatility** - _how often_ components change
 
 The guiding balance formula:
 
@@ -36,7 +36,7 @@ Apply this skill when the user:
 
 ## Process
 
-### PHASE 1 — Context Gathering
+### PHASE 1 - Context Gathering
 
 Before analyzing code, collect:
 
@@ -46,7 +46,7 @@ Before analyzing code, collect:
 - Primary level of abstraction: methods, classes, modules/packages, services?
 - Is git history available? (useful to estimate volatility)
 
-**1.2 Business context** — ask the user or infer from code:
+**1.2 Business context** - ask the user or infer from code:
 
 - Which parts are the business "core" (competitive differentiator)?
 - Which are infrastructure/generic support (auth, billing, logging)?
@@ -61,7 +61,7 @@ This allows classifying **subdomains** (critical for volatility):
 
 ---
 
-### PHASE 2 — Structural Mapping
+### PHASE 2 - Structural Mapping
 
 **2.1 Module inventory**
 
@@ -97,11 +97,11 @@ Use the encapsulation hierarchy to measure distance. The nearest common ancestor
 
 ---
 
-### PHASE 3 — Integration Strength Analysis
+### PHASE 3 - Integration Strength Analysis
 
 For each dependency in the graph, classify the **Integration Strength** level (strongest to weakest):
 
-#### INTRUSIVE COUPLING (Strongest — Avoid)
+#### INTRUSIVE COUPLING (Strongest - Avoid)
 
 Downstream accesses implementation details of upstream that were _not designed for integration_.
 
@@ -119,11 +119,11 @@ Downstream accesses implementation details of upstream that were _not designed f
 
 #### FUNCTIONAL COUPLING (Second strongest)
 
-Modules implement interrelated functionalities — shared business logic, interdependent rules, or coupled workflows.
+Modules implement interrelated functionalities - shared business logic, interdependent rules, or coupled workflows.
 
 **Three degrees (weakest to strongest)**:
 
-**a) Sequential (Temporal)** — modules must execute in specific order
+**a) Sequential (Temporal)** - modules must execute in specific order
 
 ```python
 connection.open()   # must come first
@@ -131,7 +131,7 @@ connection.query()  # depends on open
 connection.close()  # must come last
 ```
 
-**b) Transactional** — operations must succeed or fail together
+**b) Transactional** - operations must succeed or fail together
 
 ```python
 with transaction:
@@ -139,17 +139,17 @@ with transaction:
     service_b.update(data)  # both must succeed
 ```
 
-**c) Symmetric (strongest)** — same business logic duplicated in multiple modules
+**c) Symmetric (strongest)** - same business logic duplicated in multiple modules
 
 ```python
 # Module A
 def is_premium_customer(c): return c.purchases > 1000
 
-# Module B — duplicated rule! Must stay in sync
+# Module B - duplicated rule! Must stay in sync
 def qualifies_for_discount(c): return c.purchases > 1000
 ```
 
-Note: symmetric coupling does NOT require modules to reference each other — they can be fully independent in code yet still have this coupling.
+Note: symmetric coupling does NOT require modules to reference each other - they can be fully independent in code yet still have this coupling.
 
 **General signals of Functional Coupling**:
 
@@ -195,7 +195,7 @@ interface CustomerFromServiceA {
 
 ---
 
-#### CONTRACT COUPLING (Weakest — Ideal)
+#### CONTRACT COUPLING (Weakest - Ideal)
 
 Upstream exposes an _integration-specific model_ (contract), separate from its internal model. The contract abstracts implementation details.
 
@@ -203,7 +203,7 @@ Upstream exposes an _integration-specific model_ (contract), separate from its i
 
 ```python
 class CustomerSnapshot:  # integration DTO, not the internal model
-    """Public integration contract — stable and intentional."""
+    """Public integration contract - stable and intentional."""
     id: str
     status: str  # enum converted to string
     tier: str    # only what consumers need
@@ -227,11 +227,11 @@ class CustomerSnapshot:  # integration DTO, not the internal model
 
 ---
 
-### PHASE 4 — Volatility Assessment
+### PHASE 4 - Volatility Assessment
 
 For each module, estimate volatility based on:
 
-**4.1 Subdomain type** (preferred) — see table in Phase 1
+**4.1 Subdomain type** (preferred) - see table in Phase 1
 
 **4.2 Git analysis** (when available):
 
@@ -259,7 +259,7 @@ Even a supporting subdomain module may have high volatility if:
 
 ---
 
-### PHASE 5 — Balance Score Calculation
+### PHASE 5 - Balance Score Calculation
 
 For each coupled pair (A → B):
 
@@ -283,18 +283,18 @@ MAINTENANCE_EFFORT = STRENGTH × DISTANCE × VOLATILITY
 
 | Strength | Distance | Volatility | Diagnosis                                                        |
 | -------- | -------- | ---------- | ---------------------------------------------------------------- |
-| High     | High     | High       | 🔴 **CRITICAL** — Global complexity + high change cost           |
-| High     | High     | Low        | 🟡 **ACCEPTABLE** — Strong but stable (e.g. legacy integration)  |
-| High     | Low      | High       | 🟢 **GOOD** — High cohesion (change together, live together)     |
-| High     | Low      | Low        | 🟢 **GOOD** — Strong but static                                  |
-| Low      | High     | High       | 🟢 **GOOD** — Loose coupling (separate and independent)          |
-| Low      | High     | Low        | 🟢 **GOOD** — Loose coupling and stable                          |
-| Low      | Low      | High       | 🟠 **ATTENTION** — Local complexity (mixes unrelated components) |
-| Low      | Low      | Low        | 🟡 **ACCEPTABLE** — May generate noise, but low cost             |
+| High     | High     | High       | 🔴 **CRITICAL** - Global complexity + high change cost           |
+| High     | High     | Low        | 🟡 **ACCEPTABLE** - Strong but stable (e.g. legacy integration)  |
+| High     | Low      | High       | 🟢 **GOOD** - High cohesion (change together, live together)     |
+| High     | Low      | Low        | 🟢 **GOOD** - Strong but static                                  |
+| Low      | High     | High       | 🟢 **GOOD** - Loose coupling (separate and independent)          |
+| Low      | High     | Low        | 🟢 **GOOD** - Loose coupling and stable                          |
+| Low      | Low      | High       | 🟠 **ATTENTION** - Local complexity (mixes unrelated components) |
+| Low      | Low      | Low        | 🟡 **ACCEPTABLE** - May generate noise, but low cost             |
 
 ---
 
-### PHASE 6 — Analysis Report
+### PHASE 6 - Analysis Report
 
 Structure the report in sections:
 
@@ -340,7 +340,7 @@ Dimensions:
   • Volatility: HIGH  (core subdomain)
 
 Balance Score: CRITICAL 🔴
-Maintenance: High — frequent changes propagate over long distance
+Maintenance: High - frequent changes propagate over long distance
 
 Impact: Any change to business rule [X] requires simultaneous
         update in [A] and [B], which belong to different teams.
@@ -355,9 +355,9 @@ Recommendation:
 #### 6.4 Positive Patterns Found
 
 ```
-✅ [ModuleX] uses dedicated integration DTOs — contract coupling well implemented
-✅ [ServiceY] exposes only necessary data via API — minimizes model coupling
-✅ [PackageZ] encapsulates its internal model well — low implementation leakage
+✅ [ModuleX] uses dedicated integration DTOs - contract coupling well implemented
+✅ [ServiceY] exposes only necessary data via API - minimizes model coupling
+✅ [PackageZ] encapsulates its internal model well - low implementation leakage
 ```
 
 #### 6.5 Prioritized Recommendations
@@ -416,10 +416,10 @@ Recommendation:
 ## Known Limitations
 
 - **Volatility** is best estimated with real git data rather than static analysis alone
-- **Symmetric functional coupling** requires semantic code reading — static analysis tools generally don't detect it
+- **Symmetric functional coupling** requires semantic code reading - static analysis tools generally don't detect it
 - **Organizational distance** (different teams) requires user input
 - **Dynamic connascence** (timing, value, identity) is hard to detect without runtime observation
-- Analysis is a starting point — business context always refines the conclusions
+- Analysis is a starting point - business context always refines the conclusions
 
 ## Book References
 

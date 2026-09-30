@@ -22,7 +22,7 @@ export { AiModelUnavailableError, type ModelChain } from "./types"
 
 export interface ModelOptions {
   /** Receives one AiCallRecord per attempt (ok, error, fallback). Required:
-   * no metering, no call — AI_PLATFORM_PLAN.md §1 principle 2. */
+   * no metering, no call - AI_PLATFORM_PLAN.md §1 principle 2. */
   onCall: (record: AiCallRecord) => void
 }
 
@@ -38,7 +38,7 @@ interface AvailableSpec {
  * dropped (ADR 0004 §4: "chave ausente → sai da cadeia, com console.warn").
  *
  * `AI_FORCE_FALLBACK=<capability>` additionally drops the primary for that
- * one capability — evals-only (never set in production), so
+ * one capability - evals-only (never set in production), so
  * `npm run test:evals` can exercise the fallback path deliberately
  * (ADR 0004 §7.1 point 4) without needing to fake a provider outage.
  */
@@ -69,7 +69,7 @@ async function resolveAvailable(
 
 /**
  * Plain text-generating model with fallbacks (e.g. `followup`). Streams like
- * any LangChain chat model — `withFallbacks` only switches model if the
+ * any LangChain chat model - `withFallbacks` only switches model if the
  * *first* chunk fails to arrive (ADR 0004 §1 fact 3), which is why the
  * primary should use a low `maxRetries` (factory.ts default: 1).
  */
@@ -86,7 +86,7 @@ export async function getModel(
 }
 
 /**
- * Structured (Zod) output with fallbacks — `extract`, `analyze`, `route`,
+ * Structured (Zod) output with fallbacks - `extract`, `analyze`, `route`,
  * `rank`. Each model gets `withStructuredOutput` BEFORE `withFallbacks`: a
  * `RunnableWithFallbacks` has no `withStructuredOutput` method of its own.
  */
@@ -94,7 +94,7 @@ export async function getStructuredModel<T extends Record<string, unknown>>(
   supabase: SupabaseClient,
   capability: AiCapability,
   // Input left as `any`, not defaulted to T: a schema built with `.default()`
-  // fields (common for LLM output — every field optional pre-parse, filled
+  // fields (common for LLM output - every field optional pre-parse, filled
   // in post-parse) has an Input type that legitimately differs from its
   // Output type, and `withStructuredOutput` itself only cares about Output.
   schema: z.ZodType<T, z.ZodTypeDef, any>,
@@ -109,7 +109,7 @@ export async function getStructuredModel<T extends Record<string, unknown>>(
 
 /**
  * Model instances for `createAgent` + `modelFallbackMiddleware` (`converse`
- * — an agent with tools). `withFallbacks` cannot be used here: its
+ * - an agent with tools). `withFallbacks` cannot be used here: its
  * `_bindTools` rejects a `RunnableWithFallbacks` (ADR 0004 §1 fact 1), and
  * `createReactAgent` is deprecated (fact 2) in favor of `langchain`'s
  * `createAgent`, whose `modelFallbackMiddleware` re-runs the tool-bound

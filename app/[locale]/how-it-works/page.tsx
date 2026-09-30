@@ -1,30 +1,12 @@
 "use client"
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Link } from "@/i18n/routing"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Building2,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  FileText,
-  HandHeart,
-  Mail,
-  MessageSquare,
-  Search,
-  Shield,
-  TrendingUp,
-  User,
-  Users,
-  Video,
-  BarChart3,
-  Rocket,
-  Loader2
-} from "lucide-react"
+import { StepSection } from "@/components/how-it-works/StepSection"
+import { BarChart3, Building2, Calendar, Clock, MessageSquare, Search, Shield, Sparkles, TrendingUp, User, Users, Video } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
 
@@ -33,7 +15,7 @@ export default function HowItWorksPage() {
     <Suspense
       fallback={
         <div className="container max-w-7xl mx-auto px-4 py-12 flex justify-center min-h-[60vh] items-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >
@@ -42,27 +24,33 @@ export default function HowItWorksPage() {
   )
 }
 
+const VALID_TABS = ["mentees", "mentors", "organizations"]
+// Old links (footer, bookmarks) used separate ngos/companies tabs before the
+// two were merged into a single "organizations" audience - keep them working.
+const TAB_ALIASES: Record<string, string> = { ngos: "organizations", companies: "organizations" }
+
 function HowItWorksContent() {
   const t = useTranslations()
-  const { isAuthenticated } = useAuth()
+  const { isMentor } = useAuth()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get("tab")
-  const validTabs = ["mentees", "mentors", "ngos", "companies"]
+  const resolvedTabParam = tabParam ? TAB_ALIASES[tabParam] || tabParam : null
+  const defaultTab = isMentor ? "mentors" : "mentees"
   const [activeTab, setActiveTab] = useState(
-    tabParam && validTabs.includes(tabParam) ? tabParam : "mentees"
+    resolvedTabParam && VALID_TABS.includes(resolvedTabParam) ? resolvedTabParam : defaultTab
   )
 
   useEffect(() => {
-    if (tabParam && validTabs.includes(tabParam)) {
-      setActiveTab(tabParam)
+    if (resolvedTabParam && VALID_TABS.includes(resolvedTabParam)) {
+      setActiveTab(resolvedTabParam)
     }
-  }, [tabParam])
+  }, [resolvedTabParam])
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
       {/* Header */}
       <div className="flex flex-col items-center text-center space-y-4 mb-16">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
           {t("howItWorks.title")}
         </h1>
         <p className="text-muted-foreground max-w-[700px] text-lg md:text-xl leading-relaxed">
@@ -72,193 +60,93 @@ function HowItWorksContent() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-5xl mx-auto">
         <div className="flex justify-center mb-12">
-          <TabsList className="grid w-full h-auto p-1 bg-muted/50 rounded-2xl grid-cols-2 md:grid-cols-4 gap-1">
-            <TabsTrigger value="mentees" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
+          <TabsList className="grid w-full h-auto p-1 bg-muted/50 rounded-2xl grid-cols-1 sm:grid-cols-3 gap-1">
+            <TabsTrigger value="mentees" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
               {t("howItWorks.forMentees")}
             </TabsTrigger>
-            <TabsTrigger value="mentors" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
+            <TabsTrigger value="mentors" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
               {t("howItWorks.forMentors")}
             </TabsTrigger>
-            <TabsTrigger value="ngos" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
-              {t("howItWorks.forNGOs")}
-            </TabsTrigger>
-            <TabsTrigger value="companies" className="rounded-xl py-3 data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
-              {t("howItWorks.forCompanies")}
+            <TabsTrigger value="organizations" className="rounded-xl py-3 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm font-bold">
+              {t("howItWorks.forOrganizations")}
             </TabsTrigger>
           </TabsList>
         </div>
 
         {/* --- MENTEES --- */}
-        <TabsContent value="mentees" className="space-y-16 outline-none">
-          {[1, 2, 3, 4].map(step => (
-            <div key={step} className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${step % 2 === 0 ? '' : 'bg-white p-8 rounded-3xl border border-gray-50 shadow-sm'}`}>
-              <div className={`space-y-6 ${step % 2 === 0 ? 'md:order-last' : ''}`}>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transform -rotate-3">
-                  {step === 1 && <User className="h-6 w-6" />}
-                  {step === 2 && <Search className="h-6 w-6" />}
-                  {step === 3 && <Calendar className="h-6 w-6" />}
-                  {step === 4 && <Video className="h-6 w-6" />}
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t(`howItWorks.mentees.step${step}.title`)}</h2>
-                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t(`howItWorks.mentees.step${step}.description`)}</p>
-                </div>
-                <ul className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <li key={i} className="flex items-center gap-3">
-                      <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
-                      <span className="font-medium text-gray-700">{t(`howItWorks.mentees.step${step}.feature${i}`)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex justify-center relative">
-                <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
-                <Image 
-                  src={`/images/how-it-works/${step === 1 ? 'register-mentee.jpg' : step === 2 ? 'find.jpg' : step === 3 ? 'schedule.jpg' : 'grow-together.jpg'}`} 
-                  width={450} height={350} alt={`Mentee Step ${step}`} 
-                  sizes="(max-width: 768px) 100vw, 450px"
-                  className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
-                />
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-center pt-8">
-            <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href="/signup">{t("howItWorks.mentees.getStarted")}</Link>
-            </Button>
-          </div>
+        <TabsContent value="mentees">
+          <StepSection
+            section="mentees"
+            steps={[1, 2, 3, 4, 5]}
+            icons={{
+              1: <User className="h-6 w-6" />,
+              2: <Sparkles className="h-6 w-6" />,
+              3: <Search className="h-6 w-6" />,
+              4: <Calendar className="h-6 w-6" />,
+              5: <Video className="h-6 w-6" />
+            }}
+            images={{
+              1: "register-mentee.jpg",
+              2: "grow.jpg",
+              3: "find.jpg",
+              4: "schedule.jpg",
+              5: "grow-together.jpg"
+            }}
+            rotate="-rotate-3"
+            ctaKey="getStarted"
+            ctaHref="/signup"
+          />
         </TabsContent>
 
         {/* --- MENTORS --- */}
-        <TabsContent value="mentors" className="space-y-16 outline-none">
-          {[1, 2, 3, 4].map(step => (
-            <div key={step} className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${step % 2 === 0 ? '' : 'bg-white p-8 rounded-3xl border border-gray-50 shadow-sm'}`}>
-              <div className={`space-y-6 ${step % 2 === 0 ? 'md:order-last' : ''}`}>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transform rotate-3">
-                  {step === 1 && <User className="h-6 w-6" />}
-                  {step === 2 && <Shield className="h-6 w-6" />}
-                  {step === 3 && <Clock className="h-6 w-6" />}
-                  {step === 4 && <MessageSquare className="h-6 w-6" />}
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t(`howItWorks.mentors.step${step}.title`)}</h2>
-                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t(`howItWorks.mentors.step${step}.description`)}</p>
-                </div>
-                <ul className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <li key={i} className="flex items-center gap-3">
-                      <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
-                      <span className="font-medium text-gray-700">{t(`howItWorks.mentors.step${step}.feature${i}`)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex justify-center relative">
-                <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
-                <Image 
-                  src={`/images/how-it-works/${step === 1 ? 'register-mentor.jpg' : step === 2 ? 'verify.jpg' : step === 3 ? 'availability.jpg' : 'conduct.jpg'}`} 
-                  width={450} height={350} alt={`Mentor Step ${step}`} 
-                  sizes="(max-width: 768px) 100vw, 450px"
-                  className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
-                />
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-center pt-8">
-            <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href={isAuthenticated ? "/profile?tab=mentorship" : "/signup"}>{t("howItWorks.mentors.becomeMentor")}</Link>
-            </Button>
-          </div>
+        <TabsContent value="mentors">
+          <StepSection
+            section="mentors"
+            steps={[1, 2, 3, 4]}
+            icons={{
+              1: <User className="h-6 w-6" />,
+              2: <Shield className="h-6 w-6" />,
+              3: <Clock className="h-6 w-6" />,
+              4: <MessageSquare className="h-6 w-6" />
+            }}
+            images={{
+              1: "register-mentor.jpg",
+              2: "verify.jpg",
+              3: "availability.jpg",
+              4: "conduct.jpg"
+            }}
+            rotate="rotate-3"
+            ctaKey="becomeMentor"
+            ctaHref={isMentor ? "/profile?tab=mentorship" : "/signup"}
+          />
         </TabsContent>
 
-        {/* --- NGOS --- */}
-        <TabsContent value="ngos" className="space-y-16 outline-none">
-          {[1, 2, 3, 4].map(step => (
-            <div key={step} className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${step % 2 === 0 ? '' : 'bg-white p-8 rounded-3xl border border-gray-50 shadow-sm'}`}>
-              <div className={`space-y-6 ${step % 2 === 0 ? 'md:order-last' : ''}`}>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transform -rotate-3">
-                  {step === 1 && <HandHeart className="h-6 w-6" />}
-                  {step === 2 && <Users className="h-6 w-6" />}
-                  {step === 3 && <TrendingUp className="h-6 w-6" />}
-                  {step === 4 && <BarChart3 className="h-6 w-6" />}
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t(`howItWorks.ngos.step${step}.title`)}</h2>
-                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t(`howItWorks.ngos.step${step}.description`)}</p>
-                </div>
-                <ul className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <li key={i} className="flex items-center gap-3">
-                      <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
-                      <span className="font-medium text-gray-700">{t(`howItWorks.ngos.step${step}.feature${i}`)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex justify-center relative">
-                <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
-                <Image 
-                  src={`/images/how-it-works/${step === 1 ? 'ngo-register.jpg' : step === 2 ? 'ngo-connect.jpg' : 'find.jpg'}`} 
-                  width={450} height={350} alt={`NGO Step ${step}`} 
-                  sizes="(max-width: 768px) 100vw, 450px"
-                  className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
-                />
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-center pt-8">
-            <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href="/contact">{t("howItWorks.ngos.getStarted")}</Link>
-            </Button>
-          </div>
-        </TabsContent>
-
-        {/* --- COMPANIES --- */}
-        <TabsContent value="companies" className="space-y-16 outline-none">
-          {[1, 2, 3, 4].map(step => (
-            <div key={step} className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${step % 2 === 0 ? '' : 'bg-white p-8 rounded-3xl border border-gray-50 shadow-sm'}`}>
-              <div className={`space-y-6 ${step % 2 === 0 ? 'md:order-last' : ''}`}>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transform rotate-3">
-                  {step === 1 && <Building2 className="h-6 w-6" />}
-                  {step === 2 && <FileText className="h-6 w-6" />}
-                  {step === 3 && <TrendingUp className="h-6 w-6" />}
-                  {step === 4 && <Rocket className="h-6 w-6" />}
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">{t(`howItWorks.companies.step${step}.title`)}</h2>
-                  <p className="text-base md:text-lg text-muted-foreground leading-relaxed">{t(`howItWorks.companies.step${step}.description`)}</p>
-                </div>
-                <ul className="space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <li key={i} className="flex items-center gap-3">
-                      <div className="bg-primary/10 p-1 rounded-full"><CheckCircle2 className="h-4 w-4 text-primary" /></div>
-                      <span className="font-medium text-gray-700">{t(`howItWorks.companies.step${step}.feature${i}`)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex justify-center relative">
-                <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full" />
-                <Image 
-                  src={`/images/how-it-works/${step === 1 ? 'company-volunteer.jpg' : step === 2 ? 'company-esg.jpg' : step === 3 ? 'company-benefits.jpg' : 'conduct.jpg'}`} 
-                  width={450} height={350} alt={`Company Step ${step}`} 
-                  sizes="(max-width: 768px) 100vw, 450px"
-                  className="rounded-2xl object-cover shadow-2xl relative z-10 ring-4 ring-white" 
-                />
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-center pt-8">
-            <Button size="lg" asChild className="px-10 h-14 rounded-xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-transform">
-              <Link href="/contact">{t("howItWorks.companies.getStarted")}</Link>
-            </Button>
-          </div>
+        {/* --- ORGANIZATIONS (NGOs + companies, same model) --- */}
+        <TabsContent value="organizations">
+          <StepSection
+            section="organizations"
+            steps={[1, 2, 3, 4]}
+            icons={{
+              1: <Building2 className="h-6 w-6" />,
+              2: <Users className="h-6 w-6" />,
+              3: <TrendingUp className="h-6 w-6" />,
+              4: <BarChart3 className="h-6 w-6" />
+            }}
+            images={{
+              1: "ngo-register.jpg",
+              2: "ngo-connect.jpg",
+              3: "company-volunteer.jpg",
+              4: "company-esg.jpg"
+            }}
+            rotate="-rotate-3"
+            ctaKey="getStarted"
+            ctaHref="/contact?tipo=organizacao#organizacao"
+          />
         </TabsContent>
       </Tabs>
 
-      <div className="mt-24 max-w-4xl mx-auto text-center border-t pt-16">
-        <h2 className="text-3xl font-extrabold mb-4 text-gray-900">{t("howItWorks.faq.title")}</h2>
+      <div className="mt-24 max-w-4xl mx-auto text-center border-t border-border pt-16">
+        <h2 className="text-3xl font-extrabold mb-4 text-foreground">{t("howItWorks.faq.title")}</h2>
         <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
           {t("howItWorks.faq.description")}
         </p>

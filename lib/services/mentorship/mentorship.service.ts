@@ -472,6 +472,19 @@ export const mentorshipSessionsService = {
     }
   },
 
+  // Marcar agendamento como concluído pelo mentor (BFF: POST /api/appointments/mark-completed)
+  markCompleted: async (appointmentId: string): Promise<void> => {
+    const res = await fetch("/api/appointments/mark-completed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId })
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || "Erro ao concluir mentoria")
+    }
+  },
+
   // Atualizar feedback público de agendamento (BFF: PATCH /api/feedback)
   updateFeedback: async (feedbackId: string, publicFeedback: string): Promise<void> => {
     const res = await fetch("/api/appointments/feedback", {

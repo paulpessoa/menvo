@@ -18,7 +18,7 @@ interface RawUsage {
  * Providers put token counts in different places, and some only in some
  * modes: `usage_metadata` is the standard spot, but ChatGroq *streaming*
  * leaves it empty and reports usage only in `response_metadata.usage`
- * (verified with a real call, 2026-09-23 — the assistant streams, so its Groq
+ * (verified with a real call, 2026-09-23 - the assistant streams, so its Groq
  * fallback metered 0 tokens and would have been invisible to `ai_budget`).
  * `llmOutput.tokenUsage` is the older non-streaming shape.
  */
@@ -61,10 +61,10 @@ export interface MeteringCallbackOptions {
 /**
  * One callback handler per model instance (attached by
  * `lib/ai/models/factory.ts`), replacing the `streamEvents`-based collector
- * (`lib/ai/langchain-metering.ts`, removed — ADR 0004 §6). Passing callbacks
+ * (`lib/ai/langchain-metering.ts`, removed - ADR 0004 §6). Passing callbacks
  * in the model's constructor means they survive `bindTools`,
- * `withStructuredOutput` and `withFallbacks`, and — unlike `streamEvents`,
- * which has no `on_chat_model_error` event — this also sees failed attempts,
+ * `withStructuredOutput` and `withFallbacks`, and - unlike `streamEvents`,
+ * which has no `on_chat_model_error` event - this also sees failed attempts,
  * which is what makes fallback + metering work together correctly.
  */
 export function createMeteringCallback(opts: MeteringCallbackOptions): BaseCallbackHandler {

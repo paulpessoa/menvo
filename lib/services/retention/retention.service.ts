@@ -27,9 +27,9 @@ export const RETENTION_POLICY = {
 /** A JotForm profile eligible to enter the retention queue, or already tracked by it. */
 export interface RetentionCandidate {
   userId: string
-  /** Campaign of the earliest invite this person received — becomes the enrollment campaign. */
+  /** Campaign of the earliest invite this person received - becomes the enrollment campaign. */
   campaign: string
-  /** `sent_at` of that earliest invite — becomes `clock_started_at` on enrollment. */
+  /** `sent_at` of that earliest invite - becomes `clock_started_at` on enrollment. */
   firstInvitedAt: string
   /** True if `profiles.email_opt_out_at` is set or the e-mail is in `email_suppressions`. */
   optedOut: boolean
@@ -75,7 +75,7 @@ function laterOf(a: Date, b: Date): Date {
 
 /**
  * Decides what to do with one already-enrolled queue row, given the account
- * hasn't been released this run. Returns at most one action — a row is
+ * hasn't been released this run. Returns at most one action - a row is
  * always in exactly one stage (waiting for the 30-day notice, waiting for
  * the 1-day notice, waiting for deletion) or opted out, which follows its
  * own, warning-free 90-day clock.
@@ -100,7 +100,7 @@ function decideForQueueRow(row: RetentionQueueRow, optedOut: boolean, now: Date)
   }
 
   // Both notices sent: delete no earlier than the schedule AND no earlier
-  // than one day after the 1-day notice actually went out — a late 1-day
+  // than one day after the 1-day notice actually went out - a late 1-day
   // notice (e.g. after a Brevo outage) pushes deletion back instead of
   // deleting the instant it finally sends.
   if (!row.scheduledDeletionAt) return null
@@ -111,7 +111,7 @@ function decideForQueueRow(row: RetentionQueueRow, optedOut: boolean, now: Date)
 /**
  * Turns the current state of the imported-accounts cohort into the list of
  * actions a retention run should take, in the order they should execute:
- * releases first (someone signed in — never delete or notice them this
+ * releases first (someone signed in - never delete or notice them this
  * run), then new enrollments, then deletions, then the 1-day notice, then
  * the 30-day notice. Pure and side-effect free so every timing rule in
  * docs/domains/account-retention.md §2 can be unit tested directly.

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import {  CheckCircle, XCircle , Loader2 } from "lucide-react";
 
 export default function AppointmentActionPage() {
     const searchParams = useSearchParams();
@@ -126,7 +126,7 @@ export default function AppointmentActionPage() {
                             variant={action === 'confirm' ? 'default' : 'destructive'}
                         >
                             {loading ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <Loader2 className="animate-spin h-4 w-4" />
                             ) : action === 'confirm' ? (
                                 'Confirmar'
                             ) : (

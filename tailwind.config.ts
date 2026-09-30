@@ -11,7 +11,7 @@ const config = {
   ],
   prefix: "",
   theme: {
-    // Fluid until 1280px, then fixed — equivalent to max-w-7xl mx-auto px-4.
+    // Fluid until 1280px, then fixed - equivalent to max-w-7xl mx-auto px-4.
     // Without the sm..xl entries the container had no cap below 1536px.
     container: {
       center: true,

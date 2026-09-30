@@ -22,7 +22,7 @@ export interface GroupableAppointment {
 export interface GroupedAppointments<T extends GroupableAppointment> {
     /** Something only the current user can unblock (confirm, evaluate). */
     needsAction: T[]
-    /** Future sessions, soonest first — confirmed or still awaiting the other side. */
+    /** Future sessions, soonest first - confirmed or still awaiting the other side. */
     upcoming: T[]
     /** Everything that is over: done, cancelled, rejected or expired. Newest first. */
     history: T[]
@@ -39,7 +39,7 @@ const byDateAsc = (a: GroupableAppointment, b: GroupableAppointment) =>
  *
  * - Mentor perspective: a future `pending` request needs the mentor's answer.
  * - Mentee perspective: a finished session (confirmed or completed) without
- *   the mentee's feedback needs an evaluation — evaluations are mentee-only
+ *   the mentee's feedback needs an evaluation - evaluations are mentee-only
  *   by design (see STATUS.md, "Mentorship Evaluation Model").
  */
 export function groupAppointments<T extends GroupableAppointment>(
@@ -76,7 +76,7 @@ export function groupAppointments<T extends GroupableAppointment>(
     return result
 }
 
-/** The next confirmed session, if any — drives the "Próxima sessão" highlight. */
+/** The next confirmed session, if any - drives the "Próxima sessão" highlight. */
 export function nextConfirmedSession<T extends GroupableAppointment>(upcoming: T[]): T | undefined {
     return upcoming.find((a) => a.status === 'confirmed')
 }

@@ -5,7 +5,7 @@
  * unauthenticated, unmetered), now resolved through the model registry
  * (`lib/ai/models`, capability `analyze`) and called from
  * `POST /api/quiz/[id]/analyze`. Lives in `lib/ai-menvo/` (not `lib/ai/`)
- * because it's Menvo domain content — the prompt, the fallback heuristic and
+ * because it's Menvo domain content - the prompt, the fallback heuristic and
  * the mentor-matching logic are specific to this product (AI_PLATFORM_PLAN.md
  * §1 principle 6).
  */
@@ -42,7 +42,7 @@ export const quizAnalysisSchema = z.object({
 
 export type QuizAnalysisResult = z.infer<typeof quizAnalysisSchema>
 
-/** The quiz answers `claim_quiz_analysis` returns — exactly what the prompt
+/** The quiz answers `claim_quiz_analysis` returns - exactly what the prompt
  * needs, nothing more (no email, no linkedin_url). */
 export interface QuizAnswers {
   name: string
@@ -156,7 +156,7 @@ function hasVagueOrGenericResponses(answers: QuizAnswers): boolean {
 
 /**
  * Deterministic analysis, used only when the model registry has no
- * available provider or every attempt in the chain fails — the same
+ * available provider or every attempt in the chain fails - the same
  * heuristic `supabase/functions/analyze-quiz` used as its fallback.
  */
 export function fallbackAnalysis(answers: QuizAnswers, mentors: AnalysisMentor[]): QuizAnalysisResult {
@@ -289,7 +289,7 @@ export function sanitizeAnalysisMentors(
 
     const matched = mentorMap.get(rawName.toLowerCase())
     if (!matched) {
-      // Hallucinated mentor name — purge to avoid showing non-existent users
+      // Hallucinated mentor name - purge to avoid showing non-existent users
       return {
         ...item,
         mentor_nome: "",
@@ -322,7 +322,7 @@ export interface AnalyzeQuizRun {
 /**
  * Runs the `analyze` capability against the quiz answers, with the same
  * deterministic fallback the old Edge Function had. `supabase` only
- * resolves the model chain (`ai_model_config`) — this function never reads
+ * resolves the model chain (`ai_model_config`) - this function never reads
  * or writes `quiz_responses` itself (the route does, through
  * `claim_quiz_analysis`/`save_quiz_analysis`).
  */

@@ -130,7 +130,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Role Protection Logic — client-side RequireRole/AuthGuard checks alone are
+  // Role Protection Logic - client-side RequireRole/AuthGuard checks alone are
   // not a security boundary (they run after the page's JS bundle loads and can
   // be bypassed by calling the API directly or disabling JS). Resolve the
   // role here only for routes that actually need it, to avoid a DB round trip

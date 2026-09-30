@@ -26,7 +26,7 @@ describe('GET /auth/callback', () => {
   })
 
   it('redirects an "invite" link to /update-password', async () => {
-    // Regression test: this branch didn't exist before — an invite link
+    // Regression test: this branch didn't exist before - an invite link
     // (used to onboard someone whose account was created by an admin, e.g.
     // from the waiting list) fell through to the generic `next` fallback,
     // landing the person on /dashboard already authenticated (the session

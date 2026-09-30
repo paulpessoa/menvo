@@ -1,8 +1,9 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import { Eye, Loader2, Settings } from "lucide-react"
+import {  Eye, Settings , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -35,7 +36,7 @@ export default function ProfilePage() {
 function FullPageSpinner() {
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <MenvoDots />
     </div>
   )
 }
@@ -63,7 +64,7 @@ function ProfilePageContent() {
     }
   }, [authLoading, user, tabParam, router])
 
-  // Seed the form once per loaded profile id — re-seeding on every profile
+  // Seed the form once per loaded profile id - re-seeding on every profile
   // object change would wipe unsaved edits after a photo/CV upload refetch.
   useEffect(() => {
     if (profile && form === null) setForm(profileToForm(profile))
@@ -141,11 +142,11 @@ function ProfilePageContent() {
               <OrganizationsTab />
             </TabsContent>
 
-            {/* One save for every tab — edits made on other tabs are kept in state and saved together. */}
+            {/* One save for every tab - edits made on other tabs are kept in state and saved together. */}
             {activeTab !== "organizations" && (
               <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-background/95 backdrop-blur">
                 <Button type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
-                  {isUpdating && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  {isUpdating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                   Salvar perfil
                 </Button>
               </div>

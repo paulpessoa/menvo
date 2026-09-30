@@ -36,7 +36,7 @@ export interface QuizResponseSummary {
 }
 
 /**
- * What `get_quiz_result` (RPC) returns — the only fields `/quiz/results/[id]`
+ * What `get_quiz_result` (RPC) returns - the only fields `/quiz/results/[id]`
  * renders. No name, e-mail or raw answers: that page's URL is shared on
  * LinkedIn/WhatsApp by design, so it must not carry personal data.
  */
@@ -44,4 +44,6 @@ export interface QuizResultView {
   id: string
   processed_at: string | null
   ai_analysis: QuizAnalysisResult | null
+  /** True only for the logged-in person who took this quiz. */
+  is_owner?: boolean
 }

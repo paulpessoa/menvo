@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Star, CheckCircle2, XCircle } from "lucide-react"
+import {  Star, CheckCircle2, XCircle , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 export type MentorApplicationStatus = "pending" | "approved" | "rejected" | null
@@ -32,7 +32,7 @@ const STATUS_LABEL: Record<string, { label: string; className: string }> = {
 
 /**
  * Mentor-application section of the admin user modal. Decisions go through
- * POST /api/admin/verify — the same path as /dashboard/admin/verifications —
+ * POST /api/admin/verify - the same path as /dashboard/admin/verifications -
  * so approving here also grants the mentor role, publishes the profile and
  * notifies the person by chat and e-mail. It also shows *why* someone is or
  * isn't in the /mentors directory, which needs all three checks below.
@@ -55,7 +55,7 @@ export function MentorApplicationPanel({
 
   const decide = async (decision: "approved" | "rejected") => {
     if (decision === "rejected" && !notes.trim()) {
-      toast.error("Escreva o que precisa ser ajustado — a pessoa recebe esse texto.")
+      toast.error("Escreva o que precisa ser ajustado - a pessoa recebe esse texto.")
       return
     }
     setSubmitting(decision)
@@ -132,12 +132,12 @@ export function MentorApplicationPanel({
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => decide("approved")} disabled={submitting !== null}>
-              {submitting === "approved" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {submitting === "approved" && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
               Aprovar como mentor
             </Button>
             {status === "pending" && (
               <Button variant="outline" onClick={() => decide("rejected")} disabled={submitting !== null}>
-                {submitting === "rejected" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {submitting === "rejected" && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                 Pedir ajustes
               </Button>
             )}

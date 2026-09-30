@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import {
   Card,
   CardContent,
@@ -27,6 +28,7 @@ import { useTranslations, useLocale } from "next-intl"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MentorUpcomingSessions, type MentorAppointment } from "@/components/dashboard/MentorUpcomingSessions"
+import { MentorActivationChecklist } from "@/components/dashboard/MentorActivationChecklist"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { SharedDiagnosticsSection } from "@/components/diagnostic/SharedDiagnosticsSection"
 
@@ -41,7 +43,7 @@ interface MentorStats {
 }
 
 /**
- * Dashboard do Mentor — Menvo
+ * Dashboard do Mentor - Menvo
  * Focado no core loop: Próximas sessões com Google Meet, alertas de solicitações pendentes,
  * atalho rápido para disponibilidade (45 min) e avaliações recebidas.
  */
@@ -96,7 +98,7 @@ export default function MentorDashboard() {
 
   return (
     <RequireRole roles={["mentor"]}>
-      <div className="container mx-auto px-4 py-8 ">
+      <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
 
           {/* Header e Boas-vindas */}
@@ -121,8 +123,22 @@ export default function MentorDashboard() {
             </div>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
+          <Suspense>
+            <MentorDashboardTabs stats={stats} profile={profile as any} upcomingAppointments={upcomingAppointments} loading={loading} locale={locale} />
+          </Suspense>
+        </div>
+      </div>
+    </RequireRole>
+  )
+}
+
+function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, locale }: { stats: MentorStats, profile: any, upcomingAppointments: MentorAppointment[], loading: boolean, locale: string }) {
+  const searchParams = useSearchParams()
+  const defaultTab = searchParams.get("tab") || "overview"
+
+  return (
+    <Tabs defaultValue={defaultTab} className="space-y-6">
+      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
               <TabsTrigger
                 value="overview"
                 className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
@@ -150,7 +166,10 @@ export default function MentorDashboard() {
 
             {/* TAB: VISÃO GERAL */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
-              
+
+              {/* Checklist de ativação: some sozinho quando tudo estiver pronto */}
+              <MentorActivationChecklist profile={profile as any} />
+
               {/* Alerta de Solicitações Pendentes */}
               {stats.pendingRequests > 0 && (
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
@@ -168,120 +187,69 @@ export default function MentorDashboard() {
                     </div>
                   </div>
                   <Button asChild size="sm" className="rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold shrink-0 shadow-xs">
-                    <Link href="/mentorship/mentor">
+                    <Link href="/mentorship/mentor#action">
                       Revisar Solicitações
                     </Link>
                   </Button>
                 </div>
               )}
 
-              {/* Cards de Métricas */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard
-                  title="Próximas Sessões"
-                  value={stats.upcomingAppointments}
-                  icon={<Calendar className="h-5 w-5" />}
-                  description="Agendamentos ativos"
-                />
-                <StatCard
-                  title="Alunos Únicos"
-                  value={stats.totalMentees}
-                  icon={<Users className="h-5 w-5" />}
-                  description="Mentees atendidos"
-                />
-                <StatCard
-                  title="Concluídas"
-                  value={stats.completedSessions}
-                  icon={<TrendingUp className="h-5 w-5" />}
-                  description="Mentorias realizadas"
-                />
-                <StatCard
-                  title="Avaliação Média"
-                  value={stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "—"}
-                  icon={<Star className="h-5 w-5 text-amber-500 fill-amber-500" />}
-                  description={`${stats.totalReviews} avaliações`}
-                />
+              {/* Barra de Métricas Compacta */}
+              <div className="flex flex-wrap items-center gap-4 text-sm bg-muted/30 rounded-2xl p-4 border border-border/50">
+                <div className="flex items-center gap-2 font-medium">
+                  <span className="text-muted-foreground">Próximas:</span>
+                  <span className="text-foreground">{stats.upcomingAppointments}</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-2 font-medium">
+                  <span className="text-muted-foreground">Alunos:</span>
+                  <span className="text-foreground">{stats.totalMentees}</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-2 font-medium">
+                  <span className="text-muted-foreground">Concluídas:</span>
+                  <span className="text-foreground">{stats.completedSessions}</span>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-2 font-medium">
+                  <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                  <span className="text-foreground">{stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "-"}</span>
+                  <span className="text-muted-foreground text-xs font-normal">({stats.totalReviews} avaliações)</span>
+                </div>
               </div>
 
-              {/* Grid Principal */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Coluna Esquerda: Próximas Sessões + Ações Rápidas */}
-                <div className="lg:col-span-2 space-y-6">
-                  <MentorUpcomingSessions
-                    appointments={upcomingAppointments}
-                    loading={loading}
-                    locale={locale}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <QuickActionCard
-                      title="Minhas Mentorias"
-                      desc="Histórico completo de sessões pendentes, confirmadas e avaliadas."
-                      link="/mentorship/mentor"
-                      icon={<Clock className="w-6 h-6 text-primary" />}
-                    />
-                    {(profile?.slug || profile?.id) && (
-                      <QuickActionCard
-                        title="Meu Perfil Público"
-                        desc="Veja sua página pública exatamente como os mentorados a veem."
-                        link={`/mentors/${profile.slug || profile.id}`}
-                        icon={<Users className="w-6 h-6 text-primary" />}
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Coluna Direita: Disponibilidade + Status do Perfil + Dica */}
-                <div className="space-y-6">
-                  {/* Banner de Disponibilidade */}
-                  <Card className="border-none shadow-sm bg-gradient-to-r from-primary-700 via-primary-600 to-primary text-white overflow-hidden relative rounded-2xl">
-                    <CardHeader className="relative z-10 pb-2">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-white/80 uppercase tracking-wider mb-1">
-                        <Clock className="w-3.5 h-3.5" /> Sessões de 45 Minutos
-                      </div>
-                      <CardTitle className="text-xl font-bold text-white">Disponibilidade</CardTitle>
-                      <p className="text-white/90 text-xs leading-relaxed mt-1">
-                        Configure os dias e blocos de horário para mentorias voluntárias de 45 minutos.
-                      </p>
-                    </CardHeader>
-                    <CardContent className="relative z-10 pt-2">
-                      <Button asChild size="sm" className="bg-white text-primary hover:bg-white/95 font-bold shadow-md rounded-xl w-full">
-                        <Link href="/dashboard/mentor/availability">Configurar Agenda</Link>
-                      </Button>
-                    </CardContent>
-                    <Calendar className="absolute -bottom-4 -right-4 h-28 w-28 text-white/10 rotate-12 pointer-events-none" />
-                  </Card>
-
-                  {/* Perfil em Análise (se não verificado) */}
-                  {profile && !profile.verified && (
-                    <Card className="bg-amber-50/70 border-amber-200 rounded-2xl">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-amber-800 text-sm font-bold flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4" /> Perfil em Verificação
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-xs text-amber-700 leading-relaxed">
-                          Sua conta de mentor voluntário está sendo analisada pela equipe Menvo para garantir a qualidade e segurança da comunidade.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Card Boas Práticas */}
-                  <Card className="rounded-2xl border border-gray-100 shadow-xs bg-white">
+              {/* Conteúdo Principal */}
+              <div className="space-y-6 max-w-3xl">
+                {/* Perfil em Análise (se não verificado) */}
+                {profile && !profile.verified && (
+                  <Card className="bg-amber-50/70 border-amber-200 rounded-2xl">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-bold flex items-center gap-2 text-gray-900">
-                        <Sparkles className="h-4 w-4 text-primary" /> Dica de Mentoria (45 min)
+                      <CardTitle className="text-amber-800 text-sm font-bold flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" /> Perfil em Verificação
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Dedique os primeiros <strong>5 minutos</strong> da chamada para alinhar a expectativa do aluno. Sessões objetivas de 45 minutos geram até <strong>2x mais impacto</strong> e foco.
+                      <p className="text-xs text-amber-700 leading-relaxed">
+                        Sua conta de mentor voluntário está sendo analisada pela equipe Menvo para garantir a qualidade e segurança da comunidade.
                       </p>
                     </CardContent>
                   </Card>
-                </div>
+                )}
+
+                <MentorUpcomingSessions
+                  appointments={upcomingAppointments}
+                  loading={loading}
+                  locale={locale}
+                />
+
+                {(profile?.slug || profile?.id) && (
+                  <QuickActionCard
+                    title="Meu Perfil Público"
+                    desc="Veja sua página pública exatamente como os mentorados a veem."
+                    link={`/mentors/${profile.slug || profile.id}`}
+                    icon={<Users className="w-6 h-6 text-primary" />}
+                  />
+                )}
               </div>
             </TabsContent>
 
@@ -303,26 +271,10 @@ export default function MentorDashboard() {
               <SharedDiagnosticsSection />
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
-    </RequireRole>
   )
 }
 
-function StatCard({ title, value, icon, description }: { title: string, value: any, icon: any, description: string }) {
-  return (
-    <Card className="rounded-2xl border border-gray-100 shadow-xs bg-white hover:shadow-md transition-all">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xs font-bold text-gray-500 uppercase tracking-wider">{title}</CardTitle>
-        <div className="p-2 bg-primary/5 rounded-xl text-primary">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-black text-gray-900">{value}</div>
-        <p className="text-xs text-muted-foreground mt-1">{description}</p>
-      </CardContent>
-    </Card>
-  )
-}
+
 
 function QuickActionCard({ title, desc, link, icon }: { title: string, desc: string, link: string, icon: any }) {
   return (

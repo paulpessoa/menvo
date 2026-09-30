@@ -1,16 +1,10 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import React, { useState, useEffect, useCallback } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import {
-    CheckCircle,
-    AlertCircle,
-    Info,
-    AlertTriangle,
-    X,
-    Loader2
-} from 'lucide-react'
+import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from "lucide-react"
 import { cn } from '@/lib/utils'
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info' | 'loading'
@@ -57,7 +51,7 @@ function NotificationItem({ notification, onDismiss }: NotificationProps) {
             case 'info':
                 return <Info className="h-4 w-4" />
             case 'loading':
-                return <Loader2 className="h-4 w-4 animate-spin" />
+                return <MenvoDots />
             default:
                 return <Info className="h-4 w-4" />
         }
@@ -252,7 +246,7 @@ export function InlineNotification({ type, message, className, onDismiss }: Inli
             case 'info':
                 return <Info className="h-4 w-4 text-blue-600" />
             case 'loading':
-                return <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
+                return <MenvoDots />
             default:
                 return <Info className="h-4 w-4 text-blue-600" />
         }

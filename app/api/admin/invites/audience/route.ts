@@ -12,7 +12,7 @@ const bodySchema = z.object({
 
 /**
  * Counts who a reengagement campaign would actually reach for a given
- * audience — before anything is sent. The admin modal calls this on
+ * audience - before anything is sent. The admin modal calls this on
  * every audience/resend change so the confirmation step always shows a
  * true number, never a guess.
  */
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     // Returns the actual id list (not just a count): the admin modal
     // drives the send loop client-side in batches of 25
-    // (POST /api/admin/invites/send), so it needs these ids to batch —
+    // (POST /api/admin/invites/send), so it needs these ids to batch -
     // there's no "send this whole audience" endpoint that resolves the
     // list twice.
     return NextResponse.json({

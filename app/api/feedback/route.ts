@@ -34,24 +34,48 @@ export async function GET(request: NextRequest) {
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const offset = (page - 1) * limit
 
-    let query = supabase
-      .from("feedback" as any)
-      .select(`
-        *,
-        user:profiles(full_name, avatar_url)
-      `)
+    let dataClient = supabase as any;
+    if (isAdmin) {
+      const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+      dataClient = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+    }
+
+    let query = dataClient
+      .from("feedback")
+      .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
 
     // Apply filters based on user role
     if (!isAdmin) {
-      query = (query as any).eq("user_id", user.id)
+      query = query.eq("user_id", user.id)
     }
 
     // Apply pagination
-    const { data: feedback, error, count } = await (query as any)
+    const { data: rawFeedback, error, count } = await query
       .range(offset, offset + limit - 1)
 
     if (error) throw error
+
+    // Fetch user profiles manually to bypass missing foreign key error
+    const userIds = Array.from(new Set((rawFeedback || []).filter((f: any) => f.user_id).map((f: any) => f.user_id)));
+    let profilesMap: Record<string, any> = {};
+    
+    if (userIds.length > 0) {
+      const { data: profiles } = await dataClient
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", userIds);
+        
+      profilesMap = (profiles || []).reduce((acc: any, p: any) => ({ ...acc, [p.id]: p }), {});
+    }
+
+    const feedback = (rawFeedback || []).map((f: any) => ({
+      ...f,
+      user: f.user_id ? profilesMap[f.user_id] || null : null
+    }));
 
     return successResponse({
       feedback,

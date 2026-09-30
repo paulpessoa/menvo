@@ -1,3 +1,4 @@
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import Image from "next/image"
 
 /**
@@ -30,19 +31,7 @@ export default function Loading() {
 
       {/* 3 pontos pulsantes na cor brand */}
       <div className="flex items-center gap-2" role="status" aria-label="Carregando">
-        <span
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
-          style={{ animationDelay: "0ms", animationDuration: "900ms" }}
-        />
-        <span
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
-          style={{ animationDelay: "160ms", animationDuration: "900ms" }}
-        />
-        <span
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
-          style={{ animationDelay: "320ms", animationDuration: "900ms" }}
-        />
-        <span className="sr-only">Carregando...</span>
+        <MenvoDots />
       </div>
     </div>
   )

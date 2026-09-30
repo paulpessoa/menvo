@@ -4,13 +4,14 @@
  * @deprecated Not mounted on any route. Its only decision action wrote
  * straight to `profiles.verified` via VerificationService.setMentorVerification
  * (components/admin/MentorCard.tsx), bypassing the RBAC role grant, the
- * publish flag, and the chat/e-mail notification — a third, silently
+ * publish flag, and the chat/e-mail notification - a third, silently
  * diverging way to approve a mentor next to /dashboard/admin/verifications
  * and the /dashboard/admin/users modal. Approvals go through
  * POST /api/admin/verify (see MentorApplicationPanel) exclusively.
  * Kept only so it still compiles; do not wire it back up.
  */
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import {
   Card,
@@ -23,17 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Search,
-  Filter,
-  Users,
-  CheckCircle,
-  Clock,
-  Loader2,
-  RefreshCw,
-  AlertTriangle
-} from "lucide-react"
-import { adminService } from "@/lib/services/admin/admin.service"
+import { Search, Filter, Users, CheckCircle, Clock, RefreshCw, AlertTriangle } from "lucide-react"
 import { MentorCard } from "./MentorCard"
 import { toast } from "sonner"
 
@@ -83,9 +74,11 @@ export function MentorManagementPanel() {
     setLoading(true)
 
     try {
-      const data = await adminService.getAllMentors()
+      const response = await fetch('/api/admin/mentors')
+      if (!response.ok) throw new Error("Erro ao buscar mentores")
+      const { mentors: data } = await response.json()
 
-      const mentorData: Mentor[] = (data || []).map((m) => ({
+      const mentorData: Mentor[] = (data || []).map((m: any) => ({
         id: m.id || "",
         email: m.email || "",
         first_name: m.first_name || "",
@@ -179,7 +172,7 @@ export function MentorManagementPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <MenvoDots />
         <span className="ml-2">Carregando mentores...</span>
       </div>
     )

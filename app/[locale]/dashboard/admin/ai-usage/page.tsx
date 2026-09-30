@@ -1,8 +1,9 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2 } from "lucide-react"
+
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -42,7 +43,7 @@ export default function AdminAIUsagePage() {
             <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-full sm:w-44" />
           </div>
 
-          {isLoading && <Loader2 className="h-6 w-6 animate-spin text-primary" />}
+          {isLoading && <MenvoDots />}
           {error && <p className="text-destructive">Não foi possível carregar o relatório.</p>}
 
           {data && (
@@ -80,7 +81,7 @@ export default function AdminAIUsagePage() {
                           <TableCell className="text-right">{int(r.calls)}</TableCell>
                           <TableCell className="text-right">{int(r.users)}</TableCell>
                           <TableCell className="text-right">{int(r.input_tokens)} / {int(r.output_tokens)}</TableCell>
-                          <TableCell className="text-right">{r.p50_latency_ms ? `${int(r.p50_latency_ms)}ms` : "—"}</TableCell>
+                          <TableCell className="text-right">{r.p50_latency_ms ? `${int(r.p50_latency_ms)}ms` : "-"}</TableCell>
                           <TableCell className="text-right">{usd(r.cost_usd)}</TableCell>
                         </TableRow>
                       ))}
@@ -96,7 +97,7 @@ export default function AdminAIUsagePage() {
                     <TableBody>
                       {data.topUsers.map((u) => (
                         <TableRow key={u.user_id ?? "anon"}>
-                          <TableCell>{u.full_name ?? u.user_id ?? "—"}</TableCell>
+                          <TableCell>{u.full_name ?? u.user_id ?? "-"}</TableCell>
                           <TableCell className="text-right">{int(u.calls)} chamadas</TableCell>
                           <TableCell className="text-right">{usd(u.cost_usd)}</TableCell>
                         </TableRow>

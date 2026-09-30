@@ -1,9 +1,10 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth"
-import { Loader2 } from "lucide-react"
+
 
 export default function MentorshipPage() {
   const { role, loading } = useAuth()
@@ -24,7 +25,7 @@ export default function MentorshipPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <Loader2 className="h-8 w-8 animate-spin" />
+      <MenvoDots />
     </div>
   )
 }

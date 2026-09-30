@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
         .single()
 
     if (menteeRole) {
-        // user_roles has no unique constraint on (user_id, role_id) — its
-        // primary key is a synthetic `id` column we never pass — so a bare
+        // user_roles has no unique constraint on (user_id, role_id) - its
+        // primary key is a synthetic `id` column we never pass - so a bare
         // `.upsert()` here never actually detects a conflict and behaves
         // as a plain INSERT every call, silently creating a duplicate
         // "mentee" row for a user who calls stop-mentor more than once.

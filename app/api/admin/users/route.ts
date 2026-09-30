@@ -18,14 +18,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get("page") || "1")
     const limit = parseInt(searchParams.get("limit") || "10")
-    const tab = searchParams.get("tab") || "all" // all, pending, mentors, mentees, undefined
+    
     const search = searchParams.get("search") || ""
     const origin = searchParams.get("origin") || "" // "menvo" | "jotform" | "" (all)
+    const role = searchParams.get("role") || "" // "mentor" | "mentee" | ""
+    const status = searchParams.get("status") || "" // "pending" | "verified" | ""
+    const sortBy = searchParams.get("sort_by") || "created_at" // "created_at" | "full_name"
+    const sortOrder = searchParams.get("sort_order") || "desc" // "asc" | "desc"
 
     const from = (page - 1) * limit
     const to = from + limit - 1
 
-    // 3. Query base - Definimos o select dependendo da aba para forçar o filtro
+    // 3. Query base
     let selectStr = `
       *,
       user_roles (
@@ -35,8 +39,8 @@ export async function GET(request: NextRequest) {
       )
     `
 
-    // Se for uma aba de role específica, usamos !inner para filtrar o nível superior (Profiles)
-    if (["mentors", "mentees"].includes(tab)) {
+    // Se houver filtro de role, usamos !inner para filtrar o nível superior (Profiles)
+    if (role === "mentor" || role === "mentee") {
       selectStr = `
         *,
         user_roles!inner (
@@ -51,55 +55,43 @@ export async function GET(request: NextRequest) {
       .from("profiles")
       .select(selectStr, { count: "exact" })
 
-    // Filtros por aba
-    // Candidatos a mentor ficam com role "mentee" até a aprovação; o pedido vive em verification_status.
-    if (tab === "pending") {
-      query = query.eq("verification_status", "pending")
-    } else if (tab === "mentors") {
+    // Filtro por papel (role)
+    if (role === "mentor") {
       query = query.eq("user_roles.roles.name", "mentor")
-    } else if (tab === "mentees") {
+    } else if (role === "mentee") {
       query = query.eq("user_roles.roles.name", "mentee")
     }
-    // Para tab === "undefined", filtramos em memória depois, pois PostgREST não suporta is.null em relacionamentos.
+
+    // Filtro por status
+    if (status === "pending") {
+      query = query.eq("verification_status", "pending")
+    } else if (status === "verified") {
+      query = query.eq("verified", true)
+    }
 
     // Filtro de busca
     if (search) {
       query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
     }
 
-    // Filtro de origem (cadastro direto no site vs. base migrada do JotForm)
+    // Filtro de origem
     if (origin === "menvo" || origin === "jotform") {
       query = query.eq("origin_platform", origin)
     }
 
-    let paginatedQuery = query.order("created_at", { ascending: false }).range(from, to)
+    // Ordenação
+    const isAscending = sortOrder === "asc"
+    if (sortBy === "full_name") {
+      query = query.order("full_name", { ascending: isAscending })
+    } else {
+      query = query.order("created_at", { ascending: isAscending })
+    }
+
+    let paginatedQuery = query.range(from, to)
     
     let { data: profiles, error: profilesError, count } = await paginatedQuery
 
     if (profilesError) throw profilesError
-
-    // 3b. Sinalizar quem também está na lista de espera (waiting_list) —
-    // cruzamento por e-mail, só para os usuários desta página.
-    const emails = (profiles ?? [])
-      .map((p: any) => p.email)
-      .filter((email: unknown): email is string => typeof email === "string" && email.length > 0)
-
-    let waitingListEmails = new Set<string>()
-    if (emails.length > 0) {
-      const { data: waitingListRows } = await supabase
-        .from("waiting_list")
-        .select("email")
-        .in("email", emails)
-
-      waitingListEmails = new Set(
-        (waitingListRows ?? []).map((row: any) => (row.email as string).toLowerCase())
-      )
-    }
-
-    const profilesWithWaitingListFlag = (profiles ?? []).map((p: any) => ({
-      ...p,
-      in_waiting_list: typeof p.email === "string" && waitingListEmails.has(p.email.toLowerCase())
-    }))
 
     // 4. Buscar contagens para as abas de forma eficiente
     const { count: totalCount } = await supabase
@@ -133,15 +125,8 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
       .eq("origin_platform", "jotform")
 
-    // Mesmo filtro da aba: quem já entrou na plataforma não conta como
-    // "esperando" (ver sync_waiting_list_status).
-    const { count: waitingListCount } = await supabase
-      .from("waiting_list")
-      .select("*", { count: "exact", head: true })
-      .neq("status", "registered")
-
     return successResponse({
-      users: profilesWithWaitingListFlag,
+      users: profiles ?? [],
       pagination: {
         page,
         limit,
@@ -155,8 +140,7 @@ export async function GET(request: NextRequest) {
         mentees: menteesCount || 0,
 
         menvoOrigin: menvoOriginCount || 0,
-        jotformOrigin: jotformOriginCount || 0,
-        waitingList: waitingListCount || 0
+        jotformOrigin: jotformOriginCount || 0
       }
     })
   } catch (error) {

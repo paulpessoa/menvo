@@ -10,7 +10,7 @@ import { useFavorites } from '@/hooks/useFavorites'
 
 /**
  * Shape produced by the `mentors_view` and consumed by `/mentors` and `/assistant`.
- * Kept local because the view's projection is page-specific — the canonical
+ * Kept local because the view's projection is page-specific - the canonical
  * DB-side type lives in `lib/types/models/mentor.ts` as `MentorProfile`.
  */
 interface MentorCardMentor {
@@ -33,7 +33,7 @@ interface MentorCardMentor {
   total_sessions: number | null
   experience_years: number | null
   slug: string | null
-  /** Legacy field — some callers may still provide photo_url instead of avatar_url */
+  /** Legacy field - some callers may still provide photo_url instead of avatar_url */
   photo_url?: string | null
 }
 
@@ -59,7 +59,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
   const { user } = useAuth()
   const [imageError, setImageError] = useState(false)
 
-  // Foto real do mentor — aceita avatar_url ou photo_url (retrocompatibilidade)
+  // Foto real do mentor - aceita avatar_url ou photo_url (retrocompatibilidade)
   const rawPhoto = mentor.avatar_url || mentor.photo_url
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
         .join('')
     : ''
 
-  // Favoritos — requer userId para funcionar
+  // Favoritos - requer userId para funcionar
   const { favorites, toggleFavorite } = useFavorites(user?.id)
   const isFavorite = mentor.id ? favorites.includes(mentor.id) : false
 
@@ -153,7 +153,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
 
 
-        {/* Botão de Favorito — visível apenas no hover (ou se já favoritado) */}
+        {/* Botão de Favorito - visível apenas no hover (ou se já favoritado) */}
         <button
           type="button"
           onClick={handleFavoriteClick}
@@ -203,7 +203,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
         {/* Motivo da IA */}
         {aiReason && (
-          <p className="text-xs text-primary-700 dark:text-primary-300 italic line-clamp-2 mt-3 leading-relaxed border-l-2 border-primary/40 pl-2.5 bg-primary-50/50 dark:bg-primary-950/20 py-1.5 rounded-r-md">
+          <p className="text-xs text-primary-700 dark:text-primary-300 italic line-clamp-2 mt-3 leading-relaxed border-primary/40 pl-2.5 bg-primary-50/50 dark:bg-primary-950/20 py-1.5 rounded-r-md">
             <Sparkles className="w-3 h-3 inline-block mr-1 -mt-0.5" />
             {aiReason}
           </p>
@@ -211,7 +211,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
         {/* Bio */}
         {!aiReason && mentor.bio && (
-          <p className="text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2 mt-3 leading-relaxed border-l-2 border-primary/30 pl-2.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2 mt-3 leading-relaxed border-primary/30 pl-2.5">
             &ldquo;{mentor.bio}&rdquo;
           </p>
         )}
@@ -260,7 +260,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
       <Link
         href={`/mentors/${mentor.slug || mentor.id}`}
         className="absolute inset-0 z-10"
-        aria-label={`${t('mentorCard.viewProfile')} — ${mentor.full_name}`}
+        aria-label={`${t('mentorCard.viewProfile')} - ${mentor.full_name}`}
       >
         <span className="sr-only">{mentor.full_name}</span>
       </Link>

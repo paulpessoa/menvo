@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import { useRouter } from "@/i18n/routing"
 import { mentorAvailabilityService } from "@/lib/services/mentorship/mentorship.service"
@@ -21,17 +22,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import {
-  Clock,
-  Plus,
-  Trash2,
-  Save,
-  Calendar,
-  CheckCircle,
-  AlertTriangle,
-  Loader2,
-  Info
-} from "lucide-react"
+import {  Clock, Plus, Trash2, Save, Calendar, CheckCircle, AlertTriangle, Info , Loader2 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 
@@ -271,14 +262,14 @@ export default function MentorAvailabilityPage() {
   if (authLoading || isInitializing) {
     return (
       <div className="container mx-auto py-24 px-4 flex flex-col items-center justify-center min-h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <MenvoDots className="mb-4" />
         <p className="text-muted-foreground">{commonT("loading")}</p>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 ">
+    <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold">{t("title")}</h1>
@@ -322,7 +313,7 @@ export default function MentorAvailabilityPage() {
             <CardContent className="space-y-4 pt-4">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mb-2" />
+                  <MenvoDots className="mb-2" />
                   <p className="text-sm text-muted-foreground">{commonT("loading")}</p>
                 </div>
               ) : availability.length === 0 ? (
@@ -433,7 +424,7 @@ export default function MentorAvailabilityPage() {
             >
               {saving ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />{" "}
+                  <Loader2 className="animate-spin h-4 w-4" />{" "}
                   {commonT("saving")}
                 </>
               ) : (
@@ -490,7 +481,7 @@ export default function MentorAvailabilityPage() {
                 • <strong>Duração:</strong> Mentorias duram <strong>45 minutos</strong>. Intervalos devem ter no mínimo 45 min.
               </p>
               <p>
-                • <strong>Conflitos Automáticos:</strong> Sessões já marcadas ou eventos no seu Google Calendar são bloqueados automaticamente.
+                • <strong>Conflitos Automáticos:</strong> Horários com uma sessão já marcada na Menvo somem da sua agenda automaticamente. O link do Google Meet é gerado sozinho quando você confirma o pedido.
               </p>
             </CardContent>
           </Card>

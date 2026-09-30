@@ -1,11 +1,12 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useCallback, useEffect, useState } from "react"
 import { Link } from "@/i18n/routing"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, Check, Loader2, LogOut, X } from "lucide-react"
+import { Building2, Check, LogOut, X } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/lib/auth"
 
@@ -89,7 +90,7 @@ export function OrganizationsTab() {
   if (loading) {
     return (
       <div className="flex justify-center py-10">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <MenvoDots />
       </div>
     )
   }

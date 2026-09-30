@@ -1,7 +1,8 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Star, User } from "lucide-react"
+import { Star, User } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
@@ -31,7 +32,7 @@ export function AdminPlatformFeedback() {
   if (isLoading) {
     return (
       <div className="flex justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <MenvoDots />
       </div>
     )
   }

@@ -10,7 +10,7 @@ const bodySchema = z.object({
 /**
  * Renders the reengagement e-mail HTML with placeholder data, so the
  * admin modal's preview step is exactly what `buildReengagementInviteHtml`
- * produces for a real send — same function, fake name/token.
+ * produces for a real send - same function, fake name/token.
  */
 export async function POST(request: NextRequest) {
   try {

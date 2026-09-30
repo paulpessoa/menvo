@@ -1,4 +1,4 @@
-# 🔐 Environment Variables Guide — Menvo
+# 🔐 Environment Variables Guide - Menvo
 
 > **Single Source of Truth** for Menvo environment variables across Local Development, Preview, and Production (Vercel).
 > All template keys are defined in [`.env.example`](../../.env.example).
@@ -35,7 +35,6 @@ cp .env.example .env.local
 ### Feature Flags
 | Variable | Default | Description |
 |---|---|---|
-| `NEXT_PUBLIC_FEATURE_WAITING_LIST` | `false` | When true, gates new registrations behind waiting list |
 | `NEXT_PUBLIC_FEATURE_NEW_USER_REGISTRATION` | `true` | Allows immediate account creation |
 
 ### Google Calendar Integration (Meet Scheduling)
@@ -60,7 +59,7 @@ cp .env.example .env.local
 | `OPENAI_API_KEY` | Recommended | Server-only | OpenAI key for GPT-4o-mini matching |
 | `GROQ_API_KEY` | Optional | Server-only | Groq key for fallback inference and Assistant |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Optional | Server-only | Google AI key for Gemini 2.5 Flash-Lite fallback in the Assistant |
-| `AI_METERING_KEY` | **Required for AI cost metering** | Server-only | Proves AI usage rows come from the server (`record_ai_usage` rejects calls without it). Its SHA-256 must be stored in `private.ai_settings` — see migration `20260923000003`. Missing = usage not recorded, so the monthly budget can't see the spend |
+| `AI_METERING_KEY` | **Required for AI cost metering** | Server-only | Proves AI usage rows come from the server (`record_ai_usage` rejects calls without it). Its SHA-256 must be stored in `private.ai_settings` - see migration `20260923000003`. Missing = usage not recorded, so the monthly budget can't see the spend |
 | `AI_FORCE_FALLBACK` | Optional, evals-only | Local, never set in Production/Preview | Set to a capability name (e.g. `converse`) to make `lib/ai/models` drop the primary model for that one capability, so `npm run test:evals`/`npm run eval:match` can exercise the fallback model deliberately (ADR 0004 §7.1). |
 
 ### Scheduled Jobs (Vercel Cron)
@@ -74,7 +73,7 @@ cp .env.example .env.local
 ### Analytics (Microsoft Clarity MCP)
 | Variable | Required | Context | Description |
 |---|---|---|---|
-| `CLARITY_API_TOKEN` | Optional | Local dev tooling only | Used by `.mcp.json`'s `clarity` MCP server (`${CLARITY_API_TOKEN}`) to query session recordings and dashboard analytics from an agent session. Set via `.claude/settings.local.json` (`env` block) or a user-level OS env var — never committed. Not used by the running app itself. |
+| `CLARITY_API_TOKEN` | Optional | Local dev tooling only | Used by `.mcp.json`'s `clarity` MCP server (`${CLARITY_API_TOKEN}`) to query session recordings and dashboard analytics from an agent session. Set via `.claude/settings.local.json` (`env` block) or a user-level OS env var - never committed. Not used by the running app itself. |
 
 ---
 

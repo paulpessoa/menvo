@@ -1,15 +1,10 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState } from "react"
 import { Link, usePathname } from "@/i18n/routing"
 import Image from "next/image"
-import {
-  User,
-  Shield,
-  LayoutDashboard,
-  Loader2,
-  Heart
-} from "lucide-react"
+import { User, Shield, LayoutDashboard, Heart } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
@@ -153,7 +148,7 @@ export default function Header() {
 
           {loading ? (
             <div className="h-9 w-9 flex items-center justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              <MenvoDots />
             </div>
           ) : isAuthenticated ? (
             <UserNavDropdown

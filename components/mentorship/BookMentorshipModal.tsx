@@ -1,17 +1,8 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
-import {
-  X,
-  Calendar,
-  Clock,
-  Loader2,
-  Star,
-  Plus,
-  CheckCircle,
-  AlertCircle,
-  Check
-} from "lucide-react"
+import {  X, Calendar, Clock, Star, Plus, CheckCircle, AlertCircle, Check , Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -202,7 +193,7 @@ export function BookMentorshipModal({
         setSuccess(false)
         setSelectedSlot(null)
         setMessage("")
-        window.location.href = `/${locale}/mentorship/mentee`
+        window.location.href = `/${locale}/mentorship/mentee#upcoming`
       }, 1500)
     } catch (err: any) {
       setError(err.message || "Falha ao confirmar o agendamento.")
@@ -227,13 +218,7 @@ export function BookMentorshipModal({
 
         <div className="flex flex-col max-h-[90vh]">
           <div className="p-6 bg-gradient-to-r from-primary to-primary-700 text-white relative">
-            <button
-              onClick={onClose}
-              className="absolute top-5 right-5 text-white/80 hover:text-white transition-colors"
-              aria-label="Fechar"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            
             <span className="text-xs font-bold uppercase tracking-wider text-white/80">
               {t("modalTitle")}
             </span>
@@ -243,7 +228,7 @@ export function BookMentorshipModal({
           <div className="p-6 flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                <MenvoDots />
                 <p className="text-sm text-muted-foreground animate-pulse text-center">
                   Buscando horários disponíveis...
                 </p>
@@ -260,7 +245,7 @@ export function BookMentorshipModal({
                   {t("pendingEvaluationsDesc")}
                 </p>
                 <Button asChild className="mt-4 rounded-xl font-semibold shadow-sm">
-                  <Link href="/mentorship/mentee">{t("evaluateNow")}</Link>
+                  <Link href="/mentorship/mentee#action">{t("evaluateNow")}</Link>
                 </Button>
               </div>
             ) : error && !selectedSlot ? (
@@ -312,7 +297,7 @@ export function BookMentorshipModal({
                         <div className="flex items-center gap-3.5">
                           <div className="flex flex-col items-center justify-center w-12 h-12 bg-primary/10 rounded-xl group-hover:bg-primary text-primary group-hover:text-white transition-all shadow-xs">
                             <span className="text-[10px] uppercase font-extrabold tracking-wider">
-                              {slot.formatted_date.split(",")[0]}
+                              {slot.date.toLocaleDateString(intlLocale, { month: "short" }).replace(".", "")}
                             </span>
                             <span className="text-lg font-black leading-none mt-0.5">
                               {slot.date.getDate()}
@@ -419,7 +404,7 @@ export function BookMentorshipModal({
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="mr-2 animate-spin h-4 w-4" />
                         {t("submitting")}
                       </>
                     ) : (

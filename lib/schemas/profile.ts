@@ -38,7 +38,7 @@ export const updateProfileSchema = z.object({
   availability_status: z.enum(["available", "busy", "unavailable"]).optional().nullable(),
   chat_enabled: z.boolean().optional().nullable(),
   timezone: z.string().optional().nullable(),
-  // An empty slug means "keep the current one" — the DB trigger always assigns
+  // An empty slug means "keep the current one" - the DB trigger always assigns
   // one at signup, and `slug` is what the public profile URL is built from.
   slug: z.preprocess(
     (value) => (typeof value === "string" && !value.trim() ? undefined : value),

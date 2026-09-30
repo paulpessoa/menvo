@@ -35,7 +35,7 @@ describe("planRetentionActions", () => {
   const now = new Date("2026-09-25T12:00:00.000Z")
 
   it("never enrolls a self-registered account (not in the candidate list at all)", () => {
-    // Candidates only ever contains JotForm profiles with >=1 invite — a
+    // Candidates only ever contains JotForm profiles with >=1 invite - a
     // self-registered account simply never appears here, so nothing to enroll.
     const s = state({ candidates: [] })
     expect(planRetentionActions(s, now)).toEqual([])
@@ -79,7 +79,7 @@ describe("planRetentionActions", () => {
   })
 
   it("invited long ago on the first run only sends the 30-day notice, never deletes directly", () => {
-    // Enrolled 200 days ago but no notice has been sent yet — the clock for
+    // Enrolled 200 days ago but no notice has been sent yet - the clock for
     // deletion only starts once the 30-day notice actually goes out, never
     // from clockStartedAt directly.
     const s = state({
@@ -149,7 +149,7 @@ describe("planRetentionActions", () => {
 
   it("a late 1-day notice pushes deletion back instead of deleting immediately", () => {
     // scheduledDeletionAt is already in the past, but the 1-day notice only
-    // went out a few hours ago — deletion must wait until 1 day after that.
+    // went out a few hours ago - deletion must wait until 1 day after that.
     const s = state({
       queue: [
         queueRow({

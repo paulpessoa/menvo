@@ -8,23 +8,49 @@ import { Badge } from "@/components/ui/badge"
 import { MenteeCard } from "@/components/MenteeCard"
 import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { useAuth } from "@/lib/auth"
+import { RequireRole } from "@/lib/auth/auth-guard"
 import { useRouter } from "@/i18n/routing"
 import { useLocale, useTranslations } from "next-intl"
 import { toast } from "sonner"
+import { createClient } from "@/lib/utils/supabase/client"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger
 } from "@/components/ui/sheet"
 import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { useAiQuota } from "@/hooks/useAiQuota"
 import {
   communityService,
-  CommunityProfile,
+  type CommunityProfile,
 } from "@/lib/services/community/community.service"
+import { mentorService } from "@/lib/services/mentors/mentors.service"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ArrowDownUp, Filter, Check } from "lucide-react"
+
+interface FilterState {
+  organization: string
+  topics: string[]
+  sortBy: "newest" | "oldest" | "name" | "name-desc"
+}
+
+const initialFilters: FilterState = {
+  organization: "",
+  topics: [],
+  sortBy: "newest"
+}
 
 const ITEMS_PER_PAGE = 12
 
@@ -50,6 +76,7 @@ export default function CommunityPage() {
   const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<CommunityProfile[]>([])
   const [aiLoading, setAiLoading] = useState(false)
   const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
+  const [topicSearch, setTopicSearch] = useState("")
 
   const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
@@ -60,6 +87,28 @@ export default function CommunityPage() {
     cachedRoles?.mentor ||
     cachedRoles?.roles?.includes("mentor") ||
     false
+
+  const [filters, setFilters] = useState<FilterState>(initialFilters)
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
+  const [availableFilters, setAvailableFilters] = useState({
+    organizations: [] as string[],
+    topics: [] as string[]
+  })
+
+  useEffect(() => {
+    const supabase = createClient()
+    communityService.getCommunityFilterOptions(supabase).then((opts) => setAvailableFilters({
+      organizations: opts.organizations,
+      topics: opts.topics
+    })).catch(console.error)
+  }, [])
+
+  const activeFacetCount = useMemo(() => {
+    let count = 0
+    if (filters.organization) count++
+    if (filters.topics.length > 0) count += filters.topics.length
+    return count
+  }, [filters])
 
   // Tracking query ID to safely discard out-of-order responses and avoid race conditions
   const queryIdRef = useRef(0)
@@ -78,11 +127,22 @@ export default function CommunityPage() {
     }
 
     try {
-      const result = await communityService.getCommunityProfiles({
+      const queryParams = new URLSearchParams({
         search,
-        page: pageNum,
-        limit: ITEMS_PER_PAGE,
+        page: pageNum.toString(),
+        limit: ITEMS_PER_PAGE.toString(),
       })
+
+      if (filters.organization) queryParams.append("organization", filters.organization)
+      filters.topics.forEach(t => queryParams.append("topics[]", t))
+      queryParams.append("sortBy", filters.sortBy)
+      
+      const response = await fetch(`/api/community?${queryParams.toString()}`)
+      if (!response.ok) {
+        throw new Error("Failed to load community profiles")
+      }
+      
+      const result = await response.json()
 
       // If a newer query was initiated while this one was in flight, discard this result
       if (currentQueryId !== queryIdRef.current) return
@@ -116,7 +176,7 @@ export default function CommunityPage() {
     }, delay)
 
     return () => clearTimeout(timer)
-  }, [searchTerm])
+  }, [searchTerm, filters])
 
   const handleLoadMore = () => {
     if (loadingMore || !hasMore) return
@@ -133,12 +193,13 @@ export default function CommunityPage() {
     const targetProfile = profiles.find((p) => p.id === targetUserId)
     if (!targetProfile) return
 
-    // Chat desligado: a troca acontece no LinkedIn (ou no perfil, se não houver LinkedIn)
+    // Chat desligado: o mentor vai ao perfil completo, lê o contexto e usa os
+    // canais que o mentorado deixou visíveis (hoje, o LinkedIn)
     if (!isChatEnabled) {
-      if (targetProfile.linkedin_url) {
-        window.open(targetProfile.linkedin_url, "_blank", "noopener,noreferrer")
-      } else if (targetProfile.slug) {
+      if (targetProfile.slug) {
         router.push(`/mentee/${targetProfile.slug}`)
+      } else if (targetProfile.linkedin_url) {
+        window.open(targetProfile.linkedin_url, "_blank", "noopener,noreferrer")
       }
       return
     }
@@ -235,62 +296,177 @@ export default function CommunityPage() {
   }, [profiles, displayedAIProfiles])
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2">
-            Mural de Mentorados
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
-            Conheça pessoas que buscam aprender e ofereça sua mentoria de forma
-            proativa.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 bg-primary/5 p-4 rounded-lg border border-primary/10 max-w-xs">
-          <Info className="h-5 w-5 text-primary shrink-0" />
-          <p className="text-xs text-primary/80 leading-snug">
-            Dica: Mentores proativos que ajudam quem busca conhecimento ganham
-            3x mais visibilidade.
-          </p>
-        </div>
-      </div>
+    <RequireRole roles={["mentor", "admin"]}>
+      <div className="container mx-auto px-4 py-12">
+        {/* Header - Cute Phrase */}
+        <p className="text-center text-sm sm:text-base text-muted-foreground mb-6">
+          Seu hobby, sua vivência, sua história — alguém está buscando exatamente isso.
+        </p>
 
-      {/* Search + AI Match */}
-      <div className="flex flex-col sm:flex-row gap-2.5 max-w-2xl mb-12">
-        <div className="relative flex-1">
+      {/* Search + Filters (Single Row) */}
+      <div className="flex flex-col xl:flex-row gap-3 w-full mb-8">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={tCommunity("searchPlaceholder")}
-            className="pl-10 h-11 rounded-xl"
+            className="pl-10 h-11 rounded-xl w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <AIMatchButton
-          title={tCommunity("magicSearch.title")}
-          description={tCommunity("magicSearch.disclaimer")}
-          placeholder={tCommunity("magicSearch.placeholder")}
-          loading={aiLoading}
-          loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
-          minCharsMessage={tCommunity("magicSearch.minChars")}
-          submitLabel={tCommunity("magicSearch.button")}
-          buttonLabel={tCommunity("magicSearch.button")}
-          quota={aiQuota}
-          quotaHint={(q) =>
-            q.reason === "budget"
-              ? tCommunity("magicSearch.budgetExhausted", {
-                  date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
-                })
-              : q.remaining! > 0
-                ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
-                : tCommunity("magicSearch.quotaExhausted", {
+        
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto shrink-0">
+          <AIMatchButton
+            title={tCommunity("magicSearch.title")}
+            description={tCommunity("magicSearch.disclaimer")}
+            placeholder={tCommunity("magicSearch.placeholder")}
+            loading={aiLoading}
+            loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
+            minCharsMessage={tCommunity("magicSearch.minChars")}
+            submitLabel={tCommunity("magicSearch.button")}
+            buttonLabel={tCommunity("magicSearch.button")}
+            quota={aiQuota}
+            quotaHint={(q) =>
+              q.reason === "budget"
+                ? tCommunity("magicSearch.budgetExhausted", {
                     date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
                   })
-          }
-          onSubmit={handleAISearch}
-        />
+                : q.remaining! > 0
+                  ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
+                  : tCommunity("magicSearch.quotaExhausted", {
+                      date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                    })
+            }
+            onSubmit={handleAISearch}
+          />
+
+          <Select
+            value={filters.sortBy}
+            onValueChange={(val: any) =>
+              setFilters((prev) => ({ ...prev, sortBy: val }))
+            }
+          >
+            <SelectTrigger className="w-full sm:w-[155px] h-11 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
+              <div className="flex items-center gap-1.5 truncate">
+                <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <SelectValue placeholder="Ordenar por" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="newest">Mais recentes</SelectItem>
+              <SelectItem value="oldest">Mais antigos</SelectItem>
+              <SelectItem value="name">A-Z</SelectItem>
+              <SelectItem value="name-desc">Z-A</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Input
+            placeholder="Organização..."
+            value={filters.organization}
+            onChange={(e) => setFilters(p => ({ ...p, organization: e.target.value }))}
+            className="w-full sm:w-[160px] h-11 rounded-xl bg-card border-border/80 text-sm placeholder:text-muted-foreground/70 shadow-2xs"
+            list="organizations-list"
+          />
+          <datalist id="organizations-list">
+            {availableFilters.organizations.map((org, index) => (
+              <option key={index} value={org} />
+            ))}
+          </datalist>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full sm:w-[180px] h-11 rounded-xl bg-card border-border/80 shadow-2xs font-medium text-xs sm:text-sm flex items-center justify-start gap-1.5 px-3"
+              >
+                <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="truncate">
+                  {filters.topics.length === 0 
+                    ? "Tópicos" 
+                    : `${filters.topics.length} selecionado(s)`}
+                </span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[240px] p-2 rounded-xl" align="end">
+              <div className="flex flex-col gap-2">
+                <Input
+                  placeholder="Buscar tópico..."
+                  value={topicSearch}
+                  onChange={(e) => setTopicSearch(e.target.value)}
+                  className="h-8 text-sm rounded-lg"
+                />
+                <div className="max-h-[200px] overflow-y-auto pr-1 flex flex-col gap-1.5 mt-1">
+                  {availableFilters.topics
+                    .filter(t => t.toLowerCase().includes(topicSearch.toLowerCase()))
+                    .map((topic) => {
+                      const isChecked = filters.topics.includes(topic)
+                      return (
+                        <label
+                          key={topic}
+                          className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
+                        >
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={(checked) => {
+                              setFilters(prev => ({
+                                ...prev,
+                                topics: checked 
+                                  ? [...prev.topics, topic]
+                                  : prev.topics.filter(t => t !== topic)
+                              }))
+                            }}
+                          />
+                          <span className="text-sm leading-none truncate flex-1">{topic}</span>
+                        </label>
+                      )
+                    })}
+                  {availableFilters.topics.length > 0 && availableFilters.topics.filter(t => t.toLowerCase().includes(topicSearch.toLowerCase())).length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-4">Nenhum tópico encontrado.</p>
+                  )}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
+      
+      {/* Active Filter Badges */}
+      {activeFacetCount > 0 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto py-1 mb-8 text-xs scrollbar-none">
+          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider shrink-0 mr-1">
+            Ativos:
+          </span>
+          {filters.organization && (
+            <Badge
+              variant="secondary"
+              onClick={() => setFilters(p => ({ ...p, organization: "" }))}
+              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+            >
+              <span>Org: {filters.organization}</span>
+              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
+            </Badge>
+          )}
+
+          {filters.topics.map((topic) => (
+            <Badge
+              key={topic}
+              variant="secondary"
+              onClick={() => setFilters(p => ({ ...p, topics: p.topics.filter(t => t !== topic) }))}
+              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
+            >
+              <span>{topic}</span>
+              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
+            </Badge>
+          ))}
+          <button
+            type="button"
+            onClick={() => setFilters(initialFilters)}
+            className="text-[11px] font-semibold text-primary hover:underline shrink-0 ml-1.5 cursor-pointer"
+          >
+            Limpar tudo
+          </button>
+        </div>
+      )}
 
       {/* AI Recommendation Banner */}
       {aiJustification && (
@@ -377,7 +553,7 @@ export default function CommunityPage() {
                 className="px-8 shadow-sm"
               >
                 {loadingMore ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 animate-spin h-4 w-4" />
                 ) : null}
                 {tCommunity("loadMore")}
               </Button>
@@ -413,6 +589,7 @@ export default function CommunityPage() {
         </SheetContent>
       </Sheet>
       )}
-    </div>
+      </div>
+    </RequireRole>
   )
 }

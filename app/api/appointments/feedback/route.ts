@@ -5,7 +5,7 @@ import { updateFeedbackSchema } from "@/lib/schemas/appointment"
 
 /**
  * Mentorship-session feedback the current user received (as mentor) or sent
- * (as mentee). Lives under /api/appointments, not /api/feedback — that path
+ * (as mentee). Lives under /api/appointments, not /api/feedback - that path
  * is already the general site-feedback endpoint (`lib/schemas/feedback.ts`,
  * the `feedback` table), an unrelated feature.
  *

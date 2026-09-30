@@ -547,7 +547,7 @@ class MentorService {
     // A IA às vezes "inventa" um mentor_id que não é o UUID real (ex: uma
     // versão do nome tipo "nayane_prudencio"). Um único valor inválido faz
     // o Postgres rejeitar a cláusula `.in()` inteira ("invalid input syntax
-    // for type uuid"), zerando os resultados de TODOS os IDs — inclusive os
+    // for type uuid"), zerando os resultados de TODOS os IDs - inclusive os
     // válidos. Filtramos aqui pra garantir que um ID alucinado nunca derrube
     // os demais.
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

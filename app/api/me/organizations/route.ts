@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         )
     )
 
-    return successResponse({ status: "requested" }, "Solicitação enviada — aguarde a aprovação da organização")
+    return successResponse({ status: "requested" }, "Solicitação enviada - aguarde a aprovação da organização")
   } catch (error) {
     return handleApiError(error)
   }

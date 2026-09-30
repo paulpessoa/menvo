@@ -19,7 +19,7 @@ import {
 
 export interface GetAssistantAgentOptions {
   /** Receives one AiCallRecord per model attempt (primary + every fallback
-   * try), success or failure — ADR 0004 §6. */
+   * try), success or failure - ADR 0004 §6. */
   onCall: (record: AiCallRecord) => void
 }
 

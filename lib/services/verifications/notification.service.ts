@@ -47,7 +47,7 @@ function buildProfileUpdate(status: VerificationStatus, notes?: string) {
 }
 
 /**
- * The one place a mentor application is decided — used by both
+ * The one place a mentor application is decided - used by both
  * /dashboard/admin/verifications and the user modal in /dashboard/admin/users
  * (via POST /api/admin/verify), so both screens produce the same profile
  * state, RBAC role, chat message and e-mail.
@@ -68,7 +68,7 @@ export async function processVerification({
   const supabase = await createClient()
   const serviceClient = createServiceRoleClient()
 
-  // 1. Update profile — and fail loudly if no row was touched.
+  // 1. Update profile - and fail loudly if no row was touched.
   const { data: updated, error: updateError } = await (serviceClient
     .from('profiles') as any)
     .update(buildProfileUpdate(status, notes))
@@ -96,7 +96,7 @@ export async function processVerification({
     }
     if (mentorRoleId) {
       // user_roles has no unique (user_id, role_id) constraint, so upsert
-      // with onConflict fails (42P10) — check-then-insert instead.
+      // with onConflict fails (42P10) - check-then-insert instead.
       const { data: existingRole } = await serviceClient
         .from('user_roles')
         .select('id')

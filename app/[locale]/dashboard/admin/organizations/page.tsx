@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useCallback, useEffect, useState } from "react"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { Button } from "@/components/ui/button"
@@ -29,7 +30,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { Loader2, Plus, Building2, Search } from "lucide-react"
+import {  Plus, Building2, Search , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface Organization {
@@ -243,7 +244,7 @@ export default function AdminOrganizationsPage() {
             disabled={creating || !newOrg.name || !newOrg.slug}
           >
             {creating ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="mr-2 animate-spin h-4 w-4" />
             ) : (
               <Plus className="h-4 w-4 mr-2" />
             )}
@@ -294,7 +295,7 @@ export default function AdminOrganizationsPage() {
 
           {loading ? (
             <div className="flex justify-center py-10">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <MenvoDots />
             </div>
           ) : organizations.length === 0 ? (
             <p className="text-muted-foreground text-center py-10">
@@ -349,7 +350,7 @@ export default function AdminOrganizationsPage() {
                           onClick={() => handleAssignAdmin(org.id)}
                         >
                           {assigningId === org.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
+                            <Loader2 className="animate-spin h-4 w-4" />
                           ) : (
                             "Atribuir"
                           )}

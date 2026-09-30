@@ -15,7 +15,7 @@ const pick = <T,>(v: T | T[]): T => (Array.isArray(v) ? v[0] : v)
 
 /**
  * Compact highlight of the soonest confirmed session, with the Meet link one
- * click away. Renders nothing when there is no confirmed session — it replaces
+ * click away. Renders nothing when there is no confirmed session - it replaces
  * the old static hero that claimed "você tem uma sessão agendada" even when
  * the user had none.
  */
@@ -49,7 +49,7 @@ export function NextSessionCard({ upcoming, currentUserId }: NextSessionCardProp
             {isToday ? t("nextSessionToday") : t("nextSession")}
           </p>
           <p className="text-lg font-bold first-letter:uppercase">{when}</p>
-          <p className="text-sm text-white/90">{t("withPerson", { name: other?.full_name ?? "—" })}</p>
+          <p className="text-sm text-white/90">{t("withPerson", { name: other?.full_name ?? "-" })}</p>
         </div>
       </div>
       {next.google_meet_link ? (

@@ -1,6 +1,6 @@
 ---
 name: web-quality-audit
-description: Comprehensive web quality audit covering performance, accessibility, SEO, and best practices in a single review. Use when asked to "audit my site", "review web quality", "run lighthouse audit", "check page quality", or "optimize my website" across multiple areas at once. Orchestrates specialized skills for depth. Do NOT use for single-area audits — prefer core-web-vitals, web-accessibility, seo, or web-best-practices for focused work.
+description: Comprehensive web quality audit covering performance, accessibility, SEO, and best practices in a single review. Use when asked to "audit my site", "review web quality", "run lighthouse audit", "check page quality", or "optimize my website" across multiple areas at once. Orchestrates specialized skills for depth. Do NOT use for single-area audits - prefer core-web-vitals, web-accessibility, seo, or web-best-practices for focused work.
 license: MIT
 metadata:
   author: web-quality-skills
@@ -22,7 +22,7 @@ Comprehensive quality review based on Google Lighthouse audits. Covers Performan
 
 ### Performance (40% of typical issues)
 
-**Core Web Vitals** — Must pass for good page experience:
+**Core Web Vitals** - Must pass for good page experience:
 
 - **LCP (Largest Contentful Paint) < 2.5s.** The largest visible element must render quickly. Optimize images, fonts, and server response time.
 - **INP (Interaction to Next Paint) < 200ms.** User interactions must feel instant. Reduce JavaScript execution time and break up long tasks.

@@ -2,7 +2,7 @@
 
 Read this file when you need deeper guidance on specific design decisions
 during Phase 3 (Design Direction) or Phase 5 (Atomic Build). Do NOT read
-this upfront — only when a specific section is relevant to the current task.
+this upfront - only when a specific section is relevant to the current task.
 
 ## Table of Contents
 
@@ -89,7 +89,7 @@ Follow the 60-30-10 rule:
 - 30% secondary (cards, sections, supporting elements)
 - 10% accent (CTAs, highlights, key interactive elements)
 
-Projects that feel "off" usually violate this ratio — too much accent
+Projects that feel "off" usually violate this ratio - too much accent
 color or no clear dominant.
 
 ### Dark Mode Considerations
@@ -99,7 +99,7 @@ Dark mode is NOT "invert all colors." Key differences:
 - Surface colors: use desaturated near-blacks (#0a0a0a to #1a1a2e), NOT pure #000000
 - Reduce contrast slightly: pure white (#fff) on dark is harsh. Use #e0e0e0 to #f0f0f0
 - Accent colors may need lightening to maintain contrast ratios
-- Shadows become less visible — use lighter borders or subtle glows instead
+- Shadows become less visible - use lighter borders or subtle glows instead
 - Elevation is shown by lighter surfaces, not darker shadows
 
 ### Generating Palette from a Single Color
@@ -159,7 +159,7 @@ These are the spacing decisions that make or break a design:
 
 - Sidebar navigation (collapsible) + main content area
 - Card-based widgets or data panels
-- Dense but organized — clear visual groups
+- Dense but organized - clear visual groups
 - Max content width: fluid (100%) or 1600px+
 - Consider: fixed header, scrollable content area
 
@@ -252,7 +252,7 @@ These are NON-NEGOTIABLE in generated code:
 **Keyboard:**
 
 - All interactive elements reachable via Tab
-- Visible focus indicators (not just browser default — style them)
+- Visible focus indicators (not just browser default - style them)
 - Escape closes modals/overlays
 - Enter/Space activates buttons and links
 
@@ -299,8 +299,8 @@ These are NON-NEGOTIABLE in generated code:
 
 ### Easing
 
-- **ease-out** for entrances (fast start, gentle stop — feels responsive)
-- **ease-in** for exits (gentle start, fast end — feels natural)
+- **ease-out** for entrances (fast start, gentle stop - feels responsive)
+- **ease-in** for exits (gentle start, fast end - feels natural)
 - **ease-in-out** for state changes (smooth both ways)
 - **linear** only for continuous animations (loading spinners, progress)
 - **cubic-bezier** custom curves for personality and polish

@@ -13,7 +13,7 @@ export function FinalCTA() {
   return (
     <section className="w-full py-16 md:py-20 bg-primary text-primary-foreground relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
-      <div className="container  px-4 md:px-6 relative z-10">
+      <div className="container px-4 md:px-6 relative z-10">
         <div className="flex flex-col items-center justify-center space-y-6 text-center">
           <div className="space-y-3">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">

@@ -20,20 +20,7 @@ import {
   SheetTrigger
 } from "@/components/ui/sheet"
 import Link from "next/link"
-import {
-  Search,
-  Filter,
-  MapPin,
-  Clock,
-  Users,
-  Briefcase,
-  Heart,
-  Loader2,
-  ArrowDownUp,
-  SearchX,
-  Sparkles,
-  X
-} from "lucide-react"
+import {  Search, Filter, MapPin, Clock, Users, Briefcase, Heart, ArrowDownUp, SearchX, Sparkles, X , Loader2 } from "lucide-react"
 
 import { useAuth } from "@/lib/auth"
 import { MentorCard } from "@/components/mentors/MentorCard"
@@ -155,7 +142,7 @@ export default function MentorsPage() {
       const { data, count } = await mentorService.searchCatalog({
         filters: {
           // Em modo IA, o texto digitado já foi consumido pelo endpoint
-          // de match — aqui filtramos por tema (filters.topics), não pelo
+          // de match - aqui filtramos por tema (filters.topics), não pelo
           // texto literal, que quase nunca bate como ILIKE contra uma
           // frase em linguagem natural.
           search: isAIMode ? "" : (searchOverride ?? debouncedSearch),
@@ -318,7 +305,7 @@ export default function MentorsPage() {
     }
 
     // Além dos 3-4 destaques da IA, aproveitamos os temas sugeridos por ela
-    // para ampliar a lista abaixo com outros mentores do mesmo assunto —
+    // para ampliar a lista abaixo com outros mentores do mesmo assunto -
     // só aplicamos os que realmente existem como tema cadastrado na
     // plataforma, pra não zerar a lista com um tema livre que a IA inventou.
     const matchedTopics = suggestedTopics.filter((topic) =>
@@ -849,7 +836,7 @@ export default function MentorsPage() {
             {t("noMentorsDescription")}
           </p>
 
-          {/* Sugestões de áreas populares — vêm dos temas que os próprios
+          {/* Sugestões de áreas populares - vêm dos temas que os próprios
               mentores já cadastraram (carregados no load da página via
               getCatalogFilterOptions), não uma lista fixa no código. */}
           {availableFilters.topics.length > 0 && (
@@ -928,7 +915,7 @@ export default function MentorsPage() {
               >
                 {loadingMore ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 animate-spin h-4 w-4" />
                     {t("loading")}
                   </>
                 ) : (

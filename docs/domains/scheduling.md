@@ -2,11 +2,11 @@
 title: Scheduling and availability
 owner: paul
 status: current
-last_reviewed: 2026-09-23
+last_reviewed: 2026-09-28
 source_of_truth: [lib/services/appointments/availability.service.ts, app/api/appointments/availability/route.ts, app/api/mentors/availability/route.ts]
 ---
 
-# Sistema de Agenda e Disponibilidade de Mentorias — Menvo
+# Sistema de Agenda e Disponibilidade de Mentorias - Menvo
 
 Este documento consolida as **regras de negócio, arquitetura e fluxo de dados** do sistema de agendamento e disponibilidade entre mentores e mentorados na Menvo.
 
@@ -59,11 +59,19 @@ Um slot projetado só é exibido como disponível para o mentorado se passar por
 1. **Filtro de Passado:**
    - Horários cujo timestamp já tenha passado em relação ao horário atual são automaticamente descartados.
 2. **Conflito com Sessões Menvo:**
-   - Verifica na tabela `appointments` se já existe alguma mentoria com status `pending` ou `confirmed` que colida no intervalo de tempo.
-3. **Conflito com Google Calendar:**
-   - Se o mentor possui integração ativa com Google Calendar, a API faz uma chamada ao `calendar.freebusy.query`. Se houver qualquer evento pessoal/profissional no mesmo horário na agenda externa, o slot é bloqueado na Menvo dinamicamente.
-4. **Ciclo Virtuoso de Feedback (Avaliações Pendentes):**
+   - Verifica na tabela `appointments` se já existe alguma mentoria com status `pending` ou `confirmed` que colida no intervalo de tempo, **por mentor**.
+3. **Ciclo Virtuoso de Feedback (Avaliações Pendentes):**
    - Se o mentorado tiver alguma mentoria passada que ainda não foi avaliada, o sistema bloqueia novos agendamentos e solicita a avaliação da sessão anterior.
+
+> **Não existe** filtro de conflito com o Google Calendar de cada mentor - os
+> mentores não conectam agenda própria. O Google Meet de toda sessão é criado
+> numa **única conta pessoal do Paul** (MVP deliberado, `GOOGLE_CALENDAR_*`),
+> com mentor e mentorado como convidados - não é a agenda de ninguém mais.
+> Um `getCalendarBusyIntervals` que consultava `calendar.freebusy.query` nessa
+> mesma conta e aplicava o resultado a **todos os mentores** existiu até
+> 2026-09-28: qualquer mentoria confirmada de qualquer mentor (ou um evento
+> pessoal do Paul) bloqueava o mesmo horário para todo mundo. Removido nessa
+> data - ver `docs/product/how-it-works.md`, C-T5.
 
 ### 3. Fuso Horário e Precisão
 * Todo o banco de dados armazena os horários em **UTC**.
@@ -97,7 +105,16 @@ Registra as mentorias efetivamente agendadas:
 | `scheduled_at` | `timestamptz` | Data e hora de início em UTC |
 | `duration_minutes` | `integer` | Duração em minutos (padrão: 45) |
 | `status` | `text` | `pending`, `confirmed`, `completed`, `cancelled`, `rejected` |
+| `pending_reminder_sent_at` | `timestamptz` | Data do lembrete único enviado ao mentor após 24h |
 | `google_meet_link` | `text` | Link gerado automaticamente via Google Calendar |
+
+---
+
+### Ciclo de vida de um pedido pendente
+
+Quando um mentorado faz um pedido, o \`status\` passa a ser \`pending\`.
+- **Após 24 horas:** Se o horário agendado ainda não passou, o mentor recebe um único lembrete por e-mail e a coluna \`pending_reminder_sent_at\` é preenchida.
+- **Após o horário da sessão passar:** Se o pedido continuar pendente, ele é cancelado automaticamente. O mentorado recebe um e-mail sugerindo procurar outro mentor. Como a verificação acontece via cron diário (10h UTC), a expiração pode ocorrer até ~24h depois do horário previsto.
 
 ---
 
@@ -122,7 +139,6 @@ sequenceDiagram
     Front->>API: GET ?mentor_id=X&start_date=Hoje&end_date=Hoje+14d
     API->>DB: Busca regras semanais em mentor_availability
     API->>DB: Busca agendamentos existentes em appointments
-    API->>GCal: Consulta freebusy (eventos externos do mentor)
     API->>API: Projeta blocos de 45min, remove conflitos e passados
     API-->>Front: Retorna lista de datas e horários disponíveis
     Front-->>Mentee: Exibe opções (ex: 7/Set, 10/Set, 14/Set, 17/Set)

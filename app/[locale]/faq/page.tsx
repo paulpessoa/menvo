@@ -12,7 +12,7 @@ export default function FAQPage() {
     const [searchQuery, setSearchQuery] = useState("")
 
     const faqItems = useMemo(() => {
-        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => ({
+        return [1, 2, 3, 4, 5, 6, 7, 8].map(i => ({
             id: i,
             question: t(`faq.q${i}.question`),
             answer: t(`faq.q${i}.answer`)

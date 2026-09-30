@@ -196,10 +196,10 @@
   "howItWorks": {
     "title": "How Menvo Works",
     "description": "Our platform makes it easy to connect with mentors and schedule free mentorship sessions",
+    "metaDescription": "See how Menvo connects mentees, volunteer mentors, and partner organizations in free mentorship sessions.",
     "forMentees": "For Mentees",
     "forMentors": "For Mentors",
-    "forNGOs": "For NGOs",
-    "forCompanies": "For Companies",
+    "forOrganizations": "For Organizations",
     "mentees": {
       "step1": {
         "title": "Create Your Profile",
@@ -209,153 +209,101 @@
         "feature3": "Connect your LinkedIn profile"
       },
       "step2": {
+        "title": "Take Your Career Diagnostic",
+        "description": "Answer a few AI-guided questions about your goals and challenges. You get mentor suggestions tailored to your moment and can share the result with your mentor.",
+        "feature1": "AI-guided conversation",
+        "feature2": "Mentor suggestions for you",
+        "feature3": "Share with your mentor (optional)"
+      },
+      "step3": {
         "title": "Find the Right Mentor",
         "description": "Browse our diverse community of volunteer mentors. Use filters to find mentors based on expertise, industry, location, and more.",
         "feature1": "Filter by topics and expertise",
-        "feature2": "Search by location or language",
+        "feature2": "Search by location, language, or inclusion tags",
         "feature3": "Read reviews from other mentees"
       },
-      "step3": {
-        "title": "Schedule a Session",
-        "description": "Once you find a mentor you'd like to connect with, view their availability and schedule a free 45-minute mentorship session.",
+      "step4": {
+        "title": "Request a Session",
+        "description": "Once you find a mentor you'd like to connect with, view their availability for the next 14 days and request a free 45-minute mentorship session. If the mentor doesn't reply before the time slot, the request is cancelled and we'll let you know by email.",
         "feature1": "View mentor's calendar",
         "feature2": "Select a convenient time slot",
-        "feature3": "Add topics you'd like to discuss"
+        "feature3": "The mentor confirms your request"
       },
-      "step4": {
+      "step5": {
         "title": "Connect and Grow",
-        "description": "Meet with your mentor via video call. Share your challenges, ask questions, and receive personalized guidance to help you achieve your goals.",
-        "feature1": "Join via video call link",
-        "feature2": "Discuss your goals and challenges",
-        "feature3": "Receive personalized guidance"
+        "description": "Meet with your mentor via the automatic Google Meet link. Share your challenges, ask questions, and receive personalized guidance to help you achieve your goals.",
+        "feature1": "Automatic Google Meet link",
+        "feature2": "Email reminder on the day of the session",
+        "feature3": "Rate the session to unlock your next booking"
       },
       "getStarted": "Get Started as a Mentee"
     },
     "mentors": {
       "step1": {
-        "title": "Create Your Mentor Profile",
-        "description": "Sign up and create your mentor profile with details about your expertise, experience, and the topics you can help with.",
-        "feature1": "Highlight your expertise and experience",
-        "feature2": "Specify topics you can mentor on",
-        "feature3": "Connect your professional profiles"
+        "title": "Create Your Profile and Request to Become a Mentor",
+        "description": "Your account starts as a mentee. Share your experience, areas of expertise, and the topics you can help with, and request verification right from your profile.",
+        "feature1": "Start with a mentee account",
+        "feature2": "Highlight your expertise and topics",
+        "feature3": "Request verification on your profile"
       },
       "step2": {
-        "title": "Complete Verification",
-        "description": "For the safety of our community, all mentors go through a verification process. This includes a brief video call with our team.",
-        "feature1": "Schedule a verification call",
-        "feature2": "Verify your identity and expertise",
-        "feature3": "Get approved to start mentoring"
+        "title": "Review by Our Team",
+        "description": "Our team reviews your profile information to keep the community safe. You'll get a response by email and in the platform's chat.",
+        "feature1": "No calls, all through your profile",
+        "feature2": "Response by email and chat",
+        "feature3": "Approved, your profile goes public and verified"
       },
       "step3": {
         "title": "Set Your Availability",
-        "description": "Define when you're available to mentor. You have full control over your schedule and can update it anytime.",
+        "description": "Set up your recurring weekly availability. Sessions have a fixed 45-minute duration, and the Google Meet link is generated automatically when you confirm a request.",
         "feature1": "Set your weekly availability",
-        "feature2": "Specify session duration",
-        "feature3": "Update your calendar as needed"
+        "feature2": "45-min sessions with a 15-min gap",
+        "feature3": "Google Meet link generated automatically"
       },
       "step4": {
         "title": "Conduct Mentorship Sessions",
-        "description": "Connect with mentees via video calls. Share your knowledge, provide guidance, and help them navigate their challenges.",
-        "feature1": "Receive session requests",
-        "feature2": "Conduct video mentorship sessions",
-        "feature3": "Track your impact and sessions"
+        "description": "Confirm or decline session requests, see the diagnostic your mentee shared with you, and track your impact on the platform.",
+        "feature1": "Confirm or decline session requests",
+        "feature2": "See the diagnostic shared by your mentee",
+        "feature3": "Track your sessions and ratings"
       },
       "becomeMentor": "Become a Mentor"
     },
-    "ngos": {
+    "organizations": {
       "step1": {
-        "title": "Register Your NGO for Free",
-        "description": "NGOs and social organizations can register for free on the platform to connect the youth they serve with volunteer mentors.",
-        "feature1": "100% free registration for NGOs",
-        "feature2": "Unlimited access to the platform",
-        "feature3": "Dedicated support for organizations"
+        "title": "Create Your Organization's Page",
+        "description": "Talk to our team to set up your NGO, institute, or company's public page on Menvo, open for join requests or invite-only.",
+        "feature1": "Public page at menvo.com.br/o/your-org",
+        "feature2": "Open for requests or invite-only",
+        "feature3": "Set up by our team together with you"
       },
       "step2": {
-        "title": "Connect Youth with Mentors",
-        "description": "Register the young people served by your organization and help them find mentors who can guide them in their professional and personal journeys.",
-        "feature1": "Register multiple youth from your organization",
-        "feature2": "Track mentorship progress",
-        "feature3": "Receive social impact reports"
-      },
-      "getStarted": "Register My NGO",
-      "step3": {
-        "title": "Tracking and Evolution",
-        "description": "Monitor mentorship progress and see the real impact on the lives of your youth.",
-        "feature1": "Session history",
-        "feature2": "Mentor feedback",
-        "feature3": "Progress dashboard"
-      },
-      "step4": {
-        "title": "Strengthening the Cause",
-        "description": "Use real data to demonstrate social impact and facilitate fundraising.",
-        "feature1": "Impact reports",
-        "feature2": "Structured data",
-        "feature3": "Success stories"
-      },
-      "getStarted": "Talk to our team"
-    },
-    "companies": {
-      "step1": {
-        "title": "Corporate Volunteering through Mentorship",
-        "description": "Develop corporate volunteering programs by allowing your employees to become volunteer mentors, strengthening the company's purpose.",
-        "feature1": "Engage employees in social actions",
-        "feature2": "Develop leadership through mentorship",
-        "feature3": "Strengthen organizational culture"
-      },
-      "step2": {
-        "title": "ESG Reports and Social Impact",
-        "description": "Receive detailed reports on the social impact of mentorships conducted by your employees, strengthening your ESG metrics.",
-        "feature1": "Monthly social impact reports",
-        "feature2": "Metrics for ESG reporting",
-        "feature3": "Corporate volunteering certificates"
+        "title": "Bring Your Community",
+        "description": "Invite the people your organization serves and the employees who can be volunteer mentors. You approve whoever requests to join.",
+        "feature1": "Invite beneficiaries by email",
+        "feature2": "Invite employees as mentors",
+        "feature3": "Approve whoever requests to join"
       },
       "step3": {
-        "title": "Incentive Policies and Benefits",
-        "description": "Create incentive policies for mentor employees, such as paid time off, internal recognition, and career development.",
-        "feature1": "Time bank for volunteer mentoring",
-        "feature2": "Recognition and internal gamification",
-        "feature3": "Soft skills development"
+        "title": "Connect with Mentors",
+        "description": "Beneficiaries use the platform's same mentor catalog and AI career diagnostic. Your organization's mentors serve through Menvo like any other mentor.",
+        "feature1": "Same mentor catalog and career diagnostic",
+        "feature2": "Your organization's mentors serve through the platform",
+        "feature3": "100% free"
       },
       "step4": {
-        "title": "ESG Impact and Recognition",
-        "description": "Strengthen your company social impact metrics with real and auditable data.",
-        "feature1": "ESG Certificates",
-        "feature2": "Annual reports",
-        "feature3": "Partner Company Seal"
+        "title": "Track the Impact",
+        "description": "In your organization's dashboard, see beneficiaries and mentors, who has completed the diagnostic, and how many sessions were booked and completed.",
+        "feature1": "Dashboard with beneficiaries and mentors",
+        "feature2": "Who has completed the diagnostic",
+        "feature3": "Sessions booked and completed"
       },
-      "getStarted": "Talk to our team"
+      "getStarted": "Talk to Our Team"
     },
     "faq": {
       "title": "Frequently Asked Questions",
       "description": "Find answers to the most common questions about the platform.",
-      "viewAll": "View all questions",
-      "q1": {
-        "question": "Is mentorship really free?",
-        "answer": "Yes, all mentorship sessions on our platform are completely free. Our mentors volunteer their time to help others grow and develop."
-      },
-      "q2": {
-        "question": "How long are mentorship sessions?",
-        "answer": "Standard mentorship sessions are 45 minutes long. This provides enough time for meaningful conversation while respecting everyone's schedules."
-      },
-      "q3": {
-        "question": "How often can I meet with a mentor?",
-        "answer": "This depends on the mentor's availability and preferences. Some mentors are open to regular sessions, while others may prefer one-time meetings."
-      },
-      "q4": {
-        "question": "What happens if I need to cancel?",
-        "answer": "We ask that you cancel at least 24 hours in advance out of respect for the mentor's time. You can easily reschedule through your dashboard."
-      },
-      "q5": {
-        "question": "How do I become a verified mentor?",
-        "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
-      },
-      "q6": {
-        "question": "Is my information secure?",
-        "answer": "Yes, we take privacy and security seriously. Your personal information is protected and only shared with those you choose to connect with."
-      },
-      "stillHaveQuestions": "Still have questions?",
-      "supportDescription": "Our support team is here to help you with any questions you may have.",
-      "contactSupport": "Contact Support"
+      "viewAll": "View all questions"
     }
   },
   "faq": {
@@ -379,25 +327,17 @@
     },
     "q5": {
       "question": "How do I become a verified mentor?",
-      "answer": "After creating your mentor profile, you'll need to schedule a brief verification call with our team. This helps ensure the quality and safety of our community."
+      "answer": "After requesting to become a mentor from your profile, our team reviews your information and replies by email and chat. Once approved, your profile goes public and verified."
     },
     "q6": {
       "question": "Is my information safe?",
       "answer": "Yes, we take privacy and security very seriously. Your personal information is protected and only shared with those you choose to connect with."
     },
     "q7": {
-      "question": "How does it work for NGOs?",
-      "answer": "NGOs can register for free and connect the youth they serve with volunteer mentors. It's a way to expand the organization's social impact at no cost."
+      "question": "How does it work for organizations (NGOs and companies)?",
+      "answer": "NGOs, institutes, and companies with volunteering programs can have a page on Menvo to connect the people they serve - or their employees - with volunteer mentors, for free. Talk to our team to set up your organization's page."
     },
     "q8": {
-      "question": "Can companies participate?",
-      "answer": "Yes! Companies can develop corporate volunteering programs through mentorship, receive ESG reports, and create incentive policies for mentor employees."
-    },
-    "q9": {
-      "question": "How does recruiter access work?",
-      "answer": "This feature is under development. Soon, recruiters will have access to qualified talent participating on the platform, always respecting user privacy."
-    },
-    "q10": {
       "question": "Can I be both a mentor and mentee?",
       "answer": "Yes! You can have both profiles on the platform. Many professionals seek mentorship in specific areas while mentoring in their areas of expertise."
     },
@@ -532,9 +472,9 @@
     }
   },
   "community": {
-    "title": "Community Board",
+    "title": "Mentee Board",
     "subtitle": "Meet people looking to learn and proactively offer your mentorship.",
-    "mentorTip": "Tip: Proactive mentors who help those seeking knowledge get 3x more visibility.",
+    "mentorTip": "Tip: read the profile before reaching out, and in your first message say who you are and how you can help.",
     "searchPlaceholder": "Search by name, goal, or interest...",
     "seekingHelpWith": "Seeking help with:",
     "noBioProvided": "This member hasn't described their goals in detail yet.",
@@ -551,6 +491,8 @@
       "chatAnyway": "Just Chat",
       "becomeMentor": "Become a Mentor"
     },
+    "viewProfile": "View profile",
+    "myProfile": "My profile",
     "magicSearch": {
       "title": "AI search for who to help",
       "placeholder": "Describe who you'd like to help (e.g. 'I want to help someone starting out in Design looking for their first internship')",
@@ -641,8 +583,7 @@
     "howItWorks": "How it Works",
     "mentors": "Mentors",
     "mentees": "Mentees",
-    "ngos": "NGOs",
-    "companies": "Companies",
+    "organizations": "Organizations",
     "donate": "Donate",
     "company": "Institutional",
     "aboutUs": "About Us",
@@ -650,10 +591,14 @@
     "team": "Team",
     "partners": "Partners",
     "contact": "Contact",
+    "sdgs": "Sustainable Development Goals",
     "allRightsReserved": "All rights reserved.",
     "privacyPolicy": "Privacy",
     "termsOfService": "Terms",
-    "cookiePolicy": "Cookies"
+    "cookiePolicy": "Cookies",
+    "openSource": "Open source",
+    "contribute": "Contribute on GitHub",
+    "reportAndSupport": "Report / Trust & Safety"
   },
   "donate": {
     "hero": {
@@ -785,89 +730,93 @@
     }
   },
   "privacy": {
-    "badge": "Privacy",
+    "badge": "Privacy & Security",
     "title": "Privacy Policy",
-    "intro": "Your privacy is important to us. This policy explains how we collect, use, and protect your data at Menvo.",
+    "intro": "At Menvo, transparency and personal data protection are core principles of our voluntary mentorship community.",
     "dataCollection": {
-      "title": "Data Collection",
-      "text": "We collect information you provide when creating an account, such as name, email, profile photo, and professional details. We also collect social login data (Google, LinkedIn) if you choose to authenticate with these platforms."
+      "title": "Information Collection",
+      "text": "We collect information necessary to connect mentors and mentees, such as name, email, professional bio, fields of expertise, and scheduling availability voluntarily provided during registration."
     },
-    "email": {
-      "title": "Emails & Communication",
-      "text": "We use your email for essential communications, mentorship notifications, and updates. Emails are sent via Brevo, respecting your privacy and opt-out preferences."
-    },
-    "photos": {
-      "title": "Photos & Visual Content",
-      "text": "Profile photos and uploaded images are securely stored in Supabase and used only for identification and profile personalization."
-    },
-    "storage": {
-      "title": "Data Storage",
-      "text": "All data is securely stored in Supabase, with access restricted to the Menvo team and following best security practices."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar API",
-      "text": "We use the Google Calendar API exclusively to create mentorship events when a session is confirmed by the mentor. We create the event in our own calendar and send email invitations to both mentor and mentee. We do NOT access, read, or modify your personal Google Calendar. You only receive an email invitation that you can freely accept or decline. The data used is only: date, time, session duration, and participants' emails."
+    "dataUsage": {
+      "title": "Use of Data",
+      "text": "Collected data is used exclusively to facilitate mentorship sessions, personalize recommendations, send transactional notices, and enhance community experience."
     },
     "dataSharing": {
       "title": "Data Sharing",
-      "text": "We do not share your personal data with third parties for commercial or marketing purposes. Data is shared only with essential services for platform operation: Supabase (secure storage), Brevo (transactional email delivery), Google (OAuth authentication and calendar event creation), and LinkedIn (OAuth authentication). Each service processes data only for the specific purposes described in this policy."
+      "text": "We do not sell, rent or trade your personal data. Mentor profiles are public. Mentee profiles only appear on the mentee board when the person turns on “Public profile”, and even then they are visible only to signed-in mentors and administrators. On the board and on the mentee page we show name, photo, job title, bio, goals, areas of interest and the links you added (LinkedIn, GitHub, portfolio and résumé). Email, phone number and form answers are never shown to other users. You can turn visibility off at any time in your profile."
     },
-    "dataUsage": {
-      "title": "Data Usage",
-      "text": "Your data is used exclusively to: (1) Authenticate and manage your account; (2) Facilitate connections between mentors and mentees; (3) Create mentorship events in Google Calendar; (4) Send notifications and communications related to your mentorships; (5) Improve platform experience and security. We never use your data for AI/ML model training or purposes unrelated to mentorship."
+    "email": {
+      "title": "Email Communications",
+      "text": "We send transactional emails related to appointments, confirmations, cancellations, reminders, and feedback requests via Brevo. You can manage your preferences at any time."
+    },
+    "photos": {
+      "title": "Profile Pictures",
+      "text": "Photos uploaded to profiles are securely stored in Supabase Storage and used strictly for visual identification in sessions and public catalog."
+    },
+    "storage": {
+      "title": "Storage & Security",
+      "text": "We apply industry-standard security practices, encryption in transit and at rest, strict Row Level Security (RLS) policies, and secure cloud infrastructure to protect your data."
+    },
+    "googleCalendar": {
+      "title": "Google Calendar and Google Meet Integration",
+      "text": "When connecting or booking a mentorship with Google Calendar integration, Menvo accesses Google APIs exclusively to create calendar events with Google Meet video links and verify schedule conflicts for selected time slots.\n\nMenvo's use and transfer of information received from Google APIs to any other app will adhere to the Google API Services User Data Policy, including the Limited Use requirements. We do not read, store, or share unrelated personal calendar entries."
     },
     "mentorship": {
-      "title": "Mentorship & Interactions",
-      "text": "Information about mentorship sessions, reviews, and messages is used to improve the experience and ensure community safety."
+      "title": "Session Confidentiality",
+      "text": "Conversations during mentorship sessions remain strictly confidential between mentor and mentee. Menvo does not record calls or monitor the contents of video meetings."
     },
     "thirdParty": {
       "title": "Third-Party Services",
-      "text": "We use third-party services such as Google (OAuth login and Calendar API), LinkedIn (OAuth login), Supabase (storage), and Brevo (emails). Each service has its own privacy policy and processes data only for the specific purposes described in this policy."
+      "text": "We partner with trusted authentication and infrastructure providers including Supabase, Vercel, Brevo, and Google Cloud APIs, compliant with international data protection regulations and LGPD."
     },
     "reengagement": {
       "title": "Estágio Recife database",
-      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile — the e-mail's reply link goes straight to that option."
+      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile - the e-mail's reply link goes straight to that option."
+    },
+    "retention": {
+      "title": "How long we keep your data",
+      "text": "We keep your data while your account is active or while it's needed for the purpose it was collected for. If your data came from a partner initiative, such as Estágio Recife, and you never access the account, it will be automatically deleted 90 days after the first invitation, with e-mail warnings 30 days and 1 day before deletion. If you asked to stop receiving e-mails, we won't send those warnings, and the deletion happens on the same timeline. After deletion, we keep only an anonymous record (a cryptographic fingerprint of the e-mail, which can't identify you) to prove the request was fulfilled and to avoid contacting you again (LGPD, arts. 15, 16, and 18)."
     },
     "rights": {
-      "title": "Your Rights",
-      "text": "You may request access, correction, or deletion of your data at any time. To exercise your rights or revoke Google Calendar access permissions, contact us at contato@menvo.com.br."
+      "title": "Your Privacy Rights",
+      "text": "You have the right to access, correct, update, or request permanent deletion of your personal data at any time via your account settings or by reaching out to our support team."
     },
     "contact": {
-      "title": "Contact",
-      "text": "Questions about privacy? Contact us at contato@menvo.com.br."
+      "title": "Data Protection Officer Contact",
+      "text": "For questions, requests, or exercising privacy rights, please contact our team at contato@menvo.com.br."
     },
     "links": {
       "cookies": "Cookie Policy",
-      "terms": "Terms of Service"
+      "terms": "Terms of Use"
     }
   },
   "cookies": {
-    "badge": "Cookies",
+    "badge": "Transparency",
     "title": "Cookie Policy",
-    "intro": "We use cookies to enhance your experience, ensure essential features, and analyze platform usage.",
+    "intro": "Learn how we use cookies and similar technologies to ensure a secure and efficient experience on Menvo.",
     "essential": {
       "title": "Essential Cookies",
-      "text": "Required for site operation, authentication, and security. Cannot be disabled."
+      "text": "These cookies are strictly necessary for platform functionality, maintaining secure authenticated sessions via Supabase, and preserving language and theme choices."
     },
     "social": {
-      "title": "Social Login",
-      "text": "Cookies may be used for authentication via Google and LinkedIn, enabling secure login."
+      "title": "Social Authentication Cookies",
+      "text": "Used when logging in or signing up via external providers like Google and LinkedIn for identity verification and secure profile linkage."
     },
     "preferences": {
-      "title": "Preferences",
-      "text": "We store your language and settings preferences to personalize your experience."
+      "title": "Preference Cookies",
+      "text": "Enable the platform to remember your personalized settings, such as catalog view layout and detected timezone."
     },
     "analytics": {
-      "title": "Analytics & Performance",
-      "text": "We use cookies and analytics tools like Microsoft Clarity to understand how the platform is used and improve our services. Clarity helps us visualize how users interact with the site through session recordings and heatmaps. For users from the European Union (EEA), United Kingdom, and Switzerland, we request your explicit consent before activating these analytics tools."
+      "title": "Analytics Cookies",
+      "text": "Help us understand how the community navigates the platform through aggregated anonymous metrics, allowing continuous improvements to booking and search."
     },
     "clarity": {
-      "title": "Microsoft Clarity",
-      "text": "We use Microsoft Clarity to understand how you use our website through behavioral metrics, heatmaps, and session recordings. Data collected by Clarity is processed according to Microsoft's Privacy Policy. For users from the EEA, UK, and Switzerland, Clarity will only be activated after your explicit consent through the cookie banner."
+      "title": "User Experience Mapping",
+      "text": "We may use aggregate telemetry to diagnose usability issues while strictly masking sensitive user information."
     },
     "links": {
       "privacy": "Privacy Policy",
-      "terms": "Terms of Service"
+      "terms": "Terms of Use"
     }
   },
   "cookieConsent": {
@@ -898,63 +847,65 @@
     }
   },
   "terms": {
-    "badge": "Terms",
-    "title": "Terms of Service",
-    "intro": "By using Menvo, you agree to these terms. Please read carefully to understand your rights and responsibilities.",
+    "badge": "Terms of Service",
+    "title": "Terms of Use",
+    "intro": "Welcome to Menvo. By using our platform, you agree to the terms and guidelines governing our free voluntary mentorship community.",
     "usage": {
-      "title": "Platform Usage",
-      "text": "Menvo connects mentors and mentees for free sessions. Use must be respectful and in accordance with applicable laws."
+      "title": "Platform Use",
+      "text": "Menvo is a volunteer, non-profit initiative that connects professionals willing to share knowledge with people seeking career guidance. Using the platform and every mentorship is 100% free. Charging or offering payment for mentorships arranged through Menvo is not allowed."
     },
     "account": {
-      "title": "Account & Social Login",
-      "text": "You may create an account via email or social login (Google, LinkedIn). Keep your credentials secure and do not share your account."
+      "title": "Accounts & Registration",
+      "text": "You are responsible for the accuracy of information provided during signup and for maintaining credential security. Each user must maintain a single personal account."
+    },
+    "inactivity": {
+      "title": "Inactive accounts and automatic deletion",
+      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for long periods may also be deleted, always with advance e-mail notice."
     },
     "security": {
-      "title": "Security",
-      "text": "We take measures to protect your data, but you are also responsible for keeping your password secure."
+      "title": "Conduct & Safety",
+      "text": "Any form of harassment, discrimination, charging for mentorships or misuse of communication channels is forbidden. Violations may lead to suspension or deletion of the account. To report behavior, email contato@menvo.com.br."
     },
     "content": {
-      "title": "Content & Photos",
-      "text": "You are responsible for content you upload (photos, text). Do not upload offensive or copyrighted content without permission."
+      "title": "Open source and intellectual property",
+      "text": "Menvo's source code is open source and released under the MIT license at github.com/paulpessoa/menvo. The Menvo name, brand and visual identity are not covered by that license and may not be used to represent other projects. What you publish on your profile and what is shared in mentorships still belongs to its authors; by publishing it, you allow Menvo to display that content on the platform for the purposes of these Terms."
     },
     "communication": {
-      "title": "Communication & Emails",
-      "text": "We will send important communications about mentorships and updates. You may opt out of promotional emails."
+      "title": "Communications",
+      "text": "By signing up, you agree to receive essential platform notifications, including booking updates, messages between mentors and mentees, and session reminders."
     },
     "storage": {
-      "title": "Storage & Third Parties",
-      "text": "Data is stored in Supabase and emails are sent via Brevo. We use third-party social login."
+      "title": "Service Availability",
+      "text": "We strive to keep the platform reliable and available, though uninterrupted service cannot be guaranteed. We reserve the right to perform maintenance and updates."
     },
     "rights": {
-      "title": "Rights & Responsibilities",
-      "text": "You may access and delete your data. Misuse of the platform may result in account suspension."
+      "title": "Limitation of Liability",
+      "text": "Menvo connects people but is not responsible for the guidance, advice or decisions that come out of mentorships, nor for participants' conduct on or off the platform. Mentoring advice does not replace specialized professional advice such as legal, psychological, financial or medical."
     },
     "contact": {
-      "title": "Contact",
-      "text": "Questions? Contact us at contato@menvo.com.br"
+      "title": "Questions & Support",
+      "text": "For inquiries regarding these terms or to report an issue, please contact contato@menvo.com.br."
     },
     "links": {
       "privacy": "Privacy Policy",
       "cookies": "Cookie Policy"
     },
-    "warning": {
-      "title": "Attention",
-      "message": "The platform is currently under development. We're very happy to receive your feedback and opinion on what you've seen so far!",
-      "dismiss": "Got it",
-      "giveFeedback": "Give Feedback"
+    "updatedAt": "Last updated: September 29, 2026",
+    "volunteering": {
+      "title": "Voluntary participation, no employment relationship",
+      "text": "Mentors and mentees take part of their own free will, at no cost, and anyone can stop at any time without notice or justification. Mentoring is unpaid and creates no employment, partnership, association or service relationship, nor any labor, social security or similar obligation, either between participants or between them and Menvo, in line with the Brazilian Volunteer Service Law (Law No. 9,608/1998, art. 1, sole paragraph). Accepting these Terms at sign-up serves as the agreement to take part in volunteer activity. Because the relationship is free of charge, art. 392 of the Brazilian Civil Code applies: whoever offers mentoring without receiving anything in return is only liable for damage caused intentionally. Menvo does not guarantee that every mentee will find a mentor or that a mentorship will lead to any specific outcome."
     },
-    "feedback": {
-      "title": "What did you think of Menvo?",
-      "description": "Your opinion is very important to us! Tell us what you thought of the platform.",
-      "openFeedback": "Open Feedback",
-      "helpUsImprove": "Help us improve the platform",
-      "commentPlaceholder": "Tell us what you thought of the platform...",
-      "emailPlaceholder": "Your email (optional)",
-      "submit": "Submit Feedback",
-      "thankYou": "Thank you for your feedback!",
-      "error": "Error submitting feedback. Please try again.",
-      "ratingRequired": "Please select a rating.",
-      "rateStars": "Rate with {count} stars"
+    "contactBetweenUsers": {
+      "title": "Contact between mentors and mentees",
+      "text": "Mentors can see the profiles of mentees who turned on “Public profile” and reach out through the channels the mentee chose to show, such as LinkedIn. The first contact must be an offer of mentoring: say who you are and how you can help. Using this access for recruiting, selling courses, products or services, finding clients, spam or anything other than volunteer mentoring is not allowed. Conversations outside the platform (LinkedIn, WhatsApp, email, etc.) are the responsibility of the people involved. Menvo acts as an intermediary, and its liability for user-generated content follows art. 19 of the Brazilian Internet Civil Framework (Law No. 12,965/2014). Even so, we may suspend or delete accounts that break these Terms."
+    },
+    "openSource": {
+      "title": "Contribute to Menvo",
+      "text": "Because the project is open source, anyone can contribute code, copy reviews, translations, design or suggestions. Open an issue or a pull request at github.com/paulpessoa/menvo, or email contato@menvo.com.br. Contributions are voluntary too, follow the same no-employment rules in these Terms, and contributed code is licensed under MIT."
+    },
+    "minors": {
+      "title": "Minimum age and care with minors",
+      "text": "You must be 16 or older to use Menvo, as declared at sign-up. People aged 16 and 17 can search for mentors and book sessions as usual, but they do not appear on the Mentee Board: turning on “Public profile” means declaring you are 18 or older. Mentors who meet with minors must hold sessions through the platform's meeting link, must not ask for personal contacts, and must not propose in-person meetings. Any suspicion of inappropriate conduct can be reported to contato@menvo.com.br, and the account involved may be suspended while it is reviewed."
     }
   },
   "metadata": {
@@ -980,19 +931,6 @@
       "title": "MENVO - Volunteer Mentoring Platform",
       "description": "Connecting mentors and mentees for free mentoring sessions"
     }
-  },
-  "waitingList": {
-    "title": "Join the Waiting List",
-    "description": "Thank you for your interest! Please fill out the form below.",
-    "nameLabel": "Name",
-    "namePlaceholder": "Enter your full name",
-    "emailPlaceholder": "your@email.com",
-    "whatsappLabel": "WhatsApp (optional)",
-    "whatsappPlaceholder": "Your WhatsApp number",
-    "reasonLabel": "Why do you want to be part?",
-    "reasonPlaceholder": "Tell us why you want to join",
-    "successMessage": "Thank you for your interest!",
-    "errorMessage": "Error submitting form"
   },
   "feedback": {
     "title": "Feedback",
@@ -1052,7 +990,7 @@
     "cityPlaceholder": "Select city",
     "allCities": "All cities",
     "topics": "Mentorship Topics",
-    "expertise": "Expertise Areas",
+    "expertise": "Expertise",
     "inclusiveTags": "Inclusive Tags",
     "experience": "Experience",
     "experiencePlaceholder": "Years of experience",
@@ -1097,7 +1035,7 @@
     "scheduleSession": "Schedule Session",
     "freeMentorships": "100% free mentorships",
     "ownProfileMessage": "This is your mentor profile",
-    "bookMentorship": "Book Mentorship",
+    "bookMentorship": "Available Times",
     "fullSchedule": "Full Schedule",
     "manageAvailability": "Manage My Schedule",
     "availableForBooking": "Available for booking",
@@ -1145,7 +1083,7 @@
     "suggestModal": {
       "cta": "Suggest a topic",
       "title": "Suggest a topic or mentor",
-      "description": "Couldn't find what you were looking for? Tell us — every suggestion helps us decide which mentors to invite to the platform.",
+      "description": "Couldn't find what you were looking for? Tell us - every suggestion helps us decide which mentors to invite to the platform.",
       "contextLabel": "We'll send your search filters along with it:",
       "topicLabel": "What were you looking for?",
       "topicPlaceholder": "E.g. Product, Tech Careers, Service Design...",
@@ -1664,13 +1602,13 @@
       "meetPending": "The Google Meet link shows up here as soon as it's generated.",
       "howItWorksTitle": "How your session works",
       "howItWorksMeet": "Confirmed mentorships happen 100% online via Google Meet. The link is generated automatically and shows on the session card.",
-      "howItWorksTip": "Join 5 minutes early and bring your main goals. After the session, rate your mentor — it helps the community.",
+      "howItWorksTip": "Join 5 minutes early and bring your main goals. After the session, rate your mentor - it helps the community.",
       "exploreMentors": "Explore mentors",
       "asMentor": {
         "tab": "Received",
         "tabSub": "You as mentor",
         "actionTitle": "Awaiting your answer",
-        "actionHint": "Confirm or decline before the date — unanswered requests expire.",
+        "actionHint": "Confirm or decline before the date - unanswered requests expire.",
         "upcomingEmpty": "No confirmed sessions yet.",
         "emptyTitle": "You haven't received any mentorship requests yet",
         "emptyDesc": "Keep your availability up to date so mentees see open slots.",
@@ -1736,6 +1674,7 @@
     "menteeComments": "Mentee Comments:",
     "mentorNotes": "Mentor Notes:",
     "cancelledBy": "Cancelled by {name}",
+    "cancelledAutomatically": "Cancelled automatically",
     "you": "you",
     "reason": "Reason:",
     "cancelledAt": "Cancelled on {date}",
@@ -1834,7 +1773,8 @@
       "practical_steps": "Action Plan",
       "practical_steps_description": "Receive actionable guidance and clear next steps to accelerate your professional journey",
       "start_quiz": "Start Questionnaire",
-      "responses_confidential": "Your answers will help us better understand the needs of participants and recruit volunteer mentors in the most sought-after areas. In addition to contributing to building a stronger and more accessible mentoring community."
+      "responses_confidential": "Your answers will help us better understand the needs of participants and recruit volunteer mentors in the most sought-after areas. In addition to contributing to building a stronger and more accessible mentoring community.",
+      "usage_limit_note": "You can take up to 3 analyses per e-mail every 30 days."
     },
     "quiz_form": {
       "back": "Back",
@@ -1903,9 +1843,12 @@
       "submit_success_title": "Questionnaire submitted!",
       "submit_success_description": "Please wait while we process your analysis...",
       "submit_error_title": "Error submitting",
-      "submit_error_description": "An error occurred while submitting the questionnaire. Please try again."
+      "submit_error_description": "An error occurred while submitting the questionnaire. Please try again.",
+      "submit_error_email_limit_title": "Analysis limit reached",
+      "submit_error_budget_title": "Analyses unavailable right now"
     },
     "quiz_results": {
+<<<<<<< HEAD
       "processing_analysis": "Preparing your assessment...",
       "ai_is_analyzing": "It takes less than a minute.",
       "retake_quiz": "Retake quiz",
@@ -1933,6 +1876,56 @@
       "retake_link": "Retake assessment",
       "error_loading_results_toast_title": "Error",
       "error_loading_results_toast_description": "Could not load the results."
+=======
+      "processing_analysis": "Processing your analysis...",
+      "ai_is_analyzing": "Our AI is analyzing your answers",
+      "incomplete_analysis": "Incomplete Analysis",
+      "lets_try_again": "Let's try again?",
+      "retake_quiz": "Retake Questionnaire",
+      "tips_for_better_analysis": "Tips for a more accurate analysis",
+      "personalized_analysis": "Personalized Analysis",
+      "suggested_mentors": "Suggested Mentors for You",
+      "based_on_interests": "Based on your areas of interest and goals",
+      "mentor_status_tooltip": "💡 We show real mentors from the platform based on your profile.",
+      "mentor": "Mentor",
+      "view_mentor_profile": "View Mentor Profile",
+      "explore_mentors": "Explore Mentors",
+      "explore_all_mentors": "Explore All Mentors on the Platform",
+      "practical_advice": "Practical Advice",
+      "next_steps": "Next Steps",
+      "development_areas": "Development Areas",
+      "final_message_potential_mentor": "You have the potential to be a mentor!",
+      "final_message_potential_mentor_description": "We identified that you are interested in sharing knowledge. Consider registering as a volunteer mentor on the MENVO platform.",
+      "ai_disclaimer": "This analysis was generated by artificial intelligence from your answers. Use it as a starting point to reflect on your career, not as a definitive diagnosis.",
+      "share_results": "Share Results",
+      "share_results_description": "Send your analysis by email or share it with friends",
+      "send_by_email": "Send by Email",
+      "sending": "Sending...",
+      "print": "Print",
+      "share_with_mentor": "Share with Mentor",
+      "whatsapp": "WhatsApp",
+      "linkedin": "LinkedIn",
+      "potential_analysis_title": "🎯 My Potential Analysis - MENVO",
+      "potential_analysis_whatsapp_message": "I just did a personalized career analysis at MENVO and discovered my growth potential!\n\nSee my result: {currentUrl}\n\nGet to know MENVO - a free mentoring platform: https://menvo.com.br",
+      "potential_analysis_linkedin_message": "I just did a potential analysis at MENVO and discovered incredible insights about my professional growth! \n\nSee my result: {currentUrl}\n\nGet to know MENVO - a free mentoring platform that connects young people to volunteer mentors.\n\n#MENVO #Mentoring #ProfessionalDevelopment",
+      "email_sent_toast_title": "Email sent!",
+      "email_sent_toast_description": "Check your inbox.",
+      "error_sending_email_toast_title": "Error sending email",
+      "error_sending_email_toast_description": "Try again later.",
+      "error_loading_results_toast_title": "Error",
+      "error_loading_results_toast_description": "Could not load results.",
+      "save_analysis_banner_title": "Save this analysis to your account",
+      "save_analysis_banner_description": "Create a password to save this analysis to your dashboard and access it anytime.",
+      "save_analysis_password_placeholder": "Create a password (min. 6 characters)",
+      "save_analysis_button": "Save analysis and create account",
+      "save_analysis_saving": "Creating account...",
+      "save_analysis_success": "Account created! You can now sign in with this e-mail.",
+      "save_analysis_go_to_login": "Go to login",
+      "save_analysis_account_exists_title": "You already have an account",
+      "save_analysis_account_exists_description": "Sign in with this e-mail to access your analysis anytime.",
+      "save_analysis_account_exists_button": "Sign in to my account",
+      "save_analysis_error": "We couldn't create your account. Please try again."
+>>>>>>> main
     },
     "quiz_flow": {
       "how_it_works": "How the Quiz Works"
@@ -1953,9 +1946,44 @@
       "action": "Chat on WhatsApp"
     },
     "partnerships": {
-      "title": "Institutional Partnerships & Companies",
-      "description": "Looking to bring volunteer mentoring to your company, university, or organization? Reach out via our institutional email.",
-      "action": "Propose Partnership"
+      "title": "Bring Menvo to my organization",
+      "description": "NGOs, companies, schools and events: tell us a bit about your organization and our team will get back to you by email."
+    },
+    "trustSafety": {
+      "title": "Need to report something or ask for urgent help?",
+      "description": "Use our Trust & Safety Center to report inappropriate behavior or platform issues.",
+      "action": "Go to the Trust & Safety Center"
+    },
+    "organizationForm": {
+      "fields": {
+        "orgName": "Organization Name",
+        "orgType": "Organization Type",
+        "contactName": "Contact Name",
+        "contactEmail": "Corporate Email",
+        "contactPhone": "Phone (Optional)",
+        "peopleEstimate": "Organization Size",
+        "message": "Message (Optional)"
+      },
+      "errors": {
+        "orgName": "Name must be at least 2 characters",
+        "contactName": "Name must be at least 2 characters",
+        "contactEmail": "Invalid email"
+      },
+      "types": {
+        "ngo": "NGO / Non-profit",
+        "company": "Company",
+        "school": "Educational Institution",
+        "event": "Event",
+        "other": "Other"
+      },
+      "people": "people",
+      "submitButton": "Submit Request",
+      "privacyNote": "By submitting, you agree to our",
+      "privacyLink": "Privacy Policy",
+      "successTitle": "Request Received!",
+      "successMessage": "Our team will review your request and get back to you shortly.",
+      "rateLimitError": "Too many requests. Please try again later.",
+      "genericError": "Error submitting request. Please try again later."
     }
   },
   "unauthorized": {
@@ -1984,139 +2012,17 @@
     },
     "toastSuccess": "Password updated successfully!"
   },
-  "privacy": {
-    "badge": "Privacy & Security",
-    "title": "Privacy Policy",
-    "intro": "At Menvo, transparency and personal data protection are core principles of our voluntary mentorship community.",
-    "dataCollection": {
-      "title": "Information Collection",
-      "text": "We collect information necessary to connect mentors and mentees, such as name, email, professional bio, fields of expertise, and scheduling availability voluntarily provided during registration."
-    },
-    "dataUsage": {
-      "title": "Use of Data",
-      "text": "Collected data is used exclusively to facilitate mentorship sessions, personalize recommendations, send transactional notices, and enhance community experience."
-    },
-    "dataSharing": {
-      "title": "Data Sharing",
-      "text": "We do not sell, rent, or trade your personal data with third parties. Public profile details are only visible to other registered users on the platform for mentorship booking purposes."
-    },
-    "email": {
-      "title": "Email Communications",
-      "text": "We send transactional emails related to appointments, confirmations, cancellations, reminders, and feedback requests via Brevo. You can manage your preferences at any time."
-    },
-    "photos": {
-      "title": "Profile Pictures",
-      "text": "Photos uploaded to profiles are securely stored in Supabase Storage and used strictly for visual identification in sessions and public catalog."
-    },
-    "storage": {
-      "title": "Storage & Security",
-      "text": "We apply industry-standard security practices, encryption in transit and at rest, strict Row Level Security (RLS) policies, and secure cloud infrastructure to protect your data."
-    },
-    "googleCalendar": {
-      "title": "Google Calendar and Google Meet Integration",
-      "text": "When connecting or booking a mentorship with Google Calendar integration, Menvo accesses Google APIs exclusively to create calendar events with Google Meet video links and verify schedule conflicts for selected time slots.\n\nMenvo's use and transfer of information received from Google APIs to any other app will adhere to the Google API Services User Data Policy, including the Limited Use requirements. We do not read, store, or share unrelated personal calendar entries."
-    },
-    "mentorship": {
-      "title": "Session Confidentiality",
-      "text": "Conversations during mentorship sessions remain strictly confidential between mentor and mentee. Menvo does not record calls or monitor the contents of video meetings."
-    },
-    "thirdParty": {
-      "title": "Third-Party Services",
-      "text": "We partner with trusted authentication and infrastructure providers including Supabase, Vercel, Brevo, and Google Cloud APIs, compliant with international data protection regulations and LGPD."
-    },
-    "reengagement": {
-      "title": "Estágio Recife database",
-      "text": "Menvo started as an extension of Estágio Recife. Because of that, part of our mentee base comes from the Estágio Recife form: name, e-mail, and the answers given in that form. We use this data, based on our legitimate interest (Brazil's LGPD, art. 7, IX), only to send an initial invitation to get to know Menvo and complete their profile. Anyone who receives that invitation can, without logging in, ask to stop receiving e-mails or permanently delete their data and profile — the e-mail's reply link goes straight to that option."
-    },
-    "retention": {
-      "title": "How long we keep your data",
-      "text": "We keep your data while your account is active or while it's needed for the purpose it was collected for. If your data came from a partner initiative, such as Estágio Recife, and you never access the account, it will be automatically deleted 90 days after the first invitation, with e-mail warnings 30 days and 1 day before deletion. If you asked to stop receiving e-mails, we won't send those warnings, and the deletion happens on the same timeline. After deletion, we keep only an anonymous record (a cryptographic fingerprint of the e-mail, which can't identify you) to prove the request was fulfilled and to avoid contacting you again (LGPD, arts. 15, 16, and 18)."
-    },
-    "rights": {
-      "title": "Your Privacy Rights",
-      "text": "You have the right to access, correct, update, or request permanent deletion of your personal data at any time via your account settings or by reaching out to our support team."
-    },
-    "contact": {
-      "title": "Data Protection Officer Contact",
-      "text": "For questions, requests, or exercising privacy rights, please contact our team at contato@menvo.com.br."
-    },
-    "links": {
-      "cookies": "Cookie Policy",
-      "terms": "Terms of Use"
-    }
-  },
-  "terms": {
-    "badge": "Terms of Service",
-    "title": "Terms of Use",
-    "intro": "Welcome to Menvo. By using our platform, you agree to the terms and guidelines governing our free voluntary mentorship community.",
-    "usage": {
-      "title": "Platform Use",
-      "text": "Menvo is a non-profit volunteer platform created to connect professionals willing to share knowledge with individuals seeking career guidance. All mentorships are 100% free."
-    },
-    "account": {
-      "title": "Accounts & Registration",
-      "text": "You are responsible for the accuracy of information provided during signup and for maintaining credential security. Each user must maintain a single personal account."
-    },
-    "inactivity": {
-      "title": "Inactive accounts and automatic deletion",
-      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for long periods may also be deleted, always with advance e-mail notice."
-    },
-    "security": {
-      "title": "Conduct & Safety",
-      "text": "Harassment, discrimination, charging fees for mentorships, or misuse of platform communication channels is strictly prohibited. Violations lead to immediate account termination."
-    },
-    "content": {
-      "title": "Intellectual Property",
-      "text": "All platform design, branding, code, and content belong exclusively to Menvo. Content shared by users during sessions remains the property of their respective creators."
-    },
-    "communication": {
-      "title": "Communications",
-      "text": "By signing up, you agree to receive essential platform notifications, including booking updates, messages between mentors and mentees, and session reminders."
-    },
-    "storage": {
-      "title": "Service Availability",
-      "text": "We strive to keep the platform reliable and available, though uninterrupted service cannot be guaranteed. We reserve the right to perform maintenance and updates."
-    },
-    "rights": {
-      "title": "Limitation of Liability",
-      "text": "Menvo connects people, but is not liable for guidance, professional advice, or decisions made as a result of voluntary mentorship sessions between users."
-    },
-    "contact": {
-      "title": "Questions & Support",
-      "text": "For inquiries regarding these terms or to report an issue, please contact contato@menvo.com.br."
-    },
-    "links": {
-      "privacy": "Privacy Policy",
-      "cookies": "Cookie Policy"
-    }
-  },
-  "cookies": {
-    "badge": "Transparency",
-    "title": "Cookie Policy",
-    "intro": "Learn how we use cookies and similar technologies to ensure a secure and efficient experience on Menvo.",
-    "essential": {
-      "title": "Essential Cookies",
-      "text": "These cookies are strictly necessary for platform functionality, maintaining secure authenticated sessions via Supabase, and preserving language and theme choices."
-    },
-    "social": {
-      "title": "Social Authentication Cookies",
-      "text": "Used when logging in or signing up via external providers like Google and LinkedIn for identity verification and secure profile linkage."
-    },
-    "preferences": {
-      "title": "Preference Cookies",
-      "text": "Enable the platform to remember your personalized settings, such as catalog view layout and detected timezone."
-    },
-    "analytics": {
-      "title": "Analytics Cookies",
-      "text": "Help us understand how the community navigates the platform through aggregated anonymous metrics, allowing continuous improvements to booking and search."
-    },
-    "clarity": {
-      "title": "User Experience Mapping",
-      "text": "We may use aggregate telemetry to diagnose usability issues while strictly masking sensitive user information."
-    },
-    "links": {
-      "privacy": "Privacy Policy",
-      "terms": "Terms of Use"
-    }
+  "organizationLanding": {
+    "subtitle": "{name} is a Menvo partner. Join their group to connect with volunteer mentors - free, always.",
+    "requestedStatus": "Request sent - pending organization approval",
+    "joinToParticipate": "Log in to join",
+    "noAccountYet": "Don't have an account yet?",
+    "register": "Sign up",
+    "andReturnToRequest": "and come back here to request access.",
+    "youArePartOf": "You are a member of {name}",
+    "findMentor": "Find a mentor",
+    "requestToJoin": "Request to join",
+    "joinAutomatically": "Join automatically",
+    "inviteOnlyMsg": "{name} approves new accounts manually or via closed invite link. Request access below and they will screen your application according to the project criteria."
   }
 }

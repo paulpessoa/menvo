@@ -25,7 +25,7 @@ Strategy: Validate and refine.
 - "Great references. Let me confirm what I'm taking from each..."
 - "I notice [ref A] and [ref B] have different approaches to [X]. Which
   direction do you prefer for that specific element?"
-- "Your brand guidelines specify [X] — do you want to follow them strictly
+- "Your brand guidelines specify [X] - do you want to follow them strictly
   or is there room to evolve?"
 
 ### User has a vague sense
@@ -34,7 +34,7 @@ Signs: says "modern", "clean", "professional" without specifics.
 
 Strategy: Anchor to known examples.
 
-- "When you say 'modern,' help me calibrate — is it more Linear/Vercel
+- "When you say 'modern,' help me calibrate - is it more Linear/Vercel
   modern (minimal, lots of whitespace) or more Notion modern (friendly,
   illustrated, warmer)?"
 - "Think of 2-3 apps or sites you use daily and enjoy looking at. What
@@ -47,11 +47,11 @@ Signs: "just make it look good", "I trust you", "whatever works."
 
 Strategy: Elimination + binary choices.
 
-- Start with: "Let me narrow it down fast. I'll give you pairs — just pick
+- Start with: "Let me narrow it down fast. I'll give you pairs - just pick
   which one feels closer to right."
 - Use contrast pairs (see section 3)
 - After 3-4 choices, you'll have enough signal to propose a direction
-- Never proceed with "I'll just pick something" — even 2 minutes of
+- Never proceed with "I'll just pick something" - even 2 minutes of
   alignment prevents hours of rework
 
 ---
@@ -71,7 +71,7 @@ When a user shares a reference, ALWAYS ask what specifically they like.
 
 If the user shares a screenshot or image:
 
-- Analyze it thoroughly — identify the design system choices visible
+- Analyze it thoroughly - identify the design system choices visible
 - Name what you observe: "I see they're using a 4-column card grid, a
   monospace font for data, a muted blue palette with orange accents..."
 - Ask: "Is this assessment of what you like accurate? Anything I'm
@@ -148,7 +148,7 @@ When the user provides brand assets or an existing site/product, extract:
 
 **Visual Identity:**
 
-- [ ] Primary brand color(s) — exact hex values
+- [ ] Primary brand color(s) - exact hex values
 - [ ] Secondary/accent colors
 - [ ] Logo: style, color variants, clear space requirements
 - [ ] Existing typography in use (check their current site/materials)
@@ -180,7 +180,7 @@ Color: Monochromatic or near-monochromatic with single accent
 Typography: One geometric sans-serif family, wide weight range
 Layout: Generous whitespace, clear visual hierarchy, alignment-focused
 Icons: Thin outlined, consistent stroke width
-Animation: Minimal — subtle fades and slides only
+Animation: Minimal - subtle fades and slides only
 References: Stripe, Linear, Vercel, Apple
 ```
 
@@ -204,7 +204,7 @@ Color: Neutral base with refined accent
 Typography: Serif for headings, humanist sans for body
 Layout: Narrow content column, strong vertical rhythm
 Icons: Minimal use, text-primary interface
-Animation: Restrained — page transitions and scroll reveals
+Animation: Restrained - page transitions and scroll reveals
 References: Medium, Substack, NYT, The Verge
 ```
 
@@ -234,4 +234,4 @@ References: Notion, Slack, Duolingo, Headspace
 
 These templates are starting points. Every project should be customized
 based on the user's specific references and requirements. Never apply a
-template wholesale — use them as conversation anchors.
+template wholesale - use them as conversation anchors.

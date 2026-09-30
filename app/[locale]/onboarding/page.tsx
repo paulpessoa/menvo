@@ -1,25 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import { MenvoDots } from "@/components/ui/menvo-loader"
+import React, { useState, useEffect, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { 
-  Users, 
-  GraduationCap, 
-  CheckCircle2, 
-  ArrowRight, 
-  ArrowLeft, 
-  Sparkles, 
-  Loader2, 
-  MapPin, 
-  Briefcase, 
-  Building2, 
-  Linkedin, 
-  Compass, 
-  Check 
-} from "lucide-react"
+import {  Users, GraduationCap, CheckCircle2, ArrowRight, ArrowLeft, Sparkles, MapPin, Briefcase, Building2, Linkedin, Compass, Check , Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -58,10 +46,29 @@ const MENTEE_GOALS = [
 ]
 
 export default function OnboardingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <MenvoDots />
+        </div>
+      }
+    >
+      <OnboardingContent />
+    </Suspense>
+  )
+}
+
+function OnboardingContent() {
   const t = useTranslations("onboarding")
   const tc = useTranslations("common")
   const router = useRouter()
   const { user, profile, role, loading, needsRoleSelection, refreshProfile, getDefaultRedirectPath } = useAuth()
+  const searchParams = useSearchParams()
+  const nextParam = searchParams.get("next")
+  // Where to go after finishing: e.g. back to /o/[slug] for a new account that
+  // came from an organization invite/join link, instead of the generic dashboard.
+  const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : null
 
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedRole, setSelectedRole] = useState<"mentee" | "mentor" | null>(null)
@@ -84,16 +91,17 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push("/login?next=/onboarding")
+        const loginNext = safeNext ? `/onboarding?next=${encodeURIComponent(safeNext)}` : "/onboarding"
+        router.push(`/login?next=${encodeURIComponent(loginNext)}`)
         return
       }
 
       // If user already has a complete role and doesn't need role selection, redirect
       if (role && !needsRoleSelection()) {
-        router.push(getDefaultRedirectPath())
+        router.push(safeNext || getDefaultRedirectPath())
       }
     }
-  }, [user, role, loading, needsRoleSelection, router, getDefaultRedirectPath])
+  }, [user, role, loading, needsRoleSelection, router, getDefaultRedirectPath, safeNext])
 
   // Prefill from existing profile if available
   useEffect(() => {
@@ -198,8 +206,11 @@ export default function OnboardingPage() {
           : t("mentee.success")
       )
 
-      // Direct to corresponding dashboard
-      if (selectedRole === "mentor") {
+      // Back to where they came from (e.g. an org's /o/[slug] page) if any,
+      // otherwise the corresponding dashboard.
+      if (safeNext) {
+        router.push(safeNext)
+      } else if (selectedRole === "mentor") {
         router.push("/dashboard/mentor")
       } else {
         router.push("/dashboard/mentee")
@@ -216,7 +227,7 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
           <p className="text-sm text-muted-foreground">{tc("loading")}</p>
         </div>
       </div>
@@ -463,7 +474,7 @@ export default function OnboardingPage() {
                         className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
                       >
                         {isDetectingLocation ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <Loader2 className="animate-spin h-4 w-4" />
                         ) : (
                           <MapPin className="h-3.5 w-3.5" />
                         )}
@@ -608,7 +619,7 @@ export default function OnboardingPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="animate-spin h-4 w-4" />
                     {t("saving")}
                   </>
                 ) : (

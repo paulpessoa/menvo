@@ -1,5 +1,4 @@
 import { SupabaseClient } from "@supabase/supabase-js"
-import { getCalendarBusyIntervals } from "@/lib/services/mentorship/google-calendar.service"
 
 export interface AvailabilitySlotResult {
   date: string
@@ -54,14 +53,6 @@ export async function computeAvailableSlots(
   const safeEnd = new Date(endDate.getTime())
   safeEnd.setHours(23, 59, 59, 999)
 
-  // Consultar compromissos no Google Calendar para bloqueio dinâmico de horários
-  const calendarBusy = await getCalendarBusyIntervals(startDate, safeEnd).catch(() => [])
-
-  const isSlotInCalendarConflict = (slotStart: Date, slotDuration: number = 45): boolean => {
-    const slotEnd = new Date(slotStart.getTime() + slotDuration * 60 * 1000)
-    return calendarBusy.some((b) => slotStart < b.end && slotEnd > b.start)
-  }
-
   while (current <= safeEnd) {
     const dayOfWeek = current.getDay()
     const dayAvailability = availability.filter((avail) => Number(avail.day_of_week) === dayOfWeek)
@@ -99,7 +90,7 @@ export async function computeAvailableSlots(
           const endTimeStr = `${endH}:${endM}:00`
 
           if (utcDate > new Date()) {
-            if (!isSlotBooked(utcDate, slotDuration) && !isSlotInCalendarConflict(utcDate, slotDuration)) {
+            if (!isSlotBooked(utcDate, slotDuration)) {
               availableSlots.push({
                 date: dateStr,
                 time: `${h}:${m}`,

@@ -10,12 +10,12 @@ const bodySchema = z.object({
 })
 
 /**
- * Permanently deletes the account behind an invite token — no login
+ * Permanently deletes the account behind an invite token - no login
  * required, LGPD art. 18 self-service. `confirm: true` is required in
  * the body (the public page has its own explicit confirmation screen
  * before calling this) and this is a POST reached only by an explicit
  * click, never by opening a link (§3.2 of the design doc). The user_id
- * comes exclusively from the resolved token, never from the request —
+ * comes exclusively from the resolved token, never from the request -
  * this endpoint cannot be pointed at an arbitrary account.
  */
 export async function POST(request: NextRequest) {

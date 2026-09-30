@@ -554,7 +554,7 @@ async function advanceToNextStep(
         analysis.mentores_sugeridos
           .map((m: any) => {
             const nomeStr = m.mentor_nome ? ` (${m.mentor_nome})` : ""
-            const statusStr = m.disponivel ? " — *Agenda disponível*" : ""
+            const statusStr = m.disponivel ? " - *Agenda disponível*" : ""
             return `• **${m.tipo}**${nomeStr}${statusStr}: ${m.razao}`
           })
           .join("\n")

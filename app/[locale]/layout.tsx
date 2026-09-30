@@ -151,16 +151,21 @@ export default async function RootLayout({
           <Providers>
             <div className="flex min-h-screen flex-col">
               <DeferredConsoleEasterEgg />
-              <Header />
+              {/* Site chrome stays off paper: printing a page (e.g. a quiz
+                  analysis) should print only its content. */}
+              <div className="contents print:hidden">
+                <Header />
+              </div>
               <main id="main-content" className="flex-1">
                 <MaintenanceGuard>
                   {children}
                 </MaintenanceGuard>
               </main>
-              <Footer />
-              <DeferredFeedbackBanner />
-
-              <DeferredCookieConsentBanner />
+              <div className="contents print:hidden">
+                <Footer />
+                <DeferredFeedbackBanner />
+                <DeferredCookieConsentBanner />
+              </div>
               <AnalyticsWrapper />
             </div>
             <Toaster />

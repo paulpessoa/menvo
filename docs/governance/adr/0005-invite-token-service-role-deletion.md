@@ -1,12 +1,12 @@
 ---
-title: "ADR 0005 — service_role para exclusão de conta via token de convite, sem login"
+title: "ADR 0005 - service_role para exclusão de conta via token de convite, sem login"
 owner: paul
 status: current
 last_reviewed: 2026-09-27
 source_of_truth: [lib/services/invites/invite-token.service.ts, lib/services/admin/delete-user.service.ts, app/api/invites/respond/route.ts, app/api/invites/delete/route.ts]
 ---
 
-# ADR 0005 — service_role para exclusão de conta via token de convite, sem login
+# ADR 0005 - service_role para exclusão de conta via token de convite, sem login
 
 - **Status:** implementado (2026-09-27).
 - **Plano:** `docs/domains/reengagement-invites.md` §3.3.
@@ -24,7 +24,7 @@ deve poder disparar a partir de um link de e-mail:
    (LGPD art. 18, VI).
 
 Nenhuma das duas é possível com um cliente autenticado por RLS, porque não
-existe uma sessão — a pessoa não fez login, só clicou em um link.
+existe uma sessão - a pessoa não fez login, só clicou em um link.
 
 ## 2. Decisão
 
@@ -36,7 +36,7 @@ e não um atalho genérico:
    (`invite-token.service.ts`, `delete-user.service.ts`), nunca espalhado
    pelas rotas ou por outro código de UI.
 2. **As rotas públicas só aceitam `{ token }`** (`POST /api/invites/respond`,
-   `POST /api/invites/delete`) — nunca um `userId` vindo do cliente. O
+   `POST /api/invites/delete`) - nunca um `userId` vindo do cliente. O
    `user_id` usado nas escritas vem exclusivamente do registro do token,
    resolvido em `resolveInviteToken()`. Isso significa que essas rotas não
    podem, mesmo com um `service_role` por trás, ser apontadas para uma
@@ -49,7 +49,7 @@ e não um atalho genérico:
 
 Comparação com o restante do produto: em todo o resto do Menvo, RLS por
 sessão é o caminho por padrão, e `service_role` só aparece em operações que
-já são, por natureza, administrativas ou de sistema — convites em massa,
+já são, por natureza, administrativas ou de sistema - convites em massa,
 aprovação de organização, jobs de retenção. Este fluxo se encaixa na mesma
 categoria (é um gatilho de e-mail que o próprio sistema originou, não uma
 ação de UI livre do usuário dentro do app), só que o "administrador" aqui é
@@ -57,13 +57,13 @@ o token, não uma sessão de admin.
 
 ## 3. Alternativas consideradas
 
-- **Fazer login automático antes de qualquer ação:** rejeitado — o
+- **Fazer login automático antes de qualquer ação:** rejeitado - o
   objetivo explícito é deixar a pessoa recusar/apagar **sem** precisar
   criar uma sessão, exatamente o cenário que a LGPD pede para ficar simples.
 - **RLS com uma policy que aceita o hash do token como credencial:**
   Postgres RLS não tem como validar um token de aplicação arbitrário sem
   reimplementar a lógica de hash/expiração dentro de SQL (`current_setting`
-  customizado, checagem de assinatura, etc.) — mais frágil e mais difícil
+  customizado, checagem de assinatura, etc.) - mais frágil e mais difícil
   de auditar do que manter a validação em TypeScript, no único lugar que já
   centraliza como o token é gerado.
 
@@ -71,5 +71,5 @@ o token, não uma sessão de admin.
 
 Qualquer revisão de código deste fluxo deve conferir que a regra 2
 continua valendo: nenhuma rota pública sob `/api/invites/*` pode ganhar um
-parâmetro que permita escolher a conta afetada — o token é sempre a única
+parâmetro que permita escolher a conta afetada - o token é sempre a única
 fonte do `user_id`.

@@ -1,9 +1,11 @@
 import { Metadata } from "next"
-import { Mail, MessageCircle, ArrowRight, HeartHandshake } from "lucide-react"
+import { Mail, MessageCircle, ArrowRight, HeartHandshake, ShieldAlert } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { getTranslations } from "next-intl/server"
+import { Link } from "@/i18n/routing"
+import { OrganizationLeadForm } from "@/components/contact/OrganizationLeadForm"
 
 export async function generateMetadata({
   params
@@ -67,77 +69,92 @@ export default async function ContactPage() {
         </p>
       </div>
 
-      {/* Channels Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        {/* Email Card */}
-        <Card className="rounded-3xl border border-primary/15 shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="p-8 pb-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-              <Mail className="w-6 h-6" />
+      {/* Organization form (left) + direct channels (right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8 items-start">
+        {/* Organization Lead Form */}
+        <Card id="organizacao" className="lg:col-span-3 rounded-3xl border border-border scroll-mt-24">
+          <CardContent className="p-6 md:p-8 space-y-6">
+            <div className="space-y-1.5">
+              <h3 className="text-xl md:text-2xl font-bold text-foreground flex items-center gap-2">
+                <HeartHandshake className="w-6 h-6 text-primary" />
+                {t("partnerships.title")}
+              </h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                {t("partnerships.description")}
+              </p>
             </div>
-            <CardTitle className="text-2xl font-bold">{t("email.title")}</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              {t("email.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-8 pt-0 space-y-6">
-            <div className="p-3.5 rounded-xl bg-muted/50 border border-border text-sm font-semibold text-foreground select-all">
-              contato@menvo.com.br
-            </div>
-            <Button asChild className="w-full rounded-full h-12 font-bold shadow-md shadow-primary/10">
-              <a href="mailto:contato@menvo.com.br?subject=Contato%20via%20Menvo">
-                <Mail className="w-4 h-4 mr-2" />
-                {t("email.action")}
-              </a>
-            </Button>
+            <OrganizationLeadForm />
           </CardContent>
         </Card>
 
-        {/* WhatsApp Card */}
-        <Card className="rounded-3xl border border-emerald-500/20 shadow-sm hover:shadow-md transition-all">
-          <CardHeader className="p-8 pb-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-4">
-              <MessageCircle className="w-6 h-6" />
-            </div>
-            <CardTitle className="text-2xl font-bold">{t("whatsapp.title")}</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              {t("whatsapp.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-8 pt-0 space-y-6">
-            <div className="p-3.5 rounded-xl bg-muted/50 border border-border text-sm font-semibold text-foreground select-all">
-              +55 (81) 99509-7377
-            </div>
-            <Button asChild variant="outline" className="w-full rounded-full h-12 font-bold border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
-              <a href="https://wa.me/5581995097377" target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                {t("whatsapp.action")}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Direct channels */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="rounded-3xl border border-primary/15 shadow-sm hover:shadow-md transition-all">
+            <CardHeader className="p-6 pb-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <Mail className="w-6 h-6" />
+              </div>
+              <CardTitle className="text-xl font-bold">{t("email.title")}</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                {t("email.description")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 pt-0 space-y-4">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border text-sm font-semibold text-foreground select-all">
+                contato@menvo.com.br
+              </div>
+              <Button asChild className="w-full rounded-full h-11 font-bold shadow-md shadow-primary/10">
+                <a href="mailto:contato@menvo.com.br?subject=Contato%20via%20Menvo">
+                  <Mail className="w-4 h-4 mr-2" />
+                  {t("email.action")}
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
 
-      {/* Info / Partnership Banner */}
-      <Card className="rounded-3xl border border-border bg-muted/30 p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="space-y-1.5 max-w-xl">
-            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <HeartHandshake className="w-5 h-5 text-primary" />
-              {t("partnerships.title")}
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {t("partnerships.description")}
-            </p>
-          </div>
-          <Button asChild variant="secondary" className="rounded-full font-bold shrink-0">
-            <a href="mailto:contato@menvo.com.br?subject=[Parceria]%20Interesse%20Institucional">
-              {t("partnerships.action")}
-            </a>
-          </Button>
+          <Card className="rounded-3xl border border-emerald-500/20 shadow-sm hover:shadow-md transition-all">
+            <CardHeader className="p-6 pb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-3">
+                <MessageCircle className="w-6 h-6" />
+              </div>
+              <CardTitle className="text-xl font-bold">{t("whatsapp.title")}</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                {t("whatsapp.description")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 pt-0 space-y-4">
+              <div className="p-3 rounded-xl bg-muted/50 border border-border text-sm font-semibold text-foreground select-all">
+                +55 (81) 99509-7377
+              </div>
+              <Button asChild variant="outline" className="w-full rounded-full h-11 font-bold border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
+                <a href="https://wa.me/5581995097377" target="_blank" rel="noopener noreferrer">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  {t("whatsapp.action")}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-3xl border border-border bg-muted/30">
+            <CardContent className="p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-primary" />
+                <h3 className="font-bold text-foreground">{t("trustSafety.title")}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t("trustSafety.description")}
+              </p>
+              <Button asChild variant="outline" className="w-full rounded-full h-11 font-bold">
+                <Link href="/support">
+                  <ShieldAlert className="w-4 h-4 mr-2" />
+                  {t("trustSafety.action")}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

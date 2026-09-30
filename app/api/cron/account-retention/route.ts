@@ -24,7 +24,7 @@ const envSchema = z.object({
  *
  * Unlike the pre-existing ai-retention/appointments crons, this route
  * fails *closed*: a missing CRON_SECRET is a 500 (misconfiguration), not
- * an open endpoint. Never weaken this to match the other crons — fix them
+ * an open endpoint. Never weaken this to match the other crons - fix them
  * instead (tracked as a P1 follow-up in the doc).
  *
  * Authentication: `Authorization: Bearer ${CRON_SECRET}`.

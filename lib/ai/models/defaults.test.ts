@@ -7,7 +7,7 @@ import { DEFAULT_MODEL_CONFIG } from "./defaults"
  * Parses the `insert into public.ai_model_config (...) values (...)` seed in
  * the migration into the same shape as `ModelChain`, so this test can prove
  * `DEFAULT_MODEL_CONFIG` (the code's built-in copy) never drifts from the
- * migration (ADR 0004 §3 — "aplicar a migração não muda comportamento").
+ * migration (ADR 0004 §3 - "aplicar a migração não muda comportamento").
  */
 function parseMigrationSeed(): Record<string, { provider: string; model: string; params: unknown; fallback: unknown }> {
   const sql = readFileSync(

@@ -5,7 +5,7 @@ import { readdirSync } from "fs"
 /**
  * `lib/ai/` is the reusable core (AI_PLATFORM_PLAN.md §1 principle 6, §10):
  * it must not import anything from `lib/services/*` or `lib/ai-menvo/*`
- * (Menvo's own domain code) — that's what makes it exportable as a template
+ * (Menvo's own domain code) - that's what makes it exportable as a template
  * for client projects. This walks every .ts file under `lib/ai/` and fails
  * if any import crosses that boundary.
  */

@@ -46,7 +46,7 @@ function toStatus(data: unknown): AiQuotaStatus {
  * Atomically takes one credit of `feature` for the logged-in user.
  *
  * Call this BEFORE the model call: the credit is what authorizes spending
- * money. Fails closed (throws) if the check itself fails — an AI call without
+ * money. Fails closed (throws) if the check itself fails - an AI call without
  * a working limit is exactly the unbounded-cost scenario this exists to stop.
  */
 export async function consumeAiQuota(

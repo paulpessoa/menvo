@@ -6,7 +6,7 @@
 
 ## 1. Informações Cadastrais da Aplicação (OAuth Consent Screen)
 
-Acesse o console em: [Google Cloud Console — Tela de Consentimento OAuth](https://console.cloud.google.com/apis/credentials/consent)
+Acesse o console em: [Google Cloud Console - Tela de Consentimento OAuth](https://console.cloud.google.com/apis/credentials/consent)
 
 | Campo | Valor Exato para Inserir |
 |---|---|

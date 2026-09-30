@@ -8,19 +8,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Lock } from "lucide-react"
+import {  Lock , Loader2 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { Separator } from "@/components/ui/separator"
 import { useTranslations } from "next-intl"
 
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import { MenvoLoader } from "@/components/ui/menvo-loader"
 
 export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <MenvoLoader />
       </div>
     }>
       <LoginFormContent />
@@ -31,14 +32,16 @@ export default function LoginPage() {
 function LoginFormContent() {
   const t = useTranslations("login")
   const tc = useTranslations("common")
-  const [email, setEmail] = useState("")
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextParam = searchParams.get("next")
+  // Pre-filled when we already know who is arriving, e.g. straight from the
+  // quiz results page after saving the analysis to a new account.
+  const [email, setEmail] = useState(() => searchParams.get("email") ?? "")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const nextParam = searchParams.get("next")
   const { signIn, signInWithProvider, user, role, loading, isInitializing, getDefaultRedirectPath } = useAuth()
 
   const isAuthenticated = !!user && !loading && !isInitializing
@@ -121,7 +124,7 @@ function LoginFormContent() {
               disabled={!!isSocialLoading || isLoading}
             >
               {isSocialLoading === "google" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="animate-spin h-4 w-4" />
               ) : (
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
@@ -153,7 +156,7 @@ function LoginFormContent() {
               disabled={!!isSocialLoading || isLoading}
             >
               {isSocialLoading === "linkedin" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="animate-spin h-4 w-4" />
               ) : (
                 <svg className="h-5 w-5" fill="#0A66C2" viewBox="0 0 24 24">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
@@ -211,7 +214,7 @@ function LoginFormContent() {
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <Loader2 className="mr-2 animate-spin h-4 w-4" />
                   {t("loggingIn")}
                 </span>
               ) : (

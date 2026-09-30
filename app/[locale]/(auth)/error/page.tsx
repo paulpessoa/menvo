@@ -1,11 +1,12 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle, RefreshCw, Loader2 } from "lucide-react"
+import { AlertCircle, RefreshCw } from "lucide-react"
 
 const errorMessages = {
   oauth_error: "Erro na autenticação com provedor externo. Tente novamente.",
@@ -26,7 +27,7 @@ export default function AuthErrorPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-[300px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <MenvoDots />
         </div>
       }
     >

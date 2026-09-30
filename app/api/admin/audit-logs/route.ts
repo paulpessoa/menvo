@@ -9,7 +9,7 @@ import { requireAdmin } from "@/lib/auth/require-admin"
 
 export async function GET(request: NextRequest) {
   try {
-    // This only checked "is logged in", not "is admin" — any mentor or
+    // This only checked "is logged in", not "is admin" - any mentor or
     // mentee could read the full admin audit trail (admin emails, full
     // names, and every action taken against every target user).
     const guard = await requireAdmin()

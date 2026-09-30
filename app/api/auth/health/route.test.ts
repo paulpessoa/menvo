@@ -21,7 +21,7 @@ describe('GET /api/auth/health', () => {
   it('returns 404 in production, without exposing OAuth provider config', async () => {
     // Regression test: this endpoint had no gate at all, so anyone could
     // curl it in production and learn which OAuth providers are
-    // configured/misconfigured — free reconnaissance about the app's infra.
+    // configured/misconfigured - free reconnaissance about the app's infra.
     // The only consumer (components/auth/oauth-validator.tsx) already
     // restricts itself to development; the route now mirrors that.
     ;(process.env as any).NODE_ENV = 'production'

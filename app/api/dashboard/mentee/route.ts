@@ -5,7 +5,7 @@ import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 /**
  * Consolidated data for the mentee dashboard: totals, the next few
  * confirmed/pending sessions, and whether a completed session is still
- * waiting for this mentee's evaluation (gates new bookings — see
+ * waiting for this mentee's evaluation (gates new bookings - see
  * `BookMentorshipModal`).
  *
  * One request instead of three separate Supabase reads from the client.

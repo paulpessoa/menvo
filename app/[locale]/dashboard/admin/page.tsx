@@ -18,11 +18,13 @@ import {
   Building2,
   TrendingUp,
   Mail,
-  UserCheck
+  UserCheck,
+  MessageSquare
 } from "lucide-react"
 import Link from "next/link"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
+import { MenvoLoader } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { PageContainer } from "@/components/layout/PageContainer"
@@ -61,7 +63,7 @@ export default function AdminDashboard() {
 
   // Same endpoint (/api/admin/stats) the "Aguardando" tab in
   // /dashboard/admin/users and the queue in /dashboard/admin/verifications
-  // are built from — one query per number, no ad hoc counting here, so the
+  // are built from - one query per number, no ad hoc counting here, so the
   // card and what you find after clicking "Acessar" always agree.
   const fetchStats = async () => {
     try {
@@ -119,13 +121,34 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/emails",
       icon: Mail,
       color: "bg-teal-600"
+    },
+    {
+      title: "Gestão de Feedbacks",
+      description: "Moderação e avaliações da plataforma, IA e sessões",
+      href: "/dashboard/admin/feedbacks",
+      icon: MessageSquare,
+      color: "bg-blue-600"
+    },
+    {
+      title: "Organizações interessadas",
+      description: "Pedidos do formulário 'Quero a Menvo na minha organização'",
+      href: "/dashboard/admin/org-leads",
+      icon: Building2,
+      color: "bg-indigo-600"
+    },
+    {
+      title: "Organizações ativas",
+      description: "Gestão das organizações parceiras da Menvo",
+      href: "/dashboard/admin/organizations",
+      icon: Building2,
+      color: "bg-emerald-600"
     }
   ]
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <MenvoLoader />
       </div>
     )
   }

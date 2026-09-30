@@ -53,11 +53,18 @@ export default function QuizPage() {
       })
 
       router.push(`/quiz/results/${res.id}`)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting quiz:", error)
+      const code = error?.code
+      const title = code === "email_limit"
+        ? t('quiz_form.submit_error_email_limit_title')
+        : code === "budget"
+          ? t('quiz_form.submit_error_budget_title')
+          : t('quiz_form.submit_error_title')
+      const description = error?.message || t('quiz_form.submit_error_description')
       toast({
-        title: t('quiz_form.submit_error_title'),
-        description: t('quiz_form.submit_error_description'),
+        title,
+        description,
         variant: "destructive"
       })
     }
@@ -152,6 +159,9 @@ export default function QuizPage() {
 
               <p className="text-xs text-center text-muted-foreground">
                 {t('quiz_page.responses_confidential')}
+              </p>
+              <p className="text-xs text-center text-muted-foreground">
+                {t('quiz_page.usage_limit_note')}
               </p>
             </CardContent>
           </Card>

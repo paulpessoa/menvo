@@ -18,7 +18,7 @@ const ACTION_TO_RESPONSE = {
 
 /**
  * The only write a reengagement invite link can trigger without a login
- * — and only from a POST the recipient explicitly clicked, never from
+ * - and only from a POST the recipient explicitly clicked, never from
  * just opening the page (see docs/domains/reengagement-invites.md §3.2).
  * Deletion has its own endpoint (/api/invites/delete) with an extra
  * confirmation step, since it's the one irreversible action here.
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
-    // accept / accept_mentor: hand the recipient a fresh recovery link —
+    // accept / accept_mentor: hand the recipient a fresh recovery link -
     // generated on click, so it's never stale even if the invite e-mail
     // sat unread for weeks (unlike the token in the URL, this link still
     // only lives a few hours, but the person is using it right now).

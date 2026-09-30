@@ -15,19 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Loader2,
-  Save,
-  Shield,
-  User,
-  Camera,
-  Upload,
-  GraduationCap,
-  ExternalLink,
-  MailCheck,
-  Trash2,
-  Info
-} from "lucide-react"
+import {  Save, Shield, User, Camera, Upload, GraduationCap, ExternalLink, MailCheck, Trash2, Info , Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 import { type AdminUserUpdate } from "@/lib/services/admin/admin.service"
@@ -207,7 +195,7 @@ export function EditUserModal({
                   className="gap-2"
                 >
                   {imageUpload.isUploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="animate-spin h-4 w-4" />
                   ) : (
                     <Upload className="h-4 w-4" />
                   )}
@@ -435,7 +423,7 @@ export function EditUserModal({
             <p className="text-[11px] text-blue-700 italic flex items-center gap-1">
               <Shield className="h-3 w-3" /> Alterar papéis concede ou remove
               acesso a áreas privadas instantaneamente. Para tornar alguém
-              mentor, prefira &quot;Aprovar como mentor&quot; abaixo — ele também
+              mentor, prefira &quot;Aprovar como mentor&quot; abaixo - ele também
               publica o perfil e avisa a pessoa.
             </p>
           </div>
@@ -542,7 +530,7 @@ export function EditUserModal({
             </details>
           </div>
 
-          {/* Candidatura a mentor — decisões vão por /api/admin/verify */}
+          {/* Candidatura a mentor - decisões vão por /api/admin/verify */}
           <MentorApplicationPanel
             userId={user.id}
             status={user.verification_status ?? null}
@@ -586,7 +574,7 @@ export function EditUserModal({
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                  <Loader2 className="mr-2 animate-spin h-4 w-4" />{" "}
                   Processando...
                 </>
               ) : (

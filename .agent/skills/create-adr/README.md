@@ -1,14 +1,14 @@
 # ADR Creator
 
-A skill for AI coding agents that creates Architecture Decision Records (ADRs) — concise, durable documents that capture the context, decision, and consequences of significant architectural choices so future engineers understand *why* things are the way they are.
+A skill for AI coding agents that creates Architecture Decision Records (ADRs) - concise, durable documents that capture the context, decision, and consequences of significant architectural choices so future engineers understand *why* things are the way they are.
 
 ## What It Does
 
 This skill guides AI agents to create well-structured ADRs in three industry-standard formats:
 
-- **MADR** (Markdown Architectural Decision Records) — structured with options comparison, recommended for most teams
-- **Nygard** — minimal original format: Context / Decision / Consequences
-- **Y-Statement** — single-paragraph compact format for inline documentation
+- **MADR** (Markdown Architectural Decision Records) - structured with options comparison, recommended for most teams
+- **Nygard** - minimal original format: Context / Decision / Consequences
+- **Y-Statement** - single-paragraph compact format for inline documentation
 
 The skill automatically:
 
@@ -18,12 +18,12 @@ The skill automatically:
 - Enforces naming conventions (`001-kebab-case-title.md`)
 - Links superseded/superseding ADRs correctly
 
-## ADR vs RFC — Which One Do You Need?
+## ADR vs RFC - Which One Do You Need?
 
 | Question | Use |
 |----------|-----|
 | Should we do X? Which option? | **RFC** |
-| We've decided — document it for future engineers | **ADR** |
+| We've decided - document it for future engineers | **ADR** |
 | Need approval from leadership before acting | **RFC** |
 | Need to preserve the rationale of a past choice | **ADR** |
 
@@ -50,7 +50,7 @@ Escreva um ADR para documentar a decisão de usar PostgreSQL
 Escribe un ADR sobre la decisión de usar microservicios
 ```
 
-### With Rich Context (faster — skips most questions)
+### With Rich Context (faster - skips most questions)
 
 ```
 Write an ADR for adopting GraphQL over REST for our public API.
@@ -140,8 +140,8 @@ accepting **the operational overhead of an additional managed service**.
 ## What the Agent Will Ask (if context is missing)
 
 **About the decision:**
-- What was decided? (noun phrase — e.g., "Use PostgreSQL for primary storage")
-- What is the current status — Accepted, Proposed, Deprecated, or Superseded?
+- What was decided? (noun phrase - e.g., "Use PostgreSQL for primary storage")
+- What is the current status - Accepted, Proposed, Deprecated, or Superseded?
 
 **About the context:**
 - What situation or forces led to this decision?
@@ -162,13 +162,13 @@ accepting **the operational overhead of an additional managed service**.
 
 Every ADR includes:
 
-1. **Title** — noun phrase recording the decision (not a question)
-2. **Metadata** — date, status, deciders, tags
-3. **Context** — the forces and constraints that made this decision necessary
-4. **Decision** — what was chosen and why, with honest rationale
-5. **Consequences** — positive and negative consequences of this choice
-6. **Options** (MADR) — alternatives considered with pros/cons per option
-7. **Links** — related ADRs, RFCs, tickets, and supersession relationships
+1. **Title** - noun phrase recording the decision (not a question)
+2. **Metadata** - date, status, deciders, tags
+3. **Context** - the forces and constraints that made this decision necessary
+4. **Decision** - what was chosen and why, with honest rationale
+5. **Consequences** - positive and negative consequences of this choice
+6. **Options** (MADR) - alternatives considered with pros/cons per option
+7. **Links** - related ADRs, RFCs, tickets, and supersession relationships
 
 ## File Naming Convention
 
@@ -216,7 +216,7 @@ Common directory locations: `docs/adr/`, `docs/decisions/`, `adr/`, `.adr/`
 
 ### 4. Always supersede, never edit
 
-When a decision changes, create a new ADR and mark the old one as superseded. This preserves the historical context — the old decision was correct *given what was known at the time*.
+When a decision changes, create a new ADR and mark the old one as superseded. This preserves the historical context - the old decision was correct *given what was known at the time*.
 
 ### 5. Keep it short
 
@@ -236,10 +236,10 @@ Target 200–500 words. If the decision needs extensive explanation, link to the
 
 ### Not ideal for an ADR
 
-- Decisions not yet made — use **RFC** to drive the decision first
-- Implementation plans — use **TDD** for how to build something
+- Decisions not yet made - use **RFC** to drive the decision first
+- Implementation plans - use **TDD** for how to build something
 - Trivial choices (naming conventions, minor config values)
-- Exploratory spikes — write up findings separately, then record the decision in an ADR
+- Exploratory spikes - write up findings separately, then record the decision in an ADR
 
 ## Language Support
 
@@ -257,7 +257,7 @@ All section headers and content are automatically generated in the detected lang
 2. **Link** from the relevant code, PR, or RFC that triggered it
 3. **Update** your ADR index (`docs/adr/README.md`) if you maintain one
 4. **Reference** the ADR in PR descriptions when implementing the decision
-5. **Supersede** it with a new ADR if the decision changes — never edit the old one
+5. **Supersede** it with a new ADR if the decision changes - never edit the old one
 
 ## Support
 

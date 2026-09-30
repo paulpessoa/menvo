@@ -5,7 +5,7 @@
  * registry (chain resolution) and LangChain (model instances +
  * `withFallbacks`/`withStructuredOutput`). Rather than instantiating real
  * provider SDKs, `./factory` is mocked with tiny fake Runnables that record
- * how they were assembled — this proves the wiring in `index.ts` itself:
+ * how they were assembled - this proves the wiring in `index.ts` itself:
  * which spec became the primary, which became fallbacks, and in what order.
  */
 import { AiModelUnavailableError } from "./types"

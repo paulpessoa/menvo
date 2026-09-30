@@ -11,6 +11,37 @@ import { requireAdmin } from "@/lib/auth/require-admin"
 /**
  * API para Gestão e Moderação de Feedbacks (Admin)
  */
+
+/**
+ * GET /api/admin/feedbacks - avaliações pendentes de moderação. Movido de
+ * `adminService.getPendingFeedbacks`, que consultava `appointment_feedbacks`
+ * direto do navegador (docs/COMMUNITY_CONTACT_PLAN.md §13).
+ */
+export async function GET() {
+  try {
+    const guard = await requireAdmin()
+    if (!guard.ok) return guard.response
+
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from("appointment_feedbacks")
+      .select(`
+        id, rating, comment, status, created_at,
+        mentee:profiles!reviewer_id(full_name, avatar_url),
+        mentor:profiles!reviewed_id(full_name, avatar_url)
+      `)
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+
+    if (error) throw error
+
+    return successResponse(data || [])
+  } catch (error) {
+    return handleApiError(error)
+  }
+}
+
 export async function PATCH(request: NextRequest) {
   try {
     const guard = await requireAdmin()

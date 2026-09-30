@@ -1,7 +1,8 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useMemo } from "react"
-import { Calendar, Loader2 } from "lucide-react"
+import { Calendar } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/routing"
@@ -21,7 +22,7 @@ interface MentorshipBoardProps {
  * "Requer sua ação" → "Próximas sessões" → "Histórico".
  *
  * Why perspective-aware: the same appointment means different work for each
- * side — a pending request is the mentor's to answer but the mentee's to wait
+ * side - a pending request is the mentor's to answer but the mentee's to wait
  * on; a finished session is the mentee's to evaluate but history for the mentor.
  */
 export function MentorshipBoard({ perspective }: MentorshipBoardProps) {
@@ -39,7 +40,7 @@ export function MentorshipBoard({ perspective }: MentorshipBoardProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <MenvoDots />
         <p className="text-sm">{t("loading")}</p>
       </div>
     )

@@ -5,7 +5,7 @@ import type { ModelChain } from "./types"
 
 /**
  * Turns raw `ai_model_config` rows into a `ModelChain` for one capability.
- * Pure — no I/O, no Supabase client — so it's trivial to unit test every edge
+ * Pure - no I/O, no Supabase client - so it's trivial to unit test every edge
  * case in ADR 0004 §5's table without a database.
  *
  * Falls back to `DEFAULT_MODEL_CONFIG[capability]` (source: "default") when:

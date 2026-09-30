@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { adminService } from "@/lib/services/admin/admin.service"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -51,7 +50,9 @@ export function AdminFeedbackModeration() {
 
   const fetchPendingFeedbacks = async () => {
     try {
-      const data = await adminService.getPendingFeedbacks()
+      const response = await fetch('/api/admin/feedbacks')
+      if (!response.ok) throw new Error("Erro ao buscar avaliações pendentes")
+      const { data } = await response.json()
       setFeedbacks((data as unknown as AdminFeedback[]) || [])
     } catch (err) {
       console.error("Error fetching feedbacks:", err)

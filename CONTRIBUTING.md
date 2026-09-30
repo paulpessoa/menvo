@@ -63,6 +63,22 @@ We enforce Conventional Commits:
 
 ---
 
+## ✍️ Content & UX Writing Contributions (no coding needed)
+
+You don't need to run the project to improve Menvo's copy. All UI text lives in three files:
+
+- `messages/pt-BR.json` (source of truth)
+- `messages/en.json`
+- `messages/es.json`
+
+To suggest a change, open one of these files on GitHub, click the pencil icon, edit the text and choose **"Propose changes"**. GitHub creates the fork and the Pull Request for you. Keep the JSON keys untouched and change only the values; placeholders such as `{name}` must stay as they are.
+
+Some screens still have text written directly in the components instead of in these files. If you find one, open an issue with a screenshot and your suggested wording, and we will move it into `messages/`.
+
+Larger reviews (tone of voice, glossary, a whole flow) are welcome as an issue first, so we can agree on the scope before anyone edits many files.
+
+---
+
 ## 💬 Getting Help & Communication
 
 - **Official Website:** [https://www.menvo.com.br](https://www.menvo.com.br)

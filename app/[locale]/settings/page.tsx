@@ -109,10 +109,17 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     try {
-      // Implementar lógica de deletar conta
+      const res = await fetch("/api/profile/delete", {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        throw new Error("Falha ao excluir conta")
+      }
+
       toast({
-        title: t("dangerZone.deleteButton"),
-        description: t("dangerZone.confirmDesc")
+        title: "Conta excluída",
+        description: "Seus dados foram apagados com sucesso."
       })
       await signOut()
     } catch (error) {

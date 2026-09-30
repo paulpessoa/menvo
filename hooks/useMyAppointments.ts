@@ -24,7 +24,7 @@ const appointmentSchema = z
 
 const responseSchema = z.object({ appointments: z.array(appointmentSchema) })
 
-/** Upper bound per perspective — history beyond this isn't useful on this screen. */
+/** Upper bound per perspective - history beyond this isn't useful on this screen. */
 const FETCH_LIMIT = 100
 
 async function fetchAppointments(role: Perspective): Promise<AppointmentCardData[]> {

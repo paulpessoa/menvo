@@ -51,15 +51,10 @@ export interface UserProfile {
   is_public: boolean
   timezone?: string | null
 
-  // Provenance — "menvo" for organic signups, "jotform" for the historical
+  // Provenance - "menvo" for organic signups, "jotform" for the historical
   // JotForm base migrated into profiles (original_data holds the raw
   // JotForm answer payload for that case)
   origin_platform?: string | null
-
-  // True when this profile's email also has a row in `waiting_list`
-  // (someone who joined the pre-launch/interest waitlist independently of
-  // creating a site account). Cross-referenced by GET /api/admin/users.
-  in_waiting_list?: boolean
 }
 
 /**

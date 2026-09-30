@@ -1,8 +1,9 @@
 'use client';
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Loader2 } from 'lucide-react';
+import { Calendar } from "lucide-react";
 import { AppointmentWithProfiles } from '@/lib/types/models/mentorship';
 import { toast } from 'sonner';
 import { AppointmentCard } from './appointment-card';
@@ -61,7 +62,7 @@ export default function AppointmentsList({
     if (authLoading || (loading && appointments.length === 0)) {
         return (
             <div className="flex flex-col items-center justify-center py-12 gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <MenvoDots />
                 <p className="text-sm text-muted-foreground">{t("loading")}</p>
             </div>
         );

@@ -20,7 +20,7 @@ export type MentorReviewDraft = z.infer<typeof mentorReviewDraftSchema>
 
 /**
  * Only what the drafts need. Email and CV/LinkedIn URLs never reach the
- * model provider (LGPD data minimization) — presence flags are enough to
+ * model provider (LGPD data minimization) - presence flags are enough to
  * judge completeness.
  */
 export interface MentorApplication {
@@ -134,7 +134,7 @@ export interface DraftMentorReviewOptions {
 
 /**
  * Drafts one admin communication for a mentor application plus a short
- * assessment. The output is always a draft: nothing here sends it — the
+ * assessment. The output is always a draft: nothing here sends it - the
  * admin edits it and submits through /api/admin/verify.
  */
 export async function draftMentorReview(

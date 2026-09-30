@@ -8,11 +8,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "common" })
+  const tHowItWorks = await getTranslations({ locale, namespace: "howItWorks" })
 
   const path = locale === "pt-BR" ? "/how-it-works" : `/${locale}/how-it-works`
   const title = `${t("howItWorks") || "Como Funciona"} | Menvo`
-  const description =
-    "Entenda como funciona a plataforma Menvo para mentores e mentorados. Conexões gratuitas de desenvolvimento profissional."
+  const description = tHowItWorks("metaDescription")
 
   return {
     title,

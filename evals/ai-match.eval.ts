@@ -1,6 +1,6 @@
 /**
  * Eval for lib/services/ai/match.service.ts (capability "rank" in the model
- * registry, ADR 0004) — the real network calls, not a mock. Run manually
+ * registry, ADR 0004) - the real network calls, not a mock. Run manually
  * (costs a handful of real LLM calls); never wired into `npm test`. Answers
  * the question the codebase had no way to answer before: "did this
  * prompt/model change make the match better or worse?"
@@ -15,7 +15,7 @@ import { createClient } from "@supabase/supabase-js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// .env.local isn't loaded automatically outside Next.js — do it manually,
+// .env.local isn't loaded automatically outside Next.js - do it manually,
 // the same minimal parser used by scripts/_audit_*.mjs in this session.
 const envPath = resolve(__dirname, "..", ".env.local")
 try {
@@ -27,7 +27,7 @@ try {
     if (key && !(key in process.env)) process.env[key] = value
   }
 } catch {
-  console.warn(`[eval] Could not read ${envPath} — relying on already-set env vars.`)
+  console.warn(`[eval] Could not read ${envPath} - relying on already-set env vars.`)
 }
 
 async function main() {
@@ -36,13 +36,13 @@ async function main() {
   const { cases } = await import("./ai-match.cases.mjs")
 
   if (!process.env.OPENAI_API_KEY && !process.env.OPEN_AI_KEY && !process.env.GROQ_API_KEY) {
-    console.error("[eval] No OPENAI_API_KEY/OPEN_AI_KEY or GROQ_API_KEY set — nothing to eval against a real model.")
+    console.error("[eval] No OPENAI_API_KEY/OPEN_AI_KEY or GROQ_API_KEY set - nothing to eval against a real model.")
     process.exit(1)
   }
 
   // Anonymous client: ai_model_config is unreadable without a session (RLS),
   // so this resolves to the same DEFAULT_MODEL_CONFIG production falls back
-  // to when the table is empty — exactly what an eval should measure.
+  // to when the table is empty - exactly what an eval should measure.
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
   type Row = {

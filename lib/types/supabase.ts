@@ -522,6 +522,7 @@ export type Database = {
           notes_mentee: string | null
           notes_mentor: string | null
           organization_id: string | null
+          pending_reminder_sent_at: string | null
           reminded_at: string | null
           requested_date: string | null
           requested_end_time: string | null
@@ -560,6 +561,7 @@ export type Database = {
           notes_mentee?: string | null
           notes_mentor?: string | null
           organization_id?: string | null
+          pending_reminder_sent_at?: string | null
           reminded_at?: string | null
           requested_date?: string | null
           requested_end_time?: string | null
@@ -598,6 +600,7 @@ export type Database = {
           notes_mentee?: string | null
           notes_mentor?: string | null
           organization_id?: string | null
+          pending_reminder_sent_at?: string | null
           reminded_at?: string | null
           requested_date?: string | null
           requested_end_time?: string | null
@@ -1239,6 +1242,51 @@ export type Database = {
           },
         ]
       }
+      organization_leads: {
+        Row: {
+          id: string
+          org_name: string
+          org_type: string
+          contact_name: string
+          contact_email: string
+          contact_phone: string | null
+          people_estimate: string
+          message: string | null
+          locale: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_name: string
+          org_type: string
+          contact_name: string
+          contact_email: string
+          contact_phone?: string | null
+          people_estimate: string
+          message?: string | null
+          locale?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_name?: string
+          org_type?: string
+          contact_name?: string
+          contact_email?: string
+          contact_phone?: string | null
+          people_estimate?: string
+          message?: string | null
+          locale?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           contact_email: string | null
@@ -1759,44 +1807,52 @@ export type Database = {
         }
         Relationships: []
       }
-      waiting_list: {
+      user_reports: {
         Row: {
-          approved_at: string | null
-          approved_by: string | null
-          created_at: string | null
-          email: string
           id: string
-          name: string
-          reason: string | null
-          status: string | null
-          updated_at: string | null
-          whatsapp: string | null
+          reporter_id: string
+          reported_email: string | null
+          category: string
+          description: string
+          evidence_paths: string[] | null
+          status: string
+          admin_notes: string | null
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string | null
-          email: string
           id?: string
-          name: string
-          reason?: string | null
-          status?: string | null
-          updated_at?: string | null
-          whatsapp?: string | null
+          reporter_id: string
+          reported_email?: string | null
+          category: string
+          description: string
+          evidence_paths?: string[] | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          approved_at?: string | null
-          approved_by?: string | null
-          created_at?: string | null
-          email?: string
           id?: string
-          name?: string
-          reason?: string | null
-          status?: string | null
-          updated_at?: string | null
-          whatsapp?: string | null
+          reporter_id?: string
+          reported_email?: string | null
+          category?: string
+          description?: string
+          evidence_paths?: string[] | null
+          status?: string
+          admin_notes?: string | null
+          created_at?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {
@@ -2120,7 +2176,37 @@ export type Database = {
         }
         Returns: undefined
       }
-      sync_waiting_list_status: { Args: never; Returns: undefined }
+      quiz_submission_status: {
+        Args: { p_email: string }
+        Returns: string
+      }
+      get_shared_diagnostics_for_mentor: {
+        Args: { p_share_id?: string | null }
+        Returns: {
+          share_id: string
+          quiz_response_id: string | null
+          diagnostic_session_id: string | null
+          scope: string
+          created_at: string
+          mentee_id: string
+          mentee_full_name: string | null
+          mentee_avatar_url: string | null
+          analysis: Json | null
+          development_areas: string[] | null
+          current_challenge: string | null
+          future_vision: string | null
+          career_moment: string | null
+          personal_life_help: string | null
+        }[]
+      }
+      owns_quiz_response: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
+      owns_diagnostic_session: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       hub_resource_status: "pending" | "published" | "rejected" | "archived"

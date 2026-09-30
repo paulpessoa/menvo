@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
-import { CheckCircle2, Lightbulb, Loader2 } from "lucide-react"
+import {  CheckCircle2, Lightbulb , Loader2 } from "lucide-react"
 
 import {
   mentorSuggestionSchema,
@@ -38,7 +38,7 @@ interface SuggestMentorModalProps {
 
 /**
  * Captures demand the catalog can't serve yet. Opened from the empty state of
- * /mentors, so it arrives pre-filled with the search term and active filters —
+ * /mentors, so it arrives pre-filled with the search term and active filters -
  * the less the person has to retype, the more likely they finish.
  */
 export function SuggestMentorModal({ isOpen, onClose, initialTopic = "", context }: SuggestMentorModalProps) {
@@ -170,7 +170,7 @@ export function SuggestMentorModal({ isOpen, onClose, initialTopic = "", context
                   {t("cancel")}
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSubmitting && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                   {isSubmitting ? t("submitting") : t("submit")}
                 </Button>
               </div>

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { MenvoDots } from "@/components/ui/menvo-loader";
+
 
 export default function ConfirmAppointmentPage() {
     const searchParams = useSearchParams();
@@ -57,7 +59,7 @@ export default function ConfirmAppointmentPage() {
             <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
                 {status === 'loading' && (
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <MenvoDots className="justify-center mb-6" />
                         <h2 className="text-xl font-semibold text-gray-900 mb-2">
                             {t('title')}
                         </h2>
@@ -87,7 +89,7 @@ export default function ConfirmAppointmentPage() {
                         </h2>
                         <p className="text-gray-600 mb-6">{message}</p>
                         <button
-                            onClick={() => router.push('/mentorship/mentor')}
+                            onClick={() => router.push('/mentorship/mentor#upcoming')}
                             className="w-full bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
                         >
                             {t('viewAppointment')}

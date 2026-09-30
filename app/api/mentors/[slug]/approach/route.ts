@@ -8,7 +8,7 @@ interface RouteParams {
 
 /**
  * Returns a mentor's "Abordagem de Mentoria" / "O que esperar" texts.
- * Only for authenticated users — these are not part of the public mentor
+ * Only for authenticated users - these are not part of the public mentor
  * profile payload (mentors/[slug]/page.tsx), so a logged-out visitor or a
  * crawler never receives them.
  */

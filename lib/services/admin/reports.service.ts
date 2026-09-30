@@ -1,5 +1,3 @@
-import { createClient } from "@/lib/utils/supabase/client"
-
 export interface TimeSeriesData {
     date: string
     count: number
@@ -16,55 +14,24 @@ export interface AdminStats {
   }
 }
 
+/**
+ * Client-side wrapper around GET /api/admin/reports. Used to query
+ * `profiles`/`user_roles` straight from the browser
+ * (docs/COMMUNITY_CONTACT_PLAN.md §13); kept as a thin fetch layer with the
+ * same method names so /dashboard/admin/reports didn't need to change.
+ */
 export const adminReportsService = {
-  /**
-   * Busca dados históricos de novos usuários
-   */
   async getUserGrowth(startDate: string = "2020-01-01"): Promise<TimeSeriesData[]> {
-    const supabase = createClient()
-    
-    const { data, error } = await (supabase
-      .from('profiles')
-      .select('created_at')
-      .gte('created_at', startDate)
-      .order('created_at', { ascending: true }) as any)
-
-    if (error) throw error
-
-    // Agrupar por Dia para períodos curtos, ou Mês para períodos longos
-    const counts: Record<string, number> = {}
-    
-    data.forEach((profile: any) => {
-        if (!profile?.created_at) return
-        const date = new Date(profile.created_at)
-        if (isNaN(date.getTime())) return
-        const dateKey = date.toISOString().split('T')[0] // YYYY-MM-DD
-        counts[dateKey] = (counts[dateKey] || 0) + 1
-    })
-
-    return Object.entries(counts).map(([date, count]) => ({
-        date,
-        count
-    })).sort((a, b) => a.date.localeCompare(b.date))
+    const res = await fetch(`/api/admin/reports?since=${encodeURIComponent(startDate)}`)
+    if (!res.ok) throw new Error("Erro ao carregar crescimento de usuários")
+    const { growth } = await res.json()
+    return growth.users
   },
 
-  async getDashboardStats(): Promise<AdminStats['overview']> {
-    const supabase = createClient()
-
-    const [
-      { count: totalUsers },
-      { count: totalMentors },
-      { count: totalMentees }
-    ] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      supabase.from('user_roles').select('*, roles!inner(name)', { count: 'exact', head: true }).eq('roles.name', 'mentor'),
-      supabase.from('user_roles').select('*, roles!inner(name)', { count: 'exact', head: true }).eq('roles.name', 'mentee')
-    ])
-
-    return {
-      totalUsers: totalUsers || 0,
-      totalMentors: totalMentors || 0,
-      totalMentees: totalMentees || 0
-    }
+  async getDashboardStats(): Promise<AdminStats["overview"]> {
+    const res = await fetch("/api/admin/reports")
+    if (!res.ok) throw new Error("Erro ao carregar estatísticas")
+    const { overview } = await res.json()
+    return overview
   }
 }

@@ -1,6 +1,7 @@
 
 'use client';
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -11,10 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
-import {
-  Loader2, RefreshCw, Save, Plus, Trash2, History, Tag,
-  AlertTriangle, CheckCircle2, XCircle, Info, Shield, Search
-} from 'lucide-react';
+import {  RefreshCw, Save, Plus, Trash2, History, Tag, AlertTriangle, CheckCircle2, XCircle, Info, Shield, Search , Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -229,7 +227,7 @@ export default function AdminFeatureFlagsPage() {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
                 <Button onClick={createFlag} disabled={isCreating}>
-                  {isCreating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                  {isCreating ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : <Save className="h-4 w-4 mr-2" />}
                   Salvar
                 </Button>
               </DialogFooter>
@@ -280,7 +278,7 @@ export default function AdminFeatureFlagsPage() {
           )}
 
           {loading ? (
-            <div className="flex justify-center py-20 bg-muted/10 rounded-xl border border-dashed"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
+            <div className="flex justify-center py-20 bg-muted/10 rounded-xl border border-dashed"><MenvoDots /></div>
           ) : filteredFlags.length === 0 ? (
             <p className="text-muted-foreground text-center py-10">
               {flags.length === 0 ? 'Nenhuma feature flag criada ainda.' : 'Nenhuma flag encontrada para esse filtro.'}

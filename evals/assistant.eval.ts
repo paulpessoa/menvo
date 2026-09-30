@@ -1,6 +1,6 @@
 /**
  * Eval for the assistant agent (lib/services/assistant/agent.ts, capability
- * "converse" in the model registry, ADR 0004) — the real network calls, not
+ * "converse" in the model registry, ADR 0004) - the real network calls, not
  * a mock. Run manually (costs a handful of real LLM calls); never wired into
  * `npm test`.
  *
@@ -86,10 +86,10 @@ async function runEval(label: string) {
 
 async function main() {
   delete process.env.AI_FORCE_FALLBACK
-  const primaryOk = await runEval("converse — primary model")
+  const primaryOk = await runEval("converse - primary model")
 
   process.env.AI_FORCE_FALLBACK = "converse"
-  const fallbackOk = await runEval("converse — forced fallback")
+  const fallbackOk = await runEval("converse - forced fallback")
   delete process.env.AI_FORCE_FALLBACK
 
   if (!primaryOk || !fallbackOk) process.exitCode = 1

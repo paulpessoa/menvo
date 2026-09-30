@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         // vaza agendamentos de terceiros), mas o embed profiles!mentor_id /
         // profiles!mentee_id do PostgREST aplica a RLS de `profiles` na OUTRA
         // ponta do agendamento. Se essa pessoa não tiver o perfil marcado como
-        // público, o embed silenciosamente vira `null` em vez de dar erro —
+        // público, o embed silenciosamente vira `null` em vez de dar erro -
         // e o ChatButton client-side quebra a página inteira lendo
         // `otherPerson.full_name` de null. Ter marcado um horário juntos já
         // autoriza cada lado a ver o nome/avatar básico do outro.

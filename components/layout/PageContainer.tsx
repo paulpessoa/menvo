@@ -6,11 +6,11 @@ export type PageContainerSize = "default" | "7xl" | "6xl" | "5xl" | "4xl" | "3xl
 export interface PageContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Largura máxima do container:
-   * - "default" / "7xl": max-w-7xl (1280px) — padrão da aplicação
+   * - "default" / "7xl": max-w-7xl (1280px) - padrão da aplicação
    * - "6xl": max-w-6xl (1152px)
    * - "5xl": max-w-5xl (1024px)
    * - "4xl": max-w-4xl (896px)
-   * - "3xl": max-w-3xl (768px) — recomendado para páginas textuais (termos, privacidade)
+   * - "3xl": max-w-3xl (768px) - recomendado para páginas textuais (termos, privacidade)
    * - "full": max-w-full (sem limite de largura)
    */
   size?: PageContainerSize

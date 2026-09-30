@@ -4,7 +4,7 @@ export interface OrgDashboardMember {
   userId: string
   role: "admin" | "member"
   status: "invited" | "requested" | "active"
-  /** Derived from user_roles — never a separate membership field (roadmap §6, Q1). */
+  /** Derived from user_roles - never a separate membership field (roadmap §6, Q1). */
   platformRole: "mentor" | "mentee" | null
   joinedAt: string
   fullName: string | null
@@ -33,7 +33,7 @@ export interface OrgDashboard {
 
 /**
  * Everything `/dashboard/org` needs: org info, its members with their
- * derived platform role (mentor/mentee — never a separate field, see
+ * derived platform role (mentor/mentee - never a separate field, see
  * roadmap §6 Q1) and per-role stats, and aggregate counts. Pulled out of
  * the route handler so it's a plain function other callers (MCP tools,
  * an eventual assistant) can reuse without going through HTTP.
@@ -73,7 +73,7 @@ export async function getOrgDashboard(
       ? supabase.from("appointments").select("mentor_id").in("mentor_id", memberIds)
       : Promise.resolve({ data: [] as { mentor_id: string }[] }),
     // quiz_responses has no direct-select policy any more (RLS audit,
-    // STATUS.md 2026-09-23) — org admins see "did the quiz?" only through
+    // STATUS.md 2026-09-23) - org admins see "did the quiz?" only through
     // this security-definer RPC, which checks is_org_admin() itself and
     // never exposes another member's raw quiz answers.
     memberEmails.length

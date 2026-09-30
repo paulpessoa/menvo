@@ -68,6 +68,12 @@ function getNotificationIcon(type: NotificationType) {
           <Star className="h-4 w-4 fill-amber-500" />
         </div>
       )
+    case "session_starting_soon":
+      return (
+        <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-500 flex items-center justify-center shrink-0">
+          <CalendarClock className="h-4 w-4 animate-pulse" />
+        </div>
+      )
   }
 }
 

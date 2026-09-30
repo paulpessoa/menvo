@@ -160,7 +160,7 @@ describe('POST /api/profile/role', () => {
 
   it('never writes a "user_role" column to profiles', async () => {
     // Regression test: profiles has no `user_role` column (confirmed
-    // against the live schema — PostgREST returns PGRST204 "Could not find
+    // against the live schema - PostgREST returns PGRST204 "Could not find
     // the 'user_role' column"). Including it in the update payload makes
     // PostgREST reject the WHOLE update, which made this endpoint fail
     // with 500 for every single user completing onboarding. The real role
@@ -259,7 +259,7 @@ describe('POST /api/profile/role', () => {
     // (user_id, role_id) (its primary key is a synthetic `id`), so
     // `.upsert(..., { onConflict: "user_id,role_id" })` fails outright with
     // Postgres error 42P10 ("no unique or exclusion constraint matching the
-    // ON CONFLICT specification") — confirmed directly against the live
+    // ON CONFLICT specification") - confirmed directly against the live
     // database. The fix checks for an existing row first and only inserts
     // when one isn't found, so this must not insert when it already exists.
     const userRolesInsert = jest.fn().mockResolvedValue({ error: null })

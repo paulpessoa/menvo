@@ -1,5 +1,6 @@
 "use client"
 
+import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,9 +26,8 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Calendar, User, CheckCircle, XCircle, Eye, Loader2, ArrowLeft, Search } from "lucide-react"
+import { Calendar, User, CheckCircle, XCircle, Eye, ArrowLeft, Search } from "lucide-react"
 import { useAuth } from "@/lib/auth"
-import { VerificationService } from "@/lib/services/verifications/verifications.service"
 import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
 import type { Verification } from "@/lib/types/models/verification"
 import { toast } from "sonner"
@@ -45,7 +45,9 @@ export default function AdminVerificationsPage() {
   const loadVerifications = useCallback(async () => {
     try {
       if (user?.id) {
-        const data = await VerificationService.getPendingVerifications(user.id)
+        const response = await fetch("/api/admin/verifications/pending")
+        if (!response.ok) throw new Error("Erro ao carregar verificações pendentes")
+        const { verifications: data } = await response.json()
         setVerifications(data)
       }
     } catch (error) {
@@ -83,7 +85,7 @@ export default function AdminVerificationsPage() {
       // rather than the client-side VerificationService: approving a
       // mentor request also has to assign the "mentor" role in user_roles
       // for a DIFFERENT user than the admin, which needs a service-role
-      // write — see processVerification in notification.service.ts.
+      // write - see processVerification in notification.service.ts.
       await submitVerification(verificationId, "approved", undefined, message)
       toast.success("Mentor aprovado com sucesso!")
       loadVerifications()
@@ -125,7 +127,7 @@ export default function AdminVerificationsPage() {
   if (loading) {
     return (
       <PageContainer className="flex flex-col items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+        <MenvoDots className="mb-3" />
         <p className="text-muted-foreground">Carregando verificações de mentores...</p>
       </PageContainer>
     )
@@ -376,7 +378,7 @@ function VerificationDetails({ verification }: { verification: Verification }) {
             <Label htmlFor="resume" className="text-sm cursor-pointer">
               {verification.cv_url ? (
                 <a href={verification.cv_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  Currículo enviado — ver PDF
+                  Currículo enviado - ver PDF
                 </a>
               ) : (
                 "Currículo não enviado"

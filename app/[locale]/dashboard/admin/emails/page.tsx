@@ -15,24 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { PageContainer } from "@/components/layout/PageContainer"
-import {
-  Mail,
-  Smartphone,
-  Monitor,
-  ExternalLink,
-  ArrowLeft,
-  CheckCircle,
-  UserCheck,
-  Star,
-  CalendarX,
-  Bell,
-  Send,
-  Loader2,
-  AlertCircle,
-  Building2,
-  UserPlus,
-  BadgeCheck
-} from "lucide-react"
+import {  Mail, Smartphone, Monitor, ExternalLink, ArrowLeft, CheckCircle, UserCheck, Star, CalendarX, Bell, Send, AlertCircle, Building2, UserPlus, BadgeCheck , Loader2 } from "lucide-react"
 
 interface EmailTemplateMeta {
   key: string
@@ -328,7 +311,7 @@ export default function AdminEmailPreviewPage() {
               >
                 {isSending ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Disparando via Brevo...
+                    <Loader2 className="animate-spin h-4 w-4" /> Disparando via Brevo...
                   </>
                 ) : (
                   <>

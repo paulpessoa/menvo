@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import { Sparkles, Loader2 } from "lucide-react"
+import {  Sparkles , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { MentorReviewDraftPanel, type MentorReviewDraft, type ReviewKind } from "./MentorReviewDraftPanel"
 
@@ -27,7 +27,7 @@ const TAB_LABEL: Record<ReviewKind, string> = {
  * AI-assisted drafting for a mentor application: an assessment (strengths,
  * gaps, recommendation) plus an editable message for approval, a request
  * for changes, or a LinkedIn announcement post. Never sends anything on
- * its own — approval/rejection still goes through the parent's handlers,
+ * its own - approval/rejection still goes through the parent's handlers,
  * and "Divulgação" only copies the text to the clipboard.
  */
 export function MentorReviewAssistant({
@@ -127,7 +127,7 @@ export function MentorReviewAssistant({
               </div>
 
               <Button onClick={generate} disabled={loading} size="sm">
-                {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                {loading ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : <Sparkles className="h-4 w-4 mr-2" />}
                 Gerar
               </Button>
 

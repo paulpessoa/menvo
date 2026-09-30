@@ -11,7 +11,7 @@ import { MentorshipBoard } from "./MentorshipBoard"
  * Mentee mentorship screen: the lifecycle board (action → upcoming → history)
  * plus a short "how sessions work" guide.
  *
- * The old static hero ("você tem uma sessão agendada em breve") was removed —
+ * The old static hero ("você tem uma sessão agendada em breve") was removed -
  * it showed even with zero sessions. The board's NextSessionCard now shows the
  * real next session, only when one exists.
  */

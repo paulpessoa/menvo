@@ -140,79 +140,127 @@ describe("DiagnosticSharesService", () => {
   })
 
   describe("listSharesForMentor", () => {
-    it("omits personal_life_help when scope is summary", async () => {
-      const sharesData = [
-        {
-          id: "share-1",
-          mentor_id: "mentor-1",
-          mentee_id: "mentee-1",
-          quiz_response_id: "quiz-1",
-          scope: "summary",
-          created_at: "2026-09-24T12:00:00Z",
-          revoked_at: null
-        }
-      ]
+    // The row shape `get_shared_diagnostics_for_mentor` returns. It already
+    // has personal_life_help blanked for a 'summary' share, and carries no
+    // name/e-mail/LinkedIn at all - see migration 20260930000001.
+    const summaryRow = {
+      share_id: "share-1",
+      quiz_response_id: "quiz-1",
+      diagnostic_session_id: null,
+      scope: "summary",
+      created_at: "2026-09-24T12:00:00Z",
+      mentee_id: "mentee-1",
+      mentee_full_name: "Ana Mentorada",
+      mentee_avatar_url: "https://example.com/avatar.jpg",
+      analysis: {
+        titulo_personalizado: "Liderança com Propósito",
+        resumo_motivador: "Você tem grande clareza.",
+        mentores_sugeridos: [],
+        conselhos_praticos: ["Foque em delegação"],
+        proximos_passos: ["Conversar com mentores"],
+        areas_desenvolvimento: ["Liderança"],
+        mensagem_final: "Voe alto!"
+      },
+      development_areas: ["Liderança"],
+      current_challenge: "Transição para liderança tech",
+      future_vision: "Ser CTO em 3 anos",
+      career_moment: "transicao",
+      personal_life_help: null
+    }
 
-      const menteesData = [
-        {
-          id: "mentee-1",
-          full_name: "Ana Mentorada",
-          avatar_url: "https://example.com/avatar.jpg"
-        }
-      ]
-
-      const quizData = [
-        {
-          id: "quiz-1",
-          current_challenge: "Transição para liderança tech",
-          future_vision: "Ser CTO em 3 anos",
-          personal_life_help: "Segredo pessoal muito sensível",
-          ai_analysis: {
-            titulo_personalizado: "Liderança com Propósito",
-            resumo_motivador: "Você tem grande clareza.",
-            mentores_sugeridos: [],
-            conselhos_praticos: ["Foque em delegação"],
-            proximos_passos: ["Conversar com mentores"],
-            areas_desenvolvimento: ["Liderança"],
-            mensagem_final: "Voe alto!"
-          }
-        }
-      ]
-
-      const supabase = {
-        from: jest.fn().mockImplementation((table: string) => {
-          if (table === "diagnostic_shares") {
-            return {
-              select: jest.fn().mockReturnThis(),
-              eq: jest.fn().mockReturnThis(),
-              is: jest.fn().mockReturnThis(),
-              order: jest.fn().mockResolvedValue({ data: sharesData, error: null })
-            }
-          }
-          if (table === "profiles") {
-            return {
-              select: jest.fn().mockReturnThis(),
-              in: jest.fn().mockResolvedValue({ data: menteesData, error: null })
-            }
-          }
-          if (table === "quiz_responses") {
-            return {
-              select: jest.fn().mockReturnThis(),
-              in: jest.fn().mockResolvedValue({ data: quizData, error: null })
-            }
-          }
-          return {}
+    function makeRpcClient(rows: any[]) {
+      return {
+        rpc: jest.fn().mockResolvedValue({ data: rows, error: null }),
+        // Reading these tables directly is exactly what the RPC replaced;
+        // touching them here should fail loudly.
+        from: jest.fn(() => {
+          throw new Error("mentor reads must go through the RPC")
         })
       } as any
+    }
+
+    it("reads through the scope-enforcing RPC, not quiz_responses", async () => {
+      const supabase = makeRpcClient([summaryRow])
 
       const results = await service.listSharesForMentor(supabase, "mentor-1")
 
+      expect(supabase.rpc).toHaveBeenCalledWith("get_shared_diagnostics_for_mentor", {
+        p_share_id: null
+      })
+      expect(supabase.from).not.toHaveBeenCalled()
       expect(results).toHaveLength(1)
       expect(results[0].mentee.fullName).toBe("Ana Mentorada")
       expect(results[0].currentChallenge).toBe("Transição para liderança tech")
+      expect(results[0].analysis?.titulo_personalizado).toBe("Liderança com Propósito")
       // Privacy invariant: personal_life_help must be NULL for summary scope
       expect(results[0].personalLifeHelp).toBeNull()
-      expect(results[0].analysis?.titulo_personalizado).toBe("Liderança com Propósito")
+    })
+
+    it("passes through personal_life_help when the share is full", async () => {
+      const supabase = makeRpcClient([
+        { ...summaryRow, scope: "full", personal_life_help: "Segredo pessoal muito sensível" }
+      ])
+
+      const results = await service.listSharesForMentor(supabase, "mentor-1")
+
+      expect(results[0].scope).toBe("full")
+      expect(results[0].personalLifeHelp).toBe("Segredo pessoal muito sensível")
+    })
+
+    it("never exposes the mentee's name, e-mail or LinkedIn beyond the profile name", async () => {
+      const supabase = makeRpcClient([summaryRow])
+
+      const results = await service.listSharesForMentor(supabase, "mentor-1")
+
+      const serialized = JSON.stringify(results[0])
+      expect(serialized).not.toContain("@")
+      expect(serialized).not.toContain("linkedin")
+    })
+  })
+
+  describe("getSharedDiagnosticForMentor", () => {
+    it("asks the RPC for that one share", async () => {
+      const supabase = {
+        rpc: jest.fn().mockResolvedValue({
+          data: [
+            {
+              share_id: "share-9",
+              quiz_response_id: "quiz-9",
+              diagnostic_session_id: null,
+              scope: "summary",
+              created_at: "2026-09-24T12:00:00Z",
+              mentee_id: "mentee-9",
+              mentee_full_name: "Ana",
+              mentee_avatar_url: null,
+              analysis: null,
+              development_areas: null,
+              current_challenge: null,
+              future_vision: null,
+              career_moment: null,
+              personal_life_help: null
+            }
+          ],
+          error: null
+        })
+      } as any
+
+      const result = await service.getSharedDiagnosticForMentor(supabase, "mentor-1", "share-9")
+
+      expect(supabase.rpc).toHaveBeenCalledWith("get_shared_diagnostics_for_mentor", {
+        p_share_id: "share-9"
+      })
+      expect(result?.shareId).toBe("share-9")
+      expect(result?.developmentAreas).toEqual([])
+    })
+
+    it("returns null for a share that is revoked or belongs to another mentor", async () => {
+      const supabase = {
+        rpc: jest.fn().mockResolvedValue({ data: [], error: null })
+      } as any
+
+      const result = await service.getSharedDiagnosticForMentor(supabase, "mentor-1", "share-x")
+
+      expect(result).toBeNull()
     })
   })
 })

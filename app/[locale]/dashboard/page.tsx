@@ -4,6 +4,7 @@ import { useRouter } from "@/i18n/routing"
 import { useEffect } from "react"
 import { AuthGuard } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
+import { MenvoLoader } from "@/components/ui/menvo-loader"
 
 export default function Dashboard() {
   const { user, role, loading, isInitializing } = useAuth()
@@ -30,7 +31,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <MenvoLoader />
     </div>
   )
 }
