@@ -18,6 +18,11 @@ import {
   mentorshipUtils
 } from "@/lib/services/mentorship/mentorship.service"
 import { toast } from "sonner"
+import {
+  MENTORSHIP_REASON_MAX_LENGTH,
+  MENTORSHIP_REASON_MIN_LENGTH,
+  MENTORSHIP_REASON_REQUIRED_MESSAGE
+} from "@/lib/schemas/appointment"
 
 interface BookingFormProps {
   mentorId: string
@@ -38,6 +43,8 @@ export default function BookingForm({
   )
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
+  const reasonLength = message.trim().length
+  const hasValidReason = reasonLength >= MENTORSHIP_REASON_MIN_LENGTH
   const [fetchingSlots, setFetchingSlots] = useState(true)
 
   // Fetch available slots
@@ -72,6 +79,11 @@ export default function BookingForm({
       return
     }
 
+    if (!hasValidReason) {
+      toast.error(MENTORSHIP_REASON_REQUIRED_MESSAGE)
+      return
+    }
+
     try {
       setLoading(true)
 
@@ -90,7 +102,7 @@ export default function BookingForm({
           mentor_id: mentorId,
           scheduled_at: scheduledAt.toISOString(),
           duration_minutes: 60,
-          message: message.trim() || undefined
+          notes_mentee: message.trim()
         })
       })
 
@@ -223,15 +235,27 @@ export default function BookingForm({
             htmlFor="message"
             className="text-sm font-medium text-muted-foreground uppercase tracking-wider"
           >
-            O que você quer discutir?
+            O que você quer discutir? *
           </Label>
           <Textarea
             id="message"
             placeholder="Ex: Gostaria de dicas para meu primeiro emprego na área..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            maxLength={MENTORSHIP_REASON_MAX_LENGTH}
+            required
+            aria-required="true"
+            aria-describedby="message-counter"
             className="mt-2 min-h-[100px] bg-muted/30 border-none focus-visible:ring-primary"
           />
+          <p
+            id="message-counter"
+            className={`text-xs ${hasValidReason ? "text-emerald-600 font-semibold" : "text-amber-600"}`}
+          >
+            {hasValidReason
+              ? "Motivo informado"
+              : `Mínimo de ${MENTORSHIP_REASON_MIN_LENGTH} caracteres: ${reasonLength}/${MENTORSHIP_REASON_MIN_LENGTH}. O mentor lê este texto antes de aceitar.`}
+          </p>
         </div>
 
         {/* Actions */}
@@ -248,7 +272,7 @@ export default function BookingForm({
           )}
           <Button
             onClick={handleBooking}
-            disabled={!selectedSlot || loading}
+            disabled={!selectedSlot || !hasValidReason || loading}
             className="flex-1 shadow-lg shadow-primary/20"
           >
             {loading ? (

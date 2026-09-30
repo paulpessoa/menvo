@@ -18,7 +18,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const parsed = createAppointmentSchema.safeParse(body)
+    // `message` é o nome que o BookingForm sempre enviou; aceitar como alias para
+    // o motivo não ser descartado em silêncio.
+    const parsed = createAppointmentSchema.safeParse({
+      ...body,
+      notes_mentee: body?.notes_mentee ?? body?.message
+    })
 
     if (!parsed.success) {
       const errorMessage = parsed.error.issues[0]?.message || "Dados de agendamento inválidos"
@@ -62,7 +67,7 @@ export async function POST(request: NextRequest) {
         mentorName: appointment.mentor.full_name,
         menteeName: appointment.mentee.full_name,
         scheduledAt: appointment.scheduled_at,
-        message: appointment.notes_mentee || "Nenhuma mensagem enviada.",
+        message: appointment.notes_mentee,
         token: actionToken
       })
       console.log("✅ [CREATE APPOINTMENT] Email enviado para o mentor:", appointment.mentor.email)

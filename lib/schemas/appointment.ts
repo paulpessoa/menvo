@@ -1,11 +1,26 @@
 import { z } from "zod"
 
+/**
+ * Motivo do pedido de mentoria: é o que o mentor lê no e-mail de confirmação e
+ * no convite do calendário, então sem ele o mentor recebe um pedido sem contexto.
+ */
+export const MENTORSHIP_REASON_MIN_LENGTH = 20
+export const MENTORSHIP_REASON_MAX_LENGTH = 1000
+
+export const MENTORSHIP_REASON_REQUIRED_MESSAGE = `Informe o motivo da mentoria (mínimo de ${MENTORSHIP_REASON_MIN_LENGTH} caracteres)`
+
+export const mentorshipReasonSchema = z
+  .string({ required_error: MENTORSHIP_REASON_REQUIRED_MESSAGE })
+  .trim()
+  .min(MENTORSHIP_REASON_MIN_LENGTH, MENTORSHIP_REASON_REQUIRED_MESSAGE)
+  .max(MENTORSHIP_REASON_MAX_LENGTH, `O motivo não pode exceder ${MENTORSHIP_REASON_MAX_LENGTH} caracteres`)
+
 export const createAppointmentSchema = z.object({
   mentor_id: z.string().uuid("ID do mentor inválido"),
   scheduled_at: z.string().datetime({ message: "Data/hora de agendamento em formato ISO inválido" }),
   duration_minutes: z.coerce.number().int().min(15).max(180).default(60),
   mentorship_topics: z.array(z.string()).default([]),
-  notes_mentee: z.string().max(1000, "Notas não podem exceder 1000 caracteres").optional().default("")
+  notes_mentee: mentorshipReasonSchema
 })
 
 export type CreateAppointmentInput = z.infer<typeof createAppointmentSchema>
