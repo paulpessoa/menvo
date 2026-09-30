@@ -44,6 +44,7 @@ interface QuizResponse {
     id: string
     ai_analysis: AnalysisResult
     processed_at: string
+    is_owner?: boolean
 }
 
 // Printing: show only the result (no site header, footer or floating widgets)
@@ -79,6 +80,7 @@ export default function QuizResultsPage() {
     const [response, setResponse] = useState<QuizResponse | null>(null)
     const [mentorSlugMap, setMentorSlugMap] = useState<Record<string, string>>({})
     const [mentorIdMap, setMentorIdMap] = useState<Record<string, string>>({})
+    const [isOwner, setIsOwner] = useState(false)
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
     const [copied, setCopied] = useState(false)
 
@@ -139,6 +141,7 @@ export default function QuizResultsPage() {
             }
 
             setResponse(res)
+            setIsOwner(res.is_owner === true)
 
             // Resolve real mentor profile slugs if available
             const mentorNames = (res.ai_analysis?.mentores_sugeridos || [])
@@ -237,7 +240,7 @@ export default function QuizResultsPage() {
         <div className="bg-gradient-to-b from-accent/70 via-background to-background print:bg-none">
             <style>{PRINT_STYLES}</style>
 
-            <article id="quiz-result" className="mx-auto max-w-3xl px-4 pb-16 pt-10 md:pt-14">
+            <article id="quiz-result" className="mx-auto max-w-5xl px-4 pb-16 pt-10 md:pt-14">
                 {/* Headline */}
                 <header className="border-b pb-8">
                     <p className="text-sm font-semibold uppercase tracking-wider text-primary">
@@ -292,13 +295,15 @@ export default function QuizResultsPage() {
                         <Section
                             title={t("quiz_results.suggested_mentors")}
                             action={
-                                <Button size="sm" className="rounded-xl gap-2 print:hidden" onClick={() => setIsShareModalOpen(true)}>
-                                    <Send className="h-4 w-4" />
-                                    {t("quiz_results.share_with_mentor")}
-                                </Button>
+                                isOwner ? (
+                                    <Button size="sm" className="rounded-xl gap-2 print:hidden" onClick={() => setIsShareModalOpen(true)}>
+                                        <Send className="h-4 w-4" />
+                                        {t("quiz_results.share_with_mentor")}
+                                    </Button>
+                                ) : undefined
                             }
                         >
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {analysis.mentores_sugeridos.map((mentor, index) => {
                                     const name = mentor.mentor_nome?.trim()
                                     const slug = name ? mentorSlugMap[name.toLowerCase()] : null
@@ -422,13 +427,15 @@ export default function QuizResultsPage() {
                 </footer>
             </article>
 
-            <ShareDiagnosticModal
-                isOpen={isShareModalOpen}
-                onClose={() => setIsShareModalOpen(false)}
-                quizResponseId={response.id}
-                suggestedMentors={analysis.mentores_sugeridos}
-                mentorIdMap={mentorIdMap}
-            />
+            {isOwner && (
+                <ShareDiagnosticModal
+                    isOpen={isShareModalOpen}
+                    onClose={() => setIsShareModalOpen(false)}
+                    quizResponseId={response.id}
+                    suggestedMentors={analysis.mentores_sugeridos}
+                    mentorIdMap={mentorIdMap}
+                />
+            )}
         </div>
     )
 }
