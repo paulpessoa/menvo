@@ -597,7 +597,8 @@
     "sdgs": "Objetivos de Desenvolvimento Sustentável",
     "allRightsReserved": "Todos os direitos reservados.",
     "openSource": "Código aberto",
-    "contribute": "Contribua no GitHub"
+    "contribute": "Contribua no GitHub",
+    "reportAndSupport": "Denunciar / Segurança"
   },
   "donate": {
     "hero": {
@@ -1766,7 +1767,8 @@
       "practical_steps": "Plano de Ação",
       "practical_steps_description": "Receba direcionamento prático e próximos passos claros para acelerar sua trajetória profissional",
       "start_quiz": "Começar Questionário",
-      "responses_confidential": "Suas respostas nos ajudarão a entender melhor as necessidades dos participantes e a recrutar mentores voluntários nas áreas mais procuradas. Além de contribuir para construir uma comunidade de mentoria mais forte e acessível."
+      "responses_confidential": "Suas respostas nos ajudarão a entender melhor as necessidades dos participantes e a recrutar mentores voluntários nas áreas mais procuradas. Além de contribuir para construir uma comunidade de mentoria mais forte e acessível.",
+      "usage_limit_note": "Você pode fazer até 3 análises por e-mail a cada 30 dias."
     },
     "quiz_form": {
       "back": "Voltar",
@@ -1835,7 +1837,9 @@
       "submit_success_title": "Questionário enviado!",
       "submit_success_description": "Aguarde enquanto processamos sua análise...",
       "submit_error_title": "Erro ao enviar",
-      "submit_error_description": "Ocorreu um erro ao enviar o questionário. Tente novamente."
+      "submit_error_description": "Ocorreu um erro ao enviar o questionário. Tente novamente.",
+      "submit_error_email_limit_title": "Limite de análises atingido",
+      "submit_error_budget_title": "Análises indisponíveis no momento"
     },
     "quiz_results": {
       "processing_analysis": "Processando sua análise...",
@@ -1847,30 +1851,45 @@
       "personalized_analysis": "Análise Personalizada",
       "suggested_mentors": "Mentores Sugeridos para Você",
       "based_on_interests": "Baseado nas suas áreas de interesse e objetivos",
-      "mentor_status_tooltip": "💡 <strong>Status dos Mentores:</strong> Mostramos mentores reais da plataforma baseados no seu perfil. \"Disponível\" = aceita novos mentorados | \"Agenda lotada\" = temporariamente ocupado",
-      "available": "Disponível",
-      "full_schedule": "Agenda lotada",
+      "mentor_status_tooltip": "💡 Mostramos mentores reais da plataforma baseados no seu perfil.",
       "mentor": "Mentor",
+      "view_mentor_profile": "Ver Perfil do Mentor",
+      "explore_mentors": "Explorar Mentores",
+      "explore_all_mentors": "Explorar Todos os Mentores na Plataforma",
       "practical_advice": "Conselhos Práticos",
       "next_steps": "Próximos Passos",
       "development_areas": "Áreas de Desenvolvimento",
       "final_message_potential_mentor": "Você tem potencial para ser mentor!",
       "final_message_potential_mentor_description": "Identificamos que você tem interesse em compartilhar conhecimento. Considere se cadastrar como mentor voluntário na plataforma MENVO.",
+      "ai_disclaimer": "Esta análise foi gerada por inteligência artificial a partir das suas respostas. Use-a como ponto de partida para refletir sobre sua carreira, não como um diagnóstico definitivo.",
       "share_results": "Compartilhar Resultados",
       "share_results_description": "Envie sua análise por email ou compartilhe com amigos",
       "send_by_email": "Enviar por Email",
       "sending": "Enviando...",
+      "print": "Imprimir",
+      "share_with_mentor": "Compartilhar com Mentor",
       "whatsapp": "WhatsApp",
       "linkedin": "LinkedIn",
       "potential_analysis_title": "🎯 Minha Análise de Potencial - MENVO",
-      "potential_analysis_whatsapp_message": "Acabei de fazer uma análise personalizada no RecnPlay e descobri meu potencial de crescimento!\n\nVeja meu resultado: {currentUrl}\n\nConheça o MENVO - plataforma gratuita de mentoria: https://menvo.com.br",
-      "potential_analysis_linkedin_message": "Acabei de fazer uma análise de potencial no MENVO e descobri insights incríveis sobre meu crescimento profissional! \n\nVeja meu resultado: {currentUrl}\n\nConheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores voluntários.\n\n#MENVO #Mentoria #DesenvolvimentoProfissional #RecnPlay2025",
+      "potential_analysis_whatsapp_message": "Acabei de fazer uma análise personalizada de carreira na MENVO e descobri meu potencial de crescimento!\n\nVeja meu resultado: {currentUrl}\n\nConheça o MENVO - plataforma gratuita de mentoria: https://menvo.com.br",
+      "potential_analysis_linkedin_message": "Acabei de fazer uma análise de potencial na MENVO e descobri insights incríveis sobre meu crescimento profissional! \n\nVeja meu resultado: {currentUrl}\n\nConheça o MENVO - plataforma gratuita de mentoria que conecta jovens a mentores voluntários.\n\n#MENVO #Mentoria #DesenvolvimentoProfissional",
       "email_sent_toast_title": "Email enviado!",
       "email_sent_toast_description": "Verifique sua caixa de entrada.",
       "error_sending_email_toast_title": "Erro ao enviar email",
       "error_sending_email_toast_description": "Tente novamente mais tarde.",
       "error_loading_results_toast_title": "Erro",
-      "error_loading_results_toast_description": "Não foi possível carregar os resultados."
+      "error_loading_results_toast_description": "Não foi possível carregar os resultados.",
+      "save_analysis_banner_title": "Guarde esta análise na sua conta",
+      "save_analysis_banner_description": "Crie uma senha para salvar esta análise no seu painel e acessá-la quando quiser.",
+      "save_analysis_password_placeholder": "Crie uma senha (mín. 6 caracteres)",
+      "save_analysis_button": "Salvar análise e criar conta",
+      "save_analysis_saving": "Criando conta...",
+      "save_analysis_success": "Conta criada! Você já pode entrar com este e-mail.",
+      "save_analysis_go_to_login": "Ir para o login",
+      "save_analysis_account_exists_title": "Você já tem uma conta",
+      "save_analysis_account_exists_description": "Entre com este e-mail para acessar sua análise a qualquer momento.",
+      "save_analysis_account_exists_button": "Entrar na minha conta",
+      "save_analysis_error": "Não foi possível criar sua conta. Tente novamente."
     },
     "quiz_flow": {
       "how_it_works": "Como funciona o Quiz"
@@ -1893,6 +1912,11 @@
     "partnerships": {
       "title": "Quero a Menvo na minha organização",
       "description": "ONGs, empresas, escolas e eventos: conte um pouco sobre sua organização e nossa equipe entra em contato por e-mail."
+    },
+    "trustSafety": {
+      "title": "Precisa denunciar algo ou pedir ajuda urgente?",
+      "description": "Use nossa Central de Confiança e Segurança para relatar comportamento inadequado ou problemas na plataforma.",
+      "action": "Ir para a Central de Confiança e Segurança"
     },
     "organizationForm": {
       "fields": {

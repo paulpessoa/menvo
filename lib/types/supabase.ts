@@ -2176,6 +2176,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      quiz_submission_status: {
+        Args: { p_email: string }
+        Returns: string
+      }
+      owns_quiz_response: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
+      owns_diagnostic_session: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       hub_resource_status: "pending" | "published" | "rejected" | "archived"

@@ -31,9 +31,21 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
     return NextResponse.json({ error: "Resultado não encontrado" }, { status: 404 })
   }
 
+  // Owner-only actions (sharing with a mentor) need to know whether the
+  // viewer is the person who took the quiz - the link itself is public.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  let isOwner = false
+  if (user) {
+    const { data: owns } = await supabase.rpc("owns_quiz_response", { p_id: row.id })
+    isOwner = owns === true
+  }
+
   return NextResponse.json({
     id: row.id,
     processed_at: row.processed_at,
     ai_analysis: (row.ai_analysis as unknown as QuizAnalysisResult) || null,
+    is_owner: isOwner,
   })
 }

@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/utils/supabase/server"
 import { checkRateLimit } from "@/lib/rate-limit"
+import { sendQuizResultsEmailFor } from "@/lib/services/quiz/quiz-email.service"
 
 /**
- * POST /api/quiz/[id]/send-email - re-sends the quiz results by e-mail
- * (invokes the `send-quiz-email` Edge Function, which reads the row with
- * the service role and mails whatever address the person submitted).
- * Replaces `quizService.sendResultsEmail`, which invoked the Edge Function
- * straight from the browser (docs/COMMUNITY_CONTACT_PLAN.md §13).
+ * POST /api/quiz/[id]/send-email - re-sends the quiz results by e-mail (the
+ * first one goes out automatically when the analysis finishes, see
+ * `/api/quiz/[id]/analyze`).
  *
  * No session required - same as the results page itself, the `id` (a UUID)
  * is the only credential, and the e-mail only ever goes to the address on
  * that row. Rate-limited per id so the "resend" button can't be used to
  * spam that address.
  */
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function POST(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params
   if (!id) {
     return NextResponse.json({ error: "id é obrigatório" }, { status: 400 })
@@ -25,13 +23,15 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return NextResponse.json({ error: "Muitas tentativas. Tente novamente em alguns minutos." }, { status: 429 })
   }
 
-  const supabase = await createClient()
-  const { error } = await supabase.functions.invoke("send-quiz-email", {
-    body: { responseId: id },
-  })
+  const outcome = await sendQuizResultsEmailFor(id)
 
-  if (error) {
-    console.error("[POST /api/quiz/[id]/send-email] Erro ao enviar e-mail:", error.message)
+  if (outcome === "not_found") {
+    return NextResponse.json({ error: "Resultado não encontrado" }, { status: 404 })
+  }
+  if (outcome === "not_ready") {
+    return NextResponse.json({ error: "A análise ainda não está pronta" }, { status: 409 })
+  }
+  if (outcome === "failed") {
     return NextResponse.json({ error: "Não foi possível enviar o e-mail" }, { status: 500 })
   }
 

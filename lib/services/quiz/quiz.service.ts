@@ -75,7 +75,9 @@ class QuizService {
 
     const data = await res.json().catch(() => ({}))
     if (!res.ok) {
-      throw new Error(data?.error || "Não foi possível enviar o questionário")
+      const error = new Error(data?.error || "Não foi possível enviar o questionário") as Error & { code?: string }
+      error.code = data?.code
+      throw error
     }
 
     return data as { id: string }
@@ -108,6 +110,54 @@ class QuizService {
       const data = await res.json().catch(() => ({}))
       throw new Error(data?.error || "Não foi possível enviar o e-mail")
     }
+  }
+
+  /**
+   * Checks whether the `?k=` link token from the results e-mail can still be
+   * used to create an account for this quiz response - or whether an account
+   * for that e-mail already exists.
+   *
+   * @param responseId - UUID of the quiz response
+   * @param token - the `k` query param from the results e-mail link
+   */
+  async checkAccountLinkStatus(
+    responseId: string,
+    token: string
+  ): Promise<{ status: "claimable" | "exists"; email: string } | null> {
+    try {
+      const res = await fetch(`/api/quiz/${responseId}/account?k=${encodeURIComponent(token)}`)
+      if (!res.ok) return null
+      return await res.json()
+    } catch (err) {
+      console.error("[QuizService] Unexpected error checking account link:", err)
+      return null
+    }
+  }
+
+  /**
+   * Creates an account for the quiz response's e-mail using the signed `k`
+   * token from the results e-mail link, so the analysis can be saved to a
+   * real account with a password the person chooses here.
+   *
+   * @param responseId - UUID of the quiz response
+   * @param token - the `k` query param from the results e-mail link
+   * @param password - the password the person chose
+   */
+  async createAccountFromResults(responseId: string, token: string, password: string): Promise<{ email: string }> {
+    const res = await fetch(`/api/quiz/${responseId}/account`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, password })
+    })
+
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      const error = new Error(data?.error || "Não foi possível criar sua conta") as Error & { status?: string }
+      error.status = data?.status
+      throw error
+    }
+
+    return data as { email: string }
   }
 }
 

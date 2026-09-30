@@ -34,11 +34,21 @@ const validPayload = {
   personal_life_help: 'Gostaria de equilibrar melhor estudo e trabalho.'
 }
 
-function makeSupabaseMock(insertError: unknown = null, userId: string | null = null) {
+function makeSupabaseMock(
+  insertError: unknown = null,
+  userId: string | null = null,
+  submissionStatus = 'ok',
+  userEmail = 'account@example.com'
+) {
   const insert = jest.fn().mockResolvedValue({ error: insertError })
   return {
     from: jest.fn().mockReturnValue({ insert }),
-    auth: { getUser: jest.fn().mockResolvedValue({ data: { user: userId ? { id: userId } : null } }) }
+    rpc: jest.fn().mockResolvedValue({ data: submissionStatus, error: null }),
+    auth: {
+      getUser: jest.fn().mockResolvedValue({
+        data: { user: userId ? { id: userId, email: userEmail } : null }
+      })
+    }
   }
 }
 
@@ -160,6 +170,57 @@ describe('POST /api/quiz', () => {
       new URL(`http://localhost:3000/api/quiz/${body.id}/analyze`),
       { method: 'POST' }
     )
+  })
+
+  it('uses the account e-mail for a logged-in caller, not the one typed in the form', async () => {
+    const supabase = makeSupabaseMock(null, 'user-123', 'ok', 'Real@Account.com')
+    ;(createClient as jest.Mock).mockResolvedValue(supabase)
+
+    const req = new Request('http://localhost:3000/api/quiz', {
+      method: 'POST',
+      body: JSON.stringify({ ...validPayload, email: 'someone-else@example.com' })
+    })
+
+    const res = await POST(req as any)
+    expect(res.status).toBe(200)
+
+    const insertedRow = (supabase.from('quiz_responses').insert as jest.Mock).mock.calls[0][0]
+    expect(insertedRow.email).toBe('real@account.com')
+    expect(supabase.rpc).toHaveBeenCalledWith('quiz_submission_status', { p_email: 'real@account.com' })
+  })
+
+  it('returns 429 without inserting when the e-mail already used its analyses', async () => {
+    const supabase = makeSupabaseMock(null, null, 'email_limit')
+    ;(createClient as jest.Mock).mockResolvedValue(supabase)
+
+    const req = new Request('http://localhost:3000/api/quiz', {
+      method: 'POST',
+      body: JSON.stringify(validPayload)
+    })
+
+    const res = await POST(req as any)
+    const body = await res.json()
+
+    expect(res.status).toBe(429)
+    expect(body.code).toBe('email_limit')
+    expect(supabase.from).not.toHaveBeenCalled()
+  })
+
+  it('returns 503 without inserting when the monthly AI budget is exhausted', async () => {
+    const supabase = makeSupabaseMock(null, null, 'budget')
+    ;(createClient as jest.Mock).mockResolvedValue(supabase)
+
+    const req = new Request('http://localhost:3000/api/quiz', {
+      method: 'POST',
+      body: JSON.stringify(validPayload)
+    })
+
+    const res = await POST(req as any)
+    const body = await res.json()
+
+    expect(res.status).toBe(503)
+    expect(body.code).toBe('budget')
+    expect(supabase.from).not.toHaveBeenCalled()
   })
 
   it('returns 500 when the insert fails', async () => {

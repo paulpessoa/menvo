@@ -139,14 +139,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href="https://github.com/paulpessoa/menvo"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/support"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  {t("footer.openSource")}
-                </a>
+                  {t("footer.reportAndSupport")}
+                </Link>
               </li>
             </ul>
           </div>

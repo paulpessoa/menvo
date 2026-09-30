@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
 import { analyzeQuiz, type AnalysisMentor, type QuizAnswers } from "@/lib/ai-menvo/diagnostic/analyze"
+import { sendQuizResultsEmailFor } from "@/lib/services/quiz/quiz-email.service"
 
 // gemini-2.5-flash took ~10s for one analysis in a real run (2026-09-23);
 // the platform default could kill the function after claiming the row but
@@ -100,6 +101,14 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
   }
 
   await recordAiCalls(supabase, "quiz_analysis", calls)
+
+  // The claim above guarantees this runs once per analysis, so the e-mail
+  // goes out exactly once without the person having to ask for it.
+  if (!saveError) {
+    await sendQuizResultsEmailFor(id).catch((emailError) => {
+      console.error("[quiz/analyze] falha ao enviar e-mail:", emailError)
+    })
+  }
 
   return NextResponse.json({ ok: true, claimed: true })
 }

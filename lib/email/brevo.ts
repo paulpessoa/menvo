@@ -714,6 +714,56 @@ export async function sendRetentionDeletionConfirmation(data: {
 }
 
 // ---------------------------------------------------------------------------
+// Análise do quiz de carreira (/quiz)
+// ---------------------------------------------------------------------------
+
+export interface QuizResultsEmailData {
+  name: string;
+  title: string;
+  summary: string;
+  /** Link com o token `?k=` (lib/quiz/result-link.ts) - abre a análise e permite criar a conta. */
+  resultUrl: string;
+}
+
+/**
+ * E-mail curto: só o título e um trecho do resumo. A análise completa
+ * (mentores, conselhos, próximos passos) fica atrás do botão, na página de
+ * resultados - onde a pessoa também pode criar uma senha e guardar tudo na
+ * conta. Título e resumo vêm da IA (que lê texto livre do usuário), por isso
+ * passam por escapeHtml como qualquer outro texto não confiável.
+ */
+export function buildQuizResultsEmailHtml(data: QuizResultsEmailData): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name || "");
+  const summary = data.summary.length > 320 ? `${data.summary.slice(0, 317).trimEnd()}...` : data.summary;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+
+  const content = `
+    <h2>${firstName ? `Olá, ${firstName}!` : "Olá!"} Sua análise está pronta</h2>
+    <div class="info-box">
+        <p style="font-weight: 700; margin-bottom: 8px;">${escapeHtml(data.title)}</p>
+        <p style="margin-bottom: 0; color: ${COLORS.muted};">${escapeHtml(summary)}</p>
+    </div>
+    <p>Na análise completa estão os mentores sugeridos para o seu momento, conselhos práticos e os próximos passos.</p>
+    <div class="button-container">
+        <a href="${data.resultUrl}" class="button">Ver minha análise completa</a>
+    </div>
+    <p style="font-size: 13px; color: ${COLORS.muted}; text-align: center;">Pelo mesmo link você pode criar uma senha e guardar a análise na sua conta da Menvo.</p>
+  `;
+
+  const footerExtra = `
+    <p style="margin-top: 16px;">Você recebeu este e-mail porque respondeu o questionário de carreira da Menvo.
+      Leia nossa <a href="${appUrl}/privacy" style="color: ${COLORS.muted}; text-decoration: underline;">Política de Privacidade</a>.
+    </p>
+  `;
+
+  return getEmailLayout("Sua análise de carreira", content, { signatureType: "personal", footerExtra });
+}
+
+export async function sendQuizResultsEmail(data: QuizResultsEmailData & { email: string }): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(data.email, "Sua análise de carreira está pronta", buildQuizResultsEmailHtml(data));
+}
+
+// ---------------------------------------------------------------------------
 // Organizações parceiras (multi-tenant)
 // ---------------------------------------------------------------------------
 
@@ -892,7 +942,8 @@ export async function sendTestEmail(params: {
     reminder: "[TESTE] Lembrete: Sua mentoria é hoje",
     retention_notice_30d: "[TESTE] Sua conta na Menvo será apagada em 30 dias",
     retention_notice_1d: "[TESTE] Último aviso: sua conta na Menvo será apagada amanhã",
-    retention_deletion_confirmation: "[TESTE] Seus dados foram apagados da Menvo"
+    retention_deletion_confirmation: "[TESTE] Seus dados foram apagados da Menvo",
+    quiz_results: "[TESTE] Sua análise de carreira está pronta"
   };
 
   const subject = subjects[params.templateKey] || `[TESTE] Template Menvo: ${params.templateKey}`;
@@ -1013,6 +1064,13 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       });
     case 'retention_deletion_confirmation':
       return buildRetentionDeletionConfirmationHtml({ name: "Mariana" });
+    case 'quiz_results':
+      return buildQuizResultsEmailHtml({
+        name: "Mariana Silva",
+        title: "Rota prática para o primeiro estágio em tecnologia",
+        summary: "Mariana, suas respostas mostram clareza sobre onde você quer chegar: um estágio em desenvolvimento front-end. O que falta agora é transformar estudo em provas concretas do que você sabe fazer - um portfólio pequeno e candidaturas bem direcionadas.",
+        resultUrl: "https://www.menvo.com.br/quiz/results/preview"
+      });
     default:
       return getEmailLayout("Preview Menvo", "<p>Selecione um template para visualizar.</p>", { signatureType: "personal" });
   }

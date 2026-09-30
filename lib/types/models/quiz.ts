@@ -44,4 +44,6 @@ export interface QuizResultView {
   id: string
   processed_at: string | null
   ai_analysis: QuizAnalysisResult | null
+  /** True only for the logged-in person who took this quiz. */
+  is_owner?: boolean
 }

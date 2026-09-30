@@ -2,7 +2,8 @@
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
-import { useParams, useRouter, useSearchParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
+import { Link, useRouter } from "@/i18n/routing"
 import {
     Card,
     CardContent,
@@ -12,13 +13,13 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import {  Trophy, Users, Lightbulb, Target, ArrowRight, CheckCircle, Heart, Sparkles, Mail, Share2, ExternalLink, Linkedin, Loader2 } from "lucide-react"
+import { Users, Lightbulb, Target, ArrowRight, CheckCircle, Sparkles, Mail, Share2, ExternalLink, Linkedin, Loader2, Printer } from "lucide-react"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { ShareDiagnosticModal } from "@/components/diagnostic/ShareDiagnosticModal"
+import { SaveAnalysisBanner } from "@/components/quiz/SaveAnalysisBanner"
 
 interface AnalysisResult {
     precisa_refazer?: boolean
@@ -42,6 +43,7 @@ interface QuizResponse {
     id: string
     ai_analysis: AnalysisResult
     processed_at: string
+    is_owner?: boolean
 }
 
 export default function QuizResultsPage() {
@@ -54,13 +56,32 @@ export default function QuizResultsPage() {
     const [response, setResponse] = useState<QuizResponse | null>(null)
     const [sendingEmail, setSendingEmail] = useState(false)
     const [mentorSlugMap, setMentorSlugMap] = useState<Record<string, string>>({})
+    const [mentorIdMap, setMentorIdMap] = useState<Record<string, string>>({})
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+    // Captured once on mount; the results e-mail link carries this so the
+    // "save to account" banner can create an account for this address.
+    const [accountToken] = useState(() => searchParams.get('k'))
 
     useEffect(() => {
         if (params.id) {
             loadResults()
         }
     }, [params.id])
+
+    // The token proves e-mail receipt, not "safe to share" - drop it from the
+    // address bar so it never ends up in a WhatsApp/LinkedIn share link.
+    useEffect(() => {
+        if (accountToken && typeof window !== "undefined") {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('k')
+            window.history.replaceState(null, '', url.pathname + url.search)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    const handlePrint = () => {
+        window.print()
+    }
 
     const handleSendEmail = async () => {
         if (!response) return
@@ -144,13 +165,19 @@ export default function QuizResultsPage() {
                     const { mentors: mentorsFound } = await res.json()
 
                     if (mentorsFound && (mentorsFound as any[]).length > 0) {
-                        const map: Record<string, string> = {}
+                        const slugMap: Record<string, string> = {}
+                        const idMap: Record<string, string> = {}
                         for (const m of (mentorsFound as any[])) {
                             if (m.full_name) {
-                                map[m.full_name.toLowerCase()] = m.slug || m.id || ""
+                                const key = m.full_name.toLowerCase()
+                                slugMap[key] = m.slug || m.id || ""
+                                // Never fall back to slug here - sharing needs the real
+                                // UUID (POST /api/diagnostic/shares' mentor_id).
+                                if (m.id) idMap[key] = m.id
                             }
                         }
-                        setMentorSlugMap(map)
+                        setMentorSlugMap(slugMap)
+                        setMentorIdMap(idMap)
                     }
                 } catch (e) {
                     console.warn("Could not resolve mentor slugs:", e)
@@ -201,7 +228,7 @@ export default function QuizResultsPage() {
                 <div className="container mx-auto px-4 py-12">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center space-y-6 mb-8">
-                            <div className="inline-flex items-center gap-2 bg-orange-100 dark:bg-orange-900/30 px-4 py-2 rounded-full text-orange-700 dark:text-orange-300 text-sm font-medium">
+                            <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary text-sm font-medium">
                                 <Target className="h-4 w-4" />
                                 {t('quiz_results.incomplete_analysis')}
                             </div>
@@ -213,21 +240,21 @@ export default function QuizResultsPage() {
                             </p>
                         </div>
 
-                        <Card className="border-2 border-orange-300 dark:border-orange-700 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/30 dark:to-yellow-950/30">
+                        <Card className="border-2 border-primary/30 bg-primary/5">
                             <CardContent className="pt-6">
                                 <div className="text-center space-y-4">
-                                    <Target className="h-16 w-16 text-orange-600 mx-auto" />
-                                    <h3 className="text-xl font-semibold text-orange-900 dark:text-orange-100">
+                                    <Target className="h-16 w-16 text-primary mx-auto" />
+                                    <h3 className="text-xl font-semibold text-foreground">
                                         {t('quiz_results.lets_try_again')}
                                     </h3>
-                                    <p className="text-orange-800 dark:text-orange-200 max-w-md mx-auto">
+                                    <p className="text-muted-foreground max-w-md mx-auto">
                                         {analysis.mensagem_final}
                                     </p>
                                     <div className="pt-4">
                                         <Button
                                             size="lg"
                                             onClick={() => router.push('/quiz')}
-                                            className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-white"
+                                            className="bg-primary hover:bg-primary/90 text-white"
                                         >
                                             {t('quiz_results.retake_quiz')}
                                             <ArrowRight className="ml-2 h-4 w-4" />
@@ -242,7 +269,7 @@ export default function QuizResultsPage() {
                             <Card className="mt-6">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
-                                        <Lightbulb className="h-5 w-5 text-yellow-600" />
+                                        <Lightbulb className="h-5 w-5 text-primary" />
                                         {t('quiz_results.tips_for_better_analysis')}
                                     </CardTitle>
                                 </CardHeader>
@@ -250,7 +277,7 @@ export default function QuizResultsPage() {
                                     <ul className="space-y-3">
                                         {analysis.conselhos_praticos.map((conselho, index) => (
                                             <li key={index} className="flex items-start gap-3">
-                                                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                                                 <span>{conselho}</span>
                                             </li>
                                         ))}
@@ -264,274 +291,280 @@ export default function QuizResultsPage() {
         )
     }
 
+    const mentorsCard = (
+        <Card>
+            <CardHeader>
+                <div className="flex items-center gap-2">
+                    <Users className="h-6 w-6 text-primary" />
+                    <CardTitle>{t('quiz_results.suggested_mentors')}</CardTitle>
+                </div>
+                <CardDescription>
+                    {t('quiz_results.based_on_interests')}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground pb-1">
+                    {t('quiz_results.mentor_status_tooltip')}
+                </p>
+                {analysis.mentores_sugeridos.map((mentor, index) => {
+                    const resolvedSlug = mentor.mentor_nome
+                        ? mentorSlugMap[mentor.mentor_nome.toLowerCase()]
+                        : null;
+                    const mentorHref = resolvedSlug
+                        ? `/mentors/${resolvedSlug}`
+                        : mentor.mentor_nome
+                        ? `/mentors?search=${encodeURIComponent(mentor.mentor_nome)}`
+                        : `/mentors`;
+
+                    return (
+                        <Link
+                            key={index}
+                            href={mentorHref}
+                            className="block p-5 border rounded-2xl space-y-3 hover:border-primary/60 hover:shadow-md hover:bg-muted/10 transition-all duration-200 group bg-card"
+                        >
+                            <div className="flex-1">
+                                <h4 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                                    {mentor.tipo}
+                                </h4>
+                                {mentor.mentor_nome && (
+                                    <p className="text-sm font-medium text-muted-foreground mt-0.5">
+                                        {t('quiz_results.mentor')}: <span className="text-foreground font-semibold">{mentor.mentor_nome}</span>
+                                    </p>
+                                )}
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                {mentor.razao}
+                            </p>
+                            <div className="pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/40">
+                                <span className="text-xs text-muted-foreground group-hover:text-primary/80 transition-colors">
+                                    {mentor.mentor_nome
+                                        ? t('quiz_results.mentor')
+                                        : t('quiz_results.explore_mentors')}
+                                </span>
+                                <span className="print:hidden inline-flex items-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-medium text-xs px-3 py-1.5 group-hover:bg-[#006276] transition-all shadow-sm shadow-primary/20">
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                    <span>{mentor.mentor_nome ? t('quiz_results.view_mentor_profile') : t('quiz_results.explore_mentors')}</span>
+                                </span>
+                            </div>
+                        </Link>
+                    );
+                })}
+                <div className="pt-2 text-center print:hidden">
+                    <Button
+                        variant="outline"
+                        asChild
+                        className="rounded-xl border font-medium text-xs hover:bg-muted/50 transition-all"
+                    >
+                        <Link href="/mentors">{t('quiz_results.explore_all_mentors')}</Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    )
+
     return (
         <AnimatedBackground>
-            <div className="container mx-auto px-4 py-12">
-                <div className="max-w-4xl mx-auto space-y-8">
-                    {/* Header with Score */}
+            <div className="container mx-auto px-4 py-12 print:py-4">
+                <div className="max-w-5xl mx-auto space-y-8">
+                    {/* Header */}
                     <div className="text-center space-y-4">
-                        <div className="inline-flex items-center gap-2 bg-teal-100 dark:bg-teal-900/30 px-4 py-2 rounded-full text-teal-700 dark:text-teal-300 text-sm font-medium">
-                            <CheckCircle className="h-4 w-4 text-green-600" />
+                        <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary text-sm font-medium">
+                            <CheckCircle className="h-4 w-4" />
                             {t('quiz_results.personalized_analysis')}
                         </div>
 
-                        <h1 className="text-3xl md:text-4xl font-bold">
+                        <h1 className="text-3xl md:text-4xl font-bold text-foreground">
                             {analysis.titulo_personalizado}
                         </h1>
 
                         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                             {analysis.resumo_motivador}
                         </p>
+
+                        <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground max-w-xl mx-auto pt-1">
+                            <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
+                            {t('quiz_results.ai_disclaimer')}
+                        </p>
                     </div>
 
-                    {/* Mentors Suggested */}
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-2">
-                                <Users className="h-6 w-6 text-blue-600" />
-                                <CardTitle>{t('quiz_results.suggested_mentors')}</CardTitle>
-                            </div>
-                            <CardDescription>
-                                {t('quiz_results.based_on_interests')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                                <p className="text-sm text-blue-800 dark:text-blue-200" dangerouslySetInnerHTML={{ __html: t('quiz_results.mentor_status_tooltip') }} />
-                            </div>
-                            {analysis.mentores_sugeridos.map((mentor, index) => {
-                                const resolvedSlug = mentor.mentor_nome
-                                    ? mentorSlugMap[mentor.mentor_nome.toLowerCase()]
-                                    : null;
-                                const mentorHref = resolvedSlug
-                                    ? `/mentors/${resolvedSlug}`
-                                    : mentor.mentor_nome
-                                    ? `/mentors?search=${encodeURIComponent(mentor.mentor_nome)}`
-                                    : `/mentors`;
+                    {accountToken && (
+                        <div className="print:hidden">
+                            <SaveAnalysisBanner quizId={response.id} token={accountToken} />
+                        </div>
+                    )}
 
-                                return (
-                                    <div
-                                        key={index}
-                                        onClick={() => router.push(mentorHref)}
-                                        className="p-5 border rounded-2xl space-y-3 cursor-pointer hover:border-primary/60 hover:shadow-md hover:bg-muted/10 transition-all duration-200 group bg-card"
-                                    >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="flex-1">
-                                                <h4 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                                                    {mentor.tipo}
-                                                </h4>
-                                                {mentor.mentor_nome && (
-                                                    <p className="text-sm font-medium text-muted-foreground mt-0.5">
-                                                        {t('quiz_results.mentor')}: <span className="text-foreground font-semibold">{mentor.mentor_nome}</span>
-                                                    </p>
-                                                )}
-                                            </div>
-                                            {mentor.mentor_nome && (
-                                                <Badge
-                                                    variant={mentor.disponivel ? "default" : "secondary"}
-                                                    className={
-                                                        mentor.disponivel
-                                                            ? "bg-green-600 hover:bg-green-700 text-white shrink-0"
-                                                            : "bg-orange-500 text-white shrink-0"
-                                                    }
-                                                >
-                                                    <CheckCircle
-                                                        className="h-3 w-3 mr-1 text-white"
-                                                    />
-                                                    {mentor.disponivel ? t('quiz_results.available') : t('quiz_results.full_schedule')}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                        <p className="text-sm text-muted-foreground leading-relaxed">
-                                            {mentor.razao}
-                                        </p>
-                                        <div className="pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/40">
-                                            <span className="text-xs text-muted-foreground group-hover:text-primary/80 transition-colors">
-                                                {mentor.mentor_nome
-                                                    ? "Clique no card ou no botão para acessar o perfil e horários"
-                                                    : "Clique para explorar mentores cadastrados na plataforma"}
-                                            </span>
-                                            <Button
-                                                size="sm"
-                                                className="rounded-xl bg-primary text-primary-foreground font-medium text-xs hover:bg-[#006276] active:scale-[0.98] transition-all shadow-sm shadow-primary/20 gap-1.5"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(mentorHref);
-                                                }}
-                                            >
-                                                <ExternalLink className="h-3.5 w-3.5" />
-                                                <span>{mentor.mentor_nome ? "Ver Perfil do Mentor" : "Explorar Mentores"}</span>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                            <div className="pt-2 text-center">
-                                <Button
-                                    variant="outline"
-                                    onClick={() => router.push("/mentors")}
-                                    className="rounded-xl border font-medium text-xs hover:bg-muted/50 transition-all"
-                                >
-                                    Explorar Todos os Mentores na Plataforma
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Practical Advice */}
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-2">
-                                <Lightbulb className="h-6 w-6 text-yellow-600" />
-                                <CardTitle>{t('quiz_results.practical_advice')}</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-3">
-                                {analysis.conselhos_praticos.map((conselho, index) => (
-                                    <li key={index} className="flex items-start gap-3">
-                                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                                        <span>{conselho}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-
-                    {/* Next Steps */}
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-2">
-                                <Target className="h-6 w-6 text-purple-600" />
-                                <CardTitle>{t('quiz_results.next_steps')}</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-3">
-                                {analysis.proximos_passos.map((passo, index) => (
-                                    <li key={index} className="flex items-start gap-3">
-                                        <ArrowRight className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
-                                        <span>{passo}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-
-                    {/* Development Areas */}
-                    {analysis.areas_desenvolvimento &&
-                        analysis.areas_desenvolvimento.length > 0 && (
+                    {/* Two-column layout: analysis on the left, mentors + actions on the right */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                        {/* Main column */}
+                        <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
+                            {/* Practical Advice */}
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>{t('quiz_results.development_areas')}</CardTitle>
+                                    <div className="flex items-center gap-2">
+                                        <Lightbulb className="h-6 w-6 text-primary" />
+                                        <CardTitle>{t('quiz_results.practical_advice')}</CardTitle>
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="flex flex-wrap gap-2">
-                                        {analysis.areas_desenvolvimento.map((area, index) => (
-                                            <Badge key={index} variant="outline" className="text-sm">
-                                                {area}
-                                            </Badge>
+                                    <ul className="space-y-3">
+                                        {analysis.conselhos_praticos.map((conselho, index) => (
+                                            <li key={index} className="flex items-start gap-3">
+                                                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                                <span>{conselho}</span>
+                                            </li>
                                         ))}
-                                    </div>
+                                    </ul>
                                 </CardContent>
                             </Card>
-                        )}
 
-                    {/* Final Message */}
-                    <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/30 dark:to-cyan-950/30 border-2 border-teal-200 dark:border-teal-700">
-                        <CardContent className="pt-6">
-                            <p
-                                className="text-center text-lg font-medium mb-4 text-primary"
-                            >
-                                {analysis.mensagem_final}
-                            </p>
-
-                            {/* Potential Mentor Section */}
-                            {analysis.potencial_mentor && (
-                                <div className="mt-6 p-4 bg-white dark:bg-gray-800 rounded-lg border border-teal-200 dark:border-teal-700">
-                                    <div className="flex items-start gap-3">
-                                        <CheckCircle className="h-6 w-6 text-teal-600 mt-0.5 flex-shrink-0" />
-                                        <div>
-                                            <h4 className="font-semibold text-base text-teal-900 dark:text-teal-100">
-                                                {t('quiz_results.final_message_potential_mentor')}
-                                            </h4>
-                                            <p className="text-sm text-teal-700 dark:text-teal-300 mt-1">
-                                                {t('quiz_results.final_message_potential_mentor_description')}
-                                            </p>
-                                        </div>
+                            {/* Next Steps */}
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex items-center gap-2">
+                                        <Target className="h-6 w-6 text-primary" />
+                                        <CardTitle>{t('quiz_results.next_steps')}</CardTitle>
                                     </div>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                                </CardHeader>
+                                <CardContent>
+                                    <ul className="space-y-3">
+                                        {analysis.proximos_passos.map((passo, index) => (
+                                            <li key={index} className="flex items-start gap-3">
+                                                <ArrowRight className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                                                <span>{passo}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </CardContent>
+                            </Card>
 
-                    {/* Share Actions */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-center">
-                                {t('quiz_results.share_results')}
-                            </CardTitle>
-                            <CardDescription className="text-center">
-                                {t('quiz_results.share_results_description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <Button
-                                    size="lg"
-                                    onClick={() => setIsShareModalOpen(true)}
-                                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl shadow-sm active:scale-[0.98]"
-                                >
-                                    <Users className="mr-2 h-4 w-4" />
-                                    Compartilhar com Mentor
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    onClick={handleSendEmail}
-                                    disabled={sendingEmail}
-                                    className="w-full rounded-xl"
-                                >
-                                    {sendingEmail ? (
-                                        <>
-                                            <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                                            {t('quiz_results.sending')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Mail className="mr-2 h-4 w-4" />
-                                            {t('quiz_results.send_by_email')}
-                                        </>
+                            {/* Development Areas */}
+                            {analysis.areas_desenvolvimento &&
+                                analysis.areas_desenvolvimento.length > 0 && (
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>{t('quiz_results.development_areas')}</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="flex flex-wrap gap-2">
+                                                {analysis.areas_desenvolvimento.map((area, index) => (
+                                                    <Badge key={index} variant="outline" className="text-sm">
+                                                        {area}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                            {/* Final Message */}
+                            <Card className="border-2 border-primary/20 bg-primary/5">
+                                <CardContent className="pt-6">
+                                    <p className="text-center text-lg font-medium mb-4 text-primary">
+                                        {analysis.mensagem_final}
+                                    </p>
+
+                                    {/* Potential Mentor Section */}
+                                    {analysis.potencial_mentor && (
+                                        <div className="mt-6 p-4 bg-card rounded-lg border border-primary/20">
+                                            <div className="flex items-start gap-3">
+                                                <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <h4 className="font-semibold text-base text-foreground">
+                                                        {t('quiz_results.final_message_potential_mentor')}
+                                                    </h4>
+                                                    <p className="text-sm text-muted-foreground mt-1">
+                                                        {t('quiz_results.final_message_potential_mentor_description')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    onClick={handleShareWhatsApp}
-                                    className="w-full bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-xl"
-                                >
-                                    <Share2 className="mr-2 h-4 w-4" />
-                                    {t('quiz_results.whatsapp')}
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    variant="default"
-                                    onClick={handleShareLinkedIn}
-                                    className="w-full bg-[#0a66c2] text-white hover:bg-[#004182] border-none rounded-xl"
-                                >
-                                    <Linkedin className="mr-2 h-4 w-4 fill-current" />
-                                    {t('quiz_results.linkedin')}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Sidebar: mentors + actions */}
+                        <div className="lg:col-span-1 space-y-6 order-1 lg:order-2">
+                            {mentorsCard}
+
+                            {/* Share / Print Actions */}
+                            <Card className="print:hidden">
+                                <CardHeader>
+                                    <CardTitle className="text-center text-base">
+                                        {t('quiz_results.share_results')}
+                                    </CardTitle>
+                                    <CardDescription className="text-center">
+                                        {t('quiz_results.share_results_description')}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    {response.is_owner && (
+                                        <Button
+                                            size="lg"
+                                            onClick={() => setIsShareModalOpen(true)}
+                                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl shadow-sm active:scale-[0.98]"
+                                        >
+                                            <Users className="mr-2 h-4 w-4" />
+                                            {t('quiz_results.share_with_mentor')}
+                                        </Button>
+                                    )}
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        onClick={handlePrint}
+                                        className="w-full rounded-xl"
+                                    >
+                                        <Printer className="mr-2 h-4 w-4" />
+                                        {t('quiz_results.print')}
+                                    </Button>
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        onClick={handleSendEmail}
+                                        disabled={sendingEmail}
+                                        className="w-full rounded-xl"
+                                    >
+                                        {sendingEmail ? (
+                                            <>
+                                                <Loader2 className="mr-2 animate-spin h-4 w-4" />
+                                                {t('quiz_results.sending')}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Mail className="mr-2 h-4 w-4" />
+                                                {t('quiz_results.send_by_email')}
+                                            </>
+                                        )}
+                                    </Button>
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
+                                        onClick={handleShareWhatsApp}
+                                        className="w-full bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-xl"
+                                    >
+                                        <Share2 className="mr-2 h-4 w-4" />
+                                        {t('quiz_results.whatsapp')}
+                                    </Button>
+                                    <Button
+                                        size="lg"
+                                        variant="default"
+                                        onClick={handleShareLinkedIn}
+                                        className="w-full bg-[#0a66c2] text-white hover:bg-[#004182] border-none rounded-xl"
+                                    >
+                                        <Linkedin className="mr-2 h-4 w-4 fill-current" />
+                                        {t('quiz_results.linkedin')}
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
 
                     <ShareDiagnosticModal
                         isOpen={isShareModalOpen}
                         onClose={() => setIsShareModalOpen(false)}
                         quizResponseId={response.id}
                         suggestedMentors={analysis.mentores_sugeridos}
-                        mentorSlugMap={mentorSlugMap}
+                        mentorIdMap={mentorIdMap}
                     />
                 </div>
             </div>

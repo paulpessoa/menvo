@@ -26,6 +26,11 @@ export const maxDuration = 60
  * it either, so a logged-in submission from /quiz was already broken before
  * this route existed).
  *
+ * Limit: 3 analyses per e-mail every 30 days, plus the global monthly AI
+ * budget (`quiz_submission_status`, enforced again by the insert policy).
+ * The per-IP counter below is only a speed bump - it lives in one
+ * serverless instance's memory.
+ *
  * The id is generated here, not returned by a `.select()` after insert:
  * anonymous callers have no SELECT policy on this table, so a `.select()`
  * would fail even though the insert succeeded.
@@ -53,12 +58,38 @@ export async function POST(request: NextRequest) {
 
   const id = crypto.randomUUID()
   const payload = parsed.data
+  // A logged-in person's quiz is tied to their account e-mail, never to one
+  // typed in the form - that's the address the results e-mail goes to and
+  // the one the per-e-mail limit counts.
+  const email = (user?.email ?? payload.email).trim().toLowerCase()
+
+  // Same check the insert policy enforces (migration 20260930000000); asked
+  // first only to answer with a message the person can act on.
+  const { data: status } = await supabase.rpc("quiz_submission_status", { p_email: email })
+  if (status === "email_limit") {
+    return NextResponse.json(
+      {
+        error: "Você já fez 3 análises nos últimos 30 dias com este e-mail. Tente novamente mais tarde.",
+        code: "email_limit",
+      },
+      { status: 429 }
+    )
+  }
+  if (status === "budget") {
+    return NextResponse.json(
+      {
+        error: "As análises gratuitas deste mês acabaram. Tente novamente a partir do dia 1º.",
+        code: "budget",
+      },
+      { status: 503 }
+    )
+  }
 
   const { error } = await supabase.from("quiz_responses").insert({
     id,
     user_id: user?.id ?? null,
     name: payload.name,
-    email: payload.email.trim().toLowerCase(),
+    email,
     linkedin_url: payload.linkedin_url || null,
     career_moment: payload.career_moment,
     mentorship_experience: payload.mentorship_experience,

@@ -31,7 +31,8 @@ interface ShareDiagnosticModalProps {
   quizResponseId?: string
   diagnosticSessionId?: string
   suggestedMentors?: SuggestedMentorItem[]
-  mentorSlugMap?: Record<string, string>
+  /** Mentor full name (lowercased) -> mentor UUID (`profiles.id`), never a slug: this is what `POST /api/diagnostic/shares` needs as `mentor_id`. */
+  mentorIdMap?: Record<string, string>
 }
 
 /**
@@ -44,7 +45,7 @@ export function ShareDiagnosticModal({
   quizResponseId,
   diagnosticSessionId,
   suggestedMentors = [],
-  mentorSlugMap = {}
+  mentorIdMap = {}
 }: ShareDiagnosticModalProps) {
   const { toast } = useToast()
   const [scope, setScope] = useState<DiagnosticShareScope>("summary")
@@ -198,7 +199,7 @@ export function ShareDiagnosticModal({
               <div className="space-y-2">
                 {suggestedMentors.map((m, idx) => {
                   const mentorName = m.mentor_nome || m.tipo
-                  const mentorId = m.mentor_nome ? mentorSlugMap[m.mentor_nome.toLowerCase()] : null
+                  const mentorId = m.mentor_nome ? mentorIdMap[m.mentor_nome.toLowerCase()] : null
                   const isShared = mentorId ? activeMentorIds.has(mentorId) : false
                   const isSharing = mentorId === sharingMentorId
 
