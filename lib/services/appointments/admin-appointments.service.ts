@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto"
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { isPlaceholderName } from "@/lib/utils/person-name"
 import {
   sendAppointmentCancellation,
   sendAppointmentConfirmation,
@@ -134,12 +135,8 @@ export interface AdminAppointmentsResult {
 // Helpers puros (testáveis sem banco)
 // ---------------------------------------------------------------------------
 
-const PLACEHOLDER_NAME = /^(usu[aá]rio|user|teste|test)(\s+(teste|test))?$/i
-
-export function isPlaceholderName(name: string | null | undefined): boolean {
-  const trimmed = (name ?? "").trim()
-  return trimmed === "" || PLACEHOLDER_NAME.test(trimmed)
-}
+// A regra de "nome genérico" é compartilhada com o login social (lib/utils/person-name).
+export { isPlaceholderName }
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Aguardando mentor",
