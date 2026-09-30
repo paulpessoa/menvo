@@ -1,25 +1,26 @@
 "use client"
 
-import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useEffect, useState } from "react"
-import { useParams, useSearchParams } from "next/navigation"
-import { Link, useRouter } from "@/i18n/routing"
+import { useParams } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle
-} from "@/components/ui/card"
+    ArrowRight,
+    Check,
+    Link2,
+    Linkedin,
+    Loader2,
+    MessageCircle,
+    Printer,
+    RotateCcw,
+    Send,
+    Sparkles
+} from "lucide-react"
+import { Link } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Users, Lightbulb, Target, ArrowRight, CheckCircle, Sparkles, Mail, Share2, ExternalLink, Linkedin, Loader2, Printer } from "lucide-react"
-import { AnimatedBackground } from "@/components/ui/animated-background"
 import { useToast } from "@/hooks/use-toast"
-import { useTranslations } from "next-intl"
 import { quizService } from "@/lib/services/quiz/quiz.service"
+import { createClient } from "@/lib/utils/supabase/client"
 import { ShareDiagnosticModal } from "@/components/diagnostic/ShareDiagnosticModal"
-import { SaveAnalysisBanner } from "@/components/quiz/SaveAnalysisBanner"
 
 interface AnalysisResult {
     precisa_refazer?: boolean
@@ -43,24 +44,43 @@ interface QuizResponse {
     id: string
     ai_analysis: AnalysisResult
     processed_at: string
-    is_owner?: boolean
+}
+
+// Printing: show only the result (no site header, footer or floating widgets)
+// and drop the tinted background so it prints clean on paper / PDF.
+const PRINT_STYLES = `
+@media print {
+  @page { margin: 16mm; }
+  body * { visibility: hidden; }
+  #quiz-result, #quiz-result * { visibility: visible; }
+  #quiz-result { position: absolute; top: 0; left: 0; right: 0; }
+  body { background: #fff !important; }
+}
+`
+
+function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+    return (
+        <section className="break-inside-avoid-page">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
+                {action}
+            </div>
+            {children}
+        </section>
+    )
 }
 
 export default function QuizResultsPage() {
     const params = useParams()
-    const router = useRouter()
-    const searchParams = useSearchParams()
     const { toast } = useToast()
-    const t = useTranslations('quiz');
+    const t = useTranslations("quiz")
+    const locale = useLocale()
     const [loading, setLoading] = useState(true)
     const [response, setResponse] = useState<QuizResponse | null>(null)
-    const [sendingEmail, setSendingEmail] = useState(false)
     const [mentorSlugMap, setMentorSlugMap] = useState<Record<string, string>>({})
     const [mentorIdMap, setMentorIdMap] = useState<Record<string, string>>({})
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
-    // Captured once on mount; the results e-mail link carries this so the
-    // "save to account" banner can create an account for this address.
-    const [accountToken] = useState(() => searchParams.get('k'))
+    const [copied, setCopied] = useState(false)
 
     useEffect(() => {
         if (params.id) {
@@ -68,64 +88,30 @@ export default function QuizResultsPage() {
         }
     }, [params.id])
 
-    // The token proves e-mail receipt, not "safe to share" - drop it from the
-    // address bar so it never ends up in a WhatsApp/LinkedIn share link.
-    useEffect(() => {
-        if (accountToken && typeof window !== "undefined") {
-            const url = new URL(window.location.href)
-            url.searchParams.delete('k')
-            window.history.replaceState(null, '', url.pathname + url.search)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const pageUrl = () => window.location.href.split("?")[0]
 
-    const handlePrint = () => {
-        window.print()
-    }
-
-    const handleSendEmail = async () => {
-        if (!response) return
-
-        setSendingEmail(true)
+    const handleCopyLink = async () => {
         try {
-            await quizService.sendResultsEmail(response.id)
-
-            toast({
-                title: t('quiz_results.email_sent_toast_title'),
-                description: t('quiz_results.email_sent_toast_description')
-            })
-        } catch (error) {
-            console.error("Error sending email:", error)
-            toast({
-                title: t('quiz_results.error_sending_email_toast_title'),
-                description: t('quiz_results.error_sending_email_toast_description'),
-                variant: "destructive"
-            })
-        } finally {
-            setSendingEmail(false)
+            await navigator.clipboard.writeText(pageUrl())
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+        } catch {
+            toast({ title: pageUrl() })
         }
     }
 
     const handleShareWhatsApp = () => {
-        if (!response) return
-
-        const currentUrl = window.location.href
-        const text = t('quiz_results.potential_analysis_whatsapp_message', { currentUrl });
-
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`
-        window.open(whatsappUrl, "_blank")
+        const text = t("quiz_results.whatsapp_message", { url: pageUrl() })
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener")
     }
 
+    // share-offsite renders the page's Open Graph preview (title + image).
     const handleShareLinkedIn = () => {
-        if (!response) return
-
-        const currentUrl = window.location.href
-        const text = t('quiz_results.potential_analysis_linkedin_message', { currentUrl });
-
-        const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(
-            text
-        )}`
-        window.open(linkedinUrl, "_blank")
+        window.open(
+            `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl())}`,
+            "_blank",
+            "noopener"
+        )
     }
 
     const loadResults = async (attempt = 0) => {
@@ -134,7 +120,7 @@ export default function QuizResultsPage() {
             const data = await quizService.getQuizResponseById(params.id as string)
             if (!data) throw new Error("Quiz response not found")
 
-            const res = data as unknown as QuizResponse;
+            const res = data as unknown as QuizResponse
 
             // Wait for processing if not done yet
             if (!res.processed_at) {
@@ -161,19 +147,19 @@ export default function QuizResultsPage() {
 
             if (mentorNames.length > 0) {
                 try {
-                    const res = await fetch(`/api/mentors/lookup?names=${encodeURIComponent(mentorNames.join(","))}`)
-                    const { mentors: mentorsFound } = await res.json()
+                    const supabase = createClient()
+                    const { data: mentorsFound } = await (supabase
+                        .from("mentors_view") as any)
+                        .select("full_name, slug, id")
+                        .in("full_name", mentorNames)
 
                     if (mentorsFound && (mentorsFound as any[]).length > 0) {
                         const slugMap: Record<string, string> = {}
                         const idMap: Record<string, string> = {}
                         for (const m of (mentorsFound as any[])) {
                             if (m.full_name) {
-                                const key = m.full_name.toLowerCase()
-                                slugMap[key] = m.slug || m.id || ""
-                                // Never fall back to slug here - sharing needs the real
-                                // UUID (POST /api/diagnostic/shares' mentor_id).
-                                if (m.id) idMap[key] = m.id
+                                slugMap[m.full_name.toLowerCase()] = m.slug || m.id || ""
+                                idMap[m.full_name.toLowerCase()] = m.id || ""
                             }
                         }
                         setMentorSlugMap(slugMap)
@@ -186,8 +172,8 @@ export default function QuizResultsPage() {
         } catch (error) {
             console.error("Error loading results:", error)
             toast({
-                title: t('quiz_results.error_loading_results_toast_title'),
-                description: t('quiz_results.error_loading_results_toast_description'),
+                title: t("quiz_results.error_loading_results_toast_title"),
+                description: t("quiz_results.error_loading_results_toast_description"),
                 variant: "destructive"
             })
         } finally {
@@ -197,377 +183,252 @@ export default function QuizResultsPage() {
 
     if (loading || !response) {
         return (
-            <AnimatedBackground>
-                <div className="flex items-center justify-center min-h-screen">
-                    <Card className="w-full max-w-md">
-                        <CardContent className="pt-6">
-                            <div className="flex flex-col items-center space-y-4">
-                                <MenvoDots />
-                                <div className="text-center">
-                                    <h3 className="font-semibold text-lg">
-                                        {t('quiz_results.processing_analysis')}
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                        {t('quiz_results.ai_is_analyzing')}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+            <div className="flex min-h-[70vh] items-center justify-center bg-gradient-to-b from-accent/60 to-background px-4">
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <div>
+                        <p className="text-lg font-semibold">{t("quiz_results.processing_analysis")}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{t("quiz_results.ai_is_analyzing")}</p>
+                    </div>
                 </div>
-            </AnimatedBackground>
+            </div>
         )
     }
 
     const analysis = response.ai_analysis
 
-    // Se precisa refazer, mostra interface especial
+    // Answers too vague to analyse: one clear message and one action.
     if (analysis.precisa_refazer) {
         return (
-            <AnimatedBackground>
-                <div className="container mx-auto px-4 py-12">
-                    <div className="max-w-3xl mx-auto">
-                        <div className="text-center space-y-6 mb-8">
-                            <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary text-sm font-medium">
-                                <Target className="h-4 w-4" />
-                                {t('quiz_results.incomplete_analysis')}
-                            </div>
-                            <h1 className="text-4xl md:text-5xl font-bold text-primary">
-                                {analysis.titulo_personalizado}
-                            </h1>
-                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                                {analysis.resumo_motivador}
-                            </p>
-                        </div>
+            <div className="bg-gradient-to-b from-accent/60 to-background">
+                <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+                    <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{analysis.titulo_personalizado}</h1>
+                    <p className="mt-4 text-lg text-muted-foreground">{analysis.resumo_motivador}</p>
 
-                        <Card className="border-2 border-primary/30 bg-primary/5">
-                            <CardContent className="pt-6">
-                                <div className="text-center space-y-4">
-                                    <Target className="h-16 w-16 text-primary mx-auto" />
-                                    <h3 className="text-xl font-semibold text-foreground">
-                                        {t('quiz_results.lets_try_again')}
-                                    </h3>
-                                    <p className="text-muted-foreground max-w-md mx-auto">
-                                        {analysis.mensagem_final}
-                                    </p>
-                                    <div className="pt-4">
-                                        <Button
-                                            size="lg"
-                                            onClick={() => router.push('/quiz')}
-                                            className="bg-primary hover:bg-primary/90 text-white"
-                                        >
-                                            {t('quiz_results.retake_quiz')}
-                                            <ArrowRight className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                    {analysis.conselhos_praticos?.length > 0 && (
+                        <ul className="mx-auto mt-8 max-w-md space-y-3 text-left">
+                            {analysis.conselhos_praticos.map((tip, index) => (
+                                <li key={index} className="flex items-start gap-3">
+                                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                                    <span>{tip}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
 
-                        {/* Dicas para melhorar as respostas */}
-                        {analysis.conselhos_praticos && analysis.conselhos_praticos.length > 0 && (
-                            <Card className="mt-6">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Lightbulb className="h-5 w-5 text-primary" />
-                                        {t('quiz_results.tips_for_better_analysis')}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-3">
-                                        {analysis.conselhos_praticos.map((conselho, index) => (
-                                            <li key={index} className="flex items-start gap-3">
-                                                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                                <span>{conselho}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
+                    <Button asChild size="lg" className="mt-10 rounded-xl">
+                        <Link href="/quiz">
+                            {t("quiz_results.retake_quiz")}
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
                 </div>
-            </AnimatedBackground>
+            </div>
         )
     }
 
-    const mentorsCard = (
-        <Card>
-            <CardHeader>
-                <div className="flex items-center gap-2">
-                    <Users className="h-6 w-6 text-primary" />
-                    <CardTitle>{t('quiz_results.suggested_mentors')}</CardTitle>
-                </div>
-                <CardDescription>
-                    {t('quiz_results.based_on_interests')}
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground pb-1">
-                    {t('quiz_results.mentor_status_tooltip')}
-                </p>
-                {analysis.mentores_sugeridos.map((mentor, index) => {
-                    const resolvedSlug = mentor.mentor_nome
-                        ? mentorSlugMap[mentor.mentor_nome.toLowerCase()]
-                        : null;
-                    const mentorHref = resolvedSlug
-                        ? `/mentors/${resolvedSlug}`
-                        : mentor.mentor_nome
-                        ? `/mentors?search=${encodeURIComponent(mentor.mentor_nome)}`
-                        : `/mentors`;
+    const generatedOn = response.processed_at
+        ? new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(response.processed_at))
+        : null
 
-                    return (
-                        <Link
-                            key={index}
-                            href={mentorHref}
-                            className="block p-5 border rounded-2xl space-y-3 hover:border-primary/60 hover:shadow-md hover:bg-muted/10 transition-all duration-200 group bg-card"
-                        >
-                            <div className="flex-1">
-                                <h4 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                                    {mentor.tipo}
-                                </h4>
-                                {mentor.mentor_nome && (
-                                    <p className="text-sm font-medium text-muted-foreground mt-0.5">
-                                        {t('quiz_results.mentor')}: <span className="text-foreground font-semibold">{mentor.mentor_nome}</span>
-                                    </p>
-                                )}
-                            </div>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                {mentor.razao}
-                            </p>
-                            <div className="pt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/40">
-                                <span className="text-xs text-muted-foreground group-hover:text-primary/80 transition-colors">
-                                    {mentor.mentor_nome
-                                        ? t('quiz_results.mentor')
-                                        : t('quiz_results.explore_mentors')}
-                                </span>
-                                <span className="print:hidden inline-flex items-center gap-1.5 rounded-xl bg-primary text-primary-foreground font-medium text-xs px-3 py-1.5 group-hover:bg-[#006276] transition-all shadow-sm shadow-primary/20">
-                                    <ExternalLink className="h-3.5 w-3.5" />
-                                    <span>{mentor.mentor_nome ? t('quiz_results.view_mentor_profile') : t('quiz_results.explore_mentors')}</span>
-                                </span>
-                            </div>
-                        </Link>
-                    );
-                })}
-                <div className="pt-2 text-center print:hidden">
-                    <Button
-                        variant="outline"
-                        asChild
-                        className="rounded-xl border font-medium text-xs hover:bg-muted/50 transition-all"
-                    >
-                        <Link href="/mentors">{t('quiz_results.explore_all_mentors')}</Link>
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
-    )
+    const shareButtonClass = "rounded-xl gap-2"
 
     return (
-        <AnimatedBackground>
-            <div className="container mx-auto px-4 py-12 print:py-4">
-                <div className="max-w-5xl mx-auto space-y-8">
-                    {/* Header */}
-                    <div className="text-center space-y-4">
-                        <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary text-sm font-medium">
-                            <CheckCircle className="h-4 w-4" />
-                            {t('quiz_results.personalized_analysis')}
-                        </div>
+        <div className="bg-gradient-to-b from-accent/70 via-background to-background print:bg-none">
+            <style>{PRINT_STYLES}</style>
 
-                        <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                            {analysis.titulo_personalizado}
-                        </h1>
+            <article id="quiz-result" className="mx-auto max-w-3xl px-4 pb-16 pt-10 md:pt-14">
+                {/* Headline */}
+                <header className="border-b pb-8">
+                    <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+                        {t("quiz_results.eyebrow")}
+                    </p>
+                    <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl">
+                        {analysis.titulo_personalizado}
+                    </h1>
+                    <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+                        {analysis.resumo_motivador}
+                    </p>
 
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            {analysis.resumo_motivador}
-                        </p>
-
-                        <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground max-w-xl mx-auto pt-1">
-                            <Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
-                            {t('quiz_results.ai_disclaimer')}
-                        </p>
+                    <div className="mt-6 flex flex-wrap gap-2 print:hidden">
+                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={handleCopyLink}>
+                            {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
+                            {copied ? t("quiz_results.link_copied") : t("quiz_results.copy_link")}
+                        </Button>
+                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={handleShareWhatsApp}>
+                            <MessageCircle className="h-4 w-4" />
+                            {t("quiz_results.whatsapp")}
+                        </Button>
+                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={handleShareLinkedIn}>
+                            <Linkedin className="h-4 w-4" />
+                            {t("quiz_results.linkedin")}
+                        </Button>
+                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={() => window.print()}>
+                            <Printer className="h-4 w-4" />
+                            {t("quiz_results.print")}
+                        </Button>
                     </div>
+                </header>
 
-                    {accountToken && (
-                        <div className="print:hidden">
-                            <SaveAnalysisBanner quizId={response.id} token={accountToken} />
-                        </div>
+                <div className="mt-10 space-y-12">
+                    {/* Action plan — the core of the result, numbered and first */}
+                    {analysis.proximos_passos?.length > 0 && (
+                        <Section title={t("quiz_results.action_plan")}>
+                            <ol className="space-y-4">
+                                {analysis.proximos_passos.map((step, index) => (
+                                    <li key={index} className="flex gap-4 rounded-2xl border bg-card p-5 break-inside-avoid">
+                                        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">
+                                            {index + 1}
+                                        </span>
+                                        <p className="pt-1 leading-relaxed">{step}</p>
+                                    </li>
+                                ))}
+                            </ol>
+                        </Section>
                     )}
 
-                    {/* Two-column layout: analysis on the left, mentors + actions on the right */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                        {/* Main column */}
-                        <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
-                            {/* Practical Advice */}
-                            <Card>
-                                <CardHeader>
-                                    <div className="flex items-center gap-2">
-                                        <Lightbulb className="h-6 w-6 text-primary" />
-                                        <CardTitle>{t('quiz_results.practical_advice')}</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-3">
-                                        {analysis.conselhos_praticos.map((conselho, index) => (
-                                            <li key={index} className="flex items-start gap-3">
-                                                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                                <span>{conselho}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
+                    {/* Suggested mentors */}
+                    {analysis.mentores_sugeridos?.length > 0 && (
+                        <Section
+                            title={t("quiz_results.suggested_mentors")}
+                            action={
+                                <Button size="sm" className="rounded-xl gap-2 print:hidden" onClick={() => setIsShareModalOpen(true)}>
+                                    <Send className="h-4 w-4" />
+                                    {t("quiz_results.share_with_mentor")}
+                                </Button>
+                            }
+                        >
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {analysis.mentores_sugeridos.map((mentor, index) => {
+                                    const name = mentor.mentor_nome?.trim()
+                                    const slug = name ? mentorSlugMap[name.toLowerCase()] : null
+                                    const href = slug
+                                        ? `/mentors/${slug}`
+                                        : name
+                                        ? `/mentors?search=${encodeURIComponent(name)}`
+                                        : "/mentors"
 
-                            {/* Next Steps */}
-                            <Card>
-                                <CardHeader>
-                                    <div className="flex items-center gap-2">
-                                        <Target className="h-6 w-6 text-primary" />
-                                        <CardTitle>{t('quiz_results.next_steps')}</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <ul className="space-y-3">
-                                        {analysis.proximos_passos.map((passo, index) => (
-                                            <li key={index} className="flex items-start gap-3">
-                                                <ArrowRight className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                                <span>{passo}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
-
-                            {/* Development Areas */}
-                            {analysis.areas_desenvolvimento &&
-                                analysis.areas_desenvolvimento.length > 0 && (
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle>{t('quiz_results.development_areas')}</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="flex flex-wrap gap-2">
-                                                {analysis.areas_desenvolvimento.map((area, index) => (
-                                                    <Badge key={index} variant="outline" className="text-sm">
-                                                        {area}
-                                                    </Badge>
-                                                ))}
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                )}
-
-                            {/* Final Message */}
-                            <Card className="border-2 border-primary/20 bg-primary/5">
-                                <CardContent className="pt-6">
-                                    <p className="text-center text-lg font-medium mb-4 text-primary">
-                                        {analysis.mensagem_final}
-                                    </p>
-
-                                    {/* Potential Mentor Section */}
-                                    {analysis.potencial_mentor && (
-                                        <div className="mt-6 p-4 bg-card rounded-lg border border-primary/20">
-                                            <div className="flex items-start gap-3">
-                                                <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
-                                                <div>
-                                                    <h4 className="font-semibold text-base text-foreground">
-                                                        {t('quiz_results.final_message_potential_mentor')}
-                                                    </h4>
-                                                    <p className="text-sm text-muted-foreground mt-1">
-                                                        {t('quiz_results.final_message_potential_mentor_description')}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Sidebar: mentors + actions */}
-                        <div className="lg:col-span-1 space-y-6 order-1 lg:order-2">
-                            {mentorsCard}
-
-                            {/* Share / Print Actions */}
-                            <Card className="print:hidden">
-                                <CardHeader>
-                                    <CardTitle className="text-center text-base">
-                                        {t('quiz_results.share_results')}
-                                    </CardTitle>
-                                    <CardDescription className="text-center">
-                                        {t('quiz_results.share_results_description')}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                    {response.is_owner && (
-                                        <Button
-                                            size="lg"
-                                            onClick={() => setIsShareModalOpen(true)}
-                                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl shadow-sm active:scale-[0.98]"
+                                    return (
+                                        <Link
+                                            key={index}
+                                            href={href}
+                                            className="group flex flex-col rounded-2xl border bg-card p-5 transition-colors hover:border-primary/60 break-inside-avoid"
                                         >
-                                            <Users className="mr-2 h-4 w-4" />
-                                            {t('quiz_results.share_with_mentor')}
-                                        </Button>
-                                    )}
-                                    <Button
-                                        size="lg"
-                                        variant="outline"
-                                        onClick={handlePrint}
-                                        className="w-full rounded-xl"
-                                    >
-                                        <Printer className="mr-2 h-4 w-4" />
-                                        {t('quiz_results.print')}
-                                    </Button>
-                                    <Button
-                                        size="lg"
-                                        variant="outline"
-                                        onClick={handleSendEmail}
-                                        disabled={sendingEmail}
-                                        className="w-full rounded-xl"
-                                    >
-                                        {sendingEmail ? (
-                                            <>
-                                                <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                                                {t('quiz_results.sending')}
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Mail className="mr-2 h-4 w-4" />
-                                                {t('quiz_results.send_by_email')}
-                                            </>
-                                        )}
-                                    </Button>
-                                    <Button
-                                        size="lg"
-                                        variant="outline"
-                                        onClick={handleShareWhatsApp}
-                                        className="w-full bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-xl"
-                                    >
-                                        <Share2 className="mr-2 h-4 w-4" />
-                                        {t('quiz_results.whatsapp')}
-                                    </Button>
-                                    <Button
-                                        size="lg"
-                                        variant="default"
-                                        onClick={handleShareLinkedIn}
-                                        className="w-full bg-[#0a66c2] text-white hover:bg-[#004182] border-none rounded-xl"
-                                    >
-                                        <Linkedin className="mr-2 h-4 w-4 fill-current" />
-                                        {t('quiz_results.linkedin')}
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
+                                            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                                                {mentor.tipo}
+                                            </p>
+                                            {name && (
+                                                <p className="mt-2 flex items-center gap-2 text-lg font-bold">
+                                                    {name}
+                                                    {mentor.disponivel && (
+                                                        <span
+                                                            className="h-2 w-2 rounded-full bg-green-500"
+                                                            title={t("quiz_results.available")}
+                                                            aria-label={t("quiz_results.available")}
+                                                        />
+                                                    )}
+                                                </p>
+                                            )}
+                                            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                                                {mentor.razao}
+                                            </p>
+                                            <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary print:hidden">
+                                                {name ? t("quiz_results.view_profile") : t("quiz_results.find_mentors")}
+                                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                                            </span>
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                            <Link
+                                href="/mentors"
+                                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary print:hidden"
+                            >
+                                {t("quiz_results.all_mentors")}
+                                <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </Section>
+                    )}
 
-                    <ShareDiagnosticModal
-                        isOpen={isShareModalOpen}
-                        onClose={() => setIsShareModalOpen(false)}
-                        quizResponseId={response.id}
-                        suggestedMentors={analysis.mentores_sugeridos}
-                        mentorIdMap={mentorIdMap}
-                    />
+                    {/* Practical advice */}
+                    {analysis.conselhos_praticos?.length > 0 && (
+                        <Section title={t("quiz_results.practical_advice")}>
+                            <ul className="space-y-3 rounded-2xl bg-accent p-6">
+                                {analysis.conselhos_praticos.map((tip, index) => (
+                                    <li key={index} className="flex items-start gap-3 break-inside-avoid">
+                                        <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                        <span className="leading-relaxed">{tip}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </Section>
+                    )}
+
+                    {/* Focus areas */}
+                    {analysis.areas_desenvolvimento?.length > 0 && (
+                        <Section title={t("quiz_results.development_areas")}>
+                            <div className="flex flex-wrap gap-2">
+                                {analysis.areas_desenvolvimento.map((area, index) => (
+                                    <span
+                                        key={index}
+                                        className="rounded-full border border-primary/30 px-3 py-1.5 text-sm font-medium text-foreground"
+                                    >
+                                        {area}
+                                    </span>
+                                ))}
+                            </div>
+                        </Section>
+                    )}
+
+                    {/* Closing message */}
+                    {analysis.mensagem_final && (
+                        <blockquote className="border-l-4 border-primary pl-5 text-lg font-medium leading-relaxed text-foreground break-inside-avoid">
+                            {analysis.mensagem_final}
+                        </blockquote>
+                    )}
+
+                    {/* Potential mentor */}
+                    {analysis.potencial_mentor && (
+                        <div className="flex flex-col gap-4 rounded-2xl bg-primary p-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between print:hidden">
+                            <div>
+                                <p className="text-lg font-bold">{t("quiz_results.final_message_potential_mentor")}</p>
+                                <p className="mt-1 text-sm opacity-90">
+                                    {t("quiz_results.final_message_potential_mentor_description")}
+                                </p>
+                            </div>
+                            <Button asChild variant="secondary" className="rounded-xl shrink-0">
+                                <Link href="/signup">{t("quiz_results.become_mentor")}</Link>
+                            </Button>
+                        </div>
+                    )}
                 </div>
-            </div>
-        </AnimatedBackground>
+
+                {/* Footer: AI disclaimer + retake */}
+                <footer className="mt-14 border-t pt-6 text-xs leading-relaxed text-muted-foreground">
+                    <p className="flex items-start gap-2">
+                        <Sparkles className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+                        <span>
+                            {t("quiz_results.ai_disclaimer")}
+                            {generatedOn && <> · {t("quiz_results.generated_on", { date: generatedOn })}</>}
+                        </span>
+                    </p>
+                    <Link
+                        href="/quiz"
+                        className="mt-3 inline-flex items-center gap-1.5 font-medium hover:text-primary print:hidden"
+                    >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        {t("quiz_results.retake_link")}
+                    </Link>
+                </footer>
+            </article>
+
+            <ShareDiagnosticModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                quizResponseId={response.id}
+                suggestedMentors={analysis.mentores_sugeridos}
+                mentorIdMap={mentorIdMap}
+            />
+        </div>
     )
 }

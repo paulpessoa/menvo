@@ -45,6 +45,12 @@ export default function Header() {
       icon: User,
       color: "text-gray-700"
     })
+    userNavigation.push({
+      name: t("footer.reportAndSupport"),
+      href: "/support",
+      icon: Shield,
+      color: "text-gray-700"
+    })
 
     if (isAdmin) {
       userNavigation.push({ type: "separator" })

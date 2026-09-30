@@ -140,13 +140,9 @@ export function SharedDiagnosticsSection() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-1 text-xs text-primary font-medium">
-                  <span className="flex items-center gap-1">
-                    <Shield className="h-3.5 w-3.5" />
-                    Visualização de Insights
-                  </span>
+                <div className="flex justify-end pt-1 text-xs text-primary font-medium">
                   <span className="flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    Ver Diagnóstico
+                    {share.scope === "summary" ? "Ver insights" : "Ver diagnóstico completo"}
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </span>
                 </div>

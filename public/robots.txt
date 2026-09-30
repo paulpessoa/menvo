@@ -41,6 +41,9 @@ Disallow: /es/setup/
 Disallow: /unauthorized
 Disallow: /en/unauthorized
 Disallow: /es/unauthorized
+Disallow: /support
+Disallow: /en/support
+Disallow: /es/support
 Disallow: /confirmation
 Disallow: /en/confirmation
 Disallow: /es/confirmation

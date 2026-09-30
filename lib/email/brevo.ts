@@ -1108,7 +1108,7 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
   const mentorProfileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors/${data.mentorSlug}`;
 
   const content = `
-    <p>Um mentor da Menvo viu seu perfil e quer se conectar com você.</p>
+    <p>Alguém viu seu perfil e quer se conectar com você.</p>
     
     ${data.customMessage ? `
     <p>Olha a mensagem:</p>

@@ -19,7 +19,6 @@
   <a href="https://www.menvo.com.br/">Website</a> •
   <a href="https://www.menvo.com.br/about">About</a> •
   <a href="https://www.menvo.com.br/mentors">Find Mentors</a> •
-  <a href="https://www.menvo.com.br/doar">Donate (PIX)</a> •
   <a href="https://www.menvo.com.br/contact">Contact</a>
 </p>
 
@@ -127,7 +126,6 @@ menvo/
 - `/mentors` - Public directory of verified mentors with category and skill filters.
 - `/how-it-works` - Comprehensive guides for mentees, mentors, NGOs, and companies.
 - `/community` - Community discovery board for members offering and seeking guidance.
-- `/doar` - Direct zero-fee PIX donation card to support platform servers.
 - `/contact` - Official contact channels (Email & WhatsApp support).
 - `/quiz` - Career diagnostic onboarding flow with personalized recommendations.
 - `/privacy` & `/terms` - Privacy Policy (LGPD compliant) and Terms of Service.
