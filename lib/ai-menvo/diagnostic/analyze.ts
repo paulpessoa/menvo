@@ -105,7 +105,17 @@ INSTRUÇÕES:
    - Retorne uma mensagem educativa pedindo mais atenção e sugerindo refazer o questionário
    - Use o campo "precisa_refazer" como true nestes casos
 
-2. Se as respostas forem adequadas, crie uma análise calorosa, profissional e motivadora
+2. Se as respostas forem adequadas, crie uma análise calorosa, profissional e direta
+   - "titulo_personalizado": uma manchete curta (máx. 60 caracteres) que resuma a DIREÇÃO da pessoa, escrita como destino ou movimento, em linguagem simples.
+     NÃO inclua o nome da pessoa, travessões, dois-pontos nem palavras genéricas como "rota", "análise", "perfil", "jornada" ou "diagnóstico".
+     Bons exemplos: "Da sala de aula para uma nova fonte de renda", "Pronta para liderar o primeiro time", "Primeiro emprego em tecnologia em 6 meses".
+     O título aparece em prévias de links compartilhados, então não exponha detalhes sensíveis (saúde, finanças, família).
+   - "resumo_motivador": no máximo 2 frases (até ~50 palavras), falando diretamente com a pessoa pelo primeiro nome. Sem elogios vazios.
+   - "proximos_passos": exatamente 3 ações concretas, em ordem de execução, cada uma começando com um verbo no imperativo e com prazo quando fizer sentido. Máx. ~30 palavras cada.
+   - "conselhos_praticos": itens curtos (máx. ~30 palavras cada), sem repetir os próximos passos.
+   - "areas_desenvolvimento": 3 a 5 rótulos curtos (máx. 5 palavras cada).
+   - "mensagem_final": 1 frase de encorajamento, sem repetir o resumo.
+   - "razao" de cada mentor: 1 frase explicando como aquele mentor ajuda neste caso específico.
 3. Sugira 2-3 tipos de mentores baseados nas áreas de interesse:
    - REGRA CRÍTICA: NUNCA invente nomes de mentores fictícios.
    - Em "mentor_nome", use ESTRITAMENTE o nome de um mentor real presente na lista "MENTORES DISPONÍVEIS NA PLATAFORMA" acima, caso haja sinergia com a área.
@@ -222,7 +232,7 @@ export function fallbackAnalysis(answers: QuizAnswers, mentors: AnalysisMentor[]
 
   return {
     precisa_refazer: false,
-    titulo_personalizado: "Seu Perfil de Crescimento Profissional",
+    titulo_personalizado: "Seu próximo passo na carreira",
     resumo_motivador:
       "Você demonstra clareza sobre seus objetivos e está no caminho certo para alcançá-los. Continue investindo em seu desenvolvimento!",
     mentores_sugeridos: mentoresSugeridos,
