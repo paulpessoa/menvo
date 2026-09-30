@@ -68,3 +68,33 @@ export const updateFeedbackSchema = z.object({
 })
 
 export type UpdateFeedbackInput = z.infer<typeof updateFeedbackSchema>
+
+// ---------------------------------------------------------------------------
+// Admin: gestão de sessões (/dashboard/admin/appointments)
+// ---------------------------------------------------------------------------
+
+export const ADMIN_CANCEL_REASON_MIN_LENGTH = 10
+
+/** Motivo do cancelamento feito pela equipe: vai por e-mail para mentor e mentorado. */
+export const adminCancelAppointmentSchema = z.object({
+  reason: z
+    .string({ required_error: "Informe o motivo do cancelamento" })
+    .trim()
+    .min(
+      ADMIN_CANCEL_REASON_MIN_LENGTH,
+      `Informe o motivo do cancelamento (mínimo de ${ADMIN_CANCEL_REASON_MIN_LENGTH} caracteres)`
+    )
+    .max(1000, "Motivo não pode exceder 1000 caracteres")
+})
+
+export type AdminCancelAppointmentInput = z.infer<typeof adminCancelAppointmentSchema>
+
+export const ADMIN_RESEND_TARGETS = ["mentor_request", "confirmation"] as const
+
+export const adminResendAppointmentSchema = z.object({
+  target: z.enum(ADMIN_RESEND_TARGETS, {
+    errorMap: () => ({ message: "Tipo de reenvio inválido" })
+  })
+})
+
+export type AdminResendTarget = (typeof ADMIN_RESEND_TARGETS)[number]

@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+  CalendarDays,
   Users,
   Clock,
   Shield,
@@ -93,6 +94,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/users",
       icon: Users,
       color: "bg-primary"
+    },
+    {
+      title: "Sessões de Mentoria",
+      description: "Todos os pedidos e sessões com status, reenvio de e-mails e cancelamento",
+      href: "/dashboard/admin/appointments",
+      icon: CalendarDays,
+      color: "bg-rose-600"
     },
     {
       title: "Relatórios & IA",
