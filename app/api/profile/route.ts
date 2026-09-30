@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { updateProfileSchema } from "@/lib/schemas/profile"
+import { extractIdentity } from "@/lib/auth/oauth-identity"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -110,11 +111,14 @@ export async function GET(request: NextRequest) {
     if (fetchError) {
       if (fetchError.code === "PGRST116") {
         // Profile doesn't exist, create it
+        // Nome de qualquer provedor (e-mail, Google, LinkedIn...), não só das
+        // chaves first_name/last_name do cadastro por e-mail.
+        const identity = extractIdentity(user.user_metadata)
         const profileData = {
           id: user.id,
           email: user.email || "",
-          first_name: user.user_metadata?.first_name || "",
-          last_name: user.user_metadata?.last_name || "",
+          first_name: identity.firstName,
+          last_name: identity.lastName,
           verified: false,
         }
 
