@@ -23,8 +23,9 @@ export function QuizVoiceTextareaStep({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        className="rounded-2xl bg-card p-4 text-base leading-relaxed"
       />
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-muted-foreground" aria-live="polite">
         {minCharsLabel} • {value.length} {charsLabel}
       </p>
     </div>
