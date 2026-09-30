@@ -32,14 +32,16 @@ export default function LoginPage() {
 function LoginFormContent() {
   const t = useTranslations("login")
   const tc = useTranslations("common")
-  const [email, setEmail] = useState("")
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextParam = searchParams.get("next")
+  // Pre-filled when we already know who is arriving, e.g. straight from the
+  // quiz results page after saving the analysis to a new account.
+  const [email, setEmail] = useState(() => searchParams.get("email") ?? "")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSocialLoading, setIsSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState("")
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const nextParam = searchParams.get("next")
   const { signIn, signInWithProvider, user, role, loading, isInitializing, getDefaultRedirectPath } = useAuth()
 
   const isAuthenticated = !!user && !loading && !isInitializing

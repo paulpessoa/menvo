@@ -67,6 +67,13 @@ export function SaveAnalysisBanner({ quizId, token }: SaveAnalysisBannerProps) {
     }
   }
 
+  // Back to this analysis after signing in, with the e-mail already filled.
+  const goToLogin = () =>
+    router.push({
+      pathname: "/login",
+      query: { email, next: `/quiz/results/${quizId}` }
+    })
+
   if (status === "checking" || status === "invalid") return null
 
   return (
@@ -82,7 +89,7 @@ export function SaveAnalysisBanner({ quizId, token }: SaveAnalysisBannerProps) {
                 <h3 className="font-semibold text-foreground">
                   {t("quiz_results.save_analysis_success")}
                 </h3>
-                <Button onClick={() => router.push("/login")} className="rounded-xl">
+                <Button onClick={goToLogin} className="rounded-xl">
                   <CheckCircle2 className="mr-2 h-4 w-4" />
                   {t("quiz_results.save_analysis_go_to_login")}
                 </Button>
@@ -95,7 +102,7 @@ export function SaveAnalysisBanner({ quizId, token }: SaveAnalysisBannerProps) {
                 <p className="text-sm text-muted-foreground">
                   {t("quiz_results.save_analysis_account_exists_description")}
                 </p>
-                <Button onClick={() => router.push("/login")} variant="outline" className="rounded-xl">
+                <Button onClick={goToLogin} variant="outline" className="rounded-xl">
                   {t("quiz_results.save_analysis_account_exists_button")}
                 </Button>
               </>

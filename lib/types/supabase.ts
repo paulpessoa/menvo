@@ -2180,6 +2180,25 @@ export type Database = {
         Args: { p_email: string }
         Returns: string
       }
+      get_shared_diagnostics_for_mentor: {
+        Args: { p_share_id?: string | null }
+        Returns: {
+          share_id: string
+          quiz_response_id: string | null
+          diagnostic_session_id: string | null
+          scope: string
+          created_at: string
+          mentee_id: string
+          mentee_full_name: string | null
+          mentee_avatar_url: string | null
+          analysis: Json | null
+          development_areas: string[] | null
+          current_challenge: string | null
+          future_vision: string | null
+          career_moment: string | null
+          personal_life_help: string | null
+        }[]
+      }
       owns_quiz_response: {
         Args: { p_id: string }
         Returns: boolean

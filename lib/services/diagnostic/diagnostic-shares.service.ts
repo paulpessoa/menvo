@@ -212,107 +212,24 @@ export class DiagnosticSharesService {
    * and high-level insights.
    *
    * @param supabase - Authenticated Supabase client (logged in as mentor)
-   * @param mentorId - ID of the mentor
+   * @param mentorId - ID of the mentor, kept for the caller's symmetry; the RPC
+   *   derives the mentor from `auth.uid()` and ignores anything passed here.
    * @returns Array of active shares with mentee info and insights
    */
   async listSharesForMentor(
     supabase: SupabaseClient,
     mentorId: string
   ): Promise<SharedDiagnosticInsight[]> {
-    const { data: shares, error } = await supabase
-      .from("diagnostic_shares")
-      .select("id, diagnostic_session_id, quiz_response_id, mentee_id, mentor_id, scope, created_at, revoked_at")
-      .eq("mentor_id", mentorId)
-      .is("revoked_at", null)
-      .order("created_at", { ascending: false })
+    const { data, error } = await supabase.rpc("get_shared_diagnostics_for_mentor", {
+      p_share_id: null
+    })
 
     if (error) {
       console.error("[DiagnosticSharesService] Error listing mentor shares:", error)
       throw error
     }
 
-    if (!shares || shares.length === 0) return []
-
-    // 1. Fetch mentee profiles
-    const menteeIds = Array.from(new Set(shares.map((s) => s.mentee_id)))
-    const { data: mentees } = await supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url")
-      .in("id", menteeIds)
-
-    const menteeMap = new Map<string, { id: string; fullName: string; avatarUrl?: string | null }>()
-    for (const m of mentees || []) {
-      menteeMap.set(m.id, {
-        id: m.id,
-        fullName: m.full_name || "Mentorado",
-        avatarUrl: m.avatar_url || null
-      })
-    }
-
-    // 2. Fetch quiz_responses for the shared diagnostics
-    const quizResponseIds = shares
-      .map((s) => s.quiz_response_id)
-      .filter((id): id is string => Boolean(id))
-
-    const sessionIds = shares
-      .map((s) => s.diagnostic_session_id)
-      .filter((id): id is string => Boolean(id))
-
-    let responsesByQuizId = new Map<string, any>()
-    let responsesBySessionId = new Map<string, any>()
-
-    if (quizResponseIds.length > 0 || sessionIds.length > 0) {
-      let query = supabase.from("quiz_responses").select("*")
-
-      if (quizResponseIds.length > 0 && sessionIds.length > 0) {
-        query = query.or(`id.in.(${quizResponseIds.join(",")}),diagnostic_session_id.in.(${sessionIds.join(",")})`)
-      } else if (quizResponseIds.length > 0) {
-        query = query.in("id", quizResponseIds)
-      } else {
-        query = query.in("diagnostic_session_id", sessionIds)
-      }
-
-      const { data: responses } = await query
-      for (const r of responses || []) {
-        if (r.id) responsesByQuizId.set(r.id, r)
-        if (r.diagnostic_session_id) responsesBySessionId.set(r.diagnostic_session_id, r)
-      }
-    }
-
-    return shares.map((s) => {
-      const response = s.quiz_response_id
-        ? responsesByQuizId.get(s.quiz_response_id)
-        : s.diagnostic_session_id
-          ? responsesBySessionId.get(s.diagnostic_session_id)
-          : null
-
-      const mentee = menteeMap.get(s.mentee_id) || {
-        id: s.mentee_id,
-        fullName: "Mentorado",
-        avatarUrl: null
-      }
-
-      const isSummary = s.scope === "summary"
-      const rawAnalysis = (response?.ai_analysis as unknown as QuizAnalysisResult) || null
-
-      // Privacy: omit personal life in summary scope
-      const personalLifeHelp = isSummary ? null : response?.personal_life_help || null
-
-      return {
-        shareId: s.id,
-        quizResponseId: s.quiz_response_id,
-        diagnosticSessionId: s.diagnostic_session_id,
-        scope: s.scope as "summary" | "full",
-        createdAt: s.created_at,
-        mentee,
-        analysis: rawAnalysis,
-        developmentAreas: response?.development_areas || rawAnalysis?.areas_desenvolvimento || [],
-        currentChallenge: response?.current_challenge || null,
-        futureVision: response?.future_vision || null,
-        careerMoment: response?.career_moment || null,
-        personalLifeHelp
-      }
-    })
+    return (data || []).map(mapSharedDiagnosticRow)
   }
 
   /**
@@ -320,7 +237,8 @@ export class DiagnosticSharesService {
    * guaranteeing read-only access and privacy scope enforcement.
    *
    * @param supabase - Authenticated Supabase client
-   * @param mentorId - ID of the mentor
+   * @param mentorId - ID of the mentor, kept for the caller's symmetry; the RPC
+   *   derives the mentor from `auth.uid()` and ignores anything passed here.
    * @param shareId - UUID of the share
    * @returns SharedDiagnosticInsight or null if revoked/unauthorized
    */
@@ -329,65 +247,49 @@ export class DiagnosticSharesService {
     mentorId: string,
     shareId: string
   ): Promise<SharedDiagnosticInsight | null> {
-    const { data: share, error } = await supabase
-      .from("diagnostic_shares")
-      .select("id, diagnostic_session_id, quiz_response_id, mentee_id, mentor_id, scope, created_at, revoked_at")
-      .eq("id", shareId)
-      .eq("mentor_id", mentorId)
-      .is("revoked_at", null)
-      .maybeSingle()
+    const { data, error } = await supabase.rpc("get_shared_diagnostics_for_mentor", {
+      p_share_id: shareId
+    })
 
-    if (error || !share) return null
-
-    // Fetch mentee profile
-    const { data: menteeProfile } = await supabase
-      .from("profiles")
-      .select("id, full_name, avatar_url")
-      .eq("id", share.mentee_id)
-      .maybeSingle()
-
-    const mentee = {
-      id: share.mentee_id,
-      fullName: menteeProfile?.full_name || "Mentorado",
-      avatarUrl: menteeProfile?.avatar_url || null
+    if (error) {
+      console.error("[DiagnosticSharesService] Error loading mentor share:", error)
+      return null
     }
 
-    // Fetch quiz response
-    let response: any = null
-    if (share.quiz_response_id) {
-      const { data } = await supabase
-        .from("quiz_responses")
-        .select("*")
-        .eq("id", share.quiz_response_id)
-        .maybeSingle()
-      response = data
-    } else if (share.diagnostic_session_id) {
-      const { data } = await supabase
-        .from("quiz_responses")
-        .select("*")
-        .eq("diagnostic_session_id", share.diagnostic_session_id)
-        .maybeSingle()
-      response = data
-    }
+    const row = Array.isArray(data) ? data[0] : data
+    if (!row) return null
 
-    const isSummary = share.scope === "summary"
-    const rawAnalysis = (response?.ai_analysis as unknown as QuizAnalysisResult) || null
-    const personalLifeHelp = isSummary ? null : response?.personal_life_help || null
+    return mapSharedDiagnosticRow(row)
+  }
+}
 
-    return {
-      shareId: share.id,
-      quizResponseId: share.quiz_response_id,
-      diagnosticSessionId: share.diagnostic_session_id,
-      scope: share.scope as "summary" | "full",
-      createdAt: share.created_at,
-      mentee,
-      analysis: rawAnalysis,
-      developmentAreas: response?.development_areas || rawAnalysis?.areas_desenvolvimento || [],
-      currentChallenge: response?.current_challenge || null,
-      futureVision: response?.future_vision || null,
-      careerMoment: response?.career_moment || null,
-      personalLifeHelp
-    }
+/**
+ * One row of `get_shared_diagnostics_for_mentor` -> the shape the mentor UI
+ * consumes. The row already has `personal_life_help` blanked by the database
+ * for a 'summary' share, and never carries the mentee's name, e-mail or
+ * LinkedIn: this mapping only renames fields, it is not where privacy is
+ * decided (migration 20260930000001).
+ */
+function mapSharedDiagnosticRow(row: any): SharedDiagnosticInsight {
+  const analysis = (row.analysis as unknown as QuizAnalysisResult) || null
+
+  return {
+    shareId: row.share_id,
+    quizResponseId: row.quiz_response_id,
+    diagnosticSessionId: row.diagnostic_session_id,
+    scope: row.scope as "summary" | "full",
+    createdAt: row.created_at,
+    mentee: {
+      id: row.mentee_id,
+      fullName: row.mentee_full_name || "Mentorado",
+      avatarUrl: row.mentee_avatar_url || null
+    },
+    analysis,
+    developmentAreas: row.development_areas || analysis?.areas_desenvolvimento || [],
+    currentChallenge: row.current_challenge || null,
+    futureVision: row.future_vision || null,
+    careerMoment: row.career_moment || null,
+    personalLifeHelp: row.personal_life_help || null
   }
 }
 
