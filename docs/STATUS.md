@@ -106,6 +106,16 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-01 - Auditoria LGPD dos e-mails
+- **Why:** só os e-mails de reengajamento, retenção de 30/1 dia e quiz citavam a Política de Privacidade; os demais (agendamento, org, auth, contato do mentor) não.
+- **Rodapé padrão (`getEmailLayout`):** todo e-mail enviado por `lib/email/brevo.ts` agora traz o link `/privacy` e o contato do encarregado (`PRIVACY_CONTACT`); o ano deixou de ser fixo. Os `footerExtra` ficaram só com o motivo do envio. Os 13 templates de `supabase/templates/` receberam a mesma linha (precisam ser recolados no painel do Supabase Auth para valer em produção).
+- **Inatividade:** o aviso de 30 dias agora diz por que a pessoa recebeu e tem o link "pode apagar agora" (`/settings`).
+- **Contato do mentor (`sendMentorContactEmail`):** aviso de origem + como parar de receber; a rota `/api/community/contact` respeita `profiles.email_opt_out_at`.
+- **Escape de HTML:** nomes, mensagens, motivo de cancelamento, observações e comentários de avaliação passam por `escapeHtml` nos e-mails de agendamento, verificação, avaliação e aviso ao admin. O aviso inline de `appointments/create` virou `sendAdminNewAppointmentNotification`.
+- **Código de migração removido:** `lib/migration-notifications.ts` e `app/api/admin/send-migration-notifications` apagados (legado: senha em texto puro, remetente de exemplo, `service_role`). Templates do Supabase Auth recolados no painel pelo Paul.
+- **Pendente (manual):** apagar os 3 templates de exemplo da conta Brevo (Transactional > Templates).
+- **Teste que já falhava antes:** `lib/services/assistant/agent.test.ts` (2 testes na `main`).
+
 ### 2026-09-25 - Retenção automática de contas importadas nunca ativadas
 - **Why:** o convite de reengajamento (acima) está sendo disparado para a base JotForm/Estágio Recife. Quem nunca ativar a conta deve ter os dados apagados por minimização (LGPD art. 6º III), não ficar acumulando para sempre. Plano completo em [`domains/account-retention.md`](domains/account-retention.md), executado em 5 fases/commits (com a ordem das Fases 2 e 3 invertida em relação ao plano: os templates de e-mail foram implementados antes do executor, porque o executor os chama diretamente e precisava deles para compilar).
 - **Migração `20260928000000_account_retention.sql`:** tabela `account_retention` (fila; `user_id` PK) e `retention_policy` adicionado ao `check` de `data_deletion_log.source`.
