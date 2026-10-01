@@ -89,6 +89,20 @@ const nextConfig = {
         ]
       }
     ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/faq',
+        destination: '/ajuda/perguntas-frequentes',
+        permanent: true,
+      },
+      {
+        source: '/:locale/faq',
+        destination: '/:locale/ajuda/perguntas-frequentes',
+        permanent: true,
+      }
+    ]
   }
 }
 
