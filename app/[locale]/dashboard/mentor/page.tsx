@@ -117,7 +117,7 @@ export default function MentorDashboard() {
               </Button>
               <Button asChild size="sm" className="rounded-xl font-bold h-10 px-5 bg-primary hover:bg-primary/90 text-white shadow-xs">
                 <Link href="/dashboard/mentor/availability">
-                  <Clock className="h-4 w-4 mr-2" /> Agenda (45 min)
+                  <Clock className="h-4 w-4 mr-2" /> {t("mentor.actions.availability")}
                 </Link>
               </Button>
             </div>
