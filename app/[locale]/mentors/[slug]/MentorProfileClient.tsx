@@ -162,7 +162,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary/30 via-background to-background">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
         {/* Navigation */}
         <div className="mb-8 flex items-center justify-between">
