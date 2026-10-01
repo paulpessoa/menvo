@@ -122,6 +122,14 @@ export default function Footer() {
                   {t("footer.faq")}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/ajuda"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Central de Ajuda
+                </Link>
+              </li>
 
               <li>
                 <Link
