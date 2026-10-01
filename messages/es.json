@@ -712,23 +712,6 @@
       "secondary": "Saber Mais"
     }
   },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Darse de baja del boletín",
-      "description": "Lamentamos verte partir. Ingresa tu correo electrónico para darte de baja.",
-      "successTitle": "Baja exitosa",
-      "successDescription": "Has sido eliminado de nuestra lista de boletines. ¡Te extrañaremos!",
-      "rejoinText": "Si cambias de opinión, puedes volver a suscribirte en cualquier momento a través de nuestro sitio web.",
-      "rejoinButton": "Suscribirse de nuevo",
-      "considerTitle": "Antes de cancelar, considera:",
-      "considerItem1": "Solo recibirás contenido relevante sobre mentoría",
-      "considerItem2": "Enviamos un máximo de 2 correos por semana",
-      "considerItem3": "Puedes volver a suscribirte en cualquier momento",
-      "button": "Darse de baja",
-      "cancelling": "Dando de baja...",
-      "backToSite": "Volver al sitio"
-    }
-  },
   "privacy": {
     "badge": "Privacidad y Seguridad",
     "title": "Política de Privacidad",
