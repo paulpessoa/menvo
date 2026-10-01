@@ -40,6 +40,9 @@ Remember to start your message with a verb like: Add, Refactor, Delete, Fix, etc
 
 **Note:** Try to keep your messages under 50 characters and detail the changes in the commit description. While not mandatory, this is a well-known and widely used practice in the Git community.
 
+### No AI attribution
+Never credit an AI tool as author, committer or co-author of a commit or PR: no `Co-authored-by: Claude ...`, no "Generated with ..." lines, no session links, in commit messages, PR titles or PR bodies. This applies to people and to AI agents in any environment (local, cloud, web). When squash-merging on GitHub, check the merge message for an AI trailer before confirming. The `No AI attribution` workflow fails PRs that break this rule.
+
 ## Submitting your changes
 After making your changes, push them to the remote repository:
 ```bash

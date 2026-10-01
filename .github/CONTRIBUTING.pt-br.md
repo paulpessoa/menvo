@@ -42,6 +42,9 @@ Lembre-se de começar sua mensagem com uma palavra como: Adicionar, refatorar, d
 
 **Nota:** Tente manter suas mensagens com menos de 50 caractéres e detalhar as alterações na descrição do commit. Apesar de não ser obrigatório, esta é uma prática muito conhecida e utilizada na comunidade do Git.
 
+### Sem atribuição a IA
+Nunca credite uma ferramenta de IA como autora, committer ou coautora de um commit ou PR: nada de `Co-authored-by: Claude ...`, linhas "Generated with ..." ou links de sessão, nas mensagens de commit, nos títulos ou nas descrições de PR. Vale para pessoas e para agentes de IA em qualquer ambiente (local, nuvem, web). Ao fazer squash merge no GitHub, confira a mensagem de merge antes de confirmar. O workflow `No AI attribution` reprova PRs que quebrarem esta regra.
+
 ## Submetendo suas alterações
 Após ter realizado as mudanças, suba suas mudanças para o repositório remoto:
 ```bash

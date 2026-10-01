@@ -61,6 +61,12 @@ We enforce Conventional Commits:
 - `docs:` Documentation changes only.
 - `test:` Adding or updating tests.
 
+### No AI attribution
+
+Never credit an AI tool as author, committer or co-author of a commit or PR: no `Co-authored-by: Claude ...`, no "Generated with ..." lines, no session links, in commit messages, PR titles or PR bodies. This applies to humans and to AI agents working in any environment (local, cloud, web).
+
+When squash-merging on GitHub, check the merge message for an AI trailer before confirming. The `No AI attribution` workflow fails PRs that break this rule.
+
 ---
 
 ## ✍️ Content & UX Writing Contributions (no coding needed)
