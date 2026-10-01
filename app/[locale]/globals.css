@@ -4,7 +4,9 @@
 
 @layer base {
   :root {
-    --background: 0 0% 94.1%; /* #f0f0f0 */
+    --background: 0 0% 100%;
+    /* Page canvas behind main content, so white cards stand out. Kept separate from --background, which is the surface for header, footer, inputs and dialogs. */
+    --canvas: 210 20% 96%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -28,6 +30,7 @@
 
   .dark {
     --background: 222.2 84% 4.9%;
+    --canvas: 222.2 84% 3%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;

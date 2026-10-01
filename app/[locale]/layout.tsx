@@ -156,7 +156,7 @@ export default async function RootLayout({
               <div className="contents print:hidden">
                 <Header />
               </div>
-              <main id="main-content" className="flex-1">
+              <main id="main-content" className="flex-1 bg-canvas">
                 <MaintenanceGuard>
                   {children}
                 </MaintenanceGuard>
