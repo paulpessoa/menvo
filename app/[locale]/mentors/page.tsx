@@ -29,6 +29,7 @@ import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { toast } from "sonner"
 import { useLocale, useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
+import { searchCatalogAction, getCatalogFilterOptionsAction } from "@/app/actions/mentors"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useAiQuota } from "@/hooks/useAiQuota"
@@ -98,6 +99,7 @@ export default function MentorsPage() {
   const [page, setPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
+  const loaderRef = useRef<HTMLDivElement>(null)
 
   const [suggestedMentors, setSuggestedMentors] = useState<
     Record<string, string>
@@ -139,7 +141,7 @@ export default function MentorsPage() {
         setLoadingMore(true)
       }
 
-      const { data, count } = await mentorService.searchCatalog({
+      const { data, count } = await searchCatalogAction({
         filters: {
           // Em modo IA, o texto digitado já foi consumido pelo endpoint
           // de match - aqui filtramos por tema (filters.topics), não pelo
@@ -203,7 +205,7 @@ export default function MentorsPage() {
 
   const fetchFilterOptions = async () => {
     try {
-      const options = await mentorService.getCatalogFilterOptions()
+      const options = await getCatalogFilterOptionsAction()
       setAvailableFilters(options)
     } catch (error) {
       console.error("Error fetching filter options:", error)
@@ -275,11 +277,30 @@ export default function MentorsPage() {
     experienceYears: filters.experienceYears !== "all" ? filters.experienceYears : undefined,
   }), [filters])
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return
     const nextPage = page + 1
     setPage(nextPage)
     fetchMentors(false, nextPage)
-  }
+  }, [loadingMore, hasMore, page, fetchMentors])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          handleLoadMore()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    const currentRef = loaderRef.current
+    if (currentRef) observer.observe(currentRef)
+
+    return () => {
+      if (currentRef) observer.unobserve(currentRef)
+    }
+  }, [hasMore, loadingMore, handleLoadMore])
 
   const handleAIMatch = async (
     suggestions: Array<{ mentor_id: string; reason: string }>,
@@ -903,25 +924,15 @@ export default function MentorsPage() {
             ))}
           </div>
 
-          {/* Load More */}
+          {/* Infinite Scroll Trigger */}
           {hasMore && (
-            <div className="mt-12 text-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="rounded-xl border-2 font-bold px-10"
-              >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                    {t("loading")}
-                  </>
-                ) : (
-                  t("loadMore")
-                )}
-              </Button>
+            <div ref={loaderRef} className="mt-12 flex justify-center p-4">
+              {loadingMore && (
+                <div className="flex items-center text-muted-foreground font-medium">
+                  <Loader2 className="mr-2 animate-spin h-5 w-5" />
+                  {t("loading")}
+                </div>
+              )}
             </div>
           )}
         </>
