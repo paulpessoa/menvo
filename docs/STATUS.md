@@ -74,33 +74,33 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ### 🟠 P1 - High Priority
 - [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification - all completed pre-2026-09-16, see journal below for detail.
-- [ ] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
-- [ ] **`messages/{pt-BR,en,es}.json` have duplicate top-level `"privacy"` and `"terms"` keys.** JSON silently keeps the *last* occurrence, so the first block of each is dead - unreachable by `t()`, never rendered. Found because `privacy.reengagement` (added 2026-09-27) had been written into the dead first block and was never actually live; fixed by adding it and the new `privacy.retention`/`terms.inactivity` sections to the live (second) block instead. The dead blocks (~150 lines duplicated three times) are still there and should be deleted in a dedicated cleanup - didn't do it here to avoid colliding with concurrent edits to the same files.
+- [x] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
 
 ### 🟡 P2 - Medium Priority
+- [x] **Painel Admin para Fila de Retenção:** card no admin mostrando a fila (quantos em cada etapa, próximas exclusões) e um botão "isentar" por pessoa. Implementado em `/dashboard/admin/retention`.
 - [x] Profile & Calendar Sync Polish, In-App Notifications Hub, Database Portability/BFF audit, Transactional Email Hardening, Brand Color Harmonization, Evaluation Flow Distinction, Admin Breadcrumb Unification.
 
 ### 🔵 P3 - Future / Strategic
 - [x] **UI Width/Container Standardization:** Shared `PageContainer` component, 1280px cap app-wide, obsolete `AdminBreadcrumb` removed.
 - [x] **`/mentors` Dead-Click Fix:** Whole `MentorCard` interactive, dismissable filter chips (found via Clarity).
 - [x] **Multi-Tenant Phase 1:** Organizations, invite/request/approve membership, org admin dashboard, platform admin org CRUD. Shipped in PR #45.
-- [ ] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Shipped in code on 2026-09-17 (see journal and [`domains/organizations.md`](domains/organizations.md) §6).
+- [x] **Multi-Tenant Phase 1.5:** Role-aware member reporting (beneficiaries vs org mentors), `join_policy` (open/invite-only), coherent per-role emails, sitemap/SEO for org pages. Shipped in code on 2026-09-17 (see journal and [`domains/organizations.md`](domains/organizations.md) §6).
 - [x] **AI-First Platform - Fase 0 (Fundação):** Cota mensal + medição de custo no Postgres (`ai_budget`), DTOs enxutos, `@langchain/langgraph`, registro de modelos por capacidade (`lib/ai/models`, ADR 0004), protocolo SSE tipado com Zod (`lib/ai/protocol.ts`), ADRs 0001–0004 e `docs/governance/ai-policy.md`.
 - [x] **AI-First Platform - Fase 1 (Diagnóstico Agêntico em Código):** Migração `20260924000000_ai_diagnostic_sessions_and_threads.sql` (`diagnostic_sessions`, `ai_threads`, `ai_messages`, `quiz_responses.user_id`), engine com máquina de estados de 7 passos (`lib/ai-menvo/diagnostic/`), componentes interativos `ChipGroup` e `DiagnosticProgressBar`, rota com streaming SSE (`app/api/assistant/route.ts`), input de voz Web Speech API, salvaguarda de crise (CVV 188) e cota mensal integrada.
 - [x] **AI-First Platform - Fase 2 (Copiloto por Papel, Briefing e Ferramentas RBAC):** Briefing determinístico sem tokens (`/api/assistant/briefing`), tools com RBAC por papel (`getMyAppointments`, `getPendingEvaluations`, `getMentorRequests`), prompt de sistema adaptativo por papel (`mentee`, `mentor`, `admin`), e navegação fluida por chips de atalho.
 - [x] **AI-First Platform - Fase 2 (Compartilhamento Seguro de Diagnóstico com o Mentor):** Migração `20260924000002_diagnostic_shares.sql` (`diagnostic_shares` com RLS estrita), serviço `diagnostic-shares.service.ts` com sanitização por escopo (`summary` vs `full`, LGPD §12.2), rotas BFF `/api/diagnostic/shares`, modal `ShareDiagnosticModal` na página `/quiz/results/[id]`, e visualizador só-leitura no painel do mentor (`/mentor/appointments` e `/dashboard/mentor`).
 - [x] **AI-First Platform - Fase 2 (Job de Retenção LGPD para IA):** Rota `/api/cron/ai-retention` protegida por `CRON_SECRET`, agendada diariamente no `vercel.json`, expurgando estados intermediários de diagnóstico > 30 dias, threads de IA > 12 meses e compartilhamentos revogados > 12 meses (§12.1).
 - [ ] **Paid tier / BYOK (far future):** only after `/dashboard/admin/ai-usage` shows real cost per active user. Entitlements are already per role, so a paid plan = a new role (e.g. `supporter`) with higher limits; BYOK = a per-user provider key resolved before the provider list in the AI service.
-- [ ] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
+- [x] **AI Assistant Phase 2 (Contexto Avançado):** Integrar a verificação de conclusão do `/quiz` ao contexto do agente para que ele possa questionar o usuário sobre insights recebidos ou sugerir ativamente o quiz se a pessoa estiver desorientada e ainda não tiver feito.
 - [x] **Convites de reengajamento (base JotForm/Estágio Recife) + exclusão LGPD:** modal `/dashboard/admin/users` para enviar campanhas a qualquer público (selecionados, base JotForm ainda não convidada, nunca entraram, todos); e-mail com corpo editável pelo admin e rodapé fixo de LGPD; página pública `/convite/[token]` (aceitar, virar mentor, parar de receber e-mails, ou apagar dados/perfil - sem login). Ver [`domains/reengagement-invites.md`](domains/reengagement-invites.md) e ADR 0005.
-- [ ] **Exclusão de conta self-service em `/settings`:** `handleDeleteAccount` ainda é um placeholder (não deleta nada). Reusar `lib/services/admin/delete-user.service.ts` (`deleteUserCompletely(..., { source: "self_service" })`) - o mesmo serviço já usado pelo admin e pelo fluxo de convite.
+- [x] **Exclusão de conta self-service em `/settings`:** Implementado usando `lib/services/admin/delete-user.service.ts` (`deleteUserCompletely(..., { source: "self_service" })`). A rota `/api/profile/delete` já apaga corretamente e o botão na UI está funcional.
 - [x] **Retenção automática de contas importadas nunca ativadas:** `account_retention` (fila), `planRetentionActions` (decisão pura, testada) + `runRetention` (execução), cron diário `/api/cron/account-retention` (falha fechado sem `CRON_SECRET`), avisos de 30 e 1 dia + confirmação de exclusão por e-mail, novas seções `terms.inactivity`/`privacy.retention`. Ver [`domains/account-retention.md`](domains/account-retention.md). **Rodando em `RETENTION_MODE=dry_run`** - só passar para `live` depois de uma revisão do Opus (checklist §10 do doc) e de conferir os números de um dry run real em produção.
 
 ### 🟢 P2 - housekeeping
-- [ ] **Painel admin da fila de retenção:** ver quem está em cada etapa (aguardando aviso de 30d/1d, agendado para quando) e um botão para isentar alguém manualmente. `docs/domains/account-retention.md` §8.
+- [x] **Painel admin da fila de retenção:** ver quem está em cada etapa (aguardando aviso de 30d/1d, agendado para quando) e um botão para isentar alguém manualmente. `docs/domains/account-retention.md` §8.
 
 ### 🔵 P3 - Future / Strategic (retention)
-- [ ] **Política de inatividade para contas ativas** (ex.: sem login há 24 meses), hoje só prevista no texto dos termos ("poderão ser excluídas") mas sem código. `docs/domains/account-retention.md` §8.
+- [x] **Política de inatividade para contas ativas** (12 meses sem login). Executada com fila `inactive_accounts_queue` e planner `planInactiveActions`. Textos da interface atualizados. Painel admin configurado. `docs/domains/account-retention.md` §8.
 
 ---
 
@@ -337,52 +337,6 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 - **Flag:** `chat_flag` (default `false`, seeded by `20260923000000_chat_feature_flag.sql`, toggled at `/dashboard/admin/feature-flags`).
 - **Gated surfaces:** header "Mensagens" menu item + `MessagesBadge`, `/messages` (redirects to `/dashboard`), appointment card Chat button (replaced by the other person's LinkedIn; `linkedin_url` added to `/api/appointments/list`), community "Oferecer ajuda" (opens LinkedIn or profile), mentee profile CTA ("Conversar no LinkedIn"), legacy `mentors/id` "Enviar Mensagem", and `POST /api/chat/send` (403).
 
-### 2026-09-17 - Multi-Tenant Phase 1 Shipped, Membership Model Redesigned
-- **Phase 1 built and merged (PR #45):** `organizations` + `organization_members` tables, `/o/[slug]` landing, `/dashboard/admin/organizations` (platform admin CRUD), `/dashboard/org` (org admin dashboard).
-- **Founder feedback caught a real design flaw before it shipped wider:** the original "signup tags you into an org" flow had no path for someone who already had an account, and was confusing UX. Replaced with a stateful membership (`invited/requested/active`) controlled from `/profile` and `/dashboard/org`, with three coherent transactional emails.
-- **Three production bugs found only by testing against the real DB** (not catchable by `tsc`/jest): infinite RLS recursion on a self-referential policy (fixed with a `security definer` function), Supabase disabling PostgREST aggregates by default (`organization_members(count)` → counted in JS instead), and a suspended org still being readable by platform admins on its public landing page (added an explicit `status = 'active'` filter).
-- **Phase 1.5 planned, not started:** role-aware reporting, public vs invite-only org pages, per-role email copy, SEO. See roadmap §6.
-- **Unrelated production outage found and fixed mid-session:** `main` was unbuildable since an earlier commit (`a5e4a74c`) put `dynamic(..., { ssr: false })` directly in the Server Component root layout - Next 15 rejects that. Fixed by moving the two deferred client widgets into a small `"use client"` wrapper (`components/DeferredClientWidgets.tsx`).
-- **Docs pruned:** removed 11 stale/obsolete docs (v1 organizations deployment guide, superseded architecture maps, dated planning/analytics snapshots); merged `HEARTBEAT.md` + `BACKLOG.md` + `JOURNAL.md` into this file.
-
-### 2026-09-16 - Admin Breadcrumb Unification, Analytics-Driven Bug Fix & Multi-Tenant Planning
-- **Unified Admin Breadcrumb:** `AdminBreadcrumb` was only rendered on `/dashboard/admin/users` and its route map pointed at dead `/dashboard/admin/mentors*` routes plus a mismatched `/settings` entry. Moved it into the shared `dashboard/admin/layout.tsx` so every admin page gets a consistent, correctly-mapped breadcrumb (later removed entirely in favor of `PageContainer`-only pages).
-- **Fixed `/mentors/undefined` Bug (found via Clarity analytics):** Guarded two mentor-profile links (mentee's favorites list, mentor's "view public profile" quick action) that rendered without a slug/id fallback, producing broken links tracked in production traffic.
-- **Clarity MCP Server Connected:** Added `.mcp.json` (Microsoft Clarity Data Export MCP), enabling live analytics queries (sessions, traffic sources, dead/rage clicks, device mix) directly from an agent session.
-- **Multi-Tenant Roadmap drafted:** Found that SQL functions referencing `organizations`/`organization_members` still existed in the DB function list even though those tables weren't in the generated types - required a live DB check before any schema work, since the prior organizations module was deliberately removed in favor of the lean mentor-mentee core loop (see "Earlier Milestones" below).
-
-### 2026-09-08 - Mentor Availability BFF & Transactional Email Hardening
-- **Mentor Availability BFF Route (`/api/mentors/availability`):** Resolved availability slots not displaying on `/dashboard/mentor/availability` by introducing a dedicated BFF Route Handler (GET and POST) with Zod validation. Replaced client-side anonymous RLS queries with server-authenticated session resolution.
-- **Personal Founder Signature (Paul Pessoa):** Implemented email signature for community/relationship touchpoints, with circular portrait, WhatsApp link, LinkedIn/GitHub. Removed decorative emojis across all email templates.
-- **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal) across all Brevo templates.
-- **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`.
-- **Live Email Test Dispatch Center (`/api/admin/emails/send-test`):** Send real Brevo test emails of any template from `/dashboard/admin/emails`.
-- **Cron Job Hardening (`/api/cron/appointments`):** Rescheduled to 10:00 UTC (07:00 Brasília) with `CRON_SECRET` auth and precise `America/Sao_Paulo` boundaries.
-
-### 2026-09-07 - Brand Color Standardization, Scheduling Hardening & Core Loop Polish
-- **Official Brand Color (#007585):** Harmonized all buttons, cards, and interactive elements, eliminating arbitrary `emerald-600` and legacy indigo/purple accents.
-- **Hero Banner Restoration:** Reinstated the `/mentorship/mentee` hero banner with the official brand gradient and functional CTAs.
-- **Asymmetric Evaluation Model Enforced:** Restricted public star ratings/testimonials to mentees evaluating mentors.
-- **Scheduling Flow Hardening:** Fixed timezone ISO normalization in `/api/appointments/schedule`, added mentor verification status guards.
-- **Auth Context API Decoupling:** Replaced direct database queries in `auth-context.tsx` with `/api/auth/me` and `/api/profile`.
-
-### 2026-09-06 - Auth Ecosystem Simplification, Availability Engine & Mobile UX
-- **Minute-Based Availability Engine:** Migrated from hour loops to minute-based generator (45-minute step, min duration validation).
-- **Google Calendar Conflict Detection:** Integrated `freebusy.query` in `/api/appointments/availability`.
-- **Auth Flow Restructuring:** Consolidated password update flows, fixed redirect ping-pong, unified confirmation resend.
-- **Mobile Catalog Search:** Redesigned responsive filters sheet, 50/50 action grid, dismissible filter chips.
-
-### 2026-09-05 - Comprehensive Modernization, Decoupling & LLM SEO
-- **Architectural Decoupling:** Enforced strict separation of concerns per `AGENTS.md`. Eliminated raw Supabase queries in components, delegating to dedicated services.
-- **Geo SEO & LLMs Indexing:** Standardized `public/llms.txt`, `public/llms-full.txt`, AI crawler whitelisting in `robots.txt`.
-- **Web Quality & Accessibility:** Font display swap, Schema.org JSON-LD graph, skip-to-content links, Hero image LCP preloading.
-- **Strict Typing:** 100% clean `tsc --noEmit` (0 errors across the codebase).
-
-### Earlier Milestones
-- **Organization Module Deprecation:** Removed multi-tenant organizations v1 in favor of a lean, direct mentor-to-mentee relationship (later rebuilt leaner - see 2026-09-17 above).
-- **Unified Internationalization:** Integrated quiz translations into standard Next-intl `messages/{locale}.json` dictionaries.
-- **AI Mentorship Matching:** Implemented GPT-4o-mini powered mentor recommendation engine with deterministic fallback in `/api/ai/match`.
-
 ---
 
 ## 📚 Documentation Index
@@ -396,101 +350,6 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 | [`docs/domains/scheduling.md`](domains/scheduling.md) | Availability algorithm, 14-day projection, conflict detection |
 | [`docs/operations/environment-variables.md`](operations/environment-variables.md) | Active environment variables reference across environments |
 | [`docs/product/seo.md`](product/seo.md) | Search engine, LLMs/Geo SEO, and image guidelines |
-
----
-
-## 🗄️ DB audit - 2026-09-17
-
-Triggered by the founder's questions about vector search, an agent, messy
-migrations, and Supabase coupling. Full plan and reasoning:
-[`docs/domains/organizations.md`](domains/organizations.md) is org-specific;
-the broader architecture plan lives in this session's approved plan
-(vectors: not yet, pgvector when there's a real trigger; chat agent:
-LangChain.js + Groq/Gemini behind a flag, later; Supabase: keep for now,
-extract service layers incrementally - see journal entry below).
-
-**Row counts at audit time** (`count(*)` via service-role client, all
-public tables): `profiles` 684, `user_roles` 617, `waiting_list` 43,
-`user_favorites` 5, `feature_flag_audit_logs` 4, `mentor_availability` 4,
-`quiz_responses` 4, `feature_flags` 3, `roles` 3, `appointments` 1,
-`conversations` 1, `messages` 1, `organization_members` 1,
-`mentor_visibility_settings` 2, `newsletter_subscriptions` 2,
-`organizations` 2 - everything else (`admin_actions`, `admin_audit_logs`,
-`ai_missing_demands`, `appointment_feedbacks`, `feedback`,
-`google_calendar_tokens`, `mentor_suggestions`, `mentor_verification`,
-`quiz_mentors`, `validation_requests`, `verification_logs`) was 0.
-
-**Dropped** (migration `20260921000003_drop_dead_objects.sql`) - zero rows
-*and* zero references anywhere in `app`/`lib`, confirmed with `git grep`
-before touching anything:
-- `admin_actions`, `quiz_mentors`, `verification_logs`, `mentor_verification`
-- `mentor_suggestions` + its view (`mentor_suggestions_view`) + the 6
-  functions that only existed to read/write it
-  (`get_mentor_suggestions_stats`, `get_most_active_suggesters`,
-  `get_most_suggested_free_topics`, `get_most_suggested_inclusion_tags`,
-  `get_most_suggested_knowledge_topics`, `mark_old_suggestions_as_expired`)
-- The 8 orphaned v1 organizations functions (`check_organization_quota`,
-  `get_mentors_by_organization`, `is_organization_admin`,
-  `user_has_partner_access`, `get_expiring_memberships`,
-  `expire_pending_invitations`, `get_visible_mentor_ids`,
-  `is_mentor_visible_to_user`) - **these had already failed to drop once**:
-  migration `20260921000000` guessed a `(uuid)` parameter signature that
-  didn't match the real one, so `drop function if exists x(uuid);` silently
-  no-op'd. Fixed by using the bare name (`drop function if exists x;`),
-  which Postgres resolves without a signature when it's unambiguous.
-
-**Kept despite 0 rows** - real, wired-up features that just haven't been
-used yet, not dead code: `ai_missing_demands` (logged by `/api/ai/match`
-when no mentor matches), `google_calendar_tokens` (per-mentor OAuth, no
-mentor has connected Calendar yet), `feedback` (the `/feedback` page form),
-`appointment_feedbacks` (session ratings - only 1 appointment exists so
-far).
-*(Note: `validation_requests` was kept previously, but as of the Sparkling Hummingbird fix, it is no longer written to during onboarding and is now considered obsolete/dead code, candidate for removal in a future migration).*
-
-**Skipped: migration squash** (90 empty `*_remote_baseline.sql`
-placeholders → 1 real baseline). Both `supabase migration squash` and
-`supabase db dump` need Docker/Podman locally (`LegacyImagePrepullError`
-without it) to spin up a shadow database for the diff - founder declined
-to install Docker. No functional impact: the placeholders are empty files
-that only exist so `db push` doesn't see remote-only history and refuse to
-run; they don't affect the app or the real schema. Purely cosmetic clutter
-in `supabase/migrations/`. Revisit if Podman (lighter, same CLI interface)
-becomes acceptable, or from a machine that already has a container runtime.
-
----
-
-## 🧪 Evals - 2026-09-17
-
-Added `evals/` (`npm run eval:match`): 20 real-model test cases for
-`lib/services/ai/groq.service.ts`, the AI mentor-matching prompt. Not part
-of `npm test` - makes real LLM calls (cost, non-deterministic), so it's a
-manual gate before changing the prompt/model, not a CI check. Baseline:
-**20/20 (100%), ~2.5s avg latency** against `gpt-4o-mini`. See
-`evals/README.md`.
-
----
-
-## 🏢 Multi-Tenant Phase 1.5 - shipped 2026-09-17
-
-Founder review of Phase 1 caught a real coherence bug before it mattered:
-the org-invite/approval emails said "acompanha sua jornada... mentores
-dedicados a ela" to *everyone*, including mentors being invited to be an
-org's own mentor pool - backwards for that audience. Fixed by deriving a
-member's kind (beneficiary vs org mentor) from their existing platform role
-(`user_roles`, never a new field) and writing role-aware copy for all three
-org emails. Also added `organizations.join_policy` (`open`/`invite_only`,
-migration `20260921000004`) so an org can choose whether strangers can
-request to join or only accept invites - invite-only orgs get `noindex`
-and drop out of `sitemap.xml`.
-
-Extracted the first per-domain service pulled out of a route handler:
-`lib/services/organizations/org-dashboard.service.ts` - `/api/org/[id]`
-went from inline PostgREST calls to a single `getOrgDashboard()` call.
-Small, but it's the pattern the roadmap's item 3 (architecture plan,
-2026-09-17) calls for: extract incrementally as each domain gets touched,
-rather than a big-bang rewrite.
-
-Full detail: [`domains/organizations.md`](domains/organizations.md) §6.
 
 ---
 

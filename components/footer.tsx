@@ -116,34 +116,19 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/faq"
+                  href="/ajuda"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  {t("footer.faq")}
+                  Central de Ajuda
                 </Link>
               </li>
-              {/* <li>
-                <Link
-                  href="/doar"
-                  className="text-muted-foreground hover:text-foreground font-medium text-primary"
-                >
-                  {t("footer.donate")}
-                </Link>
-              </li> */}
+
               <li>
                 <Link
                   href="/contact"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   {t("footer.contact")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/support"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {t("footer.reportAndSupport")}
                 </Link>
               </li>
             </ul>

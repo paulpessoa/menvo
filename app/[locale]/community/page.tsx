@@ -36,19 +36,13 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ArrowDownUp, Filter, Check } from "lucide-react"
+import { ArrowDownUp } from "lucide-react"
 
 interface FilterState {
-  organization: string
-  topics: string[]
   sortBy: "newest" | "oldest" | "name" | "name-desc"
 }
 
 const initialFilters: FilterState = {
-  organization: "",
-  topics: [],
   sortBy: "newest"
 }
 
@@ -76,7 +70,7 @@ export default function CommunityPage() {
   const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<CommunityProfile[]>([])
   const [aiLoading, setAiLoading] = useState(false)
   const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
-  const [topicSearch, setTopicSearch] = useState("")
+
 
   const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
   const router = useRouter()
@@ -89,26 +83,7 @@ export default function CommunityPage() {
     false
 
   const [filters, setFilters] = useState<FilterState>(initialFilters)
-  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false)
-  const [availableFilters, setAvailableFilters] = useState({
-    organizations: [] as string[],
-    topics: [] as string[]
-  })
 
-  useEffect(() => {
-    const supabase = createClient()
-    communityService.getCommunityFilterOptions(supabase).then((opts) => setAvailableFilters({
-      organizations: opts.organizations,
-      topics: opts.topics
-    })).catch(console.error)
-  }, [])
-
-  const activeFacetCount = useMemo(() => {
-    let count = 0
-    if (filters.organization) count++
-    if (filters.topics.length > 0) count += filters.topics.length
-    return count
-  }, [filters])
 
   // Tracking query ID to safely discard out-of-order responses and avoid race conditions
   const queryIdRef = useRef(0)
@@ -133,8 +108,7 @@ export default function CommunityPage() {
         limit: ITEMS_PER_PAGE.toString(),
       })
 
-      if (filters.organization) queryParams.append("organization", filters.organization)
-      filters.topics.forEach(t => queryParams.append("topics[]", t))
+
       queryParams.append("sortBy", filters.sortBy)
       
       const response = await fetch(`/api/community?${queryParams.toString()}`)
@@ -360,113 +334,9 @@ export default function CommunityPage() {
             </SelectContent>
           </Select>
 
-          <Input
-            placeholder="Organização..."
-            value={filters.organization}
-            onChange={(e) => setFilters(p => ({ ...p, organization: e.target.value }))}
-            className="w-full sm:w-[160px] h-11 rounded-xl bg-card border-border/80 text-sm placeholder:text-muted-foreground/70 shadow-2xs"
-            list="organizations-list"
-          />
-          <datalist id="organizations-list">
-            {availableFilters.organizations.map((org, index) => (
-              <option key={index} value={org} />
-            ))}
-          </datalist>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full sm:w-[180px] h-11 rounded-xl bg-card border-border/80 shadow-2xs font-medium text-xs sm:text-sm flex items-center justify-start gap-1.5 px-3"
-              >
-                <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="truncate">
-                  {filters.topics.length === 0 
-                    ? "Tópicos" 
-                    : `${filters.topics.length} selecionado(s)`}
-                </span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[240px] p-2 rounded-xl" align="end">
-              <div className="flex flex-col gap-2">
-                <Input
-                  placeholder="Buscar tópico..."
-                  value={topicSearch}
-                  onChange={(e) => setTopicSearch(e.target.value)}
-                  className="h-8 text-sm rounded-lg"
-                />
-                <div className="max-h-[200px] overflow-y-auto pr-1 flex flex-col gap-1.5 mt-1">
-                  {availableFilters.topics
-                    .filter(t => t.toLowerCase().includes(topicSearch.toLowerCase()))
-                    .map((topic) => {
-                      const isChecked = filters.topics.includes(topic)
-                      return (
-                        <label
-                          key={topic}
-                          className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded-lg cursor-pointer transition-colors"
-                        >
-                          <Checkbox
-                            checked={isChecked}
-                            onCheckedChange={(checked) => {
-                              setFilters(prev => ({
-                                ...prev,
-                                topics: checked 
-                                  ? [...prev.topics, topic]
-                                  : prev.topics.filter(t => t !== topic)
-                              }))
-                            }}
-                          />
-                          <span className="text-sm leading-none truncate flex-1">{topic}</span>
-                        </label>
-                      )
-                    })}
-                  {availableFilters.topics.length > 0 && availableFilters.topics.filter(t => t.toLowerCase().includes(topicSearch.toLowerCase())).length === 0 && (
-                    <p className="text-xs text-muted-foreground text-center py-4">Nenhum tópico encontrado.</p>
-                  )}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
       </div>
       
-      {/* Active Filter Badges */}
-      {activeFacetCount > 0 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 mb-8 text-xs scrollbar-none">
-          <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider shrink-0 mr-1">
-            Ativos:
-          </span>
-          {filters.organization && (
-            <Badge
-              variant="secondary"
-              onClick={() => setFilters(p => ({ ...p, organization: "" }))}
-              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
-            >
-              <span>Org: {filters.organization}</span>
-              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
-            </Badge>
-          )}
-
-          {filters.topics.map((topic) => (
-            <Badge
-              key={topic}
-              variant="secondary"
-              onClick={() => setFilters(p => ({ ...p, topics: p.topics.filter(t => t !== topic) }))}
-              className="gap-1 rounded-lg px-2.5 py-1 text-xs shrink-0 bg-primary/10 text-primary border border-primary/20 cursor-pointer hover:bg-primary/20 hover:border-primary/40 transition-colors"
-            >
-              <span>{topic}</span>
-              <X className="h-3 w-3 opacity-70 hover:opacity-100" />
-            </Badge>
-          ))}
-          <button
-            type="button"
-            onClick={() => setFilters(initialFilters)}
-            className="text-[11px] font-semibold text-primary hover:underline shrink-0 ml-1.5 cursor-pointer"
-          >
-            Limpar tudo
-          </button>
-        </div>
-      )}
 
       {/* AI Recommendation Banner */}
       {aiJustification && (

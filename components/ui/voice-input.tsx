@@ -22,6 +22,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
   // Refs keep the recognition handlers (created once) reading current values;
   // without them the closures froze transcript/isListening at their first render.
   const transcriptRef = useRef("")
+  const preSessionTranscriptRef = useRef("")
   const isListeningRef = useRef(false)
   const onTranscriptRef = useRef(onTranscript)
   const toastRef = useRef(toast)
@@ -64,8 +65,8 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
             silenceTimerRef.current = null
           }
 
-          // Processar todos os resultados
-          for (let i = event.resultIndex; i < event.results.length; i++) {
+          // Processar todos os resultados da sessão atual do zero
+          for (let i = 0; i < event.results.length; i++) {
             const transcriptText = event.results[i][0].transcript
             if (event.results[i].isFinal) {
               finalTranscript += transcriptText
@@ -74,15 +75,16 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
             }
           }
 
-          // Combinar com transcript anterior + novos resultados
-          let fullTranscript = transcriptRef.current
+          // Combinar com o que já estava digitado antes de iniciar a gravação
+          const baseText = preSessionTranscriptRef.current ? preSessionTranscriptRef.current + ' ' : ''
+          const fullFinal = baseText + finalTranscript.trim()
+          
           if (finalTranscript) {
-            fullTranscript = fullTranscript + (fullTranscript ? ' ' : '') + finalTranscript.trim()
-            updateTranscript(fullTranscript)
+            updateTranscript(fullFinal)
           }
 
           // Mostrar resultado em tempo real (incluindo interim)
-          const displayTranscript = fullTranscript + (interimTranscript ? (fullTranscript ? ' ' : '') + interimTranscript : '')
+          const displayTranscript = fullFinal + (interimTranscript ? (fullFinal ? ' ' : '') + interimTranscript : '')
           onTranscriptRef.current(displayTranscript)
 
           // Iniciar timer para parar após 3 segundos de silêncio
@@ -148,6 +150,7 @@ export function VoiceInput({ onTranscript, className }: VoiceInputProps) {
         clearTimeout(silenceTimerRef.current)
         silenceTimerRef.current = null
       }
+      preSessionTranscriptRef.current = transcriptRef.current
       recognitionRef.current.start()
       updateListening(true)
       toast({

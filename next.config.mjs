@@ -63,6 +63,12 @@ const nextConfig = {
         hostname: "avatars.githubusercontent.com",
         port: "",
         pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "media.licdn.com",
+        port: "",
+        pathname: "/**"
       }
     ]
   },
@@ -81,6 +87,20 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }
         ]
+      }
+    ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/faq',
+        destination: '/ajuda/perguntas-frequentes',
+        permanent: true,
+      },
+      {
+        source: '/:locale/faq',
+        destination: '/:locale/ajuda/perguntas-frequentes',
+        permanent: true,
       }
     ]
   }

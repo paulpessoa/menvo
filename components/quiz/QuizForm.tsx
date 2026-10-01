@@ -2,10 +2,9 @@
 
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import {  ChevronLeft, ChevronRight , Loader2 } from "lucide-react"
-import { AnimatedBackground } from '@/components/ui/animated-background'
+import { ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-react"
 import { useTranslations } from 'next-intl'
 import { QuizFormData, stepValidation } from '@/lib/schemas/quiz'
 import { QuizRadioStep } from './steps/QuizRadioStep'
@@ -105,18 +104,37 @@ export function QuizForm({ onSubmit, onBack, initialData, isAuthenticated = fals
     switch (currentStep) {
       case 1:
         return (
-          <QuizRadioStep
-            value={formData.careerMoment}
-            onChange={(val) => updateFormData('careerMoment', val)}
-            options={[
-              { value: 'ensino-medio', label: t('quiz_form.high_school_student') },
-              { value: 'estudante-universitario', label: t('quiz_form.university_student') },
-              { value: 'recem-formado', label: t('quiz_form.recent_graduate') },
-              { value: 'profissional-junior', label: t('quiz_form.junior_professional') },
-              { value: 'transicao', label: t('quiz_form.career_transition') },
-              { value: 'outro', label: t('quiz_form.other') },
-            ]}
-          />
+          <div className="space-y-4">
+            <QuizRadioStep
+              value={(formData.careerMoment || '').startsWith('outro') ? 'outro' : formData.careerMoment}
+              onChange={(val) => {
+                if (val === 'outro') {
+                  updateFormData('careerMoment', 'outro:')
+                } else {
+                  updateFormData('careerMoment', val)
+                }
+              }}
+              options={[
+                { value: 'ensino-medio', label: t('quiz_form.high_school_student') },
+                { value: 'estudante-universitario', label: t('quiz_form.university_student') },
+                { value: 'recem-formado', label: t('quiz_form.recent_graduate') },
+                { value: 'profissional-junior', label: t('quiz_form.junior_professional') },
+                { value: 'transicao', label: t('quiz_form.career_transition') },
+                { value: 'outro', label: t('quiz_form.other') },
+              ]}
+            />
+            {(formData.careerMoment || '').startsWith('outro') && (
+              <div className="animate-in fade-in slide-in-from-top-2">
+                <Input
+                  autoFocus
+                  placeholder={t('quiz_form.other_placeholder') || 'Especifique seu momento...'}
+                  value={(formData.careerMoment || '').replace(/^outro:/, '')}
+                  onChange={(e) => updateFormData('careerMoment', `outro:${e.target.value}`)}
+                  className="h-12 bg-white"
+                />
+              </div>
+            )}
+          </div>
         )
       case 2:
         return (
@@ -219,88 +237,89 @@ export function QuizForm({ onSubmit, onBack, initialData, isAuthenticated = fals
     }
   }
 
+  // Mesma linguagem visual da página de resultados: fundo em degradê accent,
+  // cabeçalho editorial com divisória e conteúdo em cartões rounded-2xl.
   return (
-    <AnimatedBackground>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          {/* Progress Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={currentStep === 1 ? onBack : handlePrevious}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                {t('quiz_form.back')}
-              </Button>
-              <span className="text-sm font-medium text-muted-foreground">
-                {t('quiz_form.progress_header', { currentStep, totalSteps })}
-              </span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-
-          {/* Question Card */}
-          <Card className="border-2 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl">
-                {stepTitles[currentStep]?.title}
-              </CardTitle>
-              <CardDescription>
-                {stepTitles[currentStep]?.desc}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="min-h-[300px]">
-                {renderStepContent()}
-              </div>
-
-              {/* Navigation Buttons */}
-              <div className="space-y-3 pt-4">
-                <div className="flex gap-3">
-                  {currentStep < totalSteps ? (
-                    <Button
-                      onClick={handleNext}
-                      disabled={!canProceed()}
-                      className="flex-1"
-                      size="lg"
-                    >
-                      {t('quiz_form.next')}
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={!canProceed() || isSubmitting}
-                      className="flex-1 font-bold bg-primary hover:bg-primary/90 text-white shadow-md"
-                      size="lg"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                          {t('quiz_form.processing')}
-                        </>
-                      ) : (
-                        t('quiz_form.submit')
-                      )}
-                    </Button>
-                  )}
-                </div>
-                {isAuthenticated && currentStep === totalSteps && (
-                  <p className="text-xs text-center text-muted-foreground">
-                    {t('quiz_form.submit_auth_note')}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            {t('quiz_form.confidential_responses')}
+    <div className="bg-gradient-to-b from-accent/70 via-background to-background">
+      <div className="mx-auto max-w-3xl px-4 pb-16 pt-8 md:pt-12">
+        {/* Progresso */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 rounded-xl"
+            onClick={currentStep === 1 ? onBack : handlePrevious}
+          >
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            {t('quiz_form.back')}
+          </Button>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+            {t('quiz_form.progress_header', { currentStep, totalSteps })}
           </p>
         </div>
+        <Progress
+          value={progress}
+          className="mt-3 h-2"
+          aria-label={t('quiz_form.progress_header', { currentStep, totalSteps })}
+        />
+
+        {/* Pergunta */}
+        <header className="mt-8 border-b pb-6">
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-4xl">
+            {stepTitles[currentStep]?.title}
+          </h1>
+          <p className="mt-3 text-lg leading-relaxed text-muted-foreground">
+            {stepTitles[currentStep]?.desc}
+          </p>
+        </header>
+
+        <div className="mt-8 min-h-[300px]">
+          {renderStepContent()}
+        </div>
+
+        {/* Navegação */}
+        <div className="mt-8 space-y-3">
+          {currentStep < totalSteps ? (
+            <Button
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="h-12 w-full rounded-xl text-base font-bold"
+              size="lg"
+            >
+              {t('quiz_form.next')}
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={!canProceed() || isSubmitting}
+              className="h-12 w-full rounded-xl text-base font-bold"
+              size="lg"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('quiz_form.processing')}
+                </>
+              ) : (
+                t('quiz_form.submit')
+              )}
+            </Button>
+          )}
+          {isAuthenticated && currentStep === totalSteps && (
+            <p className="text-center text-xs text-muted-foreground">
+              {t('quiz_form.submit_auth_note')}
+            </p>
+          )}
+        </div>
+
+        <footer className="mt-10 border-t pt-6 text-xs leading-relaxed text-muted-foreground">
+          <p className="flex items-start gap-2">
+            <ShieldCheck className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+            {t('quiz_form.confidential_responses')}
+          </p>
+        </footer>
       </div>
-    </AnimatedBackground>
+    </div>
   )
 }

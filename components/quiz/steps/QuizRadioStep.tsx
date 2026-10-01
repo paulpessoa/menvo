@@ -17,17 +17,21 @@ interface QuizRadioStepProps {
 export function QuizRadioStep({ value, onChange, options }: QuizRadioStepProps) {
   return (
     <RadioGroup value={value} onValueChange={onChange} className="space-y-3">
-      {options.map((option) => (
-        <div
-          key={option.value}
-          className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-        >
-          <RadioGroupItem value={option.value} id={option.value} />
-          <Label htmlFor={option.value} className="flex-1 cursor-pointer">
-            {option.label}
+      {options.map((option) => {
+        const selected = value === option.value
+        return (
+          <Label
+            key={option.value}
+            htmlFor={option.value}
+            className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 text-base font-medium leading-snug transition-colors hover:border-primary/60 ${
+              selected ? 'border-primary bg-accent' : 'bg-card'
+            }`}
+          >
+            <RadioGroupItem value={option.value} id={option.value} />
+            <span className="flex-1">{option.label}</span>
           </Label>
-        </div>
-      ))}
+        )
+      })}
     </RadioGroup>
   )
 }

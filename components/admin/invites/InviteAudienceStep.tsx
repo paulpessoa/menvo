@@ -62,6 +62,10 @@ export function InviteAudienceStep({
             <Label htmlFor="audience-never" className="font-normal cursor-pointer">{AUDIENCE_LABELS.never_signed_in}</Label>
           </div>
           <div className="flex items-center space-x-2">
+            <RadioGroupItem value="unresponsive_invitees" id="audience-unresponsive" />
+            <Label htmlFor="audience-unresponsive" className="font-normal cursor-pointer">{AUDIENCE_LABELS.unresponsive_invitees}</Label>
+          </div>
+          <div className="flex items-center space-x-2">
             <RadioGroupItem value="all" id="audience-all" />
             <Label htmlFor="audience-all" className="font-normal cursor-pointer">{AUDIENCE_LABELS.all}</Label>
           </div>

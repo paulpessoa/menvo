@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { createServerClient } from "@supabase/ssr"
+import { syncProfileIdentity } from "@/lib/auth/oauth-identity"
+import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 
 /**
  * Single Source of Truth for Auth Callbacks.
@@ -68,6 +70,15 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (user) {
+      // Google/LinkedIn não enviam first_name/last_name (só name, given_name...),
+      // então o perfil podia ficar sem nome. Completa o que faltar; nunca
+      // sobrescreve um nome real e nunca impede o login.
+      try {
+        await syncProfileIdentity(createServiceRoleClient(), user)
+      } catch (syncError) {
+        console.error("Auth callback: falha ao completar o nome do perfil:", syncError)
+      }
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("*, user_roles(roles(name))")

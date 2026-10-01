@@ -1,0 +1,145 @@
+# Engineering Journal Archive
+
+### 2026-09-17 - Multi-Tenant Phase 1 Shipped, Membership Model Redesigned
+- **Phase 1 built and merged (PR #45):** `organizations` + `organization_members` tables, `/o/[slug]` landing, `/dashboard/admin/organizations` (platform admin CRUD), `/dashboard/org` (org admin dashboard).
+- **Founder feedback caught a real design flaw before it shipped wider:** the original "signup tags you into an org" flow had no path for someone who already had an account, and was confusing UX. Replaced with a stateful membership (`invited/requested/active`) controlled from `/profile` and `/dashboard/org`, with three coherent transactional emails.
+- **Three production bugs found only by testing against the real DB** (not catchable by `tsc`/jest): infinite RLS recursion on a self-referential policy (fixed with a `security definer` function), Supabase disabling PostgREST aggregates by default (`organization_members(count)` → counted in JS instead), and a suspended org still being readable by platform admins on its public landing page (added an explicit `status = 'active'` filter).
+- **Phase 1.5 planned, not started:** role-aware reporting, public vs invite-only org pages, per-role email copy, SEO. See roadmap §6.
+- **Unrelated production outage found and fixed mid-session:** `main` was unbuildable since an earlier commit (`a5e4a74c`) put `dynamic(..., { ssr: false })` directly in the Server Component root layout - Next 15 rejects that. Fixed by moving the two deferred client widgets into a small `"use client"` wrapper (`components/DeferredClientWidgets.tsx`).
+- **Docs pruned:** removed 11 stale/obsolete docs (v1 organizations deployment guide, superseded architecture maps, dated planning/analytics snapshots); merged `HEARTBEAT.md` + `BACKLOG.md` + `JOURNAL.md` into this file.
+
+### 2026-09-16 - Admin Breadcrumb Unification, Analytics-Driven Bug Fix & Multi-Tenant Planning
+- **Unified Admin Breadcrumb:** `AdminBreadcrumb` was only rendered on `/dashboard/admin/users` and its route map pointed at dead `/dashboard/admin/mentors*` routes plus a mismatched `/settings` entry. Moved it into the shared `dashboard/admin/layout.tsx` so every admin page gets a consistent, correctly-mapped breadcrumb (later removed entirely in favor of `PageContainer`-only pages).
+- **Fixed `/mentors/undefined` Bug (found via Clarity analytics):** Guarded two mentor-profile links (mentee's favorites list, mentor's "view public profile" quick action) that rendered without a slug/id fallback, producing broken links tracked in production traffic.
+- **Clarity MCP Server Connected:** Added `.mcp.json` (Microsoft Clarity Data Export MCP), enabling live analytics queries (sessions, traffic sources, dead/rage clicks, device mix) directly from an agent session.
+- **Multi-Tenant Roadmap drafted:** Found that SQL functions referencing `organizations`/`organization_members` still existed in the DB function list even though those tables weren't in the generated types - required a live DB check before any schema work, since the prior organizations module was deliberately removed in favor of the lean mentor-mentee core loop (see "Earlier Milestones" below).
+
+### 2026-09-08 - Mentor Availability BFF & Transactional Email Hardening
+- **Mentor Availability BFF Route (`/api/mentors/availability`):** Resolved availability slots not displaying on `/dashboard/mentor/availability` by introducing a dedicated BFF Route Handler (GET and POST) with Zod validation. Replaced client-side anonymous RLS queries with server-authenticated session resolution.
+- **Personal Founder Signature (Paul Pessoa):** Implemented email signature for community/relationship touchpoints, with circular portrait, WhatsApp link, LinkedIn/GitHub. Removed decorative emojis across all email templates.
+- **Brand Color Harmonization in Emails:** Enforced `#007585` (Deep Teal) across all Brevo templates.
+- **Active Cancellation Emails:** Connected `sendAppointmentCancellation` to `/api/appointments/cancel`.
+- **Live Email Test Dispatch Center (`/api/admin/emails/send-test`):** Send real Brevo test emails of any template from `/dashboard/admin/emails`.
+- **Cron Job Hardening (`/api/cron/appointments`):** Rescheduled to 10:00 UTC (07:00 Brasília) with `CRON_SECRET` auth and precise `America/Sao_Paulo` boundaries.
+
+### 2026-09-07 - Brand Color Standardization, Scheduling Hardening & Core Loop Polish
+- **Official Brand Color (#007585):** Harmonized all buttons, cards, and interactive elements, eliminating arbitrary `emerald-600` and legacy indigo/purple accents.
+- **Hero Banner Restoration:** Reinstated the `/mentorship/mentee` hero banner with the official brand gradient and functional CTAs.
+- **Asymmetric Evaluation Model Enforced:** Restricted public star ratings/testimonials to mentees evaluating mentors.
+- **Scheduling Flow Hardening:** Fixed timezone ISO normalization in `/api/appointments/schedule`, added mentor verification status guards.
+- **Auth Context API Decoupling:** Replaced direct database queries in `auth-context.tsx` with `/api/auth/me` and `/api/profile`.
+
+### 2026-09-06 - Auth Ecosystem Simplification, Availability Engine & Mobile UX
+- **Minute-Based Availability Engine:** Migrated from hour loops to minute-based generator (45-minute step, min duration validation).
+- **Google Calendar Conflict Detection:** Integrated `freebusy.query` in `/api/appointments/availability`.
+- **Auth Flow Restructuring:** Consolidated password update flows, fixed redirect ping-pong, unified confirmation resend.
+- **Mobile Catalog Search:** Redesigned responsive filters sheet, 50/50 action grid, dismissible filter chips.
+
+### 2026-09-05 - Comprehensive Modernization, Decoupling & LLM SEO
+- **Architectural Decoupling:** Enforced strict separation of concerns per `AGENTS.md`. Eliminated raw Supabase queries in components, delegating to dedicated services.
+- **Geo SEO & LLMs Indexing:** Standardized `public/llms.txt`, `public/llms-full.txt`, AI crawler whitelisting in `robots.txt`.
+- **Web Quality & Accessibility:** Font display swap, Schema.org JSON-LD graph, skip-to-content links, Hero image LCP preloading.
+- **Strict Typing:** 100% clean `tsc --noEmit` (0 errors across the codebase).
+
+### Earlier Milestones
+- **Organization Module Deprecation:** Removed multi-tenant organizations v1 in favor of a lean, direct mentor-to-mentee relationship (later rebuilt leaner - see 2026-09-17 above).
+- **Unified Internationalization:** Integrated quiz translations into standard Next-intl `messages/{locale}.json` dictionaries.
+- **AI Mentorship Matching:** Implemented GPT-4o-mini powered mentor recommendation engine with deterministic fallback in `/api/ai/match`.
+
+
+
+## 🗄️ DB audit - 2026-09-17
+
+Triggered by the founder's questions about vector search, an agent, messy
+migrations, and Supabase coupling. Full plan and reasoning:
+[`docs/domains/organizations.md`](domains/organizations.md) is org-specific;
+the broader architecture plan lives in this session's approved plan
+(vectors: not yet, pgvector when there's a real trigger; chat agent:
+LangChain.js + Groq/Gemini behind a flag, later; Supabase: keep for now,
+extract service layers incrementally - see journal entry below).
+
+**Row counts at audit time** (`count(*)` via service-role client, all
+public tables): `profiles` 684, `user_roles` 617, `waiting_list` 43,
+`user_favorites` 5, `feature_flag_audit_logs` 4, `mentor_availability` 4,
+`quiz_responses` 4, `feature_flags` 3, `roles` 3, `appointments` 1,
+`conversations` 1, `messages` 1, `organization_members` 1,
+`mentor_visibility_settings` 2, `newsletter_subscriptions` 2,
+`organizations` 2 - everything else (`admin_actions`, `admin_audit_logs`,
+`ai_missing_demands`, `appointment_feedbacks`, `feedback`,
+`google_calendar_tokens`, `mentor_suggestions`, `mentor_verification`,
+`quiz_mentors`, `validation_requests`, `verification_logs`) was 0.
+
+**Dropped** (migration `20260921000003_drop_dead_objects.sql`) - zero rows
+*and* zero references anywhere in `app`/`lib`, confirmed with `git grep`
+before touching anything:
+- `admin_actions`, `quiz_mentors`, `verification_logs`, `mentor_verification`
+- `mentor_suggestions` + its view (`mentor_suggestions_view`) + the 6
+  functions that only existed to read/write it
+  (`get_mentor_suggestions_stats`, `get_most_active_suggesters`,
+  `get_most_suggested_free_topics`, `get_most_suggested_inclusion_tags`,
+  `get_most_suggested_knowledge_topics`, `mark_old_suggestions_as_expired`)
+- The 8 orphaned v1 organizations functions (`check_organization_quota`,
+  `get_mentors_by_organization`, `is_organization_admin`,
+  `user_has_partner_access`, `get_expiring_memberships`,
+  `expire_pending_invitations`, `get_visible_mentor_ids`,
+  `is_mentor_visible_to_user`) - **these had already failed to drop once**:
+  migration `20260921000000` guessed a `(uuid)` parameter signature that
+  didn't match the real one, so `drop function if exists x(uuid);` silently
+  no-op'd. Fixed by using the bare name (`drop function if exists x;`),
+  which Postgres resolves without a signature when it's unambiguous.
+
+**Kept despite 0 rows** - real, wired-up features that just haven't been
+used yet, not dead code: `ai_missing_demands` (logged by `/api/ai/match`
+when no mentor matches), `google_calendar_tokens` (per-mentor OAuth, no
+mentor has connected Calendar yet), `feedback` (the `/feedback` page form),
+`appointment_feedbacks` (session ratings - only 1 appointment exists so
+far).
+*(Note: `validation_requests` was kept previously, but as of the Sparkling Hummingbird fix, it is no longer written to during onboarding and is now considered obsolete/dead code, candidate for removal in a future migration).*
+
+**Skipped: migration squash** (90 empty `*_remote_baseline.sql`
+placeholders → 1 real baseline). Both `supabase migration squash` and
+`supabase db dump` need Docker/Podman locally (`LegacyImagePrepullError`
+without it) to spin up a shadow database for the diff - founder declined
+to install Docker. No functional impact: the placeholders are empty files
+that only exist so `db push` doesn't see remote-only history and refuse to
+run; they don't affect the app or the real schema. Purely cosmetic clutter
+in `supabase/migrations/`. Revisit if Podman (lighter, same CLI interface)
+becomes acceptable, or from a machine that already has a container runtime.
+
+---
+
+## 🧪 Evals - 2026-09-17
+
+Added `evals/` (`npm run eval:match`): 20 real-model test cases for
+`lib/services/ai/groq.service.ts`, the AI mentor-matching prompt. Not part
+of `npm test` - makes real LLM calls (cost, non-deterministic), so it's a
+manual gate before changing the prompt/model, not a CI check. Baseline:
+**20/20 (100%), ~2.5s avg latency** against `gpt-4o-mini`. See
+`evals/README.md`.
+
+---
+
+## 🏢 Multi-Tenant Phase 1.5 - shipped 2026-09-17
+
+Founder review of Phase 1 caught a real coherence bug before it mattered:
+the org-invite/approval emails said "acompanha sua jornada... mentores
+dedicados a ela" to *everyone*, including mentors being invited to be an
+org's own mentor pool - backwards for that audience. Fixed by deriving a
+member's kind (beneficiary vs org mentor) from their existing platform role
+(`user_roles`, never a new field) and writing role-aware copy for all three
+org emails. Also added `organizations.join_policy` (`open`/`invite_only`,
+migration `20260921000004`) so an org can choose whether strangers can
+request to join or only accept invites - invite-only orgs get `noindex`
+and drop out of `sitemap.xml`.
+
+Extracted the first per-domain service pulled out of a route handler:
+`lib/services/organizations/org-dashboard.service.ts` - `/api/org/[id]`
+went from inline PostgREST calls to a single `getOrgDashboard()` call.
+Small, but it's the pattern the roadmap's item 3 (architecture plan,
+2026-09-17) calls for: extract incrementally as each domain gets touched,
+rather than a big-bang rewrite.
+
+Full detail: [`domains/organizations.md`](domains/organizations.md) §6.
+
+---
+

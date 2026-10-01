@@ -13,10 +13,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "db:types": "supabase gen types typescript --project-id evxrzmzkghshjmmyegxu --schema public > lib/types/supabase.ts",
-    "eval:match": "tsx evals/ai-match.eval.ts",
     "migrate-users": "node scripts/database/migrate-users.js",
-    "setup-admin": "node scripts/setup/setup-admin-and-mentors.js",
-    "test:evals": "tsx evals/assistant.eval.ts"
+    "setup-admin": "node scripts/setup/setup-admin-and-mentors.js"
   },
   "overrides": {
     "@testing-library/react": {
@@ -69,6 +67,7 @@
     "@supabase/auth-helpers-react": "latest",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "^2.57.0",
+    "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-query": "latest",
     "@tanstack/react-query-devtools": "latest",
     "@testing-library/dom": "latest",
@@ -101,8 +100,10 @@
     "react-dom": "^19",
     "react-hook-form": "latest",
     "react-i18next": "latest",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "latest",
     "recharts": "latest",
+    "remark-gfm": "^4.0.1",
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",

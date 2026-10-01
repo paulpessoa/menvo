@@ -14,6 +14,8 @@ jest.mock('@/lib/email/brevo', () => ({
   sendAppointmentRequest: jest.fn().mockResolvedValue({ success: true }),
 }))
 
+const VALID_REASON = 'Quero orientação sobre transição de carreira para a área de dados'
+
 describe('POST /api/appointments/schedule', () => {
   let mockSupabase: any
 
@@ -64,6 +66,33 @@ describe('POST /api/appointments/schedule', () => {
     expect(data.code).toBe('VALIDATION_ERROR')
   })
 
+  it.each([
+    ['ausente', {}],
+    ['vazio', { message: '' }],
+    ['só espaços', { message: '                              ' }],
+    ['curto demais', { message: 'Quero ajuda' }],
+    ['curto em notes_mentee', { notes_mentee: 'Dúvidas de carreira' }],
+  ])('should return 400 VALIDATION_ERROR when the reason is %s', async (_label, extra) => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'mentee-1' } },
+      error: null,
+    })
+
+    const req = createMockRequest({
+      mentor_id: 'mentor-1',
+      scheduled_at: '2026-09-10T10:00:00Z',
+      ...extra,
+    })
+    const response = await POST(req)
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.code).toBe('VALIDATION_ERROR')
+    expect(data.error).toContain('motivo')
+    // a validação acontece antes de qualquer consulta ao banco ou envio de e-mail
+    expect(mockSupabase.from).not.toHaveBeenCalled()
+    expect(sendAppointmentRequest).not.toHaveBeenCalled()
+  })
+
   it('should return 400 FORBIDDEN when user attempts self-booking', async () => {
     mockSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: 'user-same-id' } },
@@ -73,6 +102,7 @@ describe('POST /api/appointments/schedule', () => {
     const req = createMockRequest({
       mentorId: 'user-same-id',
       scheduledAt: '2026-09-10T10:00:00Z',
+      message: VALID_REASON,
     })
     const response = await POST(req)
     expect(response.status).toBe(400)
@@ -101,6 +131,7 @@ describe('POST /api/appointments/schedule', () => {
     const req = createMockRequest({
       mentorId: 'non-existent-mentor',
       scheduledAt: '2026-09-10T10:00:00Z',
+      message: VALID_REASON,
     })
     const response = await POST(req)
     expect(response.status).toBe(404)
@@ -131,6 +162,7 @@ describe('POST /api/appointments/schedule', () => {
     const req = createMockRequest({
       mentorId: 'mentor-1',
       scheduledAt: '2026-09-10T10:00:00Z',
+      message: VALID_REASON,
     })
     const response = await POST(req)
     expect(response.status).toBe(403)
@@ -173,6 +205,7 @@ describe('POST /api/appointments/schedule', () => {
     const req = createMockRequest({
       mentorId: 'mentor-1',
       scheduledAt: '2026-09-10T10:00:00Z',
+      message: VALID_REASON,
     })
     const response = await POST(req)
     expect(response.status).toBe(409)
@@ -223,7 +256,7 @@ describe('POST /api/appointments/schedule', () => {
       mentor_id: 'mentor-1',
       scheduled_at: '2026-09-10T10:00:00Z',
       duration_minutes: 45,
-      notes_mentee: 'Dúvidas de carreira',
+      notes_mentee: VALID_REASON,
     })
     const response = await POST(req)
     expect(response.status).toBe(200)

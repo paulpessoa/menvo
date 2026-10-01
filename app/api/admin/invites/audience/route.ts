@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/auth/require-admin"
 import { resolveAudience } from "@/lib/services/invites/audience.service"
 
 const bodySchema = z.object({
-  audience: z.enum(["selected", "jotform_not_invited", "never_signed_in", "all"]),
+  audience: z.enum(["selected", "jotform_not_invited", "never_signed_in", "all", "unresponsive_invitees"]),
   campaign: z.string().trim().min(1).max(100),
   userIds: z.array(z.string().uuid()).max(5000).optional(),
   resend: z.boolean().optional()

@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+  CalendarDays,
   Users,
   Clock,
   Shield,
@@ -95,6 +96,13 @@ export default function AdminDashboard() {
       color: "bg-primary"
     },
     {
+      title: "Sessões de Mentoria",
+      description: "Todos os pedidos e sessões com status, reenvio de e-mails e cancelamento",
+      href: "/dashboard/admin/appointments",
+      icon: CalendarDays,
+      color: "bg-rose-600"
+    },
+    {
       title: "Relatórios & IA",
       description: "Ver métricas de crescimento e buscas da IA",
       href: "/dashboard/admin/reports",
@@ -142,6 +150,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/organizations",
       icon: Building2,
       color: "bg-emerald-600"
+    },
+    {
+      title: "Retenção LGPD",
+      description: "Acompanhar fila de exclusão de contas e gerenciar isenções",
+      href: "/dashboard/admin/retention",
+      icon: Clock,
+      color: "bg-rose-800"
     }
   ]
 

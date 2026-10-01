@@ -19,7 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/community',
     '/how-it-works',
     '/faq',
-    '/doar',
     '/contact',
     '/privacy',
     '/terms',

@@ -1,11 +1,26 @@
 import { z } from "zod"
 
+/**
+ * Motivo do pedido de mentoria: é o que o mentor lê no e-mail de confirmação e
+ * no convite do calendário, então sem ele o mentor recebe um pedido sem contexto.
+ */
+export const MENTORSHIP_REASON_MIN_LENGTH = 20
+export const MENTORSHIP_REASON_MAX_LENGTH = 1000
+
+export const MENTORSHIP_REASON_REQUIRED_MESSAGE = `Informe o motivo da mentoria (mínimo de ${MENTORSHIP_REASON_MIN_LENGTH} caracteres)`
+
+export const mentorshipReasonSchema = z
+  .string({ required_error: MENTORSHIP_REASON_REQUIRED_MESSAGE })
+  .trim()
+  .min(MENTORSHIP_REASON_MIN_LENGTH, MENTORSHIP_REASON_REQUIRED_MESSAGE)
+  .max(MENTORSHIP_REASON_MAX_LENGTH, `O motivo não pode exceder ${MENTORSHIP_REASON_MAX_LENGTH} caracteres`)
+
 export const createAppointmentSchema = z.object({
   mentor_id: z.string().uuid("ID do mentor inválido"),
   scheduled_at: z.string().datetime({ message: "Data/hora de agendamento em formato ISO inválido" }),
   duration_minutes: z.coerce.number().int().min(15).max(180).default(60),
   mentorship_topics: z.array(z.string()).default([]),
-  notes_mentee: z.string().max(1000, "Notas não podem exceder 1000 caracteres").optional().default("")
+  notes_mentee: mentorshipReasonSchema
 })
 
 export type CreateAppointmentInput = z.infer<typeof createAppointmentSchema>
@@ -53,3 +68,33 @@ export const updateFeedbackSchema = z.object({
 })
 
 export type UpdateFeedbackInput = z.infer<typeof updateFeedbackSchema>
+
+// ---------------------------------------------------------------------------
+// Admin: gestão de sessões (/dashboard/admin/appointments)
+// ---------------------------------------------------------------------------
+
+export const ADMIN_CANCEL_REASON_MIN_LENGTH = 10
+
+/** Motivo do cancelamento feito pela equipe: vai por e-mail para mentor e mentorado. */
+export const adminCancelAppointmentSchema = z.object({
+  reason: z
+    .string({ required_error: "Informe o motivo do cancelamento" })
+    .trim()
+    .min(
+      ADMIN_CANCEL_REASON_MIN_LENGTH,
+      `Informe o motivo do cancelamento (mínimo de ${ADMIN_CANCEL_REASON_MIN_LENGTH} caracteres)`
+    )
+    .max(1000, "Motivo não pode exceder 1000 caracteres")
+})
+
+export type AdminCancelAppointmentInput = z.infer<typeof adminCancelAppointmentSchema>
+
+export const ADMIN_RESEND_TARGETS = ["mentor_request", "confirmation"] as const
+
+export const adminResendAppointmentSchema = z.object({
+  target: z.enum(ADMIN_RESEND_TARGETS, {
+    errorMap: () => ({ message: "Tipo de reenvio inválido" })
+  })
+})
+
+export type AdminResendTarget = (typeof ADMIN_RESEND_TARGETS)[number]

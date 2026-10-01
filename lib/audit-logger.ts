@@ -21,6 +21,8 @@ export type AuditAction =
   | "password_reset"
   | "email_changed"
   | "bulk_action"
+  | "appointment_resend"
+  | "appointment_cancelled"
 
 /**
  * Log admin actions for audit trail
