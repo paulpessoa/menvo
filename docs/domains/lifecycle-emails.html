@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menvo E-mails</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#1f2937;--muted:#64748b;--line:#e2e8f0;--teal:#007585;--teal-soft:#e0f2f4;--amber:#b45309;--amber-soft:#fef3c7;--violet:#6d28d9;--violet-soft:#ede9fe;--green:#15803d;--green-soft:#dcfce7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--line:#334155;--teal:#5eead4;--teal-soft:#134e4a;--amber:#fbbf24;--amber-soft:#451a03;--violet:#c4b5fd;--violet-soft:#2e1065;--green:#86efac;--green-soft:#052e16}}
+:root[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--line:#334155;--teal:#5eead4;--teal-soft:#134e4a;--amber:#fbbf24;--amber-soft:#451a03;--violet:#c4b5fd;--violet-soft:#2e1065;--green:#86efac;--green-soft:#052e16}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:36px 0 12px}
+.sub{color:var(--muted);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px}
+.A{background:var(--green-soft);color:var(--green)}.B{background:var(--teal-soft);color:var(--teal)}.C{background:var(--violet-soft);color:var(--violet)}.X{background:var(--amber-soft);color:var(--amber)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.node{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px}
+.node b{display:block}.node small{color:var(--muted)}
+.arrow{color:var(--muted);font-size:20px}
+.bar{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.bar div{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:13px;color:var(--muted)}
+.tl{position:relative;padding-left:22px;border-left:2px solid var(--line)}
+.tl .ev{position:relative;margin:0 0 14px}
+.tl .ev:before{content:"";position:absolute;left:-29px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--teal)}
+.tl .day{font-weight:700;color:var(--teal);margin-right:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.wrap{overflow-x:auto}
+.warn{border-left:4px solid var(--amber)}
+code{font-size:13px;background:var(--teal-soft);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<main>
+<h1>E-mails de ciclo de vida — Menvo</h1>
+<p class="sub">Plano MVP com custo zero (Brevo Free · Supabase Free · Vercel Hobby). Detalhes em <code>docs/domains/lifecycle-emails.md</code>.</p>
+
+<div class="grid3">
+  <div class="card"><span class="tag A">A · Transacional</span><p>Disparado por evento do sistema. <b>Já existe</b>: confirmação de conta, sessões, lembretes.</p></div>
+  <div class="card"><span class="tag B">B · Ciclo de vida</span><p>Cron diário lê o estado do usuário e enfileira: boas-vindas, "falta pouco", metas.</p></div>
+  <div class="card"><span class="tag C">C · Broadcast manual</span><p>Paul dispara pelo admin, lembrado pelo Google Calendar: novidades, conteúdo, indicação.</p></div>
+</div>
+
+<h2>1. Como um e-mail sai</h2>
+<div class="flow">
+  <div class="node"><b>Evento / cron / admin</b><small>cadastro, D3, campanha</small></div><span class="arrow">→</span>
+  <div class="node"><b>enqueue()</b><small>dedupe_key evita duplicar</small></div><span class="arrow">→</span>
+  <div class="node"><b>email_outbox</b><small>Postgres, prioridade 0/1/2</small></div><span class="arrow">→</span>
+  <div class="node"><b>drain()</b><small>orçamento + supressão + preferências</small></div><span class="arrow">→</span>
+  <div class="node"><b>Brevo API</b><small>sendEmail()</small></div><span class="arrow">→</span>
+  <div class="node"><b>email_sends</b><small>log + contador do dia</small></div>
+</div>
+
+<h2>2. Orçamento diário Brevo (300 e-mails)</h2>
+<div class="bar">
+  <div class="A" style="width:33.3%">Reserva transacional 100</div>
+  <div class="B" style="width:26.7%">Ciclo de vida 80</div>
+  <div class="C" style="width:33.3%">Broadcast 100</div>
+  <div class="X" style="width:6.7%">20</div>
+</div>
+<div class="legend"><span>Transacional nunca bloqueia</span><span>B e C só saem se sobrar cota</span><span>Folga 20 = testes/reenvios</span></div>
+<p class="sub" style="margin-top:10px">Exemplo: base de 450 usuários com opt-in → a campanha mensal sai em 5 dias (100/dia), sem custo.</p>
+
+<h2>3. Régua automática de um novo usuário</h2>
+<div class="card tl">
+  <div class="ev"><span class="day">D0</span>Verificação de conta <span class="tag A">existe</span> → Boas-vindas institucional (3 próximos passos por papel)</div>
+  <div class="ev"><span class="day">D1</span>Mensagem pessoal do Paul — "me responde contando seu objetivo"</div>
+  <div class="ev"><span class="day">D2</span>Mentor com perfil incompleto → "Falta pouco!" (bio/disponibilidade)</div>
+  <div class="ev"><span class="day">D3</span>Sem objetivo definido → convite para o quiz/diagnóstico IA</div>
+  <div class="ev"><span class="day">D7</span>Mentee sem agendamento → 3 mentores sugeridos pelo match · 2º lembrete de perfil</div>
+  <div class="ev"><span class="day">1ª sessão</span>Pedido de feedback <span class="tag A">existe</span> → convite para indicar um amigo/mentor</div>
+  <div class="ev"><span class="day">D30+</span>Sem login → "Sentimos sua falta" (máx. 1x por trimestre)</div>
+</div>
+
+<h2>4. Calendário manual do Paul</h2>
+<div class="wrap"><table>
+<tr><th>Lembrete</th><th>Quando</th><th>Ação</th></tr>
+<tr><td>📰 Novidades do mês</td><td>1ª terça, 10h</td><td>3 novidades + campanha</td></tr>
+<tr><td>📚 Conteúdo</td><td>Quinzenal, quinta 10h</td><td>1 artigo da KB</td></tr>
+<tr><td>🤝 Indicação</td><td>Trimestral</td><td>"Indique um mentor"</td></tr>
+<tr><td>📊 Revisar fila e métricas</td><td>Segunda, 9h</td><td>Bounces, descadastros, cota</td></tr>
+<tr><td>🎉 Marcos / 🛠 Incidentes</td><td>Sob demanda</td><td>Template pronto no admin</td></tr>
+</table></div>
+
+<h2>5. Antes de qualquer código</h2>
+<div class="card warn">
+  <p><b>Remetente:</b> o único sender no Brevo é "Lista Pronta" &lt;paulmspessoa@gmail.com&gt;. Autenticar <code>menvo.com.br</code> (DKIM/DMARC) e criar "Menvo &lt;contato@menvo.com.br&gt;".</p>
+  <p><b>Supabase Auth:</b> configurar o SMTP do Brevo (<code>smtp-relay.brevo.com:587</code>) — o SMTP padrão é só para testes.</p>
+  <p style="margin:0"><b>Vercel Hobby:</b> cron 1x/dia. Precisa de mais? <code>pg_cron</code> + <code>pg_net</code> no Supabase chamando a mesma rota.</p>
+</div>
+</main>
+</body>
+</html>

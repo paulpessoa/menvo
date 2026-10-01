@@ -712,23 +712,6 @@
       "secondary": "Saber Mais"
     }
   },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Cancelar inscrição da newsletter",
-      "description": "Lamentamos que você queira sair. Digite seu email para cancelar a inscrição.",
-      "successTitle": "Inscrição cancelada com sucesso",
-      "successDescription": "Você foi removido da nossa lista de newsletter. Sentiremos sua falta!",
-      "rejoinText": "Se mudou de ideia, você pode se inscrever novamente a qualquer momento através do nosso site.",
-      "rejoinButton": "Inscrever novamente",
-      "considerTitle": "Antes de cancelar, considere:",
-      "considerItem1": "Você receberá apenas conteúdo relevante sobre mentoria",
-      "considerItem2": "Enviamos no máximo 2 e-mails por semana",
-      "considerItem3": "Você pode se reinscrever a qualquer momento",
-      "button": "Cancelar inscrição",
-      "cancelling": "Cancelando...",
-      "backToSite": "Voltar ao site"
-    }
-  },
   "privacy": {
     "badge": "Privacidade e Segurança",
     "title": "Política de Privacidade",

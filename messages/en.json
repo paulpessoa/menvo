@@ -712,23 +712,6 @@
       "secondary": "Learn More"
     }
   },
-  "newsletter": {
-    "unsubscribe": {
-      "title": "Unsubscribe from newsletter",
-      "description": "We're sorry to see you go. Enter your email to unsubscribe.",
-      "successTitle": "Successfully unsubscribed",
-      "successDescription": "You have been removed from our newsletter list. We'll miss you!",
-      "rejoinText": "If you change your mind, you can subscribe again at any time through our website.",
-      "rejoinButton": "Subscribe again",
-      "considerTitle": "Before you cancel, consider:",
-      "considerItem1": "You will only receive relevant content about mentorship",
-      "considerItem2": "We send a maximum of 2 emails per week",
-      "considerItem3": "You can re-subscribe at any time",
-      "button": "Unsubscribe",
-      "cancelling": "Unsubscribing...",
-      "backToSite": "Back to site"
-    }
-  },
   "privacy": {
     "badge": "Privacy & Security",
     "title": "Privacy Policy",
