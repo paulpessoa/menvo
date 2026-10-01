@@ -860,7 +860,7 @@
     },
     "inactivity": {
       "title": "Cuentas inactivas y eliminación automática",
-      "text": "Las cuentas creadas a partir de datos importados de iniciativas asociadas, como el formulario de Estágio Recife, y que nunca sean accedidas, serán eliminadas automáticamente 90 días después de la primera invitación enviada por correo. Antes de la eliminación, enviaremos dos avisos al correo registrado: uno 30 días antes y otro 1 día antes de la fecha prevista. Para mantener la cuenta, basta con acceder a ella mediante el enlace del aviso. Después de la eliminación, recibirá un correo de confirmación y podrá crear una cuenta nueva en cualquier momento. Las cuentas sin ningún acceso durante largos períodos también podrán ser eliminadas, siempre con aviso previo por correo."
+      "text": "Las cuentas creadas a partir de datos importados de iniciativas asociadas, como el formulario de Estágio Recife, y que nunca sean accedidas, serán eliminadas automáticamente 90 días después de la primera invitación enviada por correo. Antes de la eliminación, enviaremos dos avisos al correo registrado: uno 30 días antes y otro 1 día antes de la fecha prevista. Para mantener la cuenta, basta con acceder a ella mediante el enlace del aviso. Después de la eliminación, recibirá un correo de confirmación y podrá crear una cuenta nueva en cualquier momento. Las cuentas sin ningún acceso durante más de 1 año también serán eliminadas, siempre con aviso previo por correo."
     },
     "security": {
       "title": "Conducta y Seguridad",

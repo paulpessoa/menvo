@@ -860,7 +860,7 @@
     },
     "inactivity": {
       "title": "Inactive accounts and automatic deletion",
-      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for long periods may also be deleted, always with advance e-mail notice."
+      "text": "Accounts created from data imported from partner initiatives, such as the Estágio Recife form, that are never accessed will be automatically deleted 90 days after the first e-mail invitation. Before deletion, we'll send two warnings to the registered e-mail: one 30 days before and another 1 day before the scheduled date. To keep the account, just access it through the warning's link. After deletion, you receive a confirmation e-mail and can create a new account at any time. Accounts left without any access for more than 1 year will also be deleted, always with advance e-mail notice."
     },
     "security": {
       "title": "Conduct & Safety",

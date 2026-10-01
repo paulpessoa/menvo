@@ -45,10 +45,40 @@ export async function GET() {
       }
     }
 
+    // Buscamos a fila de inativos (P3)
+    const { data: inactiveQueue, error: inactiveError } = await supabase
+      .from("inactive_accounts_queue")
+      .select(`
+        *,
+        profile:profiles!inner(
+          email,
+          full_name
+        )
+      `)
+      .order("scheduled_deletion_at", { ascending: true })
+
+    if (inactiveError) throw inactiveError
+
+    // Agrupamos os números para o card de resumo de inativos
+    const inactiveStats = {
+      enrolled: 0,
+      noticed30d: 0
+    }
+
+    for (const row of inactiveQueue) {
+      if (row.notice_30d_sent_at) {
+        inactiveStats.noticed30d++
+      } else {
+        inactiveStats.enrolled++
+      }
+    }
+
     return NextResponse.json({
       success: true,
       stats,
-      queue
+      queue,
+      inactiveStats,
+      inactiveQueue
     })
   } catch (error: any) {
     console.error("[GET /api/admin/retention] Error:", error)

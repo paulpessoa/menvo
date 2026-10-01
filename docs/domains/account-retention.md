@@ -43,8 +43,8 @@ antes → aviso 1 dia antes → exclusão + e-mail de confirmação.**
 - Contas criadas pela própria pessoa, mesmo que nunca tenham entrado. **Nunca**
   entram na rotina. A regra é explicitamente limitada a `origin_platform = 'jotform'`.
 - Inatividade de contas **ativas** (pessoa entrou uma vez e sumiu). Os termos
-  deixam essa possibilidade em aberto com "poderão" (§6), mas não há código
-  para isso agora.
+  deixam essa possibilidade em aberto com "poderão" (§6), mas o plano para isso
+  é tratado no P3.
 - Painel admin para ver ou isentar pessoas da fila. Fica como follow-up (§8).
 
 ## 2. Regras de negócio
@@ -330,8 +330,8 @@ Atualizar também a data de "última atualização" das duas páginas, se existi
 - **P1:** `ai-retention` e `appointments` falham abertos sem `CRON_SECRET`.
 - **P2:** card no admin mostrando a fila (quantos em cada etapa, próximas
   exclusões) e um botão "isentar" por pessoa.
-- **P3:** política de inatividade para contas **ativas** (ex.: 24 meses sem
-  login), já prevista com "poderão" nos termos.
+- **P3:** política de inatividade para contas **ativas** (ex.: 12 meses sem
+  login), já prevista nos termos.
 
 ## 9. Decisões do Paul (os padrões acima valem até ele mudar)
 1. **Prazo total:** 90 dias do primeiro convite até a exclusão.

@@ -925,6 +925,65 @@ async function sendEmail(
   }
 }
 
+export function buildInactiveNoticeHtml(data: {
+  name: string;
+  deletionDate: string;
+}): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name || "");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const formattedDate = new Date(data.deletionDate).toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+
+  const content = `
+    <h2>${firstName ? `Olá, ${firstName}` : "Olá"}!</h2>
+    <p>Sua conta na Menvo está inativa há mais de 1 ano. Para proteger seus dados e seguir as melhores práticas de privacidade, contas sem uso prolongado são excluídas automaticamente.</p>
+    <p>A exclusão está programada para o dia <strong>${formattedDate}</strong>.</p>
+    <p>Se você ainda quiser usar a Menvo, basta clicar no botão abaixo e fazer login para reativar sua conta imediatamente.</p>
+    <div class="button-container">
+        <a href="${appUrl}/auth/login" class="button">Fazer Login e Manter Conta</a>
+    </div>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal" });
+}
+
+export async function sendInactiveNotice(data: {
+  name: string;
+  email: string;
+  deletionDate: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const subject = "Aviso de inatividade: Sua conta será excluída em 30 dias";
+  return await sendEmail(data.email, subject, buildInactiveNoticeHtml(data));
+}
+
+export function buildInactiveDeletionConfirmationHtml(data: { name: string }): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name || "");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+
+  const content = `
+    <h2>${firstName ? `Olá, ${firstName}` : "Olá"}!</h2>
+    <p>Conforme avisamos há 30 dias, sua conta na Menvo foi excluída por inatividade (mais de 1 ano sem login).</p>
+    <p>Removemos seu perfil e todos os arquivos enviados. Mantemos apenas um registro anônimo para auditoria e evitar novos envios.</p>
+    <p>Esperamos te ver de novo no futuro! Você pode criar uma conta nova quando desejar.</p>
+    <div class="button-container">
+        <a href="${appUrl}/auth/register" class="button">Criar uma conta nova</a>
+    </div>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal" });
+}
+
+export async function sendInactiveDeletionConfirmation(data: {
+  name: string;
+  email: string;
+}): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(data.email, "Seus dados foram apagados por inatividade", buildInactiveDeletionConfirmationHtml(data));
+}
+
 /**
  * Envia um e-mail de teste real via Brevo baseado no template selecionado
  */
@@ -943,6 +1002,8 @@ export async function sendTestEmail(params: {
     retention_notice_30d: "[TESTE] Sua conta na Menvo será apagada em 30 dias",
     retention_notice_1d: "[TESTE] Último aviso: sua conta na Menvo será apagada amanhã",
     retention_deletion_confirmation: "[TESTE] Seus dados foram apagados da Menvo",
+    inactive_notice_30d: "[TESTE] Aviso de inatividade: Sua conta será excluída em 30 dias",
+    inactive_deletion_confirmation: "[TESTE] Seus dados foram apagados por inatividade",
     quiz_results: "[TESTE] Sua análise de carreira está pronta"
   };
 
@@ -1064,6 +1125,13 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       });
     case 'retention_deletion_confirmation':
       return buildRetentionDeletionConfirmationHtml({ name: "Mariana" });
+    case 'inactive_notice_30d':
+      return buildInactiveNoticeHtml({
+        name: "Mariana",
+        deletionDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+    case 'inactive_deletion_confirmation':
+      return buildInactiveDeletionConfirmationHtml({ name: "Mariana" });
     case 'quiz_results':
       return buildQuizResultsEmailHtml({
         name: "Mariana Silva",

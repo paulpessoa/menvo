@@ -860,7 +860,7 @@
     },
     "inactivity": {
       "title": "Contas inativas e exclusão automática",
-      "text": "Contas criadas a partir de dados importados de iniciativas parceiras, como o formulário do Estágio Recife, e que nunca forem acessadas serão excluídas automaticamente 90 dias após o primeiro convite enviado por e-mail. Antes da exclusão, enviaremos dois avisos para o e-mail cadastrado: um 30 dias antes e outro 1 dia antes da data prevista. Para manter a conta, basta acessá-la pelo link do aviso. Depois da exclusão, você recebe um e-mail de confirmação e pode criar uma nova conta a qualquer momento. Contas que ficarem sem nenhum acesso por longos períodos também poderão ser excluídas, sempre com aviso prévio por e-mail."
+      "text": "Contas criadas a partir de dados importados de iniciativas parceiras, como o formulário do Estágio Recife, e que nunca forem acessadas serão excluídas automaticamente 90 dias após o primeiro convite enviado por e-mail. Antes da exclusão, enviaremos dois avisos para o e-mail cadastrado: um 30 dias antes e outro 1 dia antes da data prevista. Para manter a conta, basta acessá-la pelo link do aviso. Depois da exclusão, você recebe um e-mail de confirmação e pode criar uma nova conta a qualquer momento. Contas que ficarem sem nenhum acesso por mais de 1 ano também serão excluídas, sempre com aviso prévio por e-mail."
     },
     "security": {
       "title": "Conduta e Segurança",
