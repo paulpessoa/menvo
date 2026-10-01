@@ -106,6 +106,11 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-02 - Tabela da newsletter apagada
+- **Why:** a newsletter saiu do código na PR #67, mas `newsletter_subscriptions` seguia com e-mail, nome, WhatsApp, IP e user agent sem uso (LGPD art. 6º III).
+- **Migração `20261002000000_drop_newsletter_subscriptions.sql`:** quem tinha cancelado vira hash em `email_suppressions` (`opted_out`, mesmo hash de `suppression.service.ts`); depois a tabela é apagada, sem `CASCADE`. Tipo removido de `lib/types/supabase.ts`.
+- **Aplicada** pelo Paul no SQL Editor em 2026-10-02: havia 2 inscrições, ambas `active`, então nenhum hash entrou em `email_suppressions`; a tabela foi apagada.
+
 ### 2026-10-01 - Check de PR contra crédito a IA
 - **Why:** trailers `Co-authored-by: Claude` chegaram à `main` (PRs #58-#63 e 3 commits de uma sessão remota) porque os hooks locais não cobrem sessões remotas nem squash merge no GitHub.
 - **O que:** workflow `.github/workflows/no-ai-attribution.yml` reprova PRs com IA como autora/committer/coautora; regra escrita em `CONTRIBUTING.md`. Falta marcar o check `check` como obrigatório num ruleset da `main` (Settings > Rules).
