@@ -4,6 +4,7 @@ import { SystemMessage } from "@langchain/core/messages"
 import { SupabaseClient, type User } from "@supabase/supabase-js"
 import { getAgentModels } from "@/lib/ai/models"
 import type { AiCallRecord } from "@/lib/ai/metering"
+import { diagnosticService } from "@/lib/services/diagnostic/diagnostic.service"
 import {
   assistantTools,
   searchMentorsInput,
@@ -23,7 +24,12 @@ export interface GetAssistantAgentOptions {
   onCall: (record: AiCallRecord) => void
 }
 
-function buildSystemPrompt(role: "mentee" | "mentor" | "admin", firstName: string): string {
+interface DiagnosticContext {
+  completed: boolean
+  insights?: string
+}
+
+function buildSystemPrompt(role: "mentee" | "mentor" | "admin", firstName: string, diagnostic: DiagnosticContext): string {
   let roleGuidance = ""
   if (role === "mentor") {
     roleGuidance = `
@@ -42,6 +48,19 @@ PAPEL DO USUÁRIO ATUAL: ADMINISTRADOR (${firstName})
 - Mantenha respostas executivas, técnicas e diretas.`
   } else {
     // Mentee
+    let diagnosticGuidance = ""
+    if (diagnostic.completed && diagnostic.insights) {
+      diagnosticGuidance = `
+- O usuário JÁ COMPLETOU o diagnóstico de carreira dele. 
+- INSIGHTS RECEBIDOS PELO USUÁRIO (Baseie-se nisso para guiar a conversa):
+${diagnostic.insights}
+- Como ele já fez o diagnóstico, pergunte ativamente o que ele achou dos pontos fortes/fracos apontados acima e se quer ajuda para buscar um mentor para trabalhar nesses pontos específicos.`
+    } else {
+      diagnosticGuidance = `
+- O usuário AINDA NÃO completou o diagnóstico de carreira ou não fez recentemente.
+- Se ele estiver desorientado sobre o que fazer, não souber que mentor escolher ou não tiver clareza do momento dele, SUGIRA ATIVAMENTE que ele faça o "Diagnóstico de Carreira" clicando no botão "Fazer Diagnóstico" ou digitando "/diagnostico" para alinhar suas expectativas.`
+    }
+
     roleGuidance = `
 PAPEL DO USUÁRIO ATUAL: MENTORADO (${firstName})
 - O usuário está buscando mentoria e orientação de carreira.
@@ -53,7 +72,7 @@ PAPEL DO USUÁRIO ATUAL: MENTORADO (${firstName})
   3. Peça uma nota de 1 a 5 estrelas e um comentário opcional sobre como foi a mentoria.
   4. Com a nota informada pelo mentorado, chame a ferramenta "evaluateMentorshipSession" com o appointmentId e o rating.
 - Reforce sempre que "é bom conversar para abrir a mente" e que a mentoria na Menvo é 100% gratuita.
-- Ao citar mentores encontrados, NÃO liste detalhes completos no texto porque cards visuais interativos aparecerão automaticamente. Cite apenas os nomes e a razão da recomendação.`
+- Ao citar mentores encontrados, NÃO liste detalhes completos no texto porque cards visuais interativos aparecerão automaticamente. Cite apenas os nomes e a razão da recomendação.${diagnosticGuidance}`
   }
 
   return `Você é o Copiloto da Menvo (uma plataforma brasileira e gratuita de mentorias 1-a-1). Você NÃO tem um nome humano.
@@ -103,6 +122,7 @@ export async function getAssistantAgent(
   // 1. Resolve user profile and role
   let role: "mentee" | "mentor" | "admin" = "mentee"
   let firstName = "colega"
+  const diagnosticContext: DiagnosticContext = { completed: false }
 
   if (user?.id) {
     const { data: roleRows } = await supabase
@@ -131,6 +151,33 @@ export async function getAssistantAgent(
       (user as any).user_metadata?.first_name ||
       profile?.full_name?.split(" ")[0] ||
       "colega"
+
+    // Only mentees need the diagnostic context for now
+    if (role === "mentee") {
+      const latestDiagnostic = await diagnosticService.getLatestCompletedSession(supabase, user.id)
+      if (latestDiagnostic?.quiz_response_id) {
+        diagnosticContext.completed = true
+        
+        // Fetch the quiz response details
+        const { data: responseData } = await supabase
+          .from("quiz_responses")
+          .select("ai_analysis")
+          .eq("id", latestDiagnostic.quiz_response_id)
+          .maybeSingle()
+
+        if (responseData?.ai_analysis) {
+          const analysis = responseData.ai_analysis as Record<string, any>
+          const strengths = Array.isArray(analysis.strengths) ? analysis.strengths.join(", ") : ""
+          const gaps = Array.isArray(analysis.gaps) ? analysis.gaps.join(", ") : ""
+          const suggestion = analysis.recommendation || ""
+          
+          diagnosticContext.insights = `
+Pontos Fortes: ${strengths}
+Áreas de Desenvolvimento: ${gaps}
+Recomendação da IA na época: ${suggestion}`.trim()
+        }
+      }
+    }
   }
 
   // 2. Base universal tools
@@ -251,7 +298,7 @@ export async function getAssistantAgent(
   return createAgent({
     model: primary,
     tools,
-    systemPrompt: new SystemMessage(buildSystemPrompt(role, firstName)),
+    systemPrompt: new SystemMessage(buildSystemPrompt(role, firstName, diagnosticContext)),
     middleware: fallbacks.length > 0 ? [modelFallbackMiddleware(...fallbacks)] : []
   })
 }
