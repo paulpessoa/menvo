@@ -238,7 +238,7 @@ export default function AdminVerificationsPage() {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -246,7 +246,7 @@ export default function AdminVerificationsPage() {
                               Ver Detalhes
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-xl">
+                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle>Detalhes da Verificação</DialogTitle>
                               <DialogDescription>Dados cadastrais e documentos do mentor</DialogDescription>
