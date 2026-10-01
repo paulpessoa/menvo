@@ -198,70 +198,70 @@ export async function getUserBriefing(
   const timeGreeting = currentHour < 12 ? "Bom dia" : currentHour < 18 ? "Boa tarde" : "Boa noite"
 
   // 5. Construct Greeting Message & Chips
-  let greeting = `${timeGreeting}, **${firstName}**! 👋 Sou o Copiloto da Menvo.`
+  let greeting = `${timeGreeting}, **${firstName}**! Sou o Copiloto da Menvo.`
   const suggestedChips: ChipOption[] = []
 
   if (role === "mentor") {
     greeting += "\n\nAqui está o seu resumo de mentoria:"
     if (nextSession) {
-      greeting += `\n• 📅 **Próxima mentoria:** ${nextSession.dateFormatted} às ${nextSession.timeFormatted} com **${nextSession.otherPartyName}** (${nextSession.status === "confirmed" ? "confirmada" : "aguardando confirmação"}).`
+      greeting += `\n• **Próxima mentoria:** ${nextSession.dateFormatted} às ${nextSession.timeFormatted} com **${nextSession.otherPartyName}** (${nextSession.status === "confirmed" ? "confirmada" : "aguardando confirmação"}).`
     } else {
-      greeting += "\n• 📅 Você não possui mentorias agendadas para os próximos dias."
+      greeting += "\n• Você não possui mentorias agendadas para os próximos dias."
     }
 
     if (pendingRequestsCount > 0) {
-      greeting += `\n• ⏳ Você tem **${pendingRequestsCount} solicitação(ões)** de mentoria aguardando sua resposta.`
+      greeting += `\n• Você tem **${pendingRequestsCount} solicitação(ões)** de mentoria aguardando sua resposta.`
     }
 
     greeting += "\n\nComo posso te apoiar hoje?"
 
     suggestedChips.push(
-      { label: "📅 Minhas Próximas Sessões", value: "Quais são as minhas próximas mentorias agendadas?" },
-      { label: "👥 Solicitações Pendentes", value: "Tenho alguma solicitação de mentoria pendente?" },
-      { label: "❓ Dúvidas sobre a plataforma", value: "Como funciona a confirmação e realização de mentorias na Menvo?" }
+      { label: "Minhas Próximas Sessões", value: "Quais são as minhas próximas mentorias agendadas?" },
+      { label: "Solicitações Pendentes", value: "Tenho alguma solicitação de mentoria pendente?" },
+      { label: "Dúvidas sobre a plataforma", value: "Como funciona a confirmação e realização de mentorias na Menvo?" }
     )
   } else {
     // Mentee
     greeting += "\n\nAqui está um resumo do seu momento:"
 
     if (nextSession) {
-      greeting += `\n• 📅 **Próxima mentoria:** ${nextSession.dateFormatted} às ${nextSession.timeFormatted} com **${nextSession.otherPartyName}**.`
+      greeting += `\n• **Próxima mentoria:** ${nextSession.dateFormatted} às ${nextSession.timeFormatted} com **${nextSession.otherPartyName}**.`
     } else {
-      greeting += "\n• 📅 Nenhuma mentoria agendada no momento."
+      greeting += "\n• Nenhuma mentoria agendada no momento."
     }
 
     if (completedThisMonth && reportUrl) {
-      greeting += `\n• 🎯 **Diagnóstico de Carreira:** Você já completou sua análise gratuita deste mês.`
+      greeting += `\n• **Diagnóstico de Carreira:** Você já completou sua análise gratuita deste mês.`
     } else {
-      greeting += `\n• 🎯 **Diagnóstico de Carreira:** Seu diagnóstico gratuito deste mês está disponível!`
+      greeting += `\n• **Diagnóstico de Carreira:** Seu diagnóstico gratuito deste mês está disponível!`
     }
 
     if (hasPendingEvaluations) {
-      greeting += `\n• ✍️ Você tem **${pendingEvaluationsCount} mentoria(s) concluída(s)** aguardando sua avaliação.`
+      greeting += `\n• Você tem **${pendingEvaluationsCount} mentoria(s) concluída(s)** aguardando sua avaliação.`
     }
 
     greeting += "\n\nComo posso te ajudar hoje?"
 
     if (!completedThisMonth) {
       suggestedChips.push({
-        label: "🚀 Fazer Diagnóstico de Carreira",
+        label: "Fazer Diagnóstico de Carreira",
         value: "mode:diagnostic"
       })
     } else if (reportUrl) {
       suggestedChips.push({
-        label: "📄 Ver Meu Diagnóstico",
+        label: "Ver Meu Diagnóstico",
         value: `link:${reportUrl}`
       })
     }
 
     suggestedChips.push(
-      { label: "🔍 Buscar Mentores", value: "Quero encontrar mentores ideais para o meu momento profissional" },
-      { label: "📅 Minhas Mentorias", value: "Quais são as minhas próximas mentorias agendadas?" }
+      { label: "Buscar Mentores", value: "Quero encontrar mentores ideais para o meu momento profissional" },
+      { label: "Minhas Mentorias", value: "Quais são as minhas próximas mentorias agendadas?" }
     )
 
     if (hasPendingEvaluations) {
       suggestedChips.push({
-        label: "⭐ Avaliar Mentoria no Chat",
+        label: "Avaliar Mentoria no Chat",
         value: "Quero avaliar minha mentoria pendente"
       })
     }
