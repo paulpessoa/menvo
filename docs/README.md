@@ -21,9 +21,7 @@ docs/
   README.md                   this file
   STATUS.md                   state, backlog, engineering journal - read first
   VISION.md                   product purpose and north star
-  GOOGLE_OAUTH_SUBMISSION.md  Google Cloud Console OAuth verification kit
-  AI_PLATFORM_PLAN.md         AI-first plan (diagnostic, copilot, metering, KB)
-  SPEC_MCP_ASSISTANT.md       MCP assistant spec
+  archive/                    completed or deprecated plans (AI, MCP, etc.)
   governance/
     adr/NNNN-titulo.md        architecture decision records
     ai-policy.md              allowed models, budget, data sent to LLMs, retention, LGPD
@@ -33,7 +31,7 @@ docs/
     overview.md               context and containers (C4 level 1-2), BFF flow
     data-model.md             per-domain ERD (mermaid) + tables and RLS
     security.md               RLS, security definer, auth, rate limiting
-    ai-platform.md            AI_PLATFORM_PLAN.md, once implemented, becomes this reference
+    ai-platform.md            AI platform architecture reference
   domains/                    one file per business domain
     scheduling.md             availability engine, 14-day projection, conflict detection
     organizations.md          multi-tenant organizations: decisions, phases, roadmap
@@ -41,6 +39,7 @@ docs/
     evaluations.md, diagnostic.md, notifications-email.md, feature-flags.md, admin.md
   operations/
     environment-variables.md  environment variables reference across environments
+    google-oauth-submission.md Google Cloud Console OAuth verification kit
     deploy.md, cron-jobs.md, runbooks/  (deploy process, cron jobs, incident runbooks)
   product/
     seo.md                    search engine, LLMs/Geo SEO, image guidelines
