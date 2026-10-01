@@ -62,7 +62,10 @@ const PROFILE_COLUMNS = `
     const isPending = (profile as any)?.verification_status === "pending"
 
     return NextResponse.json({
-      user,
+      user: {
+        id: user.id,
+        email: user.email
+      },
       profile: profile || null,
       role: primaryRole,
       roles: roleNames,
