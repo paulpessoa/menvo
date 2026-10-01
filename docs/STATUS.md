@@ -74,7 +74,7 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ### 🟠 P1 - High Priority
 - [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification - all completed pre-2026-09-16, see journal below for detail.
-- [ ] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
+- [x] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
 - [ ] **`messages/{pt-BR,en,es}.json` have duplicate top-level `"privacy"` and `"terms"` keys.** JSON silently keeps the *last* occurrence, so the first block of each is dead - unreachable by `t()`, never rendered. Found because `privacy.reengagement` (added 2026-09-27) had been written into the dead first block and was never actually live; fixed by adding it and the new `privacy.retention`/`terms.inactivity` sections to the live (second) block instead. The dead blocks (~150 lines duplicated three times) are still there and should be deleted in a dedicated cleanup - didn't do it here to avoid colliding with concurrent edits to the same files.
 
 ### 🟡 P2 - Medium Priority

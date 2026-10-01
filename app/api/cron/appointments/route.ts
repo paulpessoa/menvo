@@ -21,10 +21,13 @@ function getAdminClient() {
 export async function GET(request: Request) {
     try {
         // Validação de segurança: Vercel Cron envia 'Authorization: Bearer <CRON_SECRET>'
-        const authHeader = request.headers.get('authorization');
         const cronSecret = process.env.CRON_SECRET;
+        if (!cronSecret) {
+            return NextResponse.json({ error: 'CRON_SECRET is not configured' }, { status: 500 });
+        }
 
-        if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+        const authHeader = request.headers.get('authorization');
+        if (authHeader !== `Bearer ${cronSecret}`) {
             return NextResponse.json({ error: 'Unauthorized: CRON_SECRET mismatch' }, { status: 401 });
         }
 
