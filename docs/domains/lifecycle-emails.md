@@ -20,7 +20,7 @@ Organizar a comunicação por e-mail da Menvo em três trilhas, inspiradas em pl
 - `app/[locale]/dashboard/admin/emails`: preview + envio de teste de templates.
 - `lib/services/invites/*` + tabela `reengagement_invites`: envio em massa por campanha (`unique(user_id, campaign)` evita duplicidade) + token de resposta.
 - `lib/services/invites/suppression.service.ts` + `email_suppressions`: lista de não-contato por hash (LGPD).
-- `newsletter_subscriptions` com `marketing_consent`.
+- ~~`newsletter_subscriptions`~~: newsletter removida do código (branch `feat/remove-newsletter`); a tabela fica no banco só como histórico. O consentimento passa a ser pedido no cadastro.
 - Crons Vercel (`vercel.json`): `appointments` (10h UTC), `ai-retention`, `account-retention` — padrão `CRON_SECRET` fail-closed em `app/api/cron/account-retention/route.ts`.
 - Templates de Auth do Supabase em `supabase/templates/` (confirmação de e-mail, magic link etc.).
 - `pg_net` já usado no trigger `notify_new_user_role` (chama Edge Function).
@@ -50,18 +50,18 @@ Consultado na conta Brevo em 2026-10-01: plano `free`, `sendLimit` = **300/dia**
 
 1. O único remetente cadastrado no Brevo é **"Lista Pronta" <paulmspessoa@gmail.com>**. O código usa `BREVO_SENDER_EMAIL` (fallback `contato@menvo.com.br`). Confirmar no Brevo que o **domínio `menvo.com.br` está autenticado** (DKIM + DMARC) e criar o remetente "Menvo <contato@menvo.com.br>"; sem isso, Gmail/Yahoo tendem a mandar para spam.
 2. Configurar no Supabase (Auth → SMTP Settings) o relay do Brevo para os e-mails de confirmação de conta.
-3. Separar remetentes: `contato@` (institucional) e `paul@` (pessoal, com `replyTo` para o Gmail do Paul).
+3. Remetente único: `contato@menvo.com.br` (é o único endereço que existe). Muda só o **nome** exibido: "Menvo" (institucional) ou "Paul, da Menvo" (pessoal). `replyTo` também é `contato@`.
 
 ## 4. Catálogo de e-mails (inspiração → Menvo)
 
 Legenda: **Auto** = cron/evento · **Manual** = Paul dispara pelo admin · **Existe** = já implementado.
-Público: `T` transacional (não precisa de opt-in) · `R` relacionamento (opt-out por link) · `M` marketing (exige `marketing_consent`).
+Público: `T` transacional (não precisa de opt-in) · `R` relacionamento (opt-out por link) · `M` marketing (exige o consentimento marcado no cadastro, `email_preferences.marketing = true`).
 
 | # | Categoria | E-mail Menvo | Gatilho / cadência | Tipo | Público | Assinatura |
 |---|---|---|---|---|---|---|
 | 1 | Boas-vindas | Verificação de conta | Cadastro (Supabase Auth) | **Existe** | T | none |
-| 2 | Boas-vindas | Boas-vindas institucional (o que é a Menvo, 3 próximos passos por papel mentor/mentee) | D0 após confirmar e-mail | Auto | T | none |
-| 3 | Boas-vindas | Mensagem pessoal do Paul (texto curto, "responda este e-mail") | D1, horário comercial | Auto | R | personal |
+| 2 | Boas-vindas | Boas-vindas institucional (o que é a Menvo, 3 próximos passos por papel mentor/mentee) | D0 após confirmar e-mail — **só contas novas** | Auto | T | none |
+| 3 | Boas-vindas | Mensagem pessoal do Paul (texto curto, "responda este e-mail") | D1, horário comercial — **só contas novas** | Auto | R | personal |
 | 4 | Objetivos | "Defina seu objetivo de carreira" → quiz/diagnóstico IA | D3 se `learning_goals` vazio e sem quiz | Auto | R | none |
 | 5 | Objetivos | "Encontre mentores para o seu objetivo" (3 sugestões do match) | D7 se mentee sem agendamento | Auto | R | none |
 | 6 | Reengajamento | "Falta pouco!" perfil incompleto (mentor sem bio/disponibilidade) | D2 e D7 se `community_ready = false` | Auto | R | personal |
@@ -93,7 +93,45 @@ evento/cron ──► enqueue() ──► email_outbox (fila, prioridade, dedupe
 - `email_preferences`: `user_id, relationship boolean default true, marketing boolean default false, updated_at` + token de unsubscribe. Complementa `email_suppressions` (supressão total).
 - RLS: leitura só admin; usuário lê/edita a própria `email_preferences`. Escritas da fila só via service role (mesmo padrão de `reengagement_invites`).
 
-### 5.2 Código
+### 5.2 Camadas (trocar de provedor sem reescrever e-mails)
+
+Hoje `lib/email/brevo.ts` mistura três coisas: o texto do e-mail, o layout e a chamada à API do Brevo. Separando em camadas, trocar Brevo por Resend, SES ou SMTP muda **um arquivo**.
+
+```
+lib/email/
+  config.ts            # remetente único: contato@menvo.com.br, nomes "Menvo" / "Paul, da Menvo"
+  transport/
+    types.ts           # interface EmailTransport { send(msg): Promise<{ id }> }
+    brevo.ts           # adaptador Brevo (único lugar que conhece a API do Brevo)
+    smtp.ts            # (futuro) adaptador SMTP genérico via nodemailer
+    index.ts           # escolhe pelo env EMAIL_PROVIDER=brevo|smtp
+  layout.ts            # getEmailLayout + escape de HTML
+  templates/           # funções puras: (dados) => { subject, html, text }
+  send.ts              # sendTemplate(): template -> layout -> transport
+```
+
+Exemplo do contrato:
+
+```ts
+export interface EmailMessage {
+  to: { email: string; name?: string }[]
+  subject: string
+  html: string
+  text?: string
+  senderName?: string        // e-mail sempre contato@menvo.com.br
+  tags?: string[]
+  headers?: Record<string, string>   // ex.: List-Unsubscribe
+}
+export interface EmailTransport {
+  send(message: EmailMessage): Promise<{ id: string | null }>
+}
+```
+
+Regras: templates nunca importam o transporte; testes usam um `FakeTransport` em memória. O SMTP do Supabase Auth (e-mail de confirmação) é configurado no painel do Supabase e muda separado.
+
+Migração sugerida: fazer junto com a fase 2, movendo as funções de `brevo.ts` aos poucos (sem mudar o comportamento), num PR só de refatoração.
+
+### 5.3 Código
 
 - `lib/email/lifecycle/` — templates novos usando `getEmailLayout` (exportar o layout de `brevo.ts` em vez de copiar).
 - `lib/services/email-queue/` — `enqueue()`, `drain({ budget })`, `getDailyBudget()`; testes Jest no padrão dos serviços de retenção.
@@ -113,19 +151,69 @@ evento/cron ──► enqueue() ──► email_outbox (fila, prioridade, dedupe
 
 ## 7. Rotina manual do Paul (Google Calendar)
 
+✅ Criados em 01/10/2026 na agenda `paulmspessoa@gmail.com` (a mesma dos agendamentos de mentoria), como "livre", com o lembrete padrão de 30 min.
+
 | Lembrete | Recorrência | Ação |
 |---|---|---|
 | 📰 Novidades do mês (#8) | Mensal, 1ª terça 10h | Escrever 3 novidades + enviar campanha |
 | 📚 Conteúdo (#9) | Quinzenal, quinta 10h | Escolher 1 artigo da KB e enviar |
-| 🤝 Indicação (#11) | Trimestral | Campanha "indique um mentor" |
+| 🤝 Indicação (#11) | Trimestral, 2ª terça 10h (a partir de 13/10) | Campanha "indique um mentor" |
 | 📊 Revisar orçamento e métricas | Semanal, segunda 9h | Ver fila, bounces, descadastros |
 | 🎉 Marcos (#12) / 🛠 Incidente (#13) | Sob demanda | Template pronto no admin |
 
 Dica: campanhas grandes → agendar para **terça a quinta, 9h–11h (America/Recife)**; base > 200 contatos → a fila divide em dias.
 
-## 8. Decisões pendentes do Paul
+## 8. Decisões do Paul (01/10/2026)
 
-1. Remetente pessoal: `paul@menvo.com.br` existe? Respostas vão para o Gmail?
-2. Usuários atuais recebem as boas-vindas retroativamente ou só os novos?
-3. Opt-in de marketing: perguntar no onboarding (checkbox) ou só via newsletter?
-4. Tom do e-mail pessoal: o Paul escreve o texto base do #3?
+1. **Remetente:** só existe `contato@menvo.com.br`. É o remetente e o `replyTo` de tudo; `paul@` não será usado.
+2. **Boas-vindas:** só para contas novas (criadas depois que a fase 3 entrar no ar). Nada retroativo.
+3. **Consentimento:** pedido no cadastro, num checkbox **desmarcado por padrão** (LGPD), salvo com data. Quem já tem conta pode ativar depois em Configurações. A newsletter foi removida.
+4. **Texto pessoal:** rascunho na seção 9, para revisão do Paul.
+
+Fase 2 ainda não começou (o Paul está reorganizando o código local).
+
+### Checkbox do cadastro (proposta)
+
+> ☐ Quero receber por e-mail novidades, conteúdos e convites da Menvo. Posso cancelar quando quiser.
+
+E-mails de sistema (confirmação de conta, avisos de sessão) não dependem desse checkbox.
+
+## 9. Rascunhos das boas-vindas (para revisão)
+
+### #2 Institucional (D0, remetente "Menvo")
+
+**Assunto:** Bem-vindo(a) à Menvo, {primeiro_nome}!
+
+Olá, {primeiro_nome}!
+
+Que bom ter você na Menvo, uma comunidade de mentoria **100% voluntária e gratuita**.
+
+**Se você quer ser mentorado(a):**
+1. Complete seu perfil (leva 2 minutos).
+2. Faça o quiz de carreira para descobrir em que focar.
+3. Encontre um mentor e agende sua primeira conversa.
+
+**Se você quer ser mentor(a):**
+1. Complete seu perfil com sua experiência.
+2. Cadastre seus horários disponíveis.
+3. Aguarde a verificação e comece a receber pedidos.
+
+[Acessar meu painel]
+
+Dúvidas? Responda este e-mail; ele chega na nossa equipe.
+
+Equipe Menvo
+
+### #3 Pessoal (D1, remetente "Paul, da Menvo")
+
+**Assunto:** Uma pergunta rápida, {primeiro_nome}
+
+Oi, {primeiro_nome}, aqui é o Paul, criador da Menvo.
+
+Criei a plataforma porque acredito que uma boa conversa com a pessoa certa pode mudar a direção de uma carreira, e isso não deveria custar nada.
+
+Queria te fazer uma pergunta: **o que te trouxe até aqui?** Pode ser uma transição de carreira, a primeira vaga, um desafio no trabalho atual... Responda este e-mail com uma ou duas linhas. Eu leio todas as respostas.
+
+Um abraço,
+Paul Pessoa
+Fundador da Menvo
