@@ -15,6 +15,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -42,25 +53,28 @@ export default function AdminVerificationsPage() {
   const [search, setSearch] = useState("")
   const [areaFilter, setAreaFilter] = useState("all")
 
-  const loadVerifications = useCallback(async () => {
+  const [activeTab, setActiveTab] = useState("pending")
+
+  const loadVerifications = useCallback(async (status: string) => {
     try {
       if (user?.id) {
-        const response = await fetch("/api/admin/verifications/pending")
-        if (!response.ok) throw new Error("Erro ao carregar verificações pendentes")
+        setLoading(true)
+        const response = await fetch(`/api/admin/verifications/${status}`)
+        if (!response.ok) throw new Error("Erro ao carregar verificações")
         const { verifications: data } = await response.json()
-        setVerifications(data)
+        setVerifications(data || [])
       }
     } catch (error) {
       console.error("Error loading verifications:", error)
-      toast.error("Erro ao carregar verificações pendentes")
+      toast.error("Erro ao carregar verificações")
     } finally {
       setLoading(false)
     }
   }, [user?.id])
 
   useEffect(() => {
-    loadVerifications()
-  }, [loadVerifications])
+    loadVerifications(activeTab)
+  }, [loadVerifications, activeTab])
 
   const submitVerification = async (
     userId: string,
@@ -88,7 +102,7 @@ export default function AdminVerificationsPage() {
       // write - see processVerification in notification.service.ts.
       await submitVerification(verificationId, "approved", undefined, message)
       toast.success("Mentor aprovado com sucesso!")
-      loadVerifications()
+      loadVerifications(activeTab)
     } catch (error) {
       console.error("Error approving verification:", error)
       toast.error("Erro ao aprovar mentor")
@@ -100,7 +114,7 @@ export default function AdminVerificationsPage() {
     try {
       await submitVerification(verificationId, "rejected", reason, message)
       toast.success("Aplicação rejeitada.")
-      loadVerifications()
+      loadVerifications(activeTab)
     } catch (error) {
       console.error("Error rejecting verification:", error)
       toast.error("Erro ao rejeitar mentor")
@@ -133,6 +147,166 @@ export default function AdminVerificationsPage() {
     )
   }
 
+  const renderList = () => (
+    <div className="space-y-4 mt-4">
+      {verifications.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nome, e-mail ou empresa..."
+              className="pl-9"
+            />
+          </div>
+          <Select value={areaFilter} onValueChange={setAreaFilter}>
+            <SelectTrigger className="w-full sm:w-56">
+              <SelectValue placeholder="Área de atuação" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as áreas</SelectItem>
+              {expertiseAreas.map((area) => (
+                <SelectItem key={area} value={area}>{area}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {verifications.length === 0 ? (
+        <Card>
+          <CardContent className="flex items-center justify-center h-56">
+            <div className="text-center">
+              <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
+              <p className="font-medium text-gray-700">Nenhuma verificação encontrada</p>
+              <p className="text-sm text-muted-foreground">Tudo em dia por aqui.</p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : filteredVerifications.length === 0 ? (
+        <Card>
+          <CardContent className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">Nenhuma verificação encontrada para esse filtro.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {filteredVerifications.map((verification) => (
+            <Card key={verification.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-14 w-14">
+                      <AvatarImage src="/placeholder.svg" />
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                        {verification.mentor_name
+                          .split(" ")
+                          .map((n: string) => n[0])
+                          .slice(0, 2)
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <CardTitle className="text-xl">{verification.mentor_name}</CardTitle>
+                      <CardDescription className="font-medium text-gray-600">{verification.mentor_title}</CardDescription>
+                      <p className="text-sm text-muted-foreground">{verification.mentor_company || "Empresa não informada"}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="w-fit">{verification.verification_type}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4" />
+                    <span>Inscrito em {new Date(verification.created_at).toLocaleDateString("pt-BR")}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <User className="h-4 w-4" />
+                    <span>{verification.mentor_email}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Ver Detalhes
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Detalhes da Verificação</DialogTitle>
+                        <DialogDescription>Dados cadastrais e documentos do mentor</DialogDescription>
+                      </DialogHeader>
+                      <VerificationDetails verification={verification} />
+                    </DialogContent>
+                  </Dialog>
+
+                  {activeTab === "pending" && (
+                    <>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-medium">
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Aprovar Mentor
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Aprovar solicitação de mentor?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              O usuário será notificado por e-mail, receberá acesso ao painel de mentores e seu perfil será publicado na plataforma. Tem certeza que deseja prosseguir?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleApprove(verification.id)}>
+                              Sim, Aprovar Mentor
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                      <MentorReviewAssistant
+                        userId={verification.id}
+                        onApprove={(message) => handleApprove(verification.id, message)}
+                        onReject={(message) => handleReject(verification.id, "Ajustes solicitados via assistente de IA", message)}
+                      />
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="destructive" size="sm">
+                            <XCircle className="h-4 w-4 mr-2" />
+                            Rejeitar
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Rejeitar Verificação</DialogTitle>
+                            <DialogDescription>Por favor, informe a justificativa da recusa</DialogDescription>
+                          </DialogHeader>
+                          <RejectForm onReject={(reason: string) => handleReject(verification.id, reason)} />
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  )}
+                  {activeTab === "completed" && (
+                    <Badge variant={verification.status === "approved" ? "default" : "destructive"}>
+                      {verification.status === "approved" ? "Aprovado" : "Rejeitado"}
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+
   return (
     <PageContainer>
       <div className="flex flex-col space-y-6">
@@ -151,7 +325,7 @@ export default function AdminVerificationsPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="pending" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="pending">Pendentes ({verifications.length})</TabsTrigger>
             <TabsTrigger value="scheduled">Agendados</TabsTrigger>
@@ -159,134 +333,7 @@ export default function AdminVerificationsPage() {
           </TabsList>
 
           <TabsContent value="pending" className="space-y-4">
-            {verifications.length > 0 && (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar por nome, e-mail ou empresa..."
-                    className="pl-9"
-                  />
-                </div>
-                <Select value={areaFilter} onValueChange={setAreaFilter}>
-                  <SelectTrigger className="w-full sm:w-56">
-                    <SelectValue placeholder="Área de atuação" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas as áreas</SelectItem>
-                    {expertiseAreas.map((area) => (
-                      <SelectItem key={area} value={area}>{area}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {verifications.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center h-56">
-                  <div className="text-center">
-                    <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
-                    <p className="font-medium text-gray-700">Nenhuma verificação pendente</p>
-                    <p className="text-sm text-muted-foreground">Todas as solicitações de mentores estão em dia.</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : filteredVerifications.length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center h-40">
-                  <p className="text-muted-foreground">Nenhuma verificação encontrada para esse filtro.</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredVerifications.map((verification) => (
-                  <Card key={verification.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-14 w-14">
-                            <AvatarImage src="/placeholder.svg" />
-                            <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                              {verification.mentor_name
-                                .split(" ")
-                                .map((n: string) => n[0])
-                                .slice(0, 2)
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <CardTitle className="text-xl">{verification.mentor_name}</CardTitle>
-                            <CardDescription className="font-medium text-gray-600">{verification.mentor_title}</CardDescription>
-                            <p className="text-sm text-muted-foreground">{verification.mentor_company || "Empresa não informada"}</p>
-                          </div>
-                        </div>
-                        <Badge variant="outline" className="w-fit">{verification.verification_type}</Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="h-4 w-4" />
-                          <span>Inscrito em {new Date(verification.created_at).toLocaleDateString("pt-BR")}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <User className="h-4 w-4" />
-                          <span>{verification.mentor_email}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Ver Detalhes
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Detalhes da Verificação</DialogTitle>
-                              <DialogDescription>Dados cadastrais e documentos do mentor</DialogDescription>
-                            </DialogHeader>
-                            <VerificationDetails verification={verification} />
-                          </DialogContent>
-                        </Dialog>
-
-                        <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-medium" onClick={() => handleApprove(verification.id)}>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Aprovar Mentor
-                        </Button>
-
-                        <MentorReviewAssistant
-                          userId={verification.id}
-                          onApprove={(message) => handleApprove(verification.id, message)}
-                          onReject={(message) => handleReject(verification.id, "Ajustes solicitados via assistente de IA", message)}
-                        />
-
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Rejeitar
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Rejeitar Verificação</DialogTitle>
-                              <DialogDescription>Por favor, informe a justificativa da recusa</DialogDescription>
-                            </DialogHeader>
-                            <RejectForm onReject={(reason: string) => handleReject(verification.id, reason)} />
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            {renderList()}
           </TabsContent>
 
           <TabsContent value="scheduled">
@@ -298,11 +345,7 @@ export default function AdminVerificationsPage() {
           </TabsContent>
 
           <TabsContent value="completed">
-            <Card>
-              <CardContent className="flex items-center justify-center h-48">
-                <p className="text-muted-foreground">Verificações concluídas aparecerão aqui.</p>
-              </CardContent>
-            </Card>
+            {renderList()}
           </TabsContent>
         </Tabs>
       </div>
