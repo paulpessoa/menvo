@@ -9,6 +9,11 @@ jest.mock("@/lib/ai/models", () => ({
   getAgentModels: jest.fn()
 }))
 
+// Mentees load their latest diagnostic for context; these tests cover RBAC only.
+jest.mock("@/lib/services/diagnostic/diagnostic.service", () => ({
+  diagnosticService: { getLatestCompletedSession: jest.fn().mockResolvedValue(null) }
+}))
+
 jest.mock("langchain", () => ({
   createAgent: jest.fn(({ tools, systemPrompt }) => ({
     tools,
