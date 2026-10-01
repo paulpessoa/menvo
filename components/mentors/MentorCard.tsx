@@ -177,12 +177,12 @@ export const MentorCard: React.FC<MentorCardProps> = ({
         )}
 
         {/* Rating (canto inferior direito da foto) */}
-        {mentor.average_rating != null && mentor.average_rating > 0 && (
+        {/* {mentor.average_rating != null && mentor.average_rating > 0 && (
           <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold bg-slate-900/80 text-white backdrop-blur-md shadow-sm">
             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
             <span>{mentor.average_rating.toFixed(1)}</span>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* ================================================================

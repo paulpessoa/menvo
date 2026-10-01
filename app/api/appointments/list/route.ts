@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         let query = supabase
             .from('appointments')
             .select(`
-                *,
+                id, mentor_id, mentee_id, scheduled_at, duration_minutes, google_meet_link, status, created_at, message, topic, cancellation_reason, cancelled_by,
                 mentor:profiles!mentor_id(
                     id,
                     full_name,
