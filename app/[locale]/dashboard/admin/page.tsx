@@ -150,6 +150,13 @@ export default function AdminDashboard() {
       href: "/dashboard/admin/organizations",
       icon: Building2,
       color: "bg-emerald-600"
+    },
+    {
+      title: "Retenção LGPD",
+      description: "Acompanhar fila de exclusão de contas e gerenciar isenções",
+      href: "/dashboard/admin/retention",
+      icon: Clock,
+      color: "bg-rose-800"
     }
   ]
 
