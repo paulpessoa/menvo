@@ -353,7 +353,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 )}
             </div>
 
-            <MentorshipReviews mentorId={mentor.id} />
+            {/* <MentorshipReviews mentorId={mentor.id} /> */}
           </div>
 
           {/* Right Column: Actions & Availability */}

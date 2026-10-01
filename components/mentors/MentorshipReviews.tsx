@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { mentorService } from "@/lib/services/mentors/mentors.service"
+import { getMentorReviewsAction } from "@/app/actions/mentors"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Star, MessageCircle, User } from "lucide-react"
 import { format } from "date-fns"
@@ -27,7 +27,7 @@ export function MentorshipReviews({ mentorId }: { mentorId: string }) {
   useEffect(() => {
     async function fetchReviews() {
       try {
-        const data = await mentorService.getMentorReviews(mentorId)
+        const data = await getMentorReviewsAction(mentorId)
         setReviews((data as unknown as Review[]) || [])
       } catch (err) {
         console.error("Error fetching reviews:", err)

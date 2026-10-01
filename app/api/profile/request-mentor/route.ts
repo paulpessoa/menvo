@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       .from("profiles")
       .update(updateData)
       .eq("id", user.id)
-      .select()
+      .select('id, is_pending_mentor, verification_status')
       .single()
 
     if (error) throw error

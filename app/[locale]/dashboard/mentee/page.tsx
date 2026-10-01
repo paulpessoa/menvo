@@ -167,11 +167,6 @@ export default function MenteeDashboard() {
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
               <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
             </div>
-            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all">
-              <Link href="/mentors">
-                <Search className="h-4 w-4 mr-2" /> {t("mentee.actions.find")}
-              </Link>
-            </Button>
           </div>
 
           <Suspense fallback={<div className="py-10 flex justify-center"><MenvoDots /></div>}>
@@ -206,6 +201,9 @@ function MenteeDashboardTabs({
       <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
         <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
           <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
+        </TabsTrigger>
+        <TabsTrigger value="favorites" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+          <Heart className="w-4 h-4" /> {t("mentee.sections.favorites")}
         </TabsTrigger>
         <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
           <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
@@ -258,7 +256,10 @@ function MenteeDashboardTabs({
           </Button>
         </div>
 
-        {/* Favoritos */}
+      </TabsContent>
+
+      {/* TAB: FAVORITES */}
+      <TabsContent value="favorites" className="animate-in fade-in duration-500">
         <div className="max-w-3xl pt-2">
             <Card className="rounded-2xl border border-gray-100 shadow-xs">
               <CardHeader className="flex flex-row items-center justify-between pb-4">

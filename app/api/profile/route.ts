@@ -18,6 +18,18 @@ const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
   },
 })
 
+const PROFILE_COLUMNS = `
+  id, email, first_name, last_name, full_name, avatar_url, slug, verified, 
+  bio, expertise_areas, linkedin_url, created_at, updated_at, age, city, state, country, 
+  timezone, languages, job_title, company, experience_years, mentorship_topics, 
+  inclusive_tags, availability_status, github_url, twitter_url, website_url, phone, 
+  average_rating, total_reviews, total_sessions, is_volunteer, cv_url, address, 
+  portfolio_url, mentorship_approach, what_to_expect, ideal_mentee, free_topics, 
+  chat_enabled, profile_visibility, mentorship_guidelines, location, academic_level, 
+  institution, course, expected_graduation, mentee_status, show_in_community, 
+  is_pending_mentor, learning_goals
+`.trim()
+
 async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
   if (authHeader) {
@@ -61,7 +73,7 @@ export async function PUT(request: NextRequest) {
       .from("profiles")
       .update(updateData)
       .eq("id", user.id)
-      .select()
+      .select(PROFILE_COLUMNS)
       .single()
 
     if (updateError) {
@@ -104,7 +116,7 @@ export async function GET(request: NextRequest) {
     // Fetch profile from database
     const { data: profile, error: fetchError } = await supabaseAdmin
       .from("profiles")
-      .select("*")
+      .select(PROFILE_COLUMNS)
       .eq("id", user.id)
       .single()
 
@@ -125,7 +137,7 @@ export async function GET(request: NextRequest) {
         const { data: newProfile, error: createError } = await supabaseAdmin
           .from("profiles")
           .insert(profileData)
-          .select()
+          .select(PROFILE_COLUMNS)
           .single()
 
         if (createError) {
