@@ -108,10 +108,12 @@ export function FeedbackManagement({ type = 'received' }: FeedbackManagementProp
   return (
     <div className="space-y-4">
       {feedbacks.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50/50 rounded-xl border border-dashed">
-          <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 italic">Nenhuma avaliação encontrada.</p>
-        </div>
+        <Card className="rounded-2xl border-border/60 shadow-none">
+          <CardContent className="py-12 flex flex-col items-center text-center gap-4">
+            <MessageSquare className="h-8 w-8 text-muted-foreground/40" />
+            <p className="text-sm text-muted-foreground">Nenhuma avaliação encontrada.</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {feedbacks.map((fb) => (

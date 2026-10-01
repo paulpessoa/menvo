@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useFeatureFlag } from "@/lib/feature-flags"
-import { Bot, User, Sparkles, Info, Send, FileText, ExternalLink } from "lucide-react"
+import { Bot, User, Info, Send, FileText, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { MentorCard } from "@/components/mentors/MentorCard"
@@ -178,9 +178,9 @@ function AssistantChat() {
                 text: data.briefing.greetingMessage,
                 chips: data.briefing.suggestedChips?.length
                   ? {
-                      mode: "single",
-                      options: data.briefing.suggestedChips
-                    }
+                    mode: "single",
+                    options: data.briefing.suggestedChips
+                  }
                   : undefined
               }
             ])
@@ -201,7 +201,7 @@ function AssistantChat() {
         <Bot className="w-16 h-16 text-muted-foreground mb-4 opacity-50" />
         <h1 className="text-2xl font-bold mb-2">Assistente em Breve</h1>
         <p className="text-muted-foreground max-w-md">
-          Nossa inteligência artificial está sendo treinada para ajudar você a encontrar 
+          Nossa inteligência artificial está sendo treinada para ajudar você a encontrar
           os melhores mentores e tirar dúvidas sobre sua carreira. Volte em breve!
         </p>
       </div>
@@ -305,14 +305,14 @@ function AssistantChat() {
                 prev.map((msg) =>
                   msg.id === assistantMessageId
                     ? {
-                        ...msg,
-                        chips: {
-                          mode: event.mode,
-                          options: event.options,
-                          allowOther: event.allowOther,
-                          canSkip: event.canSkip
-                        }
+                      ...msg,
+                      chips: {
+                        mode: event.mode,
+                        options: event.options,
+                        allowOther: event.allowOther,
+                        canSkip: event.canSkip
                       }
+                    }
                     : msg
                 )
               )
@@ -328,11 +328,11 @@ function AssistantChat() {
                 prev.map((msg) =>
                   msg.id === assistantMessageId
                     ? {
-                        ...msg,
-                        text: msg.text
-                          ? `${msg.text}\n\n⚠️ ${event.message}`
-                          : `⚠️ Não foi possível concluir: ${event.message}`
-                      }
+                      ...msg,
+                      text: msg.text
+                        ? `${msg.text}\n\n⚠️ ${event.message}`
+                        : `⚠️ Não foi possível concluir: ${event.message}`
+                    }
                     : msg
                 )
               )
@@ -363,7 +363,6 @@ function AssistantChat() {
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] max-w-4xl mx-auto border rounded-2xl overflow-hidden bg-background shadow-sm my-6">
       <div className="flex items-center gap-2 px-6 py-4 border-b bg-muted/30">
-        <Sparkles className="w-5 h-5 text-primary" />
         <h2 className="font-semibold text-lg">
           {isDiagnosticMode ? "Diagnóstico de Carreira - Menvo" : "Copiloto Menvo"}
         </h2>
@@ -407,11 +406,10 @@ function AssistantChat() {
             )}
             <div className="flex flex-col gap-3 w-full max-w-[90%]">
               <div
-                className={`w-fit px-4 py-3 rounded-2xl ${
-                  msg.role === "user"
+                className={`w-fit px-4 py-3 rounded-2xl ${msg.role === "user"
                     ? "bg-primary text-primary-foreground rounded-tr-sm self-end"
                     : "bg-muted rounded-tl-sm self-start"
-                }`}
+                  }`}
               >
                 {msg.text ? (
                   msg.role === "assistant" ? (
@@ -423,9 +421,8 @@ function AssistantChat() {
 
                 {msg.isStreaming && (
                   <div
-                    className={`flex items-center gap-2.5 text-xs text-primary font-medium ${
-                      msg.text ? "mt-3 pt-2.5 border-t border-border/40" : ""
-                    }`}
+                    className={`flex items-center gap-2.5 text-xs text-primary font-medium ${msg.text ? "mt-3 pt-2.5 border-t border-border/40" : ""
+                      }`}
                   >
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>

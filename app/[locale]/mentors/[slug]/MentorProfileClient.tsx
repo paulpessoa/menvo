@@ -106,6 +106,11 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
   const { favorites, toggleFavorite } = useFavorites(user?.id)
   const isFavorite = favorites.includes(mentor.id)
   const isOwner = user?.id === mentor.id
+  // Single source of truth for both the desktop booking card and the mobile sticky bar.
+  const isFullyBooked =
+    availability.length === 0 ||
+    mentor.availability_status === "busy" ||
+    mentor.availability_status === "unavailable"
 
   const [approach, setApproach] = useState<MentorApproach | null>(null)
   useEffect(() => {
@@ -265,7 +270,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     {t("mentorshipApproach")}
                   </h3>
                   <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem]">
-                    <CardContent className="p-8 md:p-10 space-y-6">
+                    <CardContent className="p-6 md:p-10 space-y-6">
                       {approach.mentorship_approach && (
                         <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-wrap">
                           {approach.mentorship_approach}
@@ -295,13 +300,13 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             {/* Specialties & Inclusion */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
                             <BookOpen className="h-4 w-4 text-primary" />
                             {t("topics")}
                         </h3>
-                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
-                            <CardContent className="p-8 space-y-6">
+                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] flex-1">
+                            <CardContent className="p-6 md:p-8">
                                 <div className="flex flex-wrap gap-2">
                                     {mentor.mentorship_topics.map((topic, i) => (
                                         <Badge key={i} className="bg-primary/5 text-primary border-none font-bold px-3 py-1 rounded-xl">
@@ -314,13 +319,13 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </div>
                 )}
                 {mentor.expertise_areas && mentor.expertise_areas.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
                             <Award className="h-4 w-4 text-primary" />
                             {t("expertise")}
                         </h3>
-                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
-                            <CardContent className="p-8 space-y-6">
+                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] flex-1">
+                            <CardContent className="p-6 md:p-8">
                                 <div className="flex flex-wrap gap-2">
                                     {mentor.expertise_areas.map((area, i) => (
                                         <Badge key={i} variant="outline" className="border-2 font-bold px-3 py-1 rounded-xl text-gray-600">
@@ -333,13 +338,13 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </div>
                 )}
                 {mentor.inclusive_tags && mentor.inclusive_tags.length > 0 && (
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
                             <Heart className="h-4 w-4 text-primary" />
                             {t("cultureAndInclusion")}
                         </h3>
-                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] h-full">
-                            <CardContent className="p-8 space-y-6">
+                        <Card className="border-none shadow-lg shadow-primary/5 bg-white rounded-[2rem] flex-1">
+                            <CardContent className="p-6 md:p-8">
                                 <div className="flex flex-wrap gap-2">
                                     {mentor.inclusive_tags.map((tag, i) => (
                                         <Badge key={i} className="bg-purple-50 text-purple-700 border-none font-bold px-3 py-1 rounded-xl">
@@ -410,14 +415,11 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
+                  // Mobile uses the sticky action bar below instead.
+                  <div className="hidden md:flex gap-2">
                     <Button
                       className="flex-1 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
-                      disabled={
-                        availability.length === 0 ||
-                        mentor.availability_status === "busy" ||
-                        mentor.availability_status === "unavailable"
-                      }
+                      disabled={isFullyBooked}
                       onClick={() => {
                         if (!user) {
                           setShowLoginModal(true)
@@ -426,9 +428,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         }
                       }}
                     >
-                      {mentor.availability_status === "busy" ||
-                      mentor.availability_status === "unavailable" ||
-                      availability.length === 0 ? (
+                      {isFullyBooked ? (
                         t("fullSchedule")
                       ) : (
                         <div className="flex items-center gap-2">
@@ -515,9 +515,9 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   else setIsScheduleModalOpen(true)
                 }}
                 className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40 h-14"
-                disabled={mentor.availability_status === "busy" || mentor.availability_status === "unavailable"}
+                disabled={isFullyBooked}
               >
-                {mentor.availability_status === "busy" || mentor.availability_status === "unavailable"
+                {isFullyBooked
                   ? t("fullSchedule")
                   : t("bookMentorship")}
               </Button>

@@ -3,13 +3,7 @@
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -260,65 +254,43 @@ function MenteeDashboardTabs({
 
       {/* TAB: FAVORITES */}
       <TabsContent value="favorites" className="animate-in fade-in duration-500">
-        <div className="max-w-3xl pt-2">
-            <Card className="rounded-2xl border border-gray-100 shadow-xs">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <div>
-                  <CardTitle className="text-xl font-bold flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-red-500 fill-current" /> {t("mentee.sections.favorites")}
-                  </CardTitle>
-                  <CardDescription>{t("mentee.sections.favoritesDesc")}</CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium">
-                  <Link href="/mentors">{t("mentee.sections.viewAll")}</Link>
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {loadingFavorites ? (
-                  <div className="flex justify-center py-8"><MenvoDots /></div>
-                ) : favoriteMentorsData.length === 0 ? (
-                  <div className="py-8 px-4 text-center rounded-2xl border border-dashed border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">
-                      <Heart className="h-6 w-6 text-red-400" />
+        {loadingFavorites ? (
+          <div className="flex justify-center py-12"><MenvoDots /></div>
+        ) : favoriteMentorsData.length === 0 ? (
+          <Card className="rounded-2xl border-border/60 shadow-none">
+            <CardContent className="py-12 flex flex-col items-center text-center gap-4">
+              <Heart className="h-8 w-8 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">{t("mentee.sections.noFavorites")}</p>
+              <Button asChild size="sm" className="rounded-xl">
+                <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
+              <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
+                <Card className="rounded-2xl border-border/60 shadow-none hover:border-primary/30 transition-colors">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Avatar className="h-12 w-12 border">
+                      <AvatarImage src={m.avatar_url || undefined} />
+                      <AvatarFallback>{m.full_name[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold truncate">{m.full_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
                     </div>
-                    <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.sections.noFavorites")}</p>
-                    <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.sections.noFavoritesDesc")}</p>
-                    <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold hover:border-primary/40 hover:text-primary">
-                      <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
-                      <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
-                        <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
-                          <Avatar className="h-12 w-12 border">
-                            <AvatarImage src={m.avatar_url || undefined} />
-                            <AvatarFallback>{m.full_name[0]}</AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold truncate">{m.full_name}</p>
-                            <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-        </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </TabsContent>
 
       {/* TAB: FEEDBACKS */}
-      <TabsContent value="feedbacks" className="animate-in fade-in slide-in-from-left-4 duration-500">
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacksTitle")}</h2>
-            <p className="text-muted-foreground">{t("mentee.tabs.feedbacksDesc")}</p>
-          </div>
-          <FeedbackManagement type="sent" />
-        </div>
+      <TabsContent value="feedbacks" className="animate-in fade-in duration-500">
+        <FeedbackManagement type="sent" />
       </TabsContent>
     </Tabs>
   )
