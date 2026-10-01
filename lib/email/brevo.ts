@@ -723,6 +723,7 @@ export interface QuizResultsEmailData {
   summary: string;
   /** Link com o token `?k=` (lib/quiz/result-link.ts) - abre a análise e permite criar a conta. */
   resultUrl: string;
+  isAuthenticated?: boolean;
 }
 
 /**
@@ -747,7 +748,9 @@ export function buildQuizResultsEmailHtml(data: QuizResultsEmailData): string {
     <div class="button-container">
         <a href="${data.resultUrl}" class="button">Ver minha análise completa</a>
     </div>
+    ${!data.isAuthenticated ? `
     <p style="font-size: 13px; color: ${COLORS.muted}; text-align: center;">Pelo mesmo link você pode criar uma senha e guardar a análise na sua conta da Menvo.</p>
+    ` : ''}
   `;
 
   const footerExtra = `

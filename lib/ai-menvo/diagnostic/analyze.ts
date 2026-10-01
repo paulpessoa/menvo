@@ -70,7 +70,7 @@ export interface AnalysisMentor {
   total_sessions: number | null
 }
 
-function buildPrompt(answers: QuizAnswers, mentors: AnalysisMentor[]): string {
+function buildPrompt(answers: QuizAnswers, mentors: AnalysisMentor[], isAuthenticated: boolean): string {
   const mentorsSection =
     mentors.length > 0
       ? mentors
@@ -112,6 +112,8 @@ INSTRUÇÕES:
      O título aparece em prévias de links compartilhados, então não exponha detalhes sensíveis (saúde, finanças, família).
    - "resumo_motivador": no máximo 2 frases (até ~50 palavras), falando diretamente com a pessoa pelo primeiro nome. Sem elogios vazios.
    - "proximos_passos": exatamente 3 ações concretas, em ordem de execução, cada uma começando com um verbo no imperativo e com prazo quando fizer sentido. Máx. ~30 palavras cada.
+     IMPORTANTE: O usuário ${isAuthenticated ? "JÁ TEM CONTA" : "AINDA NÃO TEM CONTA"} na plataforma. 
+     ${isAuthenticated ? "Não sugira que ele se cadastre ou crie conta, ele já fez isso. Foque em agendar mentorias, preencher perfil ou ações fora da plataforma." : "Inclua 'Cadastre-se na plataforma MENVO' como um dos passos."}
    - "conselhos_praticos": itens curtos (máx. ~30 palavras cada), sem repetir os próximos passos.
    - "areas_desenvolvimento": 3 a 5 rótulos curtos (máx. 5 palavras cada).
    - "mensagem_final": 1 frase de encorajamento, sem repetir o resumo.
@@ -312,6 +314,7 @@ export function sanitizeAnalysisMentors(
 
 export interface AnalyzeQuizOptions {
   onCall: (record: AiCallRecord) => void
+  isAuthenticated?: boolean
 }
 
 export interface AnalyzeQuizRun {
@@ -336,7 +339,7 @@ export async function analyzeQuiz(
     const model = await getStructuredModel<QuizAnalysisResult>(supabase, "analyze", quizAnalysisSchema, {
       onCall: opts.onCall
     })
-    const rawAnalysis = await model.invoke(buildPrompt(answers, mentors))
+    const rawAnalysis = await model.invoke(buildPrompt(answers, mentors, opts.isAuthenticated ?? false))
     const analysis = sanitizeAnalysisMentors(rawAnalysis, mentors)
     return { analysis, usedFallback: false }
   } catch (err) {

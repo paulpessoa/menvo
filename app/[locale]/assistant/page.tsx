@@ -541,8 +541,10 @@ function AssistantChat() {
         </form>
 
         <div className="text-center mt-2 flex justify-center items-center gap-1 text-[10px] text-muted-foreground/70">
-          <Info className="w-3 h-3" />
-          A IA pode cometer erros. Verifique informações importantes.
+          <Info className="w-3 h-3 flex-shrink-0" />
+          <span>
+            A IA pode cometer erros. O histórico é apagado ao sair da página e há limite mensal de uso.
+          </span>
         </div>
       </div>
     </div>

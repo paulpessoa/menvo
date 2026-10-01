@@ -81,3 +81,42 @@
     transform: translateX(-50%) translateY(-50%) rotate(360deg); 
   }
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .print\:hidden,
+  nav,
+  footer,
+  button,
+  .button-container {
+    display: none !important;
+  }
+  .print\:block {
+    display: block !important;
+  }
+  .print\:text-black {
+    color: black !important;
+  }
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  .print\:border-none {
+    border: none !important;
+  }
+  .print\:bg-transparent {
+    background: transparent !important;
+  }
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+  .print\:m-0 {
+    margin: 0 !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

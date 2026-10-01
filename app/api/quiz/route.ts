@@ -63,14 +63,21 @@ export async function POST(request: NextRequest) {
   // the one the per-e-mail limit counts.
   const email = (user?.email ?? payload.email).trim().toLowerCase()
 
-  // Same check the insert policy enforces (migration 20260930000000); asked
+  // Same check the insert policy enforces (migration 20261001000000); asked
   // first only to answer with a message the person can act on.
-  const { data: status } = await supabase.rpc("quiz_submission_status", { p_email: email })
-  if (status === "email_limit") {
+  const { data: status } = await supabase.rpc("quiz_submission_status", { 
+    p_email: email,
+    p_ip: ip,
+    p_is_auth: !!user?.id
+  })
+  
+  if (status === "ip_limit" || status === "email_limit") {
+    const isAuth = !!user?.id;
+    const limitCount = isAuth ? 2 : 1;
     return NextResponse.json(
       {
-        error: "Você já fez 3 análises nos últimos 30 dias com este e-mail. Tente novamente mais tarde.",
-        code: "email_limit",
+        error: `Você já fez ${limitCount} análise${limitCount > 1 ? 's' : ''} nos últimos 30 dias. Tente novamente no mês que vem.`,
+        code: status,
       },
       { status: 429 }
     )
@@ -98,6 +105,7 @@ export async function POST(request: NextRequest) {
     future_vision: payload.future_vision,
     share_knowledge: payload.share_knowledge,
     personal_life_help: payload.personal_life_help,
+    ip_address: ip,
   })
 
   if (error) {

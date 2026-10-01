@@ -2177,7 +2177,11 @@ export type Database = {
         Returns: undefined
       }
       quiz_submission_status: {
-        Args: { p_email: string }
+        Args: {
+          p_email: string
+          p_ip?: string | null
+          p_is_auth?: boolean
+        }
         Returns: string
       }
       get_shared_diagnostics_for_mentor: {
