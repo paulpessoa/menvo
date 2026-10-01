@@ -1151,51 +1151,6 @@ export type Database = {
           },
         ]
       }
-      newsletter_subscriptions: {
-        Row: {
-          consent_date: string | null
-          consent_given: boolean
-          created_at: string
-          email: string
-          id: string
-          ip_address: string | null
-          marketing_consent: boolean
-          name: string | null
-          status: string | null
-          unsubscribed_at: string | null
-          user_agent: string | null
-          whatsapp: string | null
-        }
-        Insert: {
-          consent_date?: string | null
-          consent_given?: boolean
-          created_at?: string
-          email: string
-          id?: string
-          ip_address?: string | null
-          marketing_consent?: boolean
-          name?: string | null
-          status?: string | null
-          unsubscribed_at?: string | null
-          user_agent?: string | null
-          whatsapp?: string | null
-        }
-        Update: {
-          consent_date?: string | null
-          consent_given?: boolean
-          created_at?: string
-          email?: string
-          id?: string
-          ip_address?: string | null
-          marketing_consent?: boolean
-          name?: string | null
-          status?: string | null
-          unsubscribed_at?: string | null
-          user_agent?: string | null
-          whatsapp?: string | null
-        }
-        Relationships: []
-      }
       organization_members: {
         Row: {
           created_at: string

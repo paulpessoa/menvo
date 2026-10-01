@@ -20,7 +20,7 @@ Organizar a comunicação por e-mail da Menvo em três trilhas, inspiradas em pl
 - `app/[locale]/dashboard/admin/emails`: preview + envio de teste de templates.
 - `lib/services/invites/*` + tabela `reengagement_invites`: envio em massa por campanha (`unique(user_id, campaign)` evita duplicidade) + token de resposta.
 - `lib/services/invites/suppression.service.ts` + `email_suppressions`: lista de não-contato por hash (LGPD).
-- ~~`newsletter_subscriptions`~~: newsletter removida do código (branch `feat/remove-newsletter`); a tabela fica no banco só como histórico. O consentimento passa a ser pedido no cadastro.
+- ~~`newsletter_subscriptions`~~: newsletter removida do código (PR #67) e a tabela apagada (migração `20261002000000_drop_newsletter_subscriptions.sql`); quem tinha cancelado foi para `email_suppressions`. O consentimento passa a ser pedido no cadastro.
 - Crons Vercel (`vercel.json`): `appointments` (10h UTC), `ai-retention`, `account-retention` — padrão `CRON_SECRET` fail-closed em `app/api/cron/account-retention/route.ts`.
 - Templates de Auth do Supabase em `supabase/templates/` (confirmação de e-mail, magic link etc.).
 - `pg_net` já usado no trigger `notify_new_user_role` (chama Edge Function).
