@@ -17,7 +17,7 @@ export async function sendQuizResultsEmailFor(id: string): Promise<QuizEmailOutc
   const supabase = createServiceRoleClient()
   const { data: row, error } = await supabase
     .from("quiz_responses")
-    .select("id, name, email, ai_analysis")
+    .select("id, name, email, ai_analysis, user_id")
     .eq("id", id)
     .maybeSingle()
 
@@ -33,7 +33,8 @@ export async function sendQuizResultsEmailFor(id: string): Promise<QuizEmailOutc
     name: row.name || "",
     title: analysis.titulo_personalizado || "Sua análise de carreira",
     summary: analysis.resumo_motivador || "",
-    resultUrl: buildResultUrl(row.id, row.email)
+    resultUrl: buildResultUrl(row.id, row.email),
+    isAuthenticated: !!row.user_id
   })
 
   if (!result.success) {

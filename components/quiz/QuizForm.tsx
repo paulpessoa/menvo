@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-react"
 import { useTranslations } from 'next-intl'
@@ -103,18 +104,37 @@ export function QuizForm({ onSubmit, onBack, initialData, isAuthenticated = fals
     switch (currentStep) {
       case 1:
         return (
-          <QuizRadioStep
-            value={formData.careerMoment}
-            onChange={(val) => updateFormData('careerMoment', val)}
-            options={[
-              { value: 'ensino-medio', label: t('quiz_form.high_school_student') },
-              { value: 'estudante-universitario', label: t('quiz_form.university_student') },
-              { value: 'recem-formado', label: t('quiz_form.recent_graduate') },
-              { value: 'profissional-junior', label: t('quiz_form.junior_professional') },
-              { value: 'transicao', label: t('quiz_form.career_transition') },
-              { value: 'outro', label: t('quiz_form.other') },
-            ]}
-          />
+          <div className="space-y-4">
+            <QuizRadioStep
+              value={(formData.careerMoment || '').startsWith('outro') ? 'outro' : formData.careerMoment}
+              onChange={(val) => {
+                if (val === 'outro') {
+                  updateFormData('careerMoment', 'outro:')
+                } else {
+                  updateFormData('careerMoment', val)
+                }
+              }}
+              options={[
+                { value: 'ensino-medio', label: t('quiz_form.high_school_student') },
+                { value: 'estudante-universitario', label: t('quiz_form.university_student') },
+                { value: 'recem-formado', label: t('quiz_form.recent_graduate') },
+                { value: 'profissional-junior', label: t('quiz_form.junior_professional') },
+                { value: 'transicao', label: t('quiz_form.career_transition') },
+                { value: 'outro', label: t('quiz_form.other') },
+              ]}
+            />
+            {(formData.careerMoment || '').startsWith('outro') && (
+              <div className="animate-in fade-in slide-in-from-top-2">
+                <Input
+                  autoFocus
+                  placeholder={t('quiz_form.other_placeholder') || 'Especifique seu momento...'}
+                  value={(formData.careerMoment || '').replace(/^outro:/, '')}
+                  onChange={(e) => updateFormData('careerMoment', `outro:${e.target.value}`)}
+                  className="h-12 bg-white"
+                />
+              </div>
+            )}
+          </div>
         )
       case 2:
         return (

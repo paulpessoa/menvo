@@ -1761,7 +1761,7 @@
       "cta_description": "Answer a few quick questions and get your analysis right away.",
       "start_quiz": "Start Questionnaire",
       "responses_confidential": "Your answers will help us better understand the needs of participants and recruit volunteer mentors in the most sought-after areas. In addition to contributing to building a stronger and more accessible mentoring community.",
-      "usage_limit_note": "You can take up to 3 analyses per e-mail every 30 days."
+      "usage_limit_note": "Note: Limited to 1 analysis/month (or 2/month for free accounts)."
     },
     "quiz_form": {
       "back": "Back",

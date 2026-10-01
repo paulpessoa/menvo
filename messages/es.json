@@ -1737,7 +1737,7 @@
       "cta_description": "Responde unas preguntas rápidas y recibe tu análisis al instante.",
       "start_quiz": "Comenzar Cuestionario",
       "responses_confidential": "Tus respuestas nos ayudarán a comprender mejor las necesidades de los participantes y a reclutar mentores voluntarios en las áreas más solicitadas. Además de contribuir a construir una comunidad de mentoría más fuerte y accesible.",
-      "usage_limit_note": "Puedes hacer hasta 3 análisis por correo cada 30 días."
+      "usage_limit_note": "Nota: Límite de 1 análisis/mes (o 2/mes para cuentas gratuitas)."
     },
     "quiz_form": {
       "back": "Volver",

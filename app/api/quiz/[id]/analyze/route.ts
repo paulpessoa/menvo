@@ -32,6 +32,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
   }
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: claimRows, error: claimError } = await supabase.rpc("claim_quiz_analysis", {
     p_server_key: serverKey,
@@ -87,7 +88,8 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
 
   const calls: AiCallRecord[] = []
   const { analysis } = await analyzeQuiz(supabase, answers, mentors, {
-    onCall: (record) => calls.push(record)
+    onCall: (record) => calls.push(record),
+    isAuthenticated: !!user
   })
 
   const { error: saveError } = await supabase.rpc("save_quiz_analysis", {
