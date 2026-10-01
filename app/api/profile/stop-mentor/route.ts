@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
           verification_status: null
       })
       .eq("id", user.id)
-      .select()
+      .select('id, verified, is_public')
       .single()
 
     if (error) throw error

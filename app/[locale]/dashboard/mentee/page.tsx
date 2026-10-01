@@ -167,11 +167,6 @@ export default function MenteeDashboard() {
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
               <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
             </div>
-            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all">
-              <Link href="/mentors">
-                <Search className="h-4 w-4 mr-2" /> {t("mentee.actions.find")}
-              </Link>
-            </Button>
           </div>
 
           <Suspense fallback={<div className="py-10 flex justify-center"><MenvoDots /></div>}>
