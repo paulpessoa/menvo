@@ -106,6 +106,10 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-01 - Check de PR contra crédito a IA
+- **Why:** trailers `Co-authored-by: Claude` chegaram à `main` (PRs #58-#63 e 3 commits de uma sessão remota) porque os hooks locais não cobrem sessões remotas nem squash merge no GitHub.
+- **O que:** workflow `.github/workflows/no-ai-attribution.yml` reprova PRs com IA como autora/committer/coautora; regra escrita em `CONTRIBUTING.md`. Falta marcar o check `check` como obrigatório num ruleset da `main` (Settings > Rules).
+
 ### 2026-10-01 - Auditoria LGPD dos e-mails
 - **Why:** só os e-mails de reengajamento, retenção de 30/1 dia e quiz citavam a Política de Privacidade; os demais (agendamento, org, auth, contato do mentor) não.
 - **Rodapé padrão (`getEmailLayout`):** todo e-mail enviado por `lib/email/brevo.ts` agora traz o link `/privacy` e o contato do encarregado (`PRIVACY_CONTACT`); o ano deixou de ser fixo. Os `footerExtra` ficaram só com o motivo do envio. Os 13 templates de `supabase/templates/` receberam a mesma linha (precisam ser recolados no painel do Supabase Auth para valer em produção).
