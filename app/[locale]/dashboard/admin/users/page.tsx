@@ -57,8 +57,9 @@ export default function AdminUsersPage() {
     jotformOrigin: 0
   })
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalItems, setTotalItems] = useState(0)
 
   const [filters, setFilters] = useState({
     role: "all",
@@ -70,26 +71,22 @@ export default function AdminUsersPage() {
 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(() => {
+    const p = searchParams?.get("page")
+    return p ? parseInt(p) : 1
+  })
   const ITEMS_PER_PAGE = 30
 
   // Edit State
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
-  const fetchData = useCallback(async (isLoadMore = false) => {
-    if (isLoadMore) {
-      setLoadingMore(true)
-    } else {
-      setLoading(true)
-      setPage(1)
-    }
+  const fetchData = useCallback(async () => {
+    setLoading(true)
 
     try {
-      const currentPage = isLoadMore ? page + 1 : 1
       const params = new URLSearchParams({
-        page: currentPage.toString(),
+        page: page.toString(),
         limit: ITEMS_PER_PAGE.toString(),
         search: searchTerm,
       })
@@ -109,30 +106,28 @@ export default function AdminUsersPage() {
         roles: u.user_roles?.map((ur: any) => ur.roles?.name) || []
       }))
 
-      if (isLoadMore) {
-        setUsers(prev => [...prev, ...newUsers])
-        setPage(currentPage)
-      } else {
-        setUsers(newUsers)
-      }
-
+      setUsers(newUsers)
+      setTotalPages(result.data.pagination.totalPages)
+      setTotalItems(result.data.pagination.total)
       setStats(result.data.counts)
-      setHasMore(newUsers.length === ITEMS_PER_PAGE)
+      
+      // Update URL silently
+      window.history.replaceState(null, '', `?${params.toString()}`)
     } catch (error) {
       console.error('Error fetching admin users:', error)
       toast.error('Erro ao carregar dados')
     } finally {
       setLoading(false)
-      setLoadingMore(false)
     }
   }, [page, filters, searchTerm, sortBy, sortOrder])
 
   useEffect(() => {
     fetchData()
-  }, [filters, sortBy, sortOrder]) // Recarregar ao mudar de filtros
+  }, [page, filters, sortBy, sortOrder]) // Recarregar ao mudar página ou filtros
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    setPage(1)
     fetchData()
   }
 
@@ -184,7 +179,7 @@ export default function AdminUsersPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>Nível de Permissão</DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={filters.role} onValueChange={(v) => setFilters(f => ({ ...f, role: v }))}>
+                <DropdownMenuRadioGroup value={filters.role} onValueChange={(v) => { setFilters(f => ({ ...f, role: v })); setPage(1); }}>
                   <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="mentor">Mentores</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="mentee">Mentees</DropdownMenuRadioItem>
@@ -193,7 +188,7 @@ export default function AdminUsersPage() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuLabel>Status da Conta</DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={filters.status} onValueChange={(v) => setFilters(f => ({ ...f, status: v }))}>
+                <DropdownMenuRadioGroup value={filters.status} onValueChange={(v) => { setFilters(f => ({ ...f, status: v })); setPage(1); }}>
                   <DropdownMenuRadioItem value="all">Todos</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="verified">Verificado</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="pending">Pendente (Aguardando)</DropdownMenuRadioItem>
@@ -202,7 +197,7 @@ export default function AdminUsersPage() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuLabel>Origem (Instituição)</DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={filters.origin} onValueChange={(v) => setFilters(f => ({ ...f, origin: v }))}>
+                <DropdownMenuRadioGroup value={filters.origin} onValueChange={(v) => { setFilters(f => ({ ...f, origin: v })); setPage(1); }}>
                   <DropdownMenuRadioItem value="all">Todas as origens</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="menvo">Cadastro direto</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="jotform">Migrado do JotForm</DropdownMenuRadioItem>
@@ -214,6 +209,7 @@ export default function AdminUsersPage() {
               const [s, o] = v.split("-")
               setSortBy(s)
               setSortOrder(o)
+              setPage(1)
             }}>
               <SelectTrigger className="w-full md:w-[180px]">
                 <SelectValue placeholder="Ordenar por" />
@@ -350,12 +346,19 @@ export default function AdminUsersPage() {
                 )}
               </div>
 
-              {hasMore && !loading && (
-                <div className="p-4 border-t flex justify-center bg-gray-50/50">
-                  <Button variant="outline" onClick={() => fetchData(true)} disabled={loadingMore} className="gap-2">
-                    {loadingMore ? <Loader2 className="animate-spin h-4 w-4" /> : <RefreshCw className="h-4 w-4" />}
-                    Carregar Mais Usuários
-                  </Button>
+              {!loading && totalPages > 1 && (
+                <div className="p-4 border-t flex items-center justify-between bg-gray-50/50">
+                  <div className="text-sm text-muted-foreground">
+                    Página {page} de {totalPages} ({totalItems} registros)
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>
+                      Anterior
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
+                      Próxima
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>
