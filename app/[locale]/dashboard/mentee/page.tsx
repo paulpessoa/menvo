@@ -207,6 +207,9 @@ function MenteeDashboardTabs({
         <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
           <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
         </TabsTrigger>
+        <TabsTrigger value="favorites" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+          <Heart className="w-4 h-4" /> {t("mentee.sections.favorites")}
+        </TabsTrigger>
         <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
           <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
         </TabsTrigger>
@@ -258,7 +261,10 @@ function MenteeDashboardTabs({
           </Button>
         </div>
 
-        {/* Favoritos */}
+      </TabsContent>
+
+      {/* TAB: FAVORITES */}
+      <TabsContent value="favorites" className="animate-in fade-in duration-500">
         <div className="max-w-3xl pt-2">
             <Card className="rounded-2xl border border-gray-100 shadow-xs">
               <CardHeader className="flex flex-row items-center justify-between pb-4">
