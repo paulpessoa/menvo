@@ -140,7 +140,7 @@ export default function AdminDashboard() {
     {
       title: "Organizações interessadas",
       description: "Pedidos do formulário 'Quero a Menvo na minha organização'",
-      href: "/dashboard/admin/org-leads",
+      href: "/dashboard/admin/organizations?tab=leads",
       icon: Building2,
       color: "bg-indigo-600"
     },
