@@ -34,6 +34,17 @@ To ensure consistency, security, and high engineering standards across our codeb
    ```
 7. Push to your fork and open a Pull Request against the `main` branch.
 
+### Sync with `main` before opening a PR
+
+Always start from, and finish on, the latest `main`. Stale branches carry already-merged commits and old file versions, so the PR shows far more differences than the change itself and invites bad conflict resolutions. This applies to humans and to AI agents (local or cloud).
+
+0. **Check the git identity** (`git config user.name` / `user.email`). Cloud agent environments may default to an AI identity such as `Claude <noreply@anthropic.com>`; set the maintainer's identity for the repo before the first commit, otherwise the commits are authored by the AI and the `No AI attribution` check fails.
+1. **Before starting:** `git fetch origin && git checkout -b <branch> origin/main` (never branch from an old local `main` or from another feature branch).
+2. **Before pushing / opening the PR:** `git fetch origin && git merge origin/main` (or rebase, on a branch only you use).
+3. **Check the diff is only your change:** `git diff origin/main...HEAD --stat`. Unrelated files listed → the branch is stale or carries other work; fix it before opening the PR.
+4. **Resolve conflicts consciously:** after a merge run `git diff --name-only --diff-filter=U` and `grep -rn "^<<<<<<<\|^>>>>>>>" .` before committing. Never commit conflict markers; validate JSON files (`messages/*.json`).
+5. **One task, one branch.** Do not stack new work on a branch whose PR is already merged or still open with other changes.
+
 ---
 
 ## 🏛️ Architectural Standards
