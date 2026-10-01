@@ -1,4 +1,4 @@
-export type InviteAudience = "selected" | "jotform_not_invited" | "never_signed_in" | "all"
+export type InviteAudience = "selected" | "jotform_not_invited" | "never_signed_in" | "all" | "unresponsive_invitees"
 
 export interface AudienceSkipped {
   suppressed: number
@@ -17,6 +17,7 @@ export const AUDIENCE_LABELS: Record<InviteAudience, string> = {
   selected: "Selecionados",
   jotform_not_invited: "Base JotForm ainda não convidada",
   never_signed_in: "Nunca entraram na plataforma",
+  unresponsive_invitees: "Receberam convite mas não abriram",
   all: "Todos os usuários"
 }
 

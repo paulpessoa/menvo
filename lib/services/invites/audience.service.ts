@@ -22,7 +22,7 @@ export async function fetchAllRows<T>(
   }
 }
 
-export type InviteAudience = "selected" | "jotform_not_invited" | "never_signed_in" | "all"
+export type InviteAudience = "selected" | "jotform_not_invited" | "never_signed_in" | "all" | "unresponsive_invitees"
 
 export interface AudienceCandidate {
   id: string
@@ -100,6 +100,12 @@ export async function resolveAudience(params: {
   if (params.audience === "never_signed_in") {
     const signedIn = await fetchSignedInUserIds()
     candidates = candidates.filter(p => !signedIn.has(p.id))
+  } else if (params.audience === "unresponsive_invitees") {
+    const unopened = await fetchAllRows((from, to) =>
+      supabase.from("reengagement_invites").select("user_id").is("opened_at", null).order("user_id").range(from, to)
+    )
+    const unopenedIds = new Set(unopened.map(row => row.user_id))
+    candidates = candidates.filter(p => unopenedIds.has(p.id))
   }
 
   const skipped = { suppressed: 0, optedOut: 0, alreadyInvited: 0, noEmail: 0 }
