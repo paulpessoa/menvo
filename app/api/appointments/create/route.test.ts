@@ -12,6 +12,7 @@ jest.mock('@/lib/utils/supabase/server', () => ({
 
 jest.mock('@/lib/email/brevo', () => ({
   sendAppointmentRequest: jest.fn().mockResolvedValue({ success: true }),
+  sendAdminNewAppointmentNotification: jest.fn().mockResolvedValue({ success: true }),
 }))
 
 const MENTOR_ID = '9b2f7f2e-3c4d-4e5f-8a6b-1c2d3e4f5a6b'

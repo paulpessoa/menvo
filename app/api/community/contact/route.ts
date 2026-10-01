@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Get mentee profile + email
     const { data: menteeProfile } = await supabase
       .from("profiles")
-      .select("full_name, first_name")
+      .select("full_name, first_name, email_opt_out_at")
       .eq("id", menteeId)
       .single()
 
@@ -71,6 +71,12 @@ export async function POST(request: NextRequest) {
 
     if (!menteeProfile || !menteeAuth?.user?.email) {
       return NextResponse.json({ error: "Mentorado não encontrado" }, { status: 404 })
+    }
+
+    // Respeita quem pediu para parar de receber e-mails (LGPD art. 18, IX/§2º).
+    // Resposta de sucesso para não revelar ao mentor a decisão da pessoa.
+    if (menteeProfile.email_opt_out_at) {
+      return NextResponse.json({ success: true })
     }
 
     // Send email
