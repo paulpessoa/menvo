@@ -100,7 +100,7 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 - [ ] **Painel admin da fila de retenção:** ver quem está em cada etapa (aguardando aviso de 30d/1d, agendado para quando) e um botão para isentar alguém manualmente. `docs/domains/account-retention.md` §8.
 
 ### 🔵 P3 - Future / Strategic (retention)
-- [ ] **Política de inatividade para contas ativas** (ex.: sem login há 24 meses), hoje só prevista no texto dos termos ("poderão ser excluídas") mas sem código. `docs/domains/account-retention.md` §8.
+- [x] **Política de inatividade para contas ativas** (12 meses sem login). Executada com fila `inactive_accounts_queue` e planner `planInactiveActions`. Textos da interface atualizados. Painel admin configurado. `docs/domains/account-retention.md` §8.
 
 ---
 
