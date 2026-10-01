@@ -171,3 +171,15 @@ export async function getMentorReviewsAction(mentorId: string) {
   if (error) throw error
   return (data as any) || []
 }
+
+export async function resolveMentorSlugsAction(names: string[]) {
+  if (!names || names.length === 0) return []
+  
+  const supabase = await createClient()
+  const { data, error } = await (supabase.from("mentors_view") as any)
+    .select("full_name, slug, id")
+    .in("full_name", names)
+    
+  if (error) throw error
+  return (data as any[]) || []
+}
