@@ -45,13 +45,7 @@ export default function Header() {
       icon: User,
       color: "text-gray-700"
     })
-    userNavigation.push({
-      name: t("footer.reportAndSupport"),
-      href: "/support",
-      icon: Shield,
-      color: "text-gray-700"
-    })
-
+    // Link de suporte removido dos menus principais a pedido do usuário
     if (isAdmin) {
       userNavigation.push({ type: "separator" })
       userNavigation.push({
