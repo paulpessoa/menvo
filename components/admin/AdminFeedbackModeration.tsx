@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Star, Check, X, Clock, MessageCircle, User, Search } from "lucide-react"
+import { Star, Search } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
@@ -124,7 +124,6 @@ export function AdminFeedbackModeration() {
 
       {feedbacks.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-          <Check className="w-16 h-16 text-green-300 mx-auto mb-4" />
           <h3 className="text-xl font-bold text-gray-900">Tudo limpo!</h3>
           <p className="text-gray-500 italic">Não há avaliações pendentes de moderação.</p>
         </div>
@@ -167,10 +166,7 @@ export function AdminFeedbackModeration() {
                       "{fb.comment || "Sem comentário disponível."}"
                     </blockquote>
 
-                    <div className="flex items-center gap-2 pt-2">
-                       <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
-                          <User className="w-4 h-4 text-blue-500" />
-                       </div>
+                    <div className="pt-2">
                        <p className="text-sm text-gray-500 italic">Para o mentor: <span className="font-bold text-gray-700 not-italic">{fb.mentor?.full_name}</span></p>
                     </div>
                   </div>
@@ -181,14 +177,14 @@ export function AdminFeedbackModeration() {
                       onClick={() => handleModeration(fb.id, 'approved')} 
                       className="w-full bg-primary hover:bg-primary/90 text-white font-bold"
                     >
-                      <Check className="w-4 h-4 mr-2" /> Aprovar
+                      Aprovar
                     </Button>
                     <Button 
                       variant="outline" 
                       onClick={() => handleModeration(fb.id, 'rejected')}
                       className="w-full border-red-200 text-red-600 hover:bg-red-50 font-bold"
                     >
-                      <X className="w-4 h-4 mr-2" /> Rejeitar
+                      Rejeitar
                     </Button>
                   </div>
                 </div>

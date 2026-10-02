@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth/auth-context"
 import { toast } from "sonner"
 import {
@@ -15,13 +14,13 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { PageContainer } from "@/components/layout/PageContainer"
-import {  Mail, Smartphone, Monitor, ExternalLink, ArrowLeft, CheckCircle, UserCheck, Star, CalendarX, Bell, Send, AlertCircle, Building2, UserPlus, BadgeCheck , Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 
 interface EmailTemplateMeta {
   key: string
   label: string
   signature: "personal" | "none"
-  icon: any
   description: string
 }
 
@@ -30,76 +29,65 @@ const TEMPLATES: EmailTemplateMeta[] = [
     key: "confirmation",
     label: "Sessão Confirmada",
     signature: "personal",
-    icon: CheckCircle,
     description: "Disparado após confirmação do agendamento, com link do Meet e calendário."
   },
   {
     key: "verification",
     label: "Mentor Aprovado",
     signature: "personal",
-    icon: UserCheck,
     description: "Boas-vindas ao mentor após validação do perfil pela moderação."
   },
   {
     key: "feedback",
     label: "Pedido de Avaliação",
     signature: "personal",
-    icon: Star,
     description: "Enviado ao mentorado logo após o término da mentoria solicitando depoimento."
   },
   {
     key: "cancellation",
     label: "Mentoria Cancelada",
     signature: "none",
-    icon: CalendarX,
     description: "Notifica a contraparte com quem cancelou, motivo informado e horários alternativos."
   },
   {
     key: "reminder",
     label: "Lembrete do Dia",
     signature: "none",
-    icon: Bell,
     description: "Lembrete com horário e link da sessão na manhã do dia do agendamento."
   },
   {
     key: "org_invite",
     label: "Convite de Organização (mentorado)",
     signature: "none",
-    icon: Building2,
     description: "Admin de uma organização parceira convida um mentorado que já tem conta na Menvo."
   },
   {
     key: "org_invite_mentor",
     label: "Convite de Organização (mentor)",
     signature: "none",
-    icon: Building2,
     description: "Admin de uma organização parceira convida um mentor que já tem conta na Menvo."
   },
   {
     key: "org_join_request",
     label: "Solicitação de Entrada (Org)",
     signature: "none",
-    icon: UserPlus,
     description: "Avisa o admin da organização que alguém pediu para participar."
   },
   {
     key: "org_membership_approved",
     label: "Participação Aprovada (mentorado)",
     signature: "personal",
-    icon: BadgeCheck,
     description: "Confirma ao mentorado que ele agora faz parte da organização."
   },
   {
     key: "org_membership_approved_mentor",
     label: "Participação Aprovada (mentor)",
     signature: "personal",
-    icon: BadgeCheck,
     description: "Confirma ao mentor que ele agora faz parte da organização."
   }
 ]
 
 export default function AdminEmailPreviewPage() {
-  const router = useRouter()
   const { user } = useAuth()
   const [selectedTemplate, setSelectedTemplate] = useState<string>("confirmation")
   const [deviceView, setDeviceView] = useState<"desktop" | "mobile">("desktop")
@@ -166,39 +154,15 @@ export default function AdminEmailPreviewPage() {
 
   return (
     <PageContainer>
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Mail className="h-8 w-8 text-primary" /> Preview de E-mails Transacionais
-            </h1>
-            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
-              Brevo SMTP
-            </Badge>
-          </div>
-          <p className="text-muted-foreground mt-1">
-            Visualização ao vivo dos templates de e-mail, assinaturas personalizadas e paleta Deep Teal (#007585).
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => router.push("/dashboard/admin")}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" /> Voltar ao Painel
+      <AdminPageHeader
+        title="E-mails transacionais"
+        description="Prévia ao vivo dos templates enviados pelo Brevo, com assinatura e envio de teste."
+        actions={
+          <Button variant="outline" size="sm" onClick={() => window.open(previewUrl, "_blank")}>
+            Abrir em nova aba
           </Button>
-          <Button
-            variant="secondary"
-            onClick={() => window.open(previewUrl, "_blank")}
-            className="gap-2"
-          >
-            <ExternalLink className="h-4 w-4" /> Abrir em Nova Aba
-          </Button>
-        </div>
-      </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Template Selector Sidebar */}
@@ -212,7 +176,6 @@ export default function AdminEmailPreviewPage() {
             </CardHeader>
             <CardContent className="space-y-2 pt-0">
               {TEMPLATES.map((item) => {
-                const Icon = item.icon
                 const isSelected = selectedTemplate === item.key
 
                 return (
@@ -228,15 +191,6 @@ export default function AdminEmailPreviewPage() {
                         : "bg-card hover:bg-muted/50 border-muted"
                     }`}
                   >
-                    <div
-                      className={`p-2 rounded-lg mt-0.5 ${
-                        isSelected
-                          ? "bg-primary text-white"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
                         <span className="font-semibold text-sm truncate text-foreground">
@@ -266,12 +220,7 @@ export default function AdminEmailPreviewPage() {
           <Card className="border-primary/30 shadow-sm bg-gradient-to-b from-primary/5 to-transparent">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2 text-foreground">
-                  <Send className="h-4 w-4 text-primary" /> Disparar Teste Real
-                </CardTitle>
-                <Badge variant="outline" className="text-[10px] bg-background text-primary border-primary/30">
-                  Brevo Live
-                </Badge>
+                <CardTitle className="text-base text-foreground">Enviar teste real</CardTitle>
               </div>
               <CardDescription className="text-xs">
                 Envie o template <strong>{currentTemplate.label}</strong> para uma caixa de entrada real.
@@ -311,28 +260,21 @@ export default function AdminEmailPreviewPage() {
               >
                 {isSending ? (
                   <>
-                    <Loader2 className="animate-spin h-4 w-4" /> Disparando via Brevo...
+                    <Loader2 className="animate-spin h-4 w-4" /> Enviando...
                   </>
                 ) : (
-                  <>
-                    <Send className="h-3.5 w-3.5" /> Enviar E-mail de Teste
-                  </>
+                  "Enviar e-mail de teste"
                 )}
               </Button>
 
               {sendFeedback && (
                 <div
-                  className={`p-2.5 rounded-lg text-xs flex items-start gap-2 border ${
+                  className={`p-2.5 rounded-lg text-xs border ${
                     sendFeedback.type === "success"
                       ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
                       : "bg-red-50 text-red-800 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800"
                   }`}
                 >
-                  {sendFeedback.type === "success" ? (
-                    <CheckCircle className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" />
-                  )}
                   <span className="leading-tight">{sendFeedback.message}</span>
                 </div>
               )}
@@ -350,7 +292,7 @@ export default function AdminEmailPreviewPage() {
               {currentTemplate.signature === "personal" ? (
                 <div>
                   <p className="font-medium text-foreground mb-1">
-                    👤 Assinatura Pessoal do Idealizador
+                    Assinatura pessoal do idealizador
                   </p>
                   <p>
                     Inclui a foto circular de Paul Pessoa, identificação como idealizador, ícone com link direto de WhatsApp e links para LinkedIn e GitHub.
@@ -359,7 +301,7 @@ export default function AdminEmailPreviewPage() {
               ) : (
                 <div>
                   <p className="font-medium text-foreground mb-1">
-                    ⚡ Sem Assinatura Redundante
+                    Sem assinatura
                   </p>
                   <p>
                     Comunicação operacional e direta ao ponto, terminando imediatamente no conteúdo e aproveitando o rodapé institucional do Menvo.
@@ -387,7 +329,7 @@ export default function AdminEmailPreviewPage() {
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <Monitor className="h-3.5 w-3.5" /> Desktop (580px)
+                  Desktop (580px)
                 </button>
                 <button
                   onClick={() => setDeviceView("mobile")}
@@ -397,7 +339,7 @@ export default function AdminEmailPreviewPage() {
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <Smartphone className="h-3.5 w-3.5" /> Mobile (390px)
+                  Mobile (390px)
                 </button>
               </div>
             </div>

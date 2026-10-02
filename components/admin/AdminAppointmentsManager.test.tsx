@@ -8,6 +8,12 @@ jest.setTimeout(20_000)
 
 const toastMock = jest.fn()
 jest.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: toastMock }) }))
+// next-intl ships ESM-only builds that Jest doesn't transform; the header only needs a plain link.
+jest.mock("@/i18n/routing", () => ({
+  Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => (
+    <a href={href} {...props}>{children}</a>
+  )
+}))
 
 // Radix (menus, dialogs, sheets) usa APIs que o jsdom não implementa.
 beforeAll(() => {

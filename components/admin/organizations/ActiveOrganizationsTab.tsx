@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import {  Plus, Building2, Search , Loader2 } from "lucide-react"
+import { Search, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 interface Organization {
@@ -239,11 +239,7 @@ export default function ActiveOrganizationsTab() {
             onClick={handleCreate}
             disabled={creating || !newOrg.name || !newOrg.slug}
           >
-            {creating ? (
-              <Loader2 className="mr-2 animate-spin h-4 w-4" />
-            ) : (
-              <Plus className="h-4 w-4 mr-2" />
-            )}
+            {creating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
             Criar organização
           </Button>
         </CardFooter>

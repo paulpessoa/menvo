@@ -106,6 +106,12 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-01 - Painel admin redesenhado com visão estratégica
+- **Why:** `/dashboard/admin` era uma grade de 11 cards com ícones coloridos e 4 números soltos; cada página de admin tinha um cabeçalho diferente (tamanhos de título, ícones, só 3 com botão de voltar).
+- **Visão geral:** `GET /api/admin/overview` (`lib/services/admin/overview.service.ts`) agrega tudo numa chamada: cadastros por semana (mentorados x mentores), pedidos de sessão por desfecho, fila de verificação, distribuição de notas, gasto de IA acumulado contra o teto, organizações/leads e etapas da retenção LGPD. Agregações puras em `overview.aggregate.ts` com testes. Usa o cliente RLS (`is_admin()`), exceto `appointments` e `inactive_accounts_queue`, lidos com service role como nas rotas admin existentes.
+- **Cabeçalho único:** `components/admin/AdminPageHeader.tsx` (botão "Voltar ao painel", título, descrição, ações) em todas as páginas de admin. Ícones decorativos e emojis removidos; ficaram só spinners, botões só-ícone, busca, alertas e as estrelas das avaliações.
+- **Cores dos gráficos:** teal `#0089a0` (marca ajustada para não parecer cinza), violeta e laranja, validados para daltonismo; cinza só para séries secundárias (canceladas, sem papel).
+
 ### 2026-10-02 - Tabela da newsletter apagada
 - **Why:** a newsletter saiu do código na PR #67, mas `newsletter_subscriptions` seguia com e-mail, nome, WhatsApp, IP e user agent sem uso (LGPD art. 6º III).
 - **Migração `20261002000000_drop_newsletter_subscriptions.sql`:** quem tinha cancelado vira hash em `email_suppressions` (`opted_out`, mesmo hash de `suppression.service.ts`); depois a tabela é apagada, sem `CASCADE`. Tipo removido de `lib/types/supabase.ts`.

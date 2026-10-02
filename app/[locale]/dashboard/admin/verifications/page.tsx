@@ -37,13 +37,13 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Calendar, User, CheckCircle, XCircle, Eye, ArrowLeft, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import type { VerificationStatus } from "@/lib/services/verifications/notification.service"
 import type { Verification } from "@/lib/types/models/verification"
 import { toast } from "sonner"
 import { PageContainer } from "@/components/layout/PageContainer"
-import { Link } from "@/i18n/routing"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { MentorReviewAssistant } from "@/components/admin/MentorReviewAssistant"
 
 export default function AdminVerificationsPage() {
@@ -178,7 +178,6 @@ export default function AdminVerificationsPage() {
         <Card>
           <CardContent className="flex items-center justify-center h-56">
             <div className="text-center">
-              <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-3" />
               <p className="font-medium text-gray-700">Nenhuma verificação encontrada</p>
               <p className="text-sm text-muted-foreground">Tudo em dia por aqui.</p>
             </div>
@@ -217,22 +216,15 @@ export default function AdminVerificationsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4" />
-                    <span>Inscrito em {new Date(verification.created_at).toLocaleDateString("pt-BR")}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <User className="h-4 w-4" />
-                    <span>{verification.mentor_email}</span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-muted-foreground mb-6">
+                  <span>Inscrito em {new Date(verification.created_at).toLocaleDateString("pt-BR")}</span>
+                  <span>{verification.mentor_email}</span>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
                         Ver Detalhes
                       </Button>
                     </DialogTrigger>
@@ -250,7 +242,6 @@ export default function AdminVerificationsPage() {
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button size="sm" className="bg-primary hover:bg-primary/90 text-white font-medium">
-                            <CheckCircle className="h-4 w-4 mr-2" />
                             Aprovar Mentor
                           </Button>
                         </AlertDialogTrigger>
@@ -279,7 +270,6 @@ export default function AdminVerificationsPage() {
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="destructive" size="sm">
-                            <XCircle className="h-4 w-4 mr-2" />
                             Rejeitar
                           </Button>
                         </DialogTrigger>
@@ -309,22 +299,11 @@ export default function AdminVerificationsPage() {
 
   return (
     <PageContainer>
+      <AdminPageHeader
+        title="Verificação de mentores"
+        description="Analise, valide e aprove as candidaturas de mentores."
+      />
       <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Button variant="ghost" size="sm" asChild className="gap-1 text-muted-foreground">
-                <Link href="/dashboard/admin">
-                  <ArrowLeft className="h-4 w-4" />
-                  Painel Admin
-                </Link>
-              </Button>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight">Verificações de Mentores</h1>
-            <p className="text-muted-foreground">Analise, valide e aprove solicitações de credenciamento de mentores</p>
-          </div>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="pending">Pendentes ({verifications.length})</TabsTrigger>

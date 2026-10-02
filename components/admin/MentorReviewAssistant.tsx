@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog"
-import {  Sparkles , Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { MentorReviewDraftPanel, type MentorReviewDraft, type ReviewKind } from "./MentorReviewDraftPanel"
 
@@ -94,8 +94,7 @@ export function MentorReviewAssistant({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Sparkles className="h-4 w-4 mr-2" />
-          Assistente IA
+          Rascunho de resposta
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
@@ -127,7 +126,7 @@ export function MentorReviewAssistant({
               </div>
 
               <Button onClick={generate} disabled={loading} size="sm">
-                {loading ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                {loading && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                 Gerar
               </Button>
 
