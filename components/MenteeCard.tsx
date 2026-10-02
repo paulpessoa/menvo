@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { ContactMenteeModal } from "./ContactMenteeModal"
-import { MessageCircle, Linkedin, AlertCircle, X, Eye, Sparkles, User, FileText, Briefcase } from "lucide-react"
+import { MessageCircle, Linkedin, AlertCircle, X, Eye, Sparkles, User, FileText, Briefcase, ChevronRight } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -138,18 +138,7 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-3 pt-1">
-              {profile.linkedin_url && (
-                <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors" title="Ver LinkedIn">
-                  <Linkedin className="h-4 w-4" />
-                </a>
-              )}
-              {profile.cv_url && (
-                <a href={profile.cv_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors" title="Ver currículo">
-                  <FileText className="h-4 w-4" />
-                </a>
-              )}
-            </div>
+
           </div>
         </div>
 
@@ -186,9 +175,7 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
               </div>
             )}
           </div>
-
-
-          <div className="flex items-center gap-3 pt-6">
+          <div className="mt-auto pt-4 flex flex-col gap-3">
             {!isSelf && (
               <ContactMenteeModal
                 menteeId={profile.id}
@@ -197,7 +184,7 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
               >
                 <Button
                   variant="outline"
-                  className="flex-[1] rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-12"
+                  className="w-full rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-10 border-primary/20"
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   {tCommunity("offerHelp")}
@@ -205,21 +192,17 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
               </ContactMenteeModal>
             )}
 
-            <Button
-              size="lg"
-              onClick={handleViewProfile}
-              className="flex-[1.5] gap-2 font-bold rounded-xl h-12 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01]"
-            >
-              {isSelf ? (
-                <>
-                  <User className="h-5 w-5" /> Meu Perfil
-                </>
-              ) : (
-                <>
-                  Ver Perfil
-                </>
-              )}
-            </Button>
+            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-3 text-xs text-slate-500 dark:text-slate-400">
+              <span /> {/* Spacer */}
+
+              <button
+                onClick={handleViewProfile}
+                className="inline-flex items-center gap-1 font-semibold text-primary-700 dark:text-primary-400 hover:translate-x-0.5 transition-transform"
+              >
+                <span>{isSelf ? "Meu Perfil" : "Ver Perfil"}</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
