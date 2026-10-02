@@ -35,6 +35,7 @@ interface MenteeProfile {
     cv_url?: string
     languages?: string[]
     is_public: boolean
+    has_cv: boolean
     created_at: string
 }
 
@@ -69,7 +70,28 @@ async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | nul
     // depois dessa autorização o servidor assina a URL do bucket privado.
     const { data: cvUrl } = await supabase.rpc('profile_cv_url', { p_user_id: data.id })
 
-    return { ...withMenteeFields(data), cv_url: cvLink(data.id, cvUrl) } as unknown as MenteeProfile
+    // Para saber se o usuário tem currículo (mesmo sem permissão para ler a URL)
+    let has_cv = false
+    if (cvUrl) {
+        has_cv = true
+    } else {
+        const { createAdminClient } = await import('@/lib/utils/supabase/admin')
+        const adminSupabase = createAdminClient()
+        const { data: adminData } = await adminSupabase
+            .from('mentee_profiles')
+            .select('cv_url')
+            .eq('user_id', data.id)
+            .maybeSingle()
+        if (adminData?.cv_url) {
+            has_cv = true
+        }
+    }
+
+    return { 
+        ...withMenteeFields(data), 
+        cv_url: cvLink(data.id, cvUrl),
+        has_cv 
+    } as unknown as MenteeProfile
 }
 
 // ISR: Revalidar a cada 1 hora (mesmo padrão de app/[locale]/mentors/[slug])

@@ -89,27 +89,28 @@ export function MultiSelectAutocomplete({
               {availableOptions.map((opt) => (
                 <CommandPrimitive.Item
                   key={opt}
+                  value={opt}
+                  onMouseDown={(e) => e.preventDefault()}
                   onSelect={() => {
                     onChange([...value, opt])
                     setInputValue("")
                   }}
-                  className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                  className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
                 >
                   {opt}
                 </CommandPrimitive.Item>
               ))}
-              {inputValue && !options.includes(inputValue) && !value.includes(inputValue) && (
+              {inputValue.trim() !== "" && !options.some(o => o.toLowerCase() === inputValue.trim().toLowerCase()) && !value.some(v => v.toLowerCase() === inputValue.trim().toLowerCase()) && (
                 <CommandPrimitive.Item
+                  value={inputValue.trim()}
+                  onMouseDown={(e) => e.preventDefault()}
                   onSelect={() => {
-                    const chip = inputValue.trim()
-                    if (chip && !value.includes(chip)) {
-                      onChange([...value, chip])
-                      setInputValue("")
-                    }
+                    onChange([...value, inputValue.trim()])
+                    setInputValue("")
                   }}
-                  className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                  className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
                 >
-                  Criar "{inputValue}"
+                  Criar "{inputValue.trim()}"
                 </CommandPrimitive.Item>
               )}
             </CommandPrimitive.List>

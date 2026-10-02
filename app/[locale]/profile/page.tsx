@@ -152,7 +152,7 @@ function ProfilePageContent() {
 
             {/* One save for every tab - edits made on other tabs are kept in state and saved together. */}
             {activeTab !== "organizations" && !(activeTab === "mentorship" && !isMentor) && (
-              <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-background/95 backdrop-blur">
+              <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-canvas/95 backdrop-blur">
                 <Button id="tour-profile-save" type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
                   {isUpdating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                   Salvar perfil
