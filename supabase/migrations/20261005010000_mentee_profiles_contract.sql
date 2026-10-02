@@ -10,7 +10,12 @@
 --   * trigger/função profiles_mirror_mentee_fields (transição do expand);
 --   * as colunas cv_url e expected_graduation de mentors_view (viravam null).
 --     A view é recriada (drop + create: create or replace não remove coluna) e
---     refaz os grants. Sem CASCADE: se algo depender da view, o drop aborta.
+--     refaz os grants. Sem CASCADE: se algo depender da view, o drop aborta;
+--   * community_ready, coluna gerada que citava learning_goals (o Postgres
+--     bloqueia o drop). Uma coluna gerada não lê outra tabela, então ela é
+--     recriada sem o critério "learning_goals >= 40 caracteres". Medido em
+--     2026-10-02: nenhum perfil dependia dele (12 prontos, todos por
+--     mentorship_topics); a guarda abaixo aborta se a contagem mudar.
 -- Os grants de anon nessas colunas caem junto com elas.
 --
 -- ANTES DE APLICAR: exporte as colunas (CSV) para ter rollback, ex.:
@@ -81,6 +86,24 @@ begin
     raise exception 'Funções ainda citam colunas a apagar: %', dependents;
   end if;
 end $$;
+
+-- community_ready sem learning_goals ---------------------------------------
+
+select set_config('menvo.ready_before',
+                  (select count(*) from public.profiles where community_ready)::text, true);
+
+drop index if exists public.profiles_community_ready_updated_idx;
+alter table public.profiles drop column community_ready;
+alter table public.profiles
+  add column community_ready boolean
+  generated always as (
+    coalesce(is_public, false)
+    and char_length(coalesce(bio, '')) >= 80
+    and coalesce(array_length(mentorship_topics, 1), 0) > 0
+    and char_length(coalesce(linkedin_url, '')) > 0
+  ) stored;
+create index profiles_community_ready_updated_idx
+  on public.profiles (updated_at desc) where community_ready;
 
 -- mentors_view sem cv_url e expected_graduation ------------------------------
 
@@ -186,6 +209,12 @@ begin
   select count(*) into perfis from public.profiles;
   select count(*) into linhas from public.mentee_profiles;
 
+  if (select count(*) from public.profiles where community_ready)
+       <> current_setting('menvo.ready_before')::int then
+    raise exception 'community_ready mudou de % para % perfis',
+      current_setting('menvo.ready_before'),
+      (select count(*) from public.profiles where community_ready);
+  end if;
   if colunas <> 28 then
     raise exception 'profiles ficou com % colunas, esperado 28', colunas;
   end if;
