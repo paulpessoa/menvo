@@ -27,7 +27,8 @@ export async function GET() {
     const { data, error } = await supabase
       .from("appointment_feedbacks")
       .select(`
-        id, rating, comment, status, created_at,
+        id, rating, status, created_at,
+        comment:public_feedback,
         mentee:profiles!reviewer_id(full_name, avatar_url),
         mentor:profiles!reviewed_id(full_name, avatar_url)
       `)

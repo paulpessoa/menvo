@@ -31,6 +31,7 @@ interface AdminFeedback {
 export function AdminFeedbackModeration() {
   const [feedbacks, setFeedbacks] = useState<AdminFeedback[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [search, setSearch] = useState("")
   const [ratingFilter, setRatingFilter] = useState("all")
   const { toast } = useToast()
@@ -54,8 +55,10 @@ export function AdminFeedbackModeration() {
       if (!response.ok) throw new Error("Erro ao buscar avaliações pendentes")
       const { data } = await response.json()
       setFeedbacks((data as unknown as AdminFeedback[]) || [])
+      setLoadError(false)
     } catch (err) {
       console.error("Error fetching feedbacks:", err)
+      setLoadError(true)
     } finally {
       setLoading(false)
     }
@@ -94,6 +97,19 @@ export function AdminFeedbackModeration() {
   }
 
   if (loading) return <div className="py-20 text-center text-muted-foreground italic animate-pulse text-lg">Buscando avaliações pendentes...</div>
+
+  // Without this, a failed fetch fell through to the "Tudo limpo!" empty state
+  // and hid pending reviews from the admin.
+  if (loadError) {
+    return (
+      <div className="text-center py-16 space-y-3">
+        <p className="text-red-600 font-medium">Não foi possível carregar as avaliações pendentes.</p>
+        <Button variant="outline" onClick={() => { setLoading(true); fetchPendingFeedbacks() }}>
+          Tentar novamente
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
