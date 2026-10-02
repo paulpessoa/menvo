@@ -91,14 +91,14 @@ export function handleApiError(error: unknown): NextResponse<ApiError> {
 
     // Generic error with message
     return NextResponse.json(
-      { error: error.message, code: ErrorCodes.INTERNAL_ERROR },
+      { error: error.message, code: ErrorCodes.INTERNAL_ERROR, details: error as any },
       { status: 500 }
     )
   }
 
   // Unknown error
   return NextResponse.json(
-    { error: "An unexpected error occurred", code: ErrorCodes.INTERNAL_ERROR },
+    { error: "An unexpected error occurred", code: ErrorCodes.INTERNAL_ERROR, details: { message: String(error) } },
     { status: 500 }
   )
 }

@@ -21,12 +21,15 @@ export function useOnboarding(tourId: string, steps: DriveStep[], onComplete?: (
     // If already seen, don't show
     if (flags[tourId]) return
 
+    let driverObj: any = null
+
     // Small delay to ensure the UI is fully rendered
     const timer = setTimeout(() => {
-      const driverObj = driver({
+      driverObj = driver({
         showProgress: true,
         animate: true,
         allowClose: true,
+        overlayColor: 'rgba(0, 117, 133, 0.6)',
         doneBtnText: 'Concluir',
         nextBtnText: 'Próximo',
         prevBtnText: 'Anterior',
@@ -49,6 +52,11 @@ export function useOnboarding(tourId: string, steps: DriveStep[], onComplete?: (
       driverObj.drive()
     }, 1000)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      if (driverObj) {
+        driverObj.destroy()
+      }
+    }
   }, [isClient, isAuthenticated, profile, tourId, steps, onComplete, refreshProfile])
 }

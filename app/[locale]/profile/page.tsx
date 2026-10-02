@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth"
 import { useProfile } from "@/hooks/useProfile"
+import { useOnboarding } from "@/hooks/useOnboarding"
 import { Link, useRouter } from "@/i18n/routing"
 import { OrganizationsTab } from "@/components/profile/OrganizationsTab"
 import { ProfileAboutSection } from "@/components/profile/ProfileAboutSection"
@@ -116,7 +117,7 @@ function ProfilePageContent() {
 
         <form onSubmit={handleSubmit}>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ProfileTab)} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/50 p-1 h-auto">
+            <TabsList id="tour-profile-tabs" className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/50 p-1 h-auto">
               <TabsTrigger value="basic" className="py-2">Perfil</TabsTrigger>
               <TabsTrigger value="career" className="py-2">Carreira e Interesses</TabsTrigger>
               <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
@@ -145,7 +146,7 @@ function ProfilePageContent() {
             {/* One save for every tab - edits made on other tabs are kept in state and saved together. */}
             {activeTab !== "organizations" && (
               <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-background/95 backdrop-blur">
-                <Button type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
+                <Button id="tour-profile-save" type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
                   {isUpdating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                   Salvar perfil
                 </Button>
@@ -154,6 +155,19 @@ function ProfilePageContent() {
           </Tabs>
         </form>
       </div>
+      <ProfileTour />
     </div>
   )
+}
+
+function ProfileTour() {
+  const steps = [
+    { popover: { title: "Complete seu perfil", description: "Para que os mentores possam te ajudar melhor, é importante preencher suas informações básicas." } },
+    { element: "#tour-profile-tabs", popover: { title: "Abas do perfil", description: "Navegue entre as abas para preencher informações de Carreira e Interesses. Quanto mais detalhes, melhor!" } },
+    { element: "#tour-profile-save", popover: { title: "Não esqueça de salvar", description: "Sempre que fizer alterações, clique em Salvar para atualizar suas informações na plataforma." } }
+  ]
+
+  useOnboarding("ob_m4", steps)
+
+  return null
 }
