@@ -12,7 +12,8 @@
 -- 3. O grant de colunas de anon em profiles é refeito sem as colunas removidas.
 -- 4. Drop das colunas mortas e dos 3 contadores, sem CASCADE. Um bloco de
 --    guarda aborta a migração se alguma view, policy, índice, trigger ou
---    função ainda depender delas.
+--    função ainda depender delas. Antes disso, remove o trigger
+--    tr_update_mentor_stats (e sua função), que escrevia nos contadores.
 --
 -- ANTES DE APLICAR: exporte as colunas (CSV) para ter rollback, ex.:
 --   select id, location, twitter_url, mentorship_guidelines,
@@ -109,6 +110,13 @@ grant select (
   search_vector, created_at, updated_at
 ) on public.profiles to anon;
 
+-- O trigger abaixo gravava average_rating e total_reviews em profiles a cada
+-- mudança de feedback aprovada. Com as colunas apagadas ele passaria a falhar
+-- em qualquer insert/update/delete de appointment_feedbacks, e mentor_stats
+-- já calcula os mesmos valores ao vivo.
+drop trigger tr_update_mentor_stats on public.appointment_feedbacks;
+drop function public.handle_feedback_stats_update();
+
 -- Guarda: aborta se algo ainda depender das colunas que serão apagadas.
 do $$
 declare
@@ -126,7 +134,14 @@ begin
   where d.refobjid = 'public.profiles'::regclass
     and a.attname = any (cols)
     and d.deptype = 'n'
-    and d.classid <> 'pg_attrdef'::regclass;
+    and d.classid <> 'pg_attrdef'::regclass
+    -- CHECK da própria profiles (ex.: profiles_profile_visibility_check) some
+    -- junto com a coluna, sem CASCADE.
+    and not exists (
+      select 1 from pg_constraint c
+      where c.oid = d.objid and d.classid = 'pg_constraint'::regclass
+        and c.contype = 'c' and c.conrelid = 'public.profiles'::regclass
+    );
 
   if dependents is not null then
     raise exception 'Ainda há objetos dependendo das colunas a apagar: %', dependents;
