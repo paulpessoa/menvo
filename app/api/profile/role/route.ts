@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
       if (typeof profileData.city === "string") profileUpdates.city = profileData.city
       if (typeof profileData.state === "string") profileUpdates.state = profileData.state
       if (typeof profileData.country === "string") profileUpdates.country = profileData.country
-      if (typeof profileData.learning_goals === "string") profileUpdates.learning_goals = profileData.learning_goals
       if (Array.isArray(profileData.expertise_areas)) profileUpdates.expertise_areas = profileData.expertise_areas
       if (Array.isArray(profileData.mentorship_topics)) profileUpdates.mentorship_topics = profileData.mentorship_topics
     }
@@ -65,6 +64,16 @@ export async function POST(request: NextRequest) {
     if (updateError) {
       console.error("❌ Erro ao salvar perfil:", updateError)
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
+    }
+
+    if (profileData && typeof profileData === "object" && typeof profileData.learning_goals === "string") {
+      const { error: menteeError } = await supabase
+        .from("mentee_profiles")
+        .upsert({ user_id: user.id, learning_goals: profileData.learning_goals }, { onConflict: "user_id" })
+      if (menteeError) {
+        console.error("❌ Erro ao salvar objetivos:", menteeError)
+        return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
+      }
     }
 
     // Candidato a mentor entra na fila de verificação. O admin aprova com base

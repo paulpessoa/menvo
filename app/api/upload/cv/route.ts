@@ -75,9 +75,9 @@ export async function POST(request: NextRequest) {
 
     // Check if user already has a CV and remove it
     const { data: existingProfile } = await supabaseAdmin
-      .from("profiles")
+      .from("mentee_profiles")
       .select("cv_url")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .single()
 
     if (existingProfile?.cv_url) {
@@ -137,12 +137,8 @@ export async function POST(request: NextRequest) {
 
     // Update user profile with new CV URL
     const { data: profileData, error: updateError } = await supabaseAdmin
-      .from("profiles")
-      .update({
-        cv_url: publicUrl,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id)
+      .from("mentee_profiles")
+      .upsert({ user_id: user.id, cv_url: publicUrl }, { onConflict: "user_id" })
       .select()
 
     if (updateError) {
@@ -197,9 +193,9 @@ export async function DELETE(request: NextRequest) {
 
     // Get current CV URL
     const { data: profile } = await supabaseAdmin
-      .from("profiles")
+      .from("mentee_profiles")
       .select("cv_url")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .single()
 
     if (!profile?.cv_url) {
@@ -228,12 +224,9 @@ export async function DELETE(request: NextRequest) {
 
     // Update profile to remove CV URL
     const { error: updateError } = await supabaseAdmin
-      .from("profiles")
-      .update({
-        cv_url: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id)
+      .from("mentee_profiles")
+      .update({ cv_url: null })
+      .eq("user_id", user.id)
 
     if (updateError) {
       console.error("❌ Profile update error:", updateError)

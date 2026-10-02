@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
+import { splitMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
 
 // Admin client com service role para ignorar RLS
 const supabaseAdmin = createClient(
@@ -56,11 +57,20 @@ export async function PATCH(
     }
     const { updates, roles } = parsed.data
 
-    // 2. Atualizar Perfil
+    // 2. Atualizar Perfil (acadêmico vai para mentee_profiles)
+    const { profile: profileUpdates, mentee: menteeUpdates } = splitMenteeFields(updates)
+
+    if (Object.keys(menteeUpdates).length > 0) {
+      const { error: menteeError } = await supabaseAdmin
+        .from('mentee_profiles')
+        .upsert({ user_id: id, ...menteeUpdates }, { onConflict: 'user_id' })
+      if (menteeError) throw menteeError
+    }
+
     const { data: updatedProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .update({
-        ...updates,
+        ...profileUpdates,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)

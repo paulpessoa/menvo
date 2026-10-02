@@ -1237,6 +1237,64 @@ export type Database = {
           },
         ]
       }
+      mentee_profiles: {
+        Row: {
+          academic_level: string | null
+          course: string | null
+          created_at: string
+          cv_url: string | null
+          expected_graduation: string | null
+          institution: string | null
+          learning_goals: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          academic_level?: string | null
+          course?: string | null
+          created_at?: string
+          cv_url?: string | null
+          expected_graduation?: string | null
+          institution?: string | null
+          learning_goals?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          academic_level?: string | null
+          course?: string | null
+          created_at?: string
+          cv_url?: string | null
+          expected_graduation?: string | null
+          institution?: string | null
+          learning_goals?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentee_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentee_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentee_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_availability: {
         Row: {
           created_at: string
@@ -1653,30 +1711,24 @@ export type Database = {
       }
       profiles: {
         Row: {
-          academic_level: string | null
           avatar_url: string | null
           bio: string | null
           city: string | null
           community_ready: boolean | null
           company: string | null
           country: string | null
-          course: string | null
           created_at: string
-          cv_url: string | null
           email: string
           email_opt_out_at: string | null
-          expected_graduation: string | null
           expertise_areas: string[] | null
           first_name: string | null
           full_name: string | null
           github_url: string | null
           id: string
-          institution: string | null
           is_public: boolean | null
           job_title: string | null
           languages: string[] | null
           last_name: string | null
-          learning_goals: string | null
           linkedin_url: string | null
           mentorship_topics: string[] | null
           phone: string | null
@@ -1689,30 +1741,24 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
-          academic_level?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           community_ready?: boolean | null
           company?: string | null
           country?: string | null
-          course?: string | null
           created_at?: string
-          cv_url?: string | null
           email: string
           email_opt_out_at?: string | null
-          expected_graduation?: string | null
           expertise_areas?: string[] | null
           first_name?: string | null
           full_name?: string | null
           github_url?: string | null
           id: string
-          institution?: string | null
           is_public?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
-          learning_goals?: string | null
           linkedin_url?: string | null
           mentorship_topics?: string[] | null
           phone?: string | null
@@ -1725,30 +1771,24 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
-          academic_level?: string | null
           avatar_url?: string | null
           bio?: string | null
           city?: string | null
           community_ready?: boolean | null
           company?: string | null
           country?: string | null
-          course?: string | null
           created_at?: string
-          cv_url?: string | null
           email?: string
           email_opt_out_at?: string | null
-          expected_graduation?: string | null
           expertise_areas?: string[] | null
           first_name?: string | null
           full_name?: string | null
           github_url?: string | null
           id?: string
-          institution?: string | null
           is_public?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
-          learning_goals?: string | null
           linkedin_url?: string | null
           mentorship_topics?: string[] | null
           phone?: string | null
@@ -2241,8 +2281,6 @@ export type Database = {
           country: string | null
           course: string | null
           created_at: string | null
-          cv_url: string | null
-          expected_graduation: string | null
           experience_years: number | null
           expertise_areas: string[] | null
           first_name: string | null
@@ -2406,6 +2444,7 @@ export type Database = {
       }
       owns_diagnostic_session: { Args: { p_id: string }; Returns: boolean }
       owns_quiz_response: { Args: { p_id: string }; Returns: boolean }
+      profile_cv_url: { Args: { p_user_id: string }; Returns: string }
       profile_is_mentor: { Args: { p_profile_id: string }; Returns: boolean }
       profile_names_from_metadata: {
         Args: { meta: Json }
