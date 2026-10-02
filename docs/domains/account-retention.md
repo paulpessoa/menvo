@@ -29,7 +29,7 @@
 
 ## 1. Objetivo
 
-A base do Estágio Recife (`profiles.origin_platform = 'jotform'`) foi importada
+A base do Estágio Recife (`import_records.origin_platform = 'jotform'`) foi importada
 sem que as pessoas pedissem uma conta. Elas estão recebendo o convite de
 reengajamento. Quem **não ativar a conta** (não fizer nenhum login) dentro de um
 prazo deve ter os dados **apagados automaticamente**, depois de avisos por
@@ -51,7 +51,7 @@ antes → aviso 1 dia antes → exclusão + e-mail de confirmação.**
 
 ### 2.1 Quem entra na fila ("coorte")
 Todas as condições abaixo precisam ser verdadeiras:
-1. `profiles.origin_platform = 'jotform'`;
+1. `import_records.origin_platform = 'jotform'`;
 2. existe pelo menos uma linha em `reengagement_invites` para a pessoa;
 3. `auth.users.last_sign_in_at IS NULL` (nunca fez login).
 

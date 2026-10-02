@@ -77,11 +77,13 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
 - **Como foi feito:** os contadores vêm da view `mentor_stats` (sem `security_invoker`, só agregados; necessária porque RLS esconde feedbacks e sessões de anon), unida em `mentors_view`. A migration remove o trigger `tr_update_mentor_stats` e a função `handle_feedback_stats_update` (senão qualquer mudança de feedback falharia depois do drop; a guarda `pg_depend` revelou isso) e tem guarda que aborta se algo ainda depender das colunas, e refaz o grant de colunas de anon. `/api/dashboard/mentor` passou a devolver `averageRating`/`totalReviews` da view. `lib/types/supabase.ts` foi editado à mão; regenerar quando a migration for aplicada.
 - **Pronto quando:** perfil público mostra contagens reais; `tsc`, testes e build passam; nenhuma referência às colunas apagadas.
 
-### Fase 1: `import_records` (risco baixo)
+### Fase 1: `import_records` (risco baixo) — código pronto; migrations `20261003010000` (expand) e `20261003020000` (contract)
 1. Criar tabela + RLS só admin; copiar os 4 campos de importação.
 2. Trocar leitores (`mentor-public.service.ts`, `community.service.ts`, `mentee/[slug]`, convites admin, retenção) para a nova tabela.
 3. Apagar as colunas de `profiles`. Atualizar `account-retention.md` e `reengagement-invites.md`: a retenção passa a apagar `import_records`.
-4. Decidir com o Paul o que fazer com as 559 contas importadas marcadas `approved`/`verified` sem papel de mentor (provável: voltar `verification_status` para `null`).
+4. ~~Decidir o que fazer com as 560 contas `approved`/`verified` sem papel de mentor~~: decidido manter. O próprio site grava `verification_status = 'approved'` para todo mentorado ao fim do cadastro (`app/api/profile/role/route.ts`), então não é efeito do import; resolve na Fase 2.
+- **Como foi feito:** `import_records` tem 605 linhas (quem tem `original_data`, `external_id`, `invite_sent_at` ou origem diferente de `menvo`). `origin_platform = 'menvo'` numa linha significa "isento da retenção". No painel admin, a aba JotForm = linha com origem `jotform`; a aba Menvo = sem linha de importação (os 46 registros de lista de espera aparecem só em "Todos"). O retorno de `/api/admin/users` continua achatando `origin_platform` e `invite_sent_at`, então a tela não mudou.
+- **Ordem:** aplicar `expand` (feito) → deploy → rodar o RESYNC do rodapé do expand → exportar CSV → aplicar `contract`.
 
 ### Fase 2: `mentor_profiles` (risco médio)
 1. Criar tabela + RLS (leitura pública só de verificados e públicos; escrita do próprio mentor e admin).

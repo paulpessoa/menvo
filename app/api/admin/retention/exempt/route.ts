@@ -4,8 +4,9 @@ import { requireAdmin } from "@/lib/auth/require-admin"
 
 /**
  * Isenta um usuário da fila de retenção LGPD (JotForm).
- * A isenção é feita mudando a origin_platform para 'menvo' (tratando-o
- * como um usuário normal que não está sujeito à exclusão de importados)
+ * A isenção é feita mudando a origin_platform do registro em import_records
+ * para 'menvo' (tratando-o como um usuário normal que não está sujeito à
+ * exclusão de importados). Os dados importados são preservados
  * e removendo-o da tabela account_retention.
  */
 export async function POST(request: Request) {
@@ -22,9 +23,9 @@ export async function POST(request: Request) {
 
     // 1. Muda a origem para menvo
     const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ origin_platform: "menvo" })
-      .eq("id", userId)
+      .from("import_records")
+      .update({ origin_platform: "menvo", updated_at: new Date().toISOString() })
+      .eq("user_id", userId)
 
     if (updateError) throw updateError
 

@@ -5,7 +5,7 @@
  * docs/domains/account-retention.md for the design and invariants.
  */
 import { createServiceRoleClient, ensureServerSide } from "@/lib/utils/supabase/service-role"
-import { fetchSignedInUserIds, fetchAllRows } from "@/lib/services/invites/audience.service"
+import { fetchSignedInUserIds, fetchAllRows, fetchJotformProfiles } from "@/lib/services/invites/audience.service"
 import { hashEmail } from "@/lib/services/invites/suppression.service"
 import { createInviteToken } from "@/lib/services/invites/invite-token.service"
 import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
@@ -70,14 +70,7 @@ async function loadRetentionState(): Promise<{
 }> {
   const supabase = createServiceRoleClient()
 
-  const profiles = await fetchAllRows((from, to) =>
-    supabase
-      .from("profiles")
-      .select("id, email, full_name, email_opt_out_at")
-      .eq("origin_platform", "jotform")
-      .order("id")
-      .range(from, to)
-  )
+  const profiles = await fetchJotformProfiles(supabase)
   const profilesById = new Map(profiles.map(p => [p.id, { email: p.email, full_name: p.full_name }]))
 
   const invites = await fetchAllRows((from, to) =>
