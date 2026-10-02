@@ -1594,7 +1594,6 @@ export type Database = {
           expected_graduation: string | null
           experience_years: number | null
           expertise_areas: string[] | null
-          external_id: string | null
           first_name: string | null
           free_topics: string[] | null
           full_name: string | null
@@ -1603,7 +1602,6 @@ export type Database = {
           ideal_mentee: string | null
           inclusive_tags: string[] | null
           institution: string | null
-          invite_sent_at: string | null
           is_pending_mentor: boolean | null
           is_public: boolean | null
           is_volunteer: boolean | null
@@ -1614,8 +1612,6 @@ export type Database = {
           linkedin_url: string | null
           mentorship_approach: string | null
           mentorship_topics: string[] | null
-          origin_platform: string | null
-          original_data: Json | null
           phone: string | null
           portfolio_url: string | null
           search_vector: unknown
@@ -1648,7 +1644,6 @@ export type Database = {
           expected_graduation?: string | null
           experience_years?: number | null
           expertise_areas?: string[] | null
-          external_id?: string | null
           first_name?: string | null
           free_topics?: string[] | null
           full_name?: string | null
@@ -1657,7 +1652,6 @@ export type Database = {
           ideal_mentee?: string | null
           inclusive_tags?: string[] | null
           institution?: string | null
-          invite_sent_at?: string | null
           is_pending_mentor?: boolean | null
           is_public?: boolean | null
           is_volunteer?: boolean | null
@@ -1668,8 +1662,6 @@ export type Database = {
           linkedin_url?: string | null
           mentorship_approach?: string | null
           mentorship_topics?: string[] | null
-          origin_platform?: string | null
-          original_data?: Json | null
           phone?: string | null
           portfolio_url?: string | null
           search_vector?: unknown
@@ -1702,7 +1694,6 @@ export type Database = {
           expected_graduation?: string | null
           experience_years?: number | null
           expertise_areas?: string[] | null
-          external_id?: string | null
           first_name?: string | null
           free_topics?: string[] | null
           full_name?: string | null
@@ -1711,7 +1702,6 @@ export type Database = {
           ideal_mentee?: string | null
           inclusive_tags?: string[] | null
           institution?: string | null
-          invite_sent_at?: string | null
           is_pending_mentor?: boolean | null
           is_public?: boolean | null
           is_volunteer?: boolean | null
@@ -1722,8 +1712,6 @@ export type Database = {
           linkedin_url?: string | null
           mentorship_approach?: string | null
           mentorship_topics?: string[] | null
-          origin_platform?: string | null
-          original_data?: Json | null
           phone?: string | null
           portfolio_url?: string | null
           search_vector?: unknown

@@ -1,6 +1,6 @@
 # Plano: enxugar e normalizar a tabela `profiles`
 
-> **Status:** Fase 0 implementada no código em 2026-10-01 (branch `refactor/profiles-phase-0`); a migration `20261003000000_profiles_phase0_drop_dead_columns.sql` ainda precisa ser aplicada pelo Paul. Próxima: Fase 1.
+> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Próxima: Fase 2 (`mentor_profiles`), a que mexe nos mentores.
 > **Para quem retoma:** leia a seção "Diagnóstico" e vá direto para a fase em aberto. Cada fase é uma PR própria.
 
 ## Objetivo
@@ -77,7 +77,7 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
 - **Como foi feito:** os contadores vêm da view `mentor_stats` (sem `security_invoker`, só agregados; necessária porque RLS esconde feedbacks e sessões de anon), unida em `mentors_view`. A migration remove o trigger `tr_update_mentor_stats` e a função `handle_feedback_stats_update` (senão qualquer mudança de feedback falharia depois do drop; a guarda `pg_depend` revelou isso) e tem guarda que aborta se algo ainda depender das colunas, e refaz o grant de colunas de anon. `/api/dashboard/mentor` passou a devolver `averageRating`/`totalReviews` da view. `lib/types/supabase.ts` foi editado à mão; regenerar quando a migration for aplicada.
 - **Pronto quando:** perfil público mostra contagens reais; `tsc`, testes e build passam; nenhuma referência às colunas apagadas.
 
-### Fase 1: `import_records` (risco baixo) — código pronto; migrations `20261003010000` (expand) e `20261003020000` (contract)
+### Fase 1: `import_records` (risco baixo) — concluída em 2026-10-02 (migrations `20261003010000` expand e `20261003020000` contract aplicadas; `profiles` agora tem 48 colunas)
 1. Criar tabela + RLS só admin; copiar os 4 campos de importação.
 2. Trocar leitores (`mentor-public.service.ts`, `community.service.ts`, `mentee/[slug]`, convites admin, retenção) para a nova tabela.
 3. Apagar as colunas de `profiles`. Atualizar `account-retention.md` e `reengagement-invites.md`: a retenção passa a apagar `import_records`.
