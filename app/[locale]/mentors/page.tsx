@@ -831,11 +831,13 @@ export default function MentorsPage() {
       )}
 
       {/* Results Count */}
-      <div className="mb-6 flex justify-between items-center px-2">
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-          {t("resultsFound", { count: totalCount })}
-        </p>
-      </div>
+      {(debouncedSearch.trim() !== "" || activeFacetCount > 0 || isAIMode) && (
+        <div className="mb-6 flex justify-between items-center px-2">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+            {t("resultsFound", { count: totalCount })}
+          </p>
+        </div>
+      )}
 
       {/* Mentors Grid or Loading State */}
       {loading ? (

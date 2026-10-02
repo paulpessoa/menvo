@@ -59,6 +59,7 @@ export default function CommunityPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
 
   // Chat Sidebar State
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -128,6 +129,7 @@ export default function CommunityPage() {
       }
 
       setHasMore(result.hasMore)
+      setTotalCount(result.totalCount || 0)
       setPage(pageNum)
     } catch (error) {
       if (currentQueryId === queryIdRef.current) {
@@ -413,13 +415,15 @@ export default function CommunityPage() {
       )}
 
       {/* Results Header */}
-      <div className="flex items-center justify-between mb-4 mt-6">
-        <h2 className="text-xs font-black tracking-widest text-muted-foreground uppercase flex items-center gap-2">
-          {displayedAIProfiles.length > 0
-            ? `${profiles.length} RESULTADOS COM IA`
-            : `${profiles.length} MEMBROS ENCONTRADOS`}
-        </h2>
-      </div>
+      {(searchTerm.trim() !== "" || displayedAIProfiles.length > 0) && (
+        <div className="flex items-center justify-between mb-4 mt-6">
+          <h2 className="text-xs font-black tracking-widest text-muted-foreground uppercase flex items-center gap-2">
+            {displayedAIProfiles.length > 0
+              ? `${profiles.length} RESULTADOS COM IA`
+              : `${totalCount} MEMBROS ENCONTRADOS`}
+          </h2>
+        </div>
+      )}
 
       {/* Results Grid */}
       {loading ? (
