@@ -7,11 +7,14 @@ import {
 } from "@/lib/api/error-handler"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
+import { MENTEE_PROFILE_EMBED, withMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
+import { fetchCvUrls } from "@/lib/services/mentees/mentee-cv.service"
 
 /** Profile row as returned by the list query: the select string is built dynamically, so supabase-js cannot infer it. */
 type AdminProfileRow = Record<string, unknown> & {
   import_records: { origin_platform: string; invite_sent_at: string | null } | null
   mentor_profiles?: unknown
+  mentee_profiles?: unknown
 }
 
 export async function GET(request: NextRequest) {
@@ -151,12 +154,15 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
       .eq("origin_platform", "jotform")
 
+    const cvUrls = await fetchCvUrls(((profiles ?? []) as unknown as AdminProfileRow[]).map((p) => p.id as string))
+
     return successResponse({
       // Achata import_records para manter o formato que o painel já consome
       // (origin_platform e invite_sent_at no próprio usuário).
       // Campos de mentor e verificação também são achatados (withMentorFields).
       users: ((profiles ?? []) as unknown as AdminProfileRow[]).map(({ import_records, ...profile }) => ({
-        ...withMentorFields(profile),
+        ...withMenteeFields(withMentorFields(profile)),
+        cv_url: cvUrls.get(profile.id as string) ?? null,
         origin_platform: import_records?.origin_platform ?? "menvo",
         invite_sent_at: import_records?.invite_sent_at ?? null
       })),

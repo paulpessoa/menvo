@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
+import { MENTEE_PROFILE_EMBED, withMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,16 +24,23 @@ export async function GET(request: NextRequest) {
     // Campos de mentor e verificação vêm de mentor_profiles (embed), achatados
     // de volta no perfil por withMentorFields para as telas não mudarem.
     const PROFILE_COLUMNS =
-      "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, cv_url, portfolio_url, academic_level, institution, course, expected_graduation, learning_goals" as const
+      "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url" as const
 
     // Buscar perfil e papéis
     const { data: profileRow, error: profileError } = await supabase
       .from("profiles")
-      .select(`${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, user_roles(roles(name))` as const)
+      .select(`${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED}, user_roles(roles(name))` as const)
       .eq("id", user.id)
       .maybeSingle()
 
-    const profile = profileRow ? withMentorFields(profileRow) : null
+    const profile = profileRow ? withMenteeFields(withMentorFields(profileRow)) : null
+
+    // cv_url não é legível pelo cliente do usuário (só via função); o próprio
+    // usuário pode ver o seu.
+    if (profile) {
+      const { data: cvUrl } = await supabase.rpc("profile_cv_url", { p_user_id: user.id })
+      profile.cv_url = cvUrl ?? null
+    }
 
     if (profileError) {
       console.error("⚠️ Erro ao buscar perfil:", profileError)

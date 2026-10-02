@@ -6,12 +6,13 @@ import { handleAsyncOperation } from "@/lib/error-handler"
 import { logger } from "@/lib/logger"
 import type { Database } from "@/lib/types/supabase"
 import type { FlattenedMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
+import type { FlattenedMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
 
 /**
  * Perfil como /api/profile devolve: a linha de `profiles` mais os campos de
  * mentor de `mentor_profiles`, achatados (verified/is_pending_mentor calculados).
  */
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & FlattenedMentorFields
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & FlattenedMentorFields & FlattenedMenteeFields
 
 export interface ProfileUpdateResult {
   success: boolean;

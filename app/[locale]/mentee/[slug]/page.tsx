@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { createClient } from '@/lib/utils/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import MenteeProfileClient from './MenteeProfileClient'
+import { MENTEE_PROFILE_EMBED, withMenteeFields } from '@/lib/services/mentees/mentee-profile-fields'
 
 interface PageProps {
     params: Promise<{
@@ -42,7 +43,7 @@ interface MenteeProfile {
  * and whatever is selected ends up serialized into the client payload.
  */
 const MENTEE_PUBLIC_COLUMNS =
-    'id, first_name, last_name, avatar_url, city, state, country, bio, job_title, company, institution, course, academic_level, expected_graduation, learning_goals, expertise_areas, mentorship_topics, linkedin_url, github_url, portfolio_url, cv_url, languages, is_public, created_at'
+    `id, first_name, last_name, avatar_url, city, state, country, bio, job_title, company, expertise_areas, mentorship_topics, linkedin_url, github_url, portfolio_url, languages, is_public, created_at, ${MENTEE_PROFILE_EMBED}` as const
 
 /**
  * Fetches a mentee profile with is_public = true. RLS ("Public profiles
@@ -62,7 +63,11 @@ async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | nul
         return null
     }
 
-    return data as unknown as MenteeProfile
+    // cv_url não é legível por coluna: só o próprio, admin ou mentor com
+    // mentoria em comum recebem o currículo (função profile_cv_url).
+    const { data: cvUrl } = await supabase.rpc('profile_cv_url', { p_user_id: data.id })
+
+    return { ...withMenteeFields(data), cv_url: cvUrl ?? null } as unknown as MenteeProfile
 }
 
 // ISR: Revalidar a cada 1 hora (mesmo padrão de app/[locale]/mentors/[slug])

@@ -1,13 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/lib/types/supabase"
 import type { Verification } from "@/lib/types/models/verification"
+import { fetchCvUrls } from "@/lib/services/mentees/mentee-cv.service"
 
 type MentorStatus = "pending" | "approved" | "rejected"
 
 const SELECT = `
   user_id, verification_status, mentorship_approach, what_to_expect, created_at, updated_at,
   profiles!inner(id, email, full_name, first_name, last_name, job_title, company, bio,
-                 expertise_areas, linkedin_url, cv_url, created_at)
+                 expertise_areas, linkedin_url, created_at)
 `
 
 /**
@@ -33,6 +34,8 @@ export async function listMentorVerifications(
 
   if (error) throw new Error(error.message)
 
+  const cvUrls = await fetchCvUrls((data ?? []).map((row) => row.user_id))
+
   return (data ?? []).map((row) => {
     const profile = row.profiles
     return {
@@ -48,7 +51,7 @@ export async function listMentorVerifications(
       mentorship_approach: row.mentorship_approach,
       what_to_expect: row.what_to_expect,
       linkedin_url: profile.linkedin_url,
-      cv_url: profile.cv_url,
+      cv_url: cvUrls.get(row.user_id) ?? null,
       verification_type: "Identity",
       status: row.verification_status ?? "pending",
       created_at: profile.created_at || row.created_at,

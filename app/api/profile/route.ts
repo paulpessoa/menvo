@@ -8,6 +8,11 @@ import {
   splitMentorFields,
   withMentorFields,
 } from "@/lib/services/mentors/mentor-profile-fields"
+import {
+  MENTEE_PROFILE_EMBED_WITH_CV,
+  splitMenteeFields,
+  withMenteeFields,
+} from "@/lib/services/mentees/mentee-profile-fields"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -24,11 +29,11 @@ const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
 })
 
 const PROFILE_COLUMNS =
-  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, cv_url, portfolio_url, academic_level, institution, course, expected_graduation, learning_goals" as const
+  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url" as const
 
 // Campos de mentor ficam em mentor_profiles; o embed os traz junto e
 // withMentorFields os devolve achatados, no mesmo formato de antes.
-const PROFILE_SELECT = `${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}` as const
+const PROFILE_SELECT = `${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED_WITH_CV}` as const
 
 async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
@@ -63,7 +68,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
-    const { profile: profileFields, mentor: mentorFields } = splitMentorFields(parsed.data)
+    const { profile: nonMentorFields, mentor: mentorFields } = splitMentorFields(parsed.data)
+    const { profile: profileFields, mentee: menteeFields } = splitMenteeFields(nonMentorFields)
 
     // Campos de mentor primeiro, para o select do perfil já voltar atualizado.
     // update (não upsert): só mentor ou candidato tem linha (criada pela RPC
@@ -80,6 +86,21 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({
           error: "Erro ao atualizar perfil",
           details: mentorError.message
+        }, { status: 500 })
+      }
+    }
+
+    // Acadêmico e currículo: upsert, porque quem nunca preencheu não tem linha.
+    if (Object.keys(menteeFields).length > 0) {
+      const { error: menteeError } = await supabaseAdmin
+        .from("mentee_profiles")
+        .upsert({ user_id: user.id, ...menteeFields }, { onConflict: "user_id" })
+
+      if (menteeError) {
+        console.error("❌ Mentee profile update error:", menteeError)
+        return NextResponse.json({
+          error: "Erro ao atualizar perfil",
+          details: menteeError.message
         }, { status: 500 })
       }
     }
@@ -104,7 +125,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
-      profile: updatedRow ? withMentorFields(updatedRow) : null,
+      profile: updatedRow ? withMenteeFields(withMentorFields(updatedRow)) : null,
     })
 
   } catch (error) {
@@ -162,7 +183,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-          profile: newProfile ? withMentorFields(newProfile) : null,
+          profile: newProfile ? withMenteeFields(withMentorFields(newProfile)) : null,
         })
       } else {
         return NextResponse.json({ 
@@ -173,7 +194,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      profile: withMentorFields(profile),
+      profile: withMenteeFields(withMentorFields(profile)),
     })
 
   } catch (error) {
