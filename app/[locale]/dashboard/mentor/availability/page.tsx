@@ -533,7 +533,18 @@ export default function MentorAvailabilityPage() {
                   Evite que mentorias sejam marcadas por cima dos seus compromissos pessoais do dia a dia.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="pt-2">
+              <CardContent className="pt-2 space-y-3">
+                <ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-4">
+                  <li>
+                    <strong>Só consulta:</strong> a Menvo apenas vê se você está ocupado ou livre em cada horário, para esconder os conflitos. Não lemos títulos nem detalhes e não criamos, alteramos ou apagamos nada na sua agenda.
+                  </li>
+                  <li>
+                    <strong>Só eventos &quot;Ocupado&quot; bloqueiam:</strong> eventos marcados como &quot;Livre&quot; no Google Agenda (comuns em eventos de dia inteiro) não bloqueiam. Para fechar um dia, marque-o como &quot;Ocupado&quot;.
+                  </li>
+                  <li>
+                    <strong>Seus horários da Menvo continuam valendo:</strong> a sincronização só remove opções, nunca adiciona horários.
+                  </li>
+                </ul>
                 {checkingCalendar ? (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" /> Verificando conexão...

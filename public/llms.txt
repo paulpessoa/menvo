@@ -18,7 +18,7 @@
 - [Como configurar sua disponibilidade e horários](https://www.menvo.com.br/mentor/availability): Como definir slots semanais recorrentes de atendimento e intervalos de mentoria no painel do mentor.
 - [Como gerenciar solicitações de mentoria](https://www.menvo.com.br/mentor/appointments): Saiba como confirmar ou recusar pedidos de mentoria pendentes, prazos recomendados e avisos por e-mail.
 - [Como se tornar um mentor voluntário](https://www.menvo.com.br/profile): Conheça os passos para atuar como mentor voluntário na Menvo e impactar a vida de quem está entrando no mercado de tecnologia.
-- [Integração com o Google Calendar](https://www.menvo.com.br/mentor/availability): Como conectar seu Google Agenda para bloquear horários conflitantes e criar links automáticos no Google Meet.
+- [Integração com o Google Calendar](https://www.menvo.com.br/mentor/availability): Como conectar seu Google Agenda para a Menvo esconder horários em que você já está ocupado. É só consulta de ocupado/livre; só eventos marcados como "Ocupado" bloqueiam.
 - [Como entrar ou se vincular a uma organização parceira](https://www.menvo.com.br/profile?tab=organizations): Saiba como aceitar convites de ONGs parceiras ou solicitar entrada em uma organização pelo seu perfil.
 - [O que são organizações parceiras na Menvo](https://www.menvo.com.br/organizations): Como ONGs e empresas utilizam a Menvo para conectar seus beneficiários e colaboradores a mentores dedicados.
 - [Código de conduta e convivência da comunidade](https://www.menvo.com.br/terms): Diretrizes obrigatórias de respeito, tolerância zero a assédio e responsabilidade entre mentores e mentorados.

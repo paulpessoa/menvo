@@ -28,20 +28,21 @@ Acesse o console em: [Google Cloud Console - Tela de Consentimento OAuth](https:
 - `.../auth/userinfo.profile`
 - `openid`
 
-### Escopos Sensíveis / Restritos (Sensitive Scopes)
-- **`https://www.googleapis.com/auth/calendar`** (ou `.../auth/calendar.events`)
+### Escopo Sensível (Sensitive) - o único que o usuário concede
+- **`https://www.googleapis.com/auth/calendar.freebusy`** - mentor conecta a própria agenda só para a Menvo saber se ele está ocupado ou livre (`/mentor/availability`, card "Sincronização Pessoal", atrás da flag `google_calendar_sync_flag`).
+
+> [!IMPORTANT]
+> **Não submeter `.../auth/calendar` (nem `calendar.events`).** Ele só é usado no setup mestre (`?action=auth`), que autoriza a conta pessoal do Paul para criar os eventos com Google Meet. Nenhum usuário concede esse escopo, então ele não precisa de verificação; pedi-lo só aumentaria o escopo da revisão. O código de usuário pede apenas `calendar.freebusy` (`app/api/auth/google-calendar/route.ts`, `action=user_auth`).
 
 ---
 
 ## 3. Justificativa de Uso do Escopo (Scope Justification)
 
-Copie e cole este texto exato nos campos de justificativa da tela do Google:
-
 ### Pergunta 1: How will your application use the requested scopes?
-> "Menvo is a voluntary mentorship community platform connecting mentors and mentees for career guidance sessions. The Google Calendar API scope ('https://www.googleapis.com/auth/calendar') is used strictly and exclusively to create calendar events with automatic Google Meet video conference links when a mentor confirms a voluntary mentorship booking. The created events ensure both parties have the meeting scheduled with the appropriate Google Meet link, time, and reminders. Menvo does not read, index, or modify unrelated calendar events, and all data handling strictly complies with the Google API Services User Data Policy, including the Limited Use requirements."
+> "Menvo is a free voluntary mentorship platform. Mentors set weekly availability slots on Menvo. A mentor can optionally connect their Google Calendar so that Menvo hides, from the mentor's public booking page, any slot in which the mentor already has a busy event. Menvo calls the Calendar API 'freebusy.query' method with the 'calendar.freebusy' scope only. We receive only busy time intervals (start and end), never event titles, descriptions, attendees or locations. Menvo never creates, modifies or deletes events on the mentor's calendar and never adds availability; the integration can only remove slots that would conflict. The mentor can disconnect at any time from the same screen, and the stored tokens are deleted on disconnect and when the account is deleted. Use of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements."
 
 ### Pergunta 2: Why can't you use a less sensitive scope?
-> "Creating a calendar invite that generates an official Google Meet conference URL requires calendar event creation permissions. Menvo only creates an event when an appointment is explicitly confirmed by both mentor and mentee, without accessing any other personal user calendar entries."
+> "'calendar.freebusy' is already the narrowest Calendar scope that allows the free/busy query. Without it, mentors would receive booking requests for times when they are busy and would have to check and decline conflicts manually. We do not request calendar.readonly or any event-level scope."
 
 ---
 
@@ -49,22 +50,14 @@ Copie e cole este texto exato nos campos de justificativa da tela do Google:
 
 > [!IMPORTANT]
 > O Google exige um vídeo curto (1 a 3 minutos) hospedado no YouTube (visibilidade: **Não Listado** / *Unlisted*).
-> **Regra obrigatória:** A barra de endereços do navegador deve estar **visível em tela cheia**, mostrando claramente o domínio `https://www.menvo.com.br` e o **Client ID** do Google na URL de consentimento.
+> **Regra obrigatória:** a barra de endereços do navegador deve estar **visível**, mostrando o domínio `https://www.menvo.com.br` e o **Client ID** do Google na URL de consentimento. A tela de consentimento precisa mostrar a permissão de disponibilidade (ocupado/livre).
 
 ### Passo a Passo da Gravação:
-1. **Apresentação Inicial (0:00 - 0:20):**
-   - Mostre a home da Menvo (`https://www.menvo.com.br`) na barra do navegador.
-   - Destaque brevemente: *"Menvo is a free voluntary mentorship platform connecting professionals."*
-2. **Fluxo de Login / Consentimento (0:20 - 0:50):**
-   - Acesse a tela de conexão/login com o Google.
-   - Mostre a tela de consentimento do Google e amplie/mostre a barra de endereços contendo o parâmetro `client_id=...` correspondente ao seu Client ID no Google Cloud Console.
-3. **Agendamento da Mentoria (0:50 - 1:20):**
-   - Com o perfil de mentorado, acesse `/mentors`, escolha um mentor e faça a solicitação de mentoria para um horário disponível.
-4. **Confirmação pelo Mentor e Criação do Google Meet (1:20 - 2:00):**
-   - Acesse o painel do mentor (`/dashboard/mentor`) e clique em "Confirmar Mentoria".
-   - Mostre o evento sendo gerado no Google Calendar com o link do **Google Meet** gerado automaticamente e o e-mail de confirmação enviado para ambas as partes.
-5. **Conclusão:**
-   - Encerre mostrando a política de privacidade em `https://www.menvo.com.br/privacy` com a cláusula de conformidade da API do Google.
+1. **Apresentação (0:00 - 0:20):** home `https://www.menvo.com.br` e uma frase: *"Menvo is a free voluntary mentorship platform."*
+2. **Conexão (0:20 - 0:50):** logado como mentor, abrir `/mentor/availability`, mostrar o card "Sincronização Pessoal" com os textos de "só consulta" e clicar em "Conectar Google Calendar". Mostrar a tela de consentimento do Google com `client_id=...` na barra de endereços e aceitar.
+3. **Efeito (0:50 - 1:40):** no Google Agenda, criar um evento marcado como **"Ocupado"** num horário que a Menvo oferece (ex.: 20:30). Abrir o perfil público do mentor, escolher o fluxo de agendamento e mostrar que **aquele horário não aparece mais**. Apagar o evento e mostrar que o horário volta.
+4. **Controle do usuário (1:40 - 2:10):** clicar em "Desconectar Agenda" no mesmo card.
+5. **Conclusão (2:10 - 2:30):** mostrar `https://www.menvo.com.br/privacy` com a cláusula do Google API Limited Use.
 
 ---
 
