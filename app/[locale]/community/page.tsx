@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { Search, Users, Loader2, Info, MessageCircle, Sparkles, X } from "lucide-react"
+import { Search, Users, Loader2, Info, MessageCircle, Sparkles, X, Lock } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -293,7 +293,7 @@ export default function CommunityPage() {
   }, [profiles, displayedAIProfiles])
 
   return (
-    <RequireRole roles={["mentor", "admin"]}>
+    <RequireRole roles={["mentor", "admin"]} fallback={<RestrictedAccessFallback />}>
       <div className="container mx-auto px-4 py-12">
         {/* Header - Cute Phrase */}
         <p className="text-center text-sm sm:text-base text-muted-foreground mb-6">
@@ -478,5 +478,32 @@ export default function CommunityPage() {
       )}
       </div>
     </RequireRole>
+  )
+}
+
+function RestrictedAccessFallback() {
+  const router = useRouter()
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
+      <div className="bg-primary/10 p-5 rounded-full mb-6">
+        <Lock className="h-12 w-12 text-primary" />
+      </div>
+      <h1 className="text-3xl font-extrabold tracking-tight mb-4 text-foreground">
+        Área Exclusiva
+      </h1>
+      <p className="text-muted-foreground text-base max-w-[500px] mb-8 leading-relaxed">
+        A <strong>Comunidade</strong> é um espaço seguro e exclusivo para os mentores da plataforma conhecerem mentorados e colaborarem entre si. 
+        <br/><br/>
+        Se você deseja ter acesso a esta funcionalidade e ajudar outras pessoas, torne-se um mentor ativando seu perfil!
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <Button variant="outline" size="lg" onClick={() => router.back()} className="w-full sm:w-auto">
+          Voltar
+        </Button>
+        <Button size="lg" onClick={() => router.push('/profile?tab=mentorship')} className="w-full sm:w-auto shadow-md">
+          Quero ser Mentor
+        </Button>
+      </div>
+    </div>
   )
 }

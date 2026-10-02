@@ -29,7 +29,9 @@ export default function Header() {
   ]
 
   if (isAuthenticated) {
-    navigation.push({ name: "Comunidade", href: "/community" })
+    if (role === "mentor" || isAdmin) {
+      navigation.push({ name: "Comunidade", href: "/community" })
+    }
     navigation.push({ name: "Assistente", href: "/assistant" })
   }
 
