@@ -152,7 +152,6 @@ export default async function MentorProfilePage({ params }: PageProps) {
     experience_years: mentor.experience_years,
     linkedin_url: mentor.linkedin_url,
     github_url: mentor.github_url,
-    twitter_url: mentor.twitter_url,
     website_url: mentor.website_url,
     timezone: mentor.timezone,
     slug: mentor.slug,

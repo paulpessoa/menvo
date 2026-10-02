@@ -1281,14 +1281,11 @@ export type Database = {
       profiles: {
         Row: {
           academic_level: string | null
-          address: string | null
-          age: number | null
-          ai_disclosure_accepted_at: string | null
           availability_status: string | null
           avatar_url: string | null
-          average_rating: number | null
           bio: string | null
           chat_enabled: boolean | null
+          community_ready: boolean | null
           city: string | null
           company: string | null
           country: string | null
@@ -1318,24 +1315,16 @@ export type Database = {
           last_name: string | null
           learning_goals: string | null
           linkedin_url: string | null
-          location: string | null
-          mentee_status: string | null
           mentorship_approach: string | null
-          mentorship_guidelines: string | null
           mentorship_topics: string[] | null
           origin_platform: string | null
           original_data: Json | null
           phone: string | null
           portfolio_url: string | null
-          profile_visibility: string | null
           search_vector: unknown
-          show_in_community: boolean | null
           slug: string | null
           state: string | null
           timezone: string | null
-          total_reviews: number | null
-          total_sessions: number | null
-          twitter_url: string | null
           updated_at: string
           verification_notes: string | null
           verification_status: string | null
@@ -1346,14 +1335,11 @@ export type Database = {
         }
         Insert: {
           academic_level?: string | null
-          address?: string | null
-          age?: number | null
-          ai_disclosure_accepted_at?: string | null
           availability_status?: string | null
           avatar_url?: string | null
-          average_rating?: number | null
           bio?: string | null
           chat_enabled?: boolean | null
+          community_ready?: boolean | null
           city?: string | null
           company?: string | null
           country?: string | null
@@ -1383,24 +1369,16 @@ export type Database = {
           last_name?: string | null
           learning_goals?: string | null
           linkedin_url?: string | null
-          location?: string | null
-          mentee_status?: string | null
           mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
           origin_platform?: string | null
           original_data?: Json | null
           phone?: string | null
           portfolio_url?: string | null
-          profile_visibility?: string | null
           search_vector?: unknown
-          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
-          total_reviews?: number | null
-          total_sessions?: number | null
-          twitter_url?: string | null
           updated_at?: string
           verification_notes?: string | null
           verification_status?: string | null
@@ -1411,14 +1389,11 @@ export type Database = {
         }
         Update: {
           academic_level?: string | null
-          address?: string | null
-          age?: number | null
-          ai_disclosure_accepted_at?: string | null
           availability_status?: string | null
           avatar_url?: string | null
-          average_rating?: number | null
           bio?: string | null
           chat_enabled?: boolean | null
+          community_ready?: boolean | null
           city?: string | null
           company?: string | null
           country?: string | null
@@ -1448,24 +1423,16 @@ export type Database = {
           last_name?: string | null
           learning_goals?: string | null
           linkedin_url?: string | null
-          location?: string | null
-          mentee_status?: string | null
           mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
           origin_platform?: string | null
           original_data?: Json | null
           phone?: string | null
           portfolio_url?: string | null
-          profile_visibility?: string | null
           search_vector?: unknown
-          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
-          total_reviews?: number | null
-          total_sessions?: number | null
-          twitter_url?: string | null
           updated_at?: string
           verification_notes?: string | null
           verification_status?: string | null
@@ -1839,10 +1806,18 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_stats: {
+        Row: {
+          average_rating: number | null
+          mentor_id: string | null
+          total_reviews: number | null
+          total_sessions: number | null
+        }
+        Relationships: []
+      }
       mentors_view: {
         Row: {
           academic_level: string | null
-          address: string | null
           availability: Json | null
           availability_status: string | null
           avatar_url: string | null
@@ -1878,18 +1853,15 @@ export type Database = {
           location: string | null
           mentor_skills: string[] | null
           mentorship_approach: string | null
-          mentorship_guidelines: string | null
           mentorship_topics: string[] | null
           origin_platform: string | null
           phone: string | null
           portfolio_url: string | null
-          show_in_community: boolean | null
           slug: string | null
           state: string | null
           timezone: string | null
           total_reviews: number | null
           total_sessions: number | null
-          twitter_url: string | null
           updated_at: string | null
           verification_status: string | null
           verified: boolean | null
@@ -1898,7 +1870,6 @@ export type Database = {
         }
         Insert: {
           academic_level?: string | null
-          address?: string | null
           availability?: never
           availability_status?: string | null
           avatar_url?: string | null
@@ -1934,18 +1905,15 @@ export type Database = {
           location?: never
           mentor_skills?: never
           mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
           origin_platform?: string | null
           phone?: string | null
           portfolio_url?: string | null
-          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
           total_reviews?: number | null
           total_sessions?: number | null
-          twitter_url?: string | null
           updated_at?: string | null
           verification_status?: string | null
           verified?: boolean | null
@@ -1954,7 +1922,6 @@ export type Database = {
         }
         Update: {
           academic_level?: string | null
-          address?: string | null
           availability?: never
           availability_status?: string | null
           avatar_url?: string | null
@@ -1990,18 +1957,15 @@ export type Database = {
           location?: never
           mentor_skills?: never
           mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
           origin_platform?: string | null
           phone?: string | null
           portfolio_url?: string | null
-          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
           total_reviews?: number | null
           total_sessions?: number | null
-          twitter_url?: string | null
           updated_at?: string | null
           verification_status?: string | null
           verified?: boolean | null

@@ -72,11 +72,7 @@ export default function MentorDashboard() {
         mentorshipService.getMentorUpcomingAppointments(user.id, 5)
       ])
 
-      setStats({
-        ...statsData,
-        averageRating: (profile as any)?.average_rating || 0,
-        totalReviews: (profile as any)?.total_reviews || 0
-      })
+      setStats(statsData)
       setUpcomingAppointments(upcoming)
     } catch (error) {
       console.error("Error fetching mentor dashboard data:", error)

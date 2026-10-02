@@ -72,7 +72,6 @@ export interface MentorProfile {
   experience_years: number | null
   linkedin_url: string | null
   github_url: string | null
-  twitter_url: string | null
   website_url: string | null
   timezone: string | null
   slug: string | null

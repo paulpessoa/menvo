@@ -28,6 +28,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Erro ao buscar agendamentos" }, { status: 500 })
     }
 
+    // Avaliações vêm da view (calculadas de appointment_feedbacks aprovadas),
+    // não de colunas de profiles que ninguém atualizava.
+    const { data: rating } = await serverSupabase
+      .from("mentors_view")
+      .select("average_rating, total_reviews")
+      .eq("id", user.id)
+      .maybeSingle()
+
     const apts = appointments || []
     const now = new Date()
 
@@ -43,7 +51,9 @@ export async function GET(request: NextRequest) {
       pendingRequests: pending,
       completedSessions: completed.length,
       totalMentees,
-      totalHours: Math.round((totalMinutes / 60) * 10) / 10
+      totalHours: Math.round((totalMinutes / 60) * 10) / 10,
+      averageRating: Number(rating?.average_rating) || 0,
+      totalReviews: Number(rating?.total_reviews) || 0
     }
 
     const upcoming = apts
