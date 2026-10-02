@@ -24,6 +24,7 @@ import {
 import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { useAiQuota } from "@/hooks/useAiQuota"
+import { useOnboarding } from "@/hooks/useOnboarding"
 import {
   communityService,
   type CommunityProfile,
@@ -301,7 +302,7 @@ export default function CommunityPage() {
         </p>
 
       {/* Search + Filters (Single Row) */}
-      <div className="flex flex-col xl:flex-row gap-3 w-full mb-8">
+      <div id="tour-community-list" className="flex flex-col xl:flex-row gap-3 w-full mb-8">
         <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -313,7 +314,8 @@ export default function CommunityPage() {
         </div>
         
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto shrink-0">
-          <AIMatchButton
+          <div id="tour-community-ai" className="w-full sm:w-auto">
+            <AIMatchButton
             title={tCommunity("magicSearch.title")}
             description={tCommunity("magicSearch.disclaimer")}
             placeholder={tCommunity("magicSearch.placeholder")}
@@ -336,6 +338,7 @@ export default function CommunityPage() {
             }
             onSubmit={handleAISearch}
           />
+          </div>
 
           <Select
             value={filters.sortBy}
@@ -476,9 +479,23 @@ export default function CommunityPage() {
         </SheetContent>
       </Sheet>
       )}
+      <CommunityTour />
       </div>
     </RequireRole>
   )
+}
+
+function CommunityTour() {
+  const steps = [
+    { popover: { title: "🤝 Comunidade da Menvo", description: "Bem-vindo à área exclusiva para mentores! Aqui você tem acesso ao diretório completo de pessoas buscando mentoria." } },
+    { element: "#tour-community-ai", popover: { title: "Matching Inteligente", description: "Use a IA da Menvo para cruzar suas skills com as necessidades dos mentorados e encontrar pessoas que você pode ajudar agora mesmo." } },
+    { element: "#tour-community-list", popover: { title: "Busca e Filtros", description: "Encontre perfis específicos usando a barra de pesquisa ou navegue pelos recém-chegados na plataforma." } },
+    { popover: { title: "Seja proativo!", description: "Muitos talentos têm receio de pedir mentoria. Fique à vontade para puxar conversa e oferecer ajuda." } }
+  ]
+
+  useOnboarding("ob_community_1", steps)
+
+  return null
 }
 
 function RestrictedAccessFallback() {

@@ -50,7 +50,7 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
   // Detect location on mount if not filled yet
   useEffect(() => {
     if (!form.city && !form.state) {
-      location.detect()
+      location.detect(true) // silent
     }
   }, []) // only run once on mount
 
@@ -118,7 +118,7 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
         <div className="space-y-3 pt-4 border-t">
           <div className="flex items-center justify-between gap-4">
             <h3 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Localização</h3>
-            <Button type="button" variant="outline" size="sm" onClick={location.detect} disabled={location.isDetecting}>
+            <Button type="button" variant="outline" size="sm" onClick={() => location.detect(false)} disabled={location.isDetecting}>
               {location.isDetecting && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
               {location.isDetecting ? "Detectando..." : "Detectar"}
             </Button>

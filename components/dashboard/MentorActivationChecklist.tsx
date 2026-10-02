@@ -76,7 +76,7 @@ export function MentorActivationChecklist({ profile, stats }: MentorActivationCh
   ]
 
   return (
-    <Card className="rounded-2xl border border-primary/20 bg-primary/[0.03] shadow-xs">
+    <Card id="tour-mentor-checklist" className="rounded-2xl border border-primary/20 bg-primary/[0.03] shadow-xs">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-bold flex items-center gap-2">
           <Trophy className="h-4 w-4 text-primary" /> Jornada do Mentor

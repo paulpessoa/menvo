@@ -95,47 +95,75 @@ export async function GET(request: NextRequest) {
         minute: "2-digit",
       })
 
-      if (isMentor && apt.status === "pending") {
-        notifications.push({
-          id: `booking-request-${apt.id}`,
-          type: "booking_request",
-          title: "Nova solicitação de mentoria",
-          message: `${counterpartName} solicitou uma mentoria para ${dateFormatted}.`,
-          timestamp: apt.created_at || apt.updated_at,
-          actionUrl: "/mentorship/mentor#action",
-        })
-      }
-
-      if (apt.status === "confirmed") {
-        const isUpcoming = scheduledDate > now
-
-        if (isUpcoming) {
-          const minutesUntilStart = (scheduledDate.getTime() - now.getTime()) / (1000 * 60)
-          
-          if (minutesUntilStart <= 30 && minutesUntilStart > 0) {
-            notifications.push({
-              id: `session-starting-soon-${apt.id}`,
-              type: "session_starting_soon",
-              title: "Sessão começando em breve!",
-              message: `Sua mentoria com ${counterpartName} começa em ${Math.ceil(minutesUntilStart)} minutos.`,
-              timestamp: new Date().toISOString(),
-              actionUrl: isMentor ? "/mentorship/mentor#upcoming" : "/mentorship/mentee#upcoming",
-            })
-          }
+      // Se o usuário está agindo como mentor
+      if (isMentor && (role === "mentor" || !role)) {
+        if (apt.status === "pending") {
+          notifications.push({
+            id: `booking-request-${apt.id}`,
+            type: "booking_request",
+            title: "Nova solicitação de mentoria",
+            message: `${counterpartName} solicitou uma mentoria para ${dateFormatted}.`,
+            timestamp: apt.created_at || apt.updated_at,
+            actionUrl: "/mentorship/mentor#action",
+          })
         }
 
-        notifications.push({
-          id: `booking-confirmed-${apt.id}`,
-          type: "booking_confirmed",
-          title: isUpcoming ? "Mentoria confirmada" : "Mentoria realizada",
-          message: isUpcoming
-            ? `Sua mentoria com ${counterpartName} está agendada para ${dateFormatted}.`
-            : `Mentoria com ${counterpartName} realizada em ${dateFormatted}.`,
-          timestamp: apt.updated_at || apt.created_at,
-          actionUrl: isMentor
-            ? (isUpcoming ? "/mentorship/mentor#upcoming" : "/mentorship/mentor#history")
-            : (isUpcoming ? "/mentorship/mentee#upcoming" : "/mentorship/mentee#history"),
-        })
+        if (apt.status === "confirmed") {
+          const isUpcoming = scheduledDate > now
+          if (isUpcoming) {
+            const minutesUntilStart = (scheduledDate.getTime() - now.getTime()) / (1000 * 60)
+            if (minutesUntilStart <= 30 && minutesUntilStart > 0) {
+              notifications.push({
+                id: `session-starting-soon-${apt.id}`,
+                type: "session_starting_soon",
+                title: "Sessão começando em breve!",
+                message: `Sua mentoria com ${counterpartName} começa em ${Math.ceil(minutesUntilStart)} minutos.`,
+                timestamp: new Date().toISOString(),
+                actionUrl: "/mentorship/mentor#upcoming",
+              })
+            }
+          }
+          notifications.push({
+            id: `booking-confirmed-${apt.id}`,
+            type: "booking_confirmed",
+            title: isUpcoming ? "Mentoria confirmada" : "Mentoria realizada",
+            message: isUpcoming
+              ? `Sua mentoria com ${counterpartName} está agendada para ${dateFormatted}.`
+              : `Mentoria com ${counterpartName} realizada em ${dateFormatted}.`,
+            timestamp: apt.updated_at || apt.created_at,
+            actionUrl: isUpcoming ? "/mentorship/mentor#upcoming" : "/mentorship/mentor#history",
+          })
+        }
+      }
+
+      // Se o usuário está agindo como mentee
+      if (!isMentor && (role === "mentee" || !role)) {
+        if (apt.status === "confirmed") {
+          const isUpcoming = scheduledDate > now
+          if (isUpcoming) {
+            const minutesUntilStart = (scheduledDate.getTime() - now.getTime()) / (1000 * 60)
+            if (minutesUntilStart <= 30 && minutesUntilStart > 0) {
+              notifications.push({
+                id: `session-starting-soon-${apt.id}`,
+                type: "session_starting_soon",
+                title: "Sessão começando em breve!",
+                message: `Sua mentoria com ${counterpartName} começa em ${Math.ceil(minutesUntilStart)} minutos.`,
+                timestamp: new Date().toISOString(),
+                actionUrl: "/mentorship/mentee#upcoming",
+              })
+            }
+          }
+          notifications.push({
+            id: `booking-confirmed-${apt.id}`,
+            type: "booking_confirmed",
+            title: isUpcoming ? "Mentoria confirmada" : "Mentoria realizada",
+            message: isUpcoming
+              ? `Sua mentoria com ${counterpartName} está agendada para ${dateFormatted}.`
+              : `Mentoria com ${counterpartName} realizada em ${dateFormatted}.`,
+            timestamp: apt.updated_at || apt.created_at,
+            actionUrl: isUpcoming ? "/mentorship/mentee#upcoming" : "/mentorship/mentee#history",
+          })
+        }
       }
 
       if (apt.status === "cancelled") {
@@ -144,20 +172,32 @@ export async function GET(request: NextRequest) {
 
         if (daysSinceCancelled <= 14) {
           const reasonSnippet = apt.notes_mentor ? ` Motivo: "${apt.notes_mentor}"` : ""
-          notifications.push({
-            id: `booking-cancelled-${apt.id}`,
-            type: "booking_cancelled",
-            title: "Mentoria cancelada",
-            message: `A mentoria de ${dateFormatted} com ${counterpartName} foi cancelada.${reasonSnippet}`,
-            timestamp: apt.updated_at || apt.created_at,
-            actionUrl: isMentor
-              ? "/mentorship/mentor#history"
-              : "/mentorship/mentee#history",
-          })
+          
+          if (isMentor && (role === "mentor" || !role)) {
+            notifications.push({
+              id: `booking-cancelled-${apt.id}`,
+              type: "booking_cancelled",
+              title: "Mentoria cancelada",
+              message: `A mentoria de ${dateFormatted} com ${counterpartName} foi cancelada.${reasonSnippet}`,
+              timestamp: apt.updated_at || apt.created_at,
+              actionUrl: "/mentorship/mentor#history",
+            })
+          }
+          
+          if (!isMentor && (role === "mentee" || !role)) {
+            notifications.push({
+              id: `booking-cancelled-${apt.id}`,
+              type: "booking_cancelled",
+              title: "Mentoria cancelada",
+              message: `A mentoria de ${dateFormatted} com ${counterpartName} foi cancelada.${reasonSnippet}`,
+              timestamp: apt.updated_at || apt.created_at,
+              actionUrl: "/mentorship/mentee#history",
+            })
+          }
         }
       }
 
-      if (!isMentor && apt.status === "completed" && !reviewedAppointmentIds.has(apt.id)) {
+      if (!isMentor && (role === "mentee" || !role) && apt.status === "completed" && !reviewedAppointmentIds.has(apt.id)) {
         notifications.push({
           id: `pending-evaluation-${apt.id}`,
           type: "pending_evaluation",
