@@ -40,7 +40,7 @@ const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
 })
 
 const PROFILE_COLUMNS =
-  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url" as const
+  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url, onboarding_flags" as const
 
 // Campos de mentor ficam em mentor_profiles; o embed os traz junto e
 // withMentorFields os devolve achatados, no mesmo formato de antes.

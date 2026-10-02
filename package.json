@@ -80,6 +80,7 @@
     "cmdk": "latest",
     "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
+    "driver.js": "^1.8.0",
     "embla-carousel-react": "latest",
     "framer-motion": "^12.38.0",
     "googleapis": "^159.0.0",

@@ -22,6 +22,7 @@ import { quizService } from "@/lib/services/quiz/quiz.service"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import type { QuizResponseSummary } from "@/lib/types/models/quiz"
+import { useOnboarding } from "@/hooks/useOnboarding"
 
 interface MenteeStats {
   totalAppointments: number
@@ -183,6 +184,7 @@ export default function MenteeDashboard() {
               diagnosticHref={diagnosticHref} 
               locale={locale} 
             />
+            <MenteeDashboardTour />
           </Suspense>
         </div>
       </div>
@@ -302,3 +304,24 @@ function MenteeDashboardTabs({
     </Tabs>
   )
 }
+
+function MenteeDashboardTour() {
+  const t = useTranslations("dashboard.mentee.tour")
+  
+  // O uso das strings fallback assegura funcionamento enquanto os t() não existirem
+  const steps = [
+    { popover: { title: "👋 Bem-vindo(a) à Menvo!", description: "Você acabou de dar o primeiro passo. Vamos fazer um tour rápido para você aproveitar tudo que a plataforma oferece." } },
+    { element: "#tour-next-session", popover: { title: "Suas mentorias aparecem aqui", description: "Quando você agendar uma mentoria, os detalhes aparecerão neste card com link para a videochamada." } },
+    { element: "#tour-quiz-cta", popover: { title: "Descubra seu momento profissional", description: "O diagnóstico com IA analisa seu momento e sugere mentores ideais para você. É o melhor primeiro passo!" } },
+    { element: "#tour-nav-mentors", popover: { title: "Encontre seu mentor", description: "Aqui você encontra todos os mentores verificados. Pode filtrar por área, skills, idioma e mais." } },
+    { element: "#tour-nav-community", popover: { title: "Faça parte da comunidade", description: "Ative seu perfil na comunidade para que mentores te encontrem e ofereçam ajuda proativamente." } },
+    { element: "#tour-nav-assistant", popover: { title: "Seu copiloto de carreira", description: "Converse com a IA da Menvo para tirar dúvidas, receber recomendações de mentores ou fazer o diagnóstico interativo." } },
+    { element: "#tour-nav-profile-menu", popover: { title: "Complete seu perfil", description: "Quanto mais completo seu perfil, mais chances os mentores têm de aceitar seu pedido. Adicione foto, bio, LinkedIn e seus objetivos." } },
+    { popover: { title: "🚀 Tudo pronto!", description: "Recomendamos começar pelo diagnóstico de carreira ou explorar o catálogo de mentores. Boa jornada!" } }
+  ]
+
+  useOnboarding("ob_m1", steps)
+
+  return null
+}
+

@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Campos de mentor e verificação vêm de mentor_profiles (embed), achatados
     // de volta no perfil por withMentorFields para as telas não mudarem.
     const PROFILE_COLUMNS =
-      "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url" as const
+      "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url, onboarding_flags" as const
 
     // Buscar perfil e papéis
     const { data: profileRow, error: profileError } = await supabase

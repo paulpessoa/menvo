@@ -25,10 +25,18 @@ export default function Header() {
 
   const navigation = [
     { name: t("common.home"), href: "/" },
-    { name: t("common.findMentors"), href: "/mentors" },
+    { name: t("common.findMentors"), href: "/mentors" }
+  ]
+
+  if (isAuthenticated) {
+    navigation.push({ name: "Comunidade", href: "/community" })
+    navigation.push({ name: "Assistente", href: "/assistant" })
+  }
+
+  navigation.push(
     { name: t("common.aboutUs"), href: "/about" },
     { name: t("common.howItWorks"), href: "/how-it-works" }
-  ]
+  )
 
   const userNavigation: UserNavigationItem[] = []
 
@@ -113,6 +121,7 @@ export default function Header() {
           {navigation.map((item) => (
             <Link
               key={item.name}
+              id={`tour-nav-${item.href.replace(/\//g, "") || "home"}`}
               href={item.href}
               className={`text-sm font-medium transition-colors hover:text-primary whitespace-nowrap ${
                 pathname === item.href

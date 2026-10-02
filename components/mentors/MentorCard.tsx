@@ -43,6 +43,8 @@ interface MentorCardProps {
   isAIHighlighted?: boolean
   /** Short AI-generated reason for the recommendation */
   aiReason?: string
+  /** Optional ID for UI targeting (e.g., Driver.js tours) */
+  id?: string
 }
 
 /**
@@ -54,6 +56,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
   mentor,
   isAIHighlighted = false,
   aiReason,
+  id,
 }) => {
   const t = useTranslations('mentors')
   const { user } = useAuth()
@@ -106,6 +109,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
   return (
     <div
+      id={id}
       className={`group relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
         isAIHighlighted
           ? 'border-primary/40 dark:border-primary-400/40 ring-1 ring-primary/20'

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menvo - System Design e Visão Arquitetural</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .mermaid { display: flex; justify-content: center; background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top: 2rem; overflow-x: auto; }
+        .gradient-text { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #2563eb, #3b82f6); }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-10 border-b pb-8">
+            <h1 class="text-4xl font-extrabold text-slate-800 mb-2">System Design <span class="gradient-text">Menvo</span></h1>
+            <p class="text-slate-600 text-lg">Visão do Fundador: Arquitetura, Infraestrutura, UX/UI e Tecnologias.</p>
+            <div class="mt-6 bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                <p class="text-blue-900 font-medium italic">"O Menvo não é apenas um software, é um ecossistema digital para democratizar o acesso à mentoria voluntária. A arquitetura foi pensada para ser escalável, sem fricção, altamente automatizada (agendamentos e vídeo) e potencializada por Inteligência Artificial para extrair o máximo de valor das jornadas individuais, tudo isso com uma experiência de usuário (UX) premium e acessível."</p>
+                <p class="text-blue-700 text-sm mt-2 font-bold">— Visão do Fundador</p>
+            </div>
+        </header>
+
+        <!-- Diagrama Mermaid -->
+        <div class="mermaid">
+            graph TD
+                %% ====== Estilos ======
+                classDef client fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a,rx:10,ry:10
+                classDef frontend fill:#f0fdf4,stroke:#22c55e,stroke-width:2px,color:#14532d,rx:10,ry:10
+                classDef backend fill:#fff7ed,stroke:#f97316,stroke-width:2px,color:#9a3412,rx:10,ry:10
+                classDef database fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b,rx:10,ry:10
+                classDef thirdparty fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#701a75,rx:10,ry:10,stroke-dasharray: 5 5
+
+                %% ====== Atores / Clientes ======
+                User((Todos os Usuarios)):::client
+                Browser[Navegador e Dispositivos Mobile]:::client
+
+                User -->|Acessa via HTTPS| Browser
+
+                %% ====== Frontend & UX/UI ======
+                subgraph Presentation [Camada de Apresentacao]
+                    NextJS[Next.js 15 App Router]:::frontend
+                    UI[Tailwind CSS e Shadcn UI]:::frontend
+                    State[Zustand e TanStack Query]:::frontend
+                    I18n[Next-Intl Internacionalizacao]:::frontend
+                    
+                    Browser <-->|React Server Components + CSR| NextJS
+                    NextJS --- UI
+                    NextJS --- State
+                    NextJS --- I18n
+                end
+
+                %% ====== Backend & API ======
+                subgraph Logic [Camada Logica Serverless]
+                    ServerActions[Next.js Server Actions]:::backend
+                    RouteHandlers[API Routes e Webhooks]:::backend
+                    AuthGuard[Middlewares e Auth Guards]:::backend
+                    
+                    NextJS <-->|RPC & Fetch| ServerActions
+                    NextJS <-->|Fetch| RouteHandlers
+                    Browser -.->|Validação| AuthGuard
+                end
+
+                %% ====== Banco de Dados e Backend as a Service ======
+                subgraph Data [Camada de Dados Supabase]
+                    Postgres[(PostgreSQL Relacional)]:::database
+                    RLS{Row Level Security}:::database
+                    Storage[Supabase Storage]:::database
+                    SupabaseAuth{Supabase Auth JWT}:::database
+                    
+                    ServerActions <-->|Prisma / Supabase-js| Postgres
+                    RouteHandlers <--> Postgres
+                    Postgres --- RLS
+                    SupabaseAuth -.->|Emissão/Validação Token| AuthGuard
+                end
+
+                %% ====== Integrações Externas ======
+                subgraph Integrations [Integracoes e IA]
+                    GCP[Google Cloud Platform GCP]:::thirdparty
+                    Calendar[Google Calendar API]:::thirdparty
+                    Meet[Google Meet API]:::thirdparty
+                    AI[LLM OpenAI e Gemini]:::thirdparty
+                    Email[Servico de Email]:::thirdparty
+                    
+                    GCP --- Calendar
+                    GCP --- Meet
+                    
+                    ServerActions <-->|Sincronização| Calendar
+                    ServerActions <-->|Gera Link| Meet
+                    ServerActions <-->|Prompts JSONB| AI
+                    Postgres -->|Gatilhos/Webhooks| Email
+                end
+        </div>
+
+        <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 font-bold">1</div>
+                    <h3 class="text-xl font-bold text-slate-800">UX / UI & Frontend</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    A interface é a vitrine da democratização do Menvo. Utilizando <strong>Next.js 15 (App Router)</strong>, a aplicação entrega páginas estáticas extremamente rápidas (SEO amigável) combinadas com interações dinâmicas.
+                </p>
+                <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                    <li><strong>Design System:</strong> Tailwind CSS aliado a blocos do Shadcn/UI garante consistência, modo escuro (Dark Mode), responsividade e total aderência às diretrizes de acessibilidade (WCAG AA).</li>
+                    <li><strong>Gerenciamento de Estado:</strong> React Hook Form + Zod para formulários blindados. Zustand para o estado do usuário e TanStack Query para cache eficiente.</li>
+                    <li><strong>Localização:</strong> Suporte multi-idiomas nativo via Next-Intl.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 font-bold">2</div>
+                    <h3 class="text-xl font-bold text-slate-800">Backend & Serverless</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    A arquitetura foi projetada para não haver servidores ociosos. Tudo roda na "Borda" (Edge) através da infraestrutura da <strong>Vercel</strong>.
+                </p>
+                <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                    <li><strong>Server Actions:</strong> Mutação de dados de forma nativa e segura, sem precisar expor endpoints REST desnecessários.</li>
+                    <li><strong>Arquitetura Desacoplada:</strong> Lógica de negócio encapsulada em "Services" (ex: `mentorshipService.ts`, `quizService.ts`) permitindo testes isolados e reuso.</li>
+                    <li><strong>Zero Maintenance:</strong> Escala automaticamente do 1º ao milésimo usuário sem preocupação com load balancers ou infraestrutura manual.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-600 font-bold">3</div>
+                    <h3 class="text-xl font-bold text-slate-800">Banco de Dados e Segurança</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    Toda a camada de dados e autenticação é terceirizada com maestria para o <strong>Supabase</strong> (PostgreSQL como serviço).
+                </p>
+                <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                    <li><strong>Row Level Security (RLS):</strong> Regras de segurança gravadas diretamente no banco de dados. Um mentorado jamais consegue ler os dados privados de outro, independente do que o frontend solicite.</li>
+                    <li><strong>Storage:</strong> Armazenamento otimizado para currículos e fotos de perfil via buckets S3-compatíveis, com chaves de acesso assinadas de curta duração.</li>
+                    <li><strong>Tipagem Forte:</strong> O schema do banco gera tipos em TypeScript, criando um ecossistema 100% type-safe do banco ao botão na tela.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 font-bold">4</div>
+                    <h3 class="text-xl font-bold text-slate-800">Integrações Inteligentes (A Diferenciação)</h3>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                    É aqui que a visão do fundador ganha tração em escala: tirando o atrito da relação humana.
+                </p>
+                <ul class="list-disc list-inside text-slate-600 text-sm space-y-2">
+                    <li><strong>Sincronia Mágica (Google GCP):</strong> O mentor só precisa de 1 clique. O Menvo lê a agenda (Free/Busy), oculta horários ocupados no perfil e, quando um agendamento é fechado, cria a sala do Google Meet automaticamente e põe na agenda dos dois.</li>
+                    <li><strong>IA Educacional:</strong> LLMs embutidos avaliam os formulários de diagnóstico do mentorado em tempo real, entregando recomendações personalizadas e poupando tempo valioso nas sessões de mentoria.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                fontFamily: 'Inter',
+                lineColor: '#cbd5e1'
+            }
+        });
+    </script>
+</body>
+</html>

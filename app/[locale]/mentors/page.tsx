@@ -33,6 +33,7 @@ import { searchCatalogAction, getCatalogFilterOptionsAction } from "@/app/action
 import { useDebounce } from "@/hooks/useDebounce"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useAiQuota } from "@/hooks/useAiQuota"
+import { useOnboarding } from "@/hooks/useOnboarding"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { SuggestMentorModal } from "@/components/mentors/SuggestMentorModal"
 import type { SuggestionContext } from "@/lib/schemas/suggestions"
@@ -425,6 +426,7 @@ export default function MentorsPage() {
             <div className="flex-1 relative min-w-0">
               <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
               <Input
+                id="tour-search-bar"
                 placeholder={t("searchPlaceholder")}
                 value={filters.search}
                 onChange={(e) => {
@@ -457,9 +459,10 @@ export default function MentorsPage() {
                 </button>
               )}
             </div>
-            <AIMatchButton
-              title={t("magicSearch.title")}
-              description={t("magicSearch.disclaimer")}
+            <div id="tour-ai-search">
+              <AIMatchButton
+                title={t("magicSearch.title")}
+                description={t("magicSearch.disclaimer")}
               placeholder={t("magicSearch.placeholder")}
               loading={aiLoading}
               loginRequiredMessage={t("magicSearch.loginRequired")}
@@ -481,6 +484,7 @@ export default function MentorsPage() {
               onSubmit={handleAISearch}
               compact
             />
+            </div>
           </div>
 
           {/* Sort & Filters Action Row (balanced 50-50 on mobile, compact on desktop) */}
@@ -510,6 +514,7 @@ export default function MentorsPage() {
             <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
               <SheetTrigger asChild>
                 <Button
+                  id="tour-filters"
                   variant="outline"
                   className="w-full sm:w-auto h-11 sm:h-12 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40"
                 >
@@ -906,9 +911,10 @@ export default function MentorsPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Primeiro os recomendados pela IA */}
-            {displayedAIMentors.map((mentor) => (
+            {displayedAIMentors.map((mentor, idx) => (
               <MentorCard
                 key={`ai-${mentor.id}`}
+                id={idx === 0 ? "tour-mentor-card" : undefined}
                 mentor={mentor}
                 isAIHighlighted={true}
                 aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
@@ -916,8 +922,12 @@ export default function MentorsPage() {
             ))}
 
             {/* Depois os demais */}
-            {otherMentors.map((mentor) => (
-              <MentorCard key={mentor.id || "unknown"} mentor={mentor} />
+            {otherMentors.map((mentor, idx) => (
+              <MentorCard 
+                key={mentor.id || "unknown"} 
+                id={idx === 0 && displayedAIMentors.length === 0 ? "tour-mentor-card" : undefined}
+                mentor={mentor} 
+              />
             ))}
           </div>
 
@@ -941,6 +951,20 @@ export default function MentorsPage() {
         initialTopic={filters.search || filters.topics[0] || ""}
         context={suggestionContext}
       />
+      <MentorsCatalogTour />
     </PageContainer>
   )
+}
+
+function MentorsCatalogTour() {
+  const steps = [
+    { element: "#tour-search-bar", popover: { title: "Busque por nome, área ou skill", description: "Use a busca para encontrar mentores por área de atuação, habilidade ou nome." } },
+    { element: "#tour-filters", popover: { title: "Refine sua busca", description: "Filtre por idioma, tags de inclusão, tópicos de mentoria e mais para encontrar o match ideal." } },
+    { element: "#tour-ai-search", popover: { title: "Deixe a IA encontrar para você", description: "Descreva o que você precisa com suas palavras e a IA vai sugerir os mentores mais alinhados." } },
+    { element: "#tour-mentor-card", popover: { title: "Card do mentor", description: "Cada card mostra a foto, área, nota e especialidades do mentor. Clique para ver o perfil completo e agendar." } }
+  ]
+
+  useOnboarding("ob_m2", steps)
+
+  return null
 }

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menvo - Relacionamento de Tabelas (Banco de Dados)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .mermaid { display: flex; justify-content: center; background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top: 2rem; overflow-x: auto; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 border-b pb-6">
+            <h1 class="text-3xl font-bold text-slate-800">Menvo - Estruturas de Dados e Supabase</h1>
+            <p class="text-slate-600 mt-2">Diagrama Entidade-Relacionamento (ERD) das principais tabelas, focando no ecossistema de Mentoria, Perfis, AI e Organizações.</p>
+        </header>
+
+        <!-- Diagrama Mermaid -->
+        <div class="mermaid">
+            erDiagram
+                %% ========= AUTH CORE =========
+                auth_users {
+                    uuid id PK
+                    string email
+                    timestamp created_at
+                }
+
+                %% ========= PROFILES =========
+                profiles {
+                    uuid id PK "FK -> auth.users"
+                    string role "mentee | mentor | admin"
+                    string first_name
+                    string last_name
+                    boolean verified "Verificação manual do Admin"
+                    timestamp created_at
+                }
+
+                %% ========= MENTORSHIP ECOSYSTEM =========
+                appointments {
+                    uuid id PK
+                    uuid mentee_id FK "Mentorado"
+                    uuid mentor_id FK "Mentor"
+                    string status "pending | scheduled | completed | cancelled"
+                    timestamp scheduled_at
+                    int duration_minutes
+                    string google_meet_link
+                }
+
+                feedbacks {
+                    uuid id PK
+                    uuid appointment_id FK
+                    uuid author_id FK
+                    uuid recipient_id FK
+                    int rating "1 a 5"
+                    text review_text
+                }
+
+                %% ========= ORGANIZATIONS =========
+                organizations {
+                    uuid id PK
+                    string name
+                    string slug
+                    string logo_url
+                }
+
+                organization_members {
+                    uuid org_id PK, FK
+                    uuid user_id PK, FK
+                    string org_role "admin | member"
+                }
+
+                %% ========= AI & DIAGNOSTICS =========
+                quiz_responses {
+                    uuid id PK
+                    uuid user_id FK
+                    jsonb answers
+                    jsonb analysis
+                    timestamp created_at
+                }
+
+                ai_diagnostic_sessions {
+                    uuid id PK
+                    uuid user_id FK
+                    string status
+                    jsonb thread_context
+                }
+
+                diagnostic_shares {
+                    uuid id PK
+                    uuid session_id FK
+                    uuid shared_with_user_id FK
+                }
+
+                %% ========= RELATIONSHIPS =========
+                auth_users ||--o| profiles : "has exactly 1"
+                
+                profiles ||--o{ appointments : "requests (mentee)"
+                profiles ||--o{ appointments : "receives (mentor)"
+                
+                appointments ||--o{ feedbacks : "generates post-session"
+                profiles ||--o{ feedbacks : "authors / receives"
+                
+                profiles ||--o{ organization_members : "belongs to"
+                organizations ||--o{ organization_members : "has"
+
+                profiles ||--o{ quiz_responses : "completes"
+                profiles ||--o{ ai_diagnostic_sessions : "starts"
+                
+                ai_diagnostic_sessions ||--o{ diagnostic_shares : "generates"
+                diagnostic_shares }o--|| profiles : "shared with (Mentor)"
+        </div>
+
+        <div class="mt-8 bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Principais Conceitos Estruturais:</h3>
+            <ul class="space-y-3 text-slate-600 text-sm">
+                <li><strong class="text-blue-600">Auth & Profiles:</strong> A tabela `auth.users` é gerenciada estritamente pelo Supabase Auth. A tabela `profiles` na aba pública estende esses dados com as permissões da plataforma (ex: coluna <code>role</code> determinando acessos de mentor, mentee ou admin).</li>
+                <li><strong class="text-emerald-600">Appointments:</strong> O coração das mentorias. Vincula um Mentorado e um Mentor. Ele controla o status de agendamento e hospeda o link dinâmico do <code>google_meet_link</code> gerado via API do Google.</li>
+                <li><strong class="text-purple-600">AI Diagnostics:</strong> Respostas de Quiz e Sessões de Diagnóstico são armazenadas usando o poder do JSONB no PostgreSQL, o que permite flexibilidade absurda para os Prompts da Inteligência Artificial. E o <code>diagnostic_shares</code> cuida do controle de acesso RLS para mentores verem diagnósticos compartilhados.</li>
+                <li><strong class="text-orange-600">Organizações (B2B):</strong> A tabela relacional (N:M) <code>organization_members</code> define se um usuário faz parte do hub privado de uma ONG/Empresa e se tem permissão de gerir membros (admin).</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                fontFamily: 'Inter',
+                lineColor: '#64748b'
+            }
+        });
+    </script>
+</body>
+</html>

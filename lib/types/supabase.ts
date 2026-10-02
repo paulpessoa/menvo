@@ -1695,6 +1695,7 @@ export type Database = {
           last_name: string | null
           linkedin_url: string | null
           mentorship_topics: string[] | null
+          onboarding_flags: Json | null
           phone: string | null
           portfolio_url: string | null
           search_vector: unknown
@@ -1725,6 +1726,7 @@ export type Database = {
           last_name?: string | null
           linkedin_url?: string | null
           mentorship_topics?: string[] | null
+          onboarding_flags?: Json | null
           phone?: string | null
           portfolio_url?: string | null
           search_vector?: unknown
@@ -1755,6 +1757,7 @@ export type Database = {
           last_name?: string | null
           linkedin_url?: string | null
           mentorship_topics?: string[] | null
+          onboarding_flags?: Json | null
           phone?: string | null
           portfolio_url?: string | null
           search_vector?: unknown

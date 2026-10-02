@@ -49,6 +49,7 @@ import { useTranslations } from "next-intl"
 import { MentorshipReviews } from "@/components/mentors/MentorshipReviews"
 import { useFavorites } from "@/hooks/useFavorites"
 import { useAuth } from "@/lib/auth"
+import { useOnboarding } from "@/hooks/useOnboarding"
 
 export interface MentorProfile {
   id: string
@@ -297,7 +298,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
             )}
 
             {/* Specialties & Inclusion */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div id="tour-mentor-topics" className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {mentor.mentorship_topics && mentor.mentorship_topics.length > 0 && (
                     <div className="flex flex-col gap-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3 px-2">
@@ -363,7 +364,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
           {/* Right Column: Actions & Availability */}
           <div className="space-y-8">
             {/* Booking Card */}
-            <Card className="border-none shadow-xl shadow-primary/10 rounded-[2rem] overflow-hidden bg-white relative">
+            <Card id="tour-mentor-availability" className="border-none shadow-xl shadow-primary/10 rounded-[2rem] overflow-hidden bg-white relative">
               <CardHeader className="pb-3 pt-7 px-7">
                 <CardTitle className="text-xl font-black tracking-tight">
                   {t("scheduleSession")}
@@ -417,6 +418,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   // Mobile uses the sticky action bar below instead.
                   <div className="hidden md:flex gap-2">
                     <Button
+                      id="tour-schedule-button"
                       className="flex-1 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
                       disabled={isFullyBooked}
                       onClick={() => {
@@ -551,6 +553,20 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
         title={t("loginRequired.title")}
         description={t("loginRequired.description")}
       />
+      <MentorProfileTour />
     </div>
   )
+}
+
+function MentorProfileTour() {
+  const steps = [
+    { popover: { title: "Perfil do Mentor", description: "Aqui você encontra todas as informações sobre o mentor para decidir se ele é a pessoa certa para te ajudar." } },
+    { element: "#tour-mentor-topics", popover: { title: "Especialidades", description: "Verifique as áreas de especialidade, tópicos de mentoria e tags de inclusão." } },
+    { element: "#tour-mentor-availability", popover: { title: "Formato da Mentoria", description: "Aqui estão os detalhes como duração, formato e as regras de agendamento." } },
+    { element: "#tour-schedule-button", popover: { title: "Agende sua sessão", description: "Quando estiver pronto, clique aqui para escolher um horário na agenda do mentor." } }
+  ]
+
+  useOnboarding("ob_m3", steps)
+
+  return null
 }

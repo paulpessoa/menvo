@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menvo - Experiência e Regras de Negócio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .mermaid { display: flex; justify-content: center; background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top: 2rem; overflow-x: auto; }
+        .gradient-text { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #ec4899, #8b5cf6); }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-10 border-b pb-8">
+            <h1 class="text-4xl font-extrabold text-slate-800 mb-2">Filosofia, Jornada e <span class="gradient-text">Regras de Negócio</span></h1>
+            <p class="text-slate-600 text-lg">Mapeamento dos caminhos felizes, bloqueios (travas) e a experiência emocional da plataforma.</p>
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-indigo-50 border-l-4 border-indigo-600 p-5 rounded-r-lg">
+                    <h3 class="text-indigo-900 font-bold mb-2">A Filosofia (O Propósito)</h3>
+                    <p class="text-indigo-800 text-sm leading-relaxed">
+                        A Menvo existe para <strong>encurtar distâncias</strong>. Queremos que a pessoa que busca evolução sinta <em>"nossa, foi muito fácil achar alguém disposto a me ajudar"</em>, e que o mentor sinta <em>"compartilhar conhecimento nunca foi tão livre de atritos burocráticos"</em>.
+                    </p>
+                </div>
+                <div class="bg-rose-50 border-l-4 border-rose-600 p-5 rounded-r-lg">
+                    <h3 class="text-rose-900 font-bold mb-2">O Sentimento Alvo</h3>
+                    <p class="text-rose-800 text-sm leading-relaxed">
+                        <strong>Segurança e Empatia.</strong> O usuário deve sentir que a plataforma cuida dos detalhes chatos (agenda, links, lembretes) para que ele foque apenas na <em>conexão humana</em>. Se algo der errado (um cancelamento), a plataforma abraça o usuário e o redireciona sem frustração.
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Diagrama Mermaid -->
+        <div class="mermaid">
+            stateDiagram-v2
+                %% Definição de Estilos
+                classDef happy fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d,font-weight:bold
+                classDef rule fill:#fef9c3,stroke:#eab308,stroke-width:2px,color:#713f12,font-style:italic
+                classDef block fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#7f1d1d,stroke-dasharray: 5 5
+                
+                %% Caminho de Onboarding e Verificação
+                state "Cadastro / Escolha de Perfil" as Onboarding
+                state "Perfil Bloqueado / Invisível" as Unverified
+                state "Regra: Verificação Manual" as RuleVerify
+                state "Perfil Público Ativo" as ActiveMentor
+
+                Onboarding --> RuleVerify : Mentor
+                RuleVerify --> Unverified : Aguardando Admin
+                Unverified --> ActiveMentor : Admin Aprova
+                Unverified --> Unverified : Admin Rejeita (Trava)
+                
+                Onboarding --> MenteeDash : Mentorado
+
+                class Unverified block
+                class RuleVerify rule
+                class ActiveMentor happy
+
+                %% Jornada de Agendamento
+                state MenteeDash {
+                    state "Diagnóstico (IA)" as Diag
+                    state "Explorar Mentores" as Explore
+                }
+                
+                state "Regra: Conflito de Agenda" as RuleAgenda
+                state "Solicitar Sessão" as Request
+                state "Horário Bloqueado (Invisível)" as TimeBlocked
+
+                ActiveMentor --> RuleAgenda : Expõe Horários Livres
+                Explore --> RuleAgenda : Mentorado tenta agendar
+                
+                RuleAgenda --> TimeBlocked : Google Agenda do Mentor = Ocupado
+                RuleAgenda --> Request : Horário Livre (Caminho Feliz)
+
+                class RuleAgenda rule
+                class TimeBlocked block
+
+                %% Aprovação e Sessão
+                state "Aguardando Resposta do Mentor" as Pending
+                state "Sessão Agendada (Link Meet Gerado)" as Scheduled
+                state "Sessão Recusada / Expirada" as Rejected
+
+                Request --> Pending
+                Pending --> Scheduled : Mentor Aceita
+                Pending --> Rejected : Mentor Recusa / 72h sem resposta (Trava)
+                
+                Rejected --> Explore : Sugere buscar outro mentor
+
+                class Scheduled happy
+                class Rejected block
+
+                %% Pós Sessão
+                state "Regra: Envio de Feedback" as RuleFeedback
+                state "Feedback Concluído" as FeedbackDone
+                state "Alerta de Conta Pendente" as Warning
+
+                Scheduled --> RuleFeedback : Após horário da sessão
+                RuleFeedback --> FeedbackDone : Avaliação 1 a 5 enviada
+                RuleFeedback --> Warning : Mentorado ignora o feedback
+                Warning --> Explore : Limita novos agendamentos (Trava)
+                FeedbackDone --> Explore : Ciclo Recomeça (Retenção)
+
+                class RuleFeedback rule
+                class FeedbackDone happy
+                class Warning block
+        </div>
+
+        <div class="mt-12 space-y-8">
+            <section>
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="text-green-500">✅</span> Caminhos Felizes (Happy Paths)
+                </h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100">
+                    <p class="text-slate-600 mb-4">A jornada ideal onde não há atritos e a magia acontece:</p>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-sm">1</div>
+                            <p class="text-sm text-slate-700"><strong>Mentor Validado Rápido:</strong> O mentor se cadastra, o Admin confere o LinkedIn, aprova. O Mentor conecta o Google Calendar com 1 clique.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-sm">2</div>
+                            <p class="text-sm text-slate-700"><strong>Match Perfeito:</strong> O Mentorado entra, responde ao Diagnóstico com IA, recebe sugestões, acha um mentor que bate com seu momento de carreira e vê horários perfeitamente livres.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold text-sm">3</div>
+                            <p class="text-sm text-slate-700"><strong>Zero Trabalho Braçal:</strong> Mentor aceita o convite no celular. Instantaneamente, um evento no Google Meet é gerado e cai no calendário de ambos. No dia, fazem a videochamada, dão 5 estrelas um para o outro e o ciclo se retroalimenta.</p>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="text-red-500">🚧</span> Travas e Caminhos Tristes (Unhappy Paths)
+                </h2>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-red-100">
+                    <p class="text-slate-600 mb-4">Regras de negócio criadas para proteger a plataforma e a qualidade da comunidade:</p>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">!</div>
+                            <div>
+                                <strong class="text-sm text-slate-800">Trava de Segurança (Admin Verification):</strong>
+                                <p class="text-sm text-slate-600 mt-1">Se um perfil de mentor parecer suspeito ou falso, o Admin não aprova. O perfil <strong>nunca</strong> aparece na vitrine pública. <em>Filosofia: Confiança acima de volume.</em></p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">!</div>
+                            <div>
+                                <strong class="text-sm text-slate-800">Conflito Silencioso (Google Calendar Free/Busy):</strong>
+                                <p class="text-sm text-slate-600 mt-1">Se o mentor tiver uma reunião do trabalho marcada no Google Calendar pessoal no horário que disponibilizou na Menvo, a plataforma <strong>esconde</strong> aquele horário (Trava preventiva). <em>Filosofia: Zero double-booking, poupa o mentor de ter que cancelar.</em></p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">!</div>
+                            <div>
+                                <strong class="text-sm text-slate-800">A Ghost-Trava (Rejeição ou Expiração):</strong>
+                                <p class="text-sm text-slate-600 mt-1">Se o mentor não responder a solicitação em 72h, ela expira automaticamente. O mentorado não fica num limbo. A plataforma o incentiva a buscar outro mentor com algoritmos de sugestão. <em>Filosofia: Respeito ao tempo de quem quer aprender.</em></p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">!</div>
+                            <div>
+                                <strong class="text-sm text-slate-800">Trava de Egoísmo (Falta de Feedback):</strong>
+                                <p class="text-sm text-slate-600 mt-1">Se a mentoria aconteceu, o Mentorado TEM que dar feedback (estrelas e review). Se ele tentar agendar outra sessão sem avaliar a anterior, a plataforma emite um alerta e pode travar a ação. <em>Filosofia: Gratidão é a moeda de troca da mentoria voluntária. O mentor merece saber que ajudou.</em></p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                fontFamily: 'Inter',
+                lineColor: '#94a3b8'
+            }
+        });
+    </script>
+</body>
+</html>

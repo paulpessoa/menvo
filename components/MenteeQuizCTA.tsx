@@ -31,7 +31,7 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
   // State A: Mentee has already completed the assessment
   if (quizResponse) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent p-6 shadow-sm transition-all hover:shadow-md">
+      <div id="tour-quiz-cta" className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent p-6 shadow-sm transition-all hover:shadow-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -75,7 +75,7 @@ export function MenteeQuizCTA({ quizResponse, loading }: MenteeQuizCTAProps) {
 
   // State B: New mentee has not taken the quiz yet (Primary Activation)
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 p-6 md:p-8 text-white shadow-lg transition-all hover:shadow-xl">
+    <div id="tour-quiz-cta" className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 p-6 md:p-8 text-white shadow-lg transition-all hover:shadow-xl">
       <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-0 right-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl pointer-events-none" />
 
