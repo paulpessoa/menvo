@@ -14,36 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _backup_profiles_verification_20260925: {
-        Row: {
-          backed_up_at: string | null
-          id: string | null
-          is_pending_mentor: boolean | null
-          is_public: boolean | null
-          verification_status: string | null
-          verified: boolean | null
-          verified_at: string | null
-        }
-        Insert: {
-          backed_up_at?: string | null
-          id?: string | null
-          is_pending_mentor?: boolean | null
-          is_public?: boolean | null
-          verification_status?: string | null
-          verified?: boolean | null
-          verified_at?: string | null
-        }
-        Update: {
-          backed_up_at?: string | null
-          id?: string | null
-          is_pending_mentor?: boolean | null
-          is_public?: boolean | null
-          verification_status?: string | null
-          verified?: boolean | null
-          verified_at?: string | null
-        }
-        Relationships: []
-      }
       account_retention: {
         Row: {
           campaign: string
