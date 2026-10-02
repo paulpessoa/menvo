@@ -654,6 +654,48 @@ export async function sendReengagementInvite(data: ReengagementInviteData & {
   return await sendEmail(data.email, data.subject, buildReengagementInviteHtml(data));
 }
 
+/**
+ * Lembrete de fim de semana para mentores atualizarem a agenda. Sem horário
+ * livre cadastrado o mentee não consegue pedir sessão, então este é o e-mail
+ * que mais move agendamentos. Menciona a sincronização com o Google Agenda
+ * (opcional, só lê ocupado/livre) porque ela tira o trabalho de conferir
+ * compromissos pessoais na mão.
+ */
+export function buildMentorAgendaReminderHtml(data: { name: string }): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+  const agendaUrl = `${baseUrl}/dashboard/mentor/availability`;
+
+  const content = `
+    <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1100&q=80"
+      alt="Agenda aberta sobre uma mesa, com café e caneta"
+      width="480" style="display: block; width: 100%; max-width: 480px; height: auto; border-radius: 10px; margin: 0 auto 24px auto;" />
+    <h2>O fim de semana tá chegando, ${firstName}!</h2>
+    <p>Será que rola um tempinho livre? Que tal já preparar a próxima semana?</p>
+    <p>Quem quer uma mentoria só consegue pedir sessão nos horários que você deixa abertos. Se a sua agenda estiver vazia ou desatualizada, a pessoa nem chega a te encontrar. Leva 2 minutos: adicione ou ajuste seus horários para os próximos dias.</p>
+    <div class="button-container">
+        <a href="${agendaUrl}" class="button">Atualizar minha agenda</a>
+    </div>
+    <div class="info-box">
+        <p style="margin-bottom: 0;"><strong>Novidade:</strong> agora você pode conectar o seu Google Agenda. A Menvo só verifica se você está ocupado ou livre em cada horário, sem ver título, convidados ou detalhes dos seus eventos, e esconde automaticamente os horários que batem com seus compromissos pessoais. Fica em "Sincronização Pessoal", na mesma página da agenda.</p>
+    </div>
+    <p>Obrigado por dedicar seu tempo a quem está começando. Tenha um ótimo fim de semana!</p>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal" });
+}
+
+export async function sendMentorAgendaReminder(data: {
+  email: string;
+  name: string;
+}): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(
+    data.email,
+    "Já preparou a sua agenda para a próxima semana?",
+    buildMentorAgendaReminderHtml({ name: data.name })
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Retenção automática de contas importadas (JotForm) nunca ativadas
 // ---------------------------------------------------------------------------
