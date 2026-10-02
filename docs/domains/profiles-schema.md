@@ -1,6 +1,6 @@
 # Plano: enxugar e normalizar a tabela `profiles`
 
-> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 34 colunas e os dados de mentor e a verificação estão em `mentor_profiles`. Fase 3 (`mentee_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 28 colunas e os dados acadêmicos e o currículo estão em `mentee_profiles`.
+> **Status:** plano concluído em 2026-10-02 (Fases 0 a 3 aplicadas, `profiles` com 28 colunas). Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 34 colunas e os dados de mentor e a verificação estão em `mentor_profiles`. Fase 3 (`mentee_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 28 colunas e os dados acadêmicos e o currículo estão em `mentee_profiles`.
 > **Para quem retoma:** leia a seção "Diagnóstico" e vá direto para a fase em aberto. Cada fase é uma PR própria.
 
 ## Objetivo
