@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { CV_BUCKET, cvStoragePath, signCvUrl } from "@/lib/services/mentees/cv-storage"
+import { CV_BUCKET, cvStoragePath, cvLink } from "@/lib/services/mentees/cv-storage"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -139,11 +139,11 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    const signedUrl = await signCvUrl(user.id, filePath)
+    const cvUrl = cvLink(user.id, filePath)
 
     return NextResponse.json({
       message: "CV enviado com sucesso",
-      url: signedUrl,
+      url: cvUrl,
       path: uploadData.path,
       fileName: file.name,
       fileSize: file.size,

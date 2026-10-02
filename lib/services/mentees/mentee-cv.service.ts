@@ -1,8 +1,8 @@
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { signCvUrls } from "./cv-storage"
+import { cvLink } from "./cv-storage"
 
 /**
- * Lê as URLs (assinadas) de currículo em lote (uma query, sem N+1) para telas de admin.
+ * Monta os links de currículo em lote (uma query, sem N+1) para telas de admin.
  *
  * `mentee_profiles.cv_url` não tem grant de leitura para `authenticated`
  * (o currículo só pode ser visto pelo próprio, admin ou quem divide mentoria),
@@ -20,6 +20,11 @@ export async function fetchCvUrls(userIds: string[]): Promise<Map<string, string
 
   if (error) throw new Error(error.message)
 
-  // O bucket é privado: devolve URLs assinadas, não o valor guardado.
-  return signCvUrls((data ?? []).map((row) => ({ userId: row.user_id, stored: row.cv_url })))
+  // Devolve o link do Menvo (/api/cv/<id>), nunca o caminho no bucket.
+  const links = new Map<string, string>()
+  for (const row of data ?? []) {
+    const link = cvLink(row.user_id, row.cv_url)
+    if (link) links.set(row.user_id, link)
+  }
+  return links
 }

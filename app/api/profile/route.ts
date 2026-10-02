@@ -13,7 +13,7 @@ import {
   splitMenteeFields,
   withMenteeFields,
 } from "@/lib/services/mentees/mentee-profile-fields"
-import { signCvUrl } from "@/lib/services/mentees/cv-storage"
+import { cvLink } from "@/lib/services/mentees/cv-storage"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -29,7 +29,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
  */
 async function toProfileResponse<T extends { id: string }>(row: T) {
   const profile = withMenteeFields(withMentorFields(row as T & { mentor_profiles?: unknown }))
-  return { ...profile, cv_url: await signCvUrl(row.id, profile.cv_url) }
+  return { ...profile, cv_url: cvLink(row.id, profile.cv_url) }
 }
 
 const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
