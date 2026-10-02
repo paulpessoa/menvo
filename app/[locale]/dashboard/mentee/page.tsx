@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink, Shield } from "lucide-react"
+import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink, Shield, Star } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
@@ -203,15 +203,15 @@ function MenteeDashboardTabs({
 
   return (
     <Tabs defaultValue={defaultTab} className="space-y-6">
-      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
-        <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-6 sm:gap-8 overflow-x-auto hide-scrollbar flex-nowrap">
+        <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap">
           <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
         </TabsTrigger>
-        <TabsTrigger value="favorites" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+        <TabsTrigger value="favorites" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap">
           <Heart className="w-4 h-4" /> {t("mentee.sections.favorites")}
         </TabsTrigger>
-        <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
-          <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
+        <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap">
+          <Star className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
         </TabsTrigger>
       </TabsList>
 
@@ -267,43 +267,55 @@ function MenteeDashboardTabs({
 
       {/* TAB: FAVORITES */}
       <TabsContent value="favorites" className="animate-in fade-in duration-500">
-        {loadingFavorites ? (
-          <div className="flex justify-center py-12"><MenvoDots /></div>
-        ) : favoriteMentorsData.length === 0 ? (
-          <Card className="rounded-2xl border-border/60 shadow-none">
-            <CardContent className="py-12 flex flex-col items-center text-center gap-4">
-              <Heart className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">{t("mentee.sections.noFavorites")}</p>
-              <Button asChild size="sm" className="rounded-xl">
-                <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
-              <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
-                <Card className="rounded-2xl border-border/60 shadow-none hover:border-primary/30 transition-colors">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <Avatar className="h-12 w-12 border">
-                      <AvatarImage src={m.avatar_url || undefined} />
-                      <AvatarFallback>{m.full_name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold truncate">{m.full_name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold">{t("mentee.sections.favorites")}</h2>
+            <p className="text-muted-foreground text-sm">Mentores que você salvou para contatar no futuro.</p>
           </div>
-        )}
+          {loadingFavorites ? (
+            <div className="flex justify-center py-12"><MenvoDots /></div>
+          ) : favoriteMentorsData.length === 0 ? (
+            <Card className="rounded-2xl border-border/60 shadow-none">
+              <CardContent className="py-12 flex flex-col items-center text-center gap-4">
+                <Heart className="h-8 w-8 text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">{t("mentee.sections.noFavorites")}</p>
+                <Button asChild size="sm" className="rounded-xl">
+                  <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
+                <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
+                  <Card className="rounded-2xl border-border/60 shadow-none hover:border-primary/30 transition-colors">
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <Avatar className="h-12 w-12 border">
+                        <AvatarImage src={m.avatar_url || undefined} />
+                        <AvatarFallback>{m.full_name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{m.full_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </TabsContent>
 
       {/* TAB: FEEDBACKS */}
       <TabsContent value="feedbacks" className="animate-in fade-in duration-500">
-        <FeedbackManagement type="sent" />
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacks")}</h2>
+            <p className="text-muted-foreground text-sm">Avaliações que você deixou para seus mentores após as sessões.</p>
+          </div>
+          <FeedbackManagement type="sent" />
+        </div>
       </TabsContent>
     </Tabs>
   )

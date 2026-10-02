@@ -20,7 +20,8 @@ import {
   Star,
   LayoutDashboard,
   Sparkles,
-  Shield
+  Shield,
+  CheckCircle
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -137,16 +138,16 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
 
   return (
     <Tabs defaultValue={defaultTab} className="space-y-6">
-      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
+      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-6 sm:gap-8 overflow-x-auto hide-scrollbar flex-nowrap">
               <TabsTrigger
                 value="overview"
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap"
               >
                 <LayoutDashboard className="w-4 h-4" /> Visão Geral
               </TabsTrigger>
               <TabsTrigger
                 value="feedbacks"
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap"
               >
                 <Star className="w-4 h-4" /> Avaliações
                 {stats.totalReviews > 0 && (
@@ -157,7 +158,7 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
               </TabsTrigger>
               <TabsTrigger
                 value="diagnostics"
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap"
               >
                 <Sparkles className="w-4 h-4 text-primary" /> Diagnósticos Compartilhados
               </TabsTrigger>
@@ -196,16 +197,19 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
               {/* Barra de Métricas Compacta */}
               <div className="flex flex-wrap items-center gap-4 text-sm bg-muted/30 rounded-2xl p-4 border border-border/50">
                 <div className="flex items-center gap-2 font-medium">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Próximas:</span>
                   <span className="text-foreground">{stats.upcomingAppointments}</span>
                 </div>
                 <div className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-2 font-medium">
+                  <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Alunos:</span>
                   <span className="text-foreground">{stats.totalMentees}</span>
                 </div>
                 <div className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-2 font-medium">
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
                   <span className="text-muted-foreground">Concluídas:</span>
                   <span className="text-foreground">{stats.completedSessions}</span>
                 </div>
