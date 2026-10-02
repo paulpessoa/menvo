@@ -107,19 +107,35 @@ export function FeedbackBanner() {
     setIsOpen(open)
   }
 
-  const closeDefinitely = () => {
+  const closeDefinitely = (e: React.MouseEvent) => {
+    e.stopPropagation()
     localStorage.setItem("hasSeenFeedbackVideoPrompt", "true")
+    // Hide for 30 days
+    const until = Date.now() + 30 * 24 * 60 * 60 * 1000
+    localStorage.setItem("hideFeedbackBannerUntil", until.toString())
     setShowVideoPrompt(false)
     setIsPlaying(false)
     setIsOpen(false)
+    setMounted(false) // immediately hide
   }
 
   if (!mounted || !feedbackEnabled) return null
 
+  const hiddenUntilStr = typeof window !== "undefined" ? localStorage.getItem("hideFeedbackBannerUntil") : null
+  const hiddenUntil = hiddenUntilStr ? parseInt(hiddenUntilStr, 10) : 0
+  if (hiddenUntil > Date.now()) return null
+
   return (
     <>
       {/* Botão Flutuante */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-105 transition-transform group">
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-105 transition-transform group">
+        <button 
+          onClick={closeDefinitely}
+          className="bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground rounded-full p-1.5 shadow-sm border text-xs"
+          aria-label="Não exibir por 30 dias"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
         <div className="relative flex items-center justify-center rounded-full p-[2px] overflow-hidden shadow-2xl bg-primary">
           {/* Borda giratória */}
           <div className="absolute inset-0 z-0 flex items-center justify-center">
@@ -133,12 +149,12 @@ export function FeedbackBanner() {
           {/* Botão interno */}
           <Button
             onClick={() => setIsOpen(true)}
-            className="relative z-10 flex items-center gap-2 rounded-full bg-primary hover:bg-primary/95 px-5 h-12 border-none transition-colors"
+            className="relative z-10 flex items-center gap-2 rounded-full bg-primary hover:bg-primary/95 px-3 md:px-5 h-12 border-none transition-colors"
             size="default"
             aria-label="Reclame aqui"
           >
             <MessageSquarePlus className="h-5 w-5" />
-            <span className="font-bold text-sm tracking-wider">Reclame Aqui</span>
+            <span className="font-bold text-sm tracking-wider hidden md:inline">Reclame Aqui</span>
           </Button>
         </div>
       </div>
