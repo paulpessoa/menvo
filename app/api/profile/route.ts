@@ -13,12 +13,23 @@ import {
   splitMenteeFields,
   withMenteeFields,
 } from "@/lib/services/mentees/mentee-profile-fields"
+import { signCvUrl } from "@/lib/services/mentees/cv-storage"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error("Missing Supabase environment variables")
+}
+
+/**
+ * Perfil achatado para a resposta, com a URL assinada do currículo (bucket
+ * privado). O valor guardado é só o caminho do arquivo; quem pede aqui é o
+ * próprio dono.
+ */
+async function toProfileResponse<T extends { id: string }>(row: T) {
+  const profile = withMenteeFields(withMentorFields(row as T & { mentor_profiles?: unknown }))
+  return { ...profile, cv_url: await signCvUrl(row.id, profile.cv_url) }
 }
 
 const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
@@ -125,7 +136,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
-      profile: updatedRow ? withMenteeFields(withMentorFields(updatedRow)) : null,
+      profile: updatedRow ? await toProfileResponse(updatedRow) : null,
     })
 
   } catch (error) {
@@ -183,7 +194,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-          profile: newProfile ? withMenteeFields(withMentorFields(newProfile)) : null,
+          profile: newProfile ? await toProfileResponse(newProfile) : null,
         })
       } else {
         return NextResponse.json({ 
@@ -194,7 +205,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      profile: withMenteeFields(withMentorFields(profile)),
+      profile: await toProfileResponse(profile),
     })
 
   } catch (error) {

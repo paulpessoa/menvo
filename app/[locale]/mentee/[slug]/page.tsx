@@ -3,6 +3,7 @@ import { createClient } from '@/lib/utils/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import MenteeProfileClient from './MenteeProfileClient'
 import { MENTEE_PROFILE_EMBED, withMenteeFields } from '@/lib/services/mentees/mentee-profile-fields'
+import { signCvUrl } from '@/lib/services/mentees/cv-storage'
 
 interface PageProps {
     params: Promise<{
@@ -64,10 +65,11 @@ async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | nul
     }
 
     // cv_url não é legível por coluna: só o próprio, admin ou mentor com
-    // mentoria em comum recebem o currículo (função profile_cv_url).
+    // mentoria em comum recebem o currículo (função profile_cv_url). Só
+    // depois dessa autorização o servidor assina a URL do bucket privado.
     const { data: cvUrl } = await supabase.rpc('profile_cv_url', { p_user_id: data.id })
 
-    return { ...withMenteeFields(data), cv_url: cvUrl ?? null } as unknown as MenteeProfile
+    return { ...withMenteeFields(data), cv_url: await signCvUrl(data.id, cvUrl) } as unknown as MenteeProfile
 }
 
 // ISR: Revalidar a cada 1 hora (mesmo padrão de app/[locale]/mentors/[slug])

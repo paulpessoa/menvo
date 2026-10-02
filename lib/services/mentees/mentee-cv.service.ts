@@ -1,7 +1,8 @@
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { signCvUrls } from "./cv-storage"
 
 /**
- * Lê as URLs de currículo em lote (uma query, sem N+1) para telas de admin.
+ * Lê as URLs (assinadas) de currículo em lote (uma query, sem N+1) para telas de admin.
  *
  * `mentee_profiles.cv_url` não tem grant de leitura para `authenticated`
  * (o currículo só pode ser visto pelo próprio, admin ou quem divide mentoria),
@@ -9,8 +10,7 @@ import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
  * usa service role: o chamador PRECISA estar protegido por `requireAdmin()`.
  */
 export async function fetchCvUrls(userIds: string[]): Promise<Map<string, string>> {
-  const cvs = new Map<string, string>()
-  if (userIds.length === 0) return cvs
+  if (userIds.length === 0) return new Map()
 
   const { data, error } = await createServiceRoleClient()
     .from("mentee_profiles")
@@ -20,8 +20,6 @@ export async function fetchCvUrls(userIds: string[]): Promise<Map<string, string
 
   if (error) throw new Error(error.message)
 
-  for (const row of data ?? []) {
-    if (row.cv_url) cvs.set(row.user_id, row.cv_url)
-  }
-  return cvs
+  // O bucket é privado: devolve URLs assinadas, não o valor guardado.
+  return signCvUrls((data ?? []).map((row) => ({ userId: row.user_id, stored: row.cv_url })))
 }

@@ -114,7 +114,7 @@ Mesmo padrão da Fase 2 para os campos acadêmicos e `cv_url` (bucket de storage
   - Mudança de comportamento: o mural da comunidade deixou de mostrar o currículo (mentor só vê o de quem tem mentoria com ele). O filtro por instituição e a busca por `learning_goals` rodam em `mentee_profiles` e voltam como `id.in.(...)` no `or()` de `profiles`.
 - **Ordem seguida:** expand → deploy (PR #88) → RESYNC (desnecessário: 0 perfis sem linha ou divergentes) → CSV das 6 colunas (718 linhas) → contract.
 - **Achado no contract:** `community_ready` é coluna gerada e citava `learning_goals`, o que bloqueia o drop (dependência em `pg_attrdef`, que a guarda `pg_depend` ignora). Foi recriada sem o critério de `learning_goals` (nenhum perfil dependia: 12 prontos antes e depois). Em próximas fases, conferir também colunas geradas.
-- **Aberto:** o bucket `cvs` é público: quem tiver a URL baixa o PDF mesmo sem acesso à coluna. Fechar exige bucket privado com URL assinada (PR própria).
+- **Bucket `cvs`:** era público e listável por anon. Tornado privado depois da Fase 3 (migration `20261006000000_private_cv_bucket.sql`): `cv_url` guarda o caminho do arquivo e o servidor entrega URL assinada de 1h só a quem pode ver (`lib/services/mentees/cv-storage.ts`).
 
 ## Riscos
 - Colunas de mentor aparecem em 40 a 50 arquivos: por isso a leitura via view vem antes de apagar qualquer coluna.
