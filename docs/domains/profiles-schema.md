@@ -1,6 +1,6 @@
 # Plano: enxugar e normalizar a tabela `profiles`
 
-> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 34 colunas e os dados de mentor e a verificação estão em `mentor_profiles`. Fase 3 (`mentee_profiles`) em andamento: expand aplicado e código trocado; falta deploy, RESYNC e contract.
+> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 34 colunas e os dados de mentor e a verificação estão em `mentor_profiles`. Fase 3 (`mentee_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 28 colunas e os dados acadêmicos e o currículo estão em `mentee_profiles`.
 > **Para quem retoma:** leia a seção "Diagnóstico" e vá direto para a fase em aberto. Cada fase é uma PR própria.
 
 ## Objetivo
@@ -104,7 +104,7 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
   - Removidos caminhos mortos que gravavam verificação direto: POST de `/api/admin/mentors` e `toggle_verification_legacy`.
 - **Ordem seguida:** expand → deploy (PR #83) → RESYNC (desnecessário: nenhum mentor ou candidato sem linha) → CSV das 14 colunas (718 linhas) → contract. Types regenerados do banco final batem com os editados no PR.
 
-### Fase 3: `mentee_profiles` (risco médio) — expand aplicado em 2026-10-02 (`20261005000000`); código trocado; contract (`20261005010000`) pendente de aplicar depois do deploy
+### Fase 3: `mentee_profiles` (risco médio) — concluída em 2026-10-02 (migrations `20261005000000` expand e `20261005010000` contract aplicadas; PRs #88 e #89; `profiles` agora tem 28 colunas)
 Mesmo padrão da Fase 2 para os campos acadêmicos e `cv_url` (bucket de storage não muda, só a coluna com a URL).
 - **Diagnóstico (2026-10-02):** 589 de 718 perfis têm algum dos 6 campos (257 com `cv_url`, 1 com `learning_goals`). 13 mentores também preenchem: a busca filtra por `academic_level` e a revisão de candidato lê `cv_url`. Por isso a linha vale para qualquer papel, não só mentorado. Só a `mentors_view` dependia das colunas no banco.
 - **Como foi feito:**
@@ -112,7 +112,8 @@ Mesmo padrão da Fase 2 para os campos acadêmicos e `cv_url` (bucket de storage
   - `mentors_view` lê nível/instituição/curso daqui e deixa de expor `cv_url` e `expected_graduation` (nenhuma tela de mentor usava; o contract remove as colunas da view).
   - Código: `lib/services/mentees/mentee-profile-fields.ts` (`splitMenteeFields`/`withMenteeFields`, embed 1:1, igual ao de mentor). Telas e contrato das APIs não mudam. Telas de admin e a revisão de candidato leem `cv_url` em lote por `mentee-cv.service.ts` (service role, só atrás de `requireAdmin()`).
   - Mudança de comportamento: o mural da comunidade deixou de mostrar o currículo (mentor só vê o de quem tem mentoria com ele). O filtro por instituição e a busca por `learning_goals` rodam em `mentee_profiles` e voltam como `id.in.(...)` no `or()` de `profiles`.
-- **Ordem:** expand (feito) → deploy → RESYNC do rodapé do expand → CSV das 6 colunas → contract (`profiles` vai de 34 para 28 colunas).
+- **Ordem seguida:** expand → deploy (PR #88) → RESYNC (desnecessário: 0 perfis sem linha ou divergentes) → CSV das 6 colunas (718 linhas) → contract.
+- **Achado no contract:** `community_ready` é coluna gerada e citava `learning_goals`, o que bloqueia o drop (dependência em `pg_attrdef`, que a guarda `pg_depend` ignora). Foi recriada sem o critério de `learning_goals` (nenhum perfil dependia: 12 prontos antes e depois). Em próximas fases, conferir também colunas geradas.
 - **Aberto:** o bucket `cvs` é público: quem tiver a URL baixa o PDF mesmo sem acesso à coluna. Fechar exige bucket privado com URL assinada (PR própria).
 
 ## Riscos
