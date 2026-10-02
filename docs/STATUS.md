@@ -107,6 +107,11 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-02 - Escalada de privilégio em `user_roles` fechada
+- **Why:** as policies `users_can_insert_own_role`, `users_can_update_own_role` e `users_manage_own_roles_only` só checavam `auth.uid() = user_id`, não o papel. Qualquer conta logada podia gravar o papel `admin` (ou `mentor`) para si direto no PostgREST com a chave pública. Achado no diagnóstico da Fase 2 de `profiles-schema.md`; sem sinal de uso (1 admin, 13 mentores coerentes).
+- **Migração `20261003030000_user_roles_no_self_assign.sql`:** apaga as três policies; ficam as de leitura e `user_roles_admin_manage`. O código já gravava papéis só pelo servidor (service role) ou pelo trigger `handle_new_user`, então nada muda no site.
+- **Aplicada** pelo Paul no SQL Editor em 2026-10-02 e conferida pelo MCP.
+
 ### 2026-10-01 - Painel admin redesenhado com visão estratégica
 - **Why:** `/dashboard/admin` era uma grade de 11 cards com ícones coloridos e 4 números soltos; cada página de admin tinha um cabeçalho diferente (tamanhos de título, ícones, só 3 com botão de voltar).
 - **Visão geral:** `GET /api/admin/overview` (`lib/services/admin/overview.service.ts`) agrega tudo numa chamada: cadastros por semana (mentorados x mentores), pedidos de sessão por desfecho, fila de verificação, distribuição de notas, gasto de IA acumulado contra o teto, organizações/leads e etapas da retenção LGPD. Agregações puras em `overview.aggregate.ts` com testes. Usa o cliente RLS (`is_admin()`), exceto `appointments` e `inactive_accounts_queue`, lidos com service role como nas rotas admin existentes.
