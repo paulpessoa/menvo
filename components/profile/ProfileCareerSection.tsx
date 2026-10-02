@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useSimplePDFUpload } from "@/hooks/useSimpleUpload"
-import { ChipInput } from "./ChipInput"
+import { MultiSelectAutocomplete } from "./MultiSelectAutocomplete"
 import { Field } from "./ProfileAboutSection"
 import type { ProfileFormData, ProfileFormPatch } from "./profile-form"
 
@@ -38,16 +38,34 @@ export function ProfileCareerSection({ form, onChange, isMentor }: ProfileCareer
     }
   }
 
+  const COMMON_EXPERTISE = [
+    "Liderança", "Gestão de Projetos", "UX Design", "UI Design", 
+    "Product Management", "Engenharia de Software", "Marketing Digital",
+    "Vendas", "Customer Success", "Análise de Dados", "Inteligência Artificial",
+    "Agile", "Scrum", "Negociação", "Empreendedorismo", "Carreira em Tech",
+    "Transição de Carreira", "Primeiro Emprego"
+  ]
+
   const expertise = (
     <div className="space-y-2" key="expertise">
       <Label>{isMentor ? "Especialidades (onde você pode ajudar)" : "O que você já domina"}</Label>
-      <ChipInput value={form.expertise_areas} onChange={(v) => onChange({ expertise_areas: v })} placeholder="Ex: UX Design, React, Vendas... (Enter para adicionar)" />
+      <MultiSelectAutocomplete 
+        value={form.expertise_areas} 
+        onChange={(v) => onChange({ expertise_areas: v })} 
+        placeholder="Ex: UX Design, React, Vendas..." 
+        options={COMMON_EXPERTISE}
+      />
     </div>
   )
   const topics = (
     <div className="space-y-2" key="topics">
       <Label>{isMentor ? "Temas de mentoria" : "O que você quer aprender"}</Label>
-      <ChipInput value={form.mentorship_topics} onChange={(v) => onChange({ mentorship_topics: v })} placeholder="Ex: Primeiro emprego, Liderança... (Enter para adicionar)" />
+      <MultiSelectAutocomplete 
+        value={form.mentorship_topics} 
+        onChange={(v) => onChange({ mentorship_topics: v })} 
+        placeholder="Ex: Primeiro emprego, Liderança..." 
+        options={COMMON_EXPERTISE}
+      />
     </div>
   )
 
