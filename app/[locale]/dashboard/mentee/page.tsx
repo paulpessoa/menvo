@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MenteeQuizCTA } from "@/components/MenteeQuizCTA"
 import { MenteeNextStepCard } from "@/components/dashboard/MenteeNextStepCard"
+import { MenteeActivationChecklist } from "@/components/dashboard/MenteeActivationChecklist"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
@@ -183,6 +184,7 @@ export default function MenteeDashboard() {
               hasPendingReview={hasPendingReview} 
               diagnosticHref={diagnosticHref} 
               locale={locale} 
+              profile={profile}
             />
             <MenteeDashboardTour />
           </Suspense>
@@ -193,7 +195,7 @@ export default function MenteeDashboard() {
 }
 
 function MenteeDashboardTabs({ 
-  stats, upcomingAppointments, favoriteMentorsData, loading, loadingFavorites, loadingQuiz, quizSummary, hasPendingReview, diagnosticHref, locale 
+  stats, upcomingAppointments, favoriteMentorsData, loading, loadingFavorites, loadingQuiz, quizSummary, hasPendingReview, diagnosticHref, locale, profile
 }: any) {
   const t = useTranslations("dashboard")
   const searchParams = useSearchParams()
@@ -225,6 +227,8 @@ function MenteeDashboardTabs({
         )}
 
         {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
+
+        <MenteeActivationChecklist profile={profile} stats={stats} />
 
         {/* Barra de Métricas Compacta */}
         <div className="flex flex-wrap items-center gap-4 text-sm bg-muted/30 rounded-2xl p-4 border border-border/50">

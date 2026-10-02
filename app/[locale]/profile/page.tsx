@@ -77,6 +77,13 @@ function ProfilePageContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!form.first_name?.trim() || !form.last_name?.trim() || !form.slug?.trim()) {
+      toast.error("Por favor, preencha o Nome, Sobrenome e a URL do perfil (slug) antes de salvar.")
+      setActiveTab("basic")
+      return
+    }
+
     const result = await updateProfile(form)
     if (result.success) {
       toast.success("Perfil salvo com sucesso!")
@@ -168,6 +175,10 @@ function ProfileTour() {
       onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
       popover: { title: "Perfil Básico", description: "Sua foto, nome e resumo (bio) são o seu cartão de visitas. Perfis bem preenchidos têm muito mais chances de receber pedidos e aceites na comunidade!" } 
     },
+    {
+      element: "#tour-profile-public",
+      popover: { title: "Perfil Público", description: "Ative para ser visível na rede! Mentores precisam disso para aparecerem no catálogo. Mentorados precisam para que os mentores possam ler o perfil antes de aceitar." }
+    },
     { 
       element: "#tour-tab-career", 
       onHighlightStarted: () => { document.getElementById("tour-tab-career")?.click() },
@@ -181,7 +192,7 @@ function ProfileTour() {
     { 
       element: "#tour-tab-basic", 
       onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
-      popover: { title: "Tudo pronto?", description: "Volte para a primeira aba e comece a preencher seus dados." } 
+      popover: { title: "Tudo pronto?", description: "Volte para a primeira aba e comece a preencher seus dados. (Dica: A localização pode ser preenchida automaticamente usando o botão 'Detectar'!)" } 
     },
     { 
       element: "#tour-profile-save", 

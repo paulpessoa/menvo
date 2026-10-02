@@ -1,71 +1,46 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2, Circle, Trophy } from "lucide-react"
 import { Link } from "@/i18n/routing"
 
 interface ChecklistProfile {
-  is_public?: boolean | null
-  expertise_areas?: string[] | null
-  mentorship_topics?: string[] | null
+  first_name?: string | null
+  last_name?: string | null
+  slug?: string | null
+  bio?: string | null
+  job_title?: string | null
 }
 
-interface MentorStats {
+interface MenteeStats {
   completedSessions: number
-  totalReviews: number
 }
 
-interface MentorActivationChecklistProps {
+interface MenteeActivationChecklistProps {
   profile: ChecklistProfile | null
-  stats: MentorStats
+  stats: MenteeStats
 }
 
-export function MentorActivationChecklist({ profile, stats }: MentorActivationChecklistProps) {
-  const [availabilityConfigured, setAvailabilityConfigured] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetch("/api/mentors/availability")
-      .then((r) => (r.ok ? r.json() : { data: [] }))
-      .then((res) => {
-        if (!cancelled) setAvailabilityConfigured((res.data || []).length > 0)
-      })
-      .catch(() => {
-        if (!cancelled) setAvailabilityConfigured(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
+export function MenteeActivationChecklist({ profile, stats }: MenteeActivationChecklistProps) {
   const profileReady = Boolean(
-    profile?.is_public &&
-      (((profile.expertise_areas?.length ?? 0) > 0) || ((profile.mentorship_topics?.length ?? 0) > 0))
+    profile?.first_name && profile?.last_name && profile?.slug && profile?.bio && profile?.job_title
   )
-
-  if (availabilityConfigured === null) return null
 
   const items = [
     {
-      done: availabilityConfigured,
-      label: "Configure sua disponibilidade semanal",
-      href: "/dashboard/mentor/availability",
-    },
-    {
       done: profileReady,
-      label: "Deixe seu perfil público e adicione seus temas",
+      label: "Complete seu perfil público com suas informações",
       href: "/profile",
     },
     {
       done: stats.completedSessions > 0,
-      label: "Dê a sua primeira mentoria",
-      href: "/dashboard/mentor/availability",
+      label: "Agende e participe da sua primeira mentoria",
+      href: "/mentors",
     },
     {
-      done: stats.totalReviews > 0,
-      label: "Receba sua primeira avaliação",
-      href: "/dashboard/mentor",
+      done: stats.completedSessions > 0, // Simplified: assume they evaluate after a session since they are prompted
+      label: "Avalie a sua primeira mentoria",
+      href: "/dashboard/mentee?tab=overview",
     },
     {
       done: false,
@@ -79,10 +54,10 @@ export function MentorActivationChecklist({ profile, stats }: MentorActivationCh
     <Card className="rounded-2xl border border-primary/20 bg-primary/[0.03] shadow-xs">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-bold flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-primary" /> Jornada do Mentor
+          <Trophy className="h-4 w-4 text-primary" /> Jornada do Mentorado
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          Complete os passos abaixo para ter um perfil campeão e aumentar suas chances de realizar mentorias.
+          Siga os passos abaixo para construir um perfil sólido e aproveitar a rede ao máximo.
         </p>
       </CardHeader>
       <CardContent className="space-y-1.5">

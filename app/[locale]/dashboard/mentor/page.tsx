@@ -170,7 +170,7 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
 
               {/* Checklist de ativação: some sozinho quando tudo estiver pronto */}
-              <MentorActivationChecklist profile={profile as any} />
+              <MentorActivationChecklist profile={profile as any} stats={stats} />
 
               {/* Alerta de Solicitações Pendentes */}
               {stats.pendingRequests > 0 && (
