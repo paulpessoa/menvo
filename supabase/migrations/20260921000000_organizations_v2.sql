@@ -53,21 +53,21 @@ create policy "organizations_platform_admin_all"
     exists (
       select 1 from user_roles ur
       join roles r on r.id = ur.role_id
-      where ur.user_id = auth.uid() and r.name = 'admin'
+      where ur.user_id = (select auth.uid()) and r.name = 'admin'
     )
   )
   with check (
     exists (
       select 1 from user_roles ur
       join roles r on r.id = ur.role_id
-      where ur.user_id = auth.uid() and r.name = 'admin'
+      where ur.user_id = (select auth.uid()) and r.name = 'admin'
     )
   );
 
 -- A member reads their own membership rows.
 create policy "organization_members_self_read"
   on organization_members for select
-  using (user_id = auth.uid());
+  using (user_id = (select auth.uid()));
 
 -- An org admin reads every member row of their own org.
 create policy "organization_members_org_admin_read"
@@ -76,7 +76,7 @@ create policy "organization_members_org_admin_read"
     exists (
       select 1 from organization_members admin_row
       where admin_row.organization_id = organization_members.organization_id
-        and admin_row.user_id = auth.uid()
+        and admin_row.user_id = (select auth.uid())
         and admin_row.role = 'admin'
     )
   );
@@ -88,14 +88,14 @@ create policy "organization_members_platform_admin_all"
     exists (
       select 1 from user_roles ur
       join roles r on r.id = ur.role_id
-      where ur.user_id = auth.uid() and r.name = 'admin'
+      where ur.user_id = (select auth.uid()) and r.name = 'admin'
     )
   )
   with check (
     exists (
       select 1 from user_roles ur
       join roles r on r.id = ur.role_id
-      where ur.user_id = auth.uid() and r.name = 'admin'
+      where ur.user_id = (select auth.uid()) and r.name = 'admin'
     )
   );
 
@@ -105,7 +105,7 @@ create policy "organization_members_platform_admin_all"
 create policy "organization_members_self_join"
   on organization_members for insert
   with check (
-    user_id = auth.uid()
+    user_id = (select auth.uid())
     and role = 'member'
     and exists (select 1 from organizations o where o.id = organization_id and o.status = 'active')
   );

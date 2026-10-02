@@ -12,7 +12,7 @@ drop policy if exists "organization_members_self_join" on organization_members;
 create policy "organization_members_self_request"
   on organization_members for insert
   with check (
-    user_id = auth.uid()
+    user_id = (select auth.uid())
     and role = 'member'
     and status = 'requested'
     and exists (select 1 from organizations o where o.id = organization_id and o.status = 'active')
@@ -22,13 +22,13 @@ create policy "organization_members_self_request"
 -- self-approve a request or change their role.
 create policy "organization_members_self_accept_invite"
   on organization_members for update
-  using (user_id = auth.uid() and status = 'invited')
-  with check (user_id = auth.uid() and status = 'active' and role = 'member');
+  using (user_id = (select auth.uid()) and status = 'invited')
+  with check (user_id = (select auth.uid()) and status = 'active' and role = 'member');
 
 -- A person leaves (or declines an invite / withdraws a request).
 create policy "organization_members_self_leave"
   on organization_members for delete
-  using (user_id = auth.uid());
+  using (user_id = (select auth.uid()));
 
 -- Org admins manage every membership row of their own org: invite, approve,
 -- remove, promote.
@@ -58,7 +58,7 @@ as $$
     select 1
     from organization_members
     where organization_id = p_organization_id
-      and user_id = auth.uid()
+      and user_id = (select auth.uid())
       and role = 'admin'
       and status = 'active'
   );

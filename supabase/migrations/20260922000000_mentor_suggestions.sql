@@ -21,7 +21,7 @@ CREATE POLICY "Anyone can insert suggestions"
 -- Users can read their own suggestions
 CREATE POLICY "Users can read own suggestions"
     ON mentor_suggestions FOR SELECT
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 -- Admins can read all suggestions
 CREATE POLICY "Admins can read all suggestions"

@@ -15,14 +15,14 @@ CREATE POLICY "Public profiles visibility restricted"
 ON public.profiles
 FOR SELECT USING (
   -- Always allow viewing own profile
-  id = auth.uid()
+  id = (select auth.uid())
   OR
   (
     is_public = true AND (
       -- Viewer is admin or mentor: can see all public profiles (mentors and mentees)
       EXISTS (
         SELECT 1 FROM public.user_roles
-        WHERE user_id = auth.uid() AND role_id IN (
+        WHERE user_id = (select auth.uid()) AND role_id IN (
           SELECT id FROM public.roles WHERE name IN ('mentor', 'admin')
         )
       )
