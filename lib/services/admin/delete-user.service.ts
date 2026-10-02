@@ -1,5 +1,6 @@
 import { createServiceRoleClient, ensureServerSide } from "@/lib/utils/supabase/service-role"
 import { hashEmail, suppress } from "@/lib/services/invites/suppression.service"
+import { CV_BUCKET, cvStoragePath } from "@/lib/services/mentees/cv-storage"
 
 /** Storage buckets that store files under a `${userId}/...` prefix (see app/api/upload/*). */
 const USER_FILE_BUCKETS = ["cvs", "avatars"] as const
@@ -59,6 +60,20 @@ export async function deleteUserCompletely(
   }
 
   let filesRemoved = 0
+
+  // Currículos importados ficam fora da pasta do usuário
+  // (estagio-recife/<userId>_cv.pdf); a listagem por pasta abaixo não os acha.
+  const { data: mentee } = await supabase
+    .from("mentee_profiles")
+    .select("cv_url")
+    .eq("user_id", userId)
+    .maybeSingle()
+  const cvPath = cvStoragePath(mentee?.cv_url, userId)
+  if (cvPath && !cvPath.startsWith(`${userId}/`)) {
+    const { error: removeError } = await supabase.storage.from(CV_BUCKET).remove([cvPath])
+    if (!removeError) filesRemoved += 1
+  }
+
   for (const bucket of USER_FILE_BUCKETS) {
     const { data: files, error: listError } = await supabase.storage.from(bucket).list(userId)
     if (listError || !files?.length) continue

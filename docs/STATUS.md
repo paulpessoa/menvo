@@ -107,6 +107,12 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-02 - Bucket `cvs` privado
+- **Why:** bucket público com policy de SELECT em tudo: qualquer visitante anônimo listava as pastas (ids de usuário) e baixava os 274 currículos.
+- **Código:** `lib/services/mentees/cv-storage.ts` gera URL assinada (1h) só depois da autorização de sempre (próprio, admin, `profile_cv_url`) e só para arquivo do próprio dono (upload `<uid>/…` ou importação `estagio-recife/<uid>_cv.pdf`). `PUT /api/profile` não aceita mais `cv_url`; só `/api/upload/cv` grava, e grava o caminho. A exclusão de conta passou a apagar também o currículo importado, que ficava fora da pasta do usuário.
+- **Banco (pendente, depois do deploy):** `20261006000000_private_cv_bucket.sql` torna o bucket privado, deixa leitura só do dono, converte as 256 URLs em caminho e tira de `authenticated` a escrita em `cv_url`.
+- **Aberto:** 18 arquivos sem perfil no bucket (12 da importação); apagar é decisão de LGPD. `appointments.cv_url` existe vazia.
+
 ### 2026-10-02 - Fase 3 de `profiles`: dados acadêmicos e currículo em `mentee_profiles`
 - **Why:** 589 de 718 perfis têm dado acadêmico em `profiles`, e anon tinha grant de leitura em `cv_url`, `institution`, `course`, `academic_level`, `expected_graduation` e `learning_goals`. O currículo deve ser visto só pelo próprio, admin e mentor com mentoria.
 - **Banco:** expand `20261005000000_mentee_profiles_expand.sql` aplicado (589 linhas). `cv_url` só sai por `profile_cv_url(uuid)`; anon lê só nível, instituição e curso de mentor público. Conferido pela API pública.

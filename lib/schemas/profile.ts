@@ -54,7 +54,8 @@ export const updateProfileSchema = z.object({
   mentorship_approach: z.string().max(2000).optional().nullable(),
   what_to_expect: z.string().max(2000).optional().nullable(),
   ideal_mentee: z.string().max(2000).optional().nullable(),
-  cv_url: z.string().url().or(z.literal("")).optional().nullable(),
+  // cv_url não entra: só /api/upload/cv grava (o caminho do arquivo). A URL
+  // que o formulário tem é assinada e expira; regravá-la quebraria o link.
   is_public: z.boolean().optional(),
   learning_goals: z.string().max(2000).optional().nullable(),
 })

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 import { MENTEE_PROFILE_EMBED, withMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
+import { signCvUrl } from "@/lib/services/mentees/cv-storage"
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
     // usuário pode ver o seu.
     if (profile) {
       const { data: cvUrl } = await supabase.rpc("profile_cv_url", { p_user_id: user.id })
-      profile.cv_url = cvUrl ?? null
+      profile.cv_url = await signCvUrl(user.id, cvUrl)
     }
 
     if (profileError) {
