@@ -17,7 +17,9 @@ import {
   Globe,
   Lock,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Info,
+  Loader2
 } from "lucide-react"
 import { useLanguage } from "@/hooks/useLanguage"
 import { useTranslations } from "next-intl"
@@ -46,6 +48,36 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [isResettingOnboarding, setIsResettingOnboarding] = useState(false)
+
+  const handleResetOnboarding = async () => {
+    setIsResettingOnboarding(true)
+    try {
+      const res = await fetch("/api/profile/onboarding", {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        throw new Error("Erro ao reiniciar tutoriais")
+      }
+
+      toast({
+        title: "Tutoriais reiniciados",
+        description: "Os balões de ajuda voltarão a aparecer."
+      })
+      
+      // Reload page to re-trigger current page tours if any
+      setTimeout(() => window.location.reload(), 1500)
+    } catch (error) {
+      toast({
+        title: commonT("error"),
+        description: "Não foi possível reiniciar os tutoriais",
+        variant: "destructive"
+      })
+    } finally {
+      setIsResettingOnboarding(false)
+    }
+  }
 
   const handleChangePassword = async (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -261,6 +293,29 @@ export default function SettingsPage() {
                   : t("security.title")}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              Tutoriais da Plataforma
+            </CardTitle>
+            <CardDescription>
+              Você pode reiniciar os balões explicativos (tours) de introdução da plataforma a qualquer momento.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={handleResetOnboarding}
+              disabled={isResettingOnboarding}
+              className="w-full sm:w-auto"
+            >
+              {isResettingOnboarding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Reiniciar Tutoriais
+            </Button>
           </CardContent>
         </Card>
 

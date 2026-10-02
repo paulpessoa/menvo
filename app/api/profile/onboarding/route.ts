@@ -62,3 +62,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("authorization")
+    let user;
+    
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "")
+      const { data } = await supabaseAdmin.auth.getUser(token)
+      user = data.user
+    } else {
+      const supabase = await createServerClient()
+      const { data } = await supabase.auth.getUser()
+      user = data.user
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Clear flags
+    const { error: updateError } = await supabaseAdmin
+      .from("profiles")
+      .update({ onboarding_flags: {} })
+      .eq("id", user.id)
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, onboarding_flags: {} })
+
+  } catch (error) {
+    console.error("❌ Onboarding flag clear error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
