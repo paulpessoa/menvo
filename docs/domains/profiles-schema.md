@@ -34,7 +34,7 @@ Preenchimento real por coluna, medido com leitura direta no banco, cruzado com u
 `community_ready` existe no banco mas não em `lib/types/supabase.ts`: os tipos gerados estão desatualizados.
 
 ### Contadores parados (bug visível)
-`total_reviews` e `total_sessions` têm o mesmo valor nos 718 perfis; `average_rating` tem só 2 valores. Nenhuma migration ou rotina atualiza esses campos, mas busca de mentores, perfil público e dashboard do mentor exibem eles.
+`total_reviews` e `total_sessions` têm o mesmo valor nos 718 perfis; `average_rating` tem só 2 valores. Só o trigger `tr_update_mentor_stats` (em `appointment_feedbacks`, criado fora das migrations do repo) atualiza `average_rating` e `total_reviews`, e nada atualiza `total_sessions`. Mesmo assim busca de mentores, perfil público e dashboard do mentor exibem eles.
 
 ### Estado derivado guardado
 `verified`, `verified_at` e `is_pending_mentor` são escritos por trigger (`sync_profile_verification_flags`) a partir de `verification_status` (ver `mentor-verification.md`). Três colunas para um estado. Efeito colateral já observado: 559 contas importadas do JotForm têm `verification_status = 'approved'` e `verified = true` sem papel de mentor.
@@ -74,7 +74,7 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
 2. Migration: `drop column` de `location`, `twitter_url`, `mentorship_guidelines`, `ai_disclosure_accepted_at`, `mentee_status`, `profile_visibility`, `show_in_community`, `age`, `address`. Conferir antes se alguma view, função ou policy depende delas (`pg_depend`), e não usar `CASCADE`.
 3. Recriar `mentors_view` calculando `average_rating`, `total_reviews` (de `appointment_feedbacks` aprovadas) e `total_sessions` (de `appointments` realizadas) e trocar os leitores para a view; depois apagar as três colunas.
 4. Regenerar `lib/types/supabase.ts` (inclui `community_ready`).
-- **Como foi feito:** os contadores vêm da view `mentor_stats` (sem `security_invoker`, só agregados; necessária porque RLS esconde feedbacks e sessões de anon), unida em `mentors_view`. A migration tem guarda que aborta se algo ainda depender das colunas, e refaz o grant de colunas de anon. `/api/dashboard/mentor` passou a devolver `averageRating`/`totalReviews` da view. `lib/types/supabase.ts` foi editado à mão; regenerar quando a migration for aplicada.
+- **Como foi feito:** os contadores vêm da view `mentor_stats` (sem `security_invoker`, só agregados; necessária porque RLS esconde feedbacks e sessões de anon), unida em `mentors_view`. A migration remove o trigger `tr_update_mentor_stats` e a função `handle_feedback_stats_update` (senão qualquer mudança de feedback falharia depois do drop; a guarda `pg_depend` revelou isso) e tem guarda que aborta se algo ainda depender das colunas, e refaz o grant de colunas de anon. `/api/dashboard/mentor` passou a devolver `averageRating`/`totalReviews` da view. `lib/types/supabase.ts` foi editado à mão; regenerar quando a migration for aplicada.
 - **Pronto quando:** perfil público mostra contagens reais; `tsc`, testes e build passam; nenhuma referência às colunas apagadas.
 
 ### Fase 1: `import_records` (risco baixo)

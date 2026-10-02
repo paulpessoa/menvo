@@ -7,6 +7,22 @@
         "@microsoft/clarity-mcp-server",
         "--clarity_api_token=${CLARITY_API_TOKEN}"
       ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "-p",
+        "@modelcontextprotocol/sdk@1",
+        "-p",
+        "@supabase/mcp-server-supabase@0.10.0",
+        "mcp-server-supabase",
+        "--read-only",
+        "--project-ref=evxrzmzkghshjmmyegxu"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
     }
   }
 }
