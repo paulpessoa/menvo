@@ -1292,6 +1292,82 @@ export type Database = {
           },
         ]
       }
+      mentor_profiles: {
+        Row: {
+          availability_status: string
+          chat_enabled: boolean
+          created_at: string
+          experience_years: number | null
+          free_topics: string[] | null
+          ideal_mentee: string | null
+          inclusive_tags: string[] | null
+          is_volunteer: boolean
+          mentorship_approach: string | null
+          updated_at: string
+          user_id: string
+          verification_notes: string | null
+          verification_status: string | null
+          verified_at: string | null
+          what_to_expect: string | null
+        }
+        Insert: {
+          availability_status?: string
+          chat_enabled?: boolean
+          created_at?: string
+          experience_years?: number | null
+          free_topics?: string[] | null
+          ideal_mentee?: string | null
+          inclusive_tags?: string[] | null
+          is_volunteer?: boolean
+          mentorship_approach?: string | null
+          updated_at?: string
+          user_id: string
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          what_to_expect?: string | null
+        }
+        Update: {
+          availability_status?: string
+          chat_enabled?: boolean
+          created_at?: string
+          experience_years?: number | null
+          free_topics?: string[] | null
+          ideal_mentee?: string | null
+          inclusive_tags?: string[] | null
+          is_volunteer?: boolean
+          mentorship_approach?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          what_to_expect?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentor_suggestions: {
         Row: {
           context: Json | null
@@ -1578,10 +1654,8 @@ export type Database = {
       profiles: {
         Row: {
           academic_level: string | null
-          availability_status: string | null
           avatar_url: string | null
           bio: string | null
-          chat_enabled: boolean | null
           city: string | null
           community_ready: boolean | null
           company: string | null
@@ -1592,25 +1666,18 @@ export type Database = {
           email: string
           email_opt_out_at: string | null
           expected_graduation: string | null
-          experience_years: number | null
           expertise_areas: string[] | null
           first_name: string | null
-          free_topics: string[] | null
           full_name: string | null
           github_url: string | null
           id: string
-          ideal_mentee: string | null
-          inclusive_tags: string[] | null
           institution: string | null
-          is_pending_mentor: boolean | null
           is_public: boolean | null
-          is_volunteer: boolean | null
           job_title: string | null
           languages: string[] | null
           last_name: string | null
           learning_goals: string | null
           linkedin_url: string | null
-          mentorship_approach: string | null
           mentorship_topics: string[] | null
           phone: string | null
           portfolio_url: string | null
@@ -1619,19 +1686,12 @@ export type Database = {
           state: string | null
           timezone: string | null
           updated_at: string
-          verification_notes: string | null
-          verification_status: string | null
-          verified: boolean
-          verified_at: string | null
           website_url: string | null
-          what_to_expect: string | null
         }
         Insert: {
           academic_level?: string | null
-          availability_status?: string | null
           avatar_url?: string | null
           bio?: string | null
-          chat_enabled?: boolean | null
           city?: string | null
           community_ready?: boolean | null
           company?: string | null
@@ -1642,25 +1702,18 @@ export type Database = {
           email: string
           email_opt_out_at?: string | null
           expected_graduation?: string | null
-          experience_years?: number | null
           expertise_areas?: string[] | null
           first_name?: string | null
-          free_topics?: string[] | null
           full_name?: string | null
           github_url?: string | null
           id: string
-          ideal_mentee?: string | null
-          inclusive_tags?: string[] | null
           institution?: string | null
-          is_pending_mentor?: boolean | null
           is_public?: boolean | null
-          is_volunteer?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
           learning_goals?: string | null
           linkedin_url?: string | null
-          mentorship_approach?: string | null
           mentorship_topics?: string[] | null
           phone?: string | null
           portfolio_url?: string | null
@@ -1669,19 +1722,12 @@ export type Database = {
           state?: string | null
           timezone?: string | null
           updated_at?: string
-          verification_notes?: string | null
-          verification_status?: string | null
-          verified?: boolean
-          verified_at?: string | null
           website_url?: string | null
-          what_to_expect?: string | null
         }
         Update: {
           academic_level?: string | null
-          availability_status?: string | null
           avatar_url?: string | null
           bio?: string | null
-          chat_enabled?: boolean | null
           city?: string | null
           community_ready?: boolean | null
           company?: string | null
@@ -1692,25 +1738,18 @@ export type Database = {
           email?: string
           email_opt_out_at?: string | null
           expected_graduation?: string | null
-          experience_years?: number | null
           expertise_areas?: string[] | null
           first_name?: string | null
-          free_topics?: string[] | null
           full_name?: string | null
           github_url?: string | null
           id?: string
-          ideal_mentee?: string | null
-          inclusive_tags?: string[] | null
           institution?: string | null
-          is_pending_mentor?: boolean | null
           is_public?: boolean | null
-          is_volunteer?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
           learning_goals?: string | null
           linkedin_url?: string | null
-          mentorship_approach?: string | null
           mentorship_topics?: string[] | null
           phone?: string | null
           portfolio_url?: string | null
@@ -1719,12 +1758,7 @@ export type Database = {
           state?: string | null
           timezone?: string | null
           updated_at?: string
-          verification_notes?: string | null
-          verification_status?: string | null
-          verified?: boolean
-          verified_at?: string | null
           website_url?: string | null
-          what_to_expect?: string | null
         }
         Relationships: []
       }
@@ -2402,6 +2436,7 @@ export type Database = {
         }
         Returns: string
       }
+      request_mentor_verification: { Args: never; Returns: undefined }
       save_google_calendar_tokens: {
         Args: {
           p_access_token: string
@@ -2425,6 +2460,7 @@ export type Database = {
         Args: { p_profile_id: string }
         Returns: boolean
       }
+      withdraw_mentor_verification: { Args: never; Returns: undefined }
     }
     Enums: {
       hub_resource_status: "pending" | "published" | "rejected" | "archived"

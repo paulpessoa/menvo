@@ -75,7 +75,7 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ### 🟠 P1 - High Priority
 - [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification - all completed pre-2026-09-16, see journal below for detail.
 - [x] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
-- [ ] **Enxugar e normalizar `profiles` (64 colunas):** colunas mortas, contadores `total_reviews`/`total_sessions` parados (perfil público mostra números errados), dados de mentor/acadêmicos/importação em tabelas 1:1. Plano em fases em [`domains/profiles-schema.md`](domains/profiles-schema.md); Fases 0 e 1 concluídas e aplicadas (48 colunas em `profiles`; dados de importação em `import_records`); próxima é a Fase 2 (`mentor_profiles`).
+- [ ] **Enxugar e normalizar `profiles` (64 colunas):** colunas mortas, contadores `total_reviews`/`total_sessions` parados (perfil público mostra números errados), dados de mentor/acadêmicos/importação em tabelas 1:1. Plano em fases em [`domains/profiles-schema.md`](domains/profiles-schema.md); Fases 0 e 1 concluídas e aplicadas (48 colunas em `profiles`; dados de importação em `import_records`); Fase 2 (`mentor_profiles`) com expand aplicado e código trocado, falta deploy → RESYNC → contract.
 
 ### 🟡 P2 - Medium Priority
 - [x] **Painel Admin para Fila de Retenção:** card no admin mostrando a fila (quantos em cada etapa, próximas exclusões) e um botão "isentar" por pessoa. Implementado em `/dashboard/admin/retention`.
@@ -106,6 +106,12 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-10-02 - Fase 2 de `profiles`: dados de mentor em `mentor_profiles`
+- **Why:** verificação guardada em três colunas que divergiam (`verification_status`, `verified`, `is_pending_mentor`), 560 mentorados marcados `approved` pelo próprio onboarding, usuário conseguia se aprovar com UPDATE em `profiles` e qualquer logado lia `verification_notes` de mentores públicos.
+- **Banco:** expand `20261004000000_mentor_profiles_expand.sql` aplicado (15 linhas; `mentors_view` lê da tabela nova com os mesmos nomes; status só muda por RPC ou admin). Conferido pela API pública: visitante vê os 13 mentores, não vê candidatos rejeitados nem notas, não chama as RPCs.
+- **Código:** `lib/services/mentors/mentor-profile-fields.ts` (`splitMentorFields`, `withMentorFields`, `MENTOR_PROFILE_EMBED`) mantém o formato das respostas de `/api/auth/me` e `/api/profile`; filas e contagens do admin leem `mentor_profiles` (`listMentorVerifications`), então "concluídas" não lista mais os 560 mentorados. `/api/auth/me` passou a devolver `isVerified` certo (antes `verification_status` não estava no select e vinha sempre `false`).
+- **Pendente:** deploy → RESYNC → contract. Detalhes em [`domains/profiles-schema.md`](domains/profiles-schema.md) e [`domains/mentor-verification.md`](domains/mentor-verification.md).
 
 ### 2026-10-02 - Escalada de privilégio em `user_roles` fechada
 - **Why:** as policies `users_can_insert_own_role`, `users_can_update_own_role` e `users_manage_own_roles_only` só checavam `auth.uid() = user_id`, não o papel. Qualquer conta logada podia gravar o papel `admin` (ou `mentor`) para si direto no PostgREST com a chave pública. Achado no diagnóstico da Fase 2 de `profiles-schema.md`; sem sinal de uso (1 admin, 13 mentores coerentes).

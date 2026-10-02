@@ -31,16 +31,15 @@ export async function GET() {
       { count: recentSignups }
     ] = await Promise.all([
       supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "pending"),
+      supabase
+        .from("mentor_profiles")
+        .select("user_id", { count: "exact", head: true })
+        .eq("verification_status", "pending"),
       supabase
         .from("profiles")
         .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
         .eq("user_roles.roles.name", "mentor"),
-      supabase
-        .from("profiles")
-        .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
-        .eq("user_roles.roles.name", "mentor")
-        .eq("verified", true),
+      supabase.from("mentors_view").select("id", { count: "exact", head: true }).eq("verified", true),
       supabase
         .from("profiles")
         .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })

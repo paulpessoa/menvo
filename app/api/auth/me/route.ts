@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
+import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,24 +20,19 @@ export async function GET(request: NextRequest) {
       })
     }
 
-const PROFILE_COLUMNS = `
-  id, email, first_name, last_name, full_name, avatar_url, slug, verified, 
-  bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, 
-  timezone, languages, job_title, company, experience_years, mentorship_topics, 
-  inclusive_tags, availability_status, github_url, website_url, phone, 
-  is_volunteer, cv_url, 
-  portfolio_url, mentorship_approach, what_to_expect, ideal_mentee, free_topics, 
-  chat_enabled, academic_level, 
-  institution, course, expected_graduation, 
-  is_pending_mentor, learning_goals
-`.trim()
+    // Campos de mentor e verificação vêm de mentor_profiles (embed), achatados
+    // de volta no perfil por withMentorFields para as telas não mudarem.
+    const PROFILE_COLUMNS =
+      "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, cv_url, portfolio_url, academic_level, institution, course, expected_graduation, learning_goals" as const
 
     // Buscar perfil e papéis
-    const { data: profile, error: profileError } = await supabase
+    const { data: profileRow, error: profileError } = await supabase
       .from("profiles")
-      .select(`${PROFILE_COLUMNS}, user_roles(roles(name))`)
+      .select(`${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, user_roles(roles(name))` as const)
       .eq("id", user.id)
       .maybeSingle()
+
+    const profile = profileRow ? withMentorFields(profileRow) : null
 
     if (profileError) {
       console.error("⚠️ Erro ao buscar perfil:", profileError)
@@ -58,8 +54,8 @@ const PROFILE_COLUMNS = `
     else if (roleNames.includes("mentee") || profileRole === "mentee") primaryRole = "mentee"
     else if (roleNames.length > 0) primaryRole = roleNames[0]
 
-    const isVerified = (profile as any)?.is_verified || (profile as any)?.verification_status === "approved" || false
-    const isPending = (profile as any)?.verification_status === "pending"
+    const isVerified = profile?.verified ?? false
+    const isPending = profile?.is_pending_mentor ?? false
 
     return NextResponse.json({
       user: {

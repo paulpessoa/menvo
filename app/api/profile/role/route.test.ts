@@ -34,6 +34,7 @@ describe('POST /api/profile/role', () => {
     jest.clearAllMocks()
 
     mockSupabase = {
+      rpc: jest.fn().mockResolvedValue({ error: null }),
       auth: {
         getUser: jest.fn().mockResolvedValue({
           data: { user: { id: 'test-user-123', email: 'test@menvo.com.br' } },
@@ -48,9 +49,11 @@ describe('POST /api/profile/role', () => {
             }),
           }
         }
-        if (table === 'validation_requests') {
+        if (table === 'mentor_profiles') {
           return {
-            insert: jest.fn().mockResolvedValue({ error: null }),
+            update: jest.fn().mockReturnValue({
+              eq: jest.fn().mockResolvedValue({ error: null }),
+            }),
           }
         }
         if (table === 'roles') {
@@ -135,6 +138,12 @@ describe('POST /api/profile/role', () => {
 
     expect(mockSupabase.from).toHaveBeenCalledWith('profiles')
     expect(mockSupabase.from).toHaveBeenCalledWith('user_roles')
+    // Mentorado não passa por verificação: nada de status gravado.
+    expect(mockSupabase.rpc).not.toHaveBeenCalled()
+    const profilesUpdate = mockSupabase.from.mock.results.find(
+      (_: unknown, i: number) => mockSupabase.from.mock.calls[i][0] === 'profiles'
+    ).value.update
+    expect(profilesUpdate.mock.calls[0][0]).not.toHaveProperty('verification_status')
   })
 
   it('should successfully assign mentor role and create validation request', async () => {
@@ -155,6 +164,7 @@ describe('POST /api/profile/role', () => {
     expect(data.role).toBe('mentor')
     expect(data.status).toBe('pending')
 
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('request_mentor_verification')
     expect(mockSupabase.from).toHaveBeenCalledWith('user_roles')
   })
 

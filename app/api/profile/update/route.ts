@@ -43,7 +43,6 @@ export async function PUT(request: NextRequest) {
       company: body.company,
       expertise_areas: body.expertise_areas,
       mentorship_topics: body.mentorship_topics,
-      inclusive_tags: body.inclusive_tags,
       linkedin_url: body.linkedin_url,
       github_url: body.github_url,
       website_url: body.website_url,

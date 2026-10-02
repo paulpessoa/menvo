@@ -35,12 +35,13 @@ describe('POST /api/profile/request-mentor', () => {
           error: null
         })
       },
+      rpc: jest.fn().mockResolvedValue({ error: null }),
       from: jest.fn().mockReturnValue({
         update: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             select: jest.fn().mockReturnValue({
               single: jest.fn().mockResolvedValue({
-                data: { id: 'user-1', is_pending_mentor: true },
+                data: { user_id: 'user-1', verification_status: 'pending' },
                 error: null
               })
             })
@@ -81,15 +82,17 @@ describe('POST /api/profile/request-mentor', () => {
 
     expect(res.status).toBe(200)
 
+    // O status muda só pela RPC; o texto vai para mentor_profiles.
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('request_mentor_verification')
+    expect(mockSupabase.from).toHaveBeenCalledWith('mentor_profiles')
     const updateCall = mockSupabase.from.mock.results[0].value.update
-    expect(updateCall).toHaveBeenCalledWith(
-      expect.objectContaining({
-        is_pending_mentor: true,
-        verification_status: 'pending',
-        mentorship_approach: 'Sessões práticas de revisão de código',
-        what_to_expect: 'Traga um projeto real para revisarmos juntos'
-      })
-    )
+    expect(updateCall).toHaveBeenCalledWith({
+      mentorship_approach: 'Sessões práticas de revisão de código',
+      what_to_expect: 'Traga um projeto real para revisarmos juntos'
+    })
+
+    const body = await res.json()
+    expect(body.data).toMatchObject({ id: 'user-1', is_pending_mentor: true, verification_status: 'pending' })
 
     expect(sendAdminNewMentorNotification).toHaveBeenCalledWith(
       expect.objectContaining({

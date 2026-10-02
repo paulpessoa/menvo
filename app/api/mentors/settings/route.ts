@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
-import type { Database } from '@/lib/types/supabase';
-
-type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -29,12 +26,11 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Atualizar configuração
-    const updateData: ProfileUpdate = { chat_enabled: chatEnabled };
-    const { error: updateError } = await (supabase
-      .from('profiles') as any)
-      .update(updateData)
-      .eq('id', user.id);
+    // chat_enabled mora em mentor_profiles (só mentor/candidato tem linha).
+    const { error: updateError } = await supabase
+      .from('mentor_profiles')
+      .update({ chat_enabled: chatEnabled })
+      .eq('user_id', user.id);
 
     if (updateError) {
       console.error('[SETTINGS] Erro ao atualizar chat_enabled:', updateError);
