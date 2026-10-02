@@ -13,6 +13,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const state = searchParams.get('state');
+
   if (!code) {
     console.error('❌ [OAUTH] Código não encontrado na URL');
     return NextResponse.json(
@@ -21,7 +23,42 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Retornar página HTML que mostra o código
+  if (state === 'user_sync') {
+    try {
+      // Import here to avoid circular deps or heavy loads if not needed
+      const { OAuth2Client } = await import('google-auth-library');
+      const { createClient } = await import('@/lib/utils/supabase/server');
+      const { saveGoogleCalendarTokens } = await import('@/lib/google-calendar-db');
+
+      const oauth2Client = new OAuth2Client(
+        process.env.GOOGLE_CALENDAR_CLIENT_ID,
+        process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
+        process.env.GOOGLE_CALENDAR_REDIRECT_URI
+      );
+
+      const { tokens } = await oauth2Client.getToken(code);
+      
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        return NextResponse.redirect(new URL('/login?error=Para conectar a agenda você precisa estar logado', request.url));
+      }
+
+      await saveGoogleCalendarTokens(user.id, {
+        access_token: tokens.access_token!,
+        refresh_token: tokens.refresh_token!,
+        expires_in: tokens.expiry_date ? Math.floor((tokens.expiry_date - Date.now()) / 1000) : 3599,
+      });
+
+      return NextResponse.redirect(new URL('/dashboard/mentor/availability?calendar_connected=true', request.url));
+    } catch (err: any) {
+      console.error('❌ [OAUTH] Erro ao sincronizar agenda do usuário:', err);
+      return NextResponse.redirect(new URL('/dashboard/mentor/availability?calendar_error=true', request.url));
+    }
+  }
+
+  // Retornar página HTML que mostra o código (para setup mestre)
   const html = `
     <!DOCTYPE html>
     <html>

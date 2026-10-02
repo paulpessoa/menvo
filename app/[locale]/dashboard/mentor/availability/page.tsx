@@ -25,6 +25,7 @@ import {
 import {  Clock, Plus, Trash2, Save, Calendar, CheckCircle, AlertTriangle, Info , Loader2 } from "lucide-react"
 import { useAuth } from "@/lib/auth"
 import { useTranslations } from "next-intl"
+import { useFeatureFlag } from "@/lib/feature-flags"
 
 import {
   addMinutesToTime,
@@ -57,6 +58,9 @@ export default function MentorAvailabilityPage() {
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [calendarConnected, setCalendarConnected] = useState(false)
+  const [checkingCalendar, setCheckingCalendar] = useState(false)
+  const isGoogleCalendarSyncEnabled = useFeatureFlag("google_calendar_sync_flag")
   const [message, setMessage] = useState<{
     type: "success" | "error"
     text: string
@@ -102,11 +106,43 @@ export default function MentorAvailabilityPage() {
       }))
 
       setAvailability(normalized)
+
+      if (isGoogleCalendarSyncEnabled) {
+        setCheckingCalendar(true)
+        fetch('/api/auth/user-calendar/status')
+          .then(r => r.json())
+          .then(data => setCalendarConnected(data.connected))
+          .catch(e => console.error("Error checking calendar:", e))
+          .finally(() => setCheckingCalendar(false))
+      }
     } catch (error) {
       console.error("Error fetching availability:", error)
       setMessage({ type: "error", text: t("errorLoad") })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleConnectCalendar = () => {
+    window.location.href = '/api/auth/google-calendar?action=user_auth'
+  }
+
+  const handleDisconnectCalendar = async () => {
+    if (!confirm("Tem certeza que deseja desconectar sua agenda? A plataforma deixará de ler seus conflitos pessoais.")) return
+    
+    setCheckingCalendar(true)
+    try {
+      const res = await fetch('/api/auth/user-calendar/status', { method: 'DELETE' })
+      if (res.ok) {
+        setCalendarConnected(false)
+        setMessage({ type: "success", text: "Google Calendar desconectado com sucesso!" })
+      } else {
+        throw new Error("Falha ao desconectar")
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Erro ao desconectar agenda." })
+    } finally {
+      setCheckingCalendar(false)
     }
   }
 
@@ -485,6 +521,47 @@ export default function MentorAvailabilityPage() {
               </p>
             </CardContent>
           </Card>
+
+          {isGoogleCalendarSyncEnabled && (
+            <Card className="border-muted bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  Sincronização Pessoal
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Evite que mentorias sejam marcadas por cima dos seus compromissos pessoais do dia a dia.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-2">
+                {checkingCalendar ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Verificando conexão...
+                  </div>
+                ) : calendarConnected ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 p-2 rounded-md">
+                      <CheckCircle className="h-4 w-4" /> Conectado com sucesso
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full text-xs" 
+                      onClick={handleDisconnectCalendar}
+                    >
+                      Desconectar Agenda
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    className="w-full text-xs" 
+                    onClick={handleConnectCalendar}
+                  >
+                    Conectar Google Calendar
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

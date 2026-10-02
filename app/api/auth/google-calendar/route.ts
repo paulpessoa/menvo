@@ -23,12 +23,30 @@ export async function GET(request: NextRequest) {
       access_type: 'offline',
       scope: scopes,
       prompt: 'consent',
+      state: 'master_setup'
     });
 
     return NextResponse.json({
       authUrl,
       message: 'Visit this URL to authorize the application',
     });
+  }
+
+  if (action === 'user_auth') {
+    // Generate authorization URL for individual mentor sync
+    const scopes = [
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/calendar.freebusy',
+    ];
+
+    const authUrl = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: scopes,
+      prompt: 'consent',
+      state: 'user_sync'
+    });
+
+    return NextResponse.redirect(authUrl);
   }
 
   return NextResponse.json({

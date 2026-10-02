@@ -10,13 +10,18 @@ export interface FeatureFlags {
    * outside the platform. Turn on when users start asking for a built-in channel.
    */
   chat_flag: boolean
+  /**
+   * Integração individual de Google Calendar para mentores (ler conflitos de agenda).
+   */
+  google_calendar_sync_flag: boolean
 }
 
 export const DEFAULT_FLAGS: FeatureFlags = {
   feedback_app_flag: false,
   maintenance_mode_flag: false,
   ai_assistant_flag: false,
-  chat_flag: false
+  chat_flag: false,
+  google_calendar_sync_flag: false
 }
 
 export async function getFeatureFlags(): Promise<FeatureFlags> {
