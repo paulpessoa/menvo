@@ -148,7 +148,12 @@ export async function POST(request: NextRequest) {
         token_expires_at: tokenExpiresAt,
       } as any)
       .select(`
-        *,
+        id,
+        mentor_id,
+        mentee_id,
+        scheduled_at,
+        duration_minutes,
+        status,
         mentor:profiles!mentor_id(full_name, avatar_url),
         mentee:profiles!mentee_id(full_name, avatar_url)
       `)
