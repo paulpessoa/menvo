@@ -24,7 +24,7 @@
 
 begin;
 
-create or replace view public.mentor_stats with (security_invoker = true) as
+create or replace view public.mentor_stats as
 select
   p.id as mentor_id,
   coalesce(f.average_rating, 0)::numeric(3, 2) as average_rating,
