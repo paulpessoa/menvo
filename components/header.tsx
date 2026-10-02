@@ -22,6 +22,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
   const isChatEnabled = useFeatureFlag("chat_flag")
+  const isAssistantEnabled = useFeatureFlag("ai_assistant_flag")
 
   const navigation = [
     { name: t("common.home"), href: "/" },
@@ -32,7 +33,9 @@ export default function Header() {
     if (role === "mentor" || isAdmin) {
       navigation.push({ name: "Comunidade", href: "/community" })
     }
-    navigation.push({ name: "Assistente", href: "/assistant" })
+    if (isAssistantEnabled) {
+      navigation.push({ name: "Assistente", href: "/assistant" })
+    }
   }
 
   navigation.push(
