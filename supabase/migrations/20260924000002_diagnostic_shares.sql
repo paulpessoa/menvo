@@ -49,8 +49,8 @@ create unique index if not exists idx_diagnostic_shares_active_unique_session
 create policy "Users read authorized diagnostic shares"
   on public.diagnostic_shares for select to authenticated
   using (
-    mentee_id = auth.uid()
-    or (mentor_id = auth.uid() and revoked_at is null)
+    mentee_id = (select auth.uid())
+    or (mentor_id = (select auth.uid()) and revoked_at is null)
     or public.is_admin()
   );
 
@@ -58,24 +58,24 @@ create policy "Users read authorized diagnostic shares"
 create policy "Mentees insert own diagnostic shares"
   on public.diagnostic_shares for insert to authenticated
   with check (
-    mentee_id = auth.uid()
+    mentee_id = (select auth.uid())
   );
 
 -- 3. Mentee can update (revoke) their own shares
 create policy "Mentees update own diagnostic shares"
   on public.diagnostic_shares for update to authenticated
   using (
-    mentee_id = auth.uid() or public.is_admin()
+    mentee_id = (select auth.uid()) or public.is_admin()
   )
   with check (
-    mentee_id = auth.uid() or public.is_admin()
+    mentee_id = (select auth.uid()) or public.is_admin()
   );
 
 -- 4. Mentee can delete their own shares
 create policy "Mentees delete own diagnostic shares"
   on public.diagnostic_shares for delete to authenticated
   using (
-    mentee_id = auth.uid() or public.is_admin()
+    mentee_id = (select auth.uid()) or public.is_admin()
   );
 
 revoke all on public.diagnostic_shares from anon;
@@ -89,7 +89,7 @@ create policy "Mentors read shared quiz responses"
     exists (
       select 1 from public.diagnostic_shares s
       where (s.quiz_response_id = quiz_responses.id or s.diagnostic_session_id = quiz_responses.diagnostic_session_id)
-        and s.mentor_id = auth.uid()
+        and s.mentor_id = (select auth.uid())
         and s.revoked_at is null
     )
   );
@@ -102,7 +102,7 @@ create policy "Mentors read shared diagnostic sessions"
     exists (
       select 1 from public.diagnostic_shares s
       where s.diagnostic_session_id = diagnostic_sessions.id
-        and s.mentor_id = auth.uid()
+        and s.mentor_id = (select auth.uid())
         and s.revoked_at is null
     )
   );

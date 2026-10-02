@@ -12,7 +12,7 @@ drop policy if exists "organization_members_self_request" on organization_member
 create policy "organization_members_self_request"
   on organization_members for insert
   with check (
-    user_id = auth.uid()
+    user_id = (select auth.uid())
     and role = 'member'
     and status = 'requested'
     and exists (

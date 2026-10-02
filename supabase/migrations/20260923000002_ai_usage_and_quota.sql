@@ -90,11 +90,11 @@ create policy "Admins manage entitlements"
 
 create policy "Users read own quota, admins read all"
   on public.ai_quota_ledger for select to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users read own usage, admins read all"
   on public.ai_usage_events for select to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 -- ─── Helpers ──────────────────────────────────────────────────────────────────
 create or replace function public.ai_current_period()

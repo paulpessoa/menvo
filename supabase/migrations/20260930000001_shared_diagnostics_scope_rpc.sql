@@ -69,7 +69,7 @@ as $$
   left join public.quiz_responses q
     on q.id = s.quiz_response_id
     or (s.quiz_response_id is null and q.diagnostic_session_id = s.diagnostic_session_id)
-  where s.mentor_id = auth.uid()
+  where s.mentor_id = (select auth.uid())
     and s.revoked_at is null
     and (p_share_id is null or s.id = p_share_id)
   order by s.created_at desc

@@ -14,12 +14,12 @@ ALTER TABLE public.assistant_conversations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can insert their own conversations" 
 ON public.assistant_conversations
 FOR INSERT
-WITH CHECK (auth.uid() = user_id);
+WITH CHECK ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can view their own conversations"
 ON public.assistant_conversations
 FOR SELECT
-USING (auth.uid() = user_id);
+USING ((select auth.uid()) = user_id);
 
 -- Índices de performance
 CREATE INDEX IF NOT EXISTS idx_assistant_conversations_user_id ON public.assistant_conversations(user_id);

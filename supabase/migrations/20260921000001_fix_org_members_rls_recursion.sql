@@ -14,7 +14,7 @@ as $$
     select 1
     from organization_members
     where organization_id = p_organization_id
-      and user_id = auth.uid()
+      and user_id = (select auth.uid())
       and role = 'admin'
   );
 $$;

@@ -44,7 +44,7 @@ as $$
     select 1
     from public.user_roles ur
     join public.roles r on r.id = ur.role_id
-    where ur.user_id = auth.uid() and r.name in ('mentor', 'admin')
+    where ur.user_id = (select auth.uid()) and r.name in ('mentor', 'admin')
   );
 $$;
 
@@ -55,12 +55,12 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.appointments a
-    where (a.mentor_id = auth.uid() and a.mentee_id = p_profile_id)
-       or (a.mentee_id = auth.uid() and a.mentor_id = p_profile_id)
+    where (a.mentor_id = (select auth.uid()) and a.mentee_id = p_profile_id)
+       or (a.mentee_id = (select auth.uid()) and a.mentor_id = p_profile_id)
   ) or exists (
     select 1 from public.diagnostic_shares d
-    where (d.mentor_id = auth.uid() and d.mentee_id = p_profile_id)
-       or (d.mentee_id = auth.uid() and d.mentor_id = p_profile_id)
+    where (d.mentor_id = (select auth.uid()) and d.mentee_id = p_profile_id)
+       or (d.mentee_id = (select auth.uid()) and d.mentor_id = p_profile_id)
   );
 $$;
 
@@ -110,7 +110,7 @@ create policy "Authenticated profile visibility (restrictive)"
   for select
   to authenticated
   using (
-    id = auth.uid()
+    id = (select auth.uid())
     or public.is_admin()
     or (coalesce(is_public, false) and public.profile_is_mentor(id))
     or (coalesce(is_public, false) and public.current_user_is_mentor_or_admin())
