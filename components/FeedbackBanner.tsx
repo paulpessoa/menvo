@@ -127,14 +127,14 @@ export function FeedbackBanner() {
 
   return (
     <>
-      {/* Botão Flutuante */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-105 transition-transform group">
+      {/* Botão Flutuante (apenas mobile) */}
+      <div className="fixed bottom-6 right-6 z-50 flex md:hidden flex-col items-end gap-2 animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-105 transition-transform group">
         <button 
           onClick={closeDefinitely}
-          className="bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground rounded-full p-1.5 shadow-sm border text-xs"
+          className="bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground rounded-full p-2 shadow-md border border-border bg-white text-xs z-50 mr-1"
           aria-label="Não exibir por 30 dias"
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
         <div className="relative flex items-center justify-center rounded-full p-[2px] overflow-hidden shadow-2xl bg-primary">
           {/* Borda giratória */}

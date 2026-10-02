@@ -19,9 +19,10 @@ interface MenteeStats {
 interface MenteeActivationChecklistProps {
   profile: ChecklistProfile | null
   stats: MenteeStats
+  hasDiagnostic?: boolean
 }
 
-export function MenteeActivationChecklist({ profile, stats }: MenteeActivationChecklistProps) {
+export function MenteeActivationChecklist({ profile, stats, hasDiagnostic = false }: MenteeActivationChecklistProps) {
   const profileReady = Boolean(
     profile?.first_name && profile?.last_name && profile?.slug && profile?.bio && profile?.job_title
   )
@@ -31,6 +32,11 @@ export function MenteeActivationChecklist({ profile, stats }: MenteeActivationCh
       done: profileReady,
       label: "Complete seu perfil público com suas informações",
       href: "/profile",
+    },
+    {
+      done: hasDiagnostic,
+      label: "Responda o diagnóstico de IA para traçar seus objetivos",
+      href: "/quiz",
     },
     {
       done: stats.completedSessions > 0,

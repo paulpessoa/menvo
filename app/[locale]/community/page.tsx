@@ -29,6 +29,7 @@ import {
   communityService,
   type CommunityProfile,
 } from "@/lib/services/community/community.service"
+import { searchCommunityAction } from "@/app/actions/community"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import {
   Select,
@@ -104,20 +105,12 @@ export default function CommunityPage() {
     }
 
     try {
-      const queryParams = new URLSearchParams({
+      const result = await searchCommunityAction({
         search,
-        page: pageNum.toString(),
-        limit: ITEMS_PER_PAGE.toString(),
+        page: pageNum,
+        limit: ITEMS_PER_PAGE,
+        sortBy: filters.sortBy
       })
-
-      queryParams.append("sortBy", filters.sortBy)
-      
-      const response = await fetch(`/api/community?${queryParams.toString()}`)
-      if (!response.ok) {
-        throw new Error("Failed to load community profiles")
-      }
-      
-      const result = await response.json()
 
       // If a newer query was initiated while this one was in flight, discard this result
       if (currentQueryId !== queryIdRef.current) return

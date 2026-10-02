@@ -12,32 +12,26 @@ export async function QuizDiscoverySection() {
   const t = await getTranslations("home.quiz")
 
   return (
-    <section className="w-full py-16 md:py-24 bg-gradient-to-b from-background via-primary/[0.03] to-background relative overflow-hidden">
-      {/* Decorative background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary/10 rounded-full blur-3xl pointer-events-none -z-10" />
+    <section className="w-full py-12 md:py-16 bg-background relative overflow-hidden">
+      <div className="container max-w-3xl px-4 md:px-6">
+        <div className="rounded-2xl border border-primary/10 bg-primary/[0.02] p-6 md:p-10 flex flex-col items-center text-center">
 
-      <div className="container max-w-4xl px-4 md:px-6">
-        <div className="rounded-3xl border border-primary/20 bg-card/80 backdrop-blur-md p-8 md:p-14 shadow-xl relative overflow-hidden flex flex-col items-center text-center">
-          {/* Subtle accent ribbon */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-primary/20 via-purple-500/10 to-transparent rounded-bl-full pointer-events-none" />
-
-          <Badge variant="secondary" className="mb-6 px-3.5 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary border-primary/20 flex items-center gap-1.5 w-fit">
+          <Badge variant="secondary" className="mb-4 px-3 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary border-primary/20 flex items-center gap-1.5 w-fit">
             <BrainCircuit className="w-3.5 h-3.5" />
             {t("badge")}
           </Badge>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-foreground leading-[1.15] mb-5">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-tight mb-3">
             {t("title")}
           </h2>
 
-          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed max-w-2xl mb-8">
+          <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-xl mb-6">
             {t("subtitle")}
           </p>
 
           <Button
-            size="lg"
             asChild
-            className="rounded-xl font-bold px-8 shadow-md hover:scale-105 transition-transform"
+            className="rounded-xl font-bold px-6 shadow-sm hover:scale-105 transition-transform"
           >
             <Link href="/quiz">
               {t("ctaButton")}

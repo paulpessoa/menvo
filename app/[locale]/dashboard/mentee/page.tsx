@@ -226,9 +226,9 @@ function MenteeDashboardTabs({
           />
         )}
 
-        {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
+        <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />
 
-        <MenteeActivationChecklist profile={profile} stats={stats} />
+        <MenteeActivationChecklist profile={profile} stats={stats} hasDiagnostic={Boolean(quizSummary)} />
 
         {/* Barra de Métricas Compacta */}
         <div className="flex flex-wrap items-center gap-4 text-sm bg-muted/30 rounded-2xl p-4 border border-border/50">
