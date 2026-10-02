@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Search, Users, Loader2, Info, MessageCircle, Sparkles, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -88,7 +88,7 @@ export default function CommunityPage() {
   // Tracking query ID to safely discard out-of-order responses and avoid race conditions
   const queryIdRef = useRef(0)
 
-  const loadProfiles = async (
+  const loadProfiles = useCallback(async (
     isInitial: boolean,
     search: string,
     pageNum: number
@@ -107,7 +107,6 @@ export default function CommunityPage() {
         page: pageNum.toString(),
         limit: ITEMS_PER_PAGE.toString(),
       })
-
 
       queryParams.append("sortBy", filters.sortBy)
       
@@ -140,7 +139,7 @@ export default function CommunityPage() {
         setLoadingMore(false)
       }
     }
-  }
+  }, [filters.sortBy, tCommunity])
 
   // Initial load on mount and debounced search updates
   useEffect(() => {
@@ -152,10 +151,34 @@ export default function CommunityPage() {
     return () => clearTimeout(timer)
   }, [searchTerm, filters])
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (loadingMore || !hasMore) return
     loadProfiles(false, searchTerm, page + 1)
-  }
+  }, [loadingMore, hasMore, page, searchTerm, loadProfiles])
+
+  const loaderRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          handleLoadMore()
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    const currentRef = loaderRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [hasMore, loadingMore, handleLoadMore])
 
   const handleChat = (targetUserId: string) => {
     if (!user) {
@@ -414,19 +437,13 @@ export default function CommunityPage() {
           </div>
 
           {hasMore && (
-            <div className="mt-12 text-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="px-8 shadow-sm"
-              >
-                {loadingMore ? (
-                  <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                ) : null}
-                {tCommunity("loadMore")}
-              </Button>
+            <div ref={loaderRef} className="mt-12 flex justify-center p-4">
+              {loadingMore && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  {tCommon("loading")}
+                </div>
+              )}
             </div>
           )}
         </>
