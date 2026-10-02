@@ -303,11 +303,11 @@ export default function CommunityPage() {
 
       {/* Search + Filters (Single Row) */}
       <div id="tour-community-list" className="flex flex-col xl:flex-row gap-3 w-full mb-8">
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative flex-1 min-w-0 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
             placeholder={tCommunity("searchPlaceholder")}
-            className="pl-10 h-11 rounded-xl w-full"
+            className="pl-12 pr-12 h-14 rounded-2xl w-full border-border/80 shadow-2xs text-base transition-all focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:border-primary/50 bg-card hover:bg-accent/20"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -346,7 +346,7 @@ export default function CommunityPage() {
               setFilters((prev) => ({ ...prev, sortBy: val }))
             }
           >
-            <SelectTrigger className="w-full sm:w-[155px] h-11 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
+            <SelectTrigger className="w-full sm:w-[160px] h-11 sm:h-14 rounded-xl sm:rounded-2xl border-border/80 shadow-2xs font-medium text-xs sm:text-sm bg-card hover:bg-accent/20">
               <div className="flex items-center gap-1.5 truncate">
                 <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <SelectValue placeholder="Ordenar por" />
@@ -396,7 +396,7 @@ export default function CommunityPage() {
 
       {/* Results Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
@@ -418,7 +418,7 @@ export default function CommunityPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {displayedAIProfiles.map((profile) => (
               <MenteeCard
                 key={`ai-${profile.id}`}
