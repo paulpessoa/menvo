@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef } from "react"
+import Link from "next/link"
 import { Eye, FileText, GraduationCap, Target } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
