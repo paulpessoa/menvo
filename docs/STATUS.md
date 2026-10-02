@@ -107,6 +107,11 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-02 - Google Calendar do mentor: verificado em produção e deixado claro que é só consulta
+- **Verificado:** com a conta do Paul conectada, um evento "Ocupado" (08/10 20:30) escondeu o slot em `/api/appointments/availability`; evento de dia inteiro marcado "Livre" ("SEXTOU PAPAI") não bloqueia, porque o Google não o inclui no freebusy.
+- **Texto:** card "Sincronização Pessoal" em `/mentor/availability`, artigo `kb/mentores/integracao-google-calendar.md` (corrigido: antes prometia gravação de eventos, mas os escopos são só leitura), resposta do assistente (`lib/services/assistant/tools.ts`) e `docs/domains/scheduling.md` §2.4 agora dizem: só consulta ocupado/livre, só remove horários, só "Ocupado" bloqueia, falha silenciosa mostra todos os slots.
+- **Aberto:** primeira chamada em produção levou 5-6 s e uma estourou `FUNCTION_INVOCATION_TIMEOUT`; falta um timeout curto na chamada ao Google (com o mesmo fallback silencioso).
+
 ### 2026-10-02 - Bucket `cvs` privado
 - **Why:** bucket público com policy de SELECT em tudo: qualquer visitante anônimo listava as pastas (ids de usuário) e baixava os 274 currículos.
 - **Código:** o currículo é entregue por `/api/cv/<userId>` no domínio do Menvo: a rota confere `profile_cv_url` (próprio, admin, mentor com mentoria) a cada acesso e baixa o PDF do bucket pelo servidor, então o navegador não vê endereço do Supabase nem token e o link não expira. Só serve arquivo do próprio dono (upload `<uid>/…` ou importação `estagio-recife/<uid>_cv.pdf`). `PUT /api/profile` não aceita mais `cv_url`; só `/api/upload/cv` grava, e grava o caminho. A exclusão de conta passou a apagar também o currículo importado, que ficava fora da pasta do usuário.

@@ -385,21 +385,39 @@ Profissionais que atuam como desenvolvedores, engenheiros de dados, cientistas d
 ## Integração com o Google Calendar
 
 **Categoria:** mentores | **Público:** mentor, admin
-**Tags:** google-calendar, integracao, sincronizacao, conflitos, meet
+**Tags:** google-calendar, integracao, sincronizacao, conflitos, meet, privacidade
 
 # Integração com o Google Calendar
 
-Para evitar conflitos de agenda com sua rotina de trabalho pessoal, a Menvo permite sincronizar seu calendário Google diretamente:
+A conexão serve para **evitar conflitos** entre a sua agenda da Menvo e os seus compromissos pessoais. Ela é **somente consulta**.
 
-## Benefícios da Conexão
-1. **Detecção de Conflitos em Tempo Real:** Sempre que um mentorado for escolher um horário na sua agenda da Menvo, o sistema consulta a API `freebusy` do Google Calendar. Se você tiver uma reunião pessoal naquele horário, o slot é automaticamente ocultado da sua página pública.
-2. **Criação Automática de Eventos:** Quando você confirma uma solicitação de mentoria, um evento é adicionado ao seu Google Agenda e ao do mentorado.
-3. **Link do Google Meet Incluso:** O link seguro da videochamada é gerado e anexado diretamente ao evento da reunião.
+## O que a integração faz
+- Quando um mentorado vai escolher um horário, a Menvo pergunta ao Google apenas se você está **ocupado ou livre** naquele intervalo. Se estiver ocupado, o horário some da sua página pública.
+- Ela só **remove** opções. Nunca cria horários que você não cadastrou em `/mentor/availability`.
 
-## Como Conectar
+## O que a integração NÃO faz
+- Não lê título, descrição, convidados ou local dos seus eventos.
+- Não cria, altera nem apaga nada na sua agenda. A permissão pedida é só de leitura de disponibilidade.
+- Não importa seus horários livres: seus horários de mentoria continuam sendo os que você cadastrou na Menvo.
+
+## Regra importante: só eventos "Ocupado" bloqueiam
+O Google só informa como ocupado o que está marcado como **"Ocupado"**. Eventos marcados como **"Livre"** não bloqueiam nenhum horário. Isso é comum em eventos de **dia inteiro** (feriados, "folga", lembretes), que o Google Agenda cria como "Livre" por padrão.
+
+- Quer fechar um dia inteiro? Abra o evento no Google Agenda e mude de "Livre" para **"Ocupado"**.
+- Um evento marcado como "Ocupado" no meio da noite bloqueia só aquele intervalo (a mentoria dura 45 minutos).
+
+## Google Meet
+O link do Google Meet é criado automaticamente quando você confirma uma solicitação de mentoria, e mentor e mentorado recebem o convite por e-mail. Isso funciona **com ou sem** a integração conectada.
+
+## Como conectar
 1. Acesse o painel `/mentor/availability`.
-2. Clique no botão **"Conectar Google Calendar"**.
-3. Autorize o acesso de leitura de disponibilidade e gravação de eventos na conta Google desejada.
+2. No card **"Sincronização Pessoal"**, clique em **"Conectar Google Calendar"**.
+3. Autorize a leitura de disponibilidade na conta Google que tem a sua agenda pessoal.
+
+Para parar, clique em **"Desconectar Agenda"** no mesmo card. Se não conectar, nada muda: sua agenda funciona normalmente, apenas sem esse filtro.
+
+## Se a sincronização falhar
+Se o Google estiver fora do ar ou a conexão expirar, a Menvo ignora o filtro e mostra todos os seus horários cadastrados, então **pode haver conflito**. Nesse caso, desconecte e conecte de novo.
 
 **Links Úteis:**
 - Conectar Google Calendar: https://www.menvo.com.br/mentor/availability

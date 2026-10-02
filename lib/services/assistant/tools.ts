@@ -183,7 +183,7 @@ export function explainHowItWorks(input: z.infer<typeof explainHowItWorksInput>)
       ]
     },
     mentor: {
-      answer: "Mentores atuam de forma voluntária, compartilhando seu conhecimento prático e ajudando a democratizar o acesso à tecnologia no Brasil. A plataforma gerencia sua agenda, sincronizando automaticamente com o Google Calendar.",
+      answer: "Mentores atuam de forma voluntária, compartilhando seu conhecimento prático e ajudando a democratizar o acesso à tecnologia no Brasil. Você define seus horários na plataforma e, se quiser, conecta o Google Agenda só para consulta: a Menvo vê apenas ocupado/livre (eventos marcados como Ocupado) para esconder conflitos, sem ler detalhes nem alterar sua agenda.",
       links: [
         { label: "Como Funciona", url: `${baseUrl}/how-it-works` }
       ]

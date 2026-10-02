@@ -33,9 +33,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (action === 'user_auth') {
-    // Generate authorization URL for individual mentor sync
+    // Generate authorization URL for individual mentor sync.
+    // Only free/busy: it is all `freebusy.query` needs, and a narrower scope
+    // is easier to justify in Google's OAuth verification than `calendar.readonly`.
     const scopes = [
-      'https://www.googleapis.com/auth/calendar.readonly',
       'https://www.googleapis.com/auth/calendar.freebusy',
     ];
 
