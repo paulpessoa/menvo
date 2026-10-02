@@ -1,9 +1,4 @@
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-
 export const CV_BUCKET = "cvs"
-
-/** Validade das URLs assinadas: o link expira, então vazar um não expõe o PDF para sempre. */
-const SIGNED_URL_TTL_SECONDS = 60 * 60
 
 const LEGACY_PUBLIC_MARKER = `/storage/v1/object/public/${CV_BUCKET}/`
 
@@ -36,44 +31,11 @@ export function cvStoragePath(stored: string | null | undefined, userId: string)
 }
 
 /**
- * Gera URLs assinadas (uma chamada para todos) dos currículos dessas pessoas.
- * NÃO autoriza o leitor: o chamador já precisa ter decidido que quem pediu
- * pode ver esses currículos (próprio, admin ou `profile_cv_url`). Usa service
- * role porque o bucket é privado.
- *
- * @returns mapa userId → URL assinada (ausente se não há arquivo válido)
+ * Link do currículo de `userId` no próprio Menvo (`/api/cv/<userId>`), ou null
+ * se não há arquivo válido. A rota confere a permissão a cada acesso e entrega
+ * o PDF pelo servidor, então o navegador nunca vê o endereço do Supabase nem
+ * um token, e o link não expira.
  */
-export async function signCvUrls(
-  entries: Array<{ userId: string; stored: string | null | undefined }>
-): Promise<Map<string, string>> {
-  const signed = new Map<string, string>()
-  const pathByUser = new Map<string, string>()
-
-  for (const { userId, stored } of entries) {
-    const path = cvStoragePath(stored, userId)
-    if (path) pathByUser.set(userId, path)
-  }
-  if (pathByUser.size === 0) return signed
-
-  const { data, error } = await createServiceRoleClient()
-    .storage.from(CV_BUCKET)
-    .createSignedUrls([...pathByUser.values()], SIGNED_URL_TTL_SECONDS)
-
-  if (error) throw new Error(error.message)
-
-  const urlByPath = new Map<string, string>()
-  for (const item of data ?? []) {
-    if (item.path && item.signedUrl && !item.error) urlByPath.set(item.path, item.signedUrl)
-  }
-  for (const [userId, path] of pathByUser) {
-    const url = urlByPath.get(path)
-    if (url) signed.set(userId, url)
-  }
-  return signed
-}
-
-/** Atalho de `signCvUrls` para o currículo (já autorizado) de uma pessoa. */
-export async function signCvUrl(userId: string, stored: string | null | undefined): Promise<string | null> {
-  if (!stored) return null
-  return (await signCvUrls([{ userId, stored }])).get(userId) ?? null
+export function cvLink(userId: string, stored: string | null | undefined): string | null {
+  return cvStoragePath(stored, userId) ? `/api/cv/${userId}` : null
 }

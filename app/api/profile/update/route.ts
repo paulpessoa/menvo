@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger'
 import { ErrorHandler } from '@/lib/error-handler'
 import { Database } from '@/lib/types/supabase'
 import { MENTEE_PROFILE_EMBED_WITH_CV, splitMenteeFields, withMenteeFields } from '@/lib/services/mentees/mentee-profile-fields'
-import { signCvUrl } from '@/lib/services/mentees/cv-storage'
+import { cvLink } from '@/lib/services/mentees/cv-storage'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
 
     if (updateError) throw updateError
     const flattened = withMenteeFields(updatedRow)
-    const updatedProfile = { ...flattened, cv_url: await signCvUrl(user.id, flattened.cv_url) }
+    const updatedProfile = { ...flattened, cv_url: cvLink(user.id, flattened.cv_url) }
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       profile: {
         ...withMenteeFields(profile),
-        cv_url: await signCvUrl(user.id, withMenteeFields(profile).cv_url),
+        cv_url: cvLink(user.id, withMenteeFields(profile).cv_url),
         roles
       }
     })

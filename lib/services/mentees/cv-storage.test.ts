@@ -1,6 +1,6 @@
 jest.mock("@/lib/utils/supabase/service-role", () => ({ createServiceRoleClient: jest.fn() }))
 
-import { cvStoragePath } from "./cv-storage"
+import { cvLink, cvStoragePath } from "./cv-storage"
 
 const UID = "0737122a-0579-4981-9802-41883d6563a3"
 
@@ -31,5 +31,13 @@ describe("cvStoragePath", () => {
     expect(cvStoragePath("teste", UID)).toBeNull()
     expect(cvStoragePath("", UID)).toBeNull()
     expect(cvStoragePath(null, UID)).toBeNull()
+  })
+})
+
+describe("cvLink", () => {
+  it("returns the Menvo link only when the owner has a valid file", () => {
+    expect(cvLink(UID, `${UID}/cv-1.pdf`)).toBe(`/api/cv/${UID}`)
+    expect(cvLink(UID, `${OTHER}/cv-1.pdf`)).toBeNull()
+    expect(cvLink(UID, null)).toBeNull()
   })
 })
