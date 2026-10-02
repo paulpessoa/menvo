@@ -9,8 +9,8 @@ import { preload } from "react-dom"
 
 import { QuizDiscoverySection } from "@/components/QuizDiscoverySection"
 import { MentorCard } from "@/components/mentors/MentorCard"
-import { HeroActions } from "@/components/home/HeroActions"
-import { FinalCTA } from "@/components/home/FinalCTA"
+import { DeferredHeroActions } from "@/components/home/DeferredHeroActions"
+import { DeferredFinalCTA } from "@/components/home/DeferredFinalCTA"
 import { getFeaturedMentors } from "@/lib/services/mentors/home-highlights"
 
 const HERO_POSTER = "/images/ai-demo-poster.webp"
@@ -37,7 +37,7 @@ export default async function Home() {
             <p className="max-w-[540px] text-muted-foreground text-base md:text-lg mb-8 text-center lg:text-left leading-relaxed">
               {t("hero.description")}
             </p>
-            <HeroActions />
+            <DeferredHeroActions />
           </div>
           {/* Vídeo */}
           <div className="flex-1 flex justify-center items-center relative">
@@ -149,7 +149,7 @@ export default async function Home() {
       {/* AI Quiz Discovery Section */}
       <QuizDiscoverySection />
 
-      <FinalCTA />
+      <DeferredFinalCTA />
     </div>
   )
 }
