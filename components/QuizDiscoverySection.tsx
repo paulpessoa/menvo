@@ -1,17 +1,15 @@
-"use client"
-
+import { getTranslations } from "next-intl/server"
 import { Link } from "@/i18n/routing"
 import { BrainCircuit, CheckCircle2, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useTranslations } from "next-intl"
 
 /**
  * High-converting public Landing Page section to drive unauthenticated
  * or prospective mentees to take the AI Career Quiz.
  */
-export function QuizDiscoverySection() {
-  const t = useTranslations("home.quiz")
+export async function QuizDiscoverySection() {
+  const t = await getTranslations("home.quiz")
 
   return (
     <section className="w-full py-16 md:py-24 bg-gradient-to-b from-background via-primary/[0.03] to-background relative overflow-hidden">
