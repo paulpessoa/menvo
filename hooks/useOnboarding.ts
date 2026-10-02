@@ -22,6 +22,7 @@ export function useOnboarding(tourId: string, steps: DriveStep[], onComplete?: (
     if (flags[tourId]) return
 
     let driverObj: any = null
+    let completed = false
 
     // Small delay to ensure the UI is fully rendered
     const timer = setTimeout(() => {
@@ -34,7 +35,15 @@ export function useOnboarding(tourId: string, steps: DriveStep[], onComplete?: (
         nextBtnText: 'Próximo',
         prevBtnText: 'Anterior',
         steps,
+        onDestroyStarted: () => {
+          if (!driverObj.hasNextStep() || driverObj.isLastStep?.()) {
+            completed = true
+          }
+          driverObj.destroy()
+        },
         onDestroyed: async () => {
+          if (!completed) return
+
           try {
             await fetch('/api/profile/onboarding', {
               method: 'POST',
