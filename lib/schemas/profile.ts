@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { toPlainText } from "./plain-text"
 
 /**
  * Optional profile URL. People routinely paste `linkedin.com/in/fulano`
@@ -19,7 +20,7 @@ const profileUrl = (message: string) =>
 export const updateProfileSchema = z.object({
   first_name: z.string().trim().min(1, "Nome é obrigatório").optional(),
   last_name: z.string().trim().min(1, "Sobrenome é obrigatório").optional(),
-  bio: z.string().max(3000, "Bio muito longa").optional().nullable(),
+  bio: z.string().max(3000, "Bio muito longa").transform(toPlainText).optional().nullable(),
   job_title: z.string().max(150).optional().nullable(),
   company: z.string().max(150).optional().nullable(),
   city: z.string().max(100).optional().nullable(),

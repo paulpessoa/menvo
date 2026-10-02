@@ -5,6 +5,7 @@ import { ErrorHandler } from '@/lib/error-handler'
 import { Database } from '@/lib/types/supabase'
 import { MENTEE_PROFILE_EMBED_WITH_CV, splitMenteeFields, withMenteeFields } from '@/lib/services/mentees/mentee-profile-fields'
 import { cvLink } from '@/lib/services/mentees/cv-storage'
+import { toPlainText } from '@/lib/schemas/plain-text'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -36,7 +37,7 @@ export async function PUT(request: NextRequest) {
     const updateData: any = {
       first_name: body.first_name,
       last_name: body.last_name,
-      bio: body.bio,
+      bio: typeof body.bio === 'string' ? toPlainText(body.bio) : body.bio,
       avatar_url: body.avatar_url,
       city: body.city,
       state: body.state,

@@ -5,6 +5,7 @@ import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
 import { splitMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
+import { toPlainText } from "@/lib/schemas/plain-text"
 
 // Admin client com service role para ignorar RLS
 const supabaseAdmin = createClient(
@@ -28,7 +29,7 @@ const supabaseAdmin = createClient(
 const updatesSchema = z.object({
   first_name: z.string().max(100).optional(),
   last_name: z.string().max(100).optional(),
-  bio: z.string().max(5000).optional(),
+  bio: z.string().max(5000).transform(toPlainText).optional(),
   avatar_url: z.string().max(2000).optional(),
   is_public: z.boolean().optional(),
   institution: z.string().max(200).optional(),
