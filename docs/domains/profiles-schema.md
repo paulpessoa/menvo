@@ -1,6 +1,6 @@
 # Plano: enxugar e normalizar a tabela `profiles`
 
-> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Próxima: Fase 2 (`mentor_profiles`), a que mexe nos mentores.
+> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) em andamento: expand aplicado e código trocado; falta deploy → RESYNC → contract (`profiles` vai para 34 colunas).
 > **Para quem retoma:** leia a seção "Diagnóstico" e vá direto para a fase em aberto. Cada fase é uma PR própria.
 
 ## Objetivo
@@ -50,7 +50,9 @@ Preenchimento real por coluna, medido com leitura direta no banco, cruzado com u
 profiles            (identidade)   id, email, slug, first_name, last_name, full_name, avatar_url, bio,
                                    city, state, country, timezone, languages, linkedin_url, phone,
                                    email_opt_out_at, is_public, search_vector, created_at, updated_at
-mentor_profiles     (1:1, PK = user_id → profiles.id)   campos de mentor + verification_status/verified_at/notes
+mentor_profiles     (1:1, PK = user_id → profiles.id)   campos só de mentor + verification_status/verified_at/notes
+                                   (job_title, company, expertise_areas, mentorship_topics e os links
+                                   ficam em profiles: mentorados também usam)
 mentee_profiles     (1:1, PK = user_id → profiles.id)   campos acadêmicos + cv_url + learning_goals
 import_records      (1:1, PK = user_id → profiles.id)   origin_platform, external_id, original_data, invite_sent_at
 mentors_view        junta profiles + mentor_profiles e calcula average_rating, total_reviews,
@@ -85,13 +87,22 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
 - **Como foi feito:** `import_records` tem 605 linhas (quem tem `original_data`, `external_id`, `invite_sent_at` ou origem diferente de `menvo`). `origin_platform = 'menvo'` numa linha significa "isento da retenção". No painel admin, a aba JotForm = linha com origem `jotform`; a aba Menvo = sem linha de importação (os 46 registros de lista de espera aparecem só em "Todos"). O retorno de `/api/admin/users` continua achatando `origin_platform` e `invite_sent_at`, então a tela não mudou.
 - **Ordem:** aplicar `expand` (feito) → deploy → rodar o RESYNC do rodapé do expand → exportar CSV → aplicar `contract`.
 
-### Fase 2: `mentor_profiles` (risco médio)
-1. Criar tabela + RLS (leitura pública só de verificados e públicos; escrita do próprio mentor e admin).
-2. Copiar dados de quem é mentor ou tem `verification_status` não nulo.
+### Fase 2: `mentor_profiles` (risco médio) — expand aplicado e código trocado em 2026-10-02; falta deploy → RESYNC → contract
+1. Criar tabela + RLS (leitura pública só de mentor com perfil público; escrita do próprio mentor e admin).
+2. Copiar dados de quem é mentor ou tem `verification_status` pending/rejected.
 3. Mover `verification_status`/`verified_at`/`verification_notes`; `verified` e `is_pending_mentor` viram cálculo na view; remover o trigger `sync_profile_verification_flags`.
-4. RPC para salvar perfil + dados de mentor juntos; trocar formulários de perfil/onboarding.
+4. ~~RPC para salvar perfil + dados de mentor juntos~~: ver "Como foi feito".
 5. Trocar leituras para `mentors_view`; só então apagar as colunas de `profiles`.
 6. Atualizar `mentor-verification.md`.
+- **Diagnóstico (2026-10-02):** `job_title`, `company`, `expertise_areas`, `mentorship_topics`, `github_url`, `portfolio_url` e `website_url` **não** são só de mentor: o formulário grava para os dois papéis ("O que você quer aprender" = `mentorship_topics`), comunidade, `MenteeCard` e match de IA leem, e 11 mentorados preenchem. Ficam em `profiles`. Saem 12 colunas (`experience_years`, `free_topics`, `inclusive_tags`, `mentorship_approach`, `what_to_expect`, `ideal_mentee`, `is_volunteer`, `chat_enabled`, `availability_status`, `verification_status`, `verified_at`, `verification_notes`) e 2 viram cálculo (`verified`, `is_pending_mentor`): 48 → 34 colunas.
+- **Achado de segurança no caminho:** as policies de escrita de `user_roles` deixavam qualquer conta se dar o papel `admin`. Corrigido antes, na migration `20261003030000_user_roles_no_self_assign.sql` (PR #81).
+- **Como foi feito:**
+  - Expand `20261004000000_mentor_profiles_expand.sql` (aplicado): 15 linhas (13 mentores + 2 candidatos `rejected`; os 560 mentorados `approved` pelo onboarding antigo ficaram de fora). `mentors_view` lê de `mentor_profiles` com os mesmos nomes de coluna. `verification_notes` sem grant para usuários; status sem grant de escrita (antes o usuário conseguia se aprovar com UPDATE em `profiles`). Trigger de transição `profiles_mirror_mentor_fields` copia para `mentor_profiles` só o que o código antigo mudar em `profiles` até o contract.
+  - Status muda só por RPC `security definer` (`request_mentor_verification`, `withdraw_mentor_verification`) ou pelo admin (`processVerification`, service role). `/api/profile/role` parou de gravar `approved` para mentorado.
+  - Em vez de uma RPC que salva perfil + mentor juntos, `/api/profile` (PUT) separa o payload com `splitMentorFields` e faz dois UPDATEs (mentor primeiro). Atomicidade não compensa uma RPC com lista de colunas duplicada: as duas partes são independentes e o formulário reenvia tudo.
+  - `withMentorFields` devolve o perfil achatado no formato de antes (`verified`, `is_pending_mentor` calculados), então as telas não mudaram. `lib/types/supabase.ts` já está sem as 14 colunas, para o `tsc` pegar qualquer leitura restante.
+  - Removidos caminhos mortos que gravavam verificação direto: POST de `/api/admin/mentors` e `toggle_verification_legacy`.
+- **Ordem:** expand (feito) → deploy → RESYNC (rodapé do expand) → exportar CSV → contract `20261004010000_mentor_profiles_contract.sql`.
 
 ### Fase 3: `mentee_profiles` (risco médio)
 Mesmo padrão da Fase 2 para os campos acadêmicos e `cv_url` (bucket de storage não muda, só a coluna com a URL).

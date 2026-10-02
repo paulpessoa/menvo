@@ -55,6 +55,11 @@ export async function getAdminOverview(db: Db, serviceDb: SupabaseClient, now = 
   const month = now.toISOString().slice(0, 7)
   const monthStart = `${month}-01`
   const profiles = () => db.from("profiles").select("*", { count: "exact", head: true })
+  // select("user_id"), não "*": verification_notes não tem grant para usuários.
+  const mentorApplications = (status: string) =>
+    db.from("mentor_profiles").select("user_id", { count: "exact", head: true }).eq("verification_status", status)
+  const verifiedMentorCount = () =>
+    db.from("mentors_view").select("id", { count: "exact", head: true }).eq("verified", true)
   const byRole = (role: string) =>
     db.from("profiles").select("user_roles!inner(roles!inner(name))", { count: "exact", head: true }).eq("user_roles.roles.name", role)
   const feedbackStars = (stars: number) =>
@@ -87,13 +92,12 @@ export async function getAdminOverview(db: Db, serviceDb: SupabaseClient, now = 
     headCount(profiles()),
     headCount(profiles().gte("created_at", daysAgo(now, 30))),
     headCount(profiles().gte("created_at", daysAgo(now, 60)).lt("created_at", daysAgo(now, 30))),
-    headCount(byRole("mentor").eq("verified", true)),
+    headCount(verifiedMentorCount()),
     headCount(byRole("mentee")),
-    headCount(profiles().eq("verification_status", "pending")),
-    // Role filter on purpose: the JotForm import left ~560 mentees with
-    // verification_status = 'approved', which are not mentor approvals.
-    headCount(byRole("mentor").eq("verification_status", "approved")),
-    headCount(profiles().eq("verification_status", "rejected")),
+    headCount(mentorApplications("pending")),
+    // Approved = verified AND still holds the mentor role (mentors_view).
+    headCount(verifiedMentorCount()),
+    headCount(mentorApplications("rejected")),
     headCount(feedbackStars(5)),
     headCount(feedbackStars(4)),
     headCount(feedbackStars(3)),

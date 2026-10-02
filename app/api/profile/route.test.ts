@@ -63,7 +63,7 @@ describe("GET /api/profile: creating the profile of a new account", () => {
 
     expect(res.status).toBe(200)
     expect(inserted).toEqual([
-      { id: "u1", email: "poliannachiappetta@hotmail.com", first_name: "Polianna", last_name: "Chiappetta", verified: false }
+      { id: "u1", email: "poliannachiappetta@hotmail.com", first_name: "Polianna", last_name: "Chiappetta" }
     ])
   })
 

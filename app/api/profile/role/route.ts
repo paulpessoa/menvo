@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
     // PostgREST rejeita o payload inteiro se ele contiver uma coluna
     // desconhecida, então isso fazia esse UPDATE falhar com 500 para
     // QUALQUER usuário terminando o onboarding.
+    // Verificação só existe para candidato a mentor (mentor_profiles, via RPC
+    // mais abaixo). Antes este UPDATE gravava 'approved' em todo mentorado.
     const profileUpdates: Record<string, any> = {
-      verification_status: role === "mentor" ? "pending" : "approved",
-      is_pending_mentor: role === "mentor",
       updated_at: new Date().toISOString(),
     }
 
@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
       if (typeof profileData.learning_goals === "string") profileUpdates.learning_goals = profileData.learning_goals
       if (Array.isArray(profileData.expertise_areas)) profileUpdates.expertise_areas = profileData.expertise_areas
       if (Array.isArray(profileData.mentorship_topics)) profileUpdates.mentorship_topics = profileData.mentorship_topics
-      if (Array.isArray(profileData.inclusive_tags)) profileUpdates.inclusive_tags = profileData.inclusive_tags
     }
 
     const { error: updateError } = await (supabase
@@ -68,8 +67,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
     }
 
-    // Removemos a escrita na tabela `validation_requests` aqui (Opção A)
-    // pois ela é write-only neste fluxo e o admin aprova com base em `profiles.verification_status`.
+    // Candidato a mentor entra na fila de verificação. O admin aprova com base
+    // em `mentor_profiles.verification_status`.
+    if (role === "mentor") {
+      const { error: requestError } = await supabase.rpc("request_mentor_verification")
+      if (requestError) {
+        console.error("❌ Erro ao pedir verificação de mentor:", requestError)
+        return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
+      }
+
+      const inclusiveTags = profileData?.inclusive_tags
+      if (Array.isArray(inclusiveTags)) {
+        const { error: tagsError } = await supabase
+          .from("mentor_profiles")
+          .update({ inclusive_tags: inclusiveTags })
+          .eq("user_id", user.id)
+        if (tagsError) console.error("❌ Erro ao salvar tags inclusivas:", tagsError)
+      }
+    }
 
     // 2. Atribuir a role no sistema de RBAC
     // "mentor" e "mentee" são mutuamente exclusivos: sem isso, um usuário que

@@ -6,10 +6,12 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 
 /** Profile row as returned by the list query: the select string is built dynamically, so supabase-js cannot infer it. */
 type AdminProfileRow = Record<string, unknown> & {
   import_records: { origin_platform: string; invite_sent_at: string | null } | null
+  mentor_profiles?: unknown
 }
 
 export async function GET(request: NextRequest) {
@@ -39,9 +41,17 @@ export async function GET(request: NextRequest) {
     // filtro de origem JotForm usamos !inner para filtrar o nível de profiles.
     const importEmbed = origin === "jotform" ? "import_records!inner (origin_platform, invite_sent_at)" : "import_records (origin_platform, invite_sent_at)"
 
+    // Verificação mora em mentor_profiles; com filtro de status usamos !inner
+    // para filtrar o nível de profiles (embed nulo + or() não funciona no PostgREST).
+    const filtersByStatus = status === "pending" || status === "verified"
+    const mentorEmbed = filtersByStatus
+      ? MENTOR_PROFILE_EMBED.replace("mentor_profiles(", "mentor_profiles!inner(")
+      : MENTOR_PROFILE_EMBED
+
     let selectStr = `
       *,
       ${importEmbed},
+      ${mentorEmbed},
       user_roles (
         roles (
           name
@@ -54,6 +64,7 @@ export async function GET(request: NextRequest) {
       selectStr = `
         *,
         ${importEmbed},
+        ${mentorEmbed},
         user_roles!inner (
           roles!inner (
             name
@@ -75,9 +86,9 @@ export async function GET(request: NextRequest) {
 
     // Filtro por status
     if (status === "pending") {
-      query = query.eq("verification_status", "pending")
+      query = query.eq("mentor_profiles.verification_status", "pending")
     } else if (status === "verified") {
-      query = query.eq("verified", true)
+      query = query.eq("mentor_profiles.verification_status", "approved")
     }
 
     // Filtro de busca
@@ -114,8 +125,8 @@ export async function GET(request: NextRequest) {
       .select("*", { count: "exact", head: true })
 
     const { count: pendingCount } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
+      .from("mentor_profiles")
+      .select("user_id", { count: "exact", head: true })
       .eq("verification_status", "pending")
 
     const { count: mentorsCount } = await supabase
@@ -143,8 +154,9 @@ export async function GET(request: NextRequest) {
     return successResponse({
       // Achata import_records para manter o formato que o painel já consome
       // (origin_platform e invite_sent_at no próprio usuário).
+      // Campos de mentor e verificação também são achatados (withMentorFields).
       users: ((profiles ?? []) as unknown as AdminProfileRow[]).map(({ import_records, ...profile }) => ({
-        ...profile,
+        ...withMentorFields(profile),
         origin_platform: import_records?.origin_platform ?? "menvo",
         invite_sent_at: import_records?.invite_sent_at ?? null
       })),

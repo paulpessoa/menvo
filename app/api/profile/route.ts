@@ -3,6 +3,11 @@ import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { updateProfileSchema } from "@/lib/schemas/profile"
 import { extractIdentity } from "@/lib/auth/oauth-identity"
+import {
+  MENTOR_PROFILE_EMBED,
+  splitMentorFields,
+  withMentorFields,
+} from "@/lib/services/mentors/mentor-profile-fields"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -18,17 +23,12 @@ const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
   },
 })
 
-const PROFILE_COLUMNS = `
-  id, email, first_name, last_name, full_name, avatar_url, slug, verified, 
-  bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, 
-  timezone, languages, job_title, company, experience_years, mentorship_topics, 
-  inclusive_tags, availability_status, github_url, website_url, phone, 
-  is_volunteer, cv_url, 
-  portfolio_url, mentorship_approach, what_to_expect, ideal_mentee, free_topics, 
-  chat_enabled, academic_level, 
-  institution, course, expected_graduation, 
-  is_pending_mentor, learning_goals
-`.trim()
+const PROFILE_COLUMNS =
+  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, cv_url, portfolio_url, academic_level, institution, course, expected_graduation, learning_goals" as const
+
+// Campos de mentor ficam em mentor_profiles; o embed os traz junto e
+// withMentorFields os devolve achatados, no mesmo formato de antes.
+const PROFILE_SELECT = `${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}` as const
 
 async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
@@ -63,17 +63,32 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
-    // Update profile in database
-    const updateData = {
-      ...parsed.data,
-      updated_at: new Date().toISOString(),
+    const { profile: profileFields, mentor: mentorFields } = splitMentorFields(parsed.data)
+
+    // Campos de mentor primeiro, para o select do perfil já voltar atualizado.
+    // update (não upsert): só mentor ou candidato tem linha (criada pela RPC
+    // request_mentor_verification). O formulário manda esses campos também
+    // para mentorados, e eles não devem ganhar linha vazia.
+    if (Object.keys(mentorFields).length > 0) {
+      const { error: mentorError } = await supabaseAdmin
+        .from("mentor_profiles")
+        .update(mentorFields)
+        .eq("user_id", user.id)
+
+      if (mentorError) {
+        console.error("❌ Mentor profile update error:", mentorError)
+        return NextResponse.json({
+          error: "Erro ao atualizar perfil",
+          details: mentorError.message
+        }, { status: 500 })
+      }
     }
 
-    const { data: updatedProfile, error: updateError } = await supabaseAdmin
+    const { data: updatedRow, error: updateError } = await supabaseAdmin
       .from("profiles")
-      .update(updateData)
+      .update({ ...profileFields, updated_at: new Date().toISOString() })
       .eq("id", user.id)
-      .select(PROFILE_COLUMNS)
+      .select(PROFILE_SELECT)
       .single()
 
     if (updateError) {
@@ -89,7 +104,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
-      profile: updatedProfile,
+      profile: updatedRow ? withMentorFields(updatedRow) : null,
     })
 
   } catch (error) {
@@ -116,7 +131,7 @@ export async function GET(request: NextRequest) {
     // Fetch profile from database
     const { data: profile, error: fetchError } = await supabaseAdmin
       .from("profiles")
-      .select(PROFILE_COLUMNS)
+      .select(PROFILE_SELECT)
       .eq("id", user.id)
       .single()
 
@@ -131,13 +146,12 @@ export async function GET(request: NextRequest) {
           email: user.email || "",
           first_name: identity.firstName,
           last_name: identity.lastName,
-          verified: false,
         }
 
         const { data: newProfile, error: createError } = await supabaseAdmin
           .from("profiles")
           .insert(profileData)
-          .select(PROFILE_COLUMNS)
+          .select(PROFILE_SELECT)
           .single()
 
         if (createError) {
@@ -148,7 +162,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-          profile: newProfile,
+          profile: newProfile ? withMentorFields(newProfile) : null,
         })
       } else {
         return NextResponse.json({ 
@@ -159,7 +173,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      profile: profile,
+      profile: withMentorFields(profile),
     })
 
   } catch (error) {

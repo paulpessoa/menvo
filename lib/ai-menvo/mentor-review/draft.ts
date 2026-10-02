@@ -50,12 +50,15 @@ export async function loadMentorApplication(
   const { data, error } = await supabase
     .from("profiles")
     .select(
-      "id, slug, full_name, first_name, last_name, job_title, company, bio, expertise_areas, mentorship_topics, mentorship_approach, what_to_expect, experience_years, linkedin_url, cv_url"
+      "id, slug, full_name, first_name, last_name, job_title, company, bio, expertise_areas, mentorship_topics, linkedin_url, cv_url, mentor_profiles(mentorship_approach, what_to_expect, experience_years)"
     )
     .eq("id", userId)
     .maybeSingle()
 
   if (error || !data) return null
+
+  // Texto da candidatura mora em mentor_profiles (1:1).
+  const mentor = data.mentor_profiles
 
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.menvo.com.br").replace(/\/$/, "")
   const fullName =
@@ -69,9 +72,9 @@ export async function loadMentorApplication(
     bio: data.bio,
     expertiseAreas: data.expertise_areas ?? [],
     mentorshipTopics: data.mentorship_topics ?? [],
-    mentorshipApproach: data.mentorship_approach,
-    whatToExpect: data.what_to_expect,
-    experienceYears: data.experience_years,
+    mentorshipApproach: mentor?.mentorship_approach ?? null,
+    whatToExpect: mentor?.what_to_expect ?? null,
+    experienceYears: mentor?.experience_years ?? null,
     hasLinkedin: Boolean(data.linkedin_url),
     hasCv: Boolean(data.cv_url),
     profileUrl: `${siteUrl}/mentors/${data.slug || data.id}`

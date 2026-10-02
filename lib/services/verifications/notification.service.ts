@@ -23,27 +23,27 @@ export interface VerificationResult {
 }
 
 /**
- * Profile columns written for each decision. `verification_status` is the
- * single source of truth; the DB trigger `sync_profile_verification_flags`
- * keeps `is_pending_mentor`/`verified` in sync, but we still send them so the
- * write is correct even before that migration runs.
- *
+ * `mentor_profiles` columns written for each decision. `verification_status`
+ * is the single source of truth; `verified`/`is_pending_mentor` are derived
+ * from it in `mentors_view` and `withMentorFields`.
+ */
+function buildMentorUpdate(userId: string, status: VerificationStatus, notes?: string) {
+  return {
+    user_id: userId,
+    verification_status: status,
+    verification_notes: notes ?? null,
+    verified_at: status === 'approved' ? new Date().toISOString() : null
+  }
+}
+
+/**
  * Approval also publishes the profile (`is_public`): the mentor directory only
  * lists public profiles, and the approval message tells the mentor they are
  * already listed. The mentor can hide it again from their own profile page.
  */
-function buildProfileUpdate(status: VerificationStatus, notes?: string) {
-  const now = new Date().toISOString()
-  const base = {
-    verification_status: status,
-    verification_notes: notes ?? null,
-    is_pending_mentor: status === 'pending',
-    updated_at: now
-  }
-  if (status === 'approved') {
-    return { ...base, verified: true, verified_at: now, is_public: true }
-  }
-  return base
+function buildProfileUpdate(status: VerificationStatus) {
+  const base = { updated_at: new Date().toISOString() }
+  return status === 'approved' ? { ...base, is_public: true } : base
 }
 
 /**
@@ -69,9 +69,9 @@ export async function processVerification({
   const serviceClient = createServiceRoleClient()
 
   // 1. Update profile - and fail loudly if no row was touched.
-  const { data: updated, error: updateError } = await (serviceClient
-    .from('profiles') as any)
-    .update(buildProfileUpdate(status, notes))
+  const { data: updated, error: updateError } = await serviceClient
+    .from('profiles')
+    .update(buildProfileUpdate(status))
     .eq('id', userId)
     .select('id, email, full_name')
     .maybeSingle()
@@ -79,7 +79,14 @@ export async function processVerification({
   if (updateError) throw new Error(`Erro ao atualizar perfil: ${updateError.message}`)
   if (!updated) throw new Error('Perfil não encontrado')
 
-  // 2. Approval grants the RBAC "mentor" role. isMentor, the dashboard and
+  // 2. The decision itself lives in mentor_profiles (users have no grant on it).
+  const { error: mentorError } = await serviceClient
+    .from('mentor_profiles')
+    .upsert(buildMentorUpdate(userId, status, notes), { onConflict: 'user_id' })
+
+  if (mentorError) throw new Error(`Erro ao registrar verificação: ${mentorError.message}`)
+
+  // 3. Approval grants the RBAC "mentor" role. isMentor, the dashboard and
   // `mentors_view` (the public directory) all read user_roles, not profile
   // columns. mentor/mentee are exclusive (see /api/profile/role).
   if (status === 'approved') {
@@ -110,7 +117,7 @@ export async function processVerification({
     }
   }
 
-  // 3. Chat message (sent from the admin's own session so it shows as them).
+  // 4. Chat message (sent from the admin's own session so it shows as them).
   let chatSent = false
   try {
     const conversationId = await getOrCreateConversation(supabase, userId, adminId)

@@ -6,10 +6,6 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import { sendAdminNewMentorNotification } from "@/lib/email/brevo"
-import type { Database } from "@/lib/types/supabase"
-import { SupabaseClient } from "@supabase/supabase-js"
-
-type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"]
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,22 +34,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const updateData: ProfileUpdate = {
-      is_pending_mentor: true,
-      verification_status: 'pending',
-      mentorship_approach: mentorshipApproach,
-      what_to_expect: whatToExpect || null
-    }
+    // O status só muda pela RPC (o usuário não tem grant na coluna); quem já
+    // está aprovado continua aprovado.
+    const { error: requestError } = await supabase.rpc("request_mentor_verification")
+    if (requestError) throw requestError
 
-    // Marcar perfil como solicitante de mentor
-    const { data, error } = await supabase
-      .from("profiles")
-      .update(updateData)
-      .eq("id", user.id)
-      .select('id, is_pending_mentor, verification_status')
+    const { data: mentor, error } = await supabase
+      .from("mentor_profiles")
+      .update({ mentorship_approach: mentorshipApproach, what_to_expect: whatToExpect || null })
+      .eq("user_id", user.id)
+      .select("user_id, verification_status")
       .single()
 
     if (error) throw error
+
+    const data = {
+      id: mentor.user_id,
+      is_pending_mentor: mentor.verification_status === "pending",
+      verification_status: mentor.verification_status,
+    }
 
     // Notificar admin
     const userName = `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || user.email || 'Usuário'

@@ -151,7 +151,7 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({
-            data: { id: 'mentor-1', verified: false, full_name: 'Unverified Mentor' },
+            data: { id: 'mentor-1', full_name: 'Unverified Mentor', mentor_profiles: { verification_status: 'pending' } },
             error: null,
           }),
         }
@@ -183,7 +183,7 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({
-            data: { id: 'mentor-1', verified: true, full_name: 'Verified Mentor', email: 'm@menvo.com' },
+            data: { id: 'mentor-1', full_name: 'Verified Mentor', email: 'm@menvo.com', mentor_profiles: { verification_status: 'approved' } },
             error: null,
           }),
         }
@@ -234,7 +234,7 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({
-            data: { id: 'mentor-1', verified: true, full_name: 'Verified Mentor', email: 'mentor@test.com' },
+            data: { id: 'mentor-1', full_name: 'Verified Mentor', email: 'mentor@test.com', mentor_profiles: { verification_status: 'approved' } },
             error: null,
           }),
         }
@@ -291,7 +291,7 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({
-            data: { id: 'mentor-1', verified: true, full_name: 'Verified Mentor', email: 'mentor@test.com' },
+            data: { id: 'mentor-1', full_name: 'Verified Mentor', email: 'mentor@test.com', mentor_profiles: { verification_status: 'approved' } },
             error: null,
           }),
         }

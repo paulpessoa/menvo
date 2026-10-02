@@ -30,6 +30,7 @@ describe('processVerification', () => {
   let userRolesDelete: jest.Mock
   let userRolesUpsert: jest.Mock
   let profilesUpdate: jest.Mock
+  let mentorProfilesUpsert: jest.Mock
   let profileRow: any
 
   const profilesTable = () => ({ update: profilesUpdate })
@@ -46,6 +47,8 @@ describe('processVerification', () => {
       })
     })
 
+    mentorProfilesUpsert = jest.fn().mockResolvedValue({ error: null })
+
     mockCookieSupabase = { from: jest.fn() }
     ;(createClient as jest.Mock).mockResolvedValue(mockCookieSupabase)
 
@@ -57,6 +60,7 @@ describe('processVerification', () => {
     mockServiceSupabase = {
       from: jest.fn((table: string) => {
         if (table === 'profiles') return profilesTable()
+        if (table === 'mentor_profiles') return { upsert: mentorProfilesUpsert }
         if (table === 'roles') {
           return {
             select: jest.fn().mockReturnValue({
@@ -116,6 +120,7 @@ describe('processVerification', () => {
     // the mentor role is already assigned.
     mockServiceSupabase.from = jest.fn((table: string) => {
       if (table === 'profiles') return profilesTable()
+      if (table === 'mentor_profiles') return { upsert: mentorProfilesUpsert }
       if (table === 'roles') {
         return {
           select: jest.fn().mockReturnValue({
@@ -174,13 +179,25 @@ describe('processVerification', () => {
     await processVerification({ userId: 'mentor-1', adminId: 'admin-1', status: 'approved' })
 
     expect(mockCookieSupabase.from).not.toHaveBeenCalledWith('profiles')
-    expect(profilesUpdate).toHaveBeenCalledWith(
+    expect(mockCookieSupabase.from).not.toHaveBeenCalledWith('mentor_profiles')
+    expect(profilesUpdate).toHaveBeenCalledWith(expect.objectContaining({ is_public: true }))
+    expect(mentorProfilesUpsert).toHaveBeenCalledWith(
       expect.objectContaining({
+        user_id: 'mentor-1',
         verification_status: 'approved',
-        verified: true,
-        is_public: true,
-        is_pending_mentor: false
-      })
+        verified_at: expect.any(String)
+      }),
+      { onConflict: 'user_id' }
+    )
+  })
+
+  it('records a rejection with the admin notes and keeps the profile hidden', async () => {
+    await processVerification({ userId: 'mentor-1', adminId: 'admin-1', status: 'rejected', notes: 'foto' })
+
+    expect(profilesUpdate.mock.calls[0][0]).not.toHaveProperty('is_public')
+    expect(mentorProfilesUpsert).toHaveBeenCalledWith(
+      { user_id: 'mentor-1', verification_status: 'rejected', verification_notes: 'foto', verified_at: null },
+      { onConflict: 'user_id' }
     )
   })
 
