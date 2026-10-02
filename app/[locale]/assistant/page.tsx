@@ -13,6 +13,8 @@ import { VoiceInput } from "@/components/ui/voice-input"
 import { ChipGroup } from "@/components/assistant/ChipGroup"
 import { DiagnosticProgressBar } from "@/components/assistant/DiagnosticProgressBar"
 import { parseSseLine, type ChipOption } from "@/lib/ai/protocol"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useOnboarding } from "@/hooks/useOnboarding"
 
 interface Message {
   id: string
@@ -140,16 +142,50 @@ function AssistantChat() {
   const [progress, setProgress] = useState<DiagnosticProgress | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const hasInitializedDiagnostic = useRef(false)
   const hasInitializedBriefing = useRef(false)
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  useOnboarding("tour-assistant-v1", [
+    {
+      element: "#assistant-header-tabs",
+      popover: {
+        title: "Modos do Assistente",
+        description: "Alternar entre o Copiloto (ajuda livre) e o Diagnóstico (entrevista guiada para criar seu plano de carreira)."
+      }
+    },
+    {
+      element: "#assistant-chat-area",
+      popover: {
+        title: "Sua conversa com a IA",
+        description: "As sugestões de mentores, relatórios e dicas aparecerão direto nesta tela."
+      }
+    },
+    {
+      element: "#assistant-input-area",
+      popover: {
+        title: "Microfone inteligente",
+        description: "Com preguiça de digitar? É só clicar no microfone, falar, e nós transcrevemos tudo!"
+      }
+    }
+  ])
+
+  const scrollToBottom = (force = false) => {
+    const container = scrollContainerRef.current
+    if (!container) {
+      if (force) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      return
+    }
+
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150
+    if (force || isNearBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: force ? "smooth" : "auto" })
+    }
   }
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages.length, toolActivity])
+  }, [messages, toolActivity])
 
   // In diagnostic mode, auto-start if no messages exist yet
   useEffect(() => {
@@ -222,6 +258,8 @@ function AssistantChat() {
         { id: userMessageId, role: "user", text }
       ])
     }
+
+    setTimeout(() => scrollToBottom(true), 50)
 
     setInput("")
     setIsLoading(true)
@@ -362,10 +400,26 @@ function AssistantChat() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)] max-w-4xl mx-auto border rounded-2xl overflow-hidden bg-background shadow-sm my-6">
-      <div className="flex items-center gap-2 px-6 py-4 border-b bg-muted/30">
-        <h2 className="font-semibold text-lg">
-          {isDiagnosticMode ? "Diagnóstico de Carreira - Menvo" : "Copiloto Menvo"}
-        </h2>
+      <div id="assistant-header-tabs" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 border-b bg-muted/30">
+        <div className="flex flex-col">
+          <h2 className="font-semibold text-lg">
+            {isDiagnosticMode ? "Diagnóstico de Carreira" : "Copiloto Menvo"}
+          </h2>
+          <span className="text-xs text-muted-foreground hidden sm:block">
+             {isDiagnosticMode ? "Sessão guiada para criar seu perfil e mapa de carreira." : "Assistente livre para tirar dúvidas e achar mentores."}
+          </span>
+        </div>
+        
+        <Tabs 
+          value={isDiagnosticMode ? "diagnostic" : "assistant"} 
+          onValueChange={(val) => router.push(`/assistant?mode=${val}`)}
+          className="w-full sm:w-auto"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="assistant">Copiloto</TabsTrigger>
+            <TabsTrigger value="diagnostic">Diagnóstico</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {isDiagnosticMode && progress && (
@@ -377,7 +431,7 @@ function AssistantChat() {
         />
       )}
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div id="assistant-chat-area" ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.length === 0 && !isDiagnosticMode && (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-70">
             {isBriefingLoading ? (
@@ -499,6 +553,7 @@ function AssistantChat() {
         )}
 
         <form
+          id="assistant-input-area"
           onSubmit={(e) => {
             e.preventDefault()
             handleSubmit(input)
