@@ -1,6 +1,6 @@
 # Plano: enxugar e normalizar a tabela `profiles`
 
-> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) em andamento: expand aplicado e código trocado; falta deploy → RESYNC → contract (`profiles` vai para 34 colunas).
+> **Status:** Fases 0 e 1 concluídas e aplicadas em produção (2026-10-02): `profiles` foi de 64 para 48 colunas e os dados de importação estão em `import_records`. Fase 2 (`mentor_profiles`) concluída e aplicada em 2026-10-02: `profiles` tem 34 colunas e os dados de mentor e a verificação estão em `mentor_profiles`. Próxima: Fase 3 (`mentee_profiles`).
 > **Para quem retoma:** leia a seção "Diagnóstico" e vá direto para a fase em aberto. Cada fase é uma PR própria.
 
 ## Objetivo
@@ -87,7 +87,7 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
 - **Como foi feito:** `import_records` tem 605 linhas (quem tem `original_data`, `external_id`, `invite_sent_at` ou origem diferente de `menvo`). `origin_platform = 'menvo'` numa linha significa "isento da retenção". No painel admin, a aba JotForm = linha com origem `jotform`; a aba Menvo = sem linha de importação (os 46 registros de lista de espera aparecem só em "Todos"). O retorno de `/api/admin/users` continua achatando `origin_platform` e `invite_sent_at`, então a tela não mudou.
 - **Ordem:** aplicar `expand` (feito) → deploy → rodar o RESYNC do rodapé do expand → exportar CSV → aplicar `contract`.
 
-### Fase 2: `mentor_profiles` (risco médio) — expand aplicado e código trocado em 2026-10-02; falta deploy → RESYNC → contract
+### Fase 2: `mentor_profiles` (risco médio) — concluída em 2026-10-02 (migrations `20261004000000` expand e `20261004010000` contract aplicadas; PR #83; `profiles` agora tem 34 colunas)
 1. Criar tabela + RLS (leitura pública só de mentor com perfil público; escrita do próprio mentor e admin).
 2. Copiar dados de quem é mentor ou tem `verification_status` pending/rejected.
 3. Mover `verification_status`/`verified_at`/`verification_notes`; `verified` e `is_pending_mentor` viram cálculo na view; remover o trigger `sync_profile_verification_flags`.
@@ -102,7 +102,7 @@ Padrão para fases com mudança de tabela: **expand → migrar dados → trocar 
   - Em vez de uma RPC que salva perfil + mentor juntos, `/api/profile` (PUT) separa o payload com `splitMentorFields` e faz dois UPDATEs (mentor primeiro). Atomicidade não compensa uma RPC com lista de colunas duplicada: as duas partes são independentes e o formulário reenvia tudo.
   - `withMentorFields` devolve o perfil achatado no formato de antes (`verified`, `is_pending_mentor` calculados), então as telas não mudaram. `lib/types/supabase.ts` já está sem as 14 colunas, para o `tsc` pegar qualquer leitura restante.
   - Removidos caminhos mortos que gravavam verificação direto: POST de `/api/admin/mentors` e `toggle_verification_legacy`.
-- **Ordem:** expand (feito) → deploy → RESYNC (rodapé do expand) → exportar CSV → contract `20261004010000_mentor_profiles_contract.sql`.
+- **Ordem seguida:** expand → deploy (PR #83) → RESYNC (desnecessário: nenhum mentor ou candidato sem linha) → CSV das 14 colunas (718 linhas) → contract. Types regenerados do banco final batem com os editados no PR.
 
 ### Fase 3: `mentee_profiles` (risco médio)
 Mesmo padrão da Fase 2 para os campos acadêmicos e `cv_url` (bucket de storage não muda, só a coluna com a URL).
