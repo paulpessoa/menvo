@@ -33,7 +33,6 @@ import { searchCatalogAction, getCatalogFilterOptionsAction } from "@/app/action
 import { useDebounce } from "@/hooks/useDebounce"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useAiQuota } from "@/hooks/useAiQuota"
-import { AIQuotaHint } from "@/components/mentors/AIQuotaHint"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { SuggestMentorModal } from "@/components/mentors/SuggestMentorModal"
 import type { SuggestionContext } from "@/lib/schemas/suggestions"
@@ -717,8 +716,6 @@ export default function MentorsPage() {
             </Sheet>
           </div>
         </div>
-
-        <AIQuotaHint quota={aiQuota} />
 
         {/* Active Filter Badges Bar */}
         {activeFacetCount > 0 && (
