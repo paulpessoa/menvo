@@ -587,8 +587,6 @@ export type Database = {
           cancelled_by: string | null
           completed_at: string | null
           created_at: string
-          cv_type: string | null
-          cv_url: string | null
           description: string | null
           duration_minutes: number
           feedback_requested_at: string | null
@@ -626,8 +624,6 @@ export type Database = {
           cancelled_by?: string | null
           completed_at?: string | null
           created_at?: string
-          cv_type?: string | null
-          cv_url?: string | null
           description?: string | null
           duration_minutes?: number
           feedback_requested_at?: string | null
@@ -665,8 +661,6 @@ export type Database = {
           cancelled_by?: string | null
           completed_at?: string | null
           created_at?: string
-          cv_type?: string | null
-          cv_url?: string | null
           description?: string | null
           duration_minutes?: number
           feedback_requested_at?: string | null
