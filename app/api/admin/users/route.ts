@@ -7,6 +7,11 @@ import {
 } from "@/lib/api/error-handler"
 import { requireAdmin } from "@/lib/auth/require-admin"
 
+/** Profile row as returned by the list query: the select string is built dynamically, so supabase-js cannot infer it. */
+type AdminProfileRow = Record<string, unknown> & {
+  import_records: { origin_platform: string; invite_sent_at: string | null } | null
+}
+
 export async function GET(request: NextRequest) {
   try {
     const guard = await requireAdmin(["admin", "moderator"])
@@ -30,8 +35,13 @@ export async function GET(request: NextRequest) {
     const to = from + limit - 1
 
     // 3. Query base
+    // Dados de importação vivem em import_records (1:1, só admin lê). Com
+    // filtro de origem JotForm usamos !inner para filtrar o nível de profiles.
+    const importEmbed = origin === "jotform" ? "import_records!inner (origin_platform, invite_sent_at)" : "import_records (origin_platform, invite_sent_at)"
+
     let selectStr = `
       *,
+      ${importEmbed},
       user_roles (
         roles (
           name
@@ -43,6 +53,7 @@ export async function GET(request: NextRequest) {
     if (role === "mentor" || role === "mentee") {
       selectStr = `
         *,
+        ${importEmbed},
         user_roles!inner (
           roles!inner (
             name
@@ -75,8 +86,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Filtro de origem
-    if (origin === "menvo" || origin === "jotform") {
-      query = query.eq("origin_platform", origin)
+    // "jotform" = tem registro de importação com origem jotform;
+    // "menvo" = nunca foi importado (sem registro).
+    if (origin === "jotform") {
+      query = query.eq("import_records.origin_platform", "jotform")
+    } else if (origin === "menvo") {
+      query = query.is("import_records", null)
     }
 
     // Ordenação
@@ -117,16 +132,22 @@ export async function GET(request: NextRequest) {
 
     const { count: menvoOriginCount } = await supabase
       .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("origin_platform", "menvo")
+      .select("id, import_records(user_id)", { count: "exact", head: true })
+      .is("import_records", null)
 
     const { count: jotformOriginCount } = await supabase
-      .from("profiles")
+      .from("import_records")
       .select("*", { count: "exact", head: true })
       .eq("origin_platform", "jotform")
 
     return successResponse({
-      users: profiles ?? [],
+      // Achata import_records para manter o formato que o painel já consome
+      // (origin_platform e invite_sent_at no próprio usuário).
+      users: ((profiles ?? []) as unknown as AdminProfileRow[]).map(({ import_records, ...profile }) => ({
+        ...profile,
+        origin_platform: import_records?.origin_platform ?? "menvo",
+        invite_sent_at: import_records?.invite_sent_at ?? null
+      })),
       pagination: {
         page,
         limit,

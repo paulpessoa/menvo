@@ -68,7 +68,9 @@ export async function POST(request: NextRequest) {
 
         if (!emailResult.success) throw new Error(emailResult.error || "Falha ao enviar e-mail")
 
-        await supabase.from("profiles").update({ invite_sent_at: new Date().toISOString() }).eq("id", userId)
+        // Upsert só do convite: o merge preserva origin_platform e os dados
+        // importados se o registro já existir (e cria com origem 'menvo' se não).
+        await supabase.from("import_records").upsert({ user_id: userId, invite_sent_at: new Date().toISOString() }, { onConflict: "user_id" })
 
         results.push({ userId, success: true })
       } catch (err: any) {

@@ -1139,6 +1139,58 @@ export type Database = {
           },
         ]
       }
+      import_records: {
+        Row: {
+          created_at: string
+          external_id: string | null
+          invite_sent_at: string | null
+          origin_platform: string
+          original_data: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          external_id?: string | null
+          invite_sent_at?: string | null
+          origin_platform?: string
+          original_data?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          external_id?: string | null
+          invite_sent_at?: string | null
+          origin_platform?: string
+          original_data?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "import_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inactive_accounts_queue: {
         Row: {
           created_at: string

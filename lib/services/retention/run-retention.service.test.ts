@@ -105,8 +105,12 @@ function buildSupabase(opts: {
 
   const supabase = {
     from: jest.fn((table: string) => {
-      if (table === "profiles") {
-        return { select: () => ({ eq: () => ({ order: () => ({ range: () => Promise.resolve({ data: opts.profiles, error: null }) }) }) }) }
+      if (table === "import_records") {
+        const rows = opts.profiles.map(p => ({
+          user_id: p.id,
+          profiles: { email: p.email, full_name: p.full_name, email_opt_out_at: p.email_opt_out_at }
+        }))
+        return { select: () => ({ eq: () => ({ order: () => ({ range: () => Promise.resolve({ data: rows, error: null }) }) }) }) }
       }
       if (table === "reengagement_invites") {
         return { select: () => ({ order: () => ({ range: () => Promise.resolve({ data: opts.invites, error: null }) }) }) }

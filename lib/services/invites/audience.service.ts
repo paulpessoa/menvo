@@ -22,6 +22,41 @@ export async function fetchAllRows<T>(
   }
 }
 
+export interface JotformProfile {
+  id: string
+  email: string | null
+  full_name: string | null
+  email_opt_out_at: string | null
+}
+
+/**
+ * Profiles imported from JotForm, read from `import_records` (the origin lives
+ * there, not on `profiles`) joined to the profile fields in one paged query,
+ * so there is no per-user lookup. Shared by the invite audience and the
+ * retention run so both agree on who counts as "imported".
+ */
+export async function fetchJotformProfiles(
+  supabase: ReturnType<typeof createServiceRoleClient>
+): Promise<JotformProfile[]> {
+  const rows = await fetchAllRows((from, to) =>
+    supabase
+      .from("import_records")
+      .select("user_id, profiles!inner(email, full_name, email_opt_out_at)")
+      .eq("origin_platform", "jotform")
+      .order("user_id")
+      .range(from, to)
+  )
+  return rows.map(row => {
+    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+    return {
+      id: row.user_id,
+      email: profile?.email ?? null,
+      full_name: profile?.full_name ?? null,
+      email_opt_out_at: profile?.email_opt_out_at ?? null
+    }
+  })
+}
+
 export type InviteAudience = "selected" | "jotform_not_invited" | "never_signed_in" | "all" | "unresponsive_invitees"
 
 export interface AudienceCandidate {
@@ -87,13 +122,15 @@ export async function resolveAudience(params: {
     return { eligible: [], skipped: { suppressed: 0, optedOut: 0, alreadyInvited: 0, noEmail: 0 } }
   }
 
-  const profiles = await fetchAllRows((from, to) => {
-    let query = supabase.from("profiles").select("id, email, full_name, email_opt_out_at").order("id")
-    if (params.audience === "selected") query = query.in("id", params.userIds!)
-    else if (params.audience === "jotform_not_invited") query = query.eq("origin_platform", "jotform")
-    // "all" and "never_signed_in" start from every profile; never_signed_in is filtered below.
-    return query.range(from, to)
-  })
+  const profiles =
+    params.audience === "jotform_not_invited"
+      ? await fetchJotformProfiles(supabase)
+      : await fetchAllRows((from, to) => {
+          let query = supabase.from("profiles").select("id, email, full_name, email_opt_out_at").order("id")
+          if (params.audience === "selected") query = query.in("id", params.userIds!)
+          // "all" and "never_signed_in" start from every profile; never_signed_in is filtered below.
+          return query.range(from, to)
+        })
 
   let candidates = profiles
 
