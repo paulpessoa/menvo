@@ -118,10 +118,10 @@ function ProfilePageContent() {
         <form onSubmit={handleSubmit}>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ProfileTab)} className="space-y-6">
             <TabsList id="tour-profile-tabs" className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/50 p-1 h-auto">
-              <TabsTrigger value="basic" className="py-2">Perfil</TabsTrigger>
-              <TabsTrigger value="career" className="py-2">Carreira e Interesses</TabsTrigger>
-              <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
-              <TabsTrigger value="organizations" className="py-2">Organizações</TabsTrigger>
+              <TabsTrigger id="tour-tab-basic" value="basic" className="py-2">Perfil</TabsTrigger>
+              <TabsTrigger id="tour-tab-career" value="career" className="py-2">Carreira e Interesses</TabsTrigger>
+              <TabsTrigger id="tour-tab-mentorship" value="mentorship" className="py-2">Mentoria</TabsTrigger>
+              <TabsTrigger id="tour-tab-organizations" value="organizations" className="py-2">Organizações</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic">
@@ -162,9 +162,31 @@ function ProfilePageContent() {
 
 function ProfileTour() {
   const steps = [
-    { popover: { title: "Complete seu perfil", description: "Para que os mentores possam te ajudar melhor, é importante preencher suas informações básicas." } },
-    { element: "#tour-profile-tabs", popover: { title: "Abas do perfil", description: "Navegue entre as abas para preencher informações de Carreira e Interesses. Quanto mais detalhes, melhor!" } },
-    { element: "#tour-profile-save", popover: { title: "Não esqueça de salvar", description: "Sempre que fizer alterações, clique em Salvar para atualizar suas informações na plataforma." } }
+    { popover: { title: "Boas-vindas ao seu Perfil!", description: "Aqui é onde a comunidade vai te conhecer. Um perfil completo abre muitas portas." } },
+    { 
+      element: "#tour-tab-basic", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
+      popover: { title: "Perfil Básico", description: "Sua foto, nome e resumo (bio) são o seu cartão de visitas. Perfis bem preenchidos têm muito mais chances de receber pedidos e aceites na comunidade!" } 
+    },
+    { 
+      element: "#tour-tab-career", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-career")?.click() },
+      popover: { title: "O que você busca?", description: "Na aba Carreira e Interesses, deixe claro sua experiência e o que você espera das mentorias. Isso ajuda nossa IA a te recomendar para as pessoas certas." } 
+    },
+    { 
+      element: "#tour-tab-mentorship", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-mentorship")?.click() },
+      popover: { title: "Seja um Mentor(a)!", description: "Compartilhar conhecimento é transformador! Se você tem experiência, ative seu perfil de mentor aqui. Retribuir à comunidade ensinando os outros é incrível." } 
+    },
+    { 
+      element: "#tour-tab-basic", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
+      popover: { title: "Tudo pronto?", description: "Volte para a primeira aba e comece a preencher seus dados." } 
+    },
+    { 
+      element: "#tour-profile-save", 
+      popover: { title: "Não esqueça de salvar", description: "Lembre-se sempre de clicar em 'Salvar perfil' no final para não perder suas alterações!" } 
+    }
   ]
 
   useOnboarding("ob_m4", steps)
