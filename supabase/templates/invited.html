@@ -196,13 +196,13 @@
 
         <!-- Conteúdo Principal -->
         <div class="content">
-            <h2>Você foi convidado(a) a criar uma conta em { .SiteURL }}.</h2>
+            <h2>Você foi convidado(a) a criar uma conta em {{ .SiteURL }}.</h2>
 
             <p class="instruction">Clique no botão abaixo para aceitar o convite:</p>
 
             <!-- Botão de Confirmação -->
             <div class="button-container">
-                <a href="{ .ConfirmationURL }}" class="confirmation-button">
+                <a href="{{ .ConfirmationURL }}" class="confirmation-button">
                     Aceitar o convite
                 </a>
             </div>

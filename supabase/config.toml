@@ -178,10 +178,73 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
+# Email templates (Menvo)
+[auth.email.template.invite]
+subject = "MENVO - Um convite especial para você!"
+content_path = "./supabase/templates/invited.html"
+
+[auth.email.template.confirmation]
+subject = "MENVO - Confirme seu cadastro!"
+content_path = "./supabase/templates/template-confirm-email.html"
+
+[auth.email.template.recovery]
+subject = "MENVO - Redefina sua senha"
+content_path = "./supabase/templates/redef-pass.html"
+
+[auth.email.template.magic_link]
+subject = "MENVO - Seu link de acesso rápido"
+content_path = "./supabase/templates/magic-link.html"
+
+[auth.email.template.email_change]
+subject = "MENVO - Confirme a alteração do seu e-mail"
+content_path = "./supabase/templates/redef-email.html"
+
+[auth.email.template.reauthentication]
+subject = "MENVO - Seu código de segurança"
+content_path = "./supabase/templates/confirm-reauth.html"
+
+[auth.email.template.password_changed_notification]
+subject = "MENVO - Senha Atualizada"
+content_path = "./supabase/templates/password-changed.html"
+
+[auth.email.template.email_changed_notification]
+subject = "MENVO - E-mail Atualizado"
+content_path = "./supabase/templates/email-changed.html"
+
+[auth.email.template.phone_changed_notification]
+subject = "MENVO - Telefone Atualizado"
+content_path = "./supabase/templates/phone-changed.html"
+
+[auth.email.template.identity_linked_notification]
+subject = "MENVO - Conta Vinculada"
+content_path = "./supabase/templates/sign-in-method-linked.html"
+
+[auth.email.template.identity_unlinked_notification]
+subject = "MENVO - Conta Desvinculada"
+content_path = "./supabase/templates/sign-in-method-removed.html"
+
+[auth.email.template.mfa_factor_enrolled_notification]
+subject = "MENVO - MFA Adicionado"
+content_path = "./supabase/templates/mfa-method.added.html"
+
+[auth.email.template.mfa_factor_unenrolled_notification]
+subject = "MENVO - MFA Removido"
+content_path = "./supabase/templates/mfa-method.removed.html"
+
+[auth.email.notification.password_changed]
+enabled = true
+[auth.email.notification.email_changed]
+enabled = true
+[auth.email.notification.phone_changed]
+enabled = true
+[auth.email.notification.identity_linked]
+enabled = true
+[auth.email.notification.identity_unlinked]
+enabled = true
+[auth.email.notification.mfa_factor_enrolled]
+enabled = true
+[auth.email.notification.mfa_factor_unenrolled]
+enabled = true
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
