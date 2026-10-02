@@ -19,7 +19,8 @@ import {
   TrendingUp,
   Star,
   LayoutDashboard,
-  Sparkles
+  Sparkles,
+  Shield
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -106,6 +107,11 @@ export default function MentorDashboard() {
               <p className="text-muted-foreground text-base md:text-lg">{t("mentor.welcome")}</p>
             </div>
             <div className="flex items-center gap-3">
+              <Button asChild variant="ghost" size="sm" className="rounded-xl font-medium text-muted-foreground hover:text-foreground hidden sm:flex">
+                <Link href="/support">
+                  <Shield className="h-4 w-4 mr-2" /> Suporte
+                </Link>
+              </Button>
               <Button asChild variant="outline" size="sm" className="rounded-xl font-semibold h-10 px-4">
                 <Link href="/profile">
                   <Settings className="h-4 w-4 mr-2" /> {t("mentor.actions.editProfile")}

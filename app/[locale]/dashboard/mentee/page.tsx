@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink } from "lucide-react"
+import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink, Shield } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
@@ -160,6 +160,13 @@ export default function MenteeDashboard() {
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
               <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost" size="sm" className="rounded-xl font-medium text-muted-foreground hover:text-foreground">
+                <Link href="/support">
+                  <Shield className="h-4 w-4 mr-2" /> Suporte
+                </Link>
+              </Button>
             </div>
           </div>
 

@@ -12,6 +12,8 @@ import { AttentionPanel } from "@/components/admin/overview/AttentionPanel"
 import { OverviewKpis } from "@/components/admin/overview/OverviewKpis"
 import { AdminSectionNav } from "@/components/admin/overview/AdminSectionNav"
 import { fetchAdminOverview } from "@/lib/services/admin/overview.client"
+import { Shield } from "lucide-react"
+import { Link } from "@/i18n/routing"
 
 const OverviewCharts = dynamic(
   () => import("@/components/admin/overview/OverviewCharts").then(mod => mod.OverviewCharts),
@@ -49,9 +51,16 @@ export default function AdminDashboard() {
           title="Painel administrativo"
           description={`${firstName ? `Olá, ${firstName}. ` : ""}Visão estratégica da Menvo nas últimas 12 semanas.`}
           actions={
-            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-              {isFetching ? "Atualizando..." : "Atualizar"}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost" size="sm" className="hidden sm:flex text-muted-foreground hover:text-foreground">
+                <Link href="/support">
+                  <Shield className="h-4 w-4 mr-2" /> Suporte
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+                {isFetching ? "Atualizando..." : "Atualizar"}
+              </Button>
+            </div>
           }
         />
 
