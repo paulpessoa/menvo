@@ -12,7 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/PageContainer';
-import {  RefreshCw, Save, Plus, Trash2, History, Tag, AlertTriangle, CheckCircle2, XCircle, Info, Shield, Search , Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import {
   Select,
   SelectContent,
@@ -174,27 +175,19 @@ export default function AdminFeatureFlagsPage() {
   });
 
   return (
-    <PageContainer className="space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Shield className="h-8 w-8 text-primary" />
-            Governança de Features
-          </h1>
-          <p className="text-muted-foreground">Gerencie funcionalidades em tempo real sem deploys.</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchData} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Sincronizar
+    <PageContainer>
+      <AdminPageHeader
+        title="Feature flags"
+        description="Ligue e desligue funcionalidades em tempo real, sem deploy."
+        actions={
+          <>
+          <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
+            {loading ? 'Sincronizando...' : 'Sincronizar'}
           </Button>
-          
+
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Flag
-              </Button>
+              <Button size="sm">Nova flag</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -227,18 +220,19 @@ export default function AdminFeatureFlagsPage() {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Cancelar</Button>
                 <Button onClick={createFlag} disabled={isCreating}>
-                  {isCreating ? <Loader2 className="mr-2 animate-spin h-4 w-4" /> : <Save className="h-4 w-4 mr-2" />}
+                  {isCreating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                   Salvar
                 </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2"><Tag className="h-5 w-5" /> Flags Ativas</h2>
+          <h2 className="text-lg font-semibold">Flags</h2>
 
           {flags.length > 0 && (
             <div className="flex flex-col sm:flex-row gap-3">
@@ -310,8 +304,8 @@ export default function AdminFeatureFlagsPage() {
                   </CardContent>
                   <CardFooter className="px-5 py-3 border-t bg-muted/5 flex justify-between items-center text-[10px] text-muted-foreground">
                     <span>Atualizado em: {new Date(flag.updated_at ?? '').toLocaleString()}</span>
-                    <Button variant="ghost" size="sm" className="h-6 text-red-400" onClick={() => deleteFlag(flag.id, flag.name)}>
-                      <Trash2 className="h-3 w-3 mr-1" /> Remover
+                    <Button variant="ghost" size="sm" className="h-6 text-red-600" onClick={() => deleteFlag(flag.id, flag.name)}>
+                      Remover
                     </Button>
                   </CardFooter>
                 </Card>
@@ -321,13 +315,12 @@ export default function AdminFeatureFlagsPage() {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2"><History className="h-5 w-5" /> Audit Log</h2>
+          <h2 className="text-lg font-semibold">Histórico de alterações</h2>
           <Card>
             <CardContent className="p-0 max-h-[600px] overflow-y-auto">
                 {logs.map(log => (
                 <div key={log.id} className="p-3 border-b last:border-0">
-                    <div className="flex items-center gap-2 mb-1">
-                    {log.action === 'Ativada' ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-red-500" />}
+                    <div className="mb-1">
                     <span className="text-[11px] font-bold font-mono">{log.flag_name}</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground">{log.action} por {log.performed_by}</p>

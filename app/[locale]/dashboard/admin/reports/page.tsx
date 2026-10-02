@@ -1,13 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -16,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import { RequireRole } from "@/lib/auth/auth-guard"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
+import { StatTile } from "@/components/admin/overview/StatTile"
+import { formatInt } from "@/components/admin/overview/chart-theme"
 import { PageContainer } from "@/components/layout/PageContainer"
 import {
   adminReportsService,
@@ -25,15 +20,6 @@ import {
   type AdminStats
 } from "@/lib/services/admin/reports.service"
 import dynamic from "next/dynamic"
-import {
-  Users,
-  TrendingUp,
-  Download,
-  Calendar,
-  Loader2,
-  RefreshCw,
-  PieChart as PieIcon
-} from "lucide-react"
 import { toast } from "sonner"
 
 const AdminReportsCharts = dynamic(
@@ -101,19 +87,13 @@ export default function AdminReportsPage() {
   return (
     <RequireRole roles={["admin"]}>
       <PageContainer>
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Relatórios e Métricas</h1>
-              <p className="text-muted-foreground">
-                Análise detalhada de crescimento e distribuição da base
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
+        <AdminPageHeader
+          title="Relatórios"
+          description="Crescimento e distribuição da base por período, com exportação em CSV."
+          actions={
+            <>
               <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-48 bg-white">
-                  <Calendar className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-44 h-9">
                   <SelectValue placeholder="Período" />
                 </SelectTrigger>
                 <SelectContent>
@@ -123,43 +103,21 @@ export default function AdminReportsPage() {
                   <SelectItem value="2020-01-01">Desde o início</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={fetchData} variant="outline" size="icon">
-                <RefreshCw
-                  className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-                />
+              <Button onClick={fetchData} variant="outline" size="sm" disabled={loading}>
+                {loading ? "Atualizando..." : "Atualizar"}
               </Button>
-              <Button onClick={exportReport} variant="secondary">
-                <Download className="h-4 w-4 mr-2" /> Exportar
+              <Button onClick={exportReport} variant="outline" size="sm">
+                Exportar CSV
               </Button>
-            </div>
-          </div>
+            </>
+          }
+        />
 
-          {/* KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Total de Usuários</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats?.totalUsers.toLocaleString()}</div>
-              </CardContent>
-            </Card>
-            <Card className="">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Mentores</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats?.totalMentors}</div>
-              </CardContent>
-            </Card>
-            <Card className="">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground uppercase">Mentees</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats?.totalMentees}</div>
-              </CardContent>
-            </Card>
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <StatTile label="Total de usuários" value={stats ? formatInt(stats.totalUsers) : "-"} />
+            <StatTile label="Mentores" value={stats ? formatInt(stats.totalMentors) : "-"} />
+            <StatTile label="Mentorados" value={stats ? formatInt(stats.totalMentees) : "-"} />
           </div>
 
           <AdminReportsCharts

@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card"
-import { TrendingUp, PieChart as PieIcon } from "lucide-react"
 import {
   BarChart,
   Bar,
@@ -24,7 +23,9 @@ import {
 } from "recharts"
 import type { TimeSeriesData } from "@/lib/services/admin/reports.service"
 
-const COLORS = ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"]
+import { SERIES } from "@/components/admin/overview/chart-theme"
+
+const COLORS = [SERIES.primary, SERIES.tertiary]
 
 interface AdminReportsChartsProps {
   growthData: TimeSeriesData[]
@@ -40,12 +41,9 @@ export function AdminReportsCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Growth Chart */}
-      <Card className="shadow-md">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            Fluxo de Novos Usuários
-          </CardTitle>
+          <CardTitle className="text-base">Novos usuários por dia</CardTitle>
           <CardDescription>Novos cadastros no período selecionado</CardDescription>
         </CardHeader>
         <CardContent className="h-[300px] pt-4">
@@ -68,7 +66,7 @@ export function AdminReportsCharts({
                 />
                 <Bar
                   dataKey="count"
-                  fill="#3b82f6"
+                  fill={SERIES.primary}
                   radius={[4, 4, 0, 0]}
                   name="Novos Usuários"
                 />
@@ -79,12 +77,9 @@ export function AdminReportsCharts({
       </Card>
 
       {/* Distribution Chart */}
-      <Card className="shadow-md">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <PieIcon className="h-5 w-5 text-primary" />
-            Distribuição de Perfis
-          </CardTitle>
+          <CardTitle className="text-base">Distribuição de perfis</CardTitle>
           <CardDescription>Base total de usuários por papel</CardDescription>
         </CardHeader>
         <CardContent className="h-[300px] pt-4">

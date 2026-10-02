@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { AiUsageReport } from "@/lib/services/ai/ai-usage.service"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 
 const usd = (v: number) => `US$ ${v.toFixed(v < 1 ? 4 : 2)}`
 const int = (v: number) => v.toLocaleString("pt-BR")
@@ -34,14 +35,20 @@ export default function AdminAIUsagePage() {
   return (
     <RequireRole roles={["admin"]}>
       <PageContainer>
+        <AdminPageHeader
+          title="Custos de IA"
+          description="Cada chamada de modelo, medida em tokens e dólares."
+          actions={
+            <Input
+              type="month"
+              aria-label="Mês"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              className="h-9 w-full sm:w-44"
+            />
+          }
+        />
         <div className="space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-black tracking-tight">Custos de IA</h1>
-              <p className="text-muted-foreground text-lg">Cada chamada de modelo, medida em tokens e dólares.</p>
-            </div>
-            <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-full sm:w-44" />
-          </div>
 
           {isLoading && <MenvoDots />}
           {error && <p className="text-destructive">Não foi possível carregar o relatório.</p>}

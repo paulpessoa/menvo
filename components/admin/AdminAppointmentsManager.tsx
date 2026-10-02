@@ -1,18 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import {
-  AlertTriangle,
-  CalendarClock,
-  CalendarX2,
-  ExternalLink,
-  Loader2,
-  Mail,
-  MoreHorizontal,
-  RefreshCw,
-  Search,
-  Send
-} from "lucide-react"
+import { AlertTriangle, ExternalLink, Loader2, MoreHorizontal, Search } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -232,18 +222,15 @@ export function AdminAppointmentsManager() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-4xl font-black tracking-tight">Sessões de Mentoria</h1>
-          <p className="text-muted-foreground text-lg">
-            Acompanhe todos os pedidos e sessões, reenvie e-mails e cancele quando precisar.
-          </p>
-        </div>
-        <Button variant="outline" onClick={load} disabled={loading} className="gap-2 self-start md:self-auto">
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-          Atualizar
-        </Button>
-      </div>
+      <AdminPageHeader
+        title="Sessões de mentoria"
+        description="Acompanhe todos os pedidos e sessões, reenvie e-mails e cancele quando precisar."
+        actions={
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            {loading ? "Atualizando..." : "Atualizar"}
+          </Button>
+        }
+      />
 
       <Tabs value={status} onValueChange={setStatus}>
         <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-6 overflow-x-auto">
@@ -288,7 +275,6 @@ export function AdminAppointmentsManager() {
             </div>
           ) : appointments.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-              <CalendarX2 className="mb-4 h-12 w-12 opacity-20" />
               <p>Nenhuma sessão encontrada com estes filtros.</p>
             </div>
           ) : (
@@ -377,17 +363,17 @@ export function AdminAppointmentsManager() {
               <div className="mt-6 flex flex-wrap gap-2">
                 {details.actions.resendMentorRequest && (
                   <Button variant="outline" size="sm" onClick={() => setResendPrompt({ appointment: details, target: "mentor_request" })}>
-                    <Send className="mr-2 h-4 w-4" /> Reenviar pedido ao mentor
+                    Reenviar pedido ao mentor
                   </Button>
                 )}
                 {details.actions.resendConfirmation && (
                   <Button variant="outline" size="sm" onClick={() => setResendPrompt({ appointment: details, target: "confirmation" })}>
-                    <Mail className="mr-2 h-4 w-4" /> Reenviar confirmação
+                    Reenviar confirmação
                   </Button>
                 )}
                 {details.actions.cancel && (
                   <Button variant="destructive" size="sm" onClick={() => setCancelTarget(details)}>
-                    <CalendarX2 className="mr-2 h-4 w-4" /> Cancelar sessão
+                    Cancelar sessão
                   </Button>
                 )}
               </div>
@@ -418,7 +404,7 @@ export function AdminAppointmentsManager() {
                 confirmResend()
               }}
             >
-              {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+              {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Reenviar
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -547,24 +533,24 @@ function RowActions({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Sessão</DropdownMenuLabel>
         <DropdownMenuItem onSelect={onDetails}>
-          <CalendarClock className="mr-2 h-4 w-4" /> Ver detalhes
+          Ver detalhes
         </DropdownMenuItem>
         {(actions.resendMentorRequest || actions.resendConfirmation) && <DropdownMenuSeparator />}
         {actions.resendMentorRequest && (
           <DropdownMenuItem onSelect={() => onResend("mentor_request")}>
-            <Send className="mr-2 h-4 w-4" /> Reenviar pedido ao mentor
+            Reenviar pedido ao mentor
           </DropdownMenuItem>
         )}
         {actions.resendConfirmation && (
           <DropdownMenuItem onSelect={() => onResend("confirmation")}>
-            <Mail className="mr-2 h-4 w-4" /> Reenviar confirmação
+            Reenviar confirmação
           </DropdownMenuItem>
         )}
         {actions.cancel && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onCancel} className="text-red-600 focus:text-red-600">
-              <CalendarX2 className="mr-2 h-4 w-4" /> Cancelar sessão
+              Cancelar sessão
             </DropdownMenuItem>
           </>
         )}

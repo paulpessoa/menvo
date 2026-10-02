@@ -15,7 +15,8 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {  Search, Users, UserCheck, UserX, RefreshCw, Mail, MailCheck, Calendar, Shield, Eye, MoreVertical, Check, X, AlertTriangle, Edit, ExternalLink, SquareCheck, FileText, Filter, ChevronDown , Loader2 } from "lucide-react"
+import { Search, Edit, ExternalLink } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -152,14 +153,11 @@ export default function AdminUsersPage() {
 
   return (
     <PageContainer>
+      <AdminPageHeader
+        title="Usuários"
+        description="Busque, edite e gerencie papéis de todos os usuários da plataforma."
+      />
       <div className="space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Gestão Global</h1>
-            <p className="text-muted-foreground">Controle central de usuários, mentores e permissões</p>
-          </div>
-        </div>
-
         <div className="space-y-6">
           <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
@@ -173,8 +171,8 @@ export default function AdminUsersPage() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full md:w-auto gap-2">
-                  <Filter className="h-4 w-4" /> Filtros Avançados
+                <Button variant="outline" className="w-full md:w-auto">
+                  Filtros
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
@@ -246,16 +244,16 @@ export default function AdminUsersPage() {
                     <span className="text-xs text-muted-foreground">{selectedUserIds.length} selecionado(s)</span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="outline" className="gap-2">
-                          Ações em Massa <ChevronDown className="h-3.5 w-3.5" />
+                        <Button size="sm" variant="outline">
+                          Ações em massa
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setIsInviteModalOpen(true)}>
-                          <Mail className="h-4 w-4 mr-2" /> Convidar selecionados
+                          Convidar selecionados
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-red-600" onClick={() => toast.error('Ainda não implementado')}>
-                          <UserX className="h-4 w-4 mr-2" /> Excluir selecionados
+                          Excluir selecionados
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -271,7 +269,6 @@ export default function AdminUsersPage() {
                   </div>
                 ) : users.length === 0 ? (
                   <div className="text-center py-20">
-                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-20" />
                     <h3 className="text-lg font-medium">Nenhum resultado</h3>
                   </div>
                 ) : (
@@ -296,9 +293,9 @@ export default function AdminUsersPage() {
                             {user.full_name || 'Sem Nome'}
                           </span>
                           {user.cv_url && (
-                            <div title="Possui currículo">
-                              <FileText className="h-3.5 w-3.5 text-blue-500" />
-                            </div>
+                            <Badge variant="outline" className="text-[10px] uppercase" title="Possui currículo">
+                              CV
+                            </Badge>
                           )}
                           {user.origin_platform === "jotform" && (
                             <Badge variant="outline" className="text-[10px] uppercase text-amber-700 border-amber-300 bg-amber-50">
