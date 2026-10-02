@@ -301,65 +301,83 @@ export default function CommunityPage() {
           Seu hobby, sua vivência, sua história — alguém está buscando exatamente isso.
         </p>
 
-      {/* Search + Filters (Single Row) */}
-      <div id="tour-community-list" className="flex flex-col xl:flex-row gap-3 w-full mb-8">
-        <div className="relative flex-1 min-w-0 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
-          <Input
-            placeholder={tCommunity("searchPlaceholder")}
-            className="pl-12 pr-12 h-14 rounded-2xl w-full border-border/80 shadow-2xs text-base transition-all focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:border-primary/50 bg-card hover:bg-accent/20"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto shrink-0">
-          <div id="tour-community-ai" className="w-full sm:w-auto">
-            <AIMatchButton
-            title={tCommunity("magicSearch.title")}
-            description={tCommunity("magicSearch.disclaimer")}
-            placeholder={tCommunity("magicSearch.placeholder")}
-            loading={aiLoading}
-            loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
-            minCharsMessage={tCommunity("magicSearch.minChars")}
-            submitLabel={tCommunity("magicSearch.button")}
-            buttonLabel={tCommunity("magicSearch.button")}
-            quota={aiQuota}
-            quotaHint={(q) =>
-              q.reason === "budget"
-                ? tCommunity("magicSearch.budgetExhausted", {
-                    date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
-                  })
-                : q.remaining! > 0
-                  ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
-                  : tCommunity("magicSearch.quotaExhausted", {
-                      date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
-                    })
-            }
-            onSubmit={handleAISearch}
-          />
+      {/* Search and Filter Bar */}
+      <div id="tour-community-list" className="mb-2 sm:mb-3 space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+          {/* Search + AI Match */}
+          <div className="flex-1 flex gap-2 min-w-0">
+            <div className="flex-1 relative min-w-0">
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
+              <Input
+                placeholder={tCommunity("searchPlaceholder")}
+                className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
+                  searchTerm ? "pr-10" : ""
+                }`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  aria-label="Limpar busca"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            
+            <div id="tour-community-ai">
+              <AIMatchButton
+                title={tCommunity("magicSearch.title")}
+                description={tCommunity("magicSearch.disclaimer")}
+                placeholder={tCommunity("magicSearch.placeholder")}
+                loading={aiLoading}
+                loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
+                minCharsMessage={tCommunity("magicSearch.minChars")}
+                submitLabel={tCommunity("magicSearch.button")}
+                buttonLabel={tCommunity("magicSearch.button")}
+                quota={aiQuota}
+                quotaHint={(q) =>
+                  q.reason === "budget"
+                    ? tCommunity("magicSearch.budgetExhausted", {
+                        date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                      })
+                    : q.remaining! > 0
+                      ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
+                      : tCommunity("magicSearch.quotaExhausted", {
+                          date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                        })
+                }
+                onSubmit={handleAISearch}
+                compact
+              />
+            </div>
           </div>
 
-          <Select
-            value={filters.sortBy}
-            onValueChange={(val: any) =>
-              setFilters((prev) => ({ ...prev, sortBy: val }))
-            }
-          >
-            <SelectTrigger className="w-full sm:w-[160px] h-11 sm:h-14 rounded-xl sm:rounded-2xl border-border/80 shadow-2xs font-medium text-xs sm:text-sm bg-card hover:bg-accent/20">
-              <div className="flex items-center gap-1.5 truncate">
-                <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <SelectValue placeholder="Ordenar por" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="newest">Mais recentes</SelectItem>
-              <SelectItem value="oldest">Mais antigos</SelectItem>
-              <SelectItem value="name">A-Z</SelectItem>
-              <SelectItem value="name-desc">Z-A</SelectItem>
-            </SelectContent>
-          </Select>
-
+          {/* Sort & Filters Action Row */}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
+            <Select
+              value={filters.sortBy}
+              onValueChange={(val: any) =>
+                setFilters((prev) => ({ ...prev, sortBy: val }))
+              }
+            >
+              <SelectTrigger className="w-full sm:w-[155px] h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
+                <div className="flex items-center gap-1.5 truncate">
+                  <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <SelectValue placeholder="Ordenar por" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="newest">Mais recentes</SelectItem>
+                <SelectItem value="oldest">Mais antigos</SelectItem>
+                <SelectItem value="name">A-Z</SelectItem>
+                <SelectItem value="name-desc">Z-A</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
       
@@ -393,6 +411,15 @@ export default function CommunityPage() {
           </div>
         </div>
       )}
+
+      {/* Results Header */}
+      <div className="flex items-center justify-between mb-4 mt-6">
+        <h2 className="text-xs font-black tracking-widest text-muted-foreground uppercase flex items-center gap-2">
+          {displayedAIProfiles.length > 0
+            ? `${profiles.length} RESULTADOS COM IA`
+            : `${profiles.length} MEMBROS ENCONTRADOS`}
+        </h2>
+      </div>
 
       {/* Results Grid */}
       {loading ? (
