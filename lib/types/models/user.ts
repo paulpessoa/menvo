@@ -32,9 +32,6 @@ export interface UserProfile {
   inclusion_tags?: string[] | null // Alias for inclusive_tags
   availability_status: string | null
   availability: any[] | null // Array of slots
-  average_rating: number | null
-  total_reviews: number | null
-  total_sessions: number | null
   is_pending_mentor?: boolean
   learning_goals?: string | null
 

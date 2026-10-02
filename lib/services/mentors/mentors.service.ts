@@ -531,7 +531,7 @@ class MentorService {
   async getFavoriteMentors(ids: string[]): Promise<any[]> {
     if (!ids || ids.length === 0) return []
     const { data, error } = await (this.supabase
-      .from("profiles") as any)
+      .from("mentors_view") as any)
       .select("id, full_name, avatar_url, job_title, company, average_rating, slug")
       .in("id", ids)
       .limit(4)

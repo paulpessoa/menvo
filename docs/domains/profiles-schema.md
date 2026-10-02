@@ -1,6 +1,6 @@
 # Plano: enxugar e normalizar a tabela `profiles`
 
-> **Status:** planejado em 2026-10-01, nada executado. Comece pela Fase 0.
+> **Status:** Fase 0 implementada no código em 2026-10-01 (branch `refactor/profiles-phase-0`); a migration `20261003000000_profiles_phase0_drop_dead_columns.sql` ainda precisa ser aplicada pelo Paul. Próxima: Fase 1.
 > **Para quem retoma:** leia a seção "Diagnóstico" e vá direto para a fase em aberto. Cada fase é uma PR própria.
 
 ## Objetivo
@@ -69,11 +69,12 @@ mentors_view        junta profiles + mentor_profiles e calcula average_rating, t
 
 Padrão para fases com mudança de tabela: **expand → migrar dados → trocar leitura/escrita → contract** (apagar coluna só depois que nada mais lê).
 
-### Fase 0: limpeza e correção dos contadores (risco baixo)
+### Fase 0: limpeza e correção dos contadores (risco baixo) — feito no código, migration pendente de aplicar
 1. Remover do código as referências às colunas mortas (`/api/auth/me`, `/api/profile`, `lib/schemas/profile.ts`, perfil público, `lib/auth/auth-context.tsx`, `mentee/[slug]`).
 2. Migration: `drop column` de `location`, `twitter_url`, `mentorship_guidelines`, `ai_disclosure_accepted_at`, `mentee_status`, `profile_visibility`, `show_in_community`, `age`, `address`. Conferir antes se alguma view, função ou policy depende delas (`pg_depend`), e não usar `CASCADE`.
 3. Recriar `mentors_view` calculando `average_rating`, `total_reviews` (de `appointment_feedbacks` aprovadas) e `total_sessions` (de `appointments` realizadas) e trocar os leitores para a view; depois apagar as três colunas.
 4. Regenerar `lib/types/supabase.ts` (inclui `community_ready`).
+- **Como foi feito:** os contadores vêm da view `mentor_stats` (sem `security_invoker`, só agregados; necessária porque RLS esconde feedbacks e sessões de anon), unida em `mentors_view`. A migration tem guarda que aborta se algo ainda depender das colunas, e refaz o grant de colunas de anon. `/api/dashboard/mentor` passou a devolver `averageRating`/`totalReviews` da view. `lib/types/supabase.ts` foi editado à mão; regenerar quando a migration for aplicada.
 - **Pronto quando:** perfil público mostra contagens reais; `tsc`, testes e build passam; nenhuma referência às colunas apagadas.
 
 ### Fase 1: `import_records` (risco baixo)
