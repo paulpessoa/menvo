@@ -67,6 +67,9 @@ export function ProfileCareerSection({ form, onChange, isMentor }: ProfileCareer
             <div className="space-y-1">
               <Label>Objetivos com a mentoria</Label>
               <Textarea value={form.learning_goals} onChange={(e) => onChange({ learning_goals: e.target.value })} placeholder="O que você busca alcançar?" />
+              <p className="text-xs text-muted-foreground pt-1">
+                Ainda não sabe o que busca? <Link href="/assistant?mode=diagnostic" className="text-primary hover:underline font-medium">Faça seu diagnóstico de carreira e receba sugestões</Link>.
+              </p>
             </div>
           )}
         </div>
