@@ -75,7 +75,7 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ### 🟠 P1 - High Priority
 - [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification - all completed pre-2026-09-16, see journal below for detail.
 - [x] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
-- [ ] **Enxugar e normalizar `profiles` (64 colunas):** colunas mortas, contadores `total_reviews`/`total_sessions` parados (perfil público mostra números errados), dados de mentor/acadêmicos/importação em tabelas 1:1. Plano em fases em [`domains/profiles-schema.md`](domains/profiles-schema.md); Fase 0 feita no código (migration `20261003000000` pendente de aplicar); próxima é a Fase 1.
+- [ ] **Enxugar e normalizar `profiles` (64 colunas):** colunas mortas, contadores `total_reviews`/`total_sessions` parados (perfil público mostra números errados), dados de mentor/acadêmicos/importação em tabelas 1:1. Plano em fases em [`domains/profiles-schema.md`](domains/profiles-schema.md); Fases 0 e 1 concluídas e aplicadas (48 colunas em `profiles`; dados de importação em `import_records`); próxima é a Fase 2 (`mentor_profiles`).
 
 ### 🟡 P2 - Medium Priority
 - [x] **Painel Admin para Fila de Retenção:** card no admin mostrando a fila (quantos em cada etapa, próximas exclusões) e um botão "isentar" por pessoa. Implementado em `/dashboard/admin/retention`.
