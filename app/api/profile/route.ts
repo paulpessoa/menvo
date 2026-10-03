@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient as createAdminClient } from "@supabase/supabase-js"
+import { createClient as createAdminClient, type SupabaseClient } from "@supabase/supabase-js"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { updateProfileSchema } from "@/lib/schemas/profile"
 import { extractIdentity } from "@/lib/auth/oauth-identity"
@@ -15,11 +15,21 @@ import {
 } from "@/lib/services/mentees/mentee-profile-fields"
 import { cvLink } from "@/lib/services/mentees/cv-storage"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error("Missing Supabase environment variables")
+// Built on first use, never at import time: `next build` imports every route
+// to collect page data, and a module-scope client throws when the key is
+// absent (CI, preview builds without secrets).
+let adminClient: SupabaseClient | null = null
+function getSupabaseAdmin() {
+  if (adminClient) return adminClient
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase environment variables")
+  }
+  adminClient = createAdminClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+  return adminClient
 }
 
 /**
@@ -32,13 +42,6 @@ async function toProfileResponse<T extends { id: string }>(row: T) {
   return { ...profile, cv_url: cvLink(row.id, profile.cv_url) }
 }
 
-const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
-
 const PROFILE_COLUMNS =
   "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url, onboarding_flags" as const
 
@@ -50,7 +53,7 @@ async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
   if (authHeader) {
     const token = authHeader.replace("Bearer ", "")
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token)
+    const { data: { user }, error } = await getSupabaseAdmin().auth.getUser(token)
     return { user, error }
   }
 
@@ -87,7 +90,7 @@ export async function PUT(request: NextRequest) {
     // request_mentor_verification). O formulário manda esses campos também
     // para mentorados, e eles não devem ganhar linha vazia.
     if (Object.keys(mentorFields).length > 0) {
-      const { error: mentorError } = await supabaseAdmin
+      const { error: mentorError } = await getSupabaseAdmin()
         .from("mentor_profiles")
         .update(mentorFields)
         .eq("user_id", user.id)
@@ -103,7 +106,7 @@ export async function PUT(request: NextRequest) {
 
     // Acadêmico e currículo: upsert, porque quem nunca preencheu não tem linha.
     if (Object.keys(menteeFields).length > 0) {
-      const { error: menteeError } = await supabaseAdmin
+      const { error: menteeError } = await getSupabaseAdmin()
         .from("mentee_profiles")
         .upsert({ user_id: user.id, ...menteeFields }, { onConflict: "user_id" })
 
@@ -116,7 +119,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    const { data: updatedRow, error: updateError } = await supabaseAdmin
+    const { data: updatedRow, error: updateError } = await getSupabaseAdmin()
       .from("profiles")
       .update({ ...profileFields, updated_at: new Date().toISOString() })
       .eq("id", user.id)
@@ -161,7 +164,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch profile from database
-    const { data: profile, error: fetchError } = await supabaseAdmin
+    const { data: profile, error: fetchError } = await getSupabaseAdmin()
       .from("profiles")
       .select(PROFILE_SELECT)
       .eq("id", user.id)
@@ -180,7 +183,7 @@ export async function GET(request: NextRequest) {
           last_name: identity.lastName,
         }
 
-        const { data: newProfile, error: createError } = await supabaseAdmin
+        const { data: newProfile, error: createError } = await getSupabaseAdmin()
           .from("profiles")
           .insert(profileData)
           .select(PROFILE_SELECT)

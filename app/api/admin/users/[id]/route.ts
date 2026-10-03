@@ -8,16 +8,21 @@ import { splitMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
 import { toPlainText } from "@/lib/schemas/plain-text"
 
 // Admin client com service role para ignorar RLS
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
+// Built per request, never at import time: `next build` imports every route
+// to collect page data, and a module-scope client throws when the key is
+// absent (CI, preview builds without secrets).
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
     }
-  }
-)
+  )
+}
 
 /**
  * Profile fields an admin may edit from the user modal. Verification columns
@@ -47,6 +52,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const supabaseAdmin = getSupabaseAdmin()
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response
