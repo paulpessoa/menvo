@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MenteeCard } from "@/components/MenteeCard"
+import { MenteeSkeletonCard } from "@/components/MenteeSkeletonCard"
 import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { useAuth } from "@/lib/auth"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -421,11 +422,8 @@ export default function CommunityPage() {
       {/* Results Grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-64 rounded-xl bg-muted animate-pulse border shadow-sm"
-            />
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <MenteeSkeletonCard key={i} />
           ))}
         </div>
       ) : profiles.length === 0 ? (
