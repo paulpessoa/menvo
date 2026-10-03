@@ -1,13 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient as createAdminClient } from "@supabase/supabase-js"
+import { createClient as createAdminClient, type SupabaseClient } from "@supabase/supabase-js"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-})
+// Built on first use, never at import time: `next build` imports every route
+// to collect page data, and a module-scope client throws when the key is
+// absent (CI, preview builds without secrets).
+let adminClient: SupabaseClient | null = null
+function getSupabaseAdmin() {
+  if (adminClient) return adminClient
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error("Missing Supabase environment variables")
+  }
+  adminClient = createAdminClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+  return adminClient
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +26,7 @@ export async function POST(request: NextRequest) {
     
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "")
-      const { data } = await supabaseAdmin.auth.getUser(token)
+      const { data } = await getSupabaseAdmin().auth.getUser(token)
       user = data.user
     } else {
       const supabase = await createServerClient()
@@ -36,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current flags
-    const { data: profile } = await supabaseAdmin
+    const { data: profile } = await getSupabaseAdmin()
       .from("profiles")
       .select("onboarding_flags")
       .eq("id", user.id)
@@ -46,7 +56,7 @@ export async function POST(request: NextRequest) {
     const newFlags = { ...currentFlags, [flag]: value }
 
     // Update flags
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from("profiles")
       .update({ onboarding_flags: newFlags })
       .eq("id", user.id)
@@ -70,7 +80,7 @@ export async function DELETE(request: NextRequest) {
     
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "")
-      const { data } = await supabaseAdmin.auth.getUser(token)
+      const { data } = await getSupabaseAdmin().auth.getUser(token)
       user = data.user
     } else {
       const supabase = await createServerClient()
@@ -83,7 +93,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Clear flags
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await getSupabaseAdmin()
       .from("profiles")
       .update({ onboarding_flags: {} })
       .eq("id", user.id)

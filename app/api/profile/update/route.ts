@@ -7,17 +7,23 @@ import { MENTEE_PROFILE_EMBED_WITH_CV, splitMenteeFields, withMenteeFields } fro
 import { cvLink } from '@/lib/services/mentees/cv-storage'
 import { toPlainText } from '@/lib/schemas/plain-text'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// Built per request, never at import time: `next build` imports every route
+// to collect page data, and a module-scope client throws when the key is
+// absent (CI, preview builds without secrets).
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
+  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 export async function PUT(request: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin()
   try {
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {
@@ -95,6 +101,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const supabaseAdmin = getSupabaseAdmin()
   try {
     const authHeader = request.headers.get("authorization")
     if (!authHeader) {

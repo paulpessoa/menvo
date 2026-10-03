@@ -9,12 +9,18 @@ const FEATURE_FLAGS_TABLE = 'feature_flags'
 const FEATURE_FLAGS_AUDIT_LOGS_TABLE = 'feature_flag_audit_logs'
 
 // Usar Service Role para bypass RLS nas ações administrativas
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Built per request, never at import time: `next build` imports every route
+// to collect page data, and a module-scope client throws when the key is
+// absent (CI, preview builds without secrets).
+function getSupabase() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function GET() {
+  const supabase = getSupabase()
   try {
     const guard = await requireAdmin(["admin", "moderator"])
     if (!guard.ok) return guard.response
@@ -41,6 +47,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const supabase = getSupabase()
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response
@@ -69,6 +76,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const supabase = getSupabase()
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response
@@ -105,6 +113,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const supabase = getSupabase()
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response

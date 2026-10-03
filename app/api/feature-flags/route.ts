@@ -7,12 +7,18 @@ import type { Database } from "@/lib/types/supabase"
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+// Built per request, never at import time: `next build` imports every route
+// to collect page data, and a module-scope client throws when the key is
+// absent (CI, preview builds without secrets).
+function getSupabase() {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
 
 export async function GET() {
+  const supabase = getSupabase()
   try {
     // Buscar flags do Banco de Dados
     const { data: dbFlags, error } = await supabase
