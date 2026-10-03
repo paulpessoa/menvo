@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
@@ -114,6 +114,44 @@ export type Database = {
           {
             foreignKeyName: "admin_audit_logs_target_user_id_fkey"
             columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_audit_log: {
+        Row: {
+          actor_id: string | null
+          capability: string
+          created_at: string
+          effect: string
+          id: string
+          outcome: string
+          surface: string
+        }
+        Insert: {
+          actor_id?: string | null
+          capability: string
+          created_at?: string
+          effect: string
+          id?: string
+          outcome: string
+          surface: string
+        }
+        Update: {
+          actor_id?: string | null
+          capability?: string
+          created_at?: string
+          effect?: string
+          id?: string
+          outcome?: string
+          surface?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_audit_log_actor_id_fkey"
+            columns: ["actor_id"]
             isOneToOne: false
             referencedRelation: "vw_inactive_users"
             referencedColumns: ["id"]
@@ -1695,7 +1733,7 @@ export type Database = {
           last_name: string | null
           linkedin_url: string | null
           mentorship_topics: string[] | null
-          onboarding_flags: Json | null
+          onboarding_flags: Json
           phone: string | null
           portfolio_url: string | null
           search_vector: unknown
@@ -1726,7 +1764,7 @@ export type Database = {
           last_name?: string | null
           linkedin_url?: string | null
           mentorship_topics?: string[] | null
-          onboarding_flags?: Json | null
+          onboarding_flags?: Json
           phone?: string | null
           portfolio_url?: string | null
           search_vector?: unknown
@@ -1757,7 +1795,7 @@ export type Database = {
           last_name?: string | null
           linkedin_url?: string | null
           mentorship_topics?: string[] | null
-          onboarding_flags?: Json | null
+          onboarding_flags?: Json
           phone?: string | null
           portfolio_url?: string | null
           search_vector?: unknown
@@ -1766,6 +1804,24 @@ export type Database = {
           timezone?: string | null
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      profiles_bio_backup_20261002: {
+        Row: {
+          backed_up_at: string | null
+          bio: string | null
+          id: string | null
+        }
+        Insert: {
+          backed_up_at?: string | null
+          bio?: string | null
+          id?: string | null
+        }
+        Update: {
+          backed_up_at?: string | null
+          bio?: string | null
+          id?: string | null
         }
         Relationships: []
       }
