@@ -1,6 +1,6 @@
 ---
 name: menvo-blueprint
-description: Arquitetura de referência do MENVO. Audita, planeja e aplica, camada por camada, o padrão de 12 camadas (migration SQL → tipos gerados → entity → Zod → repository → ports → service → route handler → OpenAPI → query layer → página/componentes → testes) em um domínio (quiz, appointments, mentors…). Use quando o pedido for "aplicar o blueprint", "modo audit/plan/apply/verify", "deixar o domínio X no padrão", "criar feature nova no padrão", ou quando for criar/refatorar repository, service, route handler, query keys, OpenAPI/Swagger ou testes de um domínio. Não use para ajuste visual puro nem para conteúdo/e-mail.
+description: Arquitetura de referência do MENVO. Audita, planeja e aplica, camada por camada, o padrão de 14 camadas (migration SQL → tipos gerados → entity → Zod → repository → ports → service → route handler → OpenAPI → query layer → página/componentes → testes → tooling/CI → superfície para agentes) em um domínio (quiz, appointments, mentors…). Use quando o pedido for "aplicar o blueprint", "modo audit/plan/apply/verify", "deixar o domínio X no padrão", "criar feature nova no padrão", ou quando for criar/refatorar repository, service, route handler, query keys, OpenAPI/Swagger, testes (Jest, Playwright, pgTAP), CI, ou expor algo para agentes (MCP, function calling, assistente). Não use para ajuste visual puro nem para conteúdo/e-mail.
 ---
 
 # MENVO Blueprint
@@ -10,6 +10,7 @@ por um motivo, e o código precisa ensinar esse motivo. Seu trabalho não é só
 mover código para as pastas certas, é deixar cada decisão e cada tradeoff
 visível para quem ler depois.
 
+As regras gerais para agentes estão em `docs/blueprint/agent-rules.md`.
 A decisão por trás deste padrão está em
 `docs/governance/adr/0006-arquitetura-de-referencia.md`. Leia antes do
 primeiro uso.
@@ -25,6 +26,8 @@ for dito, comece por `audit`.
 | `plan <domínio>` | Não | Mesmo arquivo, seção "Plano": grupos de camadas em ordem, um commit por grupo, riscos |
 | `apply <domínio> <camadas>` | Sim | Só as camadas pedidas (ex.: `1-5`). Para no fim e mostra o diff resumido |
 | `verify <domínio>` | Não | Roda as checagens da seção "Verificação" e lista o que falhou |
+| `apply tooling` | Sim | Camada 13 do repositório: CI, ESLint, Playwright, OpenAPI base. Ponto de parada antes de instalar dependência |
+| `apply agents` | Sim | Camada 14 do repositório: `lib/agents` (registro, exposição, adapters) e migração das tools existentes |
 
 Grupos padrão para o `apply` (cada um é um commit):
 
@@ -32,9 +35,13 @@ Grupos padrão para o `apply` (cada um é um commit):
 2. **Servidor:** camadas 5–8 (repository, ports, service, route handler)
 3. **Contrato:** camada 9 (OpenAPI)
 4. **Cliente:** camadas 10–11 (query layer, página/componentes)
-5. **Testes:** camada 12 acompanha cada grupo acima; nunca fica para o fim
+5. **Agentes:** camada 14 (capabilities do domínio + exposição)
+6. **Testes:** camada 12 acompanha cada grupo acima; nunca fica para o fim
 
-## As 12 camadas
+A camada 13 (tooling/CI) é do repositório, não de um domínio: só muda com
+`modo apply tooling`.
+
+## As 14 camadas
 
 Resumo. As regras completas, os templates e o "não faça" de cada camada estão
 em `references/layers.md`.
@@ -52,7 +59,9 @@ em `references/layers.md`.
 | 9 | OpenAPI | `lib/openapi/paths/<d>.ts` | Gerado dos schemas Zod da camada 4. Ver `references/openapi.md` |
 | 10 | Query layer | `lib/query/keys.ts`, `lib/query/effects.ts`, `hooks/<d>/` | Toda chave nasce na fábrica; todo efeito colateral está no mapa. Ver `references/query-layer.md` |
 | 11 | Página e componentes | `app/[locale]/<rota>/`, `components/<d>/` | Server Component chama o service direto; client usa hooks |
-| 12 | Testes | ao lado do arquivo testado | Um tipo de teste por camada. Ver `references/testing.md` |
+| 12 | Testes | ao lado do arquivo testado, `e2e/`, `supabase/tests/` | Um tipo de teste por camada. Ver `references/testing.md` |
+| 13 | Tooling e CI | `.github/workflows/`, `eslint.config.mjs`, `playwright.config.ts` | O que roda, quando, e o que bloqueia merge. Ver `references/tooling-ci.md` |
+| 14 | Superfície para agentes | `lib/agents/` | Uma capability por ação; `exposure.ts` decide o que cada superfície (MCP, assistente, servidor) libera. Negar por padrão. Ver `references/agent-surface.md` |
 
 ## Fluxo de trabalho
 
@@ -76,6 +85,9 @@ em `references/layers.md`.
 - Mudar o formato de resposta de uma rota que o app já consome.
 - Qualquer uso de `service_role` (ver ADR 0005: só como exceção documentada).
 - Apagar arquivo que não foi você que criou nesta sessão.
+- Liberar uma capability nova em `lib/agents/exposure.ts`, principalmente no
+  MCP público ou com `effect` de escrita.
+- Mudar workflow do GitHub ou regra do ESLint (afeta todo PR).
 
 ## Comentários: este código ensina
 
@@ -108,10 +120,11 @@ Rode ao fim de cada grupo, nesta ordem, e só siga se tudo passar:
 
 ```bash
 npm run db:types        # se o grupo mexeu em migration (precisa do .env.local)
-npm run typecheck
-npm run lint
-npx jest <arquivos do domínio>
+npm run verify          # typecheck + lint + jest (o mesmo que o CI roda)
 npx jest lib/openapi    # teste de drift do contrato, a partir do grupo 3
+npx jest lib/agents     # snapshot de exposição, a partir do grupo 5
+npm run build && npm run test:e2e   # se mexeu em página ou fluxo
+supabase test db        # se mexeu em RLS (precisa de Docker)
 ```
 
 Se a migration ainda não foi aplicada no banco, o `db:types` não vai mostrar

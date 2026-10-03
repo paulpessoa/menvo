@@ -1,12 +1,12 @@
 ---
-title: "ADR 0006 - Arquitetura de referência em 12 camadas por domínio"
+title: "ADR 0006 - Arquitetura de referência em 14 camadas por domínio"
 owner: paul
 status: proposed
 last_reviewed: 2026-10-03
 source_of_truth: [.claude/skills/menvo-blueprint/SKILL.md, .claude/skills/menvo-blueprint/references/]
 ---
 
-# ADR 0006 - Arquitetura de referência em 12 camadas por domínio
+# ADR 0006 - Arquitetura de referência em 14 camadas por domínio
 
 - **Status:** proposto (2026-10-03). Vira "current" quando o piloto (quiz)
   estiver completo.
@@ -24,6 +24,12 @@ O MENVO cresceu feature a feature e cada domínio organiza dados de um jeito:
 - `docs/api-reference.md` é escrito à mão e já diverge das rotas.
 - Testes existem (Jest, `route.test.ts`), mas sem um critério de que tipo
   de teste cobre qual camada; não há teste de RLS.
+- O GitHub só rodava o check de atribuição de IA: nenhum typecheck, lint,
+  teste ou build em PR. O `lint` estava quebrado (Next 15.2 + ESLint 10), o
+  lockfile estava fora de sincronia e o build falhava sem segredos (seis
+  rotas criavam o client `service_role` no topo do módulo).
+- As tools de agente estão duplicadas entre o MCP público e o assistente
+  LangChain, cada uma com seu jeito de decidir permissão.
 
 Além de produto, este repositório é material de estudo do Paul para
 praticar boas práticas e tradeoffs do mundo real. A arquitetura precisa ser
@@ -31,7 +37,7 @@ explicável, não só funcionar.
 
 ## 2. Decisão
 
-Todo domínio segue as mesmas 12 camadas, cada uma com uma regra única:
+Todo domínio segue as mesmas 14 camadas, cada uma com uma regra única:
 
 | # | Camada | Regra |
 |---|---|---|
@@ -47,6 +53,8 @@ Todo domínio segue as mesmas 12 camadas, cada uma com uma regra única:
 | 10 | Query layer | Fábrica de chaves + mapa de efeitos + hooks |
 | 11 | Página/componentes | Server chama service; client usa hooks |
 | 12 | Testes | Um tipo de teste por camada |
+| 13 | Tooling e CI | O que roda, quando, e o que bloqueia merge |
+| 14 | Superfície para agentes | Registro de capabilities + `exposure.ts` decide o que cada superfície libera |
 
 Detalhes, templates e o "não faça" de cada camada:
 `.claude/skills/menvo-blueprint/references/`.
@@ -80,6 +88,20 @@ Escolhido `zod-to-openapi`, que reaproveita os schemas da camada 4.
 **Repository genérico (`BaseRepository<T>`).** Rejeitado. Cada domínio tem
 consultas próprias; o genérico vira um ORM ruim.
 
+**Vitest no lugar do Jest.** Adiado. Seria mais rápido e nativo de ESM, mas
+já existem 81 suítes em Jest e a suíte roda em tempo aceitável.
+
+**Cypress.** Rejeitado. Sobrepõe o Playwright, é mais lento em paralelo e
+cobra para paralelizar no CI. Uma ferramenta de E2E só.
+
+**Hook de pre-push.** Rejeitado como barreira. Deixa todo push lento, é
+fácil de pular e não existe nos agentes de nuvem. O CI é a barreira;
+`npm run verify` é o atalho local.
+
+**Tools de agente definidas em cada superfície.** Rejeitado (é o estado
+atual). Um registro único com exposição explícita, negando por padrão,
+torna "o que está liberado para agentes" uma lista revisável em PR.
+
 ## 4. Consequências
 
 **Boas**
@@ -89,6 +111,8 @@ consultas próprias; o genérico vira um ORM ruim.
 - Trocar provedor de e-mail/storage/IA ou de Postgres mexe em um arquivo.
 - A documentação da API não diverge: divergência quebra o teste de drift.
 - "O que atualiza quando X muda" está escrito em `lib/query/effects.ts`.
+- "O que agentes podem fazer" está escrito em `lib/agents/exposure.ts`.
+- Todo PR passa por typecheck, lint, testes, build e um smoke E2E.
 
 **Custos**
 - Mais arquivos por domínio (~10). Para uma rota trivial, parece
@@ -100,6 +124,9 @@ consultas próprias; o genérico vira um ORM ruim.
   e, depois, `@playwright/test`.
 - Testes de RLS (pgTAP) exigem Docker e rodam local antes de PRs que mexem
   em RLS, não no CI por enquanto.
+- ESLint em modo "catraca": ~970 avisos de dívida antiga ficam visíveis; as
+  pastas novas são estritas. O número só pode cair.
+- CI custa ~10 min de runner por PR.
 
 ## 5. Comentários no código
 

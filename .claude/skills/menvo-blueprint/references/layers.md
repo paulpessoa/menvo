@@ -1,4 +1,4 @@
-# As 12 camadas, uma a uma
+# As 14 camadas, uma a uma
 
 Cada camada tem: **onde fica**, **regra**, **não faça**, **tradeoff** e um
 **template**. Os templates usam o domínio `quiz` como exemplo; troque pelo
@@ -228,3 +228,11 @@ Ver `references/query-layer.md`.
 ## 12. Testes
 
 Ver `references/testing.md`.
+
+## 13. Tooling e CI
+
+Ver `references/tooling-ci.md`.
+
+## 14. Superfície para agentes
+
+Ver `references/agent-surface.md`.

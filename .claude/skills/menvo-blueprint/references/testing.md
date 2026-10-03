@@ -26,7 +26,8 @@ raro o teste.
 | 9 OpenAPI | Contrato | `lib/openapi/document.test.ts` | Jest | CI |
 | 10 Hooks | Unit | `hooks/<d>/<hook>.test.tsx` | Testing Library + QueryClient | CI |
 | 11 Componente | Unit | `components/<d>/*.test.tsx` | Testing Library | CI |
-| Fluxo | E2E | `e2e/<fluxo>.spec.ts` | Playwright | Local + CI noturno |
+| 14 Capabilities | Snapshot + invariantes | `lib/agents/exposure.test.ts` | Jest | CI |
+| Fluxo | E2E | `e2e/<fluxo>.spec.ts` | Playwright | CI (cada PR e cada Preview) + local |
 
 ## Por camada, o que vale testar
 
@@ -56,9 +57,9 @@ raro o teste.
   160 migrations. Vale rodar antes de qualquer PR que mexa em RLS.
 - **Cobertura:** não persiga %. Persiga "cada regra do service e cada
   política RLS tem um teste".
-- **Playwright:** o Chromium já vem no ambiente de nuvem; local precisa de
-  `npx playwright install chromium`. Adicionar a dependência é ponto de
-  parada.
+- **Playwright:** já instalado (`playwright.config.ts`, `e2e/`). Local, rode
+  uma vez `npx playwright install chromium`. Como e quando ele roda no CI
+  está em `references/tooling-ci.md`.
 
 ## Fakes compartilhados
 
