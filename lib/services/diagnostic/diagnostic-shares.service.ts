@@ -6,7 +6,7 @@ import type {
   DiagnosticShareWithMentee,
   SharedDiagnosticInsight
 } from "@/lib/types/models/diagnostic-shares"
-import type { QuizAnalysisResult } from "@/lib/types/models/quiz"
+import type { QuizAnalysis } from "@/lib/domain/quiz/quiz.entity"
 
 /**
  * Service to manage secure sharing of diagnostic sessions and quiz responses
@@ -271,7 +271,7 @@ export class DiagnosticSharesService {
  * decided (migration 20260930000001).
  */
 function mapSharedDiagnosticRow(row: any): SharedDiagnosticInsight {
-  const analysis = (row.analysis as unknown as QuizAnalysisResult) || null
+  const analysis = (row.analysis as unknown as QuizAnalysis) || null
 
   return {
     shareId: row.share_id,

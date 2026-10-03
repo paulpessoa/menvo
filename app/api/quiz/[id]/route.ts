@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import type { QuizAnalysisResult } from "@/lib/types/models/quiz"
+import type { QuizAnalysis } from "@/lib/domain/quiz/quiz.entity"
 
 /**
  * GET /api/quiz/[id] - the public result view for `/quiz/results/[id]`, a
@@ -45,7 +45,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
   return NextResponse.json({
     id: row.id,
     processed_at: row.processed_at,
-    ai_analysis: (row.ai_analysis as unknown as QuizAnalysisResult) || null,
+    ai_analysis: (row.ai_analysis as unknown as QuizAnalysis) || null,
     is_owner: isOwner,
   })
 }

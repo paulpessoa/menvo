@@ -1,7 +1,7 @@
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { sendQuizResultsEmail } from "@/lib/email/brevo"
 import { buildResultUrl } from "@/lib/quiz/result-link"
-import type { QuizAnalysisResult } from "@/lib/types/models/quiz"
+import type { QuizAnalysis } from "@/lib/domain/quiz/quiz.entity"
 
 export type QuizEmailOutcome = "sent" | "not_found" | "not_ready" | "failed"
 
@@ -23,7 +23,7 @@ export async function sendQuizResultsEmailFor(id: string): Promise<QuizEmailOutc
 
   if (error || !row) return "not_found"
 
-  const analysis = row.ai_analysis as unknown as QuizAnalysisResult | null
+  const analysis = row.ai_analysis as unknown as QuizAnalysis | null
   // "precisa_refazer" results are a nudge to answer again, not an analysis
   // worth e-mailing.
   if (!analysis || analysis.precisa_refazer) return "not_ready"

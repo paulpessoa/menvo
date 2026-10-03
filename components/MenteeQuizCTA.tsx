@@ -5,11 +5,11 @@ import { Sparkles, ArrowRight, RotateCcw, BrainCircuit, CheckCircle2 } from "luc
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
-import type { QuizResponseSummary } from "@/lib/types/models/quiz"
+import type { QuizSummary } from "@/lib/domain/quiz/quiz.entity"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 
 interface MenteeQuizCTAProps {
-  quizResponse: QuizResponseSummary | null
+  quizResponse: QuizSummary | null
   loading?: boolean
 }
 

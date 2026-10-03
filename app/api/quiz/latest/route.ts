@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import type { QuizAnalysisResult } from "@/lib/types/models/quiz"
+import type { QuizAnalysis } from "@/lib/domain/quiz/quiz.entity"
 
 /**
  * GET /api/quiz/latest - the caller's own most recent quiz response, used by
@@ -51,7 +51,7 @@ export async function GET() {
       created_at: data.created_at,
       development_areas: data.development_areas || [],
       career_moment: data.career_moment,
-      ai_analysis: (data.ai_analysis as unknown as QuizAnalysisResult) || null,
+      ai_analysis: (data.ai_analysis as unknown as QuizAnalysis) || null,
     },
   })
 }

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import type { QuizAnalysisResult } from "@/lib/types/models/quiz"
+import type { QuizAnalysis } from "@/lib/domain/quiz/quiz.entity"
 
 export type DiagnosticShareScope = "summary" | "full"
 
@@ -44,7 +44,7 @@ export interface SharedDiagnosticInsight {
     fullName: string
     avatarUrl?: string | null
   }
-  analysis: QuizAnalysisResult | null
+  analysis: QuizAnalysis | null
   developmentAreas: string[]
   currentChallenge?: string | null
   futureVision?: string | null

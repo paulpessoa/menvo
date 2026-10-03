@@ -22,7 +22,7 @@ import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
-import type { QuizResponseSummary } from "@/lib/types/models/quiz"
+import type { QuizSummary } from "@/lib/domain/quiz/quiz.entity"
 import { useOnboarding } from "@/hooks/useOnboarding"
 
 interface MenteeStats {
@@ -72,7 +72,7 @@ export default function MenteeDashboard() {
   const [favoriteMentorsData, setFavoriteMentorsData] = useState<FavoriteMentor[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingFavorites, setLoadingFavorites] = useState(false)
-  const [quizSummary, setQuizSummary] = useState<QuizResponseSummary | null>(null)
+  const [quizSummary, setQuizSummary] = useState<QuizSummary | null>(null)
   const [loadingQuiz, setLoadingQuiz] = useState(true)
 
   const [hasPendingReview, setHasPendingReview] = useState(false)

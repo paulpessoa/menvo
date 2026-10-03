@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { QuizAnalysis, QuizResultView, QuizSummary } from '@/lib/domain/quiz/quiz.entity';
 
 export const quizFormDataSchema = z.object({
   careerMoment: z.string().min(1, 'Selecione seu momento de carreira'),
@@ -36,7 +37,83 @@ export const quizSubmitSchema = z.object({
   personal_life_help: z.string().trim().min(11).max(4000),
 });
 
-export type QuizSubmitPayload = z.infer<typeof quizSubmitSchema>;
+/** Corpo aceito por `POST /api/quiz`; o cliente usa este mesmo tipo (sem interface duplicada). */
+export type QuizSubmitInput = z.infer<typeof quizSubmitSchema>;
+
+// ---------------------------------------------------------------------------
+// Saída das rotas e params (camada 4). Tipos de DTO = z.infer, nunca à mão.
+// Cada schema é checado contra a Entity (`satisfies`), então um campo novo na
+// Entity que não esteja aqui falha no typecheck.
+// ---------------------------------------------------------------------------
+
+/** `id` de rota: UUID. Antes qualquer string chegava até o banco. */
+export const quizIdParamSchema = z.object({ id: z.string().uuid() });
+
+/**
+ * `ai_analysis` como lido do banco. Mais frouxo que o `quizAnalysisSchema` de
+ * `analyze.ts` (o que a IA deve devolver): aqui os opcionais existem porque
+ * linhas antigas não os têm.
+ */
+export const storedQuizAnalysisSchema = z.object({
+  precisa_refazer: z.boolean().optional(),
+  titulo_personalizado: z.string(),
+  resumo_motivador: z.string(),
+  mentores_sugeridos: z.array(
+    z.object({
+      tipo: z.string(),
+      razao: z.string(),
+      disponivel: z.boolean(),
+      mentor_nome: z.string().optional(),
+    })
+  ),
+  conselhos_praticos: z.array(z.string()),
+  proximos_passos: z.array(z.string()),
+  areas_desenvolvimento: z.array(z.string()),
+  mensagem_final: z.string(),
+  potencial_mentor: z.boolean().optional(),
+  areas_vida_pessoal: z.array(z.string()).optional(),
+}) satisfies z.ZodType<QuizAnalysis>;
+
+/** `GET /api/quiz/[id]`: a visão pública do resultado. */
+export const quizResultViewSchema = z.object({
+  id: z.string().uuid(),
+  processed_at: z.string().nullable(),
+  ai_analysis: storedQuizAnalysisSchema.nullable(),
+  is_owner: z.boolean().optional(),
+}) satisfies z.ZodType<QuizResultView>;
+
+export const quizSummarySchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  email: z.string(),
+  score: z.number().nullable(),
+  processed_at: z.string().nullable(),
+  created_at: z.string().nullable(),
+  career_moment: z.string(),
+  development_areas: z.array(z.string()),
+  ai_analysis: storedQuizAnalysisSchema.nullable(),
+}) satisfies z.ZodType<QuizSummary>;
+
+/** `GET /api/quiz/latest`. */
+export const quizLatestResponseSchema = z.object({ summary: quizSummarySchema.nullable() });
+
+/** `POST /api/quiz`. */
+export const quizSubmitResponseSchema = z.object({ id: z.string().uuid() });
+
+/** `POST /api/quiz/[id]/account`: o `k` é o token assinado do link do e-mail. */
+export const quizAccountBodySchema = z.object({
+  token: z.string().min(10).max(200),
+  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.').max(72),
+});
+
+/** `GET /api/quiz/[id]/account?k=...`. */
+export const quizAccountStatusSchema = z.object({
+  status: z.enum(['claimable', 'exists']),
+  email: z.string(),
+});
+
+/** `POST /api/quiz/[id]/account` (sucesso). */
+export const quizAccountCreatedSchema = z.object({ ok: z.literal(true), email: z.string() });
 
 export const stepValidation = {
   1: (data: Partial<QuizFormData>) => !!data.careerMoment,

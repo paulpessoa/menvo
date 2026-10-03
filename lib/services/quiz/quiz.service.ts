@@ -1,21 +1,5 @@
-import type {
-  QuizResponseSummary,
-  QuizResultView,
-  QuizAnalysisResult
-} from "@/lib/types/models/quiz"
-
-export interface QuizSubmitInput {
-  name: string
-  email: string
-  linkedin_url?: string | null
-  career_moment: string
-  mentorship_experience: string
-  development_areas: string[]
-  current_challenge: string
-  future_vision: string
-  share_knowledge: string
-  personal_life_help: string
-}
+import type { QuizSummary, QuizResultView } from "@/lib/domain/quiz/quiz.entity"
+import type { QuizSubmitInput } from "@/lib/schemas/quiz"
 
 /**
  * Client-side wrapper around the quiz API routes (`app/api/quiz/**`). Kept
@@ -30,7 +14,7 @@ class QuizService {
    * The server derives the e-mail from the session - the parameter here is
    * unused, kept only so existing callers don't need to change.
    */
-  async getLatestQuizResponseByEmail(_email: string): Promise<QuizResponseSummary | null> {
+  async getLatestQuizResponseByEmail(_email: string): Promise<QuizSummary | null> {
     try {
       const res = await fetch("/api/quiz/latest")
       if (!res.ok) return null

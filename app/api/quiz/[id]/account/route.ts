@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
 import { checkRateLimit } from "@/lib/rate-limit"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { verifyResultLink } from "@/lib/quiz/result-link"
+import { quizAccountBodySchema } from "@/lib/schemas/quiz"
 
 /**
  * "Save my analysis": turns an anonymous quiz into an account, from the link
@@ -50,11 +50,6 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
   return NextResponse.json({ status: exists ? "exists" : "claimable", email: row.email })
 }
 
-const bodySchema = z.object({
-  token: z.string().min(10).max(200),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres.").max(72),
-})
-
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params
 
@@ -64,7 +59,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return NextResponse.json({ error: "Muitas tentativas. Tente novamente em alguns minutos." }, { status: 429 })
   }
 
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null))
+  const parsed = quizAccountBodySchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message || "Dados inválidos" },
