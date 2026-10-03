@@ -3,7 +3,7 @@ import { consumeAiQuota, getAiQuota } from "@/lib/ai/quota"
 import type { AiCallRecord } from "@/lib/ai/metering"
 import type { AiEvent } from "@/lib/ai/protocol"
 import { diagnosticService } from "@/lib/services/diagnostic/diagnostic.service"
-import { assistantTools } from "@/lib/services/assistant/tools"
+import { saveFeedback, searchMentors } from "@/lib/services/assistant/tools"
 import { analyzeQuiz, type AnalysisMentor, type QuizAnswers } from "./analyze"
 import { DIAGNOSTIC_STEPS, TOTAL_DIAGNOSTIC_STEPS } from "./steps"
 import { extractCareerMoment, extractDevelopmentAreas, checkCrisisTrigger, CRISIS_SAFEGUARD_MESSAGE } from "./extract"
@@ -61,7 +61,7 @@ export async function processDiagnosticTurn(
 
       if (isFeedbackIntent && trimmedInput.length > 0) {
         const rating = ratingMatch ? parseInt(ratingMatch[1], 10) : 5
-        await assistantTools.saveFeedback(supabase, {
+        await saveFeedback(supabase, {
           rating,
           comment: trimmedInput,
           source: "diagnostic",
@@ -511,9 +511,9 @@ async function advanceToNextStep(
     }
   }
 
-  // C. Fallback: try assistantTools.searchMentors
+  // C. Fallback: try searchMentors
   if (recommendedCards.length === 0) {
-    const searchResults = await assistantTools.searchMentors(supabase, { query: "carreira", limit: 3 })
+    const searchResults = await searchMentors(supabase, { query: "carreira", limit: 3 })
     if (searchResults.forCard && searchResults.forCard.length > 0) {
       recommendedCards.push(...searchResults.forCard)
     }

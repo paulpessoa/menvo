@@ -500,13 +500,10 @@ export async function evaluateMentorshipSession(
   userId: string,
   input: z.infer<typeof evaluateMentorshipSessionInput>
 ): Promise<EvaluateMentorshipResult> {
-  let client: SupabaseClient = supabase
-  try {
-    const { createServiceRoleClient } = await import("@/lib/utils/supabase/service-role")
-    client = createServiceRoleClient()
-  } catch {
-    client = supabase
-  }
+  // RLS do próprio usuário basta: appointment_feedbacks/feedback aceitam insert
+  // do reviewer e appointments aceita update do participante. Sem service_role
+  // (ADR 0005; antes caía nele em silêncio quando a chave existia).
+  const client = supabase
 
   // 1. Fetch appointment to verify ownership and status
   const { data: appointment, error: fetchError } = await client
@@ -591,17 +588,4 @@ export async function evaluateMentorshipSession(
     success: true,
     message: "Avaliação registrada com sucesso! Agradecemos por compartilhar sua experiência sobre a mentoria."
   }
-}
-
-// --- Registro único ---
-export const assistantTools = {
-  searchMentors,
-  getMentorAvailability,
-  explainHowItWorks,
-  searchKnowledgeBase,
-  saveFeedback,
-  getMyAppointments,
-  getPendingEvaluations,
-  getMentorRequests,
-  evaluateMentorshipSession
 }

@@ -1,22 +1,10 @@
 import { createAgent, modelFallbackMiddleware } from "langchain"
-import { tool } from "@langchain/core/tools"
 import { SystemMessage } from "@langchain/core/messages"
 import { SupabaseClient, type User } from "@supabase/supabase-js"
 import { getAgentModels } from "@/lib/ai/models"
 import type { AiCallRecord } from "@/lib/ai/metering"
 import { diagnosticService } from "@/lib/services/diagnostic/diagnostic.service"
-import {
-  assistantTools,
-  searchMentorsInput,
-  getMentorAvailabilityInput,
-  explainHowItWorksInput,
-  searchKnowledgeBaseInput,
-  saveFeedbackInput,
-  getMyAppointmentsInput,
-  getPendingEvaluationsInput,
-  getMentorRequestsInput,
-  evaluateMentorshipSessionInput
-} from "@/lib/services/assistant/tools"
+import { toLangChainTools } from "@/lib/agents/adapters/langchain"
 
 export interface GetAssistantAgentOptions {
   /** Receives one AiCallRecord per model attempt (primary + every fallback
@@ -181,120 +169,9 @@ Recomendação da IA na época: ${suggestion}`.trim()
     }
   }
 
-  // 2. Base universal tools
-  const searchMentorsTool = tool(
-    async (input) => {
-      const results = await assistantTools.searchMentors(supabase, input)
-      if (results.forLlm.length === 0) {
-        return [
-          "RESULTADO VAZIO. AVISO DO SISTEMA: Não tente buscar novamente. Informe imediatamente ao usuário, em poucas palavras, que você não encontrou mentores para esse tema e sugira outras áreas da plataforma.",
-          []
-        ]
-      }
-      return [JSON.stringify(results.forLlm), results.forCard]
-    },
-    {
-      name: "searchMentors",
-      description: "Busca mentores no catálogo usando filtro por relevância e IA",
-      schema: searchMentorsInput,
-      responseFormat: "content_and_artifact"
-    }
-  )
-
-  const getMentorAvailabilityTool = tool(
-    async (input) => JSON.stringify(await assistantTools.getMentorAvailability(supabase, input)),
-    {
-      name: "getMentorAvailability",
-      description: "Retorna a agenda do mentor nos próximos dias usando o slug",
-      schema: getMentorAvailabilityInput
-    }
-  )
-
-  const explainHowItWorksTool = tool(
-    async (input) => JSON.stringify(assistantTools.explainHowItWorks(input)),
-    {
-      name: "explainHowItWorks",
-      description: "Responde dúvidas sobre o funcionamento da plataforma Menvo",
-      schema: explainHowItWorksInput
-    }
-  )
-
-  const searchKnowledgeBaseTool = tool(
-    async (input) => JSON.stringify(assistantTools.searchKnowledgeBase(input, role)),
-    {
-      name: "searchKnowledgeBase",
-      description: "Consulta a base de conhecimento oficial da Menvo para responder dúvidas sobre regras, agendamentos, cancelamentos, faltas, certificados, conduta e funcionamento geral",
-      schema: searchKnowledgeBaseInput
-    }
-  )
-
-  const saveFeedbackTool = tool(
-    async (input) => JSON.stringify(await assistantTools.saveFeedback(supabase, input)),
-    {
-      name: "saveFeedback",
-      description: "Salva a nota de avaliação do usuário (1 a 5) e comentário sobre o atendimento no banco de dados",
-      schema: saveFeedbackInput
-    }
-  )
-
-  const tools: any[] = [
-    searchMentorsTool,
-    getMentorAvailabilityTool,
-    explainHowItWorksTool,
-    searchKnowledgeBaseTool,
-    saveFeedbackTool
-  ]
-
-  // 3. User-specific RBAC tools
-  if (user?.id) {
-    const userId = user.id
-
-    const getMyAppointmentsTool = tool(
-      async (input) => JSON.stringify(await assistantTools.getMyAppointments(supabase, userId, input)),
-      {
-        name: "getMyAppointments",
-        description: "Consulta as mentorias agendadas do usuário atual (próximas e recentes)",
-        schema: getMyAppointmentsInput
-      }
-    )
-    tools.push(getMyAppointmentsTool)
-
-    // Mentee and Admin can check and submit evaluations (Invariant #2: only mentees evaluate mentors)
-    if (role === "mentee" || role === "admin") {
-      const getPendingEvaluationsTool = tool(
-        async () => JSON.stringify(await assistantTools.getPendingEvaluations(supabase, userId, role)),
-        {
-          name: "getPendingEvaluations",
-          description: "Consulta mentorias concluídas que ainda aguardam avaliação pelo mentorado",
-          schema: getPendingEvaluationsInput
-        }
-      )
-      tools.push(getPendingEvaluationsTool)
-
-      const evaluateMentorshipSessionTool = tool(
-        async (input) => JSON.stringify(await assistantTools.evaluateMentorshipSession(supabase, userId, input)),
-        {
-          name: "evaluateMentorshipSession",
-          description: "Registra a avaliação do mentorado para uma mentoria realizada (nota de 1 a 5 e feedback opcional)",
-          schema: evaluateMentorshipSessionInput
-        }
-      )
-      tools.push(evaluateMentorshipSessionTool)
-    }
-
-    // Mentor and Admin can check pending requests from mentees
-    if (role === "mentor" || role === "admin") {
-      const getMentorRequestsTool = tool(
-        async () => JSON.stringify(await assistantTools.getMentorRequests(supabase, userId, role)),
-        {
-          name: "getMentorRequests",
-          description: "Consulta solicitações de mentoria pendentes de confirmação pelo mentor",
-          schema: getMentorRequestsInput
-        }
-      )
-      tools.push(getMentorRequestsTool)
-    }
-  }
+  // 2. Tools: quais existem e para quem é decidido em lib/agents/exposure.ts
+  // (negar por padrão, filtrado pelo papel). Sem usuário, só as públicas.
+  const tools = toLangChainTools(supabase, user?.id ? { id: user.id, role } : null)
 
   return createAgent({
     model: primary,

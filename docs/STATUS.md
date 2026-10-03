@@ -107,6 +107,9 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-03 - Camada 14: `lib/agents` (capabilities, exposição, adapters)
+MCP público e assistente passaram a registrar as tools a partir de um único registro (`lib/agents/registry.ts`); o que cada superfície libera é decidido só em `lib/agents/exposure.ts` (snapshot em `exposure.test.ts`). Comportamento mantido: mesmos nomes de tool (`toolName`), mesmo conjunto por papel, mesmos formatos de saída. `evaluateMentorshipSession` não cai mais em `service_role` (as policies de `appointment_feedbacks`, `appointments` e `feedback` já cobrem o participante). Dívidas: as duas escritas (`appointments.evaluate`, `feedback.save`) ainda executam sem confirmação humana (`confirmation: "none"`), e faltam rate limit por capability e log de auditoria de escrita por agente.
+
 ### 2026-10-02 - Google Calendar do mentor: verificado em produção e deixado claro que é só consulta
 - **Verificado:** com a conta do Paul conectada, um evento "Ocupado" (08/10 20:30) escondeu o slot em `/api/appointments/availability`; evento de dia inteiro marcado "Livre" ("SEXTOU PAPAI") não bloqueia, porque o Google não o inclui no freebusy.
 - **Texto:** card "Sincronização Pessoal" em `/mentor/availability`, artigo `kb/mentores/integracao-google-calendar.md` (corrigido: antes prometia gravação de eventos, mas os escopos são só leitura), resposta do assistente (`lib/services/assistant/tools.ts`) e `docs/domains/scheduling.md` §2.4 agora dizem: só consulta ocupado/livre, só remove horários, só "Ocupado" bloqueia, falha silenciosa mostra todos os slots.
