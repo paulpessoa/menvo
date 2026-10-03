@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Star, Sparkles, Search, Video, Clock } from "lucide-react"
+import { Star, Search, Video, Clock } from "lucide-react"
 import { Link } from "@/i18n/routing"
 
 interface NextSessionInfo {
@@ -21,7 +21,6 @@ interface MenteeNextStepCardProps {
   hasPendingReview: boolean
   nextSession: NextSessionInfo | null
   quizDone: boolean
-  diagnosticHref: string
 }
 
 /**
@@ -35,7 +34,7 @@ interface MenteeNextStepCardProps {
  * SupabaseClient) and would require a second network round trip here, when
  * the dashboard already has everything it needs from its own fetches.
  */
-export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, diagnosticHref }: MenteeNextStepCardProps) {
+export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone }: MenteeNextStepCardProps) {
   if (hasPendingReview) {
     return (
       <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent shadow-sm">
@@ -98,28 +97,9 @@ export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, di
     )
   }
 
-  if (!quizDone) {
-    return (
-      <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border-none bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 text-white shadow-lg">
-        <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="p-2.5 rounded-xl bg-white/15 shrink-0">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold">Seu próximo passo: faça seu diagnóstico de carreira</h4>
-              <p className="text-xs text-white/80 mt-0.5">
-                Responda algumas perguntas com IA e receba sugestões de mentores para o seu momento.
-              </p>
-            </div>
-          </div>
-          <Button asChild size="sm" className="rounded-xl bg-white text-primary hover:bg-white/95 font-bold shrink-0 shadow-sm">
-            <Link href={diagnosticHref}>Começar</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    )
-  }
+  // Diagnostic not done: the large MenteeQuizCTA below already presents this
+  // step, so rendering it here too would be redundant.
+  if (!quizDone) return null
 
   return (
     <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent shadow-sm">
