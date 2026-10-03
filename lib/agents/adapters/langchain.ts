@@ -11,11 +11,12 @@ import { tool } from "@langchain/core/tools"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Actor } from "../define"
 import { capabilitiesFor } from "../exposure"
+import { runCapability } from "../run"
 
 export function toLangChainTools(supabase: SupabaseClient, actor: Actor | null) {
   return capabilitiesFor("assistant", actor).map((capability) => {
     const run = (input: unknown) =>
-      capability.handler(input, { supabase, actor, surface: "assistant" })
+      runCapability(capability, input, { supabase, actor, surface: "assistant" })
 
     if (capability.present?.assistant) {
       const present = capability.present.assistant

@@ -10,6 +10,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { createMcpHandler } from "mcp-handler"
 import { capabilitiesFor } from "../exposure"
+import { runCapability } from "../run"
 
 type McpServer = Parameters<Parameters<typeof createMcpHandler>[0]>[0]
 
@@ -29,7 +30,7 @@ export function registerMcpCapabilities(server: McpServer, supabase: SupabaseCli
         inputSchema: capability.input
       },
       async (input: unknown) => {
-        const output = await capability.handler(input, { supabase, actor: null, surface: "mcp" })
+        const output = await runCapability(capability, input, { supabase, actor: null, surface: "mcp" })
         const payload = capability.present?.mcp ? capability.present.mcp(output) : output
         return { content: [{ type: "text" as const, text: JSON.stringify(payload, null, 2) }] }
       }

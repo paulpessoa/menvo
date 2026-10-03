@@ -108,7 +108,10 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ## 📓 Engineering Journal
 
 ### 2026-10-03 - Camada 14: `lib/agents` (capabilities, exposição, adapters)
-MCP público e assistente passaram a registrar as tools a partir de um único registro (`lib/agents/registry.ts`); o que cada superfície libera é decidido só em `lib/agents/exposure.ts` (snapshot em `exposure.test.ts`). Comportamento mantido: mesmos nomes de tool (`toolName`), mesmo conjunto por papel, mesmos formatos de saída. `evaluateMentorshipSession` não cai mais em `service_role` (as policies de `appointment_feedbacks`, `appointments` e `feedback` já cobrem o participante). Dívidas: as duas escritas (`appointments.evaluate`, `feedback.save`) ainda executam sem confirmação humana (`confirmation: "none"`), e faltam rate limit por capability e log de auditoria de escrita por agente.
+MCP público e assistente passaram a registrar as tools a partir de um único registro (`lib/agents/registry.ts`); o que cada superfície libera é decidido só em `lib/agents/exposure.ts` (snapshot em `exposure.test.ts`). Comportamento mantido: mesmos nomes de tool (`toolName`), mesmo conjunto por papel, mesmos formatos de saída. `evaluateMentorshipSession` não cai mais em `service_role` (as policies de `appointment_feedbacks`, `appointments` e `feedback` já cobrem o participante). Dívidas: as duas escritas (`appointments.evaluate`, `feedback.save`) ainda executam sem confirmação humana (`confirmation: "none"`), e falta rate limit por capability.
+
+### 2026-10-07 - Auditoria de escritas por agentes
+`lib/agents/run.ts` grava em `agent_audit_log` (ator, superfície, capability, resultado; sem o input) toda capability com `effect` de escrita, em melhor esforço. Migration `20261007010000_agent_audit_log.sql` **ainda não aplicada** (`supabase db push`); até lá o insert falha e só gera aviso no log do servidor. Depois de aplicar, rodar `npm run db:types`.
 
 ### 2026-10-02 - Google Calendar do mentor: verificado em produção e deixado claro que é só consulta
 - **Verificado:** com a conta do Paul conectada, um evento "Ocupado" (08/10 20:30) escondeu o slot em `/api/appointments/availability`; evento de dia inteiro marcado "Livre" ("SEXTOU PAPAI") não bloqueia, porque o Google não o inclui no freebusy.
