@@ -13,6 +13,7 @@ import { z } from "zod"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { getStructuredModel, AiModelUnavailableError } from "@/lib/ai/models"
 import type { AiCallRecord } from "@/lib/ai/metering"
+import type { QuizAnswers } from "@/lib/domain/quiz/quiz.entity"
 
 // Every field required and non-nullable, because both models in the
 // `analyze` chain reject the alternatives (verified with real calls,
@@ -44,16 +45,7 @@ export type QuizAnalysisResult = z.infer<typeof quizAnalysisSchema>
 
 /** The quiz answers `claim_quiz_analysis` returns - exactly what the prompt
  * needs, nothing more (no email, no linkedin_url). */
-export interface QuizAnswers {
-  name: string
-  career_moment: string
-  mentorship_experience: string
-  development_areas: string[]
-  current_challenge: string
-  future_vision: string
-  share_knowledge: string
-  personal_life_help: string
-}
+export type { QuizAnswers }
 
 export interface AnalysisMentor {
   id: string

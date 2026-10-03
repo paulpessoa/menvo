@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { checkRateLimit } from "@/lib/rate-limit"
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { verifyResultLink } from "@/lib/quiz/result-link"
-import { quizAccountBodySchema } from "@/lib/schemas/quiz"
+import { createClient } from "@/lib/utils/supabase/server"
+import { quizAccountBodySchema, quizIdParamSchema } from "@/lib/schemas/quiz"
+import { buildQuizService } from "@/lib/services/quiz/quiz.composition"
 
 /**
  * "Save my analysis": turns an anonymous quiz into an account, from the link
@@ -12,46 +12,30 @@ import { quizAccountBodySchema } from "@/lib/schemas/quiz"
  * that e-mail, so the account is created already confirmed and the person
  * only chooses a password - no second confirmation e-mail. Nothing is created
  * until they explicitly submit a password: opening the e-mail link alone never
- * creates an account for anyone.
+ * creates an account for anyone. The `service_role` use behind this is an
+ * accepted exception, see ADR 0007; it never reaches this file.
  *
  * - GET  ?k=...                 -> { status: "claimable" | "exists", email }
  * - POST { token, password }    -> creates the account, links the quiz to it,
  *                                  returns { email } so the page can sign in.
  */
 
-async function loadVerifiedRow(id: string, token: string) {
-  const supabase = createServiceRoleClient()
-  const { data: row } = await supabase
-    .from("quiz_responses")
-    .select("id, name, email, user_id")
-    .eq("id", id)
-    .maybeSingle()
-
-  if (!row || !verifyResultLink(token, row.id, row.email)) return null
-  return { supabase, row }
-}
-
-async function accountExists(supabase: ReturnType<typeof createServiceRoleClient>, email: string) {
-  const { data } = await supabase.from("profiles").select("id").eq("email", email).limit(1)
-  return Boolean(data && data.length > 0)
-}
-
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params
+  const params = quizIdParamSchema.safeParse(await context.params)
   const token = request.nextUrl.searchParams.get("k") || ""
 
-  const verified = token ? await loadVerifiedRow(id, token) : null
-  if (!verified) {
+  const status =
+    params.success && token
+      ? await buildQuizService(await createClient()).checkAccountLink(params.data.id, token)
+      : null
+  if (!status) {
     return NextResponse.json({ error: "Link inválido ou expirado" }, { status: 403 })
   }
-
-  const { supabase, row } = verified
-  const exists = Boolean(row.user_id) || (await accountExists(supabase, row.email))
-  return NextResponse.json({ status: exists ? "exists" : "claimable", email: row.email })
+  return NextResponse.json(status)
 }
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params
+  const params = quizIdParamSchema.safeParse(await context.params)
 
   const ip = request.headers.get("x-forwarded-for") || "unknown"
   const rate = checkRateLimit(`quiz-account:${ip}`, { maxRequests: 5, windowMs: 10 * 60_000 })
@@ -59,57 +43,33 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     return NextResponse.json({ error: "Muitas tentativas. Tente novamente em alguns minutos." }, { status: 429 })
   }
 
-  const parsed = quizAccountBodySchema.safeParse(await request.json().catch(() => null))
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.issues[0]?.message || "Dados inválidos" },
-      { status: 400 }
-    )
+  const body = quizAccountBodySchema.safeParse(await request.json().catch(() => null))
+  if (!body.success) {
+    return NextResponse.json({ error: body.error.issues[0]?.message || "Dados inválidos" }, { status: 400 })
   }
 
-  const verified = await loadVerifiedRow(id, parsed.data.token)
-  if (!verified) {
+  // An id that is not a UUID can never match a row: same answer as a bad token.
+  if (!params.success) {
     return NextResponse.json({ error: "Link inválido ou expirado" }, { status: 403 })
   }
 
-  const { supabase, row } = verified
-  if (row.user_id || (await accountExists(supabase, row.email))) {
-    return NextResponse.json({ status: "exists", email: row.email }, { status: 409 })
+  const outcome = await buildQuizService(await createClient()).createAccountFromResults(
+    params.data.id,
+    body.data.token,
+    body.data.password
+  )
+
+  switch (outcome.kind) {
+    case "invalid_link":
+      return NextResponse.json({ error: "Link inválido ou expirado" }, { status: 403 })
+    case "exists":
+      return NextResponse.json({ status: "exists", email: outcome.email }, { status: 409 })
+    case "password_rejected":
+      // Password rejected by the project's auth policy (length/strength).
+      return NextResponse.json({ error: outcome.message }, { status: 400 })
+    case "failed":
+      return NextResponse.json({ error: "Não foi possível criar sua conta" }, { status: 500 })
+    case "created":
+      return NextResponse.json({ ok: true, email: outcome.email })
   }
-
-  const [firstName, ...rest] = (row.name || "").trim().split(/\s+/)
-  const lastName = rest.join(" ")
-
-  const { data: created, error: createError } = await supabase.auth.admin.createUser({
-    email: row.email,
-    password: parsed.data.password,
-    email_confirm: true,
-    user_metadata: {
-      first_name: firstName || "",
-      last_name: lastName,
-      full_name: (row.name || "").trim(),
-    },
-  })
-
-  if (createError || !created?.user) {
-    // Registered through another path in the meantime (or the profile row
-    // was missing): same answer as the pre-check above.
-    if (createError?.status === 422 || /already/i.test(createError?.message || "")) {
-      return NextResponse.json({ status: "exists", email: row.email }, { status: 409 })
-    }
-    // Password rejected by the project's auth policy (length/strength).
-    if (createError?.status === 400) {
-      return NextResponse.json({ error: createError.message }, { status: 400 })
-    }
-    console.error("[quiz/account] falha ao criar conta:", createError?.message)
-    return NextResponse.json({ error: "Não foi possível criar sua conta" }, { status: 500 })
-  }
-
-  await supabase
-    .from("quiz_responses")
-    .update({ user_id: created.user.id })
-    .eq("id", row.id)
-    .is("user_id", null)
-
-  return NextResponse.json({ ok: true, email: row.email })
 }

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
-import { analyzeQuiz, type AnalysisMentor, type QuizAnswers } from "@/lib/ai-menvo/diagnostic/analyze"
-import { sendQuizResultsEmailFor } from "@/lib/services/quiz/quiz-email.service"
+import { quizIdParamSchema } from "@/lib/schemas/quiz"
+import { buildQuizService } from "@/lib/services/quiz/quiz.composition"
 
 // gemini-2.5-flash took ~10s for one analysis in a real run (2026-09-23);
 // the platform default could kill the function after claiming the row but
@@ -18,11 +17,14 @@ export const maxDuration = 60
  * Anonymous by design (the quiz itself is anonymous, D1): `claim_quiz_analysis`
  * is the only thing that reads `quiz_responses` here, and it's the gate -
  * RLS on that table denies a direct anonymous read (migration `…000005`).
+ *
+ * Thin: the claim -> mentors -> AI -> save -> e-mail sequence lives in
+ * `quizService.runAnalysis`.
  */
 export async function POST(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params
-  if (!id) {
-    return NextResponse.json({ error: "id é obrigatório" }, { status: 400 })
+  const params = quizIdParamSchema.safeParse(await context.params)
+  if (!params.success) {
+    return NextResponse.json({ error: "id inválido" }, { status: 400 })
   }
 
   const serverKey = process.env.AI_METERING_KEY
@@ -32,85 +34,19 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
   }
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const { data: claimRows, error: claimError } = await supabase.rpc("claim_quiz_analysis", {
-    p_server_key: serverKey,
-    p_id: id
+  const outcome = await buildQuizService(supabase).runAnalysis({
+    id: params.data.id,
+    serverKey,
+    isAuthenticated: !!user,
   })
 
-  if (claimError) {
-    console.error("[quiz/analyze] falha ao reivindicar análise:", claimError.message)
+  if (outcome.kind === "claim_failed") {
     return NextResponse.json({ error: "Não foi possível processar este questionário" }, { status: 500 })
   }
-
-  const claim = Array.isArray(claimRows) ? claimRows[0] : claimRows
-
-  // Not claimed: already processed, claimed by another request in the last
-  // 2 minutes, or the platform budget is exhausted this month. The results
-  // page (`/quiz/results/[id]`) polls regardless, so this is not an error -
-  // it just means "nothing to do right now".
-  if (!claim?.claimed) {
-    return NextResponse.json({ ok: true, claimed: false })
-  }
-
-  const answers: QuizAnswers = {
-    name: claim.name ?? "",
-    career_moment: claim.career_moment ?? "",
-    mentorship_experience: claim.mentorship_experience ?? "",
-    development_areas: claim.development_areas ?? [],
-    current_challenge: claim.current_challenge ?? "",
-    future_vision: claim.future_vision ?? "",
-    share_knowledge: claim.share_knowledge ?? "",
-    personal_life_help: claim.personal_life_help ?? ""
-  }
-
-  let { data: mentorRows } = await supabase
-    .from("mentors_view")
-    .select(
-      "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions"
-    )
-    .eq("verified", true)
-    .eq("is_public", true)
-    .limit(50)
-
-  if (!mentorRows || mentorRows.length === 0) {
-    const { data: allMentors } = await supabase
-      .from("mentors_view")
-      .select(
-        "id, full_name, bio, job_title, company, expertise_areas, mentor_skills, mentorship_topics, availability_status, average_rating, total_reviews, total_sessions"
-      )
-      .limit(50)
-    mentorRows = allMentors
-  }
-
-  const mentors = (mentorRows ?? []) as unknown as AnalysisMentor[]
-
-  const calls: AiCallRecord[] = []
-  const { analysis } = await analyzeQuiz(supabase, answers, mentors, {
-    onCall: (record) => calls.push(record),
-    isAuthenticated: !!user
-  })
-
-  const { error: saveError } = await supabase.rpc("save_quiz_analysis", {
-    p_server_key: serverKey,
-    p_id: id,
-    p_analysis: analysis
-  })
-
-  if (saveError) {
-    console.error("[quiz/analyze] falha ao salvar análise:", saveError.message)
-  }
-
-  await recordAiCalls(supabase, "quiz_analysis", calls)
-
-  // The claim above guarantees this runs once per analysis, so the e-mail
-  // goes out exactly once without the person having to ask for it.
-  if (!saveError) {
-    await sendQuizResultsEmailFor(id).catch((emailError) => {
-      console.error("[quiz/analyze] falha ao enviar e-mail:", emailError)
-    })
-  }
-
-  return NextResponse.json({ ok: true, claimed: true })
+  // Not claimed is not an error: the results page polls regardless.
+  return NextResponse.json({ ok: true, claimed: outcome.kind === "done" })
 }

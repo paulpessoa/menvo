@@ -33,6 +33,18 @@ export interface QuizAnalysis {
   areas_vida_pessoal?: string[]
 }
 
+/** As respostas do formulário que a análise de IA recebe. */
+export interface QuizAnswers {
+  name: string
+  career_moment: string
+  mentorship_experience: string
+  development_areas: string[]
+  current_challenge: string
+  future_vision: string
+  share_knowledge: string
+  personal_life_help: string
+}
+
 /** O dono do quiz vendo o próprio resumo (dashboard do mentorado). Inclui e-mail e nome. */
 export type QuizSummary = Pick<
   QuizRow,

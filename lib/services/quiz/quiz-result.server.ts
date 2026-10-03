@@ -1,5 +1,7 @@
 import { cache } from "react"
 import { createClient } from "@supabase/supabase-js"
+import { createQuizRepository } from "@/lib/repositories/quiz.repository"
+import { needsRetake } from "@/lib/domain/quiz/quiz.entity"
 
 export interface QuizResultPreview {
   title: string
@@ -19,16 +21,12 @@ export const getQuizResultPreview = cache(async (id: string): Promise<QuizResult
 
   try {
     const supabase = createClient(url, key, { auth: { persistSession: false } })
-    const { data, error } = await (supabase.rpc as any)("get_quiz_result", { p_id: id })
-    if (error) return null
-
-    const row = Array.isArray(data) ? data[0] : data
-    const analysis = row?.ai_analysis
-    if (!analysis?.titulo_personalizado) return null
+    const row = await createQuizRepository(supabase).getResult(id)
+    if (!row?.ai_analysis?.titulo_personalizado) return null
 
     return {
-      title: String(analysis.titulo_personalizado),
-      needsRetake: Boolean(analysis.precisa_refazer)
+      title: String(row.ai_analysis.titulo_personalizado),
+      needsRetake: needsRetake(row)
     }
   } catch {
     return null
