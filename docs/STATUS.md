@@ -107,17 +107,20 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
-### 2026-10-07 - Quiz no padrão de 14 camadas: entity, Zod e servidor (grupos 1-2)
+### 2026-10-03 - OpenAPI gerado dos schemas Zod (camada 9, quiz)
+`lib/openapi` (registro, `paths/quiz.ts`, documento 3.1) a partir dos mesmos schemas das rotas; `GET /api/openapi` (aberto em dev, só admin em produção) e Swagger UI em `/dashboard/admin/api-docs`. `document.test.ts` falha se uma rota do quiz ficar sem documentação, se sobrar documentação sem rota, ou se aparecer um domínio novo em `app/api` sem estar documentado nem em `pendingDomains` (a lista só encolhe). Dependência nova: `@asteasolutions/zod-to-openapi@7`. `docs/api-reference.md` (à mão) continua valendo para os domínios pendentes.
+
+### 2026-10-03 - Quiz no padrão de 14 camadas: entity, Zod e servidor (grupos 1-2)
 Plano em [`blueprint/quiz-audit.md`](blueprint/quiz-audit.md). `lib/domain/quiz` (entity), schemas de saída em `lib/schemas/quiz.ts`, `lib/repositories/quiz.repository.ts` (único ponto que toca `quiz_responses` e as RPCs do quiz; `ai_analysis` validado no mapper), ports de e-mail e de criação de conta, e `quiz.server.service.ts` com as regras que estavam nas 6 rotas, que agora só fazem auth/Zod/status. `service_role` do quiz documentado no ADR 0007 (criar conta e e-mail de resultado; risco aceito do `send-email`). Formato das respostas não mudou; mudança de comportamento: `id` que não é UUID passa a dar 400 (antes 500) nas rotas `[id]`. Faltam grupos 3 (OpenAPI), 4 (query layer e páginas) e, se decidido, 5.
 
 ### 2026-10-03 - Camada 14: `lib/agents` (capabilities, exposição, adapters)
 MCP público e assistente passaram a registrar as tools a partir de um único registro (`lib/agents/registry.ts`); o que cada superfície libera é decidido só em `lib/agents/exposure.ts` (snapshot em `exposure.test.ts`). Comportamento mantido: mesmos nomes de tool (`toolName`), mesmo conjunto por papel, mesmos formatos de saída. `evaluateMentorshipSession` não cai mais em `service_role` (as policies de `appointment_feedbacks`, `appointments` e `feedback` já cobrem o participante). Dívida restante: rate limit por capability.
 
-### 2026-10-07 - Confirmação humana nas escritas do assistente
+### 2026-10-03 - Confirmação humana nas escritas do assistente
 `appointments.evaluate` e `feedback.save` agora têm `confirmation: "user"`: o agente só PROPÕE (evento SSE `confirm_action`, cartão `ConfirmActionCard`) e a escrita roda em `POST /api/assistant/confirm`, que revalida exposição, confirmação e Zod (`lib/agents/confirm.ts`). Invariante em `exposure.test.ts`: toda escrita exige confirmação. O MCP segue só leitura. O prompt do assistente foi ajustado para não dizer "registrado" antes do clique. Validar em produção/preview com o passo a passo manual.
 
-### 2026-10-07 - Auditoria de escritas por agentes
-`lib/agents/run.ts` grava em `agent_audit_log` (ator, superfície, capability, resultado; sem o input) toda capability com `effect` de escrita, em melhor esforço. Migration `20261007010000_agent_audit_log.sql` aplicada em 2026-10-07; tipos regenerados.
+### 2026-10-03 - Auditoria de escritas por agentes
+`lib/agents/run.ts` grava em `agent_audit_log` (ator, superfície, capability, resultado; sem o input) toda capability com `effect` de escrita, em melhor esforço. Migration `20261007010000_agent_audit_log.sql` aplicada em 2026-10-03; tipos regenerados.
 
 ### 2026-10-02 - Google Calendar do mentor: verificado em produção e deixado claro que é só consulta
 - **Verificado:** com a conta do Paul conectada, um evento "Ocupado" (08/10 20:30) escondeu o slot em `/api/appointments/availability`; evento de dia inteiro marcado "Livre" ("SEXTOU PAPAI") não bloqueia, porque o Google não o inclui no freebusy.

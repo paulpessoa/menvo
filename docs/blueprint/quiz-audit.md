@@ -1,6 +1,6 @@
 # Audit do domínio quiz (14 camadas)
 
-> Modo `audit`: só leitura, nenhum código mudou. Data: 2026-10-07.
+> Modo `audit`: só leitura, nenhum código mudou. Data: 2026-10-03.
 > Legenda: **ok** = cumpre a regra da camada; **parcial** = existe mas foge da
 > regra; **falta** = não existe. A coluna "Prova" é o arquivo que sustenta o estado.
 

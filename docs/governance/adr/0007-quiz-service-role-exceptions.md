@@ -2,13 +2,13 @@
 title: "ADR 0007 - service_role no quiz: criar conta e enviar o e-mail de resultado"
 owner: paul
 status: current
-last_reviewed: 2026-10-07
+last_reviewed: 2026-10-03
 source_of_truth: [lib/services/quiz/quiz.server.service.ts, lib/services/quiz/quiz.composition.ts, lib/ports/adapters/account-provisioner.supabase.ts, app/api/quiz/[id]/account/route.ts, app/api/quiz/[id]/send-email/route.ts]
 ---
 
 # ADR 0007 - service_role no quiz: criar conta e enviar o e-mail de resultado
 
-- **Status:** implementado (2026-10-07).
+- **Status:** implementado (2026-10-03).
 - **Relacionado:** ADR 0005 (mesma lógica de exceção), ADR 0006 (arquitetura de referência), `docs/blueprint/quiz-audit.md`.
 
 ## 1. Contexto

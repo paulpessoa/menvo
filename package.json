@@ -29,6 +29,7 @@
     }
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@google-cloud/local-auth": "^3.0.1",
     "@googlemaps/js-api-loader": "^1.16.10",
     "@hookform/resolvers": "^5.1.1",

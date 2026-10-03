@@ -131,3 +131,15 @@ export const stepValidation = {
     return result.success;
   },
 };
+
+/** `GET /api/quiz/[id]/account?k=...`: o token assinado vem na query. */
+export const quizAccountLinkQuerySchema = z.object({ k: z.string().min(1) });
+
+/** `POST /api/quiz/[id]/account` quando o e-mail já tem conta (409). */
+export const quizAccountExistsSchema = z.object({ status: z.literal('exists'), email: z.string() });
+
+/** `POST /api/quiz/[id]/analyze`: `claimed: false` não é erro (a página de resultado faz polling). */
+export const quizAnalyzeResponseSchema = z.object({ ok: z.literal(true), claimed: z.boolean() });
+
+/** `POST /api/quiz/[id]/send-email`. */
+export const quizSendEmailResponseSchema = z.object({ ok: z.literal(true) });
