@@ -1,0 +1,44 @@
+# Tooling · E2E against the real Vercel Preview (ADR 0006, camada 13)
+#
+# ci.yml proves the app builds and renders with fake env. This proves the
+# deployed Preview works with real env and data. Vercel reports each deploy
+# to GitHub as a `deployment_status` event; we run when a Preview succeeds.
+#
+# Setup (once): Vercel → Project → Settings → Deployment Protection →
+# "Protection Bypass for Automation", then save the value as the GitHub
+# secret VERCEL_AUTOMATION_BYPASS_SECRET.
+name: E2E (Preview)
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      contains(github.event.deployment_status.environment, 'Preview')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      E2E_BASE_URL: ${{ github.event.deployment_status.target_url }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-preview
+          path: playwright-report/
+          retention-days: 7

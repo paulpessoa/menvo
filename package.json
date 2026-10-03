@@ -6,12 +6,15 @@
     "build:kb": "tsx lib/services/kb/build-kb.ts",
     "build": "npm run build:kb && next build",
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "start": "next start",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "verify": "npm run typecheck && npm run lint && npm test -- --silent",
     "db:types": "supabase gen types typescript --project-id evxrzmzkghshjmmyegxu --schema public > lib/types/supabase.ts",
     "migrate-users": "node scripts/database/migrate-users.js",
     "setup-admin": "node scripts/setup/setup-admin-and-mentors.js"
@@ -112,6 +115,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",

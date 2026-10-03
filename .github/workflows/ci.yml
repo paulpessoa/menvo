@@ -1,0 +1,70 @@
+# Tooling · CI (ADR 0006, camada 13)
+#
+# Runs on every PR and on main. Order is cheap → expensive, so a typo fails in
+# seconds instead of after a 5-minute build. Uses fake public env on purpose:
+# a build that needs real secrets to compile is a bug (it happened: six routes
+# created a service_role client at import time).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+  NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+jobs:
+  quality:
+    name: Typecheck · Lint · Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # `npm ci` fails when package-lock.json is out of sync with package.json,
+      # which is exactly the drift we want to catch before Vercel does.
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --ci --silent
+
+  build-e2e:
+    name: Build · E2E smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # next build's type-check pass exceeds Node's default ~2 GB heap.
+          NODE_OPTIONS: --max-old-space-size=4096
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: E2E smoke against `next start`
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

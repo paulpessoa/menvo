@@ -10,6 +10,8 @@ const createJestConfig = nextJest({
 const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
+  // e2e/ belongs to Playwright; .worktrees/ holds other checkouts of this repo.
+  testPathIgnorePatterns: ['/node_modules/', '/e2e/', '/.worktrees/'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },

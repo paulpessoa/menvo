@@ -75,3 +75,8 @@ supabase/.temp/
 supabase/backup_*.sql
 
 test.mjs
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
