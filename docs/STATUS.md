@@ -108,7 +108,10 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ## 📓 Engineering Journal
 
 ### 2026-10-03 - Camada 14: `lib/agents` (capabilities, exposição, adapters)
-MCP público e assistente passaram a registrar as tools a partir de um único registro (`lib/agents/registry.ts`); o que cada superfície libera é decidido só em `lib/agents/exposure.ts` (snapshot em `exposure.test.ts`). Comportamento mantido: mesmos nomes de tool (`toolName`), mesmo conjunto por papel, mesmos formatos de saída. `evaluateMentorshipSession` não cai mais em `service_role` (as policies de `appointment_feedbacks`, `appointments` e `feedback` já cobrem o participante). Dívidas: as duas escritas (`appointments.evaluate`, `feedback.save`) ainda executam sem confirmação humana (`confirmation: "none"`), e falta rate limit por capability.
+MCP público e assistente passaram a registrar as tools a partir de um único registro (`lib/agents/registry.ts`); o que cada superfície libera é decidido só em `lib/agents/exposure.ts` (snapshot em `exposure.test.ts`). Comportamento mantido: mesmos nomes de tool (`toolName`), mesmo conjunto por papel, mesmos formatos de saída. `evaluateMentorshipSession` não cai mais em `service_role` (as policies de `appointment_feedbacks`, `appointments` e `feedback` já cobrem o participante). Dívida restante: rate limit por capability.
+
+### 2026-10-07 - Confirmação humana nas escritas do assistente
+`appointments.evaluate` e `feedback.save` agora têm `confirmation: "user"`: o agente só PROPÕE (evento SSE `confirm_action`, cartão `ConfirmActionCard`) e a escrita roda em `POST /api/assistant/confirm`, que revalida exposição, confirmação e Zod (`lib/agents/confirm.ts`). Invariante em `exposure.test.ts`: toda escrita exige confirmação. O MCP segue só leitura. O prompt do assistente foi ajustado para não dizer "registrado" antes do clique. Validar em produção/preview com o passo a passo manual.
 
 ### 2026-10-07 - Auditoria de escritas por agentes
 `lib/agents/run.ts` grava em `agent_audit_log` (ator, superfície, capability, resultado; sem o input) toda capability com `effect` de escrita, em melhor esforço. Migration `20261007010000_agent_audit_log.sql` aplicada em 2026-10-07; tipos regenerados.

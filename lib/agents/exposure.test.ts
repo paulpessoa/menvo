@@ -80,8 +80,10 @@ describe("invariantes do registro", () => {
     expect(capabilitiesFor("mcp", null).every((c) => c.effect === "read")).toBe(true)
   })
 
-  it("toda capability declara a confirmação explicitamente", () => {
-    expect(capabilities.every((c) => c.confirmation === "none" || c.confirmation === "user")).toBe(true)
+  it("toda escrita exige confirmação do usuário; leitura executa direto", () => {
+    for (const c of capabilities) {
+      expect(c.confirmation).toBe(c.effect === "read" ? "none" : "user")
+    }
   })
 })
 
@@ -100,6 +102,23 @@ describe("adapters", () => {
       "getPendingEvaluations",
       "evaluateMentorshipSession"
     ])
+  })
+
+  it("LangChain: escrita só propõe, não executa o handler", async () => {
+    const db = { from: jest.fn() } as unknown as SupabaseClient
+    const tools = toLangChainTools(db, { id: "u1", role: "mentee" })
+    const evaluate = tools.find((t) => t.name === "evaluateMentorshipSession")!
+    const result = await evaluate.invoke({
+      type: "tool_call",
+      name: "evaluateMentorshipSession",
+      id: "c1",
+      args: { appointmentId: "33333333-3333-3333-3333-333333333333", rating: 5 }
+    })
+    expect(db.from).not.toHaveBeenCalled()
+    expect((result as unknown as { artifact: unknown }).artifact).toMatchObject({
+      capability: "appointments.evaluate",
+      input: { rating: 5 }
+    })
   })
 
   it("MCP: registra só o que a exposição libera, com o nome de fio", () => {

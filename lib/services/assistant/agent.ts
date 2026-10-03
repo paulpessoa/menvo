@@ -4,6 +4,7 @@ import { SupabaseClient, type User } from "@supabase/supabase-js"
 import { getAgentModels } from "@/lib/ai/models"
 import type { AiCallRecord } from "@/lib/ai/metering"
 import { diagnosticService } from "@/lib/services/diagnostic/diagnostic.service"
+import { resolveActor } from "@/lib/services/assistant/actor.service"
 import { toLangChainTools } from "@/lib/agents/adapters/langchain"
 
 export interface GetAssistantAgentOptions {
@@ -59,7 +60,7 @@ PAPEL DO USUÁRIO ATUAL: MENTORADO (${firstName})
   1. Chame "getPendingEvaluations" para consultar as mentorias concluídas ou já realizadas aguardando avaliação.
   2. Apresente ao mentorado as opções disponíveis (nome do mentor, data e horário).
   3. Peça uma nota de 1 a 5 estrelas e um comentário opcional sobre como foi a mentoria.
-  4. Com a nota informada pelo mentorado, chame a ferramenta "evaluateMentorshipSession" com o appointmentId e o rating.
+  4. Com a nota informada pelo mentorado, chame a ferramenta "evaluateMentorshipSession" com o appointmentId e o rating. Ela apenas PROPÕE a avaliação: aparece um cartão com o botão Confirmar. Diga que está aguardando a confirmação dele e NÃO diga que a avaliação foi registrada.
 - Reforce sempre que "é bom conversar para abrir a mente" e que a mentoria na Menvo é 100% gratuita.
 - Ao citar mentores encontrados, NÃO liste detalhes completos no texto porque cards visuais interativos aparecerão automaticamente. Cite apenas os nomes e a razão da recomendação.${diagnosticGuidance}`
   }
@@ -80,8 +81,8 @@ GUARDRAILS E LIMITES (ESTRITAMENTE OBRIGATÓRIO):
 
 FEEDBACK:
 - NÃO peça nota de 1 a 5 no fim das mensagens. Mantenha a conversa fluindo naturalmente. Pergunte se o usuário precisa de mais alguma coisa ou quer um tempo para pensar.
-- Se o usuário enviar espontaneamente um feedback (nota e/ou comentário) sobre o assistente, use a ferramenta "saveFeedback" para salvar e agradeça em seguida.
-- Para avaliação de sessões de mentoria com mentores, utilize a ferramenta dedicada "evaluateMentorshipSession".`
+- Se o usuário enviar espontaneamente um feedback (nota e/ou comentário) sobre o assistente, use a ferramenta "saveFeedback". Ela apenas PROPÕE o envio (o usuário confirma no cartão): peça que confirme na tela, sem dizer que já foi salvo.
+- Para avaliação de sessões de mentoria com mentores, utilize a ferramenta dedicada "evaluateMentorshipSession" (também exige confirmação do usuário no cartão).`
 }
 
 /**
@@ -114,20 +115,7 @@ export async function getAssistantAgent(
   const diagnosticContext: DiagnosticContext = { completed: false }
 
   if (user?.id) {
-    const { data: roleRows } = await supabase
-      .from("user_roles")
-      .select("roles(name)")
-      .eq("user_id", user.id)
-      .returns<{ roles: { name: string } | null }[]>()
-
-    const roleNames = (roleRows ?? []).map((r) => r.roles?.name).filter(Boolean)
-    if (roleNames.includes("admin")) {
-      role = "admin"
-    } else if (roleNames.includes("mentor")) {
-      role = "mentor"
-    } else {
-      role = "mentee"
-    }
+    role = (await resolveActor(supabase, user.id)).role
 
     const { data: profile } = await supabase
       .from("profiles")

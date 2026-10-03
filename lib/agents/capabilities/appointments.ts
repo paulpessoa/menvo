@@ -77,8 +77,9 @@ export const evaluateSessionCapability = defineCapability({
   input: evaluateMentorshipSessionInput,
   audience: ["mentee", "admin"],
   effect: "write",
-  // Dívida: o assistente hoje executa direto (o system prompt manda pedir a
-  // nota antes). Mudar para "user" exige UI de confirmação; ver STATUS.md.
-  confirmation: "none",
+  // O agente propõe; quem registra é o clique do mentorado no cartão do chat.
+  confirmation: "user",
+  summarize: (input) =>
+    `Avaliar a mentoria com nota ${input.rating}/5${input.publicFeedback ? `: "${input.publicFeedback}"` : ""}`,
   handler: (input, ctx) => evaluateMentorshipSession(ctx.supabase, requireActor(ctx).id, input)
 })

@@ -73,11 +73,13 @@ export interface Capability<Input = unknown, Output = unknown> {
   audience: readonly Audience[]
   effect: Effect
   /**
-   * `user` = o agente só propõe e a UI pede confirmação humana (ainda não
-   * implementado em nenhuma superfície); `none` = executa direto. Ver
-   * `exposure.test.ts` para a dívida atual das escritas.
+   * `user` = o agente só PROPÕE; a UI mostra um botão e a execução acontece
+   * quando o usuário confirma (lib/agents/confirm.ts). `none` = executa direto
+   * (só para leitura). Toda escrita deve ser `user` (ver exposure.test.ts).
    */
   confirmation: "none" | "user"
+  /** Frase humana mostrada no cartão de confirmação (só com `confirmation: "user"`). */
+  summarize?: (input: Input) => string
   handler: (input: Input, ctx: CapabilityContext) => Promise<Output> | Output
   present?: Presentation<Output>
 }

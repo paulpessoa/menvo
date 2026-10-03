@@ -17,6 +17,21 @@ const mentorsFoundEvent = z.object({
   type: z.literal("mentors_found"),
   mentors: z.array(z.record(z.string(), z.unknown()))
 })
+/**
+ * A write the agent PROPOSES but did not run: the UI shows a confirm button and
+ * only the user's click executes it (POST /api/assistant/confirm). `capability`
+ * is the stable name from lib/agents; `input` is opaque here, the server
+ * re-validates it against the capability's Zod schema before running.
+ */
+export const confirmActionEvent = z.object({
+  type: z.literal("confirm_action"),
+  capability: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  input: z.record(z.string(), z.unknown())
+})
+export type ConfirmActionEvent = z.infer<typeof confirmActionEvent>
+
 export const chipOptionSchema = z.object({
   value: z.string(),
   label: z.string()
@@ -47,6 +62,7 @@ export const aiEventSchema = z.discriminatedUnion("type", [
   textEvent,
   toolStartEvent,
   mentorsFoundEvent,
+  confirmActionEvent,
   chipsEvent,
   progressEvent,
   diagnosticCompleteEvent,

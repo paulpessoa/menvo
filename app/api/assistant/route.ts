@@ -5,7 +5,7 @@ import { consumeAiQuota } from "@/lib/ai/quota"
 import { recordAiCalls, type AiCallRecord } from "@/lib/ai/metering"
 import { HumanMessage, AIMessage } from "@langchain/core/messages"
 import { getAssistantAgent } from "@/lib/services/assistant/agent"
-import { encodeSseEvent, encodeSseDone } from "@/lib/ai/protocol"
+import { encodeSseEvent, encodeSseDone, confirmActionEvent } from "@/lib/ai/protocol"
 import { processDiagnosticTurn } from "@/lib/ai-menvo/diagnostic/engine"
 
 export const dynamic = "force-dynamic"
@@ -117,6 +117,15 @@ export async function POST(req: NextRequest) {
             }
 
             // Envia o payload de card (artifact da tool, nunca visto pelo LLM) para renderizar o UI Card
+            // Escrita proposta pelo agente: vira cartão de confirmação (nada foi executado).
+            if (event.event === "on_tool_end" && event.name !== "searchMentors") {
+              const proposal = confirmActionEvent.safeParse({
+                type: "confirm_action",
+                ...(event.data.output?.artifact ?? {})
+              })
+              if (proposal.success) controller.enqueue(encodeSseEvent(proposal.data))
+            }
+
             if (event.event === "on_tool_end" && event.name === "searchMentors") {
               const mentorsData = event.data.output?.artifact
               if (mentorsData && Array.isArray(mentorsData) && mentorsData.length > 0) {

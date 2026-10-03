@@ -16,7 +16,8 @@ export const saveFeedbackCapability = defineCapability({
   // A policy de `feedback` aceita insert anônimo (user_id nulo), como antes.
   audience: ["anonymous"],
   effect: "write",
-  // Dívida: executa direto, como antes da migração (ver STATUS.md).
-  confirmation: "none",
+  confirmation: "user",
+  summarize: (input) =>
+    `Enviar feedback com nota ${input.rating}/5${input.comment ? `: "${input.comment}"` : ""}`,
   handler: (input, ctx) => saveFeedback(ctx.supabase, input)
 })

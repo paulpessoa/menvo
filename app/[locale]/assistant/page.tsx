@@ -12,7 +12,8 @@ import { MentorCard } from "@/components/mentors/MentorCard"
 import { VoiceInput } from "@/components/ui/voice-input"
 import { ChipGroup } from "@/components/assistant/ChipGroup"
 import { DiagnosticProgressBar } from "@/components/assistant/DiagnosticProgressBar"
-import { parseSseLine, type ChipOption } from "@/lib/ai/protocol"
+import { ConfirmActionCard, type ConfirmStatus } from "@/components/assistant/ConfirmActionCard"
+import { parseSseLine, type ChipOption, type ConfirmActionEvent } from "@/lib/ai/protocol"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useOnboarding } from "@/hooks/useOnboarding"
 
@@ -22,6 +23,7 @@ interface Message {
   text: string
   isStreaming?: boolean
   mentors?: any[]
+  confirm?: { proposal: ConfirmActionEvent; status: ConfirmStatus }
   chips?: {
     mode: "single" | "multi"
     options: ChipOption[]
@@ -338,6 +340,15 @@ function AssistantChat() {
                     : msg
                 )
               )
+            } else if (event.type === "confirm_action") {
+              setToolActivity(null)
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, confirm: { proposal: event, status: "pending" } }
+                    : msg
+                )
+              )
             } else if (event.type === "chips") {
               setMessages((prev) =>
                 prev.map((msg) =>
@@ -396,6 +407,39 @@ function AssistantChat() {
         )
       )
     }
+  }
+
+  const setConfirmStatus = (id: string, status: ConfirmStatus) =>
+    setMessages((prev) =>
+      prev.map((m) => (m.id === id && m.confirm ? { ...m, confirm: { ...m.confirm, status } } : m))
+    )
+
+  /** Appends a plain assistant line; it also reaches the model as history on the next turn. */
+  const addAssistantNote = (text: string) =>
+    setMessages((prev) => [...prev, { id: `note-${Date.now()}`, role: "assistant", text }])
+
+  const handleConfirm = async (msg: Message) => {
+    if (!msg.confirm) return
+    setConfirmStatus(msg.id, "running")
+    try {
+      const res = await fetch("/api/assistant/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ capability: msg.confirm.proposal.capability, input: msg.confirm.proposal.input })
+      })
+      if (!res.ok) throw new Error(String(res.status))
+      const { result } = await res.json()
+      setConfirmStatus(msg.id, "done")
+      addAssistantNote(typeof result?.message === "string" ? result.message : "Pronto, registrado.")
+    } catch {
+      setConfirmStatus(msg.id, "pending")
+      addAssistantNote("Não consegui concluir agora. Toque em Confirmar para tentar de novo.")
+    }
+  }
+
+  const handleCancel = (msg: Message) => {
+    setConfirmStatus(msg.id, "cancelled")
+    addAssistantNote("Tudo bem, não vou registrar.")
   }
 
   return (
@@ -508,6 +552,15 @@ function AssistantChat() {
                     }
                     handleSubmit(val, isDiagnosticMode ? "diagnostic" : "assistant")
                   }}
+                />
+              )}
+
+              {msg.confirm && (
+                <ConfirmActionCard
+                  proposal={msg.confirm.proposal}
+                  status={msg.confirm.status}
+                  onConfirm={() => handleConfirm(msg)}
+                  onCancel={() => handleCancel(msg)}
                 />
               )}
 
