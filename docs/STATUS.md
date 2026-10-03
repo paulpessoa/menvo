@@ -75,6 +75,7 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ### 🟠 P1 - High Priority
 - [x] Mentor Search & Filtering Polish, Mentee Activation funnel tracking, Session Feedback Loop, Auth Context & Role Decoupling, Dashboard Simplification - all completed pre-2026-09-16, see journal below for detail.
 - [x] **`ai-retention`/`appointments` crons fail open:** both check `if (cronSecret && authHeader !== ...)`, so a missing `CRON_SECRET` env leaves the route open to anyone instead of rejecting. Found while building `account-retention`, which fails *closed* instead (missing secret → 500) - bring the other two in line. See `docs/domains/account-retention.md` §8.
+- [x] **Enxugar e normalizar `profiles` (64 → 28 colunas):** colunas mortas, contadores `total_reviews`/`total_sessions` parados (perfil público mostra números errados), dados de mentor/acadêmicos/importação em tabelas 1:1. Plano em fases em [`domains/profiles-schema.md`](domains/profiles-schema.md); Fases 0 e 1 concluídas e aplicadas (48 colunas em `profiles`; dados de importação em `import_records`); Fase 2 concluída e aplicada (34 colunas em `profiles`; dados de mentor e verificação em `mentor_profiles`); Fase 3 (`mentee_profiles`) concluída e aplicada (28 colunas em `profiles`; dados acadêmicos e currículo em `mentee_profiles`).
 
 ### 🟡 P2 - Medium Priority
 - [x] **Painel Admin para Fila de Retenção:** card no admin mostrando a fila (quantos em cada etapa, próximas exclusões) e um botão "isentar" por pessoa. Implementado em `/dashboard/admin/retention`.
@@ -105,6 +106,59 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 ---
 
 ## 📓 Engineering Journal
+
+### 2026-10-02 - Google Calendar do mentor: verificado em produção e deixado claro que é só consulta
+- **Verificado:** com a conta do Paul conectada, um evento "Ocupado" (08/10 20:30) escondeu o slot em `/api/appointments/availability`; evento de dia inteiro marcado "Livre" ("SEXTOU PAPAI") não bloqueia, porque o Google não o inclui no freebusy.
+- **Texto:** card "Sincronização Pessoal" em `/mentor/availability`, artigo `kb/mentores/integracao-google-calendar.md` (corrigido: antes prometia gravação de eventos, mas os escopos são só leitura), resposta do assistente (`lib/services/assistant/tools.ts`) e `docs/domains/scheduling.md` §2.4 agora dizem: só consulta ocupado/livre, só remove horários, só "Ocupado" bloqueia, falha silenciosa mostra todos os slots.
+- **Aberto:** primeira chamada em produção levou 5-6 s e uma estourou `FUNCTION_INVOCATION_TIMEOUT`; falta um timeout curto na chamada ao Google (com o mesmo fallback silencioso).
+
+### 2026-10-02 - Bucket `cvs` privado
+- **Why:** bucket público com policy de SELECT em tudo: qualquer visitante anônimo listava as pastas (ids de usuário) e baixava os 274 currículos.
+- **Código:** o currículo é entregue por `/api/cv/<userId>` no domínio do Menvo: a rota confere `profile_cv_url` (próprio, admin, mentor com mentoria) a cada acesso e baixa o PDF do bucket pelo servidor, então o navegador não vê endereço do Supabase nem token e o link não expira. Só serve arquivo do próprio dono (upload `<uid>/…` ou importação `estagio-recife/<uid>_cv.pdf`). `PUT /api/profile` não aceita mais `cv_url`; só `/api/upload/cv` grava, e grava o caminho. A exclusão de conta passou a apagar também o currículo importado, que ficava fora da pasta do usuário.
+- **Banco (aplicado em 2026-10-02, PR #91):** `20261006000000_private_cv_bucket.sql` torna o bucket privado, deixa leitura só do dono, converte as 256 URLs em caminho e tira de `authenticated` a escrita em `cv_url`. Conferido: anon lista `[]` e a URL pública antiga devolve 400.
+- **Limpeza (2026-10-02):** 18 arquivos sem perfil apagados do bucket (versões antigas, contas excluídas, teste e 12 da importação sem vínculo); restam 256, todos ligados a um perfil. `appointments.cv_url` e `cv_type` (vazias) apagadas em `20261006010000_appointments_drop_cv_columns.sql` (PR #93).
+
+### 2026-10-02 - Fase 3 de `profiles`: dados acadêmicos e currículo em `mentee_profiles`
+- **Why:** 589 de 718 perfis têm dado acadêmico em `profiles`, e anon tinha grant de leitura em `cv_url`, `institution`, `course`, `academic_level`, `expected_graduation` e `learning_goals`. O currículo deve ser visto só pelo próprio, admin e mentor com mentoria.
+- **Banco:** expand `20261005000000_mentee_profiles_expand.sql` aplicado (589 linhas). `cv_url` só sai por `profile_cv_url(uuid)`; anon lê só nível, instituição e curso de mentor público. Conferido pela API pública.
+- **Código:** `lib/services/mentees/mentee-profile-fields.ts` mantém o formato das APIs; admin e revisão de candidato leem CV em lote (`mentee-cv.service.ts`, service role atrás de `requireAdmin()`). Mural da comunidade não mostra mais currículo.
+- **Aplicada** em 2026-10-02: deploy da PR #88, RESYNC desnecessário, CSV das 6 colunas guardado, contract `20261005010000_mentee_profiles_contract.sql` aplicado (`profiles` com 28 colunas; 13 mentores, 12 `community_ready`). `community_ready` recriada sem `learning_goals` (PR #89). Aberto: bucket `cvs` público.
+
+### 2026-10-02 - Fase 2 de `profiles`: dados de mentor em `mentor_profiles`
+- **Why:** verificação guardada em três colunas que divergiam (`verification_status`, `verified`, `is_pending_mentor`), 560 mentorados marcados `approved` pelo próprio onboarding, usuário conseguia se aprovar com UPDATE em `profiles` e qualquer logado lia `verification_notes` de mentores públicos.
+- **Banco:** expand `20261004000000_mentor_profiles_expand.sql` aplicado (15 linhas; `mentors_view` lê da tabela nova com os mesmos nomes; status só muda por RPC ou admin). Conferido pela API pública: visitante vê os 13 mentores, não vê candidatos rejeitados nem notas, não chama as RPCs.
+- **Código:** `lib/services/mentors/mentor-profile-fields.ts` (`splitMentorFields`, `withMentorFields`, `MENTOR_PROFILE_EMBED`) mantém o formato das respostas de `/api/auth/me` e `/api/profile`; filas e contagens do admin leem `mentor_profiles` (`listMentorVerifications`), então "concluídas" não lista mais os 560 mentorados. `/api/auth/me` passou a devolver `isVerified` certo (antes `verification_status` não estava no select e vinha sempre `false`).
+- **Aplicada** em 2026-10-02: deploy do PR #83, RESYNC desnecessário (nenhum mentor sem linha), CSV das 14 colunas guardado, contract `20261004010000_mentor_profiles_contract.sql` aplicado (`profiles` com 34 colunas; 13 mentores na `mentors_view`, página pública e `/api/auth/me` conferidas, sem erros nos logs). Detalhes em [`domains/profiles-schema.md`](domains/profiles-schema.md) e [`domains/mentor-verification.md`](domains/mentor-verification.md).
+
+### 2026-10-02 - Escalada de privilégio em `user_roles` fechada
+- **Why:** as policies `users_can_insert_own_role`, `users_can_update_own_role` e `users_manage_own_roles_only` só checavam `auth.uid() = user_id`, não o papel. Qualquer conta logada podia gravar o papel `admin` (ou `mentor`) para si direto no PostgREST com a chave pública. Achado no diagnóstico da Fase 2 de `profiles-schema.md`; sem sinal de uso (1 admin, 13 mentores coerentes).
+- **Migração `20261003030000_user_roles_no_self_assign.sql`:** apaga as três policies; ficam as de leitura e `user_roles_admin_manage`. O código já gravava papéis só pelo servidor (service role) ou pelo trigger `handle_new_user`, então nada muda no site.
+- **Aplicada** pelo Paul no SQL Editor em 2026-10-02 e conferida pelo MCP.
+
+### 2026-10-01 - Painel admin redesenhado com visão estratégica
+- **Why:** `/dashboard/admin` era uma grade de 11 cards com ícones coloridos e 4 números soltos; cada página de admin tinha um cabeçalho diferente (tamanhos de título, ícones, só 3 com botão de voltar).
+- **Visão geral:** `GET /api/admin/overview` (`lib/services/admin/overview.service.ts`) agrega tudo numa chamada: cadastros por semana (mentorados x mentores), pedidos de sessão por desfecho, fila de verificação, distribuição de notas, gasto de IA acumulado contra o teto, organizações/leads e etapas da retenção LGPD. Agregações puras em `overview.aggregate.ts` com testes. Usa o cliente RLS (`is_admin()`), exceto `appointments` e `inactive_accounts_queue`, lidos com service role como nas rotas admin existentes.
+- **Cabeçalho único:** `components/admin/AdminPageHeader.tsx` (botão "Voltar ao painel", título, descrição, ações) em todas as páginas de admin. Ícones decorativos e emojis removidos; ficaram só spinners, botões só-ícone, busca, alertas e as estrelas das avaliações.
+- **Cores dos gráficos:** teal `#0089a0` (marca ajustada para não parecer cinza), violeta e laranja, validados para daltonismo; cinza só para séries secundárias (canceladas, sem papel).
+
+### 2026-10-02 - Tabela da newsletter apagada
+- **Why:** a newsletter saiu do código na PR #67, mas `newsletter_subscriptions` seguia com e-mail, nome, WhatsApp, IP e user agent sem uso (LGPD art. 6º III).
+- **Migração `20261002000000_drop_newsletter_subscriptions.sql`:** quem tinha cancelado vira hash em `email_suppressions` (`opted_out`, mesmo hash de `suppression.service.ts`); depois a tabela é apagada, sem `CASCADE`. Tipo removido de `lib/types/supabase.ts`.
+- **Aplicada** pelo Paul no SQL Editor em 2026-10-02: havia 2 inscrições, ambas `active`, então nenhum hash entrou em `email_suppressions`; a tabela foi apagada.
+
+### 2026-10-01 - Check de PR contra crédito a IA
+- **Why:** trailers `Co-authored-by: Claude` chegaram à `main` (PRs #58-#63 e 3 commits de uma sessão remota) porque os hooks locais não cobrem sessões remotas nem squash merge no GitHub.
+- **O que:** workflow `.github/workflows/no-ai-attribution.yml` reprova PRs com IA como autora/committer/coautora; regra escrita em `CONTRIBUTING.md`. Falta marcar o check `check` como obrigatório num ruleset da `main` (Settings > Rules).
+
+### 2026-10-01 - Auditoria LGPD dos e-mails
+- **Why:** só os e-mails de reengajamento, retenção de 30/1 dia e quiz citavam a Política de Privacidade; os demais (agendamento, org, auth, contato do mentor) não.
+- **Rodapé padrão (`getEmailLayout`):** todo e-mail enviado por `lib/email/brevo.ts` agora traz o link `/privacy` e o contato do encarregado (`PRIVACY_CONTACT`); o ano deixou de ser fixo. Os `footerExtra` ficaram só com o motivo do envio. Os 13 templates de `supabase/templates/` receberam a mesma linha (precisam ser recolados no painel do Supabase Auth para valer em produção).
+- **Inatividade:** o aviso de 30 dias agora diz por que a pessoa recebeu e tem o link "pode apagar agora" (`/settings`).
+- **Contato do mentor (`sendMentorContactEmail`):** aviso de origem + como parar de receber; a rota `/api/community/contact` respeita `profiles.email_opt_out_at`.
+- **Escape de HTML:** nomes, mensagens, motivo de cancelamento, observações e comentários de avaliação passam por `escapeHtml` nos e-mails de agendamento, verificação, avaliação e aviso ao admin. O aviso inline de `appointments/create` virou `sendAdminNewAppointmentNotification`.
+- **Código de migração removido:** `lib/migration-notifications.ts` e `app/api/admin/send-migration-notifications` apagados (legado: senha em texto puro, remetente de exemplo, `service_role`). Templates do Supabase Auth recolados no painel pelo Paul.
+- **Pendente (manual):** apagar os 3 templates de exemplo da conta Brevo (Transactional > Templates).
+- **Teste que já falhava antes:** `lib/services/assistant/agent.test.ts` (2 testes na `main`).
 
 ### 2026-09-25 - Retenção automática de contas importadas nunca ativadas
 - **Why:** o convite de reengajamento (acima) está sendo disparado para a base JotForm/Estágio Recife. Quem nunca ativar a conta deve ter os dados apagados por minimização (LGPD art. 6º III), não ficar acumulando para sempre. Plano completo em [`domains/account-retention.md`](domains/account-retention.md), executado em 5 fases/commits (com a ordem das Fases 2 e 3 invertida em relação ao plano: os templates de e-mail foram implementados antes do executor, porque o executor os chama diretamente e precisava deles para compilar).

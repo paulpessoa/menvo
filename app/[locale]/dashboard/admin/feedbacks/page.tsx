@@ -1,65 +1,51 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MessageSquare, Star, CheckCircle, ListFilter } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
-import { useTranslations } from "next-intl"
 import { AdminFeedbackModeration } from "@/components/admin/AdminFeedbackModeration"
 import { AdminPlatformFeedback } from "@/components/admin/AdminPlatformFeedback"
-import { Badge } from "@/components/ui/badge"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { PageContainer } from "@/components/layout/PageContainer"
 
-export default function AdminFeedbacksPage() {
-  const t = useTranslations("dashboard")
+const TAB_CLASS =
+  "data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-semibold text-sm md:text-base"
 
+/** Session-rating moderation and general platform feedback, side by side as tabs. */
+export default function AdminFeedbacksPage() {
   return (
     <RequireRole roles={["admin"]}>
       <PageContainer>
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight">Gestão de Feedbacks</h1>
-            <p className="text-muted-foreground text-lg">Modere e analise o que a comunidade está dizendo.</p>
-          </div>
+        <AdminPageHeader
+          title="Feedbacks"
+          description="Modere avaliações de sessões e acompanhe o que a comunidade diz sobre a plataforma."
+        />
 
-          <Tabs defaultValue="sessions" className="space-y-6">
-            <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
-              <TabsTrigger 
-                value="sessions" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
-              >
-                <Star className="w-4 h-4" /> Avaliações de Sessões
-              </TabsTrigger>
-              <TabsTrigger 
-                value="platform" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
-              >
-                <MessageSquare className="w-4 h-4" /> Voz da Comunidade
-              </TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="sessions" className="space-y-6">
+          <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
+            <TabsTrigger value="sessions" className={TAB_CLASS}>
+              Avaliações de sessões
+            </TabsTrigger>
+            <TabsTrigger value="platform" className={TAB_CLASS}>
+              Voz da comunidade
+            </TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="sessions" className="animate-in fade-in duration-500">
-               <div className="space-y-6">
-                 <div>
-                   <h2 className="text-2xl font-bold">Moderação de Avaliações</h2>
-                   <p className="text-muted-foreground">Aprove depoimentos reais para exibição nos perfis dos mentores.</p>
-                 </div>
-                 <AdminFeedbackModeration />
-               </div>
-            </TabsContent>
+          <TabsContent value="sessions" className="space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold">Moderação de avaliações</h2>
+              <p className="text-sm text-muted-foreground">Aprove depoimentos reais para exibição nos perfis dos mentores.</p>
+            </div>
+            <AdminFeedbackModeration />
+          </TabsContent>
 
-            <TabsContent value="platform" className="animate-in fade-in duration-500">
-               <div className="space-y-6">
-                 <div>
-                   <h2 className="text-2xl font-bold">Feedbacks Gerais da Plataforma</h2>
-                   <p className="text-muted-foreground">Sugestões, críticas e elogios sobre o uso do site.</p>
-                 </div>
-                 <AdminPlatformFeedback />
-               </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+          <TabsContent value="platform" className="space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold">Feedbacks gerais da plataforma</h2>
+              <p className="text-sm text-muted-foreground">Sugestões, críticas e elogios sobre o uso do site.</p>
+            </div>
+            <AdminPlatformFeedback />
+          </TabsContent>
+        </Tabs>
       </PageContainer>
     </RequireRole>
   )

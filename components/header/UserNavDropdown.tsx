@@ -46,6 +46,7 @@ export function UserNavDropdown({
           <Button
             variant="ghost"
             size="icon"
+            id="tour-nav-profile-menu"
             className="rounded-full h-9 w-9 border shadow-sm"
           >
             <Avatar className="h-full w-full">

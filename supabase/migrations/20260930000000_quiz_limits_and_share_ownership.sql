@@ -1,7 +1,7 @@
 -- Quiz analysis limit + diagnostic share ownership (2026-09-30).
 --
 -- 1. diagnostic_shares: the insert/update policies only checked
---    `mentee_id = auth.uid()`, never that the shared quiz/diagnostic belongs
+--    `mentee_id = (select auth.uid())`, never that the shared quiz/diagnostic belongs
 --    to the caller. The quiz id is in the public results URL (shared on
 --    LinkedIn/WhatsApp by design), so any logged-in person could "share"
 --    someone else's quiz with a second account of theirs and read the whole
@@ -27,7 +27,7 @@ as $$
   select exists (
     select 1 from public.quiz_responses q
     where q.id = p_id
-      and (q.user_id = auth.uid() or q.email = lower(auth.jwt() ->> 'email'))
+      and (q.user_id = (select auth.uid()) or q.email = lower(auth.jwt() ->> 'email'))
   );
 $$;
 
@@ -38,7 +38,7 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.diagnostic_sessions d
-    where d.id = p_id and d.user_id = auth.uid()
+    where d.id = p_id and d.user_id = (select auth.uid())
   );
 $$;
 
@@ -51,8 +51,8 @@ drop policy if exists "Mentees insert own diagnostic shares" on public.diagnosti
 create policy "Mentees insert own diagnostic shares"
   on public.diagnostic_shares for insert to authenticated
   with check (
-    mentee_id = auth.uid()
-    and mentor_id <> auth.uid()
+    mentee_id = (select auth.uid())
+    and mentor_id <> (select auth.uid())
     and (quiz_response_id is null or public.owns_quiz_response(quiz_response_id))
     and (diagnostic_session_id is null or public.owns_diagnostic_session(diagnostic_session_id))
   );
@@ -63,11 +63,11 @@ create policy "Mentees insert own diagnostic shares"
 drop policy if exists "Mentees update own diagnostic shares" on public.diagnostic_shares;
 create policy "Mentees update own diagnostic shares"
   on public.diagnostic_shares for update to authenticated
-  using (mentee_id = auth.uid() or public.is_admin())
+  using (mentee_id = (select auth.uid()) or public.is_admin())
   with check (
     public.is_admin()
     or (
-      mentee_id = auth.uid()
+      mentee_id = (select auth.uid())
       and (quiz_response_id is null or public.owns_quiz_response(quiz_response_id))
       and (diagnostic_session_id is null or public.owns_diagnostic_session(diagnostic_session_id))
     )
@@ -144,7 +144,7 @@ create policy "Authenticated can submit own quiz responses"
   with check (
     public.is_admin()
     or (
-      user_id = auth.uid()
+      user_id = (select auth.uid())
       and (processed_at is not null or public.quiz_submission_status(email) = 'ok')
     )
   );

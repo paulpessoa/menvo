@@ -106,7 +106,13 @@ describe("resolveAudience", () => {
     }))
     const supabase = {
       from: jest.fn((table: string) => {
-        if (table === "profiles") return { select: jest.fn().mockReturnValue(paged(bigProfiles)) }
+        if (table === "import_records") {
+          const rows = bigProfiles.map(p => ({
+            user_id: p.id,
+            profiles: { email: p.email, full_name: p.full_name, email_opt_out_at: p.email_opt_out_at }
+          }))
+          return { select: jest.fn().mockReturnValue(paged(rows)) }
+        }
         if (table === "reengagement_invites") return { select: jest.fn().mockReturnValue(paged([])) }
         if (table === "email_suppressions") return { select: jest.fn().mockReturnValue(paged([])) }
         throw new Error(`unexpected table ${table}`)

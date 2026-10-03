@@ -29,10 +29,11 @@ import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { toast } from "sonner"
 import { useLocale, useTranslations } from "next-intl"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
+import { searchCatalogAction, getCatalogFilterOptionsAction } from "@/app/actions/mentors"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useAiQuota } from "@/hooks/useAiQuota"
-import { AIQuotaHint } from "@/components/mentors/AIQuotaHint"
+import { useOnboarding } from "@/hooks/useOnboarding"
 import { PageContainer } from "@/components/layout/PageContainer"
 import { SuggestMentorModal } from "@/components/mentors/SuggestMentorModal"
 import type { SuggestionContext } from "@/lib/schemas/suggestions"
@@ -98,6 +99,7 @@ export default function MentorsPage() {
   const [page, setPage] = useState(0)
   const [totalCount, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
+  const loaderRef = useRef<HTMLDivElement>(null)
 
   const [suggestedMentors, setSuggestedMentors] = useState<
     Record<string, string>
@@ -139,7 +141,7 @@ export default function MentorsPage() {
         setLoadingMore(true)
       }
 
-      const { data, count } = await mentorService.searchCatalog({
+      const { data, count } = await searchCatalogAction({
         filters: {
           // Em modo IA, o texto digitado já foi consumido pelo endpoint
           // de match - aqui filtramos por tema (filters.topics), não pelo
@@ -203,7 +205,7 @@ export default function MentorsPage() {
 
   const fetchFilterOptions = async () => {
     try {
-      const options = await mentorService.getCatalogFilterOptions()
+      const options = await getCatalogFilterOptionsAction()
       setAvailableFilters(options)
     } catch (error) {
       console.error("Error fetching filter options:", error)
@@ -275,11 +277,30 @@ export default function MentorsPage() {
     experienceYears: filters.experienceYears !== "all" ? filters.experienceYears : undefined,
   }), [filters])
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return
     const nextPage = page + 1
     setPage(nextPage)
     fetchMentors(false, nextPage)
-  }
+  }, [loadingMore, hasMore, page, fetchMentors])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          handleLoadMore()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    const currentRef = loaderRef.current
+    if (currentRef) observer.observe(currentRef)
+
+    return () => {
+      if (currentRef) observer.unobserve(currentRef)
+    }
+  }, [hasMore, loadingMore, handleLoadMore])
 
   const handleAIMatch = async (
     suggestions: Array<{ mentor_id: string; reason: string }>,
@@ -405,6 +426,7 @@ export default function MentorsPage() {
             <div className="flex-1 relative min-w-0">
               <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
               <Input
+                id="tour-search-bar"
                 placeholder={t("searchPlaceholder")}
                 value={filters.search}
                 onChange={(e) => {
@@ -437,9 +459,10 @@ export default function MentorsPage() {
                 </button>
               )}
             </div>
-            <AIMatchButton
-              title={t("magicSearch.title")}
-              description={t("magicSearch.disclaimer")}
+            <div id="tour-ai-search">
+              <AIMatchButton
+                title={t("magicSearch.title")}
+                description={t("magicSearch.disclaimer")}
               placeholder={t("magicSearch.placeholder")}
               loading={aiLoading}
               loginRequiredMessage={t("magicSearch.loginRequired")}
@@ -461,6 +484,7 @@ export default function MentorsPage() {
               onSubmit={handleAISearch}
               compact
             />
+            </div>
           </div>
 
           {/* Sort & Filters Action Row (balanced 50-50 on mobile, compact on desktop) */}
@@ -490,6 +514,7 @@ export default function MentorsPage() {
             <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
               <SheetTrigger asChild>
                 <Button
+                  id="tour-filters"
                   variant="outline"
                   className="w-full sm:w-auto h-11 sm:h-12 rounded-xl border border-border/80 shadow-2xs px-3 sm:px-5 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 bg-card hover:bg-accent/40"
                 >
@@ -697,8 +722,6 @@ export default function MentorsPage() {
           </div>
         </div>
 
-        <AIQuotaHint quota={aiQuota} />
-
         {/* Active Filter Badges Bar */}
         {activeFacetCount > 0 && (
           <div className="flex items-center gap-1.5 overflow-x-auto py-1 text-xs scrollbar-none">
@@ -808,11 +831,13 @@ export default function MentorsPage() {
       )}
 
       {/* Results Count */}
-      <div className="mb-6 flex justify-between items-center px-2">
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-          {t("resultsFound", { count: totalCount })}
-        </p>
-      </div>
+      {(debouncedSearch.trim() !== "" || activeFacetCount > 0 || isAIMode) && (
+        <div className="mb-6 flex justify-between items-center px-2">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+            {t("resultsFound", { count: totalCount })}
+          </p>
+        </div>
+      )}
 
       {/* Mentors Grid or Loading State */}
       {loading ? (
@@ -888,9 +913,10 @@ export default function MentorsPage() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Primeiro os recomendados pela IA */}
-            {displayedAIMentors.map((mentor) => (
+            {displayedAIMentors.map((mentor, idx) => (
               <MentorCard
                 key={`ai-${mentor.id}`}
+                id={idx === 0 ? "tour-mentor-card" : undefined}
                 mentor={mentor}
                 isAIHighlighted={true}
                 aiReason={mentor.id ? suggestedMentors[mentor.id] : undefined}
@@ -898,30 +924,24 @@ export default function MentorsPage() {
             ))}
 
             {/* Depois os demais */}
-            {otherMentors.map((mentor) => (
-              <MentorCard key={mentor.id || "unknown"} mentor={mentor} />
+            {otherMentors.map((mentor, idx) => (
+              <MentorCard 
+                key={mentor.id || "unknown"} 
+                id={idx === 0 && displayedAIMentors.length === 0 ? "tour-mentor-card" : undefined}
+                mentor={mentor} 
+              />
             ))}
           </div>
 
-          {/* Load More */}
+          {/* Infinite Scroll Trigger */}
           {hasMore && (
-            <div className="mt-12 text-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="rounded-xl border-2 font-bold px-10"
-              >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                    {t("loading")}
-                  </>
-                ) : (
-                  t("loadMore")
-                )}
-              </Button>
+            <div ref={loaderRef} className="mt-12 flex justify-center p-4">
+              {loadingMore && (
+                <div className="flex items-center text-muted-foreground font-medium">
+                  <Loader2 className="mr-2 animate-spin h-5 w-5" />
+                  {t("loading")}
+                </div>
+              )}
             </div>
           )}
         </>
@@ -933,6 +953,20 @@ export default function MentorsPage() {
         initialTopic={filters.search || filters.topics[0] || ""}
         context={suggestionContext}
       />
+      <MentorsCatalogTour />
     </PageContainer>
   )
+}
+
+function MentorsCatalogTour() {
+  const steps = [
+    { element: "#tour-search-bar", popover: { title: "Busque por nome, área ou skill", description: "Use a busca para encontrar mentores por área de atuação, habilidade ou nome." } },
+    { element: "#tour-filters", popover: { title: "Refine sua busca", description: "Filtre por idioma, tags de inclusão, tópicos de mentoria e mais para encontrar o match ideal." } },
+    { element: "#tour-ai-search", popover: { title: "Deixe a IA encontrar para você", description: "Descreva o que você precisa com suas palavras e a IA vai sugerir os mentores mais alinhados." } },
+    { element: "#tour-mentor-card", popover: { title: "Card do mentor", description: "Cada card mostra a foto, área, nota e especialidades do mentor. Clique para ver o perfil completo e agendar." } }
+  ]
+
+  useOnboarding("ob_m2", steps)
+
+  return null
 }

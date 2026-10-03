@@ -3,17 +3,11 @@
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink } from "lucide-react"
+import { Calendar, Users, Search, Clock, CheckCircle, Heart, MessageSquare, TrendingUp, LayoutDashboard, Video, ExternalLink, Shield, Star } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { useAuth } from "@/lib/auth"
@@ -23,11 +17,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MenteeQuizCTA } from "@/components/MenteeQuizCTA"
 import { MenteeNextStepCard } from "@/components/dashboard/MenteeNextStepCard"
+import { MenteeActivationChecklist } from "@/components/dashboard/MenteeActivationChecklist"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { quizService } from "@/lib/services/quiz/quiz.service"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import type { QuizResponseSummary } from "@/lib/types/models/quiz"
+import { useOnboarding } from "@/hooks/useOnboarding"
 
 interface MenteeStats {
   totalAppointments: number
@@ -167,11 +163,13 @@ export default function MenteeDashboard() {
               <h1 className="text-3xl md:text-4xl font-black tracking-tight">{getGreeting()}, {profile?.first_name || t("mentee.defaultName")}!</h1>
               <p className="text-muted-foreground text-base md:text-lg">{t("mentee.welcome")}</p>
             </div>
-            <Button asChild className="rounded-xl px-6 h-12 font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all">
-              <Link href="/mentors">
-                <Search className="h-4 w-4 mr-2" /> {t("mentee.actions.find")}
-              </Link>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button asChild variant="ghost" size="sm" className="rounded-xl font-medium text-muted-foreground hover:text-foreground">
+                <Link href="/support">
+                  <Shield className="h-4 w-4 mr-2" /> Suporte
+                </Link>
+              </Button>
+            </div>
           </div>
 
           <Suspense fallback={<div className="py-10 flex justify-center"><MenvoDots /></div>}>
@@ -186,7 +184,9 @@ export default function MenteeDashboard() {
               hasPendingReview={hasPendingReview} 
               diagnosticHref={diagnosticHref} 
               locale={locale} 
+              profile={profile}
             />
+            <MenteeDashboardTour />
           </Suspense>
         </div>
       </div>
@@ -195,7 +195,7 @@ export default function MenteeDashboard() {
 }
 
 function MenteeDashboardTabs({ 
-  stats, upcomingAppointments, favoriteMentorsData, loading, loadingFavorites, loadingQuiz, quizSummary, hasPendingReview, diagnosticHref, locale 
+  stats, upcomingAppointments, favoriteMentorsData, loading, loadingFavorites, loadingQuiz, quizSummary, hasPendingReview, diagnosticHref, locale, profile
 }: any) {
   const t = useTranslations("dashboard")
   const searchParams = useSearchParams()
@@ -203,12 +203,15 @@ function MenteeDashboardTabs({
 
   return (
     <Tabs defaultValue={defaultTab} className="space-y-6">
-      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
-        <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
+      <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-6 sm:gap-8 overflow-x-auto hide-scrollbar flex-nowrap">
+        <TabsTrigger value="overview" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap">
           <LayoutDashboard className="w-4 h-4" /> {t("mentee.tabs.overview")}
         </TabsTrigger>
-        <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2">
-          <MessageSquare className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
+        <TabsTrigger value="favorites" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap">
+          <Heart className="w-4 h-4" /> {t("mentee.sections.favorites")}
+        </TabsTrigger>
+        <TabsTrigger value="feedbacks" className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2 whitespace-nowrap">
+          <Star className="w-4 h-4" /> {t("mentee.tabs.feedbacks")}
         </TabsTrigger>
       </TabsList>
 
@@ -223,7 +226,9 @@ function MenteeDashboardTabs({
           />
         )}
 
-        {quizSummary && <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />}
+        <MenteeQuizCTA quizResponse={quizSummary} loading={loadingQuiz} />
+
+        <MenteeActivationChecklist profile={profile} stats={stats} hasDiagnostic={Boolean(quizSummary)} />
 
         {/* Barra de Métricas Compacta */}
         <div className="flex flex-wrap items-center gap-4 text-sm bg-muted/30 rounded-2xl p-4 border border-border/50">
@@ -258,63 +263,56 @@ function MenteeDashboardTabs({
           </Button>
         </div>
 
-        {/* Favoritos */}
-        <div className="max-w-3xl pt-2">
-            <Card className="rounded-2xl border border-gray-100 shadow-xs">
-              <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <div>
-                  <CardTitle className="text-xl font-bold flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-red-500 fill-current" /> {t("mentee.sections.favorites")}
-                  </CardTitle>
-                  <CardDescription>{t("mentee.sections.favoritesDesc")}</CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" asChild className="rounded-xl font-medium">
-                  <Link href="/mentors">{t("mentee.sections.viewAll")}</Link>
+      </TabsContent>
+
+      {/* TAB: FAVORITES */}
+      <TabsContent value="favorites" className="animate-in fade-in duration-500">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold">{t("mentee.sections.favorites")}</h2>
+            <p className="text-muted-foreground text-sm">Mentores que você salvou para contatar no futuro.</p>
+          </div>
+          {loadingFavorites ? (
+            <div className="flex justify-center py-12"><MenvoDots /></div>
+          ) : favoriteMentorsData.length === 0 ? (
+            <Card className="rounded-2xl border-border/60 shadow-none">
+              <CardContent className="py-12 flex flex-col items-center text-center gap-4">
+                <Heart className="h-8 w-8 text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">{t("mentee.sections.noFavorites")}</p>
+                <Button asChild size="sm" className="rounded-xl">
+                  <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
                 </Button>
-              </CardHeader>
-              <CardContent>
-                {loadingFavorites ? (
-                  <div className="flex justify-center py-8"><MenvoDots /></div>
-                ) : favoriteMentorsData.length === 0 ? (
-                  <div className="py-8 px-4 text-center rounded-2xl border border-dashed border-gray-200/80 bg-gradient-to-b from-gray-50/50 to-transparent flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-3 shadow-xs">
-                      <Heart className="h-6 w-6 text-red-400" />
-                    </div>
-                    <p className="font-semibold text-gray-900 text-sm mb-1">{t("mentee.sections.noFavorites")}</p>
-                    <p className="text-xs text-muted-foreground max-w-xs mb-4">{t("mentee.sections.noFavoritesDesc")}</p>
-                    <Button asChild size="sm" variant="outline" className="rounded-xl text-xs font-semibold hover:border-primary/40 hover:text-primary">
-                      <Link href="/mentors">{t("mentee.sections.exploreMentors")}</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
-                      <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
-                        <div className="flex items-center gap-3 p-3.5 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all">
-                          <Avatar className="h-12 w-12 border">
-                            <AvatarImage src={m.avatar_url || undefined} />
-                            <AvatarFallback>{m.full_name[0]}</AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold truncate">{m.full_name}</p>
-                            <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
               </CardContent>
             </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favoriteMentorsData.filter((m: any) => m.slug || m.id).map((m: any) => (
+                <Link key={m.id} href={`/mentors/${m.slug || m.id}`}>
+                  <Card className="rounded-2xl border-border/60 shadow-none hover:border-primary/30 transition-colors">
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <Avatar className="h-12 w-12 border">
+                        <AvatarImage src={m.avatar_url || undefined} />
+                        <AvatarFallback>{m.full_name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{m.full_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{m.job_title}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </TabsContent>
 
       {/* TAB: FEEDBACKS */}
-      <TabsContent value="feedbacks" className="animate-in fade-in slide-in-from-left-4 duration-500">
+      <TabsContent value="feedbacks" className="animate-in fade-in duration-500">
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacksTitle")}</h2>
-            <p className="text-muted-foreground">{t("mentee.tabs.feedbacksDesc")}</p>
+            <h2 className="text-2xl font-bold">{t("mentee.tabs.feedbacks")}</h2>
+            <p className="text-muted-foreground text-sm">Avaliações que você deixou para seus mentores após as sessões.</p>
           </div>
           <FeedbackManagement type="sent" />
         </div>
@@ -322,3 +320,22 @@ function MenteeDashboardTabs({
     </Tabs>
   )
 }
+
+function MenteeDashboardTour() {
+  const t = useTranslations("dashboard.mentee.tour")
+  
+  // O uso das strings fallback assegura funcionamento enquanto os t() não existirem
+  const steps = [
+    { popover: { title: "👋 Bem-vindo(a) à Menvo!", description: "Você acabou de dar o primeiro passo. Vamos fazer um tour rápido para você aproveitar tudo que a plataforma oferece." } },
+    { element: "#tour-next-session", popover: { title: "Seu próximo passo", description: "Aqui a Menvo sempre vai destacar a sua prioridade do momento. Siga o fluxo para avançar na sua jornada." } },
+    { element: "#tour-nav-mentors", popover: { title: "Encontre seu mentor", description: "Aqui você encontra todos os mentores verificados. Pode filtrar por área, skills, idioma e mais." } },
+    { element: "#tour-nav-assistant", popover: { title: "Seu copiloto de carreira", description: "Converse com a IA da Menvo para tirar dúvidas, receber recomendações de mentores ou fazer o diagnóstico interativo." } },
+    { element: "#tour-nav-profile-menu", popover: { title: "Complete seu perfil", description: "Quanto mais completo seu perfil, mais chances os mentores têm de aceitar seu pedido. Adicione foto, bio, LinkedIn e seus objetivos." } },
+    { popover: { title: "🚀 Tudo pronto!", description: "Recomendamos começar pelo diagnóstico de carreira ou completar as missões da jornada. Boa sorte!" } }
+  ]
+
+  useOnboarding("ob_m1", steps)
+
+  return null
+}
+

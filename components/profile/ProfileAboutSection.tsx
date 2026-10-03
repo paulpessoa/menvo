@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useEffect } from "react"
 import {  Camera, MapPin , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -47,10 +47,17 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
     }
   }
 
+  // Detect location on mount if not filled yet
+  useEffect(() => {
+    if (!form.city && !form.state) {
+      location.detect(true) // silent
+    }
+  }, []) // only run once on mount
+
   return (
     <Card>
       <CardContent className="space-y-6 pt-6">
-        <div className="flex items-center justify-between gap-4 p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
+        <div id="tour-profile-public" className="flex items-center justify-between gap-4 p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
           <div className="space-y-1">
             <Label htmlFor="is_public" className="text-base font-bold">Perfil público</Label>
             <p className="text-xs text-muted-foreground">
@@ -80,15 +87,25 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-            <Field label="Nome" value={form.first_name} onValue={(v) => onChange({ first_name: v })} />
-            <Field label="Sobrenome" value={form.last_name} onValue={(v) => onChange({ last_name: v })} />
-            <div className="sm:col-span-2">
-              <Field
-                label="Endereço do perfil (slug)"
+            <Field label="Nome *" value={form.first_name} onValue={(v) => onChange({ first_name: v })} />
+            <Field label="Sobrenome *" value={form.last_name} onValue={(v) => onChange({ last_name: v })} />
+            <div className="sm:col-span-2 space-y-1">
+              <div className="flex items-center justify-between">
+                <Label>Endereço do perfil (slug) *</Label>
+                <button 
+                  type="button" 
+                  onClick={() => onChange({ slug: `${form.first_name || ""}-${form.last_name || ""}`.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") })} 
+                  className="text-xs text-primary hover:underline font-medium"
+                >
+                  Gerar automaticamente
+                </button>
+              </div>
+              <Input
                 value={form.slug}
-                onValue={(v) => onChange({ slug: v.toLowerCase().replace(/\s+/g, "-") })}
+                onChange={(e) => onChange({ slug: e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") })}
                 placeholder="ex: maria-silva"
               />
+              <p className="text-[10px] text-muted-foreground">Sua URL será: menvo.com.br/mentee/{form.slug || "..."}</p>
             </div>
           </div>
         </div>
@@ -101,7 +118,7 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
         <div className="space-y-3 pt-4 border-t">
           <div className="flex items-center justify-between gap-4">
             <h3 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Localização</h3>
-            <Button type="button" variant="outline" size="sm" onClick={location.detect} disabled={location.isDetecting}>
+            <Button type="button" variant="outline" size="sm" onClick={() => location.detect(false)} disabled={location.isDetecting}>
               {location.isDetecting && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
               {location.isDetecting ? "Detectando..." : "Detectar"}
             </Button>

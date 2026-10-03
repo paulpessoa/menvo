@@ -1,0 +1,53 @@
+# Blocks PRs that credit an AI as author, committer or co-author.
+# Local git hooks only cover one machine; remote agents and GitHub squash
+# merges bypass them, so the repository itself has to enforce the rule.
+name: No AI attribution
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject AI author, committer, co-author or generated-by lines
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          AI='claude|anthropic|copilot|cursor|openai|chatgpt|gpt-[0-9]|gemini|codex|devin|windsurf|codeium|aider|antigravity|tabnine|amazon q|codewhisperer|octopus'
+          TRAILER="^[[:space:]]*(co-authored-by|signed-off-by|generated-by|assisted-by|ai-assisted-by|claude-session)[[:space:]]*:.*($AI)"
+          GENERATED="generated (with|by|using) .*($AI)"
+          FAIL=0
+
+          for SHA in $(git rev-list "$BASE_SHA..$HEAD_SHA"); do
+            WHO="$(git log -1 --format='%an <%ae>%n%cn <%ce>' "$SHA" | grep -iE "$AI" || true)"
+            MSG="$(git log -1 --format='%B' "$SHA" | grep -iE "$TRAILER|$GENERATED" || true)"
+            if [ -n "$WHO$MSG" ]; then
+              echo "::error::commit $(git log -1 --format='%h %s' "$SHA") credits an AI:"
+              printf '%s\n%s\n' "$WHO" "$MSG"
+              FAIL=1
+            fi
+          done
+
+          TEXT="$(printf '%s\n%s' "$PR_TITLE" "$PR_BODY" | grep -iE "$TRAILER|$GENERATED|^[[:space:]]*🤖" || true)"
+          if [ -n "$TEXT" ]; then
+            echo "::error::PR title/body credits an AI:"
+            echo "$TEXT"
+            FAIL=1
+          fi
+
+          if [ "$FAIL" -ne 0 ]; then
+            echo "Remove the AI attribution (see CONTRIBUTING.md, 'No AI attribution') and push again."
+          fi
+          exit "$FAIL"

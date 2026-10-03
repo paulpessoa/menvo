@@ -208,7 +208,7 @@ export function BookMentorshipModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-white rounded-3xl border-0 shadow-2xl">
+      <DialogContent className="w-[95vw] sm:w-full max-w-2xl p-0 overflow-hidden bg-white rounded-3xl border-0 shadow-2xl">
         <DialogHeader className="sr-only">
           <DialogTitle>{t("modalTitle")}</DialogTitle>
           <DialogDescription>
@@ -386,7 +386,7 @@ export function BookMentorshipModal({
                   </div>
                 )}
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   <Button
                     type="button"
                     variant="outline"

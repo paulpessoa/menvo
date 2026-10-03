@@ -14,36 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _backup_profiles_verification_20260925: {
-        Row: {
-          backed_up_at: string | null
-          id: string | null
-          is_pending_mentor: boolean | null
-          is_public: boolean | null
-          verification_status: string | null
-          verified: boolean | null
-          verified_at: string | null
-        }
-        Insert: {
-          backed_up_at?: string | null
-          id?: string | null
-          is_pending_mentor?: boolean | null
-          is_public?: boolean | null
-          verification_status?: string | null
-          verified?: boolean | null
-          verified_at?: string | null
-        }
-        Update: {
-          backed_up_at?: string | null
-          id?: string | null
-          is_pending_mentor?: boolean | null
-          is_public?: boolean | null
-          verification_status?: string | null
-          verified?: boolean | null
-          verified_at?: string | null
-        }
-        Relationships: []
-      }
       account_retention: {
         Row: {
           campaign: string
@@ -76,6 +46,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "account_retention_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
           {
             foreignKeyName: "account_retention_user_id_fkey"
             columns: ["user_id"]
@@ -126,7 +103,22 @@ export type Database = {
           target_user_id?: string | null
           user_agent?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "admin_audit_logs_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_audit_logs_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_budget: {
         Row: {
@@ -206,6 +198,13 @@ export type Database = {
             referencedRelation: "ai_threads"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ai_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ai_missing_demands: {
@@ -233,7 +232,15 @@ export type Database = {
           suggested_topics?: string[] | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_missing_demands_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_model_config: {
         Row: {
@@ -269,7 +276,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_model_config_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_model_pricing: {
         Row: {
@@ -323,7 +338,15 @@ export type Database = {
           used_count?: number
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_quota_ledger_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_threads: {
         Row: {
@@ -359,7 +382,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_threads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_usage_events: {
         Row: {
@@ -413,7 +444,15 @@ export type Database = {
           status?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       appointment_feedbacks: {
         Row: {
@@ -470,6 +509,13 @@ export type Database = {
             foreignKeyName: "appointment_feedbacks_reviewed_id_fkey"
             columns: ["reviewed_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "appointment_feedbacks_reviewed_id_fkey"
+            columns: ["reviewed_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -479,6 +525,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_feedbacks_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
           },
           {
             foreignKeyName: "appointment_feedbacks_reviewer_id_fkey"
@@ -504,8 +557,6 @@ export type Database = {
           cancelled_by: string | null
           completed_at: string | null
           created_at: string
-          cv_type: string | null
-          cv_url: string | null
           description: string | null
           duration_minutes: number
           feedback_requested_at: string | null
@@ -543,8 +594,6 @@ export type Database = {
           cancelled_by?: string | null
           completed_at?: string | null
           created_at?: string
-          cv_type?: string | null
-          cv_url?: string | null
           description?: string | null
           duration_minutes?: number
           feedback_requested_at?: string | null
@@ -582,8 +631,6 @@ export type Database = {
           cancelled_by?: string | null
           completed_at?: string | null
           created_at?: string
-          cv_type?: string | null
-          cv_url?: string | null
           description?: string | null
           duration_minutes?: number
           feedback_requested_at?: string | null
@@ -616,6 +663,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "appointments_cancelled_by_fkey"
+            columns: ["cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
             foreignKeyName: "appointments_mentee_id_fkey"
             columns: ["mentee_id"]
             isOneToOne: false
@@ -628,6 +689,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
           },
           {
             foreignKeyName: "appointments_mentor_id_fkey"
@@ -667,7 +735,15 @@ export type Database = {
           user_id?: string
           user_message?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "assistant_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversations: {
         Row: {
@@ -699,6 +775,13 @@ export type Database = {
             foreignKeyName: "conversations_mentee_id_fkey"
             columns: ["mentee_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "conversations_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -708,6 +791,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
           },
           {
             foreignKeyName: "conversations_mentor_id_fkey"
@@ -797,6 +887,13 @@ export type Database = {
             referencedRelation: "quiz_responses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "diagnostic_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       diagnostic_shares: {
@@ -836,6 +933,20 @@ export type Database = {
             columns: ["diagnostic_session_id"]
             isOneToOne: false
             referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnostic_shares_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "diagnostic_shares_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
             referencedColumns: ["id"]
           },
           {
@@ -950,7 +1061,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       google_calendar_tokens: {
         Row: {
@@ -974,7 +1093,171 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_records: {
+        Row: {
+          created_at: string
+          external_id: string | null
+          invite_sent_at: string | null
+          origin_platform: string
+          original_data: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          external_id?: string | null
+          invite_sent_at?: string | null
+          origin_platform?: string
+          original_data?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          external_id?: string | null
+          invite_sent_at?: string | null
+          origin_platform?: string
+          original_data?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "import_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "import_records_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inactive_accounts_queue: {
+        Row: {
+          created_at: string
+          last_sign_in_at: string
+          notice_30d_sent_at: string | null
+          scheduled_deletion_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_sign_in_at: string
+          notice_30d_sent_at?: string | null
+          scheduled_deletion_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_sign_in_at?: string
+          notice_30d_sent_at?: string | null
+          scheduled_deletion_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inactive_accounts_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "inactive_accounts_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inactive_accounts_queue_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentee_profiles: {
+        Row: {
+          academic_level: string | null
+          course: string | null
+          created_at: string
+          cv_url: string | null
+          expected_graduation: string | null
+          institution: string | null
+          learning_goals: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          academic_level?: string | null
+          course?: string | null
+          created_at?: string
+          cv_url?: string | null
+          expected_graduation?: string | null
+          institution?: string | null
+          learning_goals?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          academic_level?: string | null
+          course?: string | null
+          created_at?: string
+          cv_url?: string | null
+          expected_graduation?: string | null
+          institution?: string | null
+          learning_goals?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentee_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentee_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentee_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mentor_availability: {
         Row: {
@@ -1012,6 +1295,13 @@ export type Database = {
             foreignKeyName: "mentor_availability_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentor_availability_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -1019,6 +1309,82 @@ export type Database = {
             foreignKeyName: "mentor_availability_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_profiles: {
+        Row: {
+          availability_status: string
+          chat_enabled: boolean
+          created_at: string
+          experience_years: number | null
+          free_topics: string[] | null
+          ideal_mentee: string | null
+          inclusive_tags: string[] | null
+          is_volunteer: boolean
+          mentorship_approach: string | null
+          updated_at: string
+          user_id: string
+          verification_notes: string | null
+          verification_status: string | null
+          verified_at: string | null
+          what_to_expect: string | null
+        }
+        Insert: {
+          availability_status?: string
+          chat_enabled?: boolean
+          created_at?: string
+          experience_years?: number | null
+          free_topics?: string[] | null
+          ideal_mentee?: string | null
+          inclusive_tags?: string[] | null
+          is_volunteer?: boolean
+          mentorship_approach?: string | null
+          updated_at?: string
+          user_id: string
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          what_to_expect?: string | null
+        }
+        Update: {
+          availability_status?: string
+          chat_enabled?: boolean
+          created_at?: string
+          experience_years?: number | null
+          free_topics?: string[] | null
+          ideal_mentee?: string | null
+          inclusive_tags?: string[] | null
+          is_volunteer?: boolean
+          mentorship_approach?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_notes?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          what_to_expect?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1055,7 +1421,15 @@ export type Database = {
           topic?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "mentor_suggestions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mentor_visibility_settings: {
         Row: {
@@ -1083,6 +1457,13 @@ export type Database = {
           visible_to_organizations?: string[] | null
         }
         Relationships: [
+          {
+            foreignKeyName: "mentor_visibility_settings_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: true
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
           {
             foreignKeyName: "mentor_visibility_settings_mentor_id_fkey"
             columns: ["mentor_id"]
@@ -1139,6 +1520,13 @@ export type Database = {
             foreignKeyName: "messages_sender_id_fkey"
             columns: ["sender_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -1151,48 +1539,48 @@ export type Database = {
           },
         ]
       }
-      newsletter_subscriptions: {
+      organization_leads: {
         Row: {
-          consent_date: string | null
-          consent_given: boolean
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
           created_at: string
-          email: string
           id: string
-          ip_address: string | null
-          marketing_consent: boolean
-          name: string | null
-          status: string | null
-          unsubscribed_at: string | null
-          user_agent: string | null
-          whatsapp: string | null
+          locale: string | null
+          message: string | null
+          org_name: string
+          org_type: string
+          people_estimate: string
+          status: string
+          updated_at: string
         }
         Insert: {
-          consent_date?: string | null
-          consent_given?: boolean
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
           created_at?: string
-          email: string
           id?: string
-          ip_address?: string | null
-          marketing_consent?: boolean
-          name?: string | null
-          status?: string | null
-          unsubscribed_at?: string | null
-          user_agent?: string | null
-          whatsapp?: string | null
+          locale?: string | null
+          message?: string | null
+          org_name: string
+          org_type: string
+          people_estimate: string
+          status?: string
+          updated_at?: string
         }
         Update: {
-          consent_date?: string | null
-          consent_given?: boolean
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
           created_at?: string
-          email?: string
           id?: string
-          ip_address?: string | null
-          marketing_consent?: boolean
-          name?: string | null
-          status?: string | null
-          unsubscribed_at?: string | null
-          user_agent?: string | null
-          whatsapp?: string | null
+          locale?: string | null
+          message?: string | null
+          org_name?: string
+          org_type?: string
+          people_estimate?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1230,6 +1618,13 @@ export type Database = {
             foreignKeyName: "organization_members_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -1241,51 +1636,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      organization_leads: {
-        Row: {
-          id: string
-          org_name: string
-          org_type: string
-          contact_name: string
-          contact_email: string
-          contact_phone: string | null
-          people_estimate: string
-          message: string | null
-          locale: string | null
-          status: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          org_name: string
-          org_type: string
-          contact_name: string
-          contact_email: string
-          contact_phone?: string | null
-          people_estimate: string
-          message?: string | null
-          locale?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          org_name?: string
-          org_type?: string
-          contact_name?: string
-          contact_email?: string
-          contact_phone?: string | null
-          people_estimate?: string
-          message?: string | null
-          locale?: string | null
-          status?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       organizations: {
         Row: {
@@ -1325,199 +1675,97 @@ export type Database = {
       }
       profiles: {
         Row: {
-          academic_level: string | null
-          address: string | null
-          age: number | null
-          ai_disclosure_accepted_at: string | null
-          availability_status: string | null
           avatar_url: string | null
-          average_rating: number | null
           bio: string | null
-          chat_enabled: boolean | null
           city: string | null
+          community_ready: boolean | null
           company: string | null
           country: string | null
-          course: string | null
           created_at: string
-          cv_url: string | null
           email: string
           email_opt_out_at: string | null
-          expected_graduation: string | null
-          experience_years: number | null
           expertise_areas: string[] | null
-          external_id: string | null
           first_name: string | null
-          free_topics: string[] | null
           full_name: string | null
           github_url: string | null
           id: string
-          ideal_mentee: string | null
-          inclusive_tags: string[] | null
-          institution: string | null
-          invite_sent_at: string | null
-          is_pending_mentor: boolean | null
           is_public: boolean | null
-          is_volunteer: boolean | null
           job_title: string | null
           languages: string[] | null
           last_name: string | null
-          learning_goals: string | null
           linkedin_url: string | null
-          location: string | null
-          mentee_status: string | null
-          mentorship_approach: string | null
-          mentorship_guidelines: string | null
           mentorship_topics: string[] | null
-          origin_platform: string | null
-          original_data: Json | null
+          onboarding_flags: Json | null
           phone: string | null
           portfolio_url: string | null
-          profile_visibility: string | null
           search_vector: unknown
-          show_in_community: boolean | null
           slug: string | null
           state: string | null
           timezone: string | null
-          total_reviews: number | null
-          total_sessions: number | null
-          twitter_url: string | null
           updated_at: string
-          verification_notes: string | null
-          verification_status: string | null
-          verified: boolean
-          verified_at: string | null
           website_url: string | null
-          what_to_expect: string | null
         }
         Insert: {
-          academic_level?: string | null
-          address?: string | null
-          age?: number | null
-          ai_disclosure_accepted_at?: string | null
-          availability_status?: string | null
           avatar_url?: string | null
-          average_rating?: number | null
           bio?: string | null
-          chat_enabled?: boolean | null
           city?: string | null
+          community_ready?: boolean | null
           company?: string | null
           country?: string | null
-          course?: string | null
           created_at?: string
-          cv_url?: string | null
           email: string
           email_opt_out_at?: string | null
-          expected_graduation?: string | null
-          experience_years?: number | null
           expertise_areas?: string[] | null
-          external_id?: string | null
           first_name?: string | null
-          free_topics?: string[] | null
           full_name?: string | null
           github_url?: string | null
           id: string
-          ideal_mentee?: string | null
-          inclusive_tags?: string[] | null
-          institution?: string | null
-          invite_sent_at?: string | null
-          is_pending_mentor?: boolean | null
           is_public?: boolean | null
-          is_volunteer?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
-          learning_goals?: string | null
           linkedin_url?: string | null
-          location?: string | null
-          mentee_status?: string | null
-          mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
-          origin_platform?: string | null
-          original_data?: Json | null
+          onboarding_flags?: Json | null
           phone?: string | null
           portfolio_url?: string | null
-          profile_visibility?: string | null
           search_vector?: unknown
-          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
-          total_reviews?: number | null
-          total_sessions?: number | null
-          twitter_url?: string | null
           updated_at?: string
-          verification_notes?: string | null
-          verification_status?: string | null
-          verified?: boolean
-          verified_at?: string | null
           website_url?: string | null
-          what_to_expect?: string | null
         }
         Update: {
-          academic_level?: string | null
-          address?: string | null
-          age?: number | null
-          ai_disclosure_accepted_at?: string | null
-          availability_status?: string | null
           avatar_url?: string | null
-          average_rating?: number | null
           bio?: string | null
-          chat_enabled?: boolean | null
           city?: string | null
+          community_ready?: boolean | null
           company?: string | null
           country?: string | null
-          course?: string | null
           created_at?: string
-          cv_url?: string | null
           email?: string
           email_opt_out_at?: string | null
-          expected_graduation?: string | null
-          experience_years?: number | null
           expertise_areas?: string[] | null
-          external_id?: string | null
           first_name?: string | null
-          free_topics?: string[] | null
           full_name?: string | null
           github_url?: string | null
           id?: string
-          ideal_mentee?: string | null
-          inclusive_tags?: string[] | null
-          institution?: string | null
-          invite_sent_at?: string | null
-          is_pending_mentor?: boolean | null
           is_public?: boolean | null
-          is_volunteer?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_name?: string | null
-          learning_goals?: string | null
           linkedin_url?: string | null
-          location?: string | null
-          mentee_status?: string | null
-          mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
           mentorship_topics?: string[] | null
-          origin_platform?: string | null
-          original_data?: Json | null
+          onboarding_flags?: Json | null
           phone?: string | null
           portfolio_url?: string | null
-          profile_visibility?: string | null
           search_vector?: unknown
-          show_in_community?: boolean | null
           slug?: string | null
           state?: string | null
           timezone?: string | null
-          total_reviews?: number | null
-          total_sessions?: number | null
-          twitter_url?: string | null
           updated_at?: string
-          verification_notes?: string | null
-          verification_status?: string | null
-          verified?: boolean
-          verified_at?: string | null
           website_url?: string | null
-          what_to_expect?: string | null
         }
         Relationships: []
       }
@@ -1535,6 +1783,7 @@ export type Database = {
           email_sent_at: string | null
           future_vision: string | null
           id: string
+          ip_address: string | null
           linkedin_url: string | null
           mentorship_experience: string
           name: string
@@ -1557,6 +1806,7 @@ export type Database = {
           email_sent_at?: string | null
           future_vision?: string | null
           id?: string
+          ip_address?: string | null
           linkedin_url?: string | null
           mentorship_experience: string
           name: string
@@ -1579,6 +1829,7 @@ export type Database = {
           email_sent_at?: string | null
           future_vision?: string | null
           id?: string
+          ip_address?: string | null
           linkedin_url?: string | null
           mentorship_experience?: string
           name?: string
@@ -1594,6 +1845,13 @@ export type Database = {
             columns: ["diagnostic_session_id"]
             isOneToOne: false
             referencedRelation: "diagnostic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_responses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
             referencedColumns: ["id"]
           },
         ]
@@ -1643,6 +1901,13 @@ export type Database = {
             foreignKeyName: "reengagement_invites_sent_by_fkey"
             columns: ["sent_by"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "reengagement_invites_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -1652,6 +1917,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reengagement_invites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
           },
           {
             foreignKeyName: "reengagement_invites_user_id_fkey"
@@ -1684,6 +1956,38 @@ export type Database = {
         }
         Relationships: []
       }
+      terms_acceptances: {
+        Row: {
+          accepted_at: string
+          id: string
+          terms_version: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          id?: string
+          terms_version: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          id?: string
+          terms_version?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terms_acceptances_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_favorites: {
         Row: {
           created_at: string | null
@@ -1708,6 +2012,13 @@ export type Database = {
             foreignKeyName: "user_favorites_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "user_favorites_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -1722,6 +2033,13 @@ export type Database = {
             foreignKeyName: "user_favorites_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "mentors_view"
             referencedColumns: ["id"]
           },
@@ -1730,6 +2048,53 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_reports: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          created_at: string
+          description: string
+          evidence_paths: string[] | null
+          id: string
+          reported_email: string | null
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          category: string
+          created_at?: string
+          description: string
+          evidence_paths?: string[] | null
+          id?: string
+          reported_email?: string | null
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          evidence_paths?: string[] | null
+          id?: string
+          reported_email?: string | null
+          reporter_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
             referencedColumns: ["id"]
           },
         ]
@@ -1760,6 +2125,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "roles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
           },
           {
             foreignKeyName: "user_roles_user_id_fkey"
@@ -1805,53 +2177,14 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: []
-      }
-      user_reports: {
-        Row: {
-          id: string
-          reporter_id: string
-          reported_email: string | null
-          category: string
-          description: string
-          evidence_paths: string[] | null
-          status: string
-          admin_notes: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          reporter_id: string
-          reported_email?: string | null
-          category: string
-          description: string
-          evidence_paths?: string[] | null
-          status?: string
-          admin_notes?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          reporter_id?: string
-          reported_email?: string | null
-          category?: string
-          description?: string
-          evidence_paths?: string[] | null
-          status?: string
-          admin_notes?: string | null
-          created_at?: string
-          updated_at?: string
-        }
         Relationships: [
           {
-            foreignKeyName: "user_reports_reporter_id_fkey"
-            columns: ["reporter_id"]
+            foreignKeyName: "validation_requests_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "vw_inactive_users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -1864,7 +2197,15 @@ export type Database = {
           month: string | null
           user_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "vw_inactive_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_usage_monthly: {
         Row: {
@@ -1884,10 +2225,18 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_stats: {
+        Row: {
+          average_rating: number | null
+          mentor_id: string | null
+          total_reviews: number | null
+          total_sessions: number | null
+        }
+        Relationships: []
+      }
       mentors_view: {
         Row: {
           academic_level: string | null
-          address: string | null
           availability: Json | null
           availability_status: string | null
           avatar_url: string | null
@@ -1899,12 +2248,8 @@ export type Database = {
           country: string | null
           course: string | null
           created_at: string | null
-          cv_url: string | null
-          email: string | null
-          expected_graduation: string | null
           experience_years: number | null
           expertise_areas: string[] | null
-          external_id: string | null
           first_name: string | null
           free_topics: string[] | null
           full_name: string | null
@@ -1923,135 +2268,33 @@ export type Database = {
           location: string | null
           mentor_skills: string[] | null
           mentorship_approach: string | null
-          mentorship_guidelines: string | null
           mentorship_topics: string[] | null
-          origin_platform: string | null
-          phone: string | null
           portfolio_url: string | null
-          show_in_community: boolean | null
           slug: string | null
           state: string | null
           timezone: string | null
           total_reviews: number | null
           total_sessions: number | null
-          twitter_url: string | null
           updated_at: string | null
           verification_status: string | null
           verified: boolean | null
           website_url: string | null
           what_to_expect: string | null
         }
+        Relationships: []
+      }
+      vw_inactive_users: {
+        Row: {
+          id: string | null
+          last_activity_at: string | null
+        }
         Insert: {
-          academic_level?: string | null
-          address?: string | null
-          availability?: never
-          availability_status?: string | null
-          avatar_url?: string | null
-          average_rating?: number | null
-          bio?: string | null
-          chat_enabled?: boolean | null
-          city?: string | null
-          company?: string | null
-          country?: string | null
-          course?: string | null
-          created_at?: string | null
-          cv_url?: string | null
-          email?: string | null
-          expected_graduation?: string | null
-          experience_years?: number | null
-          expertise_areas?: string[] | null
-          external_id?: string | null
-          first_name?: string | null
-          free_topics?: string[] | null
-          full_name?: string | null
-          github_url?: string | null
           id?: string | null
-          ideal_mentee?: string | null
-          inclusive_tags?: string[] | null
-          institution?: string | null
-          is_pending_mentor?: boolean | null
-          is_public?: boolean | null
-          is_volunteer?: boolean | null
-          job_title?: string | null
-          languages?: string[] | null
-          last_name?: string | null
-          linkedin_url?: string | null
-          location?: never
-          mentor_skills?: never
-          mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
-          mentorship_topics?: string[] | null
-          origin_platform?: string | null
-          phone?: string | null
-          portfolio_url?: string | null
-          show_in_community?: boolean | null
-          slug?: string | null
-          state?: string | null
-          timezone?: string | null
-          total_reviews?: number | null
-          total_sessions?: number | null
-          twitter_url?: string | null
-          updated_at?: string | null
-          verification_status?: string | null
-          verified?: boolean | null
-          website_url?: string | null
-          what_to_expect?: string | null
+          last_activity_at?: never
         }
         Update: {
-          academic_level?: string | null
-          address?: string | null
-          availability?: never
-          availability_status?: string | null
-          avatar_url?: string | null
-          average_rating?: number | null
-          bio?: string | null
-          chat_enabled?: boolean | null
-          city?: string | null
-          company?: string | null
-          country?: string | null
-          course?: string | null
-          created_at?: string | null
-          cv_url?: string | null
-          email?: string | null
-          expected_graduation?: string | null
-          experience_years?: number | null
-          expertise_areas?: string[] | null
-          external_id?: string | null
-          first_name?: string | null
-          free_topics?: string[] | null
-          full_name?: string | null
-          github_url?: string | null
           id?: string | null
-          ideal_mentee?: string | null
-          inclusive_tags?: string[] | null
-          institution?: string | null
-          is_pending_mentor?: boolean | null
-          is_public?: boolean | null
-          is_volunteer?: boolean | null
-          job_title?: string | null
-          languages?: string[] | null
-          last_name?: string | null
-          linkedin_url?: string | null
-          location?: never
-          mentor_skills?: never
-          mentorship_approach?: string | null
-          mentorship_guidelines?: string | null
-          mentorship_topics?: string[] | null
-          origin_platform?: string | null
-          phone?: string | null
-          portfolio_url?: string | null
-          show_in_community?: boolean | null
-          slug?: string | null
-          state?: string | null
-          timezone?: string | null
-          total_reviews?: number | null
-          total_sessions?: number | null
-          twitter_url?: string | null
-          updated_at?: string | null
-          verification_status?: string | null
-          verified?: boolean | null
-          website_url?: string | null
-          what_to_expect?: string | null
+          last_activity_at?: never
         }
         Relationships: []
       }
@@ -2068,7 +2311,7 @@ export type Database = {
       }
       ai_user_roles: { Args: { p_user_id: string }; Returns: string[] }
       assign_user_role: {
-        Args: { role_name: string; user_id: string }
+        Args: { p_role_name: string; p_user_id: string }
         Returns: boolean
       }
       check_user_role: { Args: { target_role: string }; Returns: boolean }
@@ -2086,6 +2329,7 @@ export type Database = {
           share_knowledge: string
         }[]
       }
+      clean_person_name: { Args: { value: string }; Returns: string }
       consume_ai_quota: {
         Args: { p_feature: string }
         Returns: {
@@ -2096,6 +2340,7 @@ export type Database = {
           used: number
         }[]
       }
+      current_user_is_mentor_or_admin: { Args: never; Returns: boolean }
       generate_secure_token: { Args: { length?: number }; Returns: string }
       generate_unique_slug: { Args: { base_name: string }; Returns: string }
       get_ai_quota: {
@@ -2132,8 +2377,31 @@ export type Database = {
           processed_at: string
         }[]
       }
-      get_user_role: { Args: { user_id: string }; Returns: string }
+      get_shared_diagnostics_for_mentor: {
+        Args: { p_share_id?: string }
+        Returns: {
+          analysis: Json
+          career_moment: string
+          created_at: string
+          current_challenge: string
+          development_areas: string[]
+          diagnostic_session_id: string
+          future_vision: string
+          mentee_avatar_url: string
+          mentee_full_name: string
+          mentee_id: string
+          personal_life_help: string
+          quiz_response_id: string
+          scope: string
+          share_id: string
+        }[]
+      }
+      get_user_role: { Args: { p_user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      is_admin_of_orgs_member: {
+        Args: { p_profile_id: string }
+        Returns: boolean
+      }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
       org_members_quiz_done: {
         Args: { p_org: string }
@@ -2141,6 +2409,23 @@ export type Database = {
           email: string
         }[]
       }
+      owns_diagnostic_session: { Args: { p_id: string }; Returns: boolean }
+      owns_quiz_response: { Args: { p_id: string }; Returns: boolean }
+      profile_cv_url: { Args: { p_user_id: string }; Returns: string }
+      profile_is_mentor: { Args: { p_profile_id: string }; Returns: boolean }
+      profile_names_from_metadata: {
+        Args: { meta: Json }
+        Returns: {
+          first_name: string
+          last_name: string
+        }[]
+      }
+      quiz_submission_status:
+        | { Args: { p_email: string }; Returns: string }
+        | {
+            Args: { p_email: string; p_ip?: string; p_is_auth?: boolean }
+            Returns: string
+          }
       record_ai_usage: {
         Args: {
           p_cached_input_tokens?: number
@@ -2157,6 +2442,7 @@ export type Database = {
         }
         Returns: string
       }
+      request_mentor_verification: { Args: never; Returns: undefined }
       save_google_calendar_tokens: {
         Args: {
           p_access_token: string
@@ -2176,41 +2462,11 @@ export type Database = {
         }
         Returns: undefined
       }
-      quiz_submission_status: {
-        Args: {
-          p_email: string
-          p_ip?: string | null
-          p_is_auth?: boolean
-        }
-        Returns: string
-      }
-      get_shared_diagnostics_for_mentor: {
-        Args: { p_share_id?: string | null }
-        Returns: {
-          share_id: string
-          quiz_response_id: string | null
-          diagnostic_session_id: string | null
-          scope: string
-          created_at: string
-          mentee_id: string
-          mentee_full_name: string | null
-          mentee_avatar_url: string | null
-          analysis: Json | null
-          development_areas: string[] | null
-          current_challenge: string | null
-          future_vision: string | null
-          career_moment: string | null
-          personal_life_help: string | null
-        }[]
-      }
-      owns_quiz_response: {
-        Args: { p_id: string }
+      shares_mentorship_with: {
+        Args: { p_profile_id: string }
         Returns: boolean
       }
-      owns_diagnostic_session: {
-        Args: { p_id: string }
-        Returns: boolean
-      }
+      withdraw_mentor_verification: { Args: never; Returns: undefined }
     }
     Enums: {
       hub_resource_status: "pending" | "published" | "rejected" | "archived"

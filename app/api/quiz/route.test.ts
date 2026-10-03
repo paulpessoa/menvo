@@ -186,7 +186,11 @@ describe('POST /api/quiz', () => {
 
     const insertedRow = (supabase.from('quiz_responses').insert as jest.Mock).mock.calls[0][0]
     expect(insertedRow.email).toBe('real@account.com')
-    expect(supabase.rpc).toHaveBeenCalledWith('quiz_submission_status', { p_email: 'real@account.com' })
+    expect(supabase.rpc).toHaveBeenCalledWith('quiz_submission_status', {
+      p_email: 'real@account.com',
+      p_ip: '127.0.0.1',
+      p_is_auth: true
+    })
   })
 
   it('returns 429 without inserting when the e-mail already used its analyses', async () => {

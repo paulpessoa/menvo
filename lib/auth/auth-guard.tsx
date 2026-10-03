@@ -97,13 +97,15 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
 export function RequireRole({
     children,
-    roles
+    roles,
+    fallback
 }: {
     children: React.ReactNode
     roles: ('mentor' | 'mentee' | 'admin')[]
+    fallback?: React.ReactNode
 }) {
     return (
-        <AuthGuard requireRole allowedRoles={roles}>
+        <AuthGuard requireRole allowedRoles={roles} fallback={fallback}>
             {children}
         </AuthGuard>
     )

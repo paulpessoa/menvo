@@ -24,7 +24,7 @@ alter table public.data_deletion_log add constraint data_deletion_log_source_che
   check (source in ('invite_token', 'self_service', 'admin', 'retention_policy', 'inactivity_policy'));
 
 -- Create a view to safely expose inactive users to the service role
-create or replace view public.vw_inactive_users as
+create or replace view public.vw_inactive_users with (security_invoker = on) as
 select id, coalesce(last_sign_in_at, created_at) as last_activity_at
 from auth.users
 where coalesce(last_sign_in_at, created_at) < now() - interval '1 year';

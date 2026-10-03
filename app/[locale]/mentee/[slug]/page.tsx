@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import { createClient } from '@/lib/utils/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import MenteeProfileClient from './MenteeProfileClient'
+import { MENTEE_PROFILE_EMBED, withMenteeFields } from '@/lib/services/mentees/mentee-profile-fields'
+import { cvLink } from '@/lib/services/mentees/cv-storage'
 
 interface PageProps {
     params: Promise<{
@@ -33,6 +35,7 @@ interface MenteeProfile {
     cv_url?: string
     languages?: string[]
     is_public: boolean
+    has_cv: boolean
     created_at: string
 }
 
@@ -42,7 +45,7 @@ interface MenteeProfile {
  * and whatever is selected ends up serialized into the client payload.
  */
 const MENTEE_PUBLIC_COLUMNS =
-    'id, first_name, last_name, avatar_url, city, state, country, bio, job_title, company, institution, course, academic_level, expected_graduation, learning_goals, expertise_areas, mentorship_topics, linkedin_url, github_url, portfolio_url, cv_url, languages, is_public, created_at'
+    `id, first_name, last_name, avatar_url, city, state, country, bio, job_title, company, expertise_areas, mentorship_topics, linkedin_url, github_url, portfolio_url, languages, is_public, created_at, ${MENTEE_PROFILE_EMBED}` as const
 
 /**
  * Fetches a mentee profile with is_public = true. RLS ("Public profiles
@@ -62,7 +65,33 @@ async function getPublicMenteeProfile(slug: string): Promise<MenteeProfile | nul
         return null
     }
 
-    return data as unknown as MenteeProfile
+    // cv_url não é legível por coluna: só o próprio, admin ou mentor com
+    // mentoria em comum recebem o currículo (função profile_cv_url). Só
+    // depois dessa autorização o servidor assina a URL do bucket privado.
+    const { data: cvUrl } = await supabase.rpc('profile_cv_url', { p_user_id: data.id })
+
+    // Para saber se o usuário tem currículo (mesmo sem permissão para ler a URL)
+    let has_cv = false
+    if (cvUrl) {
+        has_cv = true
+    } else {
+        const { createAdminClient } = await import('@/lib/utils/supabase/admin')
+        const adminSupabase = createAdminClient()
+        const { data: adminData } = await adminSupabase
+            .from('mentee_profiles')
+            .select('cv_url')
+            .eq('user_id', data.id)
+            .maybeSingle()
+        if (adminData?.cv_url) {
+            has_cv = true
+        }
+    }
+
+    return { 
+        ...withMenteeFields(data), 
+        cv_url: cvLink(data.id, cvUrl),
+        has_cv 
+    } as unknown as MenteeProfile
 }
 
 // ISR: Revalidar a cada 1 hora (mesmo padrão de app/[locale]/mentors/[slug])

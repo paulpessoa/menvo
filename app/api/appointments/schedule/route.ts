@@ -11,6 +11,7 @@ import {
   mentorshipReasonSchema
 } from "@/lib/schemas/appointment"
 import { randomUUID } from "crypto"
+import { withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 
 export async function POST(request: NextRequest) {
   try {
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
     // 2. Verificar se o mentor existe, está verificado e buscar email para notificação
     const { data: mentor, error: mentorError } = await (supabase
       .from("profiles")
-      .select("id, verified, verification_status, full_name, email")
+      .select("id, full_name, email, mentor_profiles(verification_status)")
       .eq("id", resolvedMentorId)
       .single() as any)
 
@@ -99,7 +100,8 @@ export async function POST(request: NextRequest) {
       return errorResponse("Mentor not found", "NOT_FOUND", 404)
     }
 
-    const isMentorVerified = mentor.verified === true || mentor.verification_status === "approved"
+    // Verificação mora em mentor_profiles (única fonte).
+    const isMentorVerified = withMentorFields(mentor).verified
     if (!isMentorVerified) {
       return errorResponse("Mentor is not verified", "FORBIDDEN", 403)
     }
@@ -148,7 +150,12 @@ export async function POST(request: NextRequest) {
         token_expires_at: tokenExpiresAt,
       } as any)
       .select(`
-        *,
+        id,
+        mentor_id,
+        mentee_id,
+        scheduled_at,
+        duration_minutes,
+        status,
         mentor:profiles!mentor_id(full_name, avatar_url),
         mentee:profiles!mentee_id(full_name, avatar_url)
       `)

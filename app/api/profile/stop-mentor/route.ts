@@ -69,20 +69,21 @@ export async function POST(request: NextRequest) {
         }
     }
 
-    // 3. Resetar flags no perfil
-    const { data, error } = await (supabase
-      .from("profiles") as any)
-      .update({ 
-          is_pending_mentor: false,
-          verified: false,
-          is_public: false,
-          verification_status: null
-      })
+    // 3. Tirar a verificação (só pela RPC: o usuário não tem grant no status)
+    // e esconder o perfil. Os textos de mentor ficam, caso volte a mentorar.
+    const { error: withdrawError } = await supabase.rpc("withdraw_mentor_verification")
+    if (withdrawError) throw withdrawError
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .update({ is_public: false })
       .eq("id", user.id)
-      .select()
+      .select("id, is_public")
       .single()
 
     if (error) throw error
+
+    const data = { ...profile, verified: false }
 
     return successResponse(data, "Você não é mais um mentor")
   } catch (error) {

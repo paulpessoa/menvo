@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef } from "react"
+import Link from "next/link"
 import { Eye, FileText, GraduationCap, Target } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -8,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useSimplePDFUpload } from "@/hooks/useSimpleUpload"
-import { ChipInput } from "./ChipInput"
+import { MultiSelectAutocomplete } from "./MultiSelectAutocomplete"
 import { Field } from "./ProfileAboutSection"
 import type { ProfileFormData, ProfileFormPatch } from "./profile-form"
 
@@ -37,16 +38,34 @@ export function ProfileCareerSection({ form, onChange, isMentor }: ProfileCareer
     }
   }
 
+  const COMMON_EXPERTISE = [
+    "Liderança", "Gestão de Projetos", "UX Design", "UI Design", 
+    "Product Management", "Engenharia de Software", "Marketing Digital",
+    "Vendas", "Customer Success", "Análise de Dados", "Inteligência Artificial",
+    "Agile", "Scrum", "Negociação", "Empreendedorismo", "Carreira em Tech",
+    "Transição de Carreira", "Primeiro Emprego"
+  ]
+
   const expertise = (
     <div className="space-y-2" key="expertise">
       <Label>{isMentor ? "Especialidades (onde você pode ajudar)" : "O que você já domina"}</Label>
-      <ChipInput value={form.expertise_areas} onChange={(v) => onChange({ expertise_areas: v })} placeholder="Ex: UX Design, React, Vendas... (Enter para adicionar)" />
+      <MultiSelectAutocomplete 
+        value={form.expertise_areas} 
+        onChange={(v) => onChange({ expertise_areas: v })} 
+        placeholder="Ex: UX Design, React, Vendas..." 
+        options={COMMON_EXPERTISE}
+      />
     </div>
   )
   const topics = (
     <div className="space-y-2" key="topics">
       <Label>{isMentor ? "Temas de mentoria" : "O que você quer aprender"}</Label>
-      <ChipInput value={form.mentorship_topics} onChange={(v) => onChange({ mentorship_topics: v })} placeholder="Ex: Primeiro emprego, Liderança... (Enter para adicionar)" />
+      <MultiSelectAutocomplete 
+        value={form.mentorship_topics} 
+        onChange={(v) => onChange({ mentorship_topics: v })} 
+        placeholder="Ex: Primeiro emprego, Liderança..." 
+        options={COMMON_EXPERTISE}
+      />
     </div>
   )
 
@@ -67,6 +86,9 @@ export function ProfileCareerSection({ form, onChange, isMentor }: ProfileCareer
             <div className="space-y-1">
               <Label>Objetivos com a mentoria</Label>
               <Textarea value={form.learning_goals} onChange={(e) => onChange({ learning_goals: e.target.value })} placeholder="O que você busca alcançar?" />
+              <p className="text-xs text-muted-foreground pt-1">
+                Ainda não sabe o que busca? <Link href="/assistant?mode=diagnostic" className="text-primary hover:underline font-medium">Faça seu diagnóstico de carreira e receba sugestões</Link>.
+              </p>
             </div>
           )}
         </div>

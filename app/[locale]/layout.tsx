@@ -4,11 +4,7 @@ import "./globals.css"
 import { Providers } from "./providers"
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
-import dynamic from "next/dynamic"
-
-const Footer = dynamic(() => import("@/components/footer"), {
-  ssr: true,
-})
+import Footer from "@/components/footer"
 import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { notFound } from "next/navigation"
@@ -156,7 +152,7 @@ export default async function RootLayout({
               <div className="contents print:hidden">
                 <Header />
               </div>
-              <main id="main-content" className="flex-1">
+              <main id="main-content" className="flex-1 bg-canvas">
                 <MaintenanceGuard>
                   {children}
                 </MaintenanceGuard>

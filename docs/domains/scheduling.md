@@ -63,8 +63,14 @@ Um slot projetado só é exibido como disponível para o mentorado se passar por
 3. **Ciclo Virtuoso de Feedback (Avaliações Pendentes):**
    - Se o mentorado tiver alguma mentoria passada que ainda não foi avaliada, o sistema bloqueia novos agendamentos e solicita a avaliação da sessão anterior.
 
-> **Não existe** filtro de conflito com o Google Calendar de cada mentor - os
-> mentores não conectam agenda própria. O Google Meet de toda sessão é criado
+4. **Google Calendar do mentor (opcional, flag `google_calendar_sync_flag`):**
+   - Se o mentor conectou a própria agenda em `/mentor/availability`, `computeAvailableSlots` consulta `calendar.freebusy.query` **só na agenda dele** (tokens em `google_calendar_tokens`, escopo `calendar.freebusy`) e esconde os slots que colidem.
+   - **Só consulta, só remove:** nunca grava na agenda do mentor nem adiciona horários. Título e detalhes dos eventos não são lidos.
+   - **Só eventos "Ocupado" bloqueiam.** Eventos marcados "Livre" (`transparency: transparent`, o padrão de eventos de dia inteiro) não aparecem no freebusy. Isso é do Google, não do código.
+   - **Falha silenciosa por desenho:** sem conexão, token expirado ou erro do Google, o filtro é ignorado e todos os slots cadastrados aparecem (log `[AVAILABILITY] Google Calendar sync skipped`). `start_date` igual a `end_date` gera intervalo vazio e também cai nesse caso; a tela sempre manda 14 dias.
+   - Verificado em produção em 2026-10-02: evento "Ocupado" às 20:30 escondeu o slot; evento de dia inteiro "Livre" não bloqueou.
+
+> O filtro acima é **por mentor**, na agenda pessoal dele. Já o Google Meet de toda sessão é criado
 > numa **única conta pessoal do Paul** (MVP deliberado, `GOOGLE_CALENDAR_*`),
 > com mentor e mentorado como convidados - não é a agenda de ninguém mais.
 > Um `getCalendarBusyIntervals` que consultava `calendar.freebusy.query` nessa

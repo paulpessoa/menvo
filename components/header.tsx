@@ -22,13 +22,26 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const t = useTranslations()
   const isChatEnabled = useFeatureFlag("chat_flag")
+  const isAssistantEnabled = useFeatureFlag("ai_assistant_flag")
 
   const navigation = [
     { name: t("common.home"), href: "/" },
-    { name: t("common.findMentors"), href: "/mentors" },
+    { name: t("common.findMentors"), href: "/mentors" }
+  ]
+
+  if (isAuthenticated) {
+    if (role === "mentor" || isAdmin) {
+      navigation.push({ name: "Comunidade", href: "/community" })
+    }
+    if (isAssistantEnabled) {
+      navigation.push({ name: "Assistente", href: "/assistant" })
+    }
+  }
+
+  navigation.push(
     { name: t("common.aboutUs"), href: "/about" },
     { name: t("common.howItWorks"), href: "/how-it-works" }
-  ]
+  )
 
   const userNavigation: UserNavigationItem[] = []
 
@@ -45,13 +58,7 @@ export default function Header() {
       icon: User,
       color: "text-gray-700"
     })
-    userNavigation.push({
-      name: t("footer.reportAndSupport"),
-      href: "/support",
-      icon: Shield,
-      color: "text-gray-700"
-    })
-
+    // Link de suporte removido dos menus principais a pedido do usuário
     if (isAdmin) {
       userNavigation.push({ type: "separator" })
       userNavigation.push({
@@ -119,6 +126,7 @@ export default function Header() {
           {navigation.map((item) => (
             <Link
               key={item.name}
+              id={`tour-nav-${item.href.replace(/\//g, "") || "home"}`}
               href={item.href}
               className={`text-sm font-medium transition-colors hover:text-primary whitespace-nowrap ${
                 pathname === item.href
@@ -135,19 +143,7 @@ export default function Header() {
         <div className="w-3/4 lg:w-1/4 flex justify-end items-center gap-2">
           <LanguageSelector />
 
-          {isAuthenticated && role === "mentee" && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-9 w-9 text-muted-foreground hover:text-red-500 transition-colors"
-              asChild
-            >
-              <Link href="/dashboard/mentee">
-                <Heart className="h-5 w-5" />
-                <span className="sr-only">Favoritos</span>
-              </Link>
-            </Button>
-          )}
+          {/* Heart button was removed per user request */}
 
           {isChatEnabled && <MessagesBadge />}
           <NotificationBell />

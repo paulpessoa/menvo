@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, Circle, UserCheck } from "lucide-react"
+import { CheckCircle2, Circle, Trophy } from "lucide-react"
 import { Link } from "@/i18n/routing"
 
 interface ChecklistProfile {
@@ -11,23 +11,17 @@ interface ChecklistProfile {
   mentorship_topics?: string[] | null
 }
 
-interface MentorActivationChecklistProps {
-  profile: ChecklistProfile | null
+interface MentorStats {
+  completedSessions: number
+  totalReviews: number
 }
 
-/**
- * Shown on `/dashboard/mentor` right after approval, until the mentor has
- * done everything needed to actually be bookable. A mentor with the `mentor`
- * role but no availability or no topics filled in is invisible/un-bookable
- * on `/mentors` (see docs/domains/mentor-verification.md) and nothing today
- * tells them why - this card is that missing signal.
- *
- * No "connect Google Calendar" item on purpose: Meet links are created on a
- * single platform account (GOOGLE_CALENDAR_REFRESH_TOKEN) with the mentor as
- * attendee, so mentors never connect their own calendar - see
- * docs/product/how-it-works.md, C-T1b.
- */
-export function MentorActivationChecklist({ profile }: MentorActivationChecklistProps) {
+interface MentorActivationChecklistProps {
+  profile: ChecklistProfile | null
+  stats: MentorStats
+}
+
+export function MentorActivationChecklist({ profile, stats }: MentorActivationChecklistProps) {
   const [availabilityConfigured, setAvailabilityConfigured] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -50,51 +44,68 @@ export function MentorActivationChecklist({ profile }: MentorActivationChecklist
       (((profile.expertise_areas?.length ?? 0) > 0) || ((profile.mentorship_topics?.length ?? 0) > 0))
   )
 
-  // Still loading availability - don't flash a wrong state.
   if (availabilityConfigured === null) return null
 
   const items = [
     {
       done: availabilityConfigured,
       label: "Configure sua disponibilidade semanal",
-      href: "/dashboard/mentor/availability"
+      href: "/dashboard/mentor/availability",
     },
     {
       done: profileReady,
-      label: "Deixe seu perfil público com os temas que você mentora",
-      href: "/profile"
+      label: "Deixe seu perfil público e adicione seus temas",
+      href: "/profile",
+    },
+    {
+      done: stats.completedSessions > 0,
+      label: "Dê a sua primeira mentoria",
+      href: "/dashboard/mentor/availability",
+    },
+    {
+      done: stats.totalReviews > 0,
+      label: "Receba sua primeira avaliação",
+      href: "/dashboard/mentor",
+    },
+    {
+      done: false,
+      label: "Convide amigos para a Menvo (Em breve)",
+      href: "#",
+      disabled: true
     }
   ]
 
-  if (items.every((item) => item.done)) return null
-
   return (
-    <Card className="rounded-2xl border border-primary/20 bg-primary/[0.03] shadow-xs">
+    <Card id="tour-mentor-checklist" className="rounded-2xl border border-primary/20 bg-primary/[0.03] shadow-xs">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-bold flex items-center gap-2">
-          <UserCheck className="h-4 w-4 text-primary" /> Complete sua ativação
+          <Trophy className="h-4 w-4 text-primary" /> Jornada do Mentor
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          Falta isso para você aparecer no catálogo de mentores e começar a receber pedidos de sessão.
+          Complete os passos abaixo para ter um perfil campeão e aumentar suas chances de realizar mentorias.
         </p>
       </CardHeader>
       <CardContent className="space-y-1.5">
-        {items.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className={`flex items-center gap-2.5 p-2.5 rounded-xl transition-colors ${item.done ? "" : "hover:bg-primary/5"}`}
-          >
-            {item.done ? (
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-            ) : (
-              <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
-            )}
-            <span className={`text-xs font-medium ${item.done ? "text-muted-foreground line-through" : "text-foreground"}`}>
-              {item.label}
-            </span>
-          </Link>
-        ))}
+        {items.map((item, idx) => {
+          const isSoon = item.disabled
+          return (
+            <Link
+              key={idx}
+              href={item.disabled ? "#" : item.href}
+              className={`flex items-center gap-2.5 p-2.5 rounded-xl transition-colors ${item.done ? "" : isSoon ? "opacity-60 cursor-default" : "hover:bg-primary/5"}`}
+              onClick={(e) => isSoon && e.preventDefault()}
+            >
+              {item.done ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              ) : (
+                <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
+              )}
+              <span className={`text-xs font-medium ${item.done ? "text-muted-foreground line-through" : "text-foreground"}`}>
+                {item.label}
+              </span>
+            </Link>
+          )
+        })}
       </CardContent>
     </Card>
   )

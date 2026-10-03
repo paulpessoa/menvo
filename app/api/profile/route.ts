@@ -3,6 +3,17 @@ import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { updateProfileSchema } from "@/lib/schemas/profile"
 import { extractIdentity } from "@/lib/auth/oauth-identity"
+import {
+  MENTOR_PROFILE_EMBED,
+  splitMentorFields,
+  withMentorFields,
+} from "@/lib/services/mentors/mentor-profile-fields"
+import {
+  MENTEE_PROFILE_EMBED_WITH_CV,
+  splitMenteeFields,
+  withMenteeFields,
+} from "@/lib/services/mentees/mentee-profile-fields"
+import { cvLink } from "@/lib/services/mentees/cv-storage"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -11,12 +22,29 @@ if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error("Missing Supabase environment variables")
 }
 
+/**
+ * Perfil achatado para a resposta, com a URL assinada do currículo (bucket
+ * privado). O valor guardado é só o caminho do arquivo; quem pede aqui é o
+ * próprio dono.
+ */
+async function toProfileResponse<T extends { id: string }>(row: T) {
+  const profile = withMenteeFields(withMentorFields(row as T & { mentor_profiles?: unknown }))
+  return { ...profile, cv_url: cvLink(row.id, profile.cv_url) }
+}
+
 const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
   },
 })
+
+const PROFILE_COLUMNS =
+  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url, onboarding_flags" as const
+
+// Campos de mentor ficam em mentor_profiles; o embed os traz junto e
+// withMentorFields os devolve achatados, no mesmo formato de antes.
+const PROFILE_SELECT = `${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED_WITH_CV}` as const
 
 async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
@@ -51,17 +79,48 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
-    // Update profile in database
-    const updateData = {
-      ...parsed.data,
-      updated_at: new Date().toISOString(),
+    const { profile: nonMentorFields, mentor: mentorFields } = splitMentorFields(parsed.data)
+    const { profile: profileFields, mentee: menteeFields } = splitMenteeFields(nonMentorFields)
+
+    // Campos de mentor primeiro, para o select do perfil já voltar atualizado.
+    // update (não upsert): só mentor ou candidato tem linha (criada pela RPC
+    // request_mentor_verification). O formulário manda esses campos também
+    // para mentorados, e eles não devem ganhar linha vazia.
+    if (Object.keys(mentorFields).length > 0) {
+      const { error: mentorError } = await supabaseAdmin
+        .from("mentor_profiles")
+        .update(mentorFields)
+        .eq("user_id", user.id)
+
+      if (mentorError) {
+        console.error("❌ Mentor profile update error:", mentorError)
+        return NextResponse.json({
+          error: "Erro ao atualizar perfil",
+          details: mentorError.message
+        }, { status: 500 })
+      }
     }
 
-    const { data: updatedProfile, error: updateError } = await supabaseAdmin
+    // Acadêmico e currículo: upsert, porque quem nunca preencheu não tem linha.
+    if (Object.keys(menteeFields).length > 0) {
+      const { error: menteeError } = await supabaseAdmin
+        .from("mentee_profiles")
+        .upsert({ user_id: user.id, ...menteeFields }, { onConflict: "user_id" })
+
+      if (menteeError) {
+        console.error("❌ Mentee profile update error:", menteeError)
+        return NextResponse.json({
+          error: "Erro ao atualizar perfil",
+          details: menteeError.message
+        }, { status: 500 })
+      }
+    }
+
+    const { data: updatedRow, error: updateError } = await supabaseAdmin
       .from("profiles")
-      .update(updateData)
+      .update({ ...profileFields, updated_at: new Date().toISOString() })
       .eq("id", user.id)
-      .select()
+      .select(PROFILE_SELECT)
       .single()
 
     if (updateError) {
@@ -77,7 +136,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
-      profile: updatedProfile,
+      profile: updatedRow ? await toProfileResponse(updatedRow) : null,
     })
 
   } catch (error) {
@@ -104,7 +163,7 @@ export async function GET(request: NextRequest) {
     // Fetch profile from database
     const { data: profile, error: fetchError } = await supabaseAdmin
       .from("profiles")
-      .select("*")
+      .select(PROFILE_SELECT)
       .eq("id", user.id)
       .single()
 
@@ -119,13 +178,12 @@ export async function GET(request: NextRequest) {
           email: user.email || "",
           first_name: identity.firstName,
           last_name: identity.lastName,
-          verified: false,
         }
 
         const { data: newProfile, error: createError } = await supabaseAdmin
           .from("profiles")
           .insert(profileData)
-          .select()
+          .select(PROFILE_SELECT)
           .single()
 
         if (createError) {
@@ -136,7 +194,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-          profile: newProfile,
+          profile: newProfile ? await toProfileResponse(newProfile) : null,
         })
       } else {
         return NextResponse.json({ 
@@ -147,7 +205,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      profile: profile,
+      profile: await toProfileResponse(profile),
     })
 
   } catch (error) {

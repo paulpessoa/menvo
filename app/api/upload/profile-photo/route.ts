@@ -153,8 +153,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: "Foto enviada com sucesso",
       url: publicUrl,
-      path: uploadData.path,
-      profile: profileData,
     })
   } catch (error) {
     console.error("❌ Unexpected upload error:", error)

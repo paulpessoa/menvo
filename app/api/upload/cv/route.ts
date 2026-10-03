@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { CV_BUCKET, cvStoragePath, cvLink } from "@/lib/services/mentees/cv-storage"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -75,19 +76,16 @@ export async function POST(request: NextRequest) {
 
     // Check if user already has a CV and remove it
     const { data: existingProfile } = await supabaseAdmin
-      .from("profiles")
+      .from("mentee_profiles")
       .select("cv_url")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .single()
 
-    if (existingProfile?.cv_url) {
-      // Extract file path from URL
-      const urlParts = existingProfile.cv_url.split('/');
-      const existingFileName = urlParts[urlParts.length - 1];
-      const existingFilePath = `${user.id}/${existingFileName}`;
-      
+    // cvStoragePath só devolve arquivo do próprio usuário.
+    const existingFilePath = cvStoragePath(existingProfile?.cv_url, user.id)
+    if (existingFilePath) {
       const { error: deleteError } = await supabaseAdmin.storage
-        .from("cvs")
+        .from(CV_BUCKET)
         .remove([existingFilePath])
       
       if (deleteError) {
@@ -113,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
-      .from("cvs")
+      .from(CV_BUCKET)
       .upload(filePath, fileBuffer, {
         contentType: file.type,
         upsert: true,
@@ -128,39 +126,27 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // Get public URL
-    const { data: urlData } = supabaseAdmin.storage
-      .from("cvs")
-      .getPublicUrl(filePath)
-
-    const publicUrl = urlData.publicUrl
-
-    // Update user profile with new CV URL
-    const { data: profileData, error: updateError } = await supabaseAdmin
-      .from("profiles")
-      .update({
-        cv_url: publicUrl,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id)
-      .select()
+    // Bucket privado: guarda só o caminho; quem vê recebe URL assinada.
+    const { error: updateError } = await supabaseAdmin
+      .from("mentee_profiles")
+      .upsert({ user_id: user.id, cv_url: filePath }, { onConflict: "user_id" })
 
     if (updateError) {
       console.error("❌ Profile update error:", updateError)
       return NextResponse.json({ 
         error: "Upload realizado, mas falha ao atualizar perfil",
-        details: updateError.message,
-        url: publicUrl 
+        details: updateError.message
       }, { status: 500 })
     }
 
+    const cvUrl = cvLink(user.id, filePath)
+
     return NextResponse.json({
       message: "CV enviado com sucesso",
-      url: publicUrl,
+      url: cvUrl,
       path: uploadData.path,
       fileName: file.name,
       fileSize: file.size,
-      profile: profileData,
     })
 
   } catch (error) {
@@ -197,25 +183,21 @@ export async function DELETE(request: NextRequest) {
 
     // Get current CV URL
     const { data: profile } = await supabaseAdmin
-      .from("profiles")
+      .from("mentee_profiles")
       .select("cv_url")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .single()
 
-    if (!profile?.cv_url) {
+    const filePath = cvStoragePath(profile?.cv_url, user.id)
+    if (!filePath) {
       return NextResponse.json({ 
         error: "Nenhum CV encontrado" 
       }, { status: 404 })
     }
 
-    // Extract file path from URL
-    const urlParts = profile.cv_url.split('/');
-    const fileName = urlParts[urlParts.length - 1];
-    const filePath = `${user.id}/${fileName}`;
-
     // Delete from storage
     const { error: deleteError } = await supabaseAdmin.storage
-      .from("cvs")
+      .from(CV_BUCKET)
       .remove([filePath])
 
     if (deleteError) {
@@ -228,12 +210,9 @@ export async function DELETE(request: NextRequest) {
 
     // Update profile to remove CV URL
     const { error: updateError } = await supabaseAdmin
-      .from("profiles")
-      .update({
-        cv_url: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id)
+      .from("mentee_profiles")
+      .update({ cv_url: null })
+      .eq("user_id", user.id)
 
     if (updateError) {
       console.error("❌ Profile update error:", updateError)

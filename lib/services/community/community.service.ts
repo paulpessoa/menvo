@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/lib/types/supabase"
 import { createClient } from "@/lib/utils/supabase/client"
+import { MENTEE_PROFILE_EMBED, withMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
 
 export interface CommunityProfile {
   id: string
@@ -43,9 +44,43 @@ export interface GetCommunityProfilesResult {
 /**
  * Only non-sensitive columns. Never add email, phone, age, address or
  * original_data here: this list is what mentors receive about a mentee.
+ * Learning goals come from the mentee_profiles embed. The résumé is not
+ * listed: it is only readable by the mentee, admins and mentors who share a
+ * mentorship (profile_cv_url), so `cv_url` is always null on the wall.
  */
 const COMMUNITY_COLUMNS =
-  "id, full_name, avatar_url, bio, job_title, company, linkedin_url, github_url, cv_url, languages, expertise_areas, mentorship_topics, learning_goals, slug"
+  `id, full_name, avatar_url, bio, job_title, company, linkedin_url, github_url, languages, expertise_areas, mentorship_topics, slug, ${MENTEE_PROFILE_EMBED}` as const
+
+type CommunityRow = Omit<RawProfileRow, "learning_goals" | "cv_url"> & { mentee_profiles?: unknown }
+
+/** Flattens the mentee_profiles embed into the shape the wall already uses. */
+function toCommunityProfile(row: CommunityRow): CommunityProfile {
+  const { learning_goals, cv_url, ...rest } = withMenteeFields(row)
+  return { ...rest, learning_goals, cv_url, role: "mentee" }
+}
+
+/**
+ * Ids of mentees whose `column` matches `term`. PostgREST cannot OR a column
+ * of the embedded table with columns of `profiles`, so the match runs on
+ * mentee_profiles and the ids are fed back into the profiles `or()`.
+ */
+async function menteeIdsMatching(
+  supabase: SupabaseClient<Database>,
+  column: "institution" | "learning_goals",
+  term: string
+): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("mentee_profiles")
+    .select("user_id")
+    .ilike(column, `%${term}%`)
+    .limit(1000)
+
+  if (error) {
+    console.warn("[CommunityService] Warning matching mentee_profiles:", error.message)
+    return []
+  }
+  return (data ?? []).map((r) => r.user_id)
+}
 
 /** Strips characters that would break out of a PostgREST `or()` filter. */
 function sanitizeSearchTerm(term: string): string {
@@ -111,15 +146,20 @@ export const communityService = {
     
     // Organization filter (search in company or institution)
     if (organization && organization !== "all") {
-      query = query.or(`company.ilike.%${organization}%,institution.ilike.%${organization}%`)
+      const org = sanitizeSearchTerm(organization)
+      const institutionIds = await menteeIdsMatching(supabase, "institution", org)
+      const clauses = [`company.ilike.%${org}%`]
+      if (institutionIds.length > 0) clauses.push(`id.in.(${institutionIds.join(",")})`)
+      query = query.or(clauses.join(","))
     }
 
     // Search filter
     const term = sanitizeSearchTerm(search)
     if (term) {
-      query = query.or(
-        `full_name.ilike.%${term}%,bio.ilike.%${term}%,job_title.ilike.%${term}%,learning_goals.ilike.%${term}%`
-      )
+      const goalIds = await menteeIdsMatching(supabase, "learning_goals", term)
+      const clauses = [`full_name.ilike.%${term}%`, `bio.ilike.%${term}%`, `job_title.ilike.%${term}%`]
+      if (goalIds.length > 0) clauses.push(`id.in.(${goalIds.join(",")})`)
+      query = query.or(clauses.join(","))
     }
 
     // Sort
@@ -142,10 +182,7 @@ export const communityService = {
       throw error
     }
 
-    const profiles: CommunityProfile[] = ((data as RawProfileRow[]) || []).map((p) => ({
-      ...p,
-      role: "mentee",
-    }))
+    const profiles: CommunityProfile[] = ((data as CommunityRow[]) || []).map(toCommunityProfile)
 
     const totalCount = count || 0
     const hasMore = totalCount > from + profiles.length
@@ -177,10 +214,7 @@ export const communityService = {
       return []
     }
 
-    return ((data as RawProfileRow[]) || []).map((p) => ({
-      ...p,
-      role: "mentee",
-    }))
+    return ((data as CommunityRow[]) || []).map(toCommunityProfile)
   },
 
   /**
@@ -194,7 +228,7 @@ export const communityService = {
   }> {
     const { data, error } = await supabase
       .from("profiles")
-      .select("company, institution, mentorship_topics")
+      .select("company, mentorship_topics, mentee_profiles(institution)")
       .eq("community_ready", true)
 
     if (error) {
@@ -207,7 +241,8 @@ export const communityService = {
 
     ;(data || []).forEach((profile: any) => {
       if (profile.company) orgs.add(profile.company)
-      if (profile.institution) orgs.add(profile.institution)
+      const institution = (Array.isArray(profile.mentee_profiles) ? profile.mentee_profiles[0] : profile.mentee_profiles)?.institution
+      if (institution) orgs.add(institution)
       
       if (profile.mentorship_topics && Array.isArray(profile.mentorship_topics)) {
         profile.mentorship_topics.forEach((t: string) => topics.add(t))

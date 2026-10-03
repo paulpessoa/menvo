@@ -13,8 +13,8 @@
 ## 1. Objetivo
 
 Paul importou para `profiles` a base histórica do formulário do **Estágio Recife**
-no JotForm (`profiles.origin_platform = 'jotform'`, respostas originais em
-`profiles.original_data`). Essas pessoas nunca pediram uma conta na Menvo. Então
+no JotForm (`import_records.origin_platform = 'jotform'`, respostas originais em
+`import_records.original_data`). Essas pessoas nunca pediram uma conta na Menvo. Então
 precisamos:
 
 1. **Avisar e convidar:** explicar que a Menvo é uma extensão do Estágio
@@ -35,7 +35,7 @@ precisamos:
 | Seleção em massa + botão "convidar" | `app/[locale]/dashboard/admin/users/page.tsx` (`handleBulkInvite`, ~L170) | Vai abrir o novo modal em vez de chamar o endpoint antigo |
 | Endpoint antigo | `app/api/admin/users/invite-batch/route.ts` | Usa `resetPasswordForEmail`, que manda o e-mail **padrão do Supabase** com link de poucas horas. **Substituir** pelo novo fluxo e apagar |
 | Filtro de origem JotForm | `app/api/admin/users/route.ts` (`origin=jotform`) | Mesma lógica usada para montar o público |
-| Coluna `profiles.invite_sent_at` | já existe | Continuar preenchendo (o admin já usa) |
+| Coluna `import_records.invite_sent_at` | movida de `profiles` na Fase 1 | Continuar preenchendo (upsert em `/api/admin/invites/send`) |
 | Padrão de link mágico + template próprio | `app/api/admin/waiting-list/create-account/route.ts` | `generateLink({type:'recovery'})` → `/update-password`. **Leia o comentário do topo**: explica por que redirecionar direto para `/update-password` e não para `/auth/callback` |
 | Layout de e-mail + `escapeHtml` + `sendEmail` | `lib/email/brevo.ts` | Novo template entra aqui, com `signatureType: 'personal'` |
 | Preview/teste de templates | `getEmailTemplatePreviewHtml`, `app/api/admin/emails/preview`, `send-test` | Registrar o novo template como `reengagement_invite` |

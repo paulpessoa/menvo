@@ -33,20 +33,20 @@ create index if not exists idx_diagnostic_sessions_expires_at
 
 create policy "Users read own diagnostic sessions"
   on public.diagnostic_sessions for select to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users insert own diagnostic sessions"
   on public.diagnostic_sessions for insert to authenticated
-  with check (user_id = auth.uid());
+  with check (user_id = (select auth.uid()));
 
 create policy "Users update own diagnostic sessions"
   on public.diagnostic_sessions for update to authenticated
-  using (user_id = auth.uid() or public.is_admin())
-  with check (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin())
+  with check (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users delete own diagnostic sessions"
   on public.diagnostic_sessions for delete to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 revoke all on public.diagnostic_sessions from anon;
 grant select, insert, update, delete on public.diagnostic_sessions to authenticated;
@@ -75,20 +75,20 @@ create index if not exists idx_ai_threads_user_updated
 
 create policy "Users read own ai threads"
   on public.ai_threads for select to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users insert own ai threads"
   on public.ai_threads for insert to authenticated
-  with check (user_id = auth.uid());
+  with check (user_id = (select auth.uid()));
 
 create policy "Users update own ai threads"
   on public.ai_threads for update to authenticated
-  using (user_id = auth.uid() or public.is_admin())
-  with check (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin())
+  with check (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users delete own ai threads"
   on public.ai_threads for delete to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 revoke all on public.ai_threads from anon;
 grant select, insert, update, delete on public.ai_threads to authenticated;
@@ -116,20 +116,20 @@ create index if not exists idx_ai_messages_user_created
 
 create policy "Users read own ai messages"
   on public.ai_messages for select to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users insert own ai messages"
   on public.ai_messages for insert to authenticated
-  with check (user_id = auth.uid());
+  with check (user_id = (select auth.uid()));
 
 create policy "Users update own ai messages"
   on public.ai_messages for update to authenticated
-  using (user_id = auth.uid() or public.is_admin())
-  with check (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin())
+  with check (user_id = (select auth.uid()) or public.is_admin());
 
 create policy "Users delete own ai messages"
   on public.ai_messages for delete to authenticated
-  using (user_id = auth.uid() or public.is_admin());
+  using (user_id = (select auth.uid()) or public.is_admin());
 
 revoke all on public.ai_messages from anon;
 grant select, insert, update, delete on public.ai_messages to authenticated;
@@ -159,7 +159,7 @@ drop policy if exists "Users read own quiz responses" on public.quiz_responses;
 create policy "Users read own quiz responses"
   on public.quiz_responses for select to authenticated
   using (
-    user_id = auth.uid()
+    user_id = (select auth.uid())
     or email = lower(auth.jwt() ->> 'email')
     or public.is_admin()
   );
@@ -171,7 +171,7 @@ create policy "Public can submit quiz responses"
   with check (
     ai_analysis is null and processed_at is null and score is null
     and coalesce(email_sent, false) = false and email_sent_at is null
-    and (user_id is null or user_id = auth.uid())
+    and (user_id is null or user_id = (select auth.uid()))
   );
 
 

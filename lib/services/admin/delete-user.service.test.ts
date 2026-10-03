@@ -42,6 +42,12 @@ describe("deleteUserCompletely", () => {
     return { insert, update }
   }
 
+  function buildMenteeTable(cvUrl: string | null) {
+    const maybeSingle = jest.fn().mockResolvedValue({ data: cvUrl ? { cv_url: cvUrl } : null, error: null })
+    const eq = jest.fn().mockReturnValue({ maybeSingle })
+    return { select: jest.fn().mockReturnValue({ eq }) }
+  }
+
   function buildStorage(filesByBucket: Record<string, { name: string }[]>) {
     return {
       from: jest.fn((bucket: string) => ({
@@ -57,7 +63,8 @@ describe("deleteUserCompletely", () => {
 
     tables = {
       profiles: buildProfilesTable("gone@example.com"),
-      data_deletion_log: buildDeletionLogTable()
+      data_deletion_log: buildDeletionLogTable(),
+      mentee_profiles: buildMenteeTable(null)
     }
 
     mockSupabase = {
@@ -102,5 +109,20 @@ describe("deleteUserCompletely", () => {
     expect(tables.data_deletion_log.insert).toHaveBeenCalledWith(
       expect.objectContaining({ campaign: "estagiorecife-2026" })
     )
+  })
+  it("also removes an imported CV stored outside the user's folder", async () => {
+    const uid = "0737122a-0579-4981-9802-41883d6563a3"
+    tables.mentee_profiles = buildMenteeTable(
+      `https://x.supabase.co/storage/v1/object/public/cvs/estagio-recife/${uid}_cv.pdf`
+    )
+    const remove = jest.fn().mockResolvedValue({ error: null })
+    mockSupabase.storage = {
+      from: jest.fn(() => ({ list: jest.fn().mockResolvedValue({ data: [], error: null }), remove }))
+    }
+
+    const result = await deleteUserCompletely(uid, { source: "admin" })
+
+    expect(remove).toHaveBeenCalledWith([`estagio-recife/${uid}_cv.pdf`])
+    expect(result.filesRemoved).toBe(1)
   })
 })

@@ -23,12 +23,31 @@ export async function GET(request: NextRequest) {
       access_type: 'offline',
       scope: scopes,
       prompt: 'consent',
+      state: 'master_setup'
     });
 
     return NextResponse.json({
       authUrl,
       message: 'Visit this URL to authorize the application',
     });
+  }
+
+  if (action === 'user_auth') {
+    // Generate authorization URL for individual mentor sync.
+    // Only free/busy: it is all `freebusy.query` needs, and a narrower scope
+    // is easier to justify in Google's OAuth verification than `calendar.readonly`.
+    const scopes = [
+      'https://www.googleapis.com/auth/calendar.freebusy',
+    ];
+
+    const authUrl = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: scopes,
+      prompt: 'consent',
+      state: 'user_sync'
+    });
+
+    return NextResponse.redirect(authUrl);
   }
 
   return NextResponse.json({

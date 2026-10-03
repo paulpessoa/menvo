@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menvo - Arquitetura e Fluxo de Usuários</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .mermaid { display: flex; justify-content: center; background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top: 2rem; overflow-x: auto; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 border-b pb-6">
+            <h1 class="text-3xl font-bold text-slate-800">Menvo - Fluxos de Usuário e Arquitetura</h1>
+            <p class="text-slate-600 mt-2">Mapeamento visual das jornadas (Visitante, Mentorado, Mentor e Admin) e interações dentro da plataforma.</p>
+        </header>
+
+        <!-- Diagrama Mermaid -->
+        <div class="mermaid">
+            flowchart TD
+            %% Definindo Estilos
+            classDef default fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px,color:#334155
+            classDef role fill:#2563eb,stroke:#1d4ed8,stroke-width:2px,color:#ffffff,font-weight:bold
+            classDef page fill:#eff6ff,stroke:#60a5fa,stroke-width:1px,color:#1e40af
+            classDef action fill:#ecfdf5,stroke:#34d399,stroke-width:1px,color:#065f46
+            classDef external fill:#fff1f2,stroke:#fb7185,stroke-width:1px,color:#9f1239,stroke-dasharray: 5 5
+            classDef auth fill:#fef3c7,stroke:#fbbf24,stroke-width:1px,color:#92400e
+
+            %% ========= VISITANTE & ONBOARDING =========
+            Visitor((Visitante)):::role --> Home[Landing Page Explore]:::page
+            Home --> Auth[Login Cadastro]:::auth
+            Auth -->|Google OAuth ou Email| Onboarding{Escolha de Perfil}:::auth
+
+            Onboarding -->|Mentorado| MenteeSetup[Completar Perfil Mentorado]:::action
+            Onboarding -->|Mentor| MentorSetup[Completar Perfil Mentor]:::action
+
+            %% ========= ROLES =========
+            Mentee((Mentorado)):::role
+            Mentor((Mentor)):::role
+            Admin((Administrador)):::role
+
+            MenteeSetup --> Mentee
+            MentorSetup --> Mentor
+
+            %% ========= FLUXO DO MENTORADO =========
+            subgraph Mentee_Journey [Jornada do Mentorado]
+                Mentee --> MDash[Dashboard do Mentorado]:::page
+                MDash --> Diagnostic[Diagnosticos e Quiz]:::action
+                MDash --> Favorites[Meus Favoritos]:::page
+                MDash --> SearchM[Buscar Mentores]:::action
+                SearchM --> ViewM[Ver Perfil do Mentor]:::page
+                ViewM --> RequestM[Solicitar Mentoria]:::action
+                RequestM --> Wait[Aguardar Aprovacao]:::action
+                Wait -->|Aprovado| MSessions[Minhas Sessoes]:::page
+                MSessions --> JoinMeet1[Participar via Google Meet]:::external
+                JoinMeet1 --> ReviewM[Avaliar Sessao e Mentor]:::action
+            end
+
+            %% ========= FLUXO DO MENTOR =========
+            subgraph Mentor_Journey [Jornada do Mentor]
+                Mentor --> MentorDash[Dashboard do Mentor]:::page
+                MentorDash --> VerifyStatus[Aguardar Verificacao Admin]:::action
+                MentorDash --> Avail[Configurar Disponibilidade]:::action
+                Avail --> CalSync[Sincronizar Google Calendar]:::external
+                MentorDash --> ReviewReq[Gerenciar Solicitacoes]:::action
+                ReviewReq -->|Aprovar| MntrSessions[Minhas Sessoes]:::page
+                ReviewReq -->|Recusar ou Reagendar| MntrSessions
+                MntrSessions --> JoinMeet2[Conduzir Mentoria no Meet]:::external
+                MntrSessions --> ReadReviews[Ler Avaliacoes Recebidas]:::action
+            end
+
+            %% ========= FLUXO ADMIN =========
+            subgraph Admin_Journey [Jornada do Admin]
+                Admin --> ADash[Painel Administrativo]:::page
+                ADash --> KPI[Visao Estrategica e KPIs]:::page
+                ADash --> Verifications[Aprovar Mentores]:::action
+                Verifications -.->|Concede Selo de Verificado| Mentor
+                ADash --> Content[Gerir Organizacoes e Usuarios]:::action
+            end
+
+            %% ========= INTEGRACOES E RELACOES =========
+            RequestM -.->|Notifica Mentor Email| ReviewReq
+            ReviewReq -.->|Notifica Mentorado Plataforma| Wait
+            ReviewReq -.->|Gera Link Google Meet| JoinMeet1
+            ReviewReq -.->|Gera Link Google Meet| JoinMeet2
+            CalSync -.->|Consulta Conflitos de Agenda| SearchM
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-[#2563eb] rounded-full"></div> <span>Perfis de Usuário</span></div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-[#eff6ff] border border-[#60a5fa] rounded"></div> <span>Páginas/Telas</span></div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-[#ecfdf5] border border-[#34d399] rounded"></div> <span>Ações na Plataforma</span></div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-[#fff1f2] border border-[#fb7185] border-dashed rounded"></div> <span>Integrações Externas</span></div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                fontFamily: 'Inter',
+                lineColor: '#94a3b8'
+            },
+            flowchart: {
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>

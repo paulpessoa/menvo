@@ -34,19 +34,9 @@
         }
 
         /* Cabeçalho */
-        .header {
-            background: #0F7185;
-            color: white;
-            padding: 40px 35px;
-            text-align: center;
-        }
+        .header { background: #ffffff; padding: 32px 35px; text-align: center; border-bottom: 1px solid #e2e8f0; }
 
-        .header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            margin: 0;
-            letter-spacing: 0.5px;
-        }
+        .header h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.3px; color: #1f2937; }
 
         /* Conteúdo principal */
         .content {
@@ -181,6 +171,7 @@
     <div class="email-container">
         <!-- Cabeçalho -->
         <div class="header">
+            <img src="https://raw.githubusercontent.com/paulpessoa/menvo/main/public/menvo-logo-light.png" alt="Menvo" height="32" style="display: block; margin: 0 auto 18px auto; max-width: 100%; height: auto; max-height: 32px;" />
             <h1>Bem-vindo(a) ao Menvo!</h1>
         </div>
 
@@ -193,7 +184,7 @@
 
             <!-- Botão de Confirmação -->
             <div class="button-container">
-                <a href="{ .ConfirmationURL }}" class="confirmation-button">
+                <a href="{{ .ConfirmationURL }}" class="confirmation-button">
                     Login
                 </a>
             </div>
@@ -210,6 +201,7 @@
         <div class="footer">
             <p>Este e-mail foi enviado automaticamente. Por favor, não responda.</p>
             <p>&copy; 2026 MENVO. Todos os direitos reservados.</p>
+            <p>Cuidamos dos seus dados conforme a LGPD. Leia nossa <a href="https://www.menvo.com.br/privacy" style="color: inherit; text-decoration: underline;">Política de Privacidade</a> ou fale com o encarregado de dados em <a href="mailto:contato@menvo.com.br" style="color: inherit; text-decoration: underline;">contato@menvo.com.br</a>.</p>
         </div>
     </div>
 </body>

@@ -43,6 +43,8 @@ interface MentorCardProps {
   isAIHighlighted?: boolean
   /** Short AI-generated reason for the recommendation */
   aiReason?: string
+  /** Optional ID for UI targeting (e.g., Driver.js tours) */
+  id?: string
 }
 
 /**
@@ -54,6 +56,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
   mentor,
   isAIHighlighted = false,
   aiReason,
+  id,
 }) => {
   const t = useTranslations('mentors')
   const { user } = useAuth()
@@ -106,6 +109,7 @@ export const MentorCard: React.FC<MentorCardProps> = ({
 
   return (
     <div
+      id={id}
       className={`group relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
         isAIHighlighted
           ? 'border-primary/40 dark:border-primary-400/40 ring-1 ring-primary/20'
@@ -177,12 +181,12 @@ export const MentorCard: React.FC<MentorCardProps> = ({
         )}
 
         {/* Rating (canto inferior direito da foto) */}
-        {mentor.average_rating != null && mentor.average_rating > 0 && (
+        {/* {mentor.average_rating != null && mentor.average_rating > 0 && (
           <div className="absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold bg-slate-900/80 text-white backdrop-blur-md shadow-sm">
             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
             <span>{mentor.average_rating.toFixed(1)}</span>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* ================================================================

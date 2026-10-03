@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js"
+import { getFeatureFlags } from "@/lib/feature-flags-server"
 
 export interface AvailabilitySlotResult {
   date: string
@@ -37,14 +38,53 @@ export async function computeAvailableSlots(
 
   // Generate available time slots
   const availableSlots: AvailabilitySlotResult[] = []
+  let googleBusySlots: { start: string; end: string }[] = []
+
+  // Check feature flag and fetch Google Calendar free/busy if enabled
+  try {
+    const flags = await getFeatureFlags()
+    if (flags.google_calendar_sync_flag) {
+      const { createUserGoogleCalendarClient } = await import('@/lib/google-calendar-db')
+      const { calendar } = await createUserGoogleCalendarClient(mentorId)
+      
+      const freebusyRes = await calendar.freebusy.query({
+        requestBody: {
+          timeMin: startDate.toISOString(),
+          timeMax: endDate.toISOString(),
+          items: [{ id: 'primary' }]
+        }
+      })
+      
+      const calendars = freebusyRes.data.calendars
+      if (calendars && calendars.primary && calendars.primary.busy) {
+        googleBusySlots = calendars.primary.busy as { start: string; end: string }[]
+      }
+    }
+  } catch (err) {
+    // Silently ignore if user hasn't connected calendar or token expired
+    console.log(`[AVAILABILITY] Google Calendar sync skipped for mentor ${mentorId}:`, err instanceof Error ? err.message : err)
+  }
 
   const isSlotBooked = (slotStart: Date, slotDuration: number = 45): boolean => {
-    return (appointments || []).some((apt: any) => {
+    const slotEnd = new Date(slotStart.getTime() + slotDuration * 60 * 1000)
+
+    // Check Menvo internal appointments
+    const hasMenvoConflict = (appointments || []).some((apt: any) => {
       const aptStart = new Date(apt.scheduled_at)
       const aptEnd = new Date(aptStart.getTime() + apt.duration_minutes * 60 * 1000)
-      const slotEnd = new Date(slotStart.getTime() + slotDuration * 60 * 1000)
       return slotStart < aptEnd && slotEnd > aptStart
     })
+
+    if (hasMenvoConflict) return true
+
+    // Check Google Calendar busy periods
+    const hasGoogleConflict = googleBusySlots.some((busy) => {
+      const busyStart = new Date(busy.start)
+      const busyEnd = new Date(busy.end)
+      return slotStart < busyEnd && slotEnd > busyStart
+    })
+
+    return hasGoogleConflict
   }
 
   let current = new Date(startDate.getTime())

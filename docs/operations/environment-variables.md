@@ -49,7 +49,6 @@ cp .env.example .env.local
 | Variable | Required | Context | Description |
 |---|---|---|---|
 | `BREVO_API_KEY` | Yes | Server-only | Brevo REST API Key |
-| `BREVO_SMTP_API_KEY` | Optional | Server-only | Brevo SMTP password |
 | `BREVO_SENDER_EMAIL` | Yes | Server-only | Verified sender email (`contato@menvo.com.br`) |
 | `BREVO_SENDER_NAME` | Yes | Server-only | Sender name (`Menvo`) |
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth"
 import { useProfile } from "@/hooks/useProfile"
+import { useOnboarding } from "@/hooks/useOnboarding"
 import { Link, useRouter } from "@/i18n/routing"
 import { OrganizationsTab } from "@/components/profile/OrganizationsTab"
 import { ProfileAboutSection } from "@/components/profile/ProfileAboutSection"
@@ -76,6 +77,13 @@ function ProfilePageContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!form.first_name?.trim() || !form.last_name?.trim() || !form.slug?.trim()) {
+      toast.error("Por favor, preencha o Nome, Sobrenome e a URL do perfil (slug) antes de salvar.")
+      setActiveTab("basic")
+      return
+    }
+
     const result = await updateProfile(form)
     if (result.success) {
       toast.success("Perfil salvo com sucesso!")
@@ -116,11 +124,11 @@ function ProfilePageContent() {
 
         <form onSubmit={handleSubmit}>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ProfileTab)} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/50 p-1 h-auto">
-              <TabsTrigger value="basic" className="py-2">Perfil</TabsTrigger>
-              <TabsTrigger value="career" className="py-2">Carreira e Interesses</TabsTrigger>
-              <TabsTrigger value="mentorship" className="py-2">Mentoria</TabsTrigger>
-              <TabsTrigger value="organizations" className="py-2">Organizações</TabsTrigger>
+            <TabsList id="tour-profile-tabs" className="grid w-full grid-cols-2 sm:grid-cols-4 bg-muted/50 p-1 h-auto">
+              <TabsTrigger id="tour-tab-basic" value="basic" className="py-2">Perfil</TabsTrigger>
+              <TabsTrigger id="tour-tab-career" value="career" className="py-2">Carreira e Interesses</TabsTrigger>
+              <TabsTrigger id="tour-tab-mentorship" value="mentorship" className="py-2">Mentoria</TabsTrigger>
+              <TabsTrigger id="tour-tab-organizations" value="organizations" className="py-2">Organizações</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic">
@@ -143,9 +151,9 @@ function ProfilePageContent() {
             </TabsContent>
 
             {/* One save for every tab - edits made on other tabs are kept in state and saved together. */}
-            {activeTab !== "organizations" && (
-              <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-background/95 backdrop-blur">
-                <Button type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
+            {activeTab !== "organizations" && !(activeTab === "mentorship" && !isMentor) && (
+              <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-canvas/95 backdrop-blur">
+                <Button id="tour-profile-save" type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
                   {isUpdating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
                   Salvar perfil
                 </Button>
@@ -154,6 +162,45 @@ function ProfilePageContent() {
           </Tabs>
         </form>
       </div>
+      <ProfileTour />
     </div>
   )
+}
+
+function ProfileTour() {
+  const steps = [
+    { popover: { title: "Boas-vindas ao seu Perfil!", description: "Aqui é onde a comunidade vai te conhecer. Um perfil completo abre muitas portas." } },
+    { 
+      element: "#tour-tab-basic", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
+      popover: { title: "Perfil Básico", description: "Sua foto, nome e resumo (bio) são o seu cartão de visitas. Perfis bem preenchidos têm muito mais chances de receber pedidos e aceites na comunidade!" } 
+    },
+    {
+      element: "#tour-profile-public",
+      popover: { title: "Perfil Público", description: "Ative para ser visível na rede! Mentores precisam disso para aparecerem no catálogo. Mentorados precisam para que os mentores possam ler o perfil antes de aceitar." }
+    },
+    { 
+      element: "#tour-tab-career", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-career")?.click() },
+      popover: { title: "O que você busca?", description: "Na aba Carreira e Interesses, deixe claro sua experiência e o que você espera das mentorias. Isso ajuda nossa IA a te recomendar para as pessoas certas." } 
+    },
+    { 
+      element: "#tour-tab-mentorship", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-mentorship")?.click() },
+      popover: { title: "Seja um Mentor(a)!", description: "Compartilhar conhecimento é transformador! Se você tem experiência, ative seu perfil de mentor aqui. Retribuir à comunidade ensinando os outros é incrível." } 
+    },
+    { 
+      element: "#tour-tab-basic", 
+      onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
+      popover: { title: "Tudo pronto?", description: "Volte para a primeira aba e comece a preencher seus dados. (Dica: A localização pode ser preenchida automaticamente usando o botão 'Detectar'!)" } 
+    },
+    { 
+      element: "#tour-profile-save", 
+      popover: { title: "Não esqueça de salvar", description: "Lembre-se sempre de clicar em 'Salvar perfil' no final para não perder suas alterações!" } 
+    }
+  ]
+
+  useOnboarding("ob_m4", steps)
+
+  return null
 }

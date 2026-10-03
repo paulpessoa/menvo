@@ -89,16 +89,28 @@ export function handleApiError(error: unknown): NextResponse<ApiError> {
       )
     }
 
-    // Generic error with message
+  // Generic error with message
     return NextResponse.json(
-      { error: error.message, code: ErrorCodes.INTERNAL_ERROR },
+      { error: error.message, code: ErrorCodes.INTERNAL_ERROR, details: error as any },
+      { status: 500 }
+    )
+  }
+
+  // Handle Supabase PostgrestError which might not be an instance of Error
+  if (typeof error === "object" && error !== null && "message" in error) {
+    return NextResponse.json(
+      { 
+        error: (error as any).message || "Database error", 
+        code: ErrorCodes.INTERNAL_ERROR, 
+        details: error as Record<string, any>
+      },
       { status: 500 }
     )
   }
 
   // Unknown error
   return NextResponse.json(
-    { error: "An unexpected error occurred", code: ErrorCodes.INTERNAL_ERROR },
+    { error: "An unexpected error occurred", code: ErrorCodes.INTERNAL_ERROR, details: { message: String(error) } },
     { status: 500 }
   )
 }

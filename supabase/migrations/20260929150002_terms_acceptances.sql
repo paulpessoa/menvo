@@ -19,11 +19,11 @@ alter table public.terms_acceptances enable row level security;
 
 create policy "Users read own terms acceptances"
   on public.terms_acceptances for select
-  using (user_id = auth.uid());
+  using (user_id = (select auth.uid()));
 
 create policy "Users record own terms acceptance"
   on public.terms_acceptances for insert
-  with check (user_id = auth.uid());
+  with check (user_id = (select auth.uid()));
 
 create policy "Admins read terms acceptances"
   on public.terms_acceptances for select

@@ -37,7 +37,8 @@ import {
   Github,
   Linkedin,
   Globe,
-  Send
+  Send,
+  Lock
 } from "lucide-react"
 import { Link, useRouter } from "@/i18n/routing"
 import { useAuth } from "@/lib/auth"
@@ -68,6 +69,7 @@ interface MenteeProfile {
   cv_url?: string
   languages?: string[]
   created_at: string
+  has_cv?: boolean
 }
 
 interface Props {
@@ -109,7 +111,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary/30 via-background to-background">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
         {/* Navigation */}
         <div className="mb-8 flex items-center justify-between">
@@ -345,7 +347,7 @@ export default function MenteeProfileClient({ mentee }: Props) {
             </Card>
 
             {/* Resume / CV Section */}
-            {mentee.cv_url && (
+            {mentee.has_cv && (
               <Card className="border-2 border-primary/5 shadow-xl shadow-primary/5 bg-white hover:border-primary/20 transition-all rounded-[2rem] overflow-hidden group">
                 <CardHeader className="pb-4 pt-8 px-8">
                   <CardTitle className="text-lg font-black uppercase tracking-tighter flex items-center gap-3">
@@ -354,15 +356,24 @@ export default function MenteeProfileClient({ mentee }: Props) {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-8 pb-10">
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full font-black rounded-xl shadow-lg shadow-primary/10 group-hover:scale-[1.02] transition-transform"
-                    onClick={() => setIsPdfViewerOpen(true)}
-                  >
-                    <Eye className="h-5 w-5 mr-2" />
-                    Visualizar
-                  </Button>
+                  {mentee.cv_url ? (
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full font-black rounded-xl shadow-lg shadow-primary/10 group-hover:scale-[1.02] transition-transform"
+                      onClick={() => setIsPdfViewerOpen(true)}
+                    >
+                      <Eye className="h-5 w-5 mr-2" />
+                      Visualizar
+                    </Button>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl text-center space-y-2">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                      <p className="text-sm text-gray-500 font-medium">
+                        Currículo visível apenas após a confirmação de um agendamento com este mentorado.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}

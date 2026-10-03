@@ -2,7 +2,7 @@
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useQuery } from "@tanstack/react-query"
-import { Star, User } from "lucide-react"
+import { Star } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
@@ -53,10 +53,7 @@ export function AdminPlatformFeedback() {
         <Card key={item.id}>
           <CardContent className="p-4 flex flex-col gap-2">
             <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2">
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <User className="h-4 w-4 text-primary" />
-                </div>
+              <div>
                 <div>
                   <p className="font-medium text-sm">
                     {item.user?.full_name || item.email || "Usuário Anônimo"}

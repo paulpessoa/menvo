@@ -6,6 +6,7 @@ import type { Database } from '@/lib/types/supabase'
 type ProfileRow = Database['public']['Tables']['profiles']['Row']
 type ProfileWithRoles = ProfileRow & {
   user_roles: { roles: { name: string } | null }[]
+  mentor_profiles: { verification_status: string | null; is_volunteer: boolean } | null
 }
 
 // GET - Listar usuários com filtros e paginação
@@ -46,6 +47,12 @@ export async function GET(request: NextRequest) {
     
     const offset = (page - 1) * limit
 
+    // Verificação e voluntariado moram em mentor_profiles; com filtro de
+    // status, !inner restringe o nível de profiles.
+    const mentorEmbed = statusFilter
+      ? 'mentor_profiles!inner(verification_status, is_volunteer)'
+      : 'mentor_profiles(verification_status, is_volunteer)'
+
     // Construir query base
     let query = supabase
       .from('profiles')
@@ -55,9 +62,8 @@ export async function GET(request: NextRequest) {
         first_name,
         last_name,
         full_name,
-        verified,
-        is_volunteer,
         created_at,
+        ${mentorEmbed},
         user_roles (
           roles (
             name
@@ -71,8 +77,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (statusFilter) {
-      const verified = statusFilter === 'verified'
-      query = query.eq('verified', verified)
+      query = query.eq('mentor_profiles.verification_status', statusFilter === 'verified' ? 'approved' : 'pending')
     }
 
     // Executar query principal
@@ -95,8 +100,8 @@ export async function GET(request: NextRequest) {
         email: profile.email,
         full_name: profile.full_name,
         user_role: userRole,
-        verification_status: profile.verified ? 'verified' : 'pending',
-        is_volunteer: profile.is_volunteer || false,
+        verification_status: profile.mentor_profiles?.verification_status === 'approved' ? 'verified' : 'pending',
+        is_volunteer: profile.mentor_profiles?.is_volunteer || false,
         created_at: profile.created_at
       }
     })

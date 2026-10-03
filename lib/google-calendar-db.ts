@@ -1,5 +1,5 @@
 
-import { createClient } from '@/lib/utils/supabase/server';
+import { createServiceRoleClient } from '@/lib/utils/supabase/service-role';
 import { google } from 'googleapis';
 import type { Database, TablesInsert } from '@/lib/types/supabase';
 
@@ -22,11 +22,9 @@ export async function saveGoogleCalendarTokens(
     scope?: string;
   }
 ) {
-  // Server client: carries the caller's session, so RLS on
-  // google_calendar_tokens (user_id = auth.uid()) applies as expected. The
-  // previous version used the browser client here, which has no session on
-  // the server and silently ran as anon.
-  const supabase = await createClient();
+  // Use service role client because this might be called in background tasks
+  // or by a mentee who doesn't have RLS access to the mentor's tokens.
+  const supabase = createServiceRoleClient();
 
   // Calcular expiry_date como timestamp em milissegundos
   const expiryDate = Date.now() + (tokens.expires_in * 1000);
@@ -53,7 +51,7 @@ export async function saveGoogleCalendarTokens(
  * Obter tokens do Google Calendar do Supabase
  */
 export async function getGoogleCalendarTokens(userId: string): Promise<GoogleCalendarTokens | null> {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const { data, error } = await (supabase
     .from('google_calendar_tokens')
     .select('user_id, access_token, refresh_token, expiry_date')
@@ -144,7 +142,7 @@ export async function hasGoogleCalendarConnected(userId: string): Promise<boolea
  * Desconectar Google Calendar do usuário
  */
 export async function disconnectGoogleCalendar(userId: string) {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const { error } = await supabase
     .from('google_calendar_tokens')
     .delete()

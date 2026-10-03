@@ -22,6 +22,7 @@ import { quizService } from "@/lib/services/quiz/quiz.service"
 import { createClient } from "@/lib/utils/supabase/client"
 import { ShareDiagnosticModal } from "@/components/diagnostic/ShareDiagnosticModal"
 import { MenvoDots } from "@/components/ui/menvo-loader"
+import { resolveMentorSlugsAction } from "@/app/actions/mentors"
 
 function LoadingScreen({ t }: { t: any }) {
     const texts = [
@@ -196,16 +197,12 @@ export default function QuizResultsPage() {
 
             if (mentorNames.length > 0) {
                 try {
-                    const supabase = createClient()
-                    const { data: mentorsFound } = await (supabase
-                        .from("mentors_view") as any)
-                        .select("full_name, slug, id")
-                        .in("full_name", mentorNames)
+                    const mentorsFound = await resolveMentorSlugsAction(mentorNames)
 
-                    if (mentorsFound && (mentorsFound as any[]).length > 0) {
+                    if (mentorsFound && mentorsFound.length > 0) {
                         const slugMap: Record<string, string> = {}
                         const idMap: Record<string, string> = {}
-                        for (const m of (mentorsFound as any[])) {
+                        for (const m of mentorsFound) {
                             if (m.full_name) {
                                 slugMap[m.full_name.toLowerCase()] = m.slug || m.id || ""
                                 idMap[m.full_name.toLowerCase()] = m.id || ""

@@ -7,7 +7,7 @@ import { MenvoDots } from "@/components/ui/menvo-loader"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { Clock, AlertTriangle, ShieldCheck, Mail, CalendarX, UserMinus, Moon } from "lucide-react"
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
@@ -132,15 +132,11 @@ export default function RetentionAdminPage() {
 
   return (
     <PageContainer>
+      <AdminPageHeader
+        title="Retenção LGPD"
+        description="Exclusões automáticas de contas importadas sem acesso e de contas inativas há mais de 1 ano."
+      />
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <UserMinus className="h-8 w-8 text-rose-600" /> Retenção LGPD
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Visão geral das exclusões automáticas (contas importadas sem acesso e contas inativas há mais de 1 ano).
-          </p>
-        </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -153,9 +149,7 @@ export default function RetentionAdminPage() {
             {/* Seção de Contas Importadas (Jotform) */}
             <section className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <UserMinus className="h-6 w-6 text-gray-600" /> Contas Importadas Sem Acesso
-                </h2>
+                <h2 className="text-lg font-semibold">Contas importadas sem acesso</h2>
                 <p className="text-sm text-muted-foreground mt-1">Exclusão em 90 dias após o primeiro convite.</p>
               </div>
 
@@ -163,7 +157,6 @@ export default function RetentionAdminPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Na Fila</CardTitle>
-                    <Clock className="h-4 w-4 text-blue-600" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-blue-600">{stats.enrolled}</div>
@@ -174,7 +167,6 @@ export default function RetentionAdminPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Aviso de 30 Dias</CardTitle>
-                    <Mail className="h-4 w-4 text-orange-600" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-orange-600">{stats.noticed30d}</div>
@@ -185,7 +177,6 @@ export default function RetentionAdminPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Aviso de 1 Dia</CardTitle>
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-red-600">{stats.noticed1d}</div>
@@ -196,7 +187,6 @@ export default function RetentionAdminPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Opt-out / Supressão</CardTitle>
-                    <CalendarX className="h-4 w-4 text-gray-600" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-gray-600">{stats.optedOut}</div>
@@ -251,8 +241,8 @@ export default function RetentionAdminPage() {
                               <td className="px-4 py-3 text-right">
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="outline" size="sm" className="gap-2">
-                                      <ShieldCheck className="h-4 w-4" /> Isentar
+                                    <Button variant="outline" size="sm">
+                                      Isentar
                                     </Button>
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
@@ -287,9 +277,7 @@ export default function RetentionAdminPage() {
             {/* Seção de Contas Inativas (1 Ano) */}
             <section className="space-y-6">
               <div className="pt-8 border-t">
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <Moon className="h-6 w-6 text-gray-600" /> Contas Inativas (+ de 1 Ano)
-                </h2>
+                <h2 className="text-lg font-semibold">Contas inativas há mais de 1 ano</h2>
                 <p className="text-sm text-muted-foreground mt-1">Exclusão após 30 dias do aviso para pessoas sem login há 12 meses.</p>
               </div>
 
@@ -297,7 +285,6 @@ export default function RetentionAdminPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Notificados (Aviso de 30 Dias)</CardTitle>
-                    <Mail className="h-4 w-4 text-orange-600" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-orange-600">{inactiveStats.noticed30d}</div>

@@ -19,13 +19,13 @@ ALTER TABLE user_reports ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can insert their own reports" 
   ON user_reports FOR INSERT 
   TO authenticated 
-  WITH CHECK (auth.uid() = reporter_id);
+  WITH CHECK ((select auth.uid()) = reporter_id);
 
 -- Reporter can view their own reports
 CREATE POLICY "Users can view their own reports" 
   ON user_reports FOR SELECT 
   TO authenticated 
-  USING (auth.uid() = reporter_id);
+  USING ((select auth.uid()) = reporter_id);
 
 -- Admin can do everything (Assuming public.is_admin() exists as per Menvo architecture)
 CREATE POLICY "Admins can view all reports" 
@@ -50,7 +50,7 @@ CREATE POLICY "Users can upload evidence"
   TO authenticated
   WITH CHECK (
     bucket_id = 'reports_evidence' AND
-    (storage.foldername(name))[1] = auth.uid()::text
+    (storage.foldername(name))[1] = (select auth.uid())::text
   );
 
 -- Users can read their own evidence
@@ -59,7 +59,7 @@ CREATE POLICY "Users can read own evidence"
   TO authenticated
   USING (
     bucket_id = 'reports_evidence' AND
-    (storage.foldername(name))[1] = auth.uid()::text
+    (storage.foldername(name))[1] = (select auth.uid())::text
   );
 
 -- Admins can read all evidence

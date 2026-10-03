@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menvo - Mapa de Onboardings (Driver.js)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; }
+        .mermaid { display: flex; justify-content: center; background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top: 1.5rem; overflow-x: auto; }
+        details { border-left: 3px solid #007585; padding-left: 1rem; margin-bottom: 1rem; }
+        details summary { cursor: pointer; font-weight: 600; color: #1e293b; padding: 0.5rem 0; }
+        details summary:hover { color: #007585; }
+        details[open] summary { color: #007585; }
+        .step-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.875rem; }
+        .step-table th { background: #f1f5f9; color: #475569; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid #e2e8f0; }
+        .step-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        .step-table tr:hover td { background: #f8fafc; }
+        .badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-mentee { background: #dcfce7; color: #166534; }
+        .badge-mentor { background: #dbeafe; color: #1e40af; }
+        .badge-org { background: #fef3c7; color: #92400e; }
+        .badge-admin { background: #ede9fe; color: #5b21b6; }
+        .badge-cross { background: #f1f5f9; color: #475569; }
+        .meta-table { font-size: 0.8125rem; color: #64748b; margin-bottom: 0.5rem; }
+        .meta-table td { padding: 0.125rem 0.5rem 0.125rem 0; }
+        .meta-table td:first-child { font-weight: 600; color: #475569; white-space: nowrap; }
+        .phase-card { background: white; border-radius: 0.75rem; padding: 1rem 1.25rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
+        .section-title { display: flex; align-items: center; gap: 0.5rem; margin-top: 2rem; margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 border-b pb-6">
+            <h1 class="text-3xl font-bold text-slate-800">🗺️ Mapa de Onboardings — Menvo</h1>
+            <p class="text-slate-600 mt-2">Inventário completo de todos os fluxos de onboarding guiado (Driver.js) organizados por <strong>papel</strong>, <strong>gatilho</strong> e <strong>páginas envolvidas</strong>. 17 tours no total.</p>
+            <div class="flex gap-3 mt-4 flex-wrap">
+                <span class="badge badge-mentee">🟢 Mentee: 8 tours</span>
+                <span class="badge badge-mentor">🔵 Mentor: 4 tours</span>
+                <span class="badge badge-org">🏢 Org Member: 1 tour</span>
+                <span class="badge badge-admin">🛡️ Org Admin: 1 tour</span>
+                <span class="badge badge-cross">🔧 Transversal: 3 tours</span>
+            </div>
+        </header>
+
+        <!-- Diagrama Mermaid -->
+        <div class="mermaid">
+            mindmap
+                root((Onboardings))
+                    Mentee
+                        OB-M1 Primeiro Login
+                        OB-M2 Catálogo de Mentores
+                        OB-M3 Perfil do Mentor
+                        OB-M4 Minhas Mentorias
+                        OB-M5 Diagnóstico IA
+                        OB-M6 Assistente IA
+                        OB-M7 Comunidade
+                        OB-M8 Meu Perfil
+                    Mentor
+                        OB-T1 Pós-Aprovação
+                        OB-T2 Gestão da Agenda
+                        OB-T3 Painel Mentor
+                        OB-T4 Fluxo Verificação
+                    Org Member
+                        OB-O1 Primeiro Acesso
+                    Org Admin
+                        OB-A1 Painel da Org
+                    Transversal
+                        OB-X1 Quiz Carreira
+                        OB-X2 Denúncia
+                        OB-X3 Configurações
+        </div>
+
+        <!-- ==================== MENTEE ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🟢 Mentee (Mentorado) — Usuário Base</h2>
+        </div>
+
+        <!-- OB-M1 -->
+        <details open>
+            <summary>
+                <span class="badge badge-mentee">OB-M1</span> Primeiro Login do Mentee
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeiro login após completar o onboarding de role (<code>role = mentee</code> + <code>onboarding_completed_at IS NULL</code>)</td></tr>
+                <tr><td>Página-alvo</td><td><code>/dashboard/mentee</code></td></tr>
+                <tr><td>Re-ativar?</td><td>Sim — botão "Rever tutorial" no dashboard ou <code>/settings</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>👋 Bem-vindo(a) à Menvo!</td><td>Você acabou de dar o primeiro passo. Vamos fazer um tour rápido para você aproveitar tudo que a plataforma oferece.</td></tr>
+                    <tr><td>2</td><td>Card "Próxima Sessão"</td><td>Suas mentorias aparecem aqui</td><td>Quando você agendar uma mentoria, os detalhes aparecerão neste card com link para a videochamada.</td></tr>
+                    <tr><td>3</td><td>Card "Quiz de Carreira"</td><td>Descubra seu momento profissional</td><td>O diagnóstico com IA analisa seu momento e sugere mentores ideais para você. É o melhor primeiro passo!</td></tr>
+                    <tr><td>4</td><td>Menu "Mentores" (header)</td><td>Encontre seu mentor</td><td>Aqui você encontra todos os mentores verificados. Pode filtrar por área, skills, idioma e mais.</td></tr>
+                    <tr><td>5</td><td>Menu "Comunidade" (header)</td><td>Faça parte da comunidade</td><td>Ative seu perfil na comunidade para que mentores te encontrem e ofereçam ajuda proativamente.</td></tr>
+                    <tr><td>6</td><td>Menu "Assistente" (header)</td><td>Seu copiloto de carreira</td><td>Converse com a IA da Menvo para tirar dúvidas, receber recomendações de mentores ou fazer o diagnóstico interativo.</td></tr>
+                    <tr><td>7</td><td>Avatar/menu do perfil</td><td>Complete seu perfil</td><td>Quanto mais completo seu perfil, mais chances os mentores têm de aceitar seu pedido. Adicione foto, bio, LinkedIn e seus objetivos.</td></tr>
+                    <tr><td>8</td><td>Popover central</td><td>🚀 Tudo pronto!</td><td>Recomendamos começar pelo diagnóstico de carreira ou explorar o catálogo de mentores. Boa jornada!</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M2 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M2</span> Catálogo de Mentores
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/mentors</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/mentors</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Barra de busca</td><td>Busque por nome, área ou skill</td><td>Use a busca para encontrar mentores por área de atuação, habilidade ou nome.</td></tr>
+                    <tr><td>2</td><td>Filtros (chips/sidebar)</td><td>Refine sua busca</td><td>Filtre por idioma, tags de inclusão, tópicos de mentoria e mais para encontrar o match ideal.</td></tr>
+                    <tr><td>3</td><td>Botão "Busca com IA"</td><td>Deixe a IA encontrar para você</td><td>Descreva o que você precisa com suas palavras e a IA vai sugerir os mentores mais alinhados.</td></tr>
+                    <tr><td>4</td><td>Primeiro MentorCard</td><td>Card do mentor</td><td>Cada card mostra a foto, área, nota e especialidades do mentor. Clique para ver o perfil completo e agendar.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M3 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M3</span> Perfil do Mentor e Agendamento
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/mentors/[slug]</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/mentors/paul-pessoa</code> (ou qualquer slug)</td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Seção de bio/skills</td><td>Conheça o mentor</td><td>Aqui você vê a trajetória, as especialidades e os tópicos que esse mentor oferece.</td></tr>
+                    <tr><td>2</td><td>Avaliações / estrelas</td><td>Veja o que outros mentorados dizem</td><td>As avaliações são deixadas por mentorados que já tiveram sessões. Leia para entender a experiência.</td></tr>
+                    <tr><td>3</td><td>Calendário de disponibilidade</td><td>Escolha um horário</td><td>Os horários em destaque são os disponíveis nas próximas 2 semanas. Clique para selecionar.</td></tr>
+                    <tr><td>4</td><td>Botão "Solicitar Mentoria"</td><td>Envie seu pedido</td><td>Escreva uma breve mensagem explicando por que você quer essa mentoria. Quanto mais contexto, maiores as chances de aceitação!</td></tr>
+                    <tr><td>5</td><td>Botão "Compartilhar Diagnóstico"</td><td>Compartilhe seu diagnóstico</td><td>Se você já fez o diagnóstico de carreira, pode compartilhá-lo para que o mentor se prepare melhor para a sessão.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M4 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M4</span> Minhas Mentorias
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/mentorship/mentee</code> com ≥1 appointment</td></tr>
+                <tr><td>Página-alvo</td><td><code>/mentorship/mentee</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Seção "Requer sua ação"</td><td>Ações pendentes</td><td>Pedidos aguardando resposta e sessões prontas para avaliar aparecem aqui. Fique de olho!</td></tr>
+                    <tr><td>2</td><td>Seção "Próximas sessões"</td><td>Suas sessões agendadas</td><td>Sessões confirmadas com link do Google Meet e data/hora aparecem nesse bloco.</td></tr>
+                    <tr><td>3</td><td>Botão "Avaliar"</td><td>Avalie após a sessão</td><td>Depois de cada mentoria, avalie o mentor. Sua nota e comentário ajudam toda a comunidade.</td></tr>
+                    <tr><td>4</td><td>Switch perspectiva</td><td>Mude a perspectiva</td><td>Se você também é mentor, alterne entre as sessões que você pediu e as que recebeu.</td></tr>
+                    <tr><td>5</td><td>Seção "Histórico"</td><td>Seu histórico completo</td><td>Todas as sessões passadas ficam guardadas aqui, incluindo canceladas e concluídas.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M5 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M5</span> Diagnóstico de Carreira (IA)
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/assistant?mode=diagnostic</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/assistant?mode=diagnostic</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>🧠 Diagnóstico de Carreira</td><td>Vou te fazer 7 perguntas para entender seu momento profissional. No final, você recebe uma análise personalizada com sugestão de mentores.</td></tr>
+                    <tr><td>2</td><td>DiagnosticProgressBar</td><td>Acompanhe seu progresso</td><td>Essa barra mostra em qual etapa você está. Pode pular perguntas opcionais.</td></tr>
+                    <tr><td>3</td><td>ChipGroup</td><td>Responda por clique ou texto</td><td>Selecione as opções que mais combinam com você, ou digite uma resposta livre. Pode usar o microfone também!</td></tr>
+                    <tr><td>4</td><td>VoiceInput (microfone)</td><td>Fale em vez de digitar</td><td>Prefere falar? Clique aqui e a IA transcreve pra você.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M6 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M6</span> Assistente de IA (Copiloto)
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/assistant</code> sem <code>mode=diagnostic</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/assistant</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Área de mensagens (briefing)</td><td>Seu copiloto de carreira</td><td>Eu já conheço seu perfil e suas mentorias. Me pergunte qualquer coisa sobre a plataforma, carreira ou seus próximos passos.</td></tr>
+                    <tr><td>2</td><td>Chips de ação rápida</td><td>Atalhos inteligentes</td><td>Esses chips são ações que eu sugiro com base no seu momento. Clique para iniciar uma conversa direcionada.</td></tr>
+                    <tr><td>3</td><td>Campo de input</td><td>Converse naturalmente</td><td>Digite sua dúvida como se estivesse falando com alguém. Posso buscar mentores, verificar sua agenda e muito mais.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M7 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M7</span> Comunidade
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/community</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/community</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>🌍 Comunidade Menvo</td><td>Aqui você encontra outros mentorados abertos a receber ajuda. Mentores podem te descobrir e oferecer mentoria.</td></tr>
+                    <tr><td>2</td><td>Toggle "Ativar meu perfil"</td><td>Torne-se visível</td><td>Ative seu perfil na comunidade para que mentores possam te encontrar e oferecer ajuda proativamente.</td></tr>
+                    <tr><td>3</td><td>Card de um membro</td><td>Perfil da comunidade</td><td>Cada card mostra o nome, área de interesse e objetivos. Mentores podem clicar para oferecer ajuda.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-M8 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentee">OB-M8</span> Meu Perfil (Campos Essenciais)
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/profile</code> após OB-M1, OU perfil &lt;60% completo</td></tr>
+                <tr><td>Página-alvo</td><td><code>/profile</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>📝 Seu perfil é seu cartão de visita</td><td>Mentores analisam seu perfil antes de aceitar pedidos. Quanto mais completo, maiores suas chances!</td></tr>
+                    <tr><td>2</td><td>Campo avatar/foto</td><td>Adicione uma foto</td><td>Perfis com foto recebem muito mais respostas. Pode ser do LinkedIn, GitHub ou uma selfie!</td></tr>
+                    <tr><td>3</td><td>Campo bio</td><td>Conte sua história</td><td>Escreva 2-3 frases sobre quem você é, o que busca e por que quer mentoria. Seja autêntico!</td></tr>
+                    <tr><td>4</td><td>Campo LinkedIn</td><td>Conecte seu LinkedIn</td><td>O LinkedIn é o principal canal de contato com mentores. Adicione para facilitar a comunicação.</td></tr>
+                    <tr><td>5</td><td>Aba "Carreira e Interesses"</td><td>Defina seus objetivos</td><td>Preencha seu nível acadêmico, área de interesse e objetivo principal. Isso ajuda o matching com IA.</td></tr>
+                    <tr><td>6</td><td>Popover central</td><td>✅ Perfil completo = mais mentorias</td><td>Volte aqui sempre que quiser atualizar. Agora vá explorar os mentores!</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- ==================== MENTOR ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🔵 Mentor</h2>
+        </div>
+
+        <!-- OB-T1 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentor">OB-T1</span> Pós-Aprovação do Mentor
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeiro login após <code>verification_status = approved</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/dashboard/mentor</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>🎉 Parabéns, você é um mentor verificado!</td><td>Sua candidatura foi aprovada. Agora você faz parte de um grupo seleto de profissionais que doam seu tempo para transformar vidas.</td></tr>
+                    <tr><td>2</td><td>Card "Pedidos Pendentes"</td><td>Pedidos de mentoria</td><td>Quando mentorados solicitarem sessões, os pedidos aparecerão aqui. Aceite ou recuse com uma mensagem.</td></tr>
+                    <tr><td>3</td><td>Card "Próxima Sessão"</td><td>Suas sessões agendadas</td><td>Sessões confirmadas aparecem aqui com link do Google Meet.</td></tr>
+                    <tr><td>4</td><td>Card "Diagnósticos Compartilhados"</td><td>Diagnósticos dos mentorados</td><td>Mentorados podem compartilhar seu diagnóstico de carreira com você antes da sessão. Use para se preparar!</td></tr>
+                    <tr><td>5</td><td>Link "Disponibilidade"</td><td>Configure sua agenda</td><td>O próximo passo essencial: configure seus horários disponíveis para que mentorados possam agendar.</td></tr>
+                    <tr><td>6</td><td>Seção de stats</td><td>Seu desempenho</td><td>Acompanhe quantas sessões realizou, sua nota média e os feedbacks recebidos.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-T2 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentor">OB-T2</span> Gestão da Agenda
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/dashboard/mentor/availability</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/dashboard/mentor/availability</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>📅 Configure seus horários</td><td>Defina os dias e horários em que você está disponível para mentorias. Os mentorados só verão os horários que você liberar.</td></tr>
+                    <tr><td>2</td><td>Seletor de dia da semana</td><td>Escolha os dias</td><td>Selecione os dias da semana em que deseja receber mentorias. Pode alterar a qualquer momento.</td></tr>
+                    <tr><td>3</td><td>Seletor de horário</td><td>Defina o intervalo</td><td>Cada slot tem no mínimo 45 minutos. Configure quantos blocos quiser por dia.</td></tr>
+                    <tr><td>4</td><td>Card "Google Calendar"</td><td>Sincronize sua agenda pessoal</td><td>Conecte seu Google Calendar para que horários ocupados sejam automaticamente removidos. É só consulta — a Menvo não grava eventos na sua agenda.</td></tr>
+                    <tr><td>5</td><td>Preview calendário</td><td>Veja como ficou</td><td>Essa visualização mostra os próximos 14 dias com seus horários projetados. Confira se está como desejado.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-T3 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentor">OB-T3</span> Painel do Mentor (Mentorias Recebidas)
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/mentorship/mentor</code> com ≥1 pedido</td></tr>
+                <tr><td>Página-alvo</td><td><code>/mentorship/mentor</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Seção "Requer sua ação"</td><td>Responda os pedidos</td><td>Pedidos de mentorados aguardando sua resposta aparecem aqui. Confirme ou recuse sempre com uma mensagem.</td></tr>
+                    <tr><td>2</td><td>Botão "Confirmar"</td><td>Aceite com um clique</td><td>Ao confirmar, o mentorado recebe a notificação e o link do Google Meet é gerado automaticamente.</td></tr>
+                    <tr><td>3</td><td>Seção "Próximas sessões"</td><td>Sessões agendadas</td><td>Sessões confirmadas com data, hora e link da videochamada.</td></tr>
+                    <tr><td>4</td><td>Seção "Histórico"</td><td>Avaliações e feedbacks</td><td>Veja as avaliações que os mentorados deixaram e acompanhe seu impacto na plataforma.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-T4 -->
+        <details>
+            <summary>
+                <span class="badge badge-mentor">OB-T4</span> Fluxo de Candidatura a Mentor (Verificação)
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td><code>role = mentor</code> + <code>verification_status = pending</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/profile</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>📋 Sua candidatura está em análise</td><td>Para ser exibido no catálogo, seu perfil precisa ser aprovado pela equipe. Veja o que acelera a aprovação.</td></tr>
+                    <tr><td>2</td><td>Campo foto</td><td>Foto profissional</td><td>Uma foto real e profissional transmite confiança e aumenta suas chances.</td></tr>
+                    <tr><td>3</td><td>Campo bio</td><td>Bio completa e autêntica</td><td>Descreva sua experiência, áreas de atuação e motivação para mentorar. Quanto mais detalhado, melhor.</td></tr>
+                    <tr><td>4</td><td>Campo LinkedIn</td><td>LinkedIn é obrigatório</td><td>Precisamos validar sua identidade profissional. Certifique-se de que o link está correto.</td></tr>
+                    <tr><td>5</td><td>Campo cargo/empresa</td><td>Cargo e empresa atuais</td><td>Esses campos ajudam mentorados a entender seu contexto profissional.</td></tr>
+                    <tr><td>6</td><td>Aba "Mentoria"</td><td>Defina suas especialidades</td><td>Selecione os tópicos que você domina e está disposto a mentorar. Isso aparece no catálogo.</td></tr>
+                    <tr><td>7</td><td>Popover central</td><td>⏳ Fique tranquilo</td><td>O time da Menvo analisa cada candidatura com cuidado. Você receberá um e-mail assim que houver uma resposta.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- ==================== ORG ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🏢 Membro de Organização</h2>
+        </div>
+
+        <!-- OB-O1 -->
+        <details>
+            <summary>
+                <span class="badge badge-org">OB-O1</span> Primeiro Acesso como Membro de Org
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td><code>organization_members.status = active</code> (primeiro login)</td></tr>
+                <tr><td>Página-alvo</td><td><code>/o/[slug]</code> ou <code>/profile?tab=organizations</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>🏢 Você é membro de [Org]!</td><td>Agora você faz parte de uma organização parceira na Menvo. Isso desbloqueia recursos especiais.</td></tr>
+                    <tr><td>2</td><td>Aba organizações no perfil</td><td>Suas organizações</td><td>Veja as organizações das quais você é membro e gerencie suas participações aqui.</td></tr>
+                    <tr><td>3</td><td>Página pública da org</td><td>Página da organização</td><td>Essa é a página pública da organização. Outros membros e mentores parceiros aparecem aqui.</td></tr>
+                    <tr><td>4</td><td>Popover central</td><td>💡 Dica</td><td>Aproveite os mentores da organização! Muitos estão disponíveis exclusivamente para os membros.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- ==================== ORG ADMIN ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🛡️ Admin de Organização</h2>
+        </div>
+
+        <!-- OB-A1 -->
+        <details>
+            <summary>
+                <span class="badge badge-admin">OB-A1</span> Painel da Organização
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/dashboard/org</code> como admin</td></tr>
+                <tr><td>Página-alvo</td><td><code>/dashboard/org</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>🎯 Painel da Organização</td><td>Aqui você gerencia membros, convites e acompanha o engajamento da sua organização na Menvo.</td></tr>
+                    <tr><td>2</td><td>Seção de membros</td><td>Gerencie membros</td><td>Veja quem está ativo, pendente ou convidado. Aprove pedidos de entrada e envie novos convites.</td></tr>
+                    <tr><td>3</td><td>Botão "Convidar"</td><td>Convide novos membros</td><td>Envie convites por e-mail para que novas pessoas entrem na sua organização.</td></tr>
+                    <tr><td>4</td><td>Stats de engajamento</td><td>Acompanhe o impacto</td><td>Veja quantas mentorias foram agendadas, quiz realizados e o nível de atividade dos membros.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- ==================== TRANSVERSAL ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🔧 Ferramentas Transversais (Todos os Papéis)</h2>
+        </div>
+
+        <!-- OB-X1 -->
+        <details>
+            <summary>
+                <span class="badge badge-cross">OB-X1</span> Quiz de Carreira
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/quiz</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/quiz</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Popover central</td><td>📊 Quiz de Carreira</td><td>Responda 8 perguntas rápidas e receba uma análise sobre seu momento profissional — com sugestões de mentores.</td></tr>
+                    <tr><td>2</td><td>Primeira pergunta</td><td>Responda com sinceridade</td><td>Não existe resposta certa ou errada. Quanto mais honesto, melhor será a análise.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-X2 -->
+        <details>
+            <summary>
+                <span class="badge badge-cross">OB-X2</span> Denúncia e Segurança
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Contextual — primeira visita a <code>/mentors/[slug]</code> ou <code>/community</code></td></tr>
+                <tr><td>Página-alvo</td><td>Qualquer página com conteúdo de outro usuário</td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Botão/ícone de denúncia</td><td>Denunciar conduta</td><td>Se alguém agir de forma inadequada, clique aqui para fazer uma denúncia. A equipe da Menvo analisa cada caso com seriedade.</td></tr>
+                    <tr><td>2</td><td>Popover</td><td>🛡️ Ambiente seguro</td><td>A Menvo tem tolerância zero com assédio, discriminação e qualquer tipo de abuso. Sua segurança é nossa prioridade.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- OB-X3 -->
+        <details>
+            <summary>
+                <span class="badge badge-cross">OB-X3</span> Configurações e Privacidade
+            </summary>
+            <table class="meta-table">
+                <tr><td>Gatilho</td><td>Primeira visita a <code>/settings</code></td></tr>
+                <tr><td>Página-alvo</td><td><code>/settings</code></td></tr>
+            </table>
+            <table class="step-table">
+                <thead><tr><th>#</th><th>Elemento</th><th>Título</th><th>Descrição</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Seção de privacidade</td><td>Controle seus dados</td><td>Gerencie suas preferências de e-mail, privacidade e exclusão de conta aqui.</td></tr>
+                    <tr><td>2</td><td>Botão "Excluir conta"</td><td>Seu direito de exclusão</td><td>Se quiser sair da plataforma, você pode apagar todos os seus dados a qualquer momento. Garantia LGPD.</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <!-- ==================== ESTADO E IMPLEMENTAÇÃO ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🗄️ Armazenamento de Estado</h2>
+        </div>
+
+        <div class="phase-card mb-4">
+            <h3 class="font-semibold text-slate-700 mb-2">Opção A — JSONB em <code>profiles</code> (Recomendada)</h3>
+            <pre class="bg-slate-50 rounded-lg p-3 text-sm text-slate-700 overflow-x-auto"><code>ALTER TABLE profiles
+ADD COLUMN onboarding_flags jsonb NOT NULL DEFAULT '{}';
+
+-- Exemplo: { "ob_m1": "2026-10-02T14:00:00Z", "ob_m2": "2026-10-02T14:05:00Z" }</code></pre>
+            <p class="text-sm text-slate-600 mt-2"><strong>Prós:</strong> Zero tabela nova, leitura no mesmo request de <code>/api/auth/me</code>.<br><strong>Contras:</strong> Não dá para fazer queries complexas por flag (mas não precisamos).</p>
+        </div>
+
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">🎯 Prioridade de Implementação</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div class="phase-card border-l-4 border-emerald-500">
+                <h3 class="font-bold text-emerald-700">Fase 1 — Core Mentee</h3>
+                <p class="text-sm text-slate-600 mt-1">OB-M1, OB-M2, OB-M3</p>
+                <p class="text-xs text-slate-500 mt-1">Primeiro login → catálogo → agendar</p>
+            </div>
+            <div class="phase-card border-l-4 border-blue-500">
+                <h3 class="font-bold text-blue-700">Fase 2 — Core Mentor</h3>
+                <p class="text-sm text-slate-600 mt-1">OB-T1, OB-T2, OB-M8</p>
+                <p class="text-xs text-slate-500 mt-1">Pós-aprovação + agenda + perfil</p>
+            </div>
+            <div class="phase-card border-l-4 border-violet-500">
+                <h3 class="font-bold text-violet-700">Fase 3 — Avançado Mentee</h3>
+                <p class="text-sm text-slate-600 mt-1">OB-M4, OB-M5, OB-M6</p>
+                <p class="text-xs text-slate-500 mt-1">Mentorias + diagnóstico + assistente</p>
+            </div>
+            <div class="phase-card border-l-4 border-amber-500">
+                <h3 class="font-bold text-amber-700">Fase 4 — Mentor Avançado</h3>
+                <p class="text-sm text-slate-600 mt-1">OB-T3, OB-T4, OB-M7</p>
+                <p class="text-xs text-slate-500 mt-1">Mentorias recebidas + comunidade</p>
+            </div>
+            <div class="phase-card border-l-4 border-slate-400">
+                <h3 class="font-bold text-slate-700">Fase 5 — Orgs + Transversal</h3>
+                <p class="text-sm text-slate-600 mt-1">OB-O1, OB-A1, OB-X1–X3</p>
+                <p class="text-xs text-slate-500 mt-1">Organizações e ferramentas</p>
+            </div>
+        </div>
+
+        <!-- ==================== DECISÕES ==================== -->
+        <div class="section-title">
+            <h2 class="text-2xl font-bold text-slate-800">❓ Decisões em Aberto</h2>
+        </div>
+
+        <div class="phase-card mb-8">
+            <ol class="list-decimal list-inside text-sm text-slate-700 space-y-3">
+                <li><strong>Mentor-exemplo:</strong> Usar o Paul Pessoa real (agenda sempre com slots) ou criar um mentor "fantasma"? <em class="text-emerald-600">→ Recomendação: Paul Pessoa real.</em></li>
+                <li><strong>Idioma dos tours:</strong> Usar chaves de i18n (<code>messages/{pt-BR,en,es}.json</code>) desde o início? <em class="text-emerald-600">→ Recomendação: Sim.</em></li>
+                <li><strong>Armazenamento de flags:</strong> Opção A (JSONB em <code>profiles</code>) ou Opção B (tabela separada)? <em class="text-emerald-600">→ Recomendação: Opção A.</em></li>
+            </ol>
+        </div>
+
+        <footer class="text-center text-xs text-slate-400 border-t pt-4 pb-8">
+            Menvo — Mapa de Onboardings · Gerado em outubro de 2026
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>

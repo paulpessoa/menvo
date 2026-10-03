@@ -34,13 +34,13 @@ drop policy if exists "Users read own feedback" on public.feedback;
 create policy "Users insert own feedback"
   on public.feedback for insert to anon, authenticated
   with check (
-    user_id is null or user_id = auth.uid()
+    user_id is null or user_id = (select auth.uid())
   );
 
 create policy "Users read own feedback"
   on public.feedback for select to authenticated
   using (
-    user_id = auth.uid() or public.is_admin()
+    user_id = (select auth.uid()) or public.is_admin()
   );
 
 revoke all on public.feedback from anon;

@@ -16,9 +16,9 @@ export interface DetectedLocation {
 export function useDetectLocation(onDetected: (location: DetectedLocation) => void) {
   const [isDetecting, setIsDetecting] = useState(false)
 
-  const detect = () => {
+  const detect = (silent = false) => {
     if (typeof window === "undefined" || !navigator.geolocation) {
-      toast.error("Geolocalização não é suportada pelo seu navegador.")
+      if (!silent) toast.error("Geolocalização não é suportada pelo seu navegador.")
       return
     }
 
@@ -37,20 +37,22 @@ export function useDetectLocation(onDetected: (location: DetectedLocation) => vo
             state: addr.state || "",
             country: addr.country || "",
           })
-          toast.success("Localização preenchida!")
+          if (!silent) toast.success("Localização preenchida!")
         } catch {
-          toast.error("Não foi possível identificar sua cidade. Preencha manualmente.")
+          if (!silent) toast.error("Não foi possível identificar sua cidade. Preencha manualmente.")
         } finally {
           setIsDetecting(false)
         }
       },
       (error) => {
         setIsDetecting(false)
-        toast.error(
-          error.code === error.PERMISSION_DENIED
-            ? "Permissão de localização negada pelo navegador."
-            : "Não foi possível obter a sua localização."
-        )
+        if (!silent) {
+          toast.error(
+            error.code === error.PERMISSION_DENIED
+              ? "Permissão de localização negada pelo navegador."
+              : "Não foi possível obter a sua localização."
+          )
+        }
       },
       { timeout: 10000, enableHighAccuracy: false }
     )

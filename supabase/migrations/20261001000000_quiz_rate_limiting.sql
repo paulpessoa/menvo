@@ -78,7 +78,7 @@ create policy "Authenticated can submit own quiz responses"
   with check (
     public.is_admin()
     or (
-      user_id = auth.uid()
+      user_id = (select auth.uid())
       and (processed_at is not null or public.quiz_submission_status(email, ip_address, true) = 'ok')
     )
   );

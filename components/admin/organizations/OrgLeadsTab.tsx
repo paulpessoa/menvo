@@ -4,7 +4,6 @@ import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, Inbox, CheckCircle2, XCircle } from "lucide-react"
 import { RequireRole } from "@/lib/auth/auth-guard"
 import { Badge } from "@/components/ui/badge"
 import { PageContainer } from "@/components/layout/PageContainer"
@@ -25,7 +24,7 @@ interface OrgLead {
   created_at: string
 }
 
-export default function AdminOrgLeadsPage() {
+export default function OrgLeadsTab() {
   const [leads, setLeads] = useState<OrgLead[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('new')
@@ -78,33 +77,27 @@ export default function AdminOrgLeadsPage() {
   }
 
   return (
-    <RequireRole roles={["admin"]}>
-      <PageContainer>
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight">Organizações Interessadas</h1>
-            <p className="text-muted-foreground text-lg">Gerencie os pedidos de quem quer a Menvo na sua organização.</p>
-          </div>
+    <div className="space-y-8">
 
           <Tabs value={filter} onValueChange={setFilter} className="space-y-6">
             <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
               <TabsTrigger 
                 value="new" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-semibold text-sm md:text-base"
               >
-                <Inbox className="w-4 h-4" /> Novos
+                Novos
               </TabsTrigger>
               <TabsTrigger 
                 value="contacted" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-semibold text-sm md:text-base"
               >
-                <CheckCircle2 className="w-4 h-4" /> Contatados
+                Contatados
               </TabsTrigger>
               <TabsTrigger 
                 value="closed" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-bold text-base flex items-center gap-2"
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-2 pb-3 bg-transparent font-semibold text-sm md:text-base"
               >
-                <XCircle className="w-4 h-4" /> Encerrados
+                Encerrados
               </TabsTrigger>
             </TabsList>
 
@@ -116,7 +109,6 @@ export default function AdminOrgLeadsPage() {
               ) : leads.length === 0 ? (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                    <Building2 className="w-12 h-12 mb-4 opacity-20" />
                     <p>Nenhum lead encontrado com este status.</p>
                   </CardContent>
                 </Card>
@@ -174,8 +166,6 @@ export default function AdminOrgLeadsPage() {
               )}
             </div>
           </Tabs>
-        </div>
-      </PageContainer>
-    </RequireRole>
+    </div>
   )
 }

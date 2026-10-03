@@ -70,7 +70,6 @@ BEGIN
         email,
         first_name,
         last_name,
-        verified,
         created_at,
         updated_at
       ) VALUES (
@@ -78,7 +77,6 @@ BEGIN
         'teste@menvo.com',
         'Usuário',
         'Teste',
-        true,
         NOW(),
         NOW()
       );
@@ -146,8 +144,6 @@ BEGIN
         last_name,
         bio,
         expertise_areas,
-        chat_enabled,
-        verified,
         created_at,
         updated_at
       ) VALUES (
@@ -157,12 +153,15 @@ BEGIN
         'Teste',
         'Mentor de teste para desenvolvimento local',
         ARRAY['JavaScript', 'React', 'Node.js'],
-        true,
-        true,
         NOW(),
         NOW()
       );
     END IF;
+
+    -- Dados de mentor e verificação moram em mentor_profiles
+    INSERT INTO public.mentor_profiles (user_id, chat_enabled, verification_status, verified_at)
+    VALUES (test_mentor_id, true, 'approved', NOW())
+    ON CONFLICT (user_id) DO NOTHING;
     
     -- Adicionar role de mentor
     INSERT INTO public.user_roles (user_id, role_id)
@@ -174,12 +173,10 @@ BEGIN
   
   -- Habilitar chat para todos os mentores existentes
   IF mentor_role_id IS NOT NULL THEN
-    UPDATE public.profiles 
-    SET chat_enabled = true
-    WHERE id IN (
-      SELECT user_id FROM public.user_roles WHERE role_id = mentor_role_id
-    )
-    AND (chat_enabled = false OR chat_enabled IS NULL);
+    INSERT INTO public.mentor_profiles (user_id, chat_enabled)
+    SELECT user_id, true FROM public.user_roles WHERE role_id = mentor_role_id
+    ON CONFLICT (user_id) DO UPDATE SET chat_enabled = true
+    WHERE mentor_profiles.chat_enabled = false;
     
     GET DIAGNOSTICS updated_count = ROW_COUNT;
     RAISE NOTICE 'Chat habilitado para % mentores', updated_count;

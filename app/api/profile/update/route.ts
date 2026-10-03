@@ -3,6 +3,9 @@ import { createClient } from '@supabase/supabase-js'
 import { logger } from '@/lib/logger'
 import { ErrorHandler } from '@/lib/error-handler'
 import { Database } from '@/lib/types/supabase'
+import { MENTEE_PROFILE_EMBED_WITH_CV, splitMenteeFields, withMenteeFields } from '@/lib/services/mentees/mentee-profile-fields'
+import { cvLink } from '@/lib/services/mentees/cv-storage'
+import { toPlainText } from '@/lib/schemas/plain-text'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -34,7 +37,7 @@ export async function PUT(request: NextRequest) {
     const updateData: any = {
       first_name: body.first_name,
       last_name: body.last_name,
-      bio: body.bio,
+      bio: typeof body.bio === 'string' ? toPlainText(body.bio) : body.bio,
       avatar_url: body.avatar_url,
       city: body.city,
       state: body.state,
@@ -43,32 +46,43 @@ export async function PUT(request: NextRequest) {
       company: body.company,
       expertise_areas: body.expertise_areas,
       mentorship_topics: body.mentorship_topics,
-      inclusive_tags: body.inclusive_tags,
       linkedin_url: body.linkedin_url,
       github_url: body.github_url,
       website_url: body.website_url,
       portfolio_url: body.portfolio_url,
       languages: body.languages,
+      is_public: body.is_public,
+      updated_at: new Date().toISOString()
+    }
+
+    const menteeFields = splitMenteeFields({
       institution: body.institution,
       course: body.course,
       academic_level: body.academic_level,
       expected_graduation: body.expected_graduation,
-      is_public: body.is_public,
       learning_goals: body.learning_goals,
-      updated_at: new Date().toISOString()
-    }
+    }).mentee
 
     // Remover campos undefined
     Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key])
 
-    const { data: updatedProfile, error: updateError } = await supabaseAdmin
+    if (Object.keys(menteeFields).length > 0) {
+      const { error: menteeError } = await supabaseAdmin
+        .from("mentee_profiles")
+        .upsert({ user_id: user.id, ...menteeFields }, { onConflict: "user_id" })
+      if (menteeError) throw menteeError
+    }
+
+    const { data: updatedRow, error: updateError } = await supabaseAdmin
       .from("profiles")
       .update(updateData)
       .eq("id", user.id)
-      .select()
+      .select(`*, ${MENTEE_PROFILE_EMBED_WITH_CV}`)
       .single()
 
     if (updateError) throw updateError
+    const flattened = withMenteeFields(updatedRow)
+    const updatedProfile = { ...flattened, cv_url: cvLink(user.id, flattened.cv_url) }
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
@@ -96,7 +110,7 @@ export async function GET(request: NextRequest) {
 
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("profiles")
-      .select("*")
+      .select(`*, ${MENTEE_PROFILE_EMBED_WITH_CV}`)
       .eq("id", user.id)
       .single()
 
@@ -111,7 +125,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       profile: {
-        ...profile,
+        ...withMenteeFields(profile),
+        cv_url: cvLink(user.id, withMenteeFields(profile).cv_url),
         roles
       }
     })

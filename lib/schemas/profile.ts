@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { toPlainText } from "./plain-text"
 
 /**
  * Optional profile URL. People routinely paste `linkedin.com/in/fulano`
@@ -19,16 +20,14 @@ const profileUrl = (message: string) =>
 export const updateProfileSchema = z.object({
   first_name: z.string().trim().min(1, "Nome é obrigatório").optional(),
   last_name: z.string().trim().min(1, "Sobrenome é obrigatório").optional(),
-  bio: z.string().max(3000, "Bio muito longa").optional().nullable(),
+  bio: z.string().max(3000, "Bio muito longa").transform(toPlainText).optional().nullable(),
   job_title: z.string().max(150).optional().nullable(),
   company: z.string().max(150).optional().nullable(),
-  location: z.string().max(150).optional().nullable(),
   city: z.string().max(100).optional().nullable(),
   country: z.string().max(100).optional().nullable(),
   linkedin_url: profileUrl("URL do LinkedIn inválida"),
   github_url: profileUrl("URL do GitHub inválida"),
   website_url: profileUrl("URL do site inválida"),
-  twitter_url: profileUrl("URL do Twitter inválida"),
   phone: z.string().max(30).optional().nullable(),
   avatar_url: z.string().url().or(z.literal("")).optional().nullable(),
   academic_level: z.string().optional().nullable(),
@@ -47,7 +46,6 @@ export const updateProfileSchema = z.object({
       .min(3, "Slug deve ter ao menos 3 caracteres").max(60).optional()
   ),
   state: z.string().max(100).optional().nullable(),
-  address: z.string().max(255).optional().nullable(),
   portfolio_url: profileUrl("URL do portfólio inválida"),
   institution: z.string().max(150).optional().nullable(),
   course: z.string().max(150).optional().nullable(),
@@ -57,7 +55,8 @@ export const updateProfileSchema = z.object({
   mentorship_approach: z.string().max(2000).optional().nullable(),
   what_to_expect: z.string().max(2000).optional().nullable(),
   ideal_mentee: z.string().max(2000).optional().nullable(),
-  cv_url: z.string().url().or(z.literal("")).optional().nullable(),
+  // cv_url não entra: só /api/upload/cv grava (o caminho do arquivo). A URL
+  // que o formulário tem é assinada e expira; regravá-la quebraria o link.
   is_public: z.boolean().optional(),
   learning_goals: z.string().max(2000).optional().nullable(),
 })

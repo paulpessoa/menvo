@@ -34,7 +34,7 @@ create policy "Authenticated reads allowed profiles"
   for select
   to authenticated
   using (
-    id = auth.uid()
+    id = (select auth.uid())
     or public.is_admin()
     or (coalesce(is_public, false) and public.profile_is_mentor(id))
     or (coalesce(is_public, false) and public.current_user_is_mentor_or_admin())

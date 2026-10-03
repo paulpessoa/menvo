@@ -25,7 +25,7 @@ function makeRequest(body: any) {
 }
 
 describe("POST /api/admin/invites/send", () => {
-  let updateEq: jest.Mock
+  let upsert: jest.Mock
   let mockSupabase: any
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe("POST /api/admin/invites/send", () => {
     ;(createInviteToken as jest.Mock).mockResolvedValue({ token: "plaintext-token", inviteId: "invite-1" })
     ;(sendReengagementInvite as jest.Mock).mockResolvedValue({ success: true })
 
-    updateEq = jest.fn().mockResolvedValue({ error: null })
+    upsert = jest.fn().mockResolvedValue({ error: null })
     mockSupabase = {
       from: jest.fn().mockReturnValue({
         select: jest.fn().mockReturnValue({
@@ -42,7 +42,7 @@ describe("POST /api/admin/invites/send", () => {
             maybeSingle: jest.fn().mockResolvedValue({ data: { id: "u1", email: "u1@example.com", full_name: "U1" }, error: null })
           })
         }),
-        update: jest.fn().mockReturnValue({ eq: updateEq })
+        upsert
       })
     }
     ;(createServiceRoleClient as jest.Mock).mockReturnValue(mockSupabase)
@@ -68,7 +68,11 @@ describe("POST /api/admin/invites/send", () => {
     expect(sendReengagementInvite).toHaveBeenCalledWith(
       expect.objectContaining({ email: "u1@example.com", inviteUrl: expect.stringContaining("/convite/plaintext-token") })
     )
-    expect(updateEq).toHaveBeenCalledWith("id", "00000000-0000-0000-0000-000000000001")
+    expect(mockSupabase.from).toHaveBeenCalledWith("import_records")
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: "00000000-0000-0000-0000-000000000001" }),
+      { onConflict: "user_id" }
+    )
   })
 
   it("records a per-user failure instead of aborting the whole batch", async () => {

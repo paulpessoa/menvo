@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react"
-import { Search, Users, Loader2, Info, MessageCircle, Sparkles, X } from "lucide-react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
+import { Search, Users, Loader2, Info, MessageCircle, Sparkles, X, Lock } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -24,10 +24,12 @@ import {
 import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { useAiQuota } from "@/hooks/useAiQuota"
+import { useOnboarding } from "@/hooks/useOnboarding"
 import {
   communityService,
   type CommunityProfile,
 } from "@/lib/services/community/community.service"
+import { searchCommunityAction } from "@/app/actions/community"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
 import {
   Select,
@@ -58,6 +60,7 @@ export default function CommunityPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
 
   // Chat Sidebar State
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -88,7 +91,7 @@ export default function CommunityPage() {
   // Tracking query ID to safely discard out-of-order responses and avoid race conditions
   const queryIdRef = useRef(0)
 
-  const loadProfiles = async (
+  const loadProfiles = useCallback(async (
     isInitial: boolean,
     search: string,
     pageNum: number
@@ -102,21 +105,12 @@ export default function CommunityPage() {
     }
 
     try {
-      const queryParams = new URLSearchParams({
+      const result = await searchCommunityAction({
         search,
-        page: pageNum.toString(),
-        limit: ITEMS_PER_PAGE.toString(),
+        page: pageNum,
+        limit: ITEMS_PER_PAGE,
+        sortBy: filters.sortBy
       })
-
-
-      queryParams.append("sortBy", filters.sortBy)
-      
-      const response = await fetch(`/api/community?${queryParams.toString()}`)
-      if (!response.ok) {
-        throw new Error("Failed to load community profiles")
-      }
-      
-      const result = await response.json()
 
       // If a newer query was initiated while this one was in flight, discard this result
       if (currentQueryId !== queryIdRef.current) return
@@ -128,6 +122,7 @@ export default function CommunityPage() {
       }
 
       setHasMore(result.hasMore)
+      setTotalCount(result.totalCount || 0)
       setPage(pageNum)
     } catch (error) {
       if (currentQueryId === queryIdRef.current) {
@@ -140,7 +135,7 @@ export default function CommunityPage() {
         setLoadingMore(false)
       }
     }
-  }
+  }, [filters.sortBy, tCommunity])
 
   // Initial load on mount and debounced search updates
   useEffect(() => {
@@ -152,10 +147,34 @@ export default function CommunityPage() {
     return () => clearTimeout(timer)
   }, [searchTerm, filters])
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (loadingMore || !hasMore) return
     loadProfiles(false, searchTerm, page + 1)
-  }
+  }, [loadingMore, hasMore, page, searchTerm, loadProfiles])
+
+  const loaderRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          handleLoadMore()
+        }
+      },
+      { threshold: 1.0 }
+    )
+
+    const currentRef = loaderRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef)
+      }
+    }
+  }, [hasMore, loadingMore, handleLoadMore])
 
   const handleChat = (targetUserId: string) => {
     if (!user) {
@@ -270,70 +289,90 @@ export default function CommunityPage() {
   }, [profiles, displayedAIProfiles])
 
   return (
-    <RequireRole roles={["mentor", "admin"]}>
+    <RequireRole roles={["mentor", "admin"]} fallback={<RestrictedAccessFallback />}>
       <div className="container mx-auto px-4 py-12">
         {/* Header - Cute Phrase */}
         <p className="text-center text-sm sm:text-base text-muted-foreground mb-6">
           Seu hobby, sua vivência, sua história — alguém está buscando exatamente isso.
         </p>
 
-      {/* Search + Filters (Single Row) */}
-      <div className="flex flex-col xl:flex-row gap-3 w-full mb-8">
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={tCommunity("searchPlaceholder")}
-            className="pl-10 h-11 rounded-xl w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto shrink-0">
-          <AIMatchButton
-            title={tCommunity("magicSearch.title")}
-            description={tCommunity("magicSearch.disclaimer")}
-            placeholder={tCommunity("magicSearch.placeholder")}
-            loading={aiLoading}
-            loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
-            minCharsMessage={tCommunity("magicSearch.minChars")}
-            submitLabel={tCommunity("magicSearch.button")}
-            buttonLabel={tCommunity("magicSearch.button")}
-            quota={aiQuota}
-            quotaHint={(q) =>
-              q.reason === "budget"
-                ? tCommunity("magicSearch.budgetExhausted", {
-                    date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
-                  })
-                : q.remaining! > 0
-                  ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
-                  : tCommunity("magicSearch.quotaExhausted", {
-                      date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
-                    })
-            }
-            onSubmit={handleAISearch}
-          />
+      {/* Search and Filter Bar */}
+      <div id="tour-community-list" className="mb-2 sm:mb-3 space-y-3">
+        <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+          {/* Search + AI Match */}
+          <div className="flex-1 flex gap-2 min-w-0">
+            <div className="flex-1 relative min-w-0">
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
+              <Input
+                placeholder={tCommunity("searchPlaceholder")}
+                className={`pl-10 h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs focus-visible:ring-2 focus-visible:ring-primary/20 text-sm sm:text-base ${
+                  searchTerm ? "pr-10" : ""
+                }`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  aria-label="Limpar busca"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            
+            <div id="tour-community-ai">
+              <AIMatchButton
+                title={tCommunity("magicSearch.title")}
+                description={tCommunity("magicSearch.disclaimer")}
+                placeholder={tCommunity("magicSearch.placeholder")}
+                loading={aiLoading}
+                loginRequiredMessage={tCommunity("magicSearch.loginRequired")}
+                minCharsMessage={tCommunity("magicSearch.minChars")}
+                submitLabel={tCommunity("magicSearch.button")}
+                buttonLabel={tCommunity("magicSearch.button")}
+                quota={aiQuota}
+                quotaHint={(q) =>
+                  q.reason === "budget"
+                    ? tCommunity("magicSearch.budgetExhausted", {
+                        date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                      })
+                    : q.remaining! > 0
+                      ? tCommunity("magicSearch.quotaRemaining", { remaining: q.remaining!, limit: q.limit! })
+                      : tCommunity("magicSearch.quotaExhausted", {
+                          date: new Date(q.resetsAt).toLocaleDateString(locale, { day: "2-digit", month: "2-digit" })
+                        })
+                }
+                onSubmit={handleAISearch}
+                compact
+              />
+            </div>
+          </div>
 
-          <Select
-            value={filters.sortBy}
-            onValueChange={(val: any) =>
-              setFilters((prev) => ({ ...prev, sortBy: val }))
-            }
-          >
-            <SelectTrigger className="w-full sm:w-[155px] h-11 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
-              <div className="flex items-center gap-1.5 truncate">
-                <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <SelectValue placeholder="Ordenar por" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="newest">Mais recentes</SelectItem>
-              <SelectItem value="oldest">Mais antigos</SelectItem>
-              <SelectItem value="name">A-Z</SelectItem>
-              <SelectItem value="name-desc">Z-A</SelectItem>
-            </SelectContent>
-          </Select>
-
+          {/* Sort & Filters Action Row */}
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
+            <Select
+              value={filters.sortBy}
+              onValueChange={(val: any) =>
+                setFilters((prev) => ({ ...prev, sortBy: val }))
+              }
+            >
+              <SelectTrigger className="w-full sm:w-[155px] h-11 sm:h-12 rounded-xl bg-card border border-border/80 shadow-2xs font-medium text-xs sm:text-sm">
+                <div className="flex items-center gap-1.5 truncate">
+                  <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <SelectValue placeholder="Ordenar por" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="newest">Mais recentes</SelectItem>
+                <SelectItem value="oldest">Mais antigos</SelectItem>
+                <SelectItem value="name">A-Z</SelectItem>
+                <SelectItem value="name-desc">Z-A</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
       
@@ -368,9 +407,20 @@ export default function CommunityPage() {
         </div>
       )}
 
+      {/* Results Header */}
+      {(searchTerm.trim() !== "" || displayedAIProfiles.length > 0) && (
+        <div className="flex items-center justify-between mb-4 mt-6">
+          <h2 className="text-xs font-black tracking-widest text-muted-foreground uppercase flex items-center gap-2">
+            {displayedAIProfiles.length > 0
+              ? `${profiles.length} RESULTADOS COM IA`
+              : `${totalCount} MEMBROS ENCONTRADOS`}
+          </h2>
+        </div>
+      )}
+
       {/* Results Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
@@ -392,7 +442,7 @@ export default function CommunityPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {displayedAIProfiles.map((profile) => (
               <MenteeCard
                 key={`ai-${profile.id}`}
@@ -414,19 +464,13 @@ export default function CommunityPage() {
           </div>
 
           {hasMore && (
-            <div className="mt-12 text-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="px-8 shadow-sm"
-              >
-                {loadingMore ? (
-                  <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                ) : null}
-                {tCommunity("loadMore")}
-              </Button>
+            <div ref={loaderRef} className="mt-12 flex justify-center p-4">
+              {loadingMore && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  {tCommon("loading")}
+                </div>
+              )}
             </div>
           )}
         </>
@@ -459,7 +503,48 @@ export default function CommunityPage() {
         </SheetContent>
       </Sheet>
       )}
+      <CommunityTour />
       </div>
     </RequireRole>
+  )
+}
+
+function CommunityTour() {
+  const steps = [
+    { popover: { title: "🤝 Comunidade da Menvo", description: "Bem-vindo à área exclusiva para mentores! Aqui você tem acesso ao diretório completo de pessoas buscando mentoria." } },
+    { element: "#tour-community-ai", popover: { title: "Matching Inteligente", description: "Use a IA da Menvo para cruzar suas skills com as necessidades dos mentorados e encontrar pessoas que você pode ajudar agora mesmo." } },
+    { element: "#tour-community-list", popover: { title: "Busca e Filtros", description: "Encontre perfis específicos usando a barra de pesquisa ou navegue pelos recém-chegados na plataforma." } },
+    { popover: { title: "Seja proativo!", description: "Muitos talentos têm receio de pedir mentoria. Fique à vontade para puxar conversa e oferecer ajuda." } }
+  ]
+
+  useOnboarding("ob_community_1", steps)
+
+  return null
+}
+
+function RestrictedAccessFallback() {
+  const router = useRouter()
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
+      <div className="bg-primary/10 p-5 rounded-full mb-6">
+        <Lock className="h-12 w-12 text-primary" />
+      </div>
+      <h1 className="text-3xl font-extrabold tracking-tight mb-4 text-foreground">
+        Área Exclusiva
+      </h1>
+      <p className="text-muted-foreground text-base max-w-[500px] mb-8 leading-relaxed">
+        A <strong>Comunidade</strong> é um espaço seguro e exclusivo para os mentores da plataforma conhecerem mentorados e colaborarem entre si. 
+        <br/><br/>
+        Se você deseja ter acesso a esta funcionalidade e ajudar outras pessoas, torne-se um mentor ativando seu perfil!
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <Button variant="outline" size="lg" onClick={() => router.back()} className="w-full sm:w-auto">
+          Voltar
+        </Button>
+        <Button size="lg" onClick={() => router.push('/profile?tab=mentorship')} className="w-full sm:w-auto shadow-md">
+          Quero ser Mentor
+        </Button>
+      </div>
+    </div>
   )
 }

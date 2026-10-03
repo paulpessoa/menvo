@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { ContactMenteeModal } from "./ContactMenteeModal"
-import { MessageCircle, Linkedin, AlertCircle, X, Eye, Sparkles, User, FileText } from "lucide-react"
+import { MessageCircle, Linkedin, AlertCircle, X, Eye, Sparkles, User, FileText, Briefcase, ChevronRight } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -92,63 +92,59 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
 
   return (
     <>
-      <Card
-        className={`hover:shadow-xl transition-all duration-300 flex flex-col h-full shadow-sm bg-white group overflow-hidden rounded-[2rem] relative ${
-          isAIHighlighted ? "border-primary/40 ring-1 ring-primary/20" : "border-none"
+      <div
+        className={`group relative flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+          isAIHighlighted
+            ? 'border-primary/40 dark:border-primary-400/40 ring-1 ring-primary/20'
+            : 'border-slate-200/80 dark:border-slate-800'
         }`}
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-
         {isAIHighlighted && (
           <div className="absolute top-4 left-4 z-[2] inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/90 text-white backdrop-blur-md shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Recomendado pela IA</span>
           </div>
         )}
-        
-        <CardHeader className="pb-3 px-6 pt-8">
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="relative">
-              <Avatar className="h-20 w-20 border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300">
-                <AvatarImage
-                  src={profile.avatar_url || ""}
-                  alt={profile.full_name || "Membro"}
-                />
-                <AvatarFallback className="bg-primary/5 text-primary text-xl font-bold">
-                  {profile.full_name?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-            <div className="space-y-1">
-              <CardTitle className="text-xl font-extrabold text-gray-900 group-hover:text-primary transition-colors">
-                {profile.full_name || "Membro Menvo"}
-              </CardTitle>
-              {profile.job_title && (
-                <div className="flex flex-col items-center text-sm font-semibold text-primary/70">
-                  <span>{profile.job_title}</span>
-                  {profile.company && (
-                    <span className="text-xs text-muted-foreground font-medium">@{profile.company}</span>
-                  )}
-                </div>
-              )}
-              <div className="flex items-center justify-center gap-2 pt-1">
-                {profile.linkedin_url && (
-                  <div className="flex items-center gap-1 text-blue-500" title="Tem LinkedIn">
-                    <Linkedin className="h-3.5 w-3.5" />
-                  </div>
-                )}
-                {profile.cv_url && (
-                  <div className="flex items-center gap-1 text-primary" title="Tem currículo">
-                    <FileText className="h-3.5 w-3.5" />
-                  </div>
-                )}
+
+        {/* HERO IMAGE */}
+        <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
+          {profile.avatar_url ? (
+            <img
+              src={profile.avatar_url}
+              alt={profile.full_name || "Membro"}
+              className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 via-primary-50/20 to-slate-200 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 select-none">
+              <div className="w-20 h-20 rounded-full bg-white dark:bg-slate-800 shadow-md border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-primary-700 dark:text-primary-300">
+                <User className="w-10 h-10 opacity-50" />
               </div>
             </div>
-          </div>
-        </CardHeader>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-1.5">
+            <h3 className="text-xl font-black text-white leading-tight drop-shadow-md">
+              {profile.full_name || "Membro Menvo"}
+            </h3>
+            {profile.job_title && (
+              <div className="flex items-center gap-1.5 text-white/90 text-sm font-medium">
+                <Briefcase className="w-3.5 h-3.5 opacity-80" />
+                <span className="truncate">
+                  {profile.job_title}
+                  {profile.company ? ` @ ${profile.company}` : ''}
+                </span>
+              </div>
+            )}
 
-        <CardContent className="space-y-5 flex-1 flex flex-col px-8 pb-8">
-          <div className="space-y-3 flex-1 text-center">
+          </div>
+        </div>
+
+        {/* CONTENT */}
+        <div className="flex-1 p-5 flex flex-col">
+          <div className="space-y-3 flex-1">
             {aiReason ? (
               <p className="text-xs text-primary italic line-clamp-3 leading-relaxed border-l-2 border-primary/40 pl-2.5 bg-primary/5 py-1.5 rounded-r-md text-left">
                 <Sparkles className="w-3 h-3 inline-block mr-1 -mt-0.5" />
@@ -159,28 +155,27 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                   {tCommunity("seekingHelpWith")}
                 </p>
-                <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed italic">
+                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed italic">
                   "{profile.bio || tCommunity("noBioProvided")}"
                 </p>
               </>
             )}
+
+            {topics && topics.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-2">
+                {topics.slice(0, 3).map((area, i) => (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="text-[9px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-none px-2"
+                  >
+                    {area}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
-
-          {topics && topics.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1.5 pt-2">
-              {topics.slice(0, 3).map((area, i) => (
-                <Badge
-                  key={i}
-                  variant="secondary"
-                  className="text-[9px] font-bold uppercase tracking-wider bg-primary/5 text-primary border-none px-2"
-                >
-                  {area}
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center gap-3 pt-6">
+          <div className="mt-auto pt-4 flex flex-col gap-3">
             {!isSelf && (
               <ContactMenteeModal
                 menteeId={profile.id}
@@ -189,7 +184,7 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
               >
                 <Button
                   variant="outline"
-                  className="flex-[1] rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-12"
+                  className="w-full rounded-xl text-sm font-bold text-primary hover:text-primary hover:border-primary h-10 border-primary/20"
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   {tCommunity("offerHelp")}
@@ -197,24 +192,20 @@ export function MenteeCard({ profile, isMentor, onChat, isAIHighlighted = false,
               </ContactMenteeModal>
             )}
 
-            <Button
-              size="lg"
-              onClick={handleViewProfile}
-              className="flex-[1.5] gap-2 font-bold rounded-xl h-12 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01]"
-            >
-              {isSelf ? (
-                <>
-                  <User className="h-5 w-5" /> Meu Perfil
-                </>
-              ) : (
-                <>
-                  Ver Perfil
-                </>
-              )}
-            </Button>
+            <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800/80 pt-3 text-xs text-slate-500 dark:text-slate-400">
+              <span /> {/* Spacer */}
+
+              <button
+                onClick={handleViewProfile}
+                className="inline-flex items-center gap-1 font-semibold text-primary-700 dark:text-primary-400 hover:translate-x-0.5 transition-transform"
+              >
+                <span>{isSelf ? "Meu Perfil" : "Ver Perfil"}</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Modal de Login Necessário */}
       <LoginRequiredModal

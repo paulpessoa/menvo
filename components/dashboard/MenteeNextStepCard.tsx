@@ -38,7 +38,7 @@ interface MenteeNextStepCardProps {
 export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, diagnosticHref }: MenteeNextStepCardProps) {
   if (hasPendingReview) {
     return (
-      <Card className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent shadow-sm">
+      <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent shadow-sm">
         <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
@@ -65,7 +65,7 @@ export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, di
     const isConfirmed = nextSession.status === "confirmed"
 
     return (
-      <Card className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent shadow-sm">
+      <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent shadow-sm">
         <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5 min-w-0">
             <Avatar className="h-11 w-11 border shrink-0">
@@ -100,7 +100,7 @@ export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, di
 
   if (!quizDone) {
     return (
-      <Card className="relative overflow-hidden rounded-2xl border-none bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 text-white shadow-lg">
+      <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border-none bg-gradient-to-r from-primary-800 via-primary-700 to-primary-600 text-white shadow-lg">
         <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="p-2.5 rounded-xl bg-white/15 shrink-0">
@@ -122,7 +122,7 @@ export function MenteeNextStepCard({ hasPendingReview, nextSession, quizDone, di
   }
 
   return (
-    <Card className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent shadow-sm">
+    <Card id="tour-next-session" className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent shadow-sm">
       <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">

@@ -40,15 +40,17 @@ export function LoginRequiredModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <div className="mx-auto w-12 h-12 rounded-full bg-blue-50 border-2 border-blue-200 flex items-center justify-center mb-4">
-            <LogIn className="h-6 w-6 text-blue-600" />
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-primary/10 rounded-full">
+              <LogIn className="w-6 h-6 text-primary" />
+            </div>
           </div>
           <DialogTitle className="text-center">{title}</DialogTitle>
           <DialogDescription className="text-center">{finalDescription}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
+          <div className="p-4 rounded-lg bg-muted/50 border border-border">
             <h4 className="font-semibold mb-2">Benefícios de ter uma conta:</h4>
             <ul className="text-sm space-y-1 list-disc list-inside">
               <li>Acesso a mentores verificados</li>
@@ -63,7 +65,7 @@ export function LoginRequiredModal({
               <LogIn className="h-4 w-4 mr-2" />
               Fazer Login
             </Button>
-            <Button variant="outline" onClick={handleSignup} className="w-full bg-transparent">
+            <Button variant="outline" onClick={handleSignup} className="w-full">
               <UserPlus className="h-4 w-4 mr-2" />
               Criar Conta
             </Button>

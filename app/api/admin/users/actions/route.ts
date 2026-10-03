@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     // Buscar dados do usuário alvo
     const { data: targetUser } = await supabase
       .from('profiles')
-      .select('email, full_name, verified')
+      .select('email, full_name')
       .eq('id', userId)
       .single()
 
@@ -77,50 +77,23 @@ export async function POST(request: NextRequest) {
         break
 
       case 'toggle_verification':
+      case 'toggle_verification_legacy':
         // Aposentado: aprovar mentor só por POST /api/admin/verify, que também
-        // concede o papel, publica o perfil e avisa a pessoa.
+        // concede o papel, publica o perfil e avisa a pessoa. O "legacy"
+        // ligava profiles.verified direto, pulando tudo isso.
         return NextResponse.json(
           { error: 'Use /api/admin/verify para decidir candidaturas a mentor' },
           { status: 410 }
         )
-
-      case 'toggle_verification_legacy':
-        const newVerificationStatus = !targetUser.verified
-        
-        const { error: verificationError } = await supabase
-          .from('profiles')
-          .update({ verified: newVerificationStatus })
-          .eq('id', userId)
-
-        if (verificationError) {
-          return NextResponse.json({ error: 'Erro ao alterar status de verificação' }, { status: 500 })
-        }
-
-        result.newStatus = newVerificationStatus ? 'verified' : 'pending'
-        auditDetails = { 
-          old_status: targetUser.verified ? 'verified' : 'pending',
-          new_status: result.newStatus
-        }
-        
-        // Log de auditoria
-        await logAdminAction(
-          user.id,
-          'user_status_changed',
-          auditDetails,
-          userId,
-          targetUser.email,
-          request
-        )
-        break
 
       case 'toggle_volunteer':
         const currentVolunteerStatus = actionData?.currentStatus || false
         const newVolunteerStatus = !currentVolunteerStatus
         
         const { error: volunteerError } = await supabase
-          .from('profiles')
+          .from('mentor_profiles')
           .update({ is_volunteer: newVolunteerStatus })
-          .eq('id', userId)
+          .eq('user_id', userId)
 
         if (volunteerError) {
           return NextResponse.json({ error: 'Erro ao alterar status de voluntário' }, { status: 500 })

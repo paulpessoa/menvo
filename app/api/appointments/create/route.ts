@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { sendAppointmentRequest } from "@/lib/email/brevo"
+import { sendAppointmentRequest, sendAdminNewAppointmentNotification } from "@/lib/email/brevo"
 import { createAppointmentSchema } from "@/lib/schemas/appointment"
 import crypto from "crypto"
 
@@ -77,29 +77,14 @@ export async function POST(request: NextRequest) {
 
     // Notificar Admin (MENVO)
     try {
-      const brevoKey = process.env.BREVO_API_KEY
-      if (brevoKey) {
-        await fetch("https://api.brevo.com/v3/smtp/email", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "api-key": brevoKey
-          },
-          body: JSON.stringify({
-            sender: { name: "Menvo Sistema", email: "contato@menvo.com.br" },
-            to: [{ email: "contato@menvo.com.br", name: "Admin Menvo" }],
-            subject: `🚨 Nova Solicitação: ${appointment.mentee.full_name} -> ${appointment.mentor.full_name}`,
-            htmlContent: `
-              <h3>Nova solicitação de mentoria no sistema</h3>
-              <p><strong>Mentor:</strong> ${appointment.mentor.full_name} (${appointment.mentor.email})</p>
-              <p><strong>Mentee:</strong> ${appointment.mentee.full_name} (${appointment.mentee.email})</p>
-              <p><strong>Data:</strong> ${new Date(appointment.scheduled_at).toLocaleString("pt-BR")}</p>
-              <p><strong>Notas:</strong> ${appointment.notes_mentee}</p>
-            `
-          })
-        })
-      }
+      await sendAdminNewAppointmentNotification({
+        mentorName: appointment.mentor.full_name,
+        mentorEmail: appointment.mentor.email,
+        menteeName: appointment.mentee.full_name,
+        menteeEmail: appointment.mentee.email,
+        scheduledAt: appointment.scheduled_at,
+        notes: appointment.notes_mentee
+      })
     } catch (adminNotifyError) {
       console.error("❌ [CREATE APPOINTMENT] Erro ao notificar admin:", adminNotifyError)
     }
