@@ -19,10 +19,9 @@ import { MenteeQuizCTA } from "@/components/MenteeQuizCTA"
 import { MenteeNextStepCard } from "@/components/dashboard/MenteeNextStepCard"
 import { MenteeActivationChecklist } from "@/components/dashboard/MenteeActivationChecklist"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
-import { quizService } from "@/lib/services/quiz/quiz.service"
+import { useLatestQuiz } from "@/hooks/quiz/useLatestQuiz"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
-import type { QuizSummary } from "@/lib/domain/quiz/quiz.entity"
 import { useOnboarding } from "@/hooks/useOnboarding"
 
 interface MenteeStats {
@@ -72,8 +71,10 @@ export default function MenteeDashboard() {
   const [favoriteMentorsData, setFavoriteMentorsData] = useState<FavoriteMentor[]>([])
   const [loading, setLoading] = useState(true)
   const [loadingFavorites, setLoadingFavorites] = useState(false)
-  const [quizSummary, setQuizSummary] = useState<QuizSummary | null>(null)
-  const [loadingQuiz, setLoadingQuiz] = useState(true)
+  // Sent quizzes invalidate this (lib/query/effects.ts), so the card refreshes without a reload.
+  const latestQuiz = useLatestQuiz(user?.id)
+  const quizSummary = latestQuiz.data ?? null
+  const loadingQuiz = !user?.id || latestQuiz.isPending
 
   const [hasPendingReview, setHasPendingReview] = useState(false)
   const { favorites } = useFavorites(user?.id)
@@ -117,28 +118,12 @@ export default function MenteeDashboard() {
     }
   }
 
-  const fetchQuizStatus = async () => {
-    if (!user?.email) {
-      setLoadingQuiz(false)
-      return
-    }
-    try {
-      const summary = await quizService.getLatestQuizResponseByEmail(user.email)
-      setQuizSummary(summary)
-    } catch (error) {
-      console.error("Error checking mentee quiz status:", error)
-    } finally {
-      setLoadingQuiz(false)
-    }
-  }
-
   useEffect(() => {
     if (user?.id) {
       fetchMenteeStats()
       fetchUpcomingAppointments()
-      fetchQuizStatus()
     }
-  }, [user?.id, user?.email, profile])
+  }, [user?.id, profile])
 
   useEffect(() => {
     if (user?.id && favorites.length > 0) fetchFavoriteMentorsDetails()

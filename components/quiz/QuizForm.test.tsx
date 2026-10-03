@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event"
 import { QuizForm } from "./QuizForm"
 import { QuizRadioStep } from "./steps/QuizRadioStep"
 import { QuizAreasStep } from "./steps/QuizAreasStep"
+import { QUIZ_DRAFT_KEY, QUIZ_DRAFT_VERSION } from "@/lib/quiz/draft"
+import { writeDraft } from "@/hooks/usePersistentDraft"
 
 // Devolve a chave + parâmetros, para dar para conferir "etapa 2 de 8" sem depender do texto traduzido.
 jest.mock("next-intl", () => ({
@@ -20,6 +22,8 @@ const options = [
   { value: "a", label: "Opção A" },
   { value: "b", label: "Opção B" }
 ]
+
+beforeEach(() => window.localStorage.clear()) // o rascunho persiste entre testes do mesmo arquivo
 
 describe("QuizRadioStep", () => {
   it("selects when the option text is clicked, exactly once", async () => {
@@ -120,6 +124,36 @@ describe("QuizForm", () => {
   it("has one step fewer for signed-in users", () => {
     render(<QuizForm onSubmit={jest.fn()} onBack={jest.fn()} isAuthenticated />)
     expect(screen.getByText(progress(1, 7))).toBeInTheDocument()
+  })
+
+  it("restores the saved answers and step after a reload", () => {
+    writeDraft(QUIZ_DRAFT_KEY, QUIZ_DRAFT_VERSION, { currentStep: 2, answers: { careerMoment: "transicao" } })
+    render(<QuizForm onSubmit={jest.fn()} onBack={jest.fn()} />)
+    expect(screen.getByText(progress(2))).toBeInTheDocument()
+  })
+
+  it("ignores a draft from another version", () => {
+    writeDraft(QUIZ_DRAFT_KEY, QUIZ_DRAFT_VERSION + 1, { currentStep: 2, answers: {} })
+    render(<QuizForm onSubmit={jest.fn()} onBack={jest.fn()} />)
+    expect(screen.getByText(progress(1))).toBeInTheDocument()
+  })
+
+  it("saves answers as the person goes, but never name, e-mail or LinkedIn", async () => {
+    const user = userEvent.setup({ delay: null })
+    render(
+      <QuizForm
+        onSubmit={jest.fn()}
+        onBack={jest.fn()}
+        initialData={{ name: "Ana Silva", email: "ana@example.com", linkedinUrl: "https://linkedin.com/in/ana" }}
+      />
+    )
+
+    await user.click(screen.getByText("quiz_form.university_student"))
+    await user.click(screen.getByRole("button", { name: /quiz_form\.next/ }))
+
+    const saved = window.localStorage.getItem(QUIZ_DRAFT_KEY) ?? ""
+    expect(saved).toContain("estudante-universitario")
+    expect(saved).not.toMatch(/ana@example\.com|Ana Silva|linkedin/)
   })
 
   it("exposes progress to assistive technology", () => {

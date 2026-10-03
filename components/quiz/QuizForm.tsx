@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-react"
 import { useTranslations } from 'next-intl'
 import { QuizFormData, stepValidation } from '@/lib/schemas/quiz'
+import { usePersistentDraft } from '@/hooks/usePersistentDraft'
+import { isEmptyQuizDraft, QUIZ_DRAFT_KEY, QUIZ_DRAFT_VERSION, quizDraftSchema } from '@/lib/quiz/draft'
 import { QuizRadioStep } from './steps/QuizRadioStep'
 import { QuizVoiceTextareaStep } from './steps/QuizVoiceTextareaStep'
 import { QuizAreasStep } from './steps/QuizAreasStep'
@@ -23,14 +25,29 @@ interface QuizFormProps {
 
 export function QuizForm({ onSubmit, onBack, initialData, isAuthenticated = false }: QuizFormProps) {
   const t = useTranslations('quiz')
-  const [currentStep, setCurrentStep] = useState(1)
+  const totalSteps = isAuthenticated ? 7 : 8
+
+  // Answers and step are saved as the person goes (a long form is easy to lose
+  // to a closed tab). Contact data is never saved: it comes from `initialData`
+  // or the last step. Cleared on a successful submit (hooks/quiz/useSubmitQuiz).
+  const { restored, save: saveDraft } = usePersistentDraft(
+    QUIZ_DRAFT_KEY,
+    quizDraftSchema,
+    QUIZ_DRAFT_VERSION,
+    isEmptyQuizDraft
+  )
+  const [currentStep, setCurrentStep] = useState(() => Math.min(restored?.currentStep ?? 1, totalSteps))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<Partial<QuizFormData>>({
     developmentAreas: [],
+    ...restored?.answers,
     ...initialData
   })
 
-  const totalSteps = isAuthenticated ? 7 : 8
+  useEffect(() => {
+    const { name: _name, email: _email, linkedinUrl: _linkedinUrl, ...answers } = formData
+    saveDraft({ currentStep, answers })
+  }, [currentStep, formData, saveDraft])
   const progress = (currentStep / totalSteps) * 100
 
   const updateFormData = useCallback(<K extends keyof QuizFormData>(field: K, value: QuizFormData[K]) => {

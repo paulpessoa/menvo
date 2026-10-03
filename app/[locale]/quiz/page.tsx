@@ -8,7 +8,7 @@ import { QuizForm, QuizFormData } from "@/components/quiz/QuizForm"
 import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-import { quizService } from "@/lib/services/quiz/quiz.service"
+import { useSubmitQuiz } from "@/hooks/quiz/useSubmitQuiz"
 import { trackQuizCompleted } from "@/lib/utils/google-analytics/events"
 
 export default function QuizPage() {
@@ -17,10 +17,11 @@ export default function QuizPage() {
   const { toast } = useToast()
   const t = useTranslations('quiz')
   const { user, profile } = useAuth()
+  const submitQuiz = useSubmitQuiz()
 
   const handleQuizSubmit = async (data: QuizFormData) => {
     try {
-      const res = await quizService.submitQuiz({
+      const res = await submitQuiz.mutateAsync({
         name: data.name,
         email: data.email,
         linkedin_url: data.linkedinUrl || null,

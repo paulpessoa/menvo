@@ -1,474 +1,122 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
-import { useLocale, useTranslations } from "next-intl"
-import {
-    ArrowRight,
-    Check,
-    Link2,
-    Linkedin,
-    Loader2,
-    MessageCircle,
-    Printer,
-    RotateCcw,
-    Send,
-    Sparkles
-} from "lucide-react"
-import { Link } from "@/i18n/routing"
-import { Button } from "@/components/ui/button"
+import { useParams, useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useToast } from "@/hooks/use-toast"
-import { quizService } from "@/lib/services/quiz/quiz.service"
-import { createClient } from "@/lib/utils/supabase/client"
+import { useQuizResult } from "@/hooks/quiz/useQuizResult"
+import { useMentorSlugs } from "@/hooks/quiz/useMentorSlugs"
 import { ShareDiagnosticModal } from "@/components/diagnostic/ShareDiagnosticModal"
-import { MenvoDots } from "@/components/ui/menvo-loader"
-import { resolveMentorSlugsAction } from "@/app/actions/mentors"
+import { SaveAnalysisBanner } from "@/components/quiz/SaveAnalysisBanner"
+import { ResultLoading } from "@/components/quiz/results/ResultLoading"
+import { RetakeNotice } from "@/components/quiz/results/RetakeNotice"
+import { ResultHeader } from "@/components/quiz/results/ResultHeader"
+import { SuggestedMentors } from "@/components/quiz/results/SuggestedMentors"
+import { PRINT_STYLES } from "@/components/quiz/results/ResultSection"
+import {
+  ActionPlan,
+  DevelopmentAreas,
+  FinalMessage,
+  PotentialMentorCta,
+  PracticalAdvice,
+  ResultFooter,
+} from "@/components/quiz/results/ResultSections"
 
-function LoadingScreen({ t }: { t: any }) {
-    const texts = [
-        t("quiz_results.processing_analysis"),
-        "Lendo suas respostas...",
-        "Buscando padrões de desenvolvimento...",
-        "Analisando seu momento de carreira...",
-        "Procurando os mentores ideais...",
-        "Preparando seus próximos passos..."
-    ];
-    const [textIndex, setTextIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTextIndex(prev => (prev + 1) % texts.length);
-        }, 3000);
-        return () => clearInterval(interval);
-    }, [texts.length]);
-
-    return (
-        <div className="flex min-h-[70vh] items-center justify-center bg-gradient-to-b from-accent/60 to-background px-4">
-            <div className="flex flex-col items-center gap-6 text-center">
-                <MenvoDots />
-                <div className="h-16 flex flex-col justify-center">
-                    <p key={textIndex} className="text-xl font-semibold text-primary animate-in fade-in zoom-in duration-500">
-                        {texts[textIndex]}
-                    </p>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-interface AnalysisResult {
-    precisa_refazer?: boolean
-    titulo_personalizado: string
-    resumo_motivador: string
-    mentores_sugeridos: Array<{
-        tipo: string
-        razao: string
-        disponivel: boolean
-        mentor_nome?: string
-    }>
-    conselhos_praticos: string[]
-    proximos_passos: string[]
-    areas_desenvolvimento: string[]
-    mensagem_final: string
-    potencial_mentor?: boolean
-    areas_vida_pessoal?: string[]
-}
-
-interface QuizResponse {
-    id: string
-    ai_analysis: AnalysisResult
-    processed_at: string
-    is_owner?: boolean
-}
-
-// Printing: show only the result (no site header, footer or floating widgets)
-// and drop the tinted background so it prints clean on paper / PDF.
-const PRINT_STYLES = `
-@media print {
-  @page { margin: 20mm; }
-  body * { visibility: hidden; }
-  #quiz-result, #quiz-result * { visibility: visible; }
-  #quiz-result { position: absolute; top: 0; left: 0; right: 0; padding: 0 !important; }
-  body { background: #fff !important; }
-  
-  /* Reset UI elements for a document feel */
-  .rounded-xl, .rounded-2xl, .rounded-lg, .rounded-full { border-radius: 0 !important; }
-  .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }
-  .bg-card, .bg-accent, .bg-muted { background: transparent !important; border: none !important; }
-  .border, .border-border, .border-primary\/20 { border-color: #e5e7eb !important; }
-  
-  /* Ensure text is readable */
-  * { color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .text-muted-foreground { color: #374151 !important; }
-  
-  /* Hide unnecessary elements */
-  .lucide, svg { display: none !important; }
-}
-`
-
-function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
-    return (
-        <section className="break-inside-avoid-page">
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-                <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
-                {action}
-            </div>
-            {children}
-        </section>
-    )
-}
-
+/**
+ * /quiz/results/[id] - the shareable result of a quiz. Public by design: the
+ * link goes to LinkedIn/WhatsApp, so the page only ever holds the analysis.
+ * Data and polling live in `useQuizResult`; this page only composes.
+ */
 export default function QuizResultsPage() {
-    const params = useParams()
-    const { toast } = useToast()
-    const t = useTranslations("quiz")
-    const locale = useLocale()
-    const [loading, setLoading] = useState(true)
-    const [response, setResponse] = useState<QuizResponse | null>(null)
-    const [mentorSlugMap, setMentorSlugMap] = useState<Record<string, string>>({})
-    const [mentorIdMap, setMentorIdMap] = useState<Record<string, string>>({})
-    const [isOwner, setIsOwner] = useState(false)
-    const [isShareModalOpen, setIsShareModalOpen] = useState(false)
-    const [copied, setCopied] = useState(false)
+  const params = useParams()
+  const searchParams = useSearchParams()
+  const { toast } = useToast()
+  const t = useTranslations("quiz")
+  const id = typeof params.id === "string" ? params.id : undefined
 
-    useEffect(() => {
-        if (params.id) {
-            loadResults()
-        }
-    }, [params.id])
+  // Captured once on mount: the results e-mail link carries this so the
+  // "save to account" banner can create an account for that address.
+  const [accountToken] = useState(() => searchParams.get("k"))
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
-    const pageUrl = () => window.location.href.split("?")[0]
+  const { data: result, isError } = useQuizResult(id)
+  const analysis = result?.processed_at ? result.ai_analysis : null
+  const isOwner = result?.is_owner === true
 
-    const handleCopyLink = async () => {
-        try {
-            await navigator.clipboard.writeText(pageUrl())
-            setCopied(true)
-            setTimeout(() => setCopied(false), 2000)
-        } catch {
-            toast({ title: pageUrl() })
-        }
+  const slugs = useMentorSlugs(
+    (analysis?.mentores_sugeridos ?? []).map((m) => m.mentor_nome?.trim()).filter((n): n is string => Boolean(n))
+  )
+
+  // The token proves e-mail receipt, not "safe to share": drop it from the
+  // address bar so it never ends up in a WhatsApp/LinkedIn share link.
+  useEffect(() => {
+    if (accountToken) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete("k")
+      window.history.replaceState(null, "", url.pathname + url.search)
     }
+  }, [accountToken])
 
-    const handleShareWhatsApp = () => {
-        const text = t("quiz_results.whatsapp_message", { url: pageUrl() })
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener")
+  // A result that never arrives (not found, server error, ~4 min timeout) or
+  // arrives unreadable: say so once, and keep the waiting screen.
+  const unreadable = Boolean(result?.processed_at) && !result?.ai_analysis
+  useEffect(() => {
+    if (isError || unreadable) {
+      toast({
+        title: t("quiz_results.error_loading_results_toast_title"),
+        description: t("quiz_results.error_loading_results_toast_description"),
+        variant: "destructive",
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError, unreadable])
 
-    // share-offsite renders the page's Open Graph preview (title + image).
-    const handleShareLinkedIn = () => {
-        window.open(
-            `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl())}`,
-            "_blank",
-            "noopener"
-        )
-    }
+  if (!result || !analysis) return <ResultLoading />
+  if (analysis.precisa_refazer) return <RetakeNotice analysis={analysis} />
 
-    const loadResults = async (attempt = 0) => {
-        if (!params.id) return
-        try {
-            const data = await quizService.getQuizResponseById(params.id as string)
-            if (!data) throw new Error("Quiz response not found")
+  return (
+    <div className="bg-gradient-to-b from-accent/70 via-background to-background print:bg-none">
+      <style>{PRINT_STYLES}</style>
 
-            const res = data as unknown as QuizResponse
+      <article id="quiz-result" className="mx-auto max-w-5xl px-4 pb-16 pt-10 md:pt-14">
+        <ResultHeader analysis={analysis} />
 
-            // Wait for processing if not done yet
-            if (!res.processed_at) {
-                // ~4 min without a result: stop spinning and show the error
-                // toast (e.g. the monthly AI budget is exhausted).
-                if (attempt >= 120) throw new Error("Quiz analysis timed out")
-                // Every ~70s, ask for the analysis again: covers a request
-                // that died mid-analysis (its 2-min claim expires) or a tab
-                // closed right after submitting. The server-side claim makes
-                // a duplicate request a no-op.
-                if (attempt > 0 && attempt % 35 === 0) {
-                    quizService.requestAnalysis(res.id)
-                }
-                setTimeout(() => loadResults(attempt + 1), 2000) // Retry after 2 seconds
-                return
-            }
+        {accountToken && id && (
+          <div className="mt-8 print:hidden">
+            <SaveAnalysisBanner quizId={id} token={accountToken} />
+          </div>
+        )}
 
-            setResponse(res)
-            setIsOwner(res.is_owner === true)
+        <div className="mt-10 space-y-12">
+          {analysis.proximos_passos?.length > 0 && <ActionPlan steps={analysis.proximos_passos} />}
 
-            // Resolve real mentor profile slugs if available
-            const mentorNames = (res.ai_analysis?.mentores_sugeridos || [])
-                .map((m) => m.mentor_nome?.trim())
-                .filter((name): name is string => Boolean(name))
+          {analysis.mentores_sugeridos?.length > 0 && (
+            <SuggestedMentors
+              mentors={analysis.mentores_sugeridos}
+              slugs={slugs}
+              canShare={isOwner}
+              onShare={() => setIsShareModalOpen(true)}
+            />
+          )}
 
-            if (mentorNames.length > 0) {
-                try {
-                    const mentorsFound = await resolveMentorSlugsAction(mentorNames)
-
-                    if (mentorsFound && mentorsFound.length > 0) {
-                        const slugMap: Record<string, string> = {}
-                        const idMap: Record<string, string> = {}
-                        for (const m of mentorsFound) {
-                            if (m.full_name) {
-                                slugMap[m.full_name.toLowerCase()] = m.slug || m.id || ""
-                                idMap[m.full_name.toLowerCase()] = m.id || ""
-                            }
-                        }
-                        setMentorSlugMap(slugMap)
-                        setMentorIdMap(idMap)
-                    }
-                } catch (e) {
-                    console.warn("Could not resolve mentor slugs:", e)
-                }
-            }
-        } catch (error) {
-            console.error("Error loading results:", error)
-            toast({
-                title: t("quiz_results.error_loading_results_toast_title"),
-                description: t("quiz_results.error_loading_results_toast_description"),
-                variant: "destructive"
-            })
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    if (loading || !response) {
-        return <LoadingScreen t={t} />
-    }
-
-    const analysis = response.ai_analysis
-
-    // Answers too vague to analyse: one clear message and one action.
-    if (analysis.precisa_refazer) {
-        return (
-            <div className="bg-gradient-to-b from-accent/60 to-background">
-                <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{analysis.titulo_personalizado}</h1>
-                    <p className="mt-4 text-lg text-muted-foreground">{analysis.resumo_motivador}</p>
-
-                    {analysis.conselhos_praticos?.length > 0 && (
-                        <ul className="mx-auto mt-8 max-w-md space-y-3 text-left">
-                            {analysis.conselhos_praticos.map((tip, index) => (
-                                <li key={index} className="flex items-start gap-3">
-                                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
-                                    <span>{tip}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-
-                    <Button asChild size="lg" className="mt-10 rounded-xl">
-                        <Link href="/quiz">
-                            {t("quiz_results.retake_quiz")}
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
-            </div>
-        )
-    }
-
-    const generatedOn = response.processed_at
-        ? new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(response.processed_at))
-        : null
-
-    const shareButtonClass = "rounded-xl gap-2"
-
-    return (
-        <div className="bg-gradient-to-b from-accent/70 via-background to-background print:bg-none">
-            <style>{PRINT_STYLES}</style>
-
-            <article id="quiz-result" className="mx-auto max-w-5xl px-4 pb-16 pt-10 md:pt-14">
-                {/* Headline */}
-                <header className="border-b pb-8">
-                    <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-                        {t("quiz_results.eyebrow")}
-                    </p>
-                    <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl">
-                        {analysis.titulo_personalizado}
-                    </h1>
-                    <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                        {analysis.resumo_motivador}
-                    </p>
-
-                    <div className="mt-6 flex flex-wrap gap-2 print:hidden">
-                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={handleCopyLink}>
-                            {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
-                            {copied ? t("quiz_results.link_copied") : t("quiz_results.copy_link")}
-                        </Button>
-                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={handleShareWhatsApp}>
-                            <MessageCircle className="h-4 w-4" />
-                            {t("quiz_results.whatsapp")}
-                        </Button>
-                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={handleShareLinkedIn}>
-                            <Linkedin className="h-4 w-4" />
-                            {t("quiz_results.linkedin")}
-                        </Button>
-                        <Button variant="outline" size="sm" className={shareButtonClass} onClick={() => window.print()}>
-                            <Printer className="h-4 w-4" />
-                            {t("quiz_results.print")}
-                        </Button>
-                    </div>
-                </header>
-
-                <div className="mt-10 space-y-12">
-                    {/* Action plan — the core of the result, numbered and first */}
-                    {analysis.proximos_passos?.length > 0 && (
-                        <Section title={t("quiz_results.action_plan")}>
-                            <ol className="space-y-4">
-                                {analysis.proximos_passos.map((step, index) => (
-                                    <li key={index} className="flex gap-4 rounded-2xl border bg-card p-5 break-inside-avoid">
-                                        <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">
-                                            {index + 1}
-                                        </span>
-                                        <p className="pt-1 leading-relaxed">{step}</p>
-                                    </li>
-                                ))}
-                            </ol>
-                        </Section>
-                    )}
-
-                    {/* Suggested mentors */}
-                    {analysis.mentores_sugeridos?.length > 0 && (
-                        <Section
-                            title={t("quiz_results.suggested_mentors")}
-                            action={
-                                isOwner ? (
-                                    <Button size="sm" className="rounded-xl gap-2 print:hidden" onClick={() => setIsShareModalOpen(true)}>
-                                        <Send className="h-4 w-4" />
-                                        {t("quiz_results.share_with_mentor")}
-                                    </Button>
-                                ) : undefined
-                            }
-                        >
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                {analysis.mentores_sugeridos.map((mentor, index) => {
-                                    const name = mentor.mentor_nome?.trim()
-                                    const slug = name ? mentorSlugMap[name.toLowerCase()] : null
-                                    const href = slug
-                                        ? `/mentors/${slug}`
-                                        : name
-                                        ? `/mentors?search=${encodeURIComponent(name)}`
-                                        : "/mentors"
-
-                                    return (
-                                        <Link
-                                            key={index}
-                                            href={href}
-                                            className="group flex flex-col rounded-2xl border bg-card p-5 transition-colors hover:border-primary/60 break-inside-avoid"
-                                        >
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                                                {mentor.tipo}
-                                            </p>
-                                            {name && (
-                                                <p className="mt-2 flex items-center gap-2 text-lg font-bold">
-                                                    {name}
-                                                    {mentor.disponivel && (
-                                                        <span
-                                                            className="h-2 w-2 rounded-full bg-green-500"
-                                                            title={t("quiz_results.available")}
-                                                            aria-label={t("quiz_results.available")}
-                                                        />
-                                                    )}
-                                                </p>
-                                            )}
-                                            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-                                                {mentor.razao}
-                                            </p>
-                                            <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary print:hidden">
-                                                {name ? t("quiz_results.view_profile") : t("quiz_results.find_mentors")}
-                                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                                            </span>
-                                        </Link>
-                                    )
-                                })}
-                            </div>
-                            <Link
-                                href="/mentors"
-                                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary print:hidden"
-                            >
-                                {t("quiz_results.all_mentors")}
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        </Section>
-                    )}
-
-                    {/* Practical advice */}
-                    {analysis.conselhos_praticos?.length > 0 && (
-                        <Section title={t("quiz_results.practical_advice")}>
-                            <ul className="space-y-3 rounded-2xl bg-accent p-6">
-                                {analysis.conselhos_praticos.map((tip, index) => (
-                                    <li key={index} className="flex items-start gap-3 break-inside-avoid">
-                                        <Check className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
-                                        <span className="leading-relaxed">{tip}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </Section>
-                    )}
-
-                    {/* Focus areas */}
-                    {analysis.areas_desenvolvimento?.length > 0 && (
-                        <Section title={t("quiz_results.development_areas")}>
-                            <div className="flex flex-wrap gap-2">
-                                {analysis.areas_desenvolvimento.map((area, index) => (
-                                    <span
-                                        key={index}
-                                        className="rounded-full border border-primary/30 px-3 py-1.5 text-sm font-medium text-foreground"
-                                    >
-                                        {area}
-                                    </span>
-                                ))}
-                            </div>
-                        </Section>
-                    )}
-
-                    {/* Closing message */}
-                    {analysis.mensagem_final && (
-                        <blockquote className="border-l-4 border-primary pl-5 text-lg font-medium leading-relaxed text-foreground break-inside-avoid">
-                            {analysis.mensagem_final}
-                        </blockquote>
-                    )}
-
-                    {/* Potential mentor */}
-                    {analysis.potencial_mentor && (
-                        <div className="flex flex-col gap-4 rounded-2xl bg-primary p-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between print:hidden">
-                            <div>
-                                <p className="text-lg font-bold">{t("quiz_results.final_message_potential_mentor")}</p>
-                                <p className="mt-1 text-sm opacity-90">
-                                    {t("quiz_results.final_message_potential_mentor_description")}
-                                </p>
-                            </div>
-                            <Button asChild variant="secondary" className="rounded-xl shrink-0">
-                                <Link href="/signup">{t("quiz_results.become_mentor")}</Link>
-                            </Button>
-                        </div>
-                    )}
-                </div>
-
-                {/* Footer: AI disclaimer + retake */}
-                <footer className="mt-14 border-t pt-6 text-xs leading-relaxed text-muted-foreground">
-                    <p className="flex items-start gap-2">
-                        <Sparkles className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-                        <span>
-                            {t("quiz_results.ai_disclaimer")}
-                            {generatedOn && <> · {t("quiz_results.generated_on", { date: generatedOn })}</>}
-                        </span>
-                    </p>
-                    <Link
-                        href="/quiz"
-                        className="mt-3 inline-flex items-center gap-1.5 font-medium hover:text-primary print:hidden"
-                    >
-                        <RotateCcw className="h-3.5 w-3.5" />
-                        {t("quiz_results.retake_link")}
-                    </Link>
-                </footer>
-            </article>
-
-            {isOwner && (
-                <ShareDiagnosticModal
-                    isOpen={isShareModalOpen}
-                    onClose={() => setIsShareModalOpen(false)}
-                    quizResponseId={response.id}
-                    suggestedMentors={analysis.mentores_sugeridos}
-                    mentorIdMap={mentorIdMap}
-                />
-            )}
+          {analysis.conselhos_praticos?.length > 0 && <PracticalAdvice tips={analysis.conselhos_praticos} />}
+          {analysis.areas_desenvolvimento?.length > 0 && <DevelopmentAreas areas={analysis.areas_desenvolvimento} />}
+          {analysis.mensagem_final && <FinalMessage message={analysis.mensagem_final} />}
+          {analysis.potencial_mentor && <PotentialMentorCta />}
         </div>
-    )
+
+        <ResultFooter processedAt={result.processed_at} />
+      </article>
+
+      {isOwner && (
+        <ShareDiagnosticModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          quizResponseId={result.id}
+          suggestedMentors={analysis.mentores_sugeridos}
+          mentorIdMap={slugs.idByName}
+        />
+      )}
+    </div>
+  )
 }

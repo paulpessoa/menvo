@@ -50,9 +50,11 @@ chega ao dono da linha. O dano é spam limitado: o conteúdo é o resultado do
 próprio dono, o limite é 3 envios por 10 minutos por `id` (em memória, por
 instância) e o reenvio só funciona se a análise já está pronta.
 
-Aceito por ora porque a alternativa (exigir o token `k`) quebra o botão
-"reenviar" na página pública de resultado, que não guarda o token de propósito.
-**Reavaliar** se aparecer abuso: a saída é limitar por `id` no banco, não em memória.
+**Nenhuma tela chama esta rota hoje:** o botão "reenviar" saiu da página de
+resultado no redesign de 2026-09-30 (commit `7c1d7fa0`). Então o risco existe só
+por a rota estar exposta. A saída mais barata é remover a rota; se um botão
+voltar, exigir o token `k` (como no `account`) em vez de aceitar só o `id`.
+**Reavaliar** se aparecer abuso: limitar por `id` no banco, não em memória.
 
 ## 4. Alternativas consideradas
 
