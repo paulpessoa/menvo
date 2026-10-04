@@ -30,7 +30,8 @@ const GROUPS: { title: string; sections: AdminSection[] }[] = [
     sections: [
       { title: "Retenção LGPD", description: "Fila de exclusão de contas e isenções", href: "/dashboard/admin/retention" },
       { title: "E-mails transacionais", description: "Prévia dos templates e envio de teste", href: "/dashboard/admin/emails" },
-      { title: "Feature flags", description: "Ligar e desligar funcionalidades", href: "/dashboard/admin/feature-flags" }
+      { title: "Feature flags", description: "Ligar e desligar funcionalidades", href: "/dashboard/admin/feature-flags" },
+      { title: "Logs de atividade", description: "O que os usuários atualizam, com busca", href: "/dashboard/admin/logs" }
     ]
   }
 ]
