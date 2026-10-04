@@ -13,7 +13,7 @@ export function HeroActions() {
   return (
     <div className="flex flex-col gap-3 w-full max-w-sm mx-auto lg:flex-row lg:max-w-none lg:mx-0">
       <Button size="lg" asChild className="w-full lg:w-auto">
-        <Link href="/mentors">{t("findMentor")}</Link>
+        <Link href="/quiz">{t("takeQuiz")}</Link>
       </Button>
       {!isMentor && (
         <Button size="lg" variant="outline" asChild className="w-full lg:w-auto">

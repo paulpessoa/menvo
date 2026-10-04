@@ -7,10 +7,8 @@ import { Calendar, MessageSquare, Search } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import { preload } from "react-dom"
 
-import { QuizDiscoverySection } from "@/components/QuizDiscoverySection"
 import { MentorCard } from "@/components/mentors/MentorCard"
 import { DeferredHeroActions } from "@/components/home/DeferredHeroActions"
-import { DeferredFinalCTA } from "@/components/home/DeferredFinalCTA"
 import { getFeaturedMentors } from "@/lib/services/mentors/home-highlights"
 
 const HERO_POSTER = "/images/ai-demo-poster.webp"
@@ -111,7 +109,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="flex justify-center mt-12">
-            <Button variant="outline" asChild>
+            <Button asChild>
               <Link href="/how-it-works">
                 {t("howItWorks.learnMore")}
               </Link>
@@ -145,11 +143,6 @@ export default async function Home() {
           </div>
         </section>
       )}
-
-      {/* AI Quiz Discovery Section */}
-      <QuizDiscoverySection />
-
-      <DeferredFinalCTA />
     </div>
   )
 }

@@ -81,18 +81,9 @@
     },
     "hero": {
       "title": "Conéctate con Mentores Voluntarios",
-      "description": "Encuentra orientación, comparte experiencias y crece con nosotros. Nuestra plataforma te conecta con mentores voluntarios para sesiones de mentoría gratuitas.",
-      "findMentor": "Encontrar un Mentor",
+      "description": "Encuentra orientación, comparte experiencias y crece con nosotros.",
+      "takeQuiz": "Hacer Quiz de Carrera",
       "becomeMentor": "Conviértete en Mentor"
-    },
-    "quiz": {
-      "badge": "Orientación Inteligente",
-      "title": "¿Dudas sobre qué mentor elegir?",
-      "subtitle": "Haz nuestro Quiz de Carrera con IA en solo 2 minutos. Analizamos tus metas y te recomendamos los mentores más compatibles con tu momento profesional.",
-      "feature1": "Diagnóstico de carrera personalizado",
-      "feature2": "Recomendaciones compatibles en tiempo real",
-      "feature3": "100% gratuito y sin compromiso",
-      "ctaButton": "Hacer Quiz de Carrera"
     },
     "howItWorks": {
       "title": "Cómo Funciona",
@@ -115,14 +106,6 @@
       "title": "Mentores Destacados",
       "description": "Conoce a algunos de nuestros dedicados mentores voluntarios",
       "viewAll": "Ver Todos los Mentores"
-    },
-    "cta": {
-      "title": "¿Listo para empezar?",
-      "description": "Únete hoy y conéctate con personas que pueden ayudarte a alcanzar tus objetivos",
-      "signup": "Regístrate Ahora",
-      "titleAuthenticated": "Continúa tu camino",
-      "descriptionAuthenticated": "Sigue tus sesiones, mensajes y próximos pasos en tu panel.",
-      "dashboard": "Ir al panel"
     }
   },
   "about": {
