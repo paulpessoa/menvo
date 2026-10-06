@@ -7,6 +7,7 @@
 import { OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi"
 import { registry } from "./registry"
 import "./paths/quiz"
+import "./paths/mentors"
 
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
@@ -17,6 +18,9 @@ export function buildOpenApiDocument() {
       description:
         "Gerado dos schemas Zod. Domínios fora desta lista ainda não migraram para o padrão (ver `pendingDomains` em document.test.ts).",
     },
-    tags: [{ name: "quiz", description: "Diagnóstico de carreira (quiz) e análise por IA" }],
+    tags: [
+      { name: "quiz", description: "Diagnóstico de carreira (quiz) e análise por IA" },
+      { name: "mentors", description: "Agenda e perfil público de mentores" },
+    ],
   })
 }
