@@ -54,7 +54,7 @@ describe('GET /auth/callback', () => {
   describe('completing the profile name after a code login (Google / LinkedIn)', () => {
     const user = {
       id: 'user-1',
-      user_metadata: { name: 'Polianna Chiappetta', given_name: 'Polianna', family_name: 'Chiappetta' }
+      user_metadata: { name: 'Maria Silva', given_name: 'Maria', family_name: 'Silva' }
     }
 
     function mockSession({ exchangeError = null as any } = {}) {

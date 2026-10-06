@@ -82,7 +82,7 @@ describe("AdminAppointmentsManager", () => {
     fetchMock.mockImplementation(() =>
       jsonResponse(
         listResponse([
-          appointment({ mentee: person("Usuário Teste", "polianna@example.com", true) }),
+          appointment({ mentee: person("Usuário Teste", "usuario.teste@example.com", true) }),
           appointment({
             id: "22222222-2222-4222-8222-222222222222",
             reason: null,
@@ -95,7 +95,7 @@ describe("AdminAppointmentsManager", () => {
     render(<AdminAppointmentsManager />)
 
     expect(await screen.findAllByText("Bianca Dias")).toHaveLength(2)
-    expect(screen.getByText("polianna@example.com")).toBeInTheDocument()
+    expect(screen.getByText("usuario.teste@example.com")).toBeInTheDocument()
     expect(screen.getByText("Perfil incompleto")).toBeInTheDocument()
     expect(screen.getByText("Sem resposta há 3 dias")).toBeInTheDocument()
     expect(screen.getByText("Link do e-mail expirado")).toBeInTheDocument()

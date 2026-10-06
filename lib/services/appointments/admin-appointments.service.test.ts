@@ -123,7 +123,7 @@ describe("isPlaceholderName", () => {
     value => expect(isPlaceholderName(value as any)).toBe(true)
   )
 
-  it.each(["Maria Silva", "Polianna Chiappetta", "Teste Silva Souza"])("keeps %p", value =>
+  it.each(["Maria Silva", "Ana Souza", "Teste Silva Souza"])("keeps %p", value =>
     expect(isPlaceholderName(value)).toBe(false)
   )
 })

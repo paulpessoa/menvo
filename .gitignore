@@ -80,3 +80,6 @@ test.mjs
 /playwright-report/
 /test-results/
 /blob-report/
+
+# local git worktrees
+.worktrees/
