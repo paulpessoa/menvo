@@ -97,3 +97,30 @@ fallback. A sugestão é resolver isso **antes** de mover código.
 | D5 | Unificar os quatro caminhos de leitura num repository + service de servidor, mantendo as server actions como "rotas" da página? | Sim. É o mesmo desenho do quiz |
 
 Próximo modo sugerido: `modo plan mentors`, depois das respostas de D1 a D5.
+
+---
+
+## Execução (2026-10-06)
+
+Decisões D1 a D5 aprovadas pelo Paul. Feito nesta branch:
+
+| Camada | O que mudou |
+|---|---|
+| 1 | `20261008000000_mentor_availability_rls_and_rpc.sql`: tabela versionada, políticas antigas trocadas por leitura pública (aprovado + público), leitura e escrita do dono, e a RPC transacional `set_mentor_availability`. `20261008000100_drop_mentor_visibility_settings.sql` (D1) |
+| 3 | `lib/domain/mentors/availability.entity.ts` e `mentor.entity.ts` (campos públicos explícitos, `isMentorId`, `displayName`) |
+| 4 | `lib/schemas/availability.ts` (query e saída), `lib/schemas/mentors.ts` |
+| 5 | `mentor-availability.repository.ts`, `mentors.repository.ts` |
+| 7 | `mentor-availability.service.ts` e `mentor-profile.service.ts`, cada um com sua composição. Nenhum usa `service_role` |
+| 8 | `availability` e `[slug]/approach` finas; `lookup`, `visibility` e `settings` removidas (D1) |
+| 9 | `lib/openapi/paths/mentors.ts`; `mentors` saiu de `pendingDomains` |
+| 11 | Páginas `mentors/id` e `mentors/id/schedule` removidas (D4); `[slug]/page.tsx` usa o service |
+| 12 | pgTAP `supabase/tests/mentor_availability.test.sql` (10 casos) e testes de entity, repository, service e rotas |
+| 14 | `getMentorAvailability` (tool do agente) usa o service de perfil com o client de quem chamou |
+
+**Ainda pendente (D5, segunda etapa):** a busca do catálogo. `mentors.service.ts`
+(navegador, 590 linhas) continua usado por `mentors/page.tsx` (972 linhas),
+`community/page.tsx`, `appointments/book/[mentorId]` e `dashboard/mentee`, e
+`app/actions/mentors.ts` ainda consulta `mentors_view` direto em
+`searchCatalogAction` e `getCatalogFilterOptionsAction`. Essa etapa mexe em
+camadas 10 e 11 (query keys e páginas grandes) e merece um PR próprio, com
+teste E2E do catálogo usando dados reais.
