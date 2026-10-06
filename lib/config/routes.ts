@@ -19,7 +19,6 @@ export const publicRoutes = [
 export const protectedRoutes = [
   "/dashboard",
   "/profile",
-  "/mentors/id/schedule",
   "/messages",
   "/assistant",
   "/calendar",
@@ -36,7 +35,6 @@ export const adminRoutes = ["/dashboard/admin"]
 
 export const onboardingRequiredRoutes = [
   "/dashboard",
-  "/mentors/id/schedule",
   "/messages",
   "/calendar",
   "/mentorship",

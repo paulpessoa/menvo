@@ -42,9 +42,6 @@
 |--------|------|------|-----------|
 | GET | `/api/mentors/availability` | 🔒 Session | Lista slots de disponibilidade do mentor logado |
 | POST | `/api/mentors/availability` | 🔒 Session | Salva/atualiza slots de disponibilidade |
-| GET | `/api/mentors/lookup` | 🌐 Pública | Busca mentores verificados por slug/nome |
-| GET | `/api/mentors/settings` | 🔒 Mentor | Configurações do mentor (visibilidade, etc.) |
-| PUT | `/api/mentors/visibility` | 🔒 Mentor | Atualiza visibilidade do mentor no catálogo |
 | GET | `/api/mentors/[slug]/approach` | 🌐 Pública | Retorna a abordagem/estilo do mentor |
 
 ---
