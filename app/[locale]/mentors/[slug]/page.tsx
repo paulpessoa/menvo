@@ -1,7 +1,14 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import MentorProfileClient, { type MentorProfile } from "./MentorProfileClient"
-import { mentorPublicService } from "@/lib/services/mentors/mentor-public.service"
+import { createClient } from "@/lib/utils/supabase/server"
+import { buildMentorProfileService } from "@/lib/services/mentors/mentor-profile.composition"
+
+/** Perfil público + agenda, ou null se o diretório não mostra este mentor. */
+async function loadMentor(slug: string) {
+  const result = await buildMentorProfileService(await createClient()).getPublicProfile(slug)
+  return result.kind === "ok" ? { mentor: result.mentor, availability: result.availability } : null
+}
 
 interface PageProps {
   params: Promise<{
@@ -15,7 +22,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   try {
     const { slug } = await params
-    const data = await mentorPublicService.getMentorBySlugOrId(slug)
+    const data = await loadMentor(slug)
 
     if (!data) {
       const title = "Mentor não encontrado | Menvo"
@@ -117,7 +124,7 @@ export default async function MentorProfilePage({ params }: PageProps) {
   let data = null
   try {
     const { slug } = await params
-    data = await mentorPublicService.getMentorBySlugOrId(slug)
+    data = await loadMentor(slug)
   } catch (error) {
     console.error("[mentors/[slug]] Erro ao carregar página do mentor:", error)
     notFound()

@@ -1,7 +1,9 @@
 import { z } from "zod"
 import { SupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/lib/types/supabase"
 import { mentorService } from "@/lib/services/mentors/mentors.service"
-import { mentorPublicService } from "@/lib/services/mentors/mentor-public.service"
+import { buildMentorProfileService } from "@/lib/services/mentors/mentor-profile.composition"
+import { displayName } from "@/lib/domain/mentors/mentor.entity"
 import { computeAvailableSlots } from "@/lib/services/appointments/availability.service"
 import { kbService } from "@/lib/services/kb/kb.service"
 
@@ -123,15 +125,16 @@ export async function getMentorAvailability(
   supabase: SupabaseClient,
   input: z.infer<typeof getMentorAvailabilityInput>
 ): Promise<MentorAvailability | null> {
-  const mentorData = await mentorPublicService.getMentorBySlugOrId(input.slug)
-  
-  if (!mentorData || !mentorData.mentor) {
+  // Usa o client de quem chamou (agente/MCP), sob RLS, como as outras tools.
+  const mentor = await buildMentorProfileService(supabase as SupabaseClient<Database>).findPublic(input.slug)
+
+  if (!mentor?.id) {
     return null
   }
 
-  const mentorId = mentorData.mentor.id
-  const mentorName = `${mentorData.mentor.first_name} ${mentorData.mentor.last_name}`.trim()
-  const mentorSlug = mentorData.mentor.slug || mentorId
+  const mentorId = mentor.id
+  const mentorName = displayName(mentor)
+  const mentorSlug = mentor.slug || mentorId
 
   const startDate = new Date()
   const endDate = new Date(Date.now() + input.days * 24 * 60 * 60 * 1000)

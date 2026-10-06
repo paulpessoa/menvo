@@ -5,7 +5,7 @@ import { mentorService } from "@/lib/services/mentors/mentors.service"
 jest.mock("@/lib/services/mentors/mentors.service", () => ({
   mentorService: { searchCatalog: jest.fn() }
 }))
-jest.mock("@/lib/services/mentors/mentor-public.service", () => ({ mentorPublicService: {} }))
+jest.mock("@/lib/services/mentors/mentor-profile.composition", () => ({ buildMentorProfileService: jest.fn() }))
 jest.mock("@/lib/services/appointments/availability.service", () => ({ computeAvailableSlots: jest.fn() }))
 
 const searchCatalog = mentorService.searchCatalog as jest.Mock
